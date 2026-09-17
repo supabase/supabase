@@ -93,6 +93,7 @@ describe('getAIDetails', () => {
       planId: 'pro',
       region: 'us-east-1',
       isSensitive: false,
+      isRestrictedByHipaa: false,
     })
   })
 
@@ -249,6 +250,7 @@ describe('getAIDetails', () => {
 
       expect(result.aiOptInLevel).toBe('disabled')
       expect(result.hasHipaaAddon).toBe(true)
+      expect(result.isRestrictedByHipaa).toBe(true)
     })
 
     it('disables the opt-in level when project sensitivity is unknown', async () => {

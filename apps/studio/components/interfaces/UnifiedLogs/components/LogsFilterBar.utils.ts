@@ -31,6 +31,16 @@ export const filterPropertySchema = z.object({
   operators: z.array(filterOperatorSchema).optional(),
 })
 
+const COMPARISON_OPERATORS: FilterProperty['operators'] = [
+  { label: 'Equals', value: '=', group: 'comparison' },
+  { label: 'Not equal', value: '<>', group: 'comparison' },
+]
+
+const PATTERN_OPERATORS: FilterProperty['operators'] = [
+  { label: 'iLike', value: '~~*', group: 'pattern' },
+  { label: 'Not iLike', value: '!~~*', group: 'pattern' },
+]
+
 export const buildFilterProperties = ({
   fields,
   userOptions,
@@ -41,24 +51,23 @@ export const buildFilterProperties = ({
   return [
     ...fields
       .filter((field) => field.type !== 'timerange')
-      .map(
-        (field): FilterProperty => ({
+      .map((field): FilterProperty => {
+        // event_message only supports substring matching (it's free text); pathname
+        // supports both exact segment matching and substring matching.
+        const operators =
+          field.value === 'event_message'
+            ? PATTERN_OPERATORS
+            : field.value === 'pathname'
+              ? [...COMPARISON_OPERATORS, ...PATTERN_OPERATORS]
+              : COMPARISON_OPERATORS
+        return {
           label: field.label,
           name: field.value,
           type: 'string',
           options: field.options ?? [],
-          operators:
-            field.value === 'event_message'
-              ? [
-                  { label: 'iLike', value: '~~*', group: 'pattern' },
-                  { label: 'Not iLike', value: '!~~*', group: 'pattern' },
-                ]
-              : [
-                  { label: 'Equals', value: '=', group: 'comparison' },
-                  { label: 'Not equal', value: '<>', group: 'comparison' },
-                ],
-        })
-      ),
+          operators,
+        }
+      }),
     {
       label: 'User',
       name: USER_PROPERTY,

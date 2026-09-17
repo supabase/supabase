@@ -8,6 +8,7 @@ import {
   getEventMessageDisplay,
   getRawLogData,
   parseMultigresEventMessage,
+  wrapIlikePattern,
 } from './UnifiedLogs.utils'
 
 describe('buildUnifiedLogsUrl', () => {
@@ -258,5 +259,20 @@ describe('getComputeLogsAvailability', () => {
       preserveComputeFilter: false,
       readyToSyncFilters: true,
     })
+  })
+})
+
+describe('wrapIlikePattern', () => {
+  it('wraps a bare value in %...% for a contains match', () => {
+    expect(wrapIlikePattern('foo')).toBe('%foo%')
+  })
+
+  it('leaves the value untouched when it already contains a % wildcard', () => {
+    expect(wrapIlikePattern('foo%')).toBe('foo%')
+    expect(wrapIlikePattern('%foo')).toBe('%foo')
+  })
+
+  it('leaves the value untouched when it already contains a _ wildcard', () => {
+    expect(wrapIlikePattern('fo_bar')).toBe('fo_bar')
   })
 })
