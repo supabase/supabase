@@ -34,7 +34,6 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
 const USER_BOUND_REQUIRED_PROJECTS: OAuthAppGrantConfig = {
   bind_to_authorizing_user: true,
   project_selection: 'required',
-  is_dynamic_client: false,
 }
 
 const VERCEL_SCOPE_GROUPS: OAuthScopeGroup[] = [
@@ -52,10 +51,13 @@ const VERCEL_SCOPE_GROUPS: OAuthScopeGroup[] = [
 
 const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
   client_id: 'vercel',
-  app_name: 'Vercel',
-  publisher: 'Vercel Inc.',
+  name: 'Vercel',
+  website: 'https://vercel.com',
+  domain: 'vercel.com',
   is_verified: true,
   redirect_uri: 'https://vercel.com/api/integrations/supabase/callback',
+  registration_type: 'manual',
+  expires_at: '2026-09-17T12:00:00.000Z',
   scope_groups: VERCEL_SCOPE_GROUPS,
   reuses_grant_across_workspaces: false,
   suggested_project_refs: [],
@@ -107,23 +109,27 @@ const VERCEL_RECONSENT_ALL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
 const DYNAMIC_MCP_CLIENT_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
   client_id: 'dynamic-mcp-client',
-  app_name: 'Northwind MCP',
-  publisher: 'Registered dynamically',
+  name: 'Northwind MCP',
+  website: 'https://mcp.northwind.example',
+  domain: 'mcp.northwind.example',
   is_verified: false,
   redirect_uri: 'https://mcp.northwind.example/callback',
+  registration_type: 'dynamic',
   grant_config: {
     bind_to_authorizing_user: false,
     project_selection: 'off',
-    is_dynamic_client: true,
   },
 }
 
 const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
   client_id: 'kemal-bot',
-  app_name: 'kemal-bot',
-  publisher: 'kemal-bot',
+  name: 'kemal-bot',
+  website: 'https://kemal.lol',
+  domain: 'kemal.lol',
   is_verified: false,
   redirect_uri: 'https://kemal.lol/hollerback',
+  registration_type: 'manual',
+  expires_at: '2026-09-17T12:00:00.000Z',
   scope_groups: [
     {
       name: 'Project Settings',
@@ -136,7 +142,6 @@ const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
   grant_config: {
     bind_to_authorizing_user: false,
     project_selection: 'required',
-    is_dynamic_client: false,
   },
   existing_grant: null,
 }
@@ -151,7 +156,6 @@ const KEMAL_BOT_ORG_WIDE_REQUEST: OAuthAppsAuthorizeRequest = {
   grant_config: {
     bind_to_authorizing_user: false,
     project_selection: 'off',
-    is_dynamic_client: false,
   },
 }
 
