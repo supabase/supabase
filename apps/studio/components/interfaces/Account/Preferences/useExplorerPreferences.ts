@@ -16,7 +16,7 @@ const defaultPreferences = preferencesSchema.parse({})
 
 export const useExplorerPreferences = () => {
   const { profile } = useProfile()
-  const accountId = profile?.id.toString() ?? 'self-hosted'
+  const accountId = IS_PLATFORM && profile ? profile.id.toString() : 'self-hosted'
   const [stored, setStored, { isSuccess, isError }] = useLocalStorageQuery<unknown>(
     LOCAL_STORAGE_KEYS.EXPLORER_PREFERENCES,
     {}

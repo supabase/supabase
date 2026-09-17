@@ -29,7 +29,7 @@ const ExplorerHomeLoading = () => (
     aria-label="Opening Explorer"
     className="flex h-full items-center justify-center bg-surface-100"
   >
-    <Loader2 size={18} className="animate-spin text-foreground-muted" />
+    <Loader2 size={18} className="animate-spin motion-reduce:animate-none text-foreground-muted" />
   </div>
 )
 

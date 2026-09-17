@@ -14,6 +14,12 @@ const { createQuery, project } = vi.hoisted(() => ({
   project: { ref: 'default' as string | undefined },
 }))
 
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  IS_PLATFORM: true,
+  useParams: () => ({ ref: 'default' }),
+}))
+
 vi.mock('../hooks', () => ({
   useCreateQuery: () => ({ createQuery, projectRef: project.ref }),
   useCreateNotebook: () => ({ createNotebook: vi.fn() }),
