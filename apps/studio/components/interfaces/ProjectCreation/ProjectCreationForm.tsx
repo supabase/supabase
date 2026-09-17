@@ -40,13 +40,9 @@ import {
 import { ProjectCreationFooter } from './ProjectCreationFooter'
 import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
-import {
-  getRegionRestrictionMessage,
-  parseRestrictedRegions,
-  resolveRegionRestriction,
-  RESTRICTED_REGIONS_FLAG_KEY,
-} from './RegionSelector.utils'
+import { getRegionRestrictionMessage } from './RegionSelector.utils'
 import { SecurityOptions } from './SecurityOptions'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import {
   GitHubRepositoryField,
@@ -143,11 +139,7 @@ export const ProjectCreationForm = ({
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
-  const restrictedRegionsFlag = useFlag<string | boolean>(RESTRICTED_REGIONS_FLAG_KEY)
-  const restrictedRegions = useMemo(
-    () => parseRestrictedRegions(restrictedRegionsFlag),
-    [restrictedRegionsFlag]
-  )
+  const { getRegionRestriction } = useRegionRestriction()
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -489,12 +481,9 @@ export const ProjectCreationForm = ({
       : Object.values(getAvailableRegions(cloudProvider as CloudProvider)).find(
           (region) => region.displayName === dbRegion
         )
-    const selectedRegionCode = selectedSpecificRegion?.code ?? selectedStaticRegion?.code
-    const selectedRegionRestriction = resolveRegionRestriction({
-      platformStatus: selectedSpecificRegion?.status,
-      flagRestriction:
-        selectedRegionCode !== undefined ? restrictedRegions[selectedRegionCode] : undefined,
-    })
+    const selectedRegionRestriction = getRegionRestriction(
+      selectedSpecificRegion ?? selectedStaticRegion
+    )
     if (selectedRegionRestriction !== undefined) {
       setError(
         'dbRegion',

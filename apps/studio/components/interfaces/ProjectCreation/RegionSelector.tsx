@@ -1,6 +1,6 @@
-import { useFeatureFlags, useFlag, useParams } from 'common'
+import { useFeatureFlags, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -30,13 +30,8 @@ import {
   getAvailableRegions,
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
-import {
-  getRegionRestrictionCopy,
-  parseRestrictedRegions,
-  resolveRegionRestriction,
-  RESTRICTED_REGIONS_FLAG_KEY,
-  SELECT_DIFFERENT_REGION,
-} from './RegionSelector.utils'
+import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
@@ -92,11 +87,7 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
-  const restrictedRegionsFlag = useFlag<string | boolean>(RESTRICTED_REGIONS_FLAG_KEY)
-  const restrictedRegions = useMemo(
-    () => parseRestrictedRegions(restrictedRegionsFlag),
-    [restrictedRegionsFlag]
-  )
+  const { getRegionRestriction } = useRegionRestriction()
 
   const { data: statusData } = useIncidentStatusQuery()
   const { incidents = [] } = statusData ?? {}
@@ -146,10 +137,7 @@ export const RegionSelector = ({
   )
   const regionOptionsWithRestriction = regionOptions.map((region) => ({
     ...region,
-    restriction: resolveRegionRestriction({
-      platformStatus: region.status,
-      flagRestriction: restrictedRegions[region.code],
-    }),
+    restriction: getRegionRestriction(region),
   }))
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
 
