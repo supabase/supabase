@@ -17,6 +17,7 @@ export const getTools = async ({
   connectionString,
   authorization,
   aiOptInLevel,
+  isRestrictedByHipaa,
   accessToken,
   baseUrl,
   supportMode,
@@ -27,6 +28,8 @@ export const getTools = async ({
   connectionString: string
   authorization?: string
   aiOptInLevel: AiOptInLevel
+  // Only changes the blocked-tool wording.
+  isRestrictedByHipaa: boolean
   accessToken?: string
   baseUrl?: string
   supportMode?: boolean
@@ -63,6 +66,7 @@ export const getTools = async ({
         accessToken,
         projectRef,
         aiOptInLevel,
+        isRestrictedByHipaa,
         signal,
       })
     } catch (error) {
@@ -91,7 +95,11 @@ export const getTools = async ({
 
   // Filter all tools based on the (potentially modified) AI opt-in level
   const toolsWithSupport = supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
-  const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel)
+  const filteredTools: ToolSet = filterToolsByOptInLevel(
+    toolsWithSupport,
+    aiOptInLevel,
+    isRestrictedByHipaa
+  )
 
   return filteredTools
 }

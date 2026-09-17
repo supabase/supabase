@@ -534,7 +534,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   return (
     <>
-      <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
+      <Shell className={className}>
         <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
             <CodeSquare size={16} strokeWidth={2} />

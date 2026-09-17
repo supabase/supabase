@@ -10,7 +10,7 @@ import {
 
 const datum = (attributes: Record<string, unknown>) => ({
   id: 'embed',
-  type: 'project_worker',
+  type: 'project_compute_instance',
   attributes: {
     build_state: 'active',
     secret_generation: '1',

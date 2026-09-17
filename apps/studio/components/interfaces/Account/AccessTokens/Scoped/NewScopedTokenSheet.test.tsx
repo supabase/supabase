@@ -13,8 +13,8 @@ import { addAPIMock } from '@/tests/lib/msw'
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
-type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse']
-type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse']
+type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse_Output']
+type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse_Output']
 
 const mockUseReducedMotion = vi.fn(() => false)
 vi.mock('common', async (importOriginal) => {

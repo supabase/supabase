@@ -450,16 +450,20 @@ export const ExplorerNotebookTab = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
-          <ExplorerToolbarAction
+          <ButtonTooltip
+            type="button"
+            variant="default"
+            size="tiny"
+            className="ml-1"
             aria-label="Run notebook"
             icon={<Play size={16} strokeWidth={2} />}
-            tooltip="Run notebook"
+            tooltip={{ content: { side: 'bottom', text: 'Run notebook' } }}
             loading={isRunningNotebook}
             disabled={queryCellIds.length === 0}
             onClick={handleRunNotebook}
           >
             Run
-          </ExplorerToolbarAction>
+          </ButtonTooltip>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 

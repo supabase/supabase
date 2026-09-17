@@ -7,6 +7,7 @@ import {
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -179,11 +180,20 @@ const translateFilter = (
       // Postgres SQLSTATE for postgres rows. Inline STATUS_EXPR so e.g.
       // filtering on '00000' picks up postgres success rows.
       return safeSql`(${STATUS_EXPR}) ${inOp} ${inList(values)}`
-    case 'pathname':
+    case 'pathname': {
+      if (operator === '~~*' || operator === '!~~*') {
+        const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
+        const join = operator === '!~~*' ? ' AND ' : ' OR '
+        return safeSql`(${joinSqlFragments(
+          values.map((v) => safeSql`${ATTR.path} ${op} ${lit(wrapIlikePattern(v))}`),
+          join
+        )})`
+      }
       return safeSql`(${joinSqlFragments(
         values.map((v) => safeSql`${ATTR.path} ${likeOp} ${lit('%' + v + '%')}`),
         joinAndOr
       )})`
+    }
     case 'host':
       // Best-effort: use full request URL since `host` isn't a top-level field.
       return safeSql`(${joinSqlFragments(
@@ -199,9 +209,8 @@ const translateFilter = (
       if (operator === '~~*' || operator === '!~~*') {
         const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
         const join = operator === '!~~*' ? ' AND ' : ' OR '
-        const pattern = (v: string) => (v.includes('%') ? v : '%' + v + '%')
         return safeSql`(${joinSqlFragments(
-          values.map((v) => safeSql`event_message ${op} ${lit(pattern(v))}`),
+          values.map((v) => safeSql`event_message ${op} ${lit(wrapIlikePattern(v))}`),
           join
         )})`
       }
@@ -348,14 +357,8 @@ const userFilterValue = (search: QuerySearchParamsType): string =>
   typeof search.user === 'string' ? search.user.trim() : ''
 
 /**
- * Cross-cutting "attributable to one user" condition. Only the two sources that can
- * be positively tied to a user are eligible, each with its own match:
- *   - auth_logs: structured identity (`auth_event.actor_id`)
- *   - postgres_logs: the identifier appears verbatim in the error text (e.g. a 23502
- *     failing row echoing the id column).
- * edge_logs / storage_logs / realtime_logs carry no per-user field and can't satisfy
- * either branch, so they're auto-excluded while the filter is active — never guessed
- * at via IP or timestamp proximity.
+ * Matches structured user identifiers in Auth events and API Gateway JWT subjects.
+ * Sources without these fields cannot match the user filter.
  */
 const userAttributionCondition = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
   const value = userFilterValue(search)
@@ -372,12 +375,10 @@ const USER_ATTRIBUTABLE_SOURCES = new Set([LOG_TYPE_TO_SOURCE.auth, LOG_TYPE_TO_
 
 /**
  * True when the user filter is active but an explicit log_type filter restricts the
- * view to source(s) that can never satisfy `userAttributionCondition` (e.g. `edge`) —
+ * view to source(s) that can never satisfy `userAttributionCondition` (e.g. `postgres`) —
  * the combination is guaranteed to match zero rows. Consumed by the UI to show a
  * specific empty state instead of the generic "No results found".
  *
- * [Joshen] Basically filtering by user only works on Auth and Postgres logs atm
- * Refer to userAttributeCondition above
  */
 export const isUserFilterUnreachable = (search: QuerySearchParamsType): boolean => {
   if (!userFilterValue(search)) return false

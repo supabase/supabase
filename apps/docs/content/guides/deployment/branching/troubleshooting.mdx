@@ -69,6 +69,12 @@ supabase db reset
 # Navigate to Branches > Your Branch > View Logs
 ```
 
+### Permission denied errors on a new branch
+
+If the Data API returns `42501` permission denied errors on a branch for tables or functions that work on your base project, the branch is missing default privileges on the `public` schema. New branches are created without them, and only your migrations can grant them back.
+
+Check whether your initial migration contains `alter default privileges ... grant` statements for the `public` schema. If it doesn't, see [Default privileges on branches](/docs/guides/deployment/branching/working-with-branches#default-privileges-on-branches) for how to add them, or [grant access explicitly](/docs/guides/api/securing-your-api#grant-access-explicitly) in a migration.
+
 ### Migration order problems
 
 Migrations must run in the correct order. Common issues:
