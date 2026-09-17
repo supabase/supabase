@@ -5,6 +5,7 @@ import {
   getConnectionsAttentionCopy,
   getConnectionStatusUi,
   getConnectionTitle,
+  isIamRoleArn,
   type PrivateLinkConnectionStatus,
 } from './AWSPrivateLink.utils'
 
@@ -33,11 +34,16 @@ describe('getConnectionTitle', () => {
       getConnectionTitle({
         account_name: 'Production VPC',
         aws_account_id: '123456789012',
+        partner: 'vercel',
       })
     ).toBe('Production VPC')
   })
 
-  it('falls back to the AWS account ID for an unnamed connection', () => {
+  it('falls back to Vercel when that partner has no nickname', () => {
+    expect(getConnectionTitle({ aws_account_id: '111122223333', partner: 'vercel' })).toBe('Vercel')
+  })
+
+  it('falls back to the AWS account ID for an unnamed AWS-direct connection', () => {
     expect(getConnectionTitle({ aws_account_id: '123456789012' })).toBe('123456789012')
   })
 
@@ -48,6 +54,18 @@ describe('getConnectionTitle', () => {
         aws_account_id: '123456789012',
       })
     ).toBe('123456789012')
+  })
+})
+
+describe('isIamRoleArn', () => {
+  it('accepts a role ARN', () => {
+    expect(isIamRoleArn('arn:aws:iam::111122223333:role/TenantConnector')).toBe(true)
+  })
+
+  it('rejects empty and non-role ARNs', () => {
+    expect(isIamRoleArn('')).toBe(false)
+    expect(isIamRoleArn('111122223333')).toBe(false)
+    expect(isIamRoleArn('arn:aws:iam::111122223333:user/admin')).toBe(false)
   })
 })
 
