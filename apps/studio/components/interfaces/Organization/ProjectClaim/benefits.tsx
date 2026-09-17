@@ -81,7 +81,7 @@ export const ProjectClaimBenefits = ({
           </ul>
         </div>
         <div className="flex justify-center sticky bottom-0">
-          <Button size="medium" onClick={onContinue}>
+          <Button variant="primary" size="medium" onClick={onContinue}>
             Continue connection
           </Button>
         </div>

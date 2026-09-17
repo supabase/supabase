@@ -24,6 +24,8 @@ interface PipelineRequestStatusContextType {
     snapshotStatus?: string
   ) => void
   getRequestStatus: (pipelineId: number) => PipelineStatusRequestStatus
+  setTableResetting: (pipelineId: number, isResetting: boolean) => void
+  getIsTableResetting: (pipelineId: number) => boolean
   updatePipelineStatus: (pipelineId: number, backendStatus: string | undefined) => void
 }
 
@@ -45,6 +47,7 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
   const [pipelineStatusSnapshot, setPipelineStatusSnapshot] = useState<
     Record<number, string | undefined>
   >({})
+  const [tableResetStatus, setTableResetStatus] = useState<Record<number, boolean>>({})
   const timeoutsRef = useRef<Record<number, number>>({})
   const REQUEST_TIMEOUT_MS = 10_000
 
@@ -100,6 +103,16 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
     return requestStatus[pipelineId] || PipelineStatusRequestStatus.None
   }
 
+  const setTableResetting = (pipelineId: number, isResetting: boolean) => {
+    setTableResetStatus((prev) => {
+      if (isResetting) return { ...prev, [pipelineId]: true }
+      const { [pipelineId]: _omit, ...rest } = prev
+      return rest
+    })
+  }
+
+  const getIsTableResetting = (pipelineId: number) => tableResetStatus[pipelineId] === true
+
   const updatePipelineStatus = useCallback(
     (pipelineId: number, newStatus: string | undefined) => {
       const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
@@ -129,6 +142,8 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
         pipelineStatusSnapshot,
         setRequestStatus,
         getRequestStatus,
+        setTableResetting,
+        getIsTableResetting,
         updatePipelineStatus,
       }}
     >

@@ -1,7 +1,7 @@
 'use client'
 
 import { cva, VariantProps } from 'class-variance-authority'
-import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+import { Check, ChevronDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
 import React, { Children, useEffect } from 'react'
@@ -223,6 +223,7 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
   persistLabel?: boolean
   className?: string
   badgeLimit?: number | 'wrap'
+  wrapBadges?: boolean
   deletableBadge?: boolean
   showIcon?: boolean
   mode?: MultiSelectorMode
@@ -262,11 +263,11 @@ const MultiSelectorBadgesVariants = cva('flex overflow-hidden flex-1 min-w-0', {
 })
 
 const MultiSelectorBadgeVariants = cva(
-  'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs',
+  'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs/none',
   {
     variants: {
       size: {
-        tiny: 'h-full py-0 leading-none',
+        tiny: 'h-full py-0',
         small: '',
         medium: '',
         large: '',
@@ -285,10 +286,10 @@ const MultiSelectorLabelVariants = cva(
     variants: {
       size: {
         tiny: 'leading-none',
-        small: 'ml-1 leading-5.5',
-        medium: 'ml-1 leading-5.5',
-        large: 'ml-1 leading-5.5',
-        xlarge: 'ml-1 leading-5.5',
+        small: 'ml-1 leading-5',
+        medium: 'ml-1 leading-5',
+        large: 'ml-1 leading-5',
+        xlarge: 'ml-1 leading-5',
       },
     },
     defaultVariants: {
@@ -335,6 +336,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       className,
       deletableBadge = true,
       badgeLimit = 9999,
+      wrapBadges = false,
       showIcon = true,
       mode = 'combobox',
       renderValue,
@@ -357,7 +359,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const [extraBadgesCount, setExtraBadgesCount] = React.useState(0)
     const [isDeleteHovered, setIsDeleteHovered] = React.useState(false)
 
-    const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
+    const SHOULD_WRAP_BADGES = wrapBadges || badgeLimit === 'wrap'
     const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
     const HAS_TINY_PLACEHOLDER = size === 'tiny' && values.length === 0
@@ -365,12 +367,12 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
 
-      if (IS_BADGE_LIMIT_WRAP) {
-        setVisibleBadges(values)
-        setExtraBadgesCount(0)
-      } else {
+      if (IS_NUMERIC_LIMIT) {
         setVisibleBadges(values.slice(0, badgeLimit))
         setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
+      } else {
+        setVisibleBadges(values)
+        setExtraBadgesCount(0)
       }
     }, [values, badgeLimit])
 
@@ -427,8 +429,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             ref={badgesRef}
             className={cn(
               MultiSelectorBadgesVariants({ size }),
-              IS_BADGE_LIMIT_WRAP && 'flex-wrap',
-              !IS_BADGE_LIMIT_WRAP &&
+              SHOULD_WRAP_BADGES && 'flex-wrap',
+              !SHOULD_WRAP_BADGES &&
                 'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
             )}
           >
@@ -478,7 +480,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 autoFocus={false}
                 wrapperClassName={cn(
                   MultiSelectorInlineInputWrapperVariants({ size }),
-                  IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
+                  SHOULD_WRAP_BADGES && 'min-w-[85px]'
                 )}
                 className={cn(
                   MultiSelectorInlineInputVariants({ size }),
@@ -489,7 +491,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           </div>
 
           {showIcon && (
-            <ChevronsUpDown
+            <ChevronDown
+              aria-hidden="true"
               size={16}
               strokeWidth={1.5}
               className="text-foreground-lighter shrink-0 ml-1.5 self-center"
@@ -669,7 +672,6 @@ const MultiSelectorList = React.forwardRef<
         style={{
           maxHeight: `min(${dropdownMaxHeight}px, calc(var(--radix-popover-content-available-height) - ${DROPDOWN_BORDER_HEIGHT}px))`,
         }}
-        onWheel={(e) => e.stopPropagation()}
         {...props}
       >
         <SelectionListState

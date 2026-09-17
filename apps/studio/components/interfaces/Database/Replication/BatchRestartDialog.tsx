@@ -26,7 +26,7 @@ interface BatchRestartDialogProps {
   tables: ReplicationPipelineTableStatus[]
   sourceId?: number
   publicationName?: string
-  tableSyncCopy?: TableSyncCopyConfig
+  tableSyncCopy?: TableSyncCopyConfig | null
   pipelineStatusName?: PipelineStatusName
   onRestartStart?: (tableIds: number[]) => void
   onRestartComplete?: (tableIds: number[]) => void

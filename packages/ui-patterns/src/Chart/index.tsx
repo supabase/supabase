@@ -189,7 +189,6 @@ const ChartActions = React.forwardRef<HTMLDivElement, ChartActionsProps>(
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
                   <Button
-                    variant="default"
                     size="tiny"
                     className={cn('px-1.5 text-foreground-lighter', action.className)}
                     onClick={action.onClick}

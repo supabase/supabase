@@ -45,7 +45,6 @@ vi.mock('@/state/ai-assistant-state', () => ({
 
 describe('useCreateChat', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockWhenInitialized.mockImplementation(() => Promise.resolve())
   })
 
@@ -112,10 +111,6 @@ describe('useCreateChat', () => {
 })
 
 describe('useCreateQuery', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('creates a draft and opens it as an Explorer query tab', () => {
     const { result } = renderHook(() => useCreateQuery())
 
@@ -140,6 +135,19 @@ describe('useCreateQuery', () => {
       projectRef: 'default',
       sql: undefined,
       name: undefined,
+    })
+  })
+
+  it('forwards autoRun to the draft so its query tab can run itself once mounted', () => {
+    const { result } = renderHook(() => useCreateQuery())
+
+    result.current.createQuery({ sql: 'select 1', autoRun: true })
+    expect(mockCreateDraft).toHaveBeenCalledWith({
+      id: 'query-new',
+      projectRef: 'default',
+      sql: 'select 1',
+      name: undefined,
+      autoRun: true,
     })
   })
 })

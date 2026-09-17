@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { Accordion, AccordionItem, AccordionTrigger } from './accordion'
 
 describe('AccordionTrigger', () => {
-  it('provides rounded geometry and the shared inset focus ring', () => {
+  it('fills its container without adding horizontal padding', () => {
     render(
       <Accordion type="single" collapsible>
         <AccordionItem value="advanced">
@@ -14,7 +14,9 @@ describe('AccordionTrigger', () => {
     )
 
     const trigger = screen.getByRole('button', { name: 'Advanced settings' })
-    expect(trigger).toHaveClass('px-2', 'relative', 'focus-inset')
+    expect(trigger.parentElement).toHaveClass('flex', 'w-full')
+    expect(trigger).toHaveClass('flex-1', 'relative', 'focus-inset')
+    expect(trigger).not.toHaveClass('px-2')
     expect(trigger).not.toHaveClass('rounded-md')
     expect(trigger).not.toHaveClass('focus-ring')
     expect(trigger).not.toHaveClass('transition-colors')

@@ -15,13 +15,14 @@ Accessibility is about making an interface work for as many people as possible a
 About to push some code? At a minimum, check your work against this list:
 
 - Are interactive page elements [keyboard-focusable](#focus-management)?
+- Are unavailable actions [discoverable and explained](#disabled-controls) for keyboard users?
 - Are all elements announcable by a [screen reader](#screen-reader-support)?
 - Are textual elements legible and scalable?
 - Can I use this on a smaller and/or older device?
 
 ## Focus management
 
-All interactive page elements should be reachable by keyboard. Given the below inconsistency between devices and browsers, add `tabIndex={0}` to all buttons, links, and non-text inputs, ideally at the component level. Consider tying the state of `tabIndex` to the `disabled` state of a component, if applicable.
+All interactive page elements should be reachable by keyboard. Native buttons, links with `href`, and form inputs are keyboard accessible by default. Add `tabIndex={0}` only to bespoke interactive elements. For controls using native `disabled`, tie `tabIndex` to that state (disabled controls default to `tabIndex={-1}`). Controls that use `aria-disabled` to stay discoverable should remain at `tabIndex={0}`. See [Disabled controls](#disabled-controls).
 
 Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari, by default, requires the Option key to also be held down. Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result.
 
@@ -124,6 +125,51 @@ Some keyboard-navigable content may contain hundreds or thousands of items. Help
 - Skip links and “jump to” shortcuts
 
 Apps with persistent header and sidebar chrome should expose a skip link as the first focusable element. Use the shared [Skip to Content](fragments/skip-to-content) fragment which owns the component API, usage sample, and target landmark contract.
+
+## Disabled controls
+
+Native `disabled` controls are removed from the tab order. When users need to focus a disabled button to discover the action or understand why it is unavailable, add `focusableWhenDisabled`.
+
+### Focusable when disabled
+
+Use `disabled` with `focusableWhenDisabled` when an action is unavailable for a reason that is not obvious, especially when you show a tooltip explaining why:
+
+- Permission gates
+- Plan or infrastructure restrictions
+- Business rules that block an otherwise visible action
+
+`focusableWhenDisabled` changes how the disabled state is implemented. It sets `aria-disabled="true"`, keeps the control in the tab order, and applies disabled styling without `pointer-events-none`. Guard handlers are built into [Button](components/button). See also [MDN: aria-disabled](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-disabled).
+
+Tab to the example below with the keyboard. The disabled button stays focusable and exposes its tooltip.
+
+<ComponentPreview name="disabled-focusable" />
+
+Implementation checklist for focusable disabled buttons:
+
+- Add `focusableWhenDisabled` when the reason for disabling the control is not obvious
+- Pair with a tooltip when you need to explain why
+- Guard `onClick` and keyboard activation (`Enter` / `Space`) (`Button` does this automatically)
+- Keep `tabIndex={0}` (`Button` does this automatically)
+- Do **not** use `pointer-events-none` on the control (it blocks hover and tooltips)
+
+```tsx showLineNumbers
+<Tooltip>
+  <TooltipTrigger asChild>
+    <Button disabled={unavailable} focusableWhenDisabled>
+      Pause project
+    </Button>
+  </TooltipTrigger>
+  {unavailable && <TooltipContent>{reason}</TooltipContent>}
+</Tooltip>
+```
+
+In Studio, `ButtonTooltip` adds `focusableWhenDisabled` to disabled buttons with tooltip text automatically.
+
+### Page-level context
+
+Tooltips alone are not enough for significant restrictions. Pair focusable disabled controls with visible page context (for example: an [Admonition](fragments/admonition), empty state, or inline copy) so the reason is available even without hover or focus.
+
+<ComponentPreview name="disabled-unavailable-with-notice" />
 
 ## Screen readers
 

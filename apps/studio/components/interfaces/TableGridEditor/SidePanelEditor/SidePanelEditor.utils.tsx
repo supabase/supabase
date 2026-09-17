@@ -47,8 +47,10 @@ import {
 import { getTables } from '@/data/tables/tables-query'
 import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import type { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly } from '@/lib/type-helpers'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import type { SidePanel } from '@/state/table-editor'
 
 const BATCH_SIZE = 1000
@@ -933,6 +935,7 @@ export async function insertRowsViaSpreadsheet({
   table,
   selectedHeaders,
   emptyStringAsNullHeaders = selectedHeaders,
+  roleImpersonationState,
   onProgressUpdate,
 }: {
   projectRef: string
@@ -941,6 +944,7 @@ export async function insertRowsViaSpreadsheet({
   table: RetrieveTableResult
   selectedHeaders: string[]
   emptyStringAsNullHeaders?: string[]
+  roleImpersonationState?: RoleImpersonationState
   onProgressUpdate: (progress: number) => void
 }): Promise<{ error: unknown }> {
   let chunkNumber = 0
@@ -964,10 +968,18 @@ export async function insertRowsViaSpreadsheet({
           emptyStringAsNullHeaders,
         })
 
-        const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
+        const insertQuery = wrapWithRoleImpersonation(
+          new Query().from(table.name, table.schema).insert(formattedData).toSql(),
+          roleImpersonationState
+        )
         try {
           await executeWithRetry(() =>
-            executeSql({ projectRef, connectionString, sql: insertQuery })
+            executeSql({
+              projectRef,
+              connectionString,
+              sql: insertQuery,
+              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+            })
           )
         } catch (error) {
           console.warn(error)
@@ -1034,6 +1046,7 @@ export async function insertTableRows({
   rows,
   selectedHeaders,
   emptyStringAsNullHeaders = selectedHeaders,
+  roleImpersonationState,
   onProgressUpdate,
 }: {
   projectRef: string
@@ -1042,6 +1055,7 @@ export async function insertTableRows({
   rows: unknown[]
   selectedHeaders: string[]
   emptyStringAsNullHeaders?: string[]
+  roleImpersonationState?: RoleImpersonationState
   onProgressUpdate: (progress: number) => void
 }): Promise<{ error: unknown }> {
   let insertError: unknown = undefined
@@ -1059,9 +1073,17 @@ export async function insertTableRows({
     return () => {
       return Promise.race([
         new Promise(async (resolve, reject) => {
-          const insertQuery = new Query().from(table.name, table.schema).insert(batch).toSql()
+          const insertQuery = wrapWithRoleImpersonation(
+            new Query().from(table.name, table.schema).insert(batch).toSql(),
+            roleImpersonationState
+          )
           try {
-            await executeSql({ projectRef, connectionString, sql: insertQuery })
+            await executeSql({
+              projectRef,
+              connectionString,
+              sql: insertQuery,
+              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+            })
           } catch (error) {
             insertError = error
             reject(error)

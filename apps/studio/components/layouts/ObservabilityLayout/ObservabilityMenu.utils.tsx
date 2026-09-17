@@ -2,7 +2,6 @@ import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
-import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery, type Content, type ContentBase } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -49,7 +48,6 @@ export const useGenerateObservabilityMenu = () => {
   const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   const showOverview = useFlag('observabilityOverview')
-  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
   const baseUrl = `/project/${ref}/observability`
@@ -92,16 +90,12 @@ export const useGenerateObservabilityMenu = () => {
           },
         ]
       : []),
-    ...(isDatabaseConnectionsEnabled
-      ? [
-          {
-            name: 'Database Connections',
-            key: 'connections',
-            url: `${baseUrl}/connections`,
-            shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_API_GATEWAY,
-          },
-        ]
-      : []),
+    {
+      name: 'Database Connections',
+      key: 'connections',
+      url: `${baseUrl}/connections`,
+      shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_CONNECTIONS,
+    },
   ]
 
   const productItems: ObservabilityMenuItem[] = [

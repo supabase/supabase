@@ -31,11 +31,7 @@ export const NoSearchResults = ({
           {description ?? `Your search for “${searchString}” did not return any results`}
         </p>
       </div>
-      {onResetFilter !== undefined && (
-        <Button variant="default" onClick={() => onResetFilter()}>
-          Reset filter
-        </Button>
-      )}
+      {onResetFilter !== undefined && <Button onClick={() => onResetFilter()}>Reset filter</Button>}
     </div>
   )
 }

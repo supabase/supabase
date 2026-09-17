@@ -50,7 +50,6 @@ export const ConversationScrollButton = ({
         className={cn('absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full', className)}
         onClick={handleScrollToBottom}
         size="tiny"
-        variant="default"
         {...props}
       >
         <ArrowDownIcon className="size-4" />

@@ -211,7 +211,6 @@ export function DevToolbarTrigger() {
   return (
     <div style={containerStyle}>
       <Button
-        variant="default"
         rounded
         className={cn(
           'relative h-10 w-10 p-0 shadow-md',

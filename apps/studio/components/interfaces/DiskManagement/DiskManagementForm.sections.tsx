@@ -272,7 +272,6 @@ export function AdvancedSection({
               actions={
                 canUpdateDiskConfiguration ? (
                   <Button
-                    variant="default"
                     onClick={() => {
                       form.setValue('computeSize', 'ci_large', {
                         shouldDirty: true,
@@ -302,7 +301,6 @@ export function AdvancedSection({
               actions={
                 !disableDiskSizeInput ? (
                   <Button
-                    variant="default"
                     onClick={() => {
                       form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
                         shouldDirty: true,

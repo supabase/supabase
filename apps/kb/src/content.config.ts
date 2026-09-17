@@ -8,7 +8,7 @@ import { TOPIC_NAMES } from './lib/topics'
 // src/pages/guides/[...slug].astro — dropping a new file in
 // src/content/guides doesn't need any per-file layout wiring.
 const guides = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/guides' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides' }),
   schema: z.object({
     title: z.string(),
     description: z.string(),

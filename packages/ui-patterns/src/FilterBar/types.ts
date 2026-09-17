@@ -104,6 +104,7 @@ export type MenuItem = {
   isFreeformSearch?: boolean
   freeformPropertyName?: string
   freeformValue?: string
+  disabled?: boolean
 }
 
 export type GroupedMenuItem = {

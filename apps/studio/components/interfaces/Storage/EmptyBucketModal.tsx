@@ -70,7 +70,7 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
           </p>
         </DialogSection>
         <DialogFooter>
-          <Button variant="default" disabled={isPending} onClick={onClose}>
+          <Button disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
           <Button variant="danger" loading={isPending} onClick={onEmptyBucket}>

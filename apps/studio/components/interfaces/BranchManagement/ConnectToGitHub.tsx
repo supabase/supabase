@@ -48,7 +48,7 @@ export const ConnectToGitHub = () => {
           Keep this preview branch in sync with a chosen GitHub branch
         </p>
       </div>
-      <Button variant="default" icon={<Github />} onClick={onClick}>
+      <Button icon={<Github />} onClick={onClick}>
         {showAuthorizeCta ? 'Authorize' : 'Configure'}
       </Button>
     </div>

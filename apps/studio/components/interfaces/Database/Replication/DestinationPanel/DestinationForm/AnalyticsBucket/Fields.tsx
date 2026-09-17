@@ -298,7 +298,6 @@ export const AnalyticsBucketFields = ({
                   field.value ? (
                     <div className="flex items-center justify-center">
                       <Button
-                        variant="default"
                         className="w-7"
                         icon={showCatalogToken ? <Eye /> : <EyeOff />}
                         onClick={() => setShowCatalogToken(!showCatalogToken)}
@@ -413,7 +412,6 @@ export const AnalyticsBucketFields = ({
                   />
                 </FormControl>
                 <Button
-                  variant="default"
                   icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
                   className="w-7 absolute right-1 top-[4px]"
                   onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}

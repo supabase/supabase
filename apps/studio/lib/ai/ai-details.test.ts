@@ -45,8 +45,6 @@ describe('getAIDetails', () => {
   let mockCheckEntitlement: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
-    vi.clearAllMocks()
-
     const orgsQuery = await import('@/data/organizations/organizations-query')
     const subscriptionQuery = await import('@/data/subscriptions/org-subscription-query')
     const projectQuery = await import('@/data/projects/project-detail-query')
@@ -95,6 +93,7 @@ describe('getAIDetails', () => {
       planId: 'pro',
       region: 'us-east-1',
       isSensitive: false,
+      isRestrictedByHipaa: false,
     })
   })
 
@@ -251,6 +250,7 @@ describe('getAIDetails', () => {
 
       expect(result.aiOptInLevel).toBe('disabled')
       expect(result.hasHipaaAddon).toBe(true)
+      expect(result.isRestrictedByHipaa).toBe(true)
     })
 
     it('disables the opt-in level when project sensitivity is unknown', async () => {

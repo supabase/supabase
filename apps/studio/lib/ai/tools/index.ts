@@ -17,6 +17,7 @@ export const getTools = async ({
   connectionString,
   authorization,
   aiOptInLevel,
+  isRestrictedByHipaa,
   accessToken,
   baseUrl,
   supportMode,
@@ -27,6 +28,8 @@ export const getTools = async ({
   connectionString: string
   authorization?: string
   aiOptInLevel: AiOptInLevel
+  // Only changes the blocked-tool wording.
+  isRestrictedByHipaa: boolean
   accessToken?: string
   baseUrl?: string
   supportMode?: boolean
@@ -54,16 +57,16 @@ export const getTools = async ({
     }
   } else if (accessToken) {
     // If platform, fetch MCP and other platform specific tools. The MCP tools
-    // may be fetched from the remote MCP server over the network (see
-    // `USE_REMOTE_MCP`), so a failure there (outage, timeout, auth) should
-    // degrade gracefully to the remaining tools rather than break the entire
-    // assistant.
+    // are fetched from the remote MCP server over the network, so a failure
+    // there (outage, timeout, auth) should degrade gracefully to the remaining
+    // tools rather than break the entire assistant.
     let mcpTools: ToolSet = {}
     try {
       mcpTools = await getMcpTools({
         accessToken,
         projectRef,
         aiOptInLevel,
+        isRestrictedByHipaa,
         signal,
       })
     } catch (error) {
@@ -92,7 +95,11 @@ export const getTools = async ({
 
   // Filter all tools based on the (potentially modified) AI opt-in level
   const toolsWithSupport = supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
-  const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel)
+  const filteredTools: ToolSet = filterToolsByOptInLevel(
+    toolsWithSupport,
+    aiOptInLevel,
+    isRestrictedByHipaa
+  )
 
   return filteredTools
 }

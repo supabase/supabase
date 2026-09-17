@@ -55,7 +55,6 @@ export const LinterPageFooter = ({
           align="start"
         >
           <Button
-            variant="default"
             className="mt-3! w-min"
             disabled={isLoading || isRefetching}
             loading={isLoading || isRefetching}

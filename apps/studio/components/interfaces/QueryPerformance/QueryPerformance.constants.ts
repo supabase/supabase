@@ -55,9 +55,13 @@ export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
   {
     name: 'supabase_storage_admin',
     description:
-      'Used by the Auth middleware to connect to the database and run migration. Access is scoped to the storage schema.',
+      'Used by the Storage middleware to connect to the database and run migration. Access is scoped to the storage schema.',
   },
-  { name: 'dashboard_user', description: 'For running commands via the Supabase UI.' },
+  {
+    name: 'dashboard_user',
+    description:
+      'The Supabase Dashboard doesn\'t connect as this role. Dashboard queries execute as postgres and include a "-- source: dashboard" comment.',
+  },
   {
     name: 'supabase_admin',
     description:

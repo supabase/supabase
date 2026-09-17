@@ -187,11 +187,7 @@ export const AuditLogsForm = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {isDirty && (
-                  <Button variant="default" onClick={() => form.reset()}>
-                    Cancel
-                  </Button>
-                )}
+                {isDirty && <Button onClick={() => form.reset()}>Cancel</Button>}
                 <Button
                   variant="primary"
                   type="submit"

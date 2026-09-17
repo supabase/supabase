@@ -102,7 +102,6 @@ export const TableReplicationRow = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                variant="default"
                 className="w-7"
                 icon={<RotateCcw />}
                 disabled={showDisabledState || isRestarting || isAnyRestartInProgress}

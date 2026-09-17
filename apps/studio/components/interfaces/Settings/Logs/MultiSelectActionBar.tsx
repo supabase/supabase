@@ -61,7 +61,6 @@ export function MultiSelectActionBar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="default"
               size="tiny"
               icon={copiedFormat ? <Check size={12} className="text-brand" /> : <Copy size={12} />}
               iconRight={<ChevronDown size={11} />}

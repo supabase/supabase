@@ -81,21 +81,21 @@ const ProductHeaderCentered = (props: Types) => (
         </div>
         <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
           {props.cta && (
-            <Button size="medium" iconRight={props.cta.icon} asChild>
+            <Button variant="primary" size="medium" iconRight={props.cta.icon} asChild>
               <Link href={props.cta.link} as={props.cta.link}>
                 {props.cta.label ?? 'Start for free'}
               </Link>
             </Button>
           )}
           {props.video && (
-            <Button variant="default" size="medium" icon={<PlayCircle />} asChild>
+            <Button size="medium" icon={<PlayCircle />} asChild>
               <Link href={props.video} as={props.video}>
                 Watch video
               </Link>
             </Button>
           )}
           {props.secondaryCta && (
-            <Button variant="default" size="medium" iconRight={props.secondaryCta.icon} asChild>
+            <Button size="medium" iconRight={props.secondaryCta.icon} asChild>
               <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
                 {props.secondaryCta.label}
               </Link>
