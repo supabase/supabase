@@ -1,5 +1,5 @@
 import { type UntrustedSqlFragment } from '@supabase/pg-meta'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   createContext,
   use,
@@ -35,6 +35,7 @@ import {
 } from '@/data/logs/safe-analytics-sql'
 import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import {
   useDatabaseSelectorStateSnapshot,
@@ -156,6 +157,10 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
     },
     { enabled: isValidConnString(project?.connectionString) }
   )
+  const [lastSelectedDatabase] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref ?? ''),
+    ''
+  )
 
   const { setAiTitle } = useSnippetTitleGenerator()
 
@@ -219,13 +224,24 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   }, [id])
 
   useEffect(() => {
-    // Only set the default (primary) selection once, when nothing has been selected yet.
-    // Must not re-run on every `databases` refetch, or it'll clobber the user's replica choice.
+    // Only set the initial selection once, when nothing has been selected yet.
     if (isSuccessReadReplicas && getSelectedDatabaseId() === undefined) {
-      const primaryDatabase = databases.find((db) => db.identifier === ref)
-      setSelectedDatabaseId(primaryDatabase?.identifier)
+      const lastSelectedIsStillValid = databases.some(
+        (db) => db.identifier === lastSelectedDatabase
+      )
+      const defaultDatabase = lastSelectedIsStillValid
+        ? lastSelectedDatabase
+        : databases.find((db) => db.identifier === ref)?.identifier
+      setSelectedDatabaseId(defaultDatabase)
     }
-  }, [isSuccessReadReplicas, databases, ref, setSelectedDatabaseId, getSelectedDatabaseId])
+  }, [
+    isSuccessReadReplicas,
+    databases,
+    ref,
+    lastSelectedDatabase,
+    setSelectedDatabaseId,
+    getSelectedDatabaseId,
+  ])
 
   const snippetName =
     urlId === 'new'
