@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import { buildLlmsTxt, getDocFiles } from '../scripts/build-llms-txt'
+import { buildLlmsTxt, getDocFiles } from '../scripts/build-markdown-index'
 import { collectMdxFiles, getDocSlug, parseLibraryDocument } from './library-documents'
 
 describe('library document exports', () => {

@@ -53,3 +53,8 @@ export function toAgentHref(
   }
   return url.href
 }
+
+export function markdownLink(title: string, url: string): string {
+  const escaped = title.replace(/\s+/g, ' ').replace(/([\\\[\]])/g, '\\$1')
+  return `[${escaped}](${url})`
+}
