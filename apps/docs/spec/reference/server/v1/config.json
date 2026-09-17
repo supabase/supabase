@@ -1,5 +1,5 @@
 {
   "categoryOrder": ["Middleware", "Primitives", "Adapters", "Errors", "Types"],
-  "partialsOrder": ["introduction", "installing"],
+  "partialsOrder": ["introduction", "installing", "frameworks"],
   "navigationPrefixes": {}
 }
