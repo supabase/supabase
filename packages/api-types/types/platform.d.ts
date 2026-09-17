@@ -3945,7 +3945,7 @@ export interface paths {
     put?: never
     /**
      * Rollback pipeline tables
-     * @description Reset tables to their initial replication state. Supports resetting a single table, all errored tables or all tables. Waits for shutdown before resetting state, then recreates an active pipeline. Stopped pipelines remain stopped. Requires bearer auth and an active, healthy project.
+     * @description Rollback the replication state of tables in the pipeline. Supports rolling back a single table, all errored tables or all tables. Requires bearer auth and an active, healthy project.
      */
     post: operations['PipelinesController_rollbackTables']
     delete?: never
@@ -12320,6 +12320,12 @@ export interface components {
       website: string
     }
     RollbackTablesBody: {
+      /**
+       * @description Rollback type
+       * @example individual
+       * @enum {string}
+       */
+      rollback_type: 'individual' | 'full'
       /** @description Rollback target */
       target:
         | {
@@ -30564,7 +30570,7 @@ export interface operations {
     }
     responses: {
       /** @description New table states after rollback. */
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
@@ -30738,8 +30744,8 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Pipeline shutdown accepted. Resources may still be terminating. */
-      202: {
+      /** @description Pipeline stopped. */
+      200: {
         headers: {
           [name: string]: unknown
         }

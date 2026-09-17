@@ -5,7 +5,7 @@ import { HttpResponse } from 'msw'
 import { Button } from 'ui'
 import { describe, expect, test, vi } from 'vitest'
 
-import { PipelineStatus } from './PipelineStatus'
+import { PipelineStatePill } from './PipelineStatePill'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { replicationKeys } from '@/data/replication/keys'
 import {
@@ -39,7 +39,7 @@ const StatusView = () => {
   const { getRequestStatus, isRequestPending } = usePipelineRequestStatus()
   return (
     <>
-      <PipelineStatus
+      <PipelineStatePill
         pipelineStatus={data?.status}
         error={error}
         isLoading={isPending}

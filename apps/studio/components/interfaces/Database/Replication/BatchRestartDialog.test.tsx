@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { BatchRestartDialog } from './BatchRestartDialog'
 import { getStatusName } from './Pipeline.utils'
-import { PipelineStatus } from './PipelineStatus'
+import { PipelineStatePill } from './PipelineStatePill'
 import { RestartTableDialog } from './RestartTableDialog'
 import { replicationKeys } from '@/data/replication/keys'
 import type { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
@@ -219,7 +219,7 @@ const RestartDialogWithStatus = ({
   const pipelineStatusName = getStatusName(data?.status)
   return (
     <>
-      <PipelineStatus
+      <PipelineStatePill
         pipelineStatus={data?.status}
         error={error}
         isLoading={isPending}

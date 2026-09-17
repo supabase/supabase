@@ -27,7 +27,8 @@ async function rollbackTables(
     '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-tables',
     {
       params: { path: { ref: projectRef, pipeline_id: pipelineId } },
-      body: { target },
+      // Production OpenAPI still includes the retired rollback_type field.
+      body: { target } as components['schemas']['RollbackTablesBody'],
       signal,
     }
   )
