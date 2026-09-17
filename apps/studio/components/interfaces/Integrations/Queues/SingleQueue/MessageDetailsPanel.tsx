@@ -4,7 +4,18 @@ import dayjs from 'dayjs'
 import { isNil } from 'lodash'
 import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
-import { Button, ResizablePanel, Separator, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import {
+  Button,
+  ResizablePanel,
+  Separator,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -80,12 +91,20 @@ export const MessageDetailsPanel = ({
       }}
       className="bg-studio border-t pointer-events-auto"
     >
-      <Button
-        variant="text"
-        className="absolute top-3 right-3 px-1"
-        icon={<X />}
-        onClick={() => setSelectedMessage(null)}
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="text"
+            className="absolute top-3 right-3 px-1"
+            icon={<X />}
+            onClick={() => setSelectedMessage(null)}
+            aria-label="Close panel"
+            // Tooltip repeats the label; the description would read the name twice
+            aria-describedby={undefined}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Close panel</TooltipContent>
+      </Tooltip>
 
       <Tabs
         value={view}

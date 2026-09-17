@@ -10,6 +10,9 @@ import {
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -54,9 +57,22 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
     return (
       <div className="flex items-center justify-end w-full" onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button title="Manage Secret" variant="text" className="px-1" icon={<MoreVertical />} />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  title="Manage Secret"
+                  variant="text"
+                  className="px-1"
+                  icon={<MoreVertical />}
+                  aria-label="Manage secret"
+                  // Tooltip repeats the label; the description would read the name twice
+                  aria-describedby={undefined}
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Manage secret</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent side="bottom" align="end" className="w-40">
             <DropdownMenuItemTooltip
               className="gap-x-2"
@@ -95,20 +111,30 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   if (col.id === 'secret_value') {
     return (
       <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
-        <Button
-          variant="text"
-          className="px-1.5"
-          icon={
-            isFetching && revealedValue === undefined ? (
-              <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-            ) : !revealSecret ? (
-              <Eye size={16} strokeWidth={1.5} />
-            ) : (
-              <EyeOff size={16} strokeWidth={1.5} />
-            )
-          }
-          onClick={() => setRevealSecret(!revealSecret)}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="text"
+              className="px-1.5"
+              icon={
+                isFetching && revealedValue === undefined ? (
+                  <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+                ) : !revealSecret ? (
+                  <Eye size={16} strokeWidth={1.5} />
+                ) : (
+                  <EyeOff size={16} strokeWidth={1.5} />
+                )
+              }
+              onClick={() => setRevealSecret(!revealSecret)}
+              aria-label={revealSecret ? 'Hide secret value' : 'Show secret value'}
+              // Tooltip repeats the label; the description would read the name twice
+              aria-describedby={undefined}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {revealSecret ? 'Hide secret value' : 'Show secret value'}
+          </TooltipContent>
+        </Tooltip>
         <div className="grow min-w-0">
           {revealSecret && revealedValue !== undefined ? (
             <Input copy readOnly size="tiny" className="font-mono" value={revealedValue} />
