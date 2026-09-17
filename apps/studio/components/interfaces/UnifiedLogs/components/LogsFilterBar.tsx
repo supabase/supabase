@@ -9,12 +9,13 @@ import {
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
+import { isLogsFilterColumnValue } from '../UnifiedLogs.filters'
 import {
-  isLogsFilterColumnValue,
-  type LogsColumnFilterValue,
-  type LogsFilterOperator,
-} from '../UnifiedLogs.filters'
-import { buildFilterProperties, getUserFilterValue, USER_PROPERTY } from './LogsFilterBar.utils'
+  buildColumnFilterValues,
+  buildFilterProperties,
+  getUserFilterValue,
+  USER_PROPERTY,
+} from './LogsFilterBar.utils'
 import { searchAuthUsers } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -28,17 +29,15 @@ const buildFilterGroup = (
 ): FilterGroup => {
   const conditions: FilterCondition[] = []
   for (const { id, value } of columnFilters) {
-    if (!filterableNames.has(id) || value === null || value === undefined) continue
-    // Equality filters carry their operator inside a wrapped value; range/slider
-    // filters arrive as plain arrays and default to `=`.
-    const { operator, values } = isLogsFilterColumnValue(value)
-      ? value
-      : { operator: '=' as LogsFilterOperator, values: Array.isArray(value) ? value : [value] }
-    for (const v of values) {
+    // Non-timerange column filter values are always the wrapped `{ operator, values }`
+    // shape; skip anything else (e.g. the `date` timerange brush, which isn't in
+    // filterableNames, or an unexpected shape).
+    if (!filterableNames.has(id) || !isLogsFilterColumnValue(value)) continue
+    for (const v of value.values) {
       conditions.push({
         propertyName: id,
         value: v as FilterCondition['value'],
-        operator,
+        operator: value.operator,
       })
     }
   }
@@ -119,26 +118,14 @@ export const LogsFilterBar = () => {
 
     applyUser(getUserFilterValue(next.conditions as FilterCondition[]))
 
-    const wrappedByColumn = new Map<string, LogsColumnFilterValue>()
-    for (const cond of next.conditions as FilterCondition[]) {
-      if (cond.propertyName === USER_PROPERTY) continue
-      const operator = cond.operator as LogsFilterOperator
-      const existing = wrappedByColumn.get(cond.propertyName)
-      if (!existing) {
-        wrappedByColumn.set(cond.propertyName, { operator, values: [String(cond.value)] })
-      } else {
-        existing.values.push(String(cond.value))
-        if (existing.operator !== operator) existing.operator = operator
-      }
-    }
-
-    for (const [name, wrapped] of wrappedByColumn) {
-      table.getColumn(name)?.setFilterValue(wrapped)
+    const columnFilterValues = buildColumnFilterValues(next.conditions as FilterCondition[])
+    for (const [name, value] of columnFilterValues) {
+      table.getColumn(name)?.setFilterValue(value)
     }
 
     // Only clear filters owned by this bar — leaves externally-set filters
     // (e.g. the timeline date range) untouched.
-    const nextNames = new Set(wrappedByColumn.keys())
+    const nextNames = new Set(columnFilterValues.keys())
     const filtersToRemove = table
       .getState()
       .columnFilters.filter((x) => columnBackedNames.has(x.id) && !nextNames.has(x.id))

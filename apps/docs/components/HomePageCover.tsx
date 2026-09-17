@@ -24,12 +24,12 @@ function SetupPrompt({ cliCode }: { cliCode: ReactNode }) {
         <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
         <PromptCopy>{setupPrompt}</PromptCopy>
         <PromptContent>
-          Help me get set up with Supabase. Do the following: 1. Install the Supabase CLI globally
-          with{' '}
+          Help me get set up with Supabase. Do the following: 1. Install the Supabase CLI as a
+          project dev dependency with{' '}
           <code className="shimmer-none rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
             {setupCommand.installCli}
           </code>
-          . 2. Install the Supabase Plugin with{' '}
+          , so the version is pinned per project. 2. Install the Supabase Plugin with{' '}
           <code className="shimmer-none rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
             {setupCommand.installPlugin}
           </code>

@@ -3,6 +3,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/server'
 
 const confirmFn = createServerFn({ method: 'GET' })
@@ -29,7 +30,12 @@ const confirmFn = createServerFn({ method: 'GET' })
     const token_hash = searchParams['token_hash'] as string
     const type = searchParams['type'] as EmailOtpType | null
     const _next = searchParams['next'] as string
-    const next = _next?.startsWith('/') ? _next : '/'
+    const origin = new URL(request.url).origin
+    const next = safeNextPath(
+      _next?.startsWith(`${origin}/`) ? _next.slice(origin.length) : _next,
+      '/',
+      origin
+    )
 
     if (token_hash && type) {
       const supabase = createClient()

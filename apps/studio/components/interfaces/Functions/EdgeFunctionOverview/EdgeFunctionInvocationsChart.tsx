@@ -8,7 +8,14 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import {
   formatChartTimestamp,
@@ -20,7 +27,7 @@ import type { InvocationChartDatum, InvocationUpdateAnnotation } from './EdgeFun
 interface EdgeFunctionInvocationsChartProps {
   chartData: InvocationChartDatum[]
   dateTimeFormat: string
-  onChartClick: () => void
+  onChartClick: (timestamp: string) => void
   updateAnnotation?: InvocationUpdateAnnotation
 }
 
@@ -41,8 +48,12 @@ export const EdgeFunctionInvocationsChart = ({
         <ChartContainer config={INVOCATION_CHART_CONFIG} className="aspect-auto! h-full! w-full!">
           <RechartBarChart
             data={chartData}
+            className="cursor-pointer"
             margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-            onClick={onChartClick}
+            onClick={(tooltipData) => {
+              const timestamp = tooltipData?.activePayload?.[0]?.payload?.timestamp
+              if (typeof timestamp === 'string') onChartClick(timestamp)
+            }}
           >
             <CartesianGrid vertical={false} />
             <YAxis hide width={0} />
@@ -94,13 +105,25 @@ export const EdgeFunctionInvocationsChart = ({
           </RechartBarChart>
         </ChartContainer>
         {updateAnnotation && (
-          <span
-            className="pointer-events-none absolute bottom-0 z-10 flex h-6 w-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border border-foreground/20 bg-background text-foreground shadow-xs"
-            style={{ left: `${updateAnnotation.position}%` }}
-            title={`Updated ${formatChartTimestamp(updateAnnotation.updatedAt, dateTimeFormat)}`}
-          >
-            <Rocket size={12} strokeWidth={1.75} />
-          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                className="pointer-events-auto absolute bottom-0 z-10 flex h-6 w-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border border-foreground/20 bg-background text-foreground shadow-xs"
+                style={{ left: `${updateAnnotation.position}%` }}
+                role="img"
+                tabIndex={0}
+                aria-label={`Deployment at ${formatChartTimestamp(
+                  updateAnnotation.updatedAt,
+                  dateTimeFormat
+                )}`}
+              >
+                <Rocket size={12} strokeWidth={1.75} aria-hidden />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="top" align="center">
+              Deployment at {formatChartTimestamp(updateAnnotation.updatedAt, dateTimeFormat)}
+            </TooltipContent>
+          </Tooltip>
         )}
       </div>
       {timeRangeLabels && (

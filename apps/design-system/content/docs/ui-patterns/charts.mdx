@@ -23,6 +23,29 @@ Our charts use a combination of our own presentational components and [Recharts]
 
 3. **Keep it simple**: Try to avoid abstracting the chart content too much. These components should cover most of your presentational needs.
 
+## Color
+
+Series colors come from eight categorical slots, `--chart-1` through `--chart-8`, defined in
+`packages/config/css/charts.css`. Assign them in order and never cycle: a ninth series folds
+into "Other" or becomes small multiples. Each slot has a matching `-fill` token. Slots resolve
+per theme, so pass `var(--chart-n)` and never branch on light/dark in code. Adjacent slots
+alternate hue families and clear colorblind separation in both themes.
+
+Reference lines use `--chart-reference`. Headroom, idle and unused capacity use `--chart-muted`.
+Directional pairs use `--chart-in` / `--chart-out` so read and write keep the same hue across
+charts.
+
+Status colors (`--chart-status-success`, `-warning`, `-destructive`, each with a `-muted` tier)
+are reserved for state and always ship with an icon or label. Never use one as a series color:
+amber on a neutral metric reads as a problem. Warm hues are otherwise limited to tomato, slot 5,
+because no amber or yellow step is legible on the dark surface.
+
+<ComponentPreview name="chart-palette" wide />
+
+Every slot stacked together, to check adjacent segments stay separable in both themes.
+
+<ComponentPreview name="chart-palette-stress" wide />
+
 ## Examples
 
 ### Basic Chart Types

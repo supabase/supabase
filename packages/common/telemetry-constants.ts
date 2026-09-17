@@ -3622,7 +3622,7 @@ export interface PricingPanelPlanPresentationExperimentExposedEvent {
   action: 'pricing_panel_plan_presentation_experiment_exposed'
   properties: {
     /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps'
+    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3875,6 +3875,39 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
+ * User enabled Warehouse by submitting a schema and table selection.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseEnabledEvent {
+  action: 'warehouse_enabled'
+  properties: {
+    /** Where the user initiated Warehouse setup. */
+    source: 'integrations_overview'
+    /** Number of schemas replicated in full. */
+    schemaTargetCount: number
+    /** Number of tables replicated individually. */
+    tableTargetCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User disabled Warehouse for a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseDisabledEvent {
+  action: 'warehouse_disabled'
+  properties: {}
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -4093,3 +4126,5 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | WarehouseEnabledEvent
+  | WarehouseDisabledEvent

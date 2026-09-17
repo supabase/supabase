@@ -102,7 +102,7 @@ export async function fetchCSharpLibReferenceSource() {
     'csharp-lib',
     '/reference/csharp',
     { title: 'C# Reference', language: 'C#' },
-    'spec/supabase_csharp_v0.yml',
+    'spec/supabase_csharp_v8.yml',
     'spec/common-client-libs-sections.json'
   ).load()
 }

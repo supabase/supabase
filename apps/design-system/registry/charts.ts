@@ -57,4 +57,20 @@ export const charts: Registry = [
     category: 'Charts',
     subcategory: 'Composed',
   },
+  {
+    name: 'chart-palette',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-palette.tsx'],
+    category: 'Charts',
+    subcategory: 'Palette',
+  },
+  {
+    name: 'chart-palette-stress',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-palette-stress.tsx'],
+    category: 'Charts',
+    subcategory: 'Palette',
+  },
 ]
