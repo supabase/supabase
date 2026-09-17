@@ -23,6 +23,10 @@ type ComponentHandler = (ctx: HandlerContext) => string
 const omit: ComponentHandler = () => ''
 const unwrap: ComponentHandler = ({ children }) => children
 
+function getRegistryItem(name: string) {
+  return registry.items.find((item) => item.name === name)
+}
+
 function requiredName(props: Record<string, unknown>, field: string): string {
   const name = props[field]
   if (typeof name !== 'string' || !name) {
@@ -33,7 +37,7 @@ function requiredName(props: Record<string, unknown>, field: string): string {
 
 function BlockItem({ props }: HandlerContext): string {
   const name = requiredName(props, 'name')
-  resolveRegistryItem(registry, name)
+  resolveRegistryItem(getRegistryItem, name)
   const framework = props.framework ?? 'react'
   if (framework !== 'react' && framework !== 'vue') {
     throw new Error(`Unsupported install framework for ${name}: ${String(framework)}`)
@@ -44,7 +48,7 @@ function BlockItem({ props }: HandlerContext): string {
 
 function RegistryBlock({ props, options }: HandlerContext): string {
   const itemName = requiredName(props, 'itemName')
-  const definition = resolveRegistryItem(registry, itemName)
+  const definition = resolveRegistryItem(getRegistryItem, itemName)
   const registryPath = path.join(
     options.registryDirectory ?? path.join(process.cwd(), 'public', 'r'),
     `${itemName}.json`
