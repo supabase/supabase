@@ -24,6 +24,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import {
+  COMPUTE_AGENT_GUIDE_URL,
   COMPUTE_INSTANCE_DEPLOYABLE_RUNTIMES,
   COMPUTE_INSTANCE_SIZES,
   COMPUTE_REGION,
@@ -32,6 +33,7 @@ import type { ComputeInstanceAccess } from './Compute.types'
 import { formatSize, generateComputeInstanceName } from './Compute.utils'
 import { ComputeInstanceSnippetTabs } from './ComputeInstanceSnippetTabs'
 import { RuntimeBadge } from './RuntimeBadge'
+import { DocsButton } from '@/components/ui/DocsButton'
 
 const FORM_ID = 'deploy-instance-form'
 
@@ -228,11 +230,12 @@ export const DeployComputeInstanceDialog = ({
               access: access ?? DEFAULT_VALUES.access,
               instances: typeof instances === 'number' ? instances : DEFAULT_VALUES.instances,
             }}
-            tabs={['ai', 'cli', 'config']}
+            tabs={['ai', 'skill', 'cli', 'config']}
           />
         </DialogSection>
 
-        <DialogFooter>
+        <DialogFooter className="sm:justify-between">
+          <DocsButton href={COMPUTE_AGENT_GUIDE_URL} label="Agent guide" />
           <Button onClick={() => onOpenChange(false)}>Cancel</Button>
         </DialogFooter>
       </DialogContent>

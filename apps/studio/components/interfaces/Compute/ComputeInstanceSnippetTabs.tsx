@@ -1,8 +1,9 @@
 import { useParams } from 'common'
-import { FileCode, Sparkles, Terminal, type LucideIcon } from 'lucide-react'
+import { Bot, FileCode, Sparkles, Terminal, type LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'ui'
 
+import { COMPUTE_AGENT_GUIDE_URL, COMPUTE_SKILL_NAME } from './Compute.constants'
 import {
   buildComputeInstanceSnippets,
   type ComputeInstanceSnippetInput,
@@ -10,7 +11,7 @@ import {
 import CopyButton from '@/components/ui/CopyButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 
-export type ComputeInstanceSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
+export type ComputeInstanceSnippetTab = 'ai' | 'skill' | 'config' | 'cli' | 'curl' | 'js' | 'python'
 
 export const COMPUTE_INSTANCE_CALL_TABS = [
   'curl',
@@ -20,6 +21,7 @@ export const COMPUTE_INSTANCE_CALL_TABS = [
 
 const TAB_LABEL: Record<ComputeInstanceSnippetTab, string> = {
   ai: 'AI Prompt',
+  skill: 'Agent skill',
   config: 'config.toml',
   cli: 'CLI',
   curl: 'cURL',
@@ -29,6 +31,7 @@ const TAB_LABEL: Record<ComputeInstanceSnippetTab, string> = {
 
 const TAB_ICON: Record<ComputeInstanceSnippetTab, LucideIcon> = {
   ai: Sparkles,
+  skill: Bot,
   config: FileCode,
   cli: Terminal,
   curl: Terminal,
@@ -58,6 +61,7 @@ export const ComputeInstanceSnippetTabs = ({
   })
   const snippetByTab: Record<ComputeInstanceSnippetTab, string> = {
     ai: snippets.aiPrompt,
+    skill: snippets.skill,
     config: snippets.configToml,
     cli: snippets.cli,
     curl: snippets.curl,
@@ -105,11 +109,27 @@ export const ComputeInstanceSnippetTabs = ({
             {value}
           </p>
         ) : (
-          <pre className="overflow-x-auto p-3 pr-10 font-mono text-xs leading-relaxed text-foreground-light">
+          <pre className="max-h-80 overflow-auto p-3 pr-10 font-mono text-xs leading-relaxed text-foreground-light">
             {value}
           </pre>
         )}
       </div>
+
+      {activeTab === 'skill' && (
+        <p className="text-xs text-foreground-lighter">
+          Save this as{' '}
+          <code className="text-code-inline">.claude/skills/{COMPUTE_SKILL_NAME}/SKILL.md</code>, or
+          wherever your agent keeps skills.{' '}
+          <a
+            href={COMPUTE_AGENT_GUIDE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-foreground-light"
+          >
+            Read the full guide
+          </a>
+        </p>
+      )}
     </div>
   )
 }
