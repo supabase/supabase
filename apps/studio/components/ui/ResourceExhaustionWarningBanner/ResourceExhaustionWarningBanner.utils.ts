@@ -115,6 +115,7 @@ export const getResourceWarningMetricsHref = (
 
   const params = new URLSearchParams({
     chart: chartId,
+    db: projectRef,
     isHelper: 'true',
     helperText: REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
   })
