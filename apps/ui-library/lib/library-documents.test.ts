@@ -1,11 +1,10 @@
-import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { describe, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { buildLlmsTxt, getDocFiles } from './build-llms-txt'
+import { buildLlmsTxt, getDocFiles } from '../scripts/build-llms-txt'
 import { collectMdxFiles, getDocSlug, parseLibraryDocument } from './library-documents'
 
 describe('library document exports', () => {
@@ -34,7 +33,7 @@ description: 'A quoted description'
 `
       )
       const docs = getDocFiles(directory)
-      assert.deepEqual(docs, [
+      expect(docs).toEqual([
         {
           title: 'A title: with punctuation',
           description: 'A folded description across two lines',
@@ -43,10 +42,10 @@ description: 'A quoted description'
         { title: 'Quoted title', description: 'A quoted description', path: 'quoted' },
       ])
       const output = buildLlmsTxt(docs, new Date('2026-09-11T00:00:00Z'))
-      assert.match(output, /folded.md\)/)
-      assert.match(output, /    - A folded description across two lines/)
-      assert.match(output, /    - A quoted description/)
-      assert.doesNotMatch(output, />-|description:|'A quoted description'/)
+      expect(output).toMatch(/folded.md\)/)
+      expect(output).toMatch(/    - A folded description across two lines/)
+      expect(output).toMatch(/    - A quoted description/)
+      expect(output).not.toMatch(/>-|description:|'A quoted description'/)
     } finally {
       rmSync(directory, { recursive: true, force: true })
     }
@@ -56,36 +55,34 @@ description: 'A quoted description'
     const directory = fileURLToPath(new URL('../content/docs/', import.meta.url))
     const sources = collectMdxFiles(directory)
     const docs = getDocFiles(directory)
-    assert.deepEqual(
-      docs.map((doc) => doc.path),
+    expect(docs.map((doc) => doc.path)).toEqual(
       sources.map((source) => getDocSlug(path.relative(directory, source)))
     )
-    assert.equal(new Set(docs.map((doc) => doc.path)).size, docs.length)
-    assert.equal(getDocSlug('framework\\index.mdx'), 'framework')
+    expect(new Set(docs.map((doc) => doc.path)).size).toBe(docs.length)
+    expect(getDocSlug('framework\\index.mdx')).toBe('framework')
     const aiChat = docs.find((doc) => doc.path === 'starters/ai-chat-app')!
-    assert.equal(
-      aiChat.description,
+    expect(aiChat.description).toBe(
       'A Next.js chat app with streaming responses, authentication, and saved conversations'
     )
     const output = buildLlmsTxt(docs)
-    assert.ok(output.includes('    - Local-first, reactive collections backed by Supabase'))
-    assert.doesNotMatch(output, /    - >-/)
+    expect(output.includes('    - Local-first, reactive collections backed by Supabase')).toBe(true)
+    expect(output).not.toMatch(/    - >-/)
   })
 
   it('rejects invalid metadata types rather than stringifying them into generated content', () => {
-    assert.throws(
-      () => parseLibraryDocument('---\ntitle: [one, two]\n---'),
+    expect(() => parseLibraryDocument('---\ntitle: [one, two]\n---')).toThrow(
       /title must be a string/
     )
-    assert.throws(
-      () => parseLibraryDocument('---\ndescription: 42\n---'),
+    expect(() => parseLibraryDocument('---\ndescription: 42\n---')).toThrow(
       /description must be a string/
     )
-    assert.throws(() => parseLibraryDocument('---\npreview: true\n---'), /preview must be a string/)
+    expect(() => parseLibraryDocument('---\npreview: true\n---')).toThrow(
+      /preview must be a string/
+    )
     const source = readFileSync(
       new URL('../content/docs/starters/ai-chat-app.mdx', import.meta.url),
       'utf8'
     )
-    assert.match(parseLibraryDocument(source).content, /npx create-next-app/)
+    expect(parseLibraryDocument(source).content).toMatch(/npx create-next-app/)
   })
 })

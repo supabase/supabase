@@ -1,8 +1,7 @@
-import assert from 'node:assert/strict'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { describe, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { componentPages, mcpBlocks, oauthBlocks, platformBlocks } from '../config/docs'
 import { getLibraryBlockHref, libraryBlocks, libraryCategories } from '../config/library'
@@ -33,19 +32,19 @@ describe('library catalog', () => {
     )
 
     for (const route of documentRoutes) {
-      assert.ok(
+      expect(
         catalogRoutes.has(route) || unlistedRoutes.has(route),
         `${route} needs a catalog entry`
-      )
+      ).toBe(true)
     }
     for (const route of [...catalogRoutes, ...unlistedRoutes]) {
-      assert.ok(documentRoutes.has(route), `${route} must resolve to a guide`)
+      expect(documentRoutes.has(route), `${route} must resolve to a guide`).toBe(true)
     }
     for (const block of libraryBlocks) {
-      assert.ok(block.title.trim(), `${block.slug} needs a title`)
-      assert.ok(block.description?.trim(), `${block.slug} needs a description`)
-      assert.ok(block.preview, `${block.slug} needs a preview`)
-      assert.ok(libraryCategories.some((category) => category.name === block.category))
+      expect(block.title.trim(), `${block.slug} needs a title`).toBeTruthy()
+      expect(block.description?.trim(), `${block.slug} needs a description`).toBeTruthy()
+      expect(block.preview, `${block.slug} needs a preview`).toBeTruthy()
+      expect(libraryCategories.some((category) => category.name === block.category)).toBe(true)
     }
   })
 
@@ -59,12 +58,12 @@ describe('library catalog', () => {
 
     for (const item of existingItems) {
       const block = libraryBlocks.find((block) => block.href === item.href)
-      assert.ok(block, `${item.title} must remain in the catalog`)
-      assert.ok(libraryCategories.some((category) => category.name === block.category))
-      assert.ok(existsSync(new URL(`../content${block.href}.mdx`, import.meta.url)))
+      if (!block) throw new Error(`${item.title} must remain in the catalog`)
+      expect(libraryCategories.some((category) => category.name === block.category)).toBe(true)
+      expect(existsSync(new URL(`../content${block.href}.mdx`, import.meta.url))).toBe(true)
       for (const framework of block.supportedFrameworks ?? []) {
         const href = getLibraryBlockHref(block, framework)
-        assert.ok(existsSync(new URL(`../content${href}.mdx`, import.meta.url)), href)
+        expect(existsSync(new URL(`../content${href}.mdx`, import.meta.url)), href).toBe(true)
       }
     }
   })
@@ -74,20 +73,20 @@ describe('library catalog', () => {
     const monaco = libraryBlocks.find((block) => block.slug === 'realtime-monaco')!
     const infiniteQuery = libraryBlocks.find((block) => block.slug === 'infinite-query')!
 
-    assert.equal(getLibraryBlockHref(oauth, 'react-router'), '/docs/react-router/oauth-consent')
-    assert.equal(getLibraryBlockHref(monaco, 'vue'), '/docs/nextjs/realtime-monaco')
-    assert.equal(getLibraryBlockHref(infiniteQuery, 'nextjs'), '/docs/react/infinite-query')
+    expect(getLibraryBlockHref(oauth, 'react-router')).toBe('/docs/react-router/oauth-consent')
+    expect(getLibraryBlockHref(monaco, 'vue')).toBe('/docs/nextjs/realtime-monaco')
+    expect(getLibraryBlockHref(infiniteQuery, 'nextjs')).toBe('/docs/react/infinite-query')
   })
 
   it('includes starter apps as blocks with unique slugs and internal documentation routes', () => {
-    assert.equal(new Set(libraryBlocks.map((block) => block.slug)).size, libraryBlocks.length)
+    expect(new Set(libraryBlocks.map((block) => block.slug)).size).toBe(libraryBlocks.length)
     const starters = libraryBlocks.filter((block) => block.category === 'Starter apps')
-    assert.ok(starters.length > 0)
+    expect(starters.length > 0).toBe(true)
     for (const starter of starters) {
-      assert.equal(starter.href, `/docs/starters/${starter.slug}`)
-      assert.ok(existsSync(new URL(`../content${starter.href}.mdx`, import.meta.url)))
-      assert.notEqual(starter.external, true)
-      assert.equal(getLibraryBlockHref(starter, 'vue'), starter.href)
+      expect(starter.href).toBe(`/docs/starters/${starter.slug}`)
+      expect(existsSync(new URL(`../content${starter.href}.mdx`, import.meta.url))).toBe(true)
+      expect(starter.external).not.toBe(true)
+      expect(getLibraryBlockHref(starter, 'vue')).toBe(starter.href)
     }
   })
 })

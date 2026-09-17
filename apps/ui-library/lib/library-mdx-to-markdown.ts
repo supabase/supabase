@@ -8,7 +8,7 @@ import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { visit } from 'unist-util-visit'
 
-import { parseLibraryDocument, toAgentHref } from '../scripts/library-documents'
+import { parseLibraryDocument, toAgentHref } from './library-documents'
 import { markdownSchema, type MarkdownOptions } from './markdown-schema'
 
 type JsxNode = MdxJsxFlowElement | MdxJsxTextElement
