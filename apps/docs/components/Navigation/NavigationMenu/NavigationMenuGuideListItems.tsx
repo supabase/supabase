@@ -173,9 +173,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
             'flex items-center gap-2',
             'cursor-pointer transition text-sm',
             'focus-inset rounded-md',
-            activeItem
-              ? 'text-brand font-medium'
-              : 'hover:text-foreground text-foreground-lighter',
+            activeItem ? 'text-brand font-medium' : 'hover:text-foreground text-foreground-lighter',
           ].join(' ')}
           parent={props.subItem.parent}
         >
@@ -206,9 +204,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
         className={[
           'cursor-pointer transition text-sm',
           'focus-inset rounded-md',
-          props.url === pathname
-            ? 'text-brand'
-            : 'hover:text-foreground text-foreground-lighter',
+          props.url === pathname ? 'text-brand' : 'hover:text-foreground text-foreground-lighter',
         ].join(' ')}
       >
         {props.icon && (
