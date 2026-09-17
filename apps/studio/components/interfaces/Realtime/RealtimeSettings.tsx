@@ -119,6 +119,7 @@ export const RealtimeSettings = () => {
   const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
   const isRealtimeDisabled = data?.suspend ?? REALTIME_DEFAULT_CONFIG.suspend
+  const isAdminSuspended = Boolean(data?.admin_suspended_at)
   // Check if RLS policies exist for realtime.messages table
   const realtimeMessagesPolicies = policies?.filter(
     (policy) => policy.schema === 'realtime' && policy.table === 'messages'
@@ -332,6 +333,14 @@ export const RealtimeSettings = () => {
           ) : (
             <Card>
               <CardContent className="space-y-4">
+                {isAdminSuspended && (
+                  <Admonition
+                    showIcon={false}
+                    type="destructive"
+                    title="Realtime has been suspended"
+                    description="Supabase has suspended Realtime for this project. Contact support if you believe this is a mistake."
+                  />
+                )}
                 <FormField
                   control={form.control}
                   name="suspend"
