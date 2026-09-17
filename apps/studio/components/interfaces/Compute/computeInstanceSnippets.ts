@@ -72,6 +72,8 @@ export function buildComputeInstanceSnippets(
   const aiPrompt = [
     `Scaffold and deploy a Supabase Compute instance named "${name}" using the ${runtimeMeta.label} runtime:`,
     ``,
+    `Run \`export SUPABASE_EXPERIMENTAL_COMPUTE=1\` in the current shell before running any Supabase CLI commands. Use \`npx supabase@beta\` for every Supabase CLI command.`,
+    ``,
     `1. Create a supabase/${CLI_NAME}/${name}/ directory with a ${runtimeMeta.label} entrypoint (${entrypointFile}) that responds with "Hello, world!".`,
     ``,
     `2. Add this block to supabase/config.toml:`,
@@ -79,7 +81,7 @@ export function buildComputeInstanceSnippets(
     configBlock,
     '```',
     ``,
-    `3. Run \`supabase ${CLI_NAME} push ${name} --exposure ${input.access}\` to deploy it.`,
+    `3. Run \`npx supabase@beta ${CLI_NAME} push ${name} --exposure ${input.access}\` to deploy it.`,
   ].join('\n')
 
   const keyPlaceholder = input.access === 'public' ? '[YOUR ANON KEY]' : '[YOUR SERVICE ROLE KEY]'

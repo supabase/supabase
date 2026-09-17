@@ -19,6 +19,18 @@ describe('buildComputeInstanceSnippets', () => {
     expect(cli).toContain('--exposure private')
     expect(configToml).toContain('exposure  = "private"')
   })
+
+  it('includes the Compute CLI setup and beta deploy command in the AI prompt', () => {
+    const { aiPrompt } = buildComputeInstanceSnippets(input({ name: 'embed', access: 'private' }))
+
+    expect(aiPrompt).toContain(
+      'Run `export SUPABASE_EXPERIMENTAL_COMPUTE=1` in the current shell before running any Supabase CLI commands.'
+    )
+    expect(aiPrompt).toContain('Use `npx supabase@beta` for every Supabase CLI command.')
+    expect(aiPrompt).toContain(
+      'Run `npx supabase@beta compute push embed --exposure private` to deploy it.'
+    )
+  })
 })
 
 describe('buildComputeInstanceCliCommands', () => {
