@@ -5,7 +5,7 @@
  * real-looking content without a live ETL pipeline. Switch states with the floating control in the
  * bottom-right of any replication page (PipelineFixtureController).
  *
- * Delete this file, its three query call sites, and the controller to go back to live data.
+ * Delete this file, its query call sites, and the controller to go back to live data.
  */
 import type { components } from 'api-types'
 
@@ -13,6 +13,11 @@ type PipelineStatusResponse = components['schemas']['ReplicationPipelineStatusRe
 type PipelineVersionResponse = components['schemas']['ReplicationPipelineVersionResponse']
 type ReplicationStatusResponse =
   components['schemas']['ReplicationPipelineReplicationStatusResponse']
+type DestinationsResponse = components['schemas']['DestinationsResponse_Output']
+type DestinationResponse = components['schemas']['DestinationResponse_Output']
+type PipelinesResponse = components['schemas']['PipelinesResponse_Output']
+type PipelineResponse = components['schemas']['PipelineResponse_Output']
+type SourcesResponse = components['schemas']['SourcesResponse_Output']
 type TableStatus = ReplicationStatusResponse['table_statuses'][number]
 
 // Off under vitest so the MSW-backed component tests keep exercising the real fetch path.
@@ -29,6 +34,10 @@ export const PIPELINE_FIXTURE_SCENARIOS = [
   'starting',
   'no-tables',
   'status-unreachable',
+  'bigquery-example',
+  'ducklake-example',
+  'clickhouse-example',
+  'snowflake-example',
 ] as const
 
 export type PipelineFixtureScenario = (typeof PIPELINE_FIXTURE_SCENARIOS)[number]
@@ -44,6 +53,10 @@ export const PIPELINE_FIXTURE_SCENARIO_LABEL: Record<PipelineFixtureScenario, st
   starting: 'Pipeline starting',
   'no-tables': 'Running, no tables yet',
   'status-unreachable': 'Live updates unreachable',
+  'bigquery-example': 'Screenshot: BigQuery',
+  'ducklake-example': 'Screenshot: DuckLake',
+  'clickhouse-example': 'Screenshot: ClickHouse',
+  'snowflake-example': 'Screenshot: Snowflake',
 }
 
 const STORAGE_KEY = 'replication-fixture-scenario'
@@ -97,6 +110,10 @@ const STATUS_BY_SCENARIO: Record<
   starting: 'starting',
   'no-tables': 'started',
   'status-unreachable': 'started',
+  'bigquery-example': 'started',
+  'ducklake-example': 'started',
+  'clickhouse-example': 'started',
+  'snowflake-example': 'started',
 }
 
 export const getPipelineStatusFixture = (pipelineId: number): PipelineStatusResponse => ({
@@ -225,7 +242,123 @@ const TABLES_BY_SCENARIO: Record<PipelineFixtureScenario, TableStatus[]> = {
   starting: LIVE_TABLES,
   'no-tables': [],
   'status-unreachable': LIVE_TABLES,
+  'bigquery-example': LIVE_TABLES,
+  'ducklake-example': LIVE_TABLES,
+  'clickhouse-example': LIVE_TABLES,
+  'snowflake-example': LIVE_TABLES,
 }
+
+const DESTINATION_BY_SCENARIO: Record<
+  Extract<PipelineFixtureScenario, `${string}-example`> | 'default',
+  DestinationResponse
+> = {
+  default: {
+    id: 2_001,
+    name: 'Production analytics',
+    tenant_id: 'fixture-tenant',
+    config: { big_query: { project_id: 'northstar-production', dataset_id: 'analytics' } },
+  },
+  'bigquery-example': {
+    id: 2_001,
+    name: 'Production analytics',
+    tenant_id: 'fixture-tenant',
+    config: { big_query: { project_id: 'northstar-production', dataset_id: 'analytics' } },
+  },
+  'ducklake-example': {
+    id: 2_002,
+    name: 'Customer data lake',
+    tenant_id: 'fixture-tenant',
+    config: {
+      ducklake: {
+        data_path: 's3://meridian-data/analytics/',
+        metadata_schema: 'ducklake',
+      },
+    },
+  },
+  'clickhouse-example': {
+    id: 2_003,
+    name: 'Product events',
+    tenant_id: 'fixture-tenant',
+    config: {
+      clickhouse: {
+        database: 'analytics',
+        engine: 'replacing_merge_tree',
+        url: 'https://events.example.com:8443',
+        user: 'pipelines',
+      },
+    },
+  },
+  'snowflake-example': {
+    id: 2_004,
+    name: 'Finance reporting',
+    tenant_id: 'fixture-tenant',
+    config: {
+      snowflake: {
+        account_id: 'SUMMIT-PRODUCTION',
+        database: 'ANALYTICS',
+        schema: 'PUBLIC',
+        user: 'PIPELINES_USER',
+      },
+    },
+  },
+}
+
+const getDestinationFixture = (): DestinationResponse =>
+  DESTINATION_BY_SCENARIO[
+    scenario.endsWith('-example')
+      ? (scenario as Extract<PipelineFixtureScenario, `${string}-example`>)
+      : 'default'
+  ]
+
+export const getDestinationsFixture = (): DestinationsResponse => ({
+  destinations: [getDestinationFixture()],
+})
+
+export const getDestinationByIdFixture = (destinationId: number): DestinationResponse => ({
+  ...getDestinationFixture(),
+  id: destinationId,
+})
+
+const getPipelineFixture = (): PipelineResponse => {
+  const destination = getDestinationFixture()
+
+  return {
+    id: 1_012,
+    tenant_id: 'fixture-tenant',
+    source_id: 3_001,
+    source_name: 'main',
+    destination_id: destination.id,
+    destination_name: destination.name,
+    replicator_id: 9_001,
+    config: {
+      publication_name: 'supabase_realtime',
+      table_sync_copy: { type: 'include_all_tables' },
+    },
+  }
+}
+
+export const getPipelinesFixture = (): PipelinesResponse => ({ pipelines: [getPipelineFixture()] })
+
+export const getPipelineByIdFixture = (pipelineId: number): PipelineResponse => ({
+  ...getPipelineFixture(),
+  id: pipelineId,
+})
+
+export const getSourcesFixture = (projectRef: string): SourcesResponse => ({
+  sources: [
+    {
+      id: 3_001,
+      name: projectRef,
+      tenant_id: 'fixture-tenant',
+      config: {
+        host: 'db.internal',
+        name: 'main',
+        port: 5432,
+        username: 'postgres',
+      },
+    },
+  ],
+})
 
 export const getReplicationStatusFixture = (pipelineId: number): ReplicationStatusResponse => ({
   pipeline_id: pipelineId,

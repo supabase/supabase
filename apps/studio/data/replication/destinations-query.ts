@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { getDestinationsFixture, USE_REPLICATION_DEV_FIXTURES } from './dev-fixtures'
 import { replicationKeys } from './keys'
 import { checkReplicationFeatureFlagRetry } from './utils'
 import { get, handleError } from '@/data/fetchers'
@@ -12,6 +13,7 @@ async function fetchReplicationDestinations(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+  if (USE_REPLICATION_DEV_FIXTURES) return getDestinationsFixture()
 
   const { data, error } = await get('/platform/replication/{ref}/destinations', {
     params: { path: { ref: projectRef } },

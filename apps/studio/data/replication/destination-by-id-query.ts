@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
+import { getDestinationByIdFixture, USE_REPLICATION_DEV_FIXTURES } from './dev-fixtures'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -13,6 +14,7 @@ async function fetchReplicationDestinationById(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!destinationId) throw new Error('destinationId is required')
+  if (USE_REPLICATION_DEV_FIXTURES) return getDestinationByIdFixture(destinationId)
   const { data, error } = await get('/platform/replication/{ref}/destinations/{destination_id}', {
     params: { path: { ref: projectRef, destination_id: destinationId } },
     signal,

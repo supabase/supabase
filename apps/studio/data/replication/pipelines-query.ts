@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { getPipelinesFixture, USE_REPLICATION_DEV_FIXTURES } from './dev-fixtures'
 import { replicationKeys } from './keys'
 import { checkReplicationFeatureFlagRetry } from './utils'
 import { get, handleError } from '@/data/fetchers'
@@ -12,6 +13,7 @@ async function fetchReplicationPipelines(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+  if (USE_REPLICATION_DEV_FIXTURES) return getPipelinesFixture()
 
   const { data, error } = await get('/platform/replication/{ref}/pipelines', {
     params: { path: { ref: projectRef } },
