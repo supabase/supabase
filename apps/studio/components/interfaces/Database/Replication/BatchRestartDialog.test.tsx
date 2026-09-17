@@ -177,7 +177,11 @@ describe('BatchRestartDialog', () => {
         { queryClient }
       )
       await screen.findByText(initialStatus === 'started' ? 'Running' : 'Stopped')
-      fireEvent.click(screen.getByRole('button', { name: 'Restart' }))
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: target === 'all' ? 'Reset all tables' : 'Reset table',
+        })
+      )
       expect(screen.getByText(optimisticLabel)).toBeInTheDocument()
       backendStatus = nextStatus
       await act(async () => {
@@ -187,9 +191,7 @@ describe('BatchRestartDialog', () => {
         )
       })
       expect(screen.getByText(optimisticLabel)).toBeInTheDocument()
-      expect(
-        screen.getByRole('button', { name: 'Preparing to restart replication...' })
-      ).toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Resetting…' })).toBeDisabled()
       await act(async () => {
         complete()
       })
