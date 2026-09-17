@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -26,14 +26,22 @@ export const FilterInput = ({ value, onChange, placeholder, className }: FilterI
       className={className || 'w-56'}
       actions={[
         value && (
-          <Button
-            key="clear"
-            size="tiny"
-            variant="text"
-            icon={<X />}
-            onClick={() => onChange('')}
-            className="p-0 h-5 w-5"
-          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                key="clear"
+                size="tiny"
+                variant="text"
+                icon={<X />}
+                onClick={() => onChange('')}
+                className="p-0 h-5 w-5"
+                aria-label="Clear search"
+                // Tooltip repeats the label; the description would read the name twice
+                aria-describedby={undefined}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Clear search</TooltipContent>
+          </Tooltip>
         ),
       ]}
     />

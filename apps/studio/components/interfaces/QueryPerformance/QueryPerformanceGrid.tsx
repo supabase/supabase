@@ -18,6 +18,9 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -128,15 +131,23 @@ export const QueryPerformanceGrid = ({
 
             {isSortable && (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="text"
-                    size="tiny"
-                    className="p-1 h-5 w-5 shrink-0"
-                    icon={<ChevronDown size={14} className="text-foreground-muted" />}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </DropdownMenuTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="text"
+                        size="tiny"
+                        className="p-1 h-5 w-5 shrink-0"
+                        icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label="Sort options"
+                        // Tooltip repeats the label; the description would read the name twice
+                        aria-describedby={undefined}
+                      />
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Sort options</TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem
                     onClick={() => {
