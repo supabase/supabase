@@ -22,7 +22,7 @@ interface ResourceWarningMessage {
 
 type ResourceWarningMessages = Record<string, ResourceWarningMessage>
 
-export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
+const RESOURCE_WARNING_MESSAGE_CONFIG = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
@@ -235,4 +235,12 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       'My database is exhausting multiple resources ({resources}). Can you query pg_stat_statements to identify the most expensive queries overall, and suggest which optimizations would have the biggest impact on reducing resource consumption?',
     metric: null,
   },
-}
+} satisfies ResourceWarningMessages
+
+export type ResourceWarningMessageKey = keyof typeof RESOURCE_WARNING_MESSAGE_CONFIG
+
+export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = RESOURCE_WARNING_MESSAGE_CONFIG
+
+export const isResourceWarningMessageKey = (
+  property: string
+): property is ResourceWarningMessageKey => Object.hasOwn(RESOURCE_WARNING_MESSAGE_CONFIG, property)

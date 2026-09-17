@@ -15,7 +15,11 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
+import {
+  isResourceWarningMessageKey,
+  RESOURCE_WARNING_MESSAGES,
+  type ResourceWarningMessageKey,
+} from './ResourceExhaustionWarningBanner.constants'
 import {
   applyResourceList,
   getResourceWarningAiPrompt,
@@ -36,6 +40,10 @@ import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 type LinkedTroubleshootItem = Extract<TroubleshootItem, { kind: 'metrics' | 'docs' }>
+type ConfiguredResourceWarning = Exclude<ResourceWarningMessageKey, 'multiple_resource_warnings'>
+
+const isConfiguredResourceWarning = (property: string): property is ConfiguredResourceWarning =>
+  isResourceWarningMessageKey(property) && property !== 'multiple_resource_warnings'
 
 const MULTIPLE_RESOURCE_WARNING_NO_AI_DESCRIPTION =
   'Use the Troubleshoot menu to review the affected resources and resolve these warnings.'
@@ -107,30 +115,26 @@ export const ResourceExhaustionWarningBanner = () => {
   )
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
-  const activeWarnings =
+  const activeWarnings: ConfiguredResourceWarning[] =
     projectResourceWarnings !== undefined
       ? projectResourceWarnings.is_readonly_mode_enabled
         ? ['is_readonly_mode_enabled']
         : Object.keys(projectResourceWarnings).filter(
-            (property) =>
+            (property): property is ConfiguredResourceWarning =>
               property !== 'project' &&
               property !== 'is_readonly_mode_enabled' &&
-              Object.hasOwn(RESOURCE_WARNING_MESSAGES, property) &&
-              projectResourceWarnings[property as keyof typeof projectResourceWarnings] !== null
+              isConfiguredResourceWarning(property) &&
+              projectResourceWarnings[property] !== null
           )
       : []
 
   const hasCriticalWarning =
     projectResourceWarnings !== undefined
-      ? activeWarnings.some(
-          (x) => projectResourceWarnings[x as keyof typeof projectResourceWarnings] === 'critical'
-        )
+      ? activeWarnings.some((warningType) => projectResourceWarnings[warningType] === 'critical')
       : false
   const hasWarningSeverity =
     projectResourceWarnings !== undefined
-      ? activeWarnings.some(
-          (x) => projectResourceWarnings[x as keyof typeof projectResourceWarnings] === 'warning'
-        )
+      ? activeWarnings.some((warningType) => projectResourceWarnings[warningType] === 'warning')
       : false
   const hasMixedWarningSeverities = hasCriticalWarning && hasWarningSeverity
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
@@ -169,8 +173,7 @@ export const ResourceExhaustionWarningBanner = () => {
   const metric =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.metric
-      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.metric
+      : RESOURCE_WARNING_MESSAGES[activeWarnings[0]]?.metric
 
   const isFreePlan = organization?.plan?.id === 'free'
 
@@ -189,8 +192,7 @@ export const ResourceExhaustionWarningBanner = () => {
     if (isComputeUpgradeMetric) return 'Upgrade compute'
     return activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.buttonText
-      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.buttonText
+      : RESOURCE_WARNING_MESSAGES[activeWarnings[0]]?.buttonText
   })()
 
   const troubleshootItems = getTroubleshootItems({
@@ -235,8 +237,7 @@ export const ResourceExhaustionWarningBanner = () => {
     (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
   // these take precedence over each other, so there's only one active warning to check
-  const activeWarning =
-    RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
+  const activeWarning = RESOURCE_WARNING_MESSAGES[activeWarnings[0]]
   const restrictToRoutes = activeWarning?.restrictToRoutes
 
   const isVisible =
