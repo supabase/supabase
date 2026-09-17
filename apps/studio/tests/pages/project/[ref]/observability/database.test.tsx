@@ -90,6 +90,17 @@ describe('useDatabaseChartDeepLink', () => {
     expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
   })
 
+  test('stops polling after the user interacts before the chart mounts', () => {
+    renderHook(() => useDatabaseChartDeepLink('disk-size'))
+
+    act(() => window.dispatchEvent(new Event('wheel')))
+    const target = addChart('disk-size')
+    act(() => vi.advanceTimersByTime(200))
+
+    expect(target.scrollIntoView).not.toHaveBeenCalled()
+    expect(MockResizeObserver.instances).toHaveLength(0)
+  })
+
   test('starts a fresh observer when the chart query parameter changes', () => {
     const cpuTarget = addChart('cpu-usage')
     const diskTarget = addChart('disk-size')

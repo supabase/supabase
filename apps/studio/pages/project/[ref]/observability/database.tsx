@@ -93,23 +93,29 @@ export const useDatabaseChartDeepLink = (chart?: string) => {
     if (chart === undefined) return
 
     let attempts = 0
+    let pollForChart: number | undefined
     let resizeObserver: ResizeObserver | undefined
     let stopObservingTimer: number | undefined
 
-    const stopObserving = () => {
+    const stopDeepLink = () => {
+      if (pollForChart !== undefined) window.clearInterval(pollForChart)
       if (stopObservingTimer !== undefined) window.clearTimeout(stopObservingTimer)
       resizeObserver?.disconnect()
       CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS.forEach((eventName) =>
-        window.removeEventListener(eventName, stopObserving, true)
+        window.removeEventListener(eventName, stopDeepLink, true)
       )
     }
 
-    const pollForChart = window.setInterval(() => {
+    CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS.forEach((eventName) =>
+      window.addEventListener(eventName, stopDeepLink, true)
+    )
+
+    pollForChart = window.setInterval(() => {
       attempts += 1
       const target = document.getElementById(chart)
 
       if (target === null) {
-        if (attempts >= CHART_TARGET_POLL_ATTEMPTS) window.clearInterval(pollForChart)
+        if (attempts >= CHART_TARGET_POLL_ATTEMPTS) stopDeepLink()
         return
       }
 
@@ -125,16 +131,10 @@ export const useDatabaseChartDeepLink = (chart?: string) => {
         }
       })
       resizeObserver.observe(chartList)
-      CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS.forEach((eventName) =>
-        window.addEventListener(eventName, stopObserving, true)
-      )
-      stopObservingTimer = window.setTimeout(stopObserving, CHART_LAYOUT_OBSERVATION_DURATION)
+      stopObservingTimer = window.setTimeout(stopDeepLink, CHART_LAYOUT_OBSERVATION_DURATION)
     }, CHART_TARGET_POLL_INTERVAL)
 
-    return () => {
-      window.clearInterval(pollForChart)
-      stopObserving()
-    }
+    return stopDeepLink
   }, [chart])
 }
 
