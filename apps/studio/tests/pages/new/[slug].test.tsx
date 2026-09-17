@@ -493,7 +493,7 @@ describe('project creation wizard', () => {
       await generateAndWaitForStrongPassword()
 
       await user.click(getSelectTriggerByLabel('Compute size'))
-      await user.click(await screen.findByText('4 GB RAM / 2-core CPU'))
+      await user.click(await screen.findByText('4 GB RAM / Shared compute'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
