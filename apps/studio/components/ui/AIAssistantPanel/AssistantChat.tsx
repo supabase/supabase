@@ -564,7 +564,7 @@ export const AssistantChat = ({
         })}
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
+            <ConversationContent className="w-full py-8 mb-10">
               {renderedMessages}
               <div className="w-full max-w-3xl mx-auto">
                 {error && (
