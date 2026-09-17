@@ -30,6 +30,7 @@ import {
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getAvailableRegions,
   getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
@@ -483,12 +484,16 @@ export const ProjectCreationForm = ({
     }
 
     const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
+    const selectedStaticRegion = smartRegionEnabled
+      ? undefined
+      : Object.values(getAvailableRegions(cloudProvider as CloudProvider)).find(
+          (region) => region.displayName === dbRegion
+        )
+    const selectedRegionCode = selectedSpecificRegion?.code ?? selectedStaticRegion?.code
     const selectedRegionRestriction = resolveRegionRestriction({
       platformStatus: selectedSpecificRegion?.status,
       flagRestriction:
-        selectedSpecificRegion !== undefined
-          ? restrictedRegions[selectedSpecificRegion.code]
-          : undefined,
+        selectedRegionCode !== undefined ? restrictedRegions[selectedRegionCode] : undefined,
     })
     if (selectedRegionRestriction !== undefined) {
       setError(
