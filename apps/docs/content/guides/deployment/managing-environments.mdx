@@ -116,7 +116,7 @@ You should see that a new file `supabase/migrations/<timestamp>_new_employee.sql
 
 <$Partial path="diff_engine_check.mdx" />
 
-This auto-generated migration script is usually more verbose than the manually written one. Both engines treat permissions as part of the schema state, so generated migrations can include `GRANT` and `REVOKE` statements you didn't write. If you haven't changed permissions, these lines are safe to remove.
+This auto-generated migration script is usually more verbose than the manually written one. Both engines treat permissions as part of the schema state, so generated migrations can include `GRANT` and `REVOKE` statements you didn't write. If you haven't changed permissions and the roles already hold those privileges on the target database, these lines are safe to remove.
 
 Commit the new migration script to git and you are ready to deploy.
 

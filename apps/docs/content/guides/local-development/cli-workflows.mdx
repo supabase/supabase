@@ -465,7 +465,7 @@ Objects that extensions create and manage themselves, such as partitions maintai
 
 ### Grants and revoke patterns
 
-Both engines treat permissions as part of the schema state, so generated migrations can include grant statements you didn't write. New tables can come with explicit `GRANT` lines for the default roles, and a first diff against an existing database can emit long runs of `REVOKE ALL` followed by `GRANT` statements derived from default privileges. If you haven't changed permissions, these lines are safe to remove. Be consistent across your team about whether you keep or remove them.
+Both engines treat permissions as part of the schema state, so generated migrations can include grant statements you didn't write. New tables can come with explicit `GRANT` lines for the default roles, and a first diff against an existing database can emit long runs of `REVOKE ALL` followed by `GRANT` statements derived from default privileges. These statements can also come from default-privilege differences between the two databases, so before removing them, check that the roles already hold the intended privileges on the target database. If they do and you haven't changed permissions, the lines are safe to remove. Be consistent across your team about whether you keep or remove them.
 
 ### Known limitations of `db diff`
 
