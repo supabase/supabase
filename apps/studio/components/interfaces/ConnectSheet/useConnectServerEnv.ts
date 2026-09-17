@@ -70,6 +70,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
   )
   const publishableKey = keys?.publishableKey?.api_key ?? keys?.anonKey?.api_key ?? ''
   const secretKey = keys?.secretKey ?? keys?.serviceKey
+  const isServiceRoleKey = secretKey?.id === 'service_role'
   const maskedValue = secretKey?.api_key
     ? `${secretKey.api_key.slice(0, 15)}${SECRET_MASK}`
     : 'your-secret-key'
@@ -87,12 +88,13 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
   const revealPromiseRef = useRef<ReturnType<typeof reveal> | null>(null)
   const revealOnce = useCallback(() => {
     if (!revealPromiseRef.current) {
-      revealPromiseRef.current = reveal().finally(() => {
+      const promise = isServiceRoleKey ? () => Promise.resolve(secretKey.api_key) : reveal
+      revealPromiseRef.current = promise().finally(() => {
         revealPromiseRef.current = null
       })
     }
     return revealPromiseRef.current
-  }, [reveal])
+  }, [secretKey, isServiceRoleKey, reveal])
 
   // clear() invalidates the in-flight reveal request (by request id) but
   // doesn't know about revealPromiseRef, so a hide immediately followed by
@@ -158,7 +160,11 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
       isRevealed,
       isRevealing,
       maskedValue,
-      displayValue: isRevealed && revealedSecret ? revealedSecret : maskedValue,
+      displayValue: isRevealed
+        ? isServiceRoleKey
+          ? secretKey.api_key
+          : revealedSecret || maskedValue
+        : maskedValue,
       toggle,
       getValue: getSecretValue,
     },
