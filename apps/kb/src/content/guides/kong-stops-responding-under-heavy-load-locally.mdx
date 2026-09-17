@@ -1,8 +1,11 @@
 ---
 title: 'Kong stops responding under heavy load in local development'
 description: 'Explains why the local Kong gateway becomes unresponsive under heavy parallel load and how to fix it by tuning nginx worker processes.'
-topics: ['Troubleshooting', 'Supabase Platform', 'Storage', 'CLI', 'Self-Hosting', 'Deprecated']
+topics: ['Troubleshooting', 'Supabase Platform', 'Storage', 'CLI', 'Self-Hosting']
 ---
+
+> [!CAUTION]
+> Supabase now uses an Envoy-based API gateway by default, with Kong available only as an optional override. This guide applies only to stacks still running Kong.
 
 When running Supabase locally with the CLI, the Kong API gateway can stop
 responding under heavy load. This typically happens when many parallel

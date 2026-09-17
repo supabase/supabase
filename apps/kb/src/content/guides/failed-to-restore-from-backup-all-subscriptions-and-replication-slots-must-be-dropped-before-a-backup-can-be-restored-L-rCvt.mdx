@@ -9,15 +9,15 @@ As the error suggests, you must first drop any current subscriptions or replicat
 
 You can check those with:
 
-```
-SELECT * FROM pg_replication_slots;
+```sql
+select * from pg_replication_slots;
 
-SELECT * FROM pg_subscription;
+select * from pg_subscription;
 ```
 
 You can drop them with:
 
-```
+```sql
 DROP SUBSCRIPTION <subscription>;
 
 SELECT pg_drop_replication_slot(slot_name);

@@ -1,6 +1,6 @@
 ---
 title: 'Errors when creating / updating / deleting users'
-description: 'Explains common 500 unexpected_failure errors when creating, updating, or deleting users from the dashboard, and how to fix trigger or constraint issues on auth.users.'
+description: 'Explains 500 unexpected_failure errors when creating, updating, or deleting dashboard users, and how to fix trigger or constraint issues on auth.users.'
 topics: ['Troubleshooting', 'Auth', 'Database', 'Supabase Platform', 'Dashboard']
 github_url: 'https://github.com/orgs/supabase/discussions/21247'
 ---
@@ -28,28 +28,28 @@ These error are normal a side effect of issues in your custom user management lo
 
 Use the hints provided in the error message to fix issues in your custom user management logic.
 
-**Trigger/trigger function related error messages** - [Solution for trigger related issues](/docs/guides/troubleshooting/dashboard-errors-when-managing-users-N1ls4A#solution-for-trigger-related-issues)
+**Trigger/trigger function related error messages** - [Solution for trigger related issues](/kb/guides/dashboard-errors-when-managing-users-N1ls4A#solution-for-trigger-related-issues)
 
-```
+```text
 "error":"error update user`s last_sign_in field: ERROR: permission denied for table profiles (SQLSTATE 42501)"
 ```
 
-**Constraint related error message** - [Solution for constraint related issues](/docs/guides/troubleshooting/dashboard-errors-when-managing-users-N1ls4A#solution-for-constraint-related-issues)
+**Constraint related error message** - [Solution for constraint related issues](/kb/guides/dashboard-errors-when-managing-users-N1ls4A#solution-for-constraint-related-issues)
 
-```
+```text
 ERROR:  23503: update or delete on table "users" violates foreign key constraint "profiles_id_fkey" on table "profiles"
 DETAIL:  Key (id)=(7428a53c-75b7-4531-9ae9-1567d9c4ac0a) is still referenced from table "profiles".
 ```
 
 **Missing column**
 
-```
+```text
 ERROR: column \"updated_at\" of relation \"profiles\" does not exist (SQLSTATE 42703)
 ```
 
-**Broken search path / incorrect name** - [42P01 related solution](/docs/guides/troubleshooting/resolving-42p01-relation-does-not-exist-error-W4_9-V)
+**Broken search path / incorrect name** - [42P01 related solution](/kb/guides/resolving-42p01-relation-does-not-exist-error-W4_9-V)
 
-```
+```text
 failed to close prepared statement: ERROR: current transaction is aborted, commands ignored until end of transaction block (SQLSTATE 25P02): ERROR: relation \"public.profiles\" does not exist (SQLSTATE 42P01)
 ```
 

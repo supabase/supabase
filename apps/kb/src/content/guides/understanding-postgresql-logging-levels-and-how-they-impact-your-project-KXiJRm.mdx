@@ -1,7 +1,7 @@
 ---
 title: 'Understanding Postgres Logging Levels and How They Impact Your Project'
 description: 'Explains Postgres logging levels and how leaving verbose levels like DEBUG or INFO enabled can exhaust disk space and degrade database performance.'
-topics: ['Tip', 'Database']
+topics: ['Troubleshooting', 'Database']
 github_url: 'https://github.com/orgs/supabase/discussions/29877'
 ---
 
@@ -24,7 +24,7 @@ Postgres provides multiple logging levels that allow you to control how much inf
 
 Each of these log levels is useful in specific situations. Here's an example of what messages tagged with each severity level look like:
 
-```
+```text
 DEBUG:  server process (PID 12345) exited with exit code 0
 INFO:  vacuuming "example_schema.public.example_table"
 NOTICE:  identifier "very_very_very_long_table_name_exceeding_63_characters" will be truncated to "very_very_very_long_table_name_exceedin"
@@ -73,25 +73,25 @@ You can adjust log levels using SQL commands in the SQL Editor or any connected 
 
 - To check the current log level:
 
-```
+```sql
 SHOW log_min_messages;
 ```
 
 - To set the log level to WARNING (recommended default):
 
-```
+```sql
 ALTER ROLE postgres SET log_min_messages TO 'WARNING';
 ```
 
 - To set the log level to ERROR:
 
-```
+```sql
 ALTER ROLE postgres SET log_min_messages TO 'ERROR';
 ```
 
 - To reset to the default level:
 
-```
+```sql
 ALTER ROLE postgres RESET log_min_messages;
 ```
 

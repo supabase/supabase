@@ -1,7 +1,7 @@
 ---
 title: 'Why is my select returning an empty data array and I have data in the table?'
 description: 'Helps diagnose empty query results caused by RLS policies or filters, with a SQL and JS snippet to test whether a request carries a session.'
-topics: ['Troubleshooting', 'Database', 'Auth']
+topics: ['Troubleshooting', 'Database', 'Auth', 'Data API']
 github_url: 'https://github.com/orgs/supabase/discussions/12895'
 ---
 
@@ -11,7 +11,7 @@ If you have RLS enabled you can test by disabling RLS on the table. If your quer
 
 If you have policies that depend on having a signed in user (TO set to `authenticated` or using `auth.uid()`) then you can check by setting TO as `anon` and setting your policy to `TRUE`. If that works then you don't have a signed in user (with a JWT in the authorization header) when you make the call.
 
-For more information on RLS see https://supabase.com/docs/guides/auth/row-level-security
+For more information on [RLS](/docs/guides/auth/row-level-security)
 
 Adding:
 To test if you have a user session at time of your call you can add this function with the SQL editor and an RPC call in your code at same place as your current database call.
@@ -25,7 +25,7 @@ $$
 $$;
 ```
 
-```javascript
+```js
 const { data: testData, error: testError } = await supabase.rpc('test_authorization_header')
 console.log(`The user role is ${testData.role} and the user UUID is ${testData.sub}. `, testError)
 ```

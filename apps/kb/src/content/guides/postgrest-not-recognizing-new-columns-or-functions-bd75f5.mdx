@@ -1,12 +1,12 @@
 ---
 title: 'PostgREST not recognizing new columns, tables, views or functions'
 description: 'Fixes a stale PostgREST schema cache caused by a stuck Postgres notification queue by running pg_notification_queue_usage() to refresh it.'
-topics: ['Troubleshooting', 'Database', 'PostgREST']
+topics: ['Troubleshooting', 'Database', 'Data API']
 ---
 
 If PostgREST is returning errors by not recognizing new database columns, tables, views or functions, and logging errors similar to:
 
-```console
+```text
 24/Dec/2025:18:16:33 -0500: Failed listening for database notifications on the "pgrst" channel. ERROR:  could not access status of transaction 12037872 DETAIL:  Could not open file "pg_xact/000B": No such file or directory.
 ```
 

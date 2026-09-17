@@ -22,7 +22,7 @@ postgres://[db-user].[project-ref]:[db-password]@aws-0-[aws-region].pooler.supab
 
 When using transaction mode, you should use the[ `NullPool` setting:](https://docs.sqlalchemy.org/en/20/core/pooling.html#switching-pool-implementations)
 
-```py
+```python
 from sqlalchemy.pool import NullPool
 
 con = sqlalchemy.create_engine(url, client_encoding='utf8', poolclass=NullPool)
@@ -30,13 +30,13 @@ con = sqlalchemy.create_engine(url, client_encoding='utf8', poolclass=NullPool)
 
 When relying on Supavisor, it's important to pick an adequate pool size. This guide can walk you through the process:
 
-- https://github.com/orgs/supabase/discussions/21566
+- [Supavisor FAQ](https://github.com/orgs/supabase/discussions/21566)
 
 ## Deploying to stationary servers
 
 For stationary servers, such as VMs and long-running containers, it is recommended to use your direct connection string, which can be found on the dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
-```
+```text
 # Example DB string:
 postgresql://postgres:[PASSWORD]@db.[PROJECT REF].supabase.co:5432/postgres
 ```

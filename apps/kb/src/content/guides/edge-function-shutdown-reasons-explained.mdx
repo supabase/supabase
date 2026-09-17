@@ -122,7 +122,7 @@ Each `ShutdownEvent` includes valuable diagnostic information:
 
 Make your functions safe to run multiple times with the same input. Use execution IDs from metadata to detect duplicate runs and avoid repeating side effects.
 
-```typescript
+```ts
 // Store execution_id to detect retries
 const executionId = Deno.env.get('SB_EXECUTION_ID')
 const alreadyProcessed = await checkIfProcessed(executionId)
@@ -136,7 +136,7 @@ if (alreadyProcessed) {
 
 Save progress frequently to durable storage
 
-```typescript
+```ts
 // Save progress incrementally
 for (const batch of dataBatches) {
   await processBatch(batch)
@@ -148,7 +148,7 @@ for (const batch of dataBatches) {
 
 Avoid loading entire files or responses into memory. Stream data to reduce memory footprint.
 
-```typescript
+```ts
 // Stream responses instead of buffering
 return new Response(readableStream, {
   headers: { 'Content-Type': 'application/json' },
@@ -170,7 +170,7 @@ Access your function logs at [Functions Logs](/dashboard/project/_/functions).
 
 While you can't always rely on cleanup code running, implement it anyway for the cases where graceful shutdown is possible.
 
-```typescript
+```ts
 // Cleanup handler (may not always run)
 addEventListener('unload', () => {
   // Close connections, flush buffers, etc.

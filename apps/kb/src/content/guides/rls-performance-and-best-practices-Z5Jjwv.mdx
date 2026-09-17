@@ -1,6 +1,6 @@
 ---
 title: 'RLS Performance and Best Practices'
-description: 'Explains how Row Level Security policies can slow down queries and gives techniques, such as indexing and wrapping functions in select, to improve performance.'
+description: 'Explains how Row Level Security policies can slow down queries, and techniques such as indexing and wrapping functions in select to improve performance.'
 topics: ['Troubleshooting', 'Auth', 'Database']
 github_url: 'https://github.com/orgs/supabase/discussions/14576'
 ---
@@ -95,7 +95,7 @@ will be much slower than:
 `team_id in (select team_id from team_user where user_id = auth.uid())`
 Also consider moving the join query to a security definer function to avoid RLS on join table:
 `team_id in (select user_teams())`
-Note that if the `in` list gets to be over 10K items, then extra analysis is likely needed. See this follow up testing: https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/Supabase-Docs-Test .
+Note that if the `in` list gets to be over 10K items, then extra analysis is likely needed. See this [follow up testing](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/Supabase-Docs-Test) .
 
 #### 6. Use role in TO option or roles dropdown in the dashboard.
 
@@ -125,7 +125,7 @@ Show RLS and before after for above examples.
 
 ### Tools to measure performance
 
-Postgres has tools to analyze the performance of queries. https://www.postgresql.org/docs/current/sql-explain.html
+Postgres has tools to analyze the performance of queries, such as [EXPLAIN](https://www.postgresql.org/docs/current/sql-explain.html).
 The use of explain in detail for query analysis is beyond the scope of this discussion.
 Here we will use it mainly to get a performance metric to compare times.
 In order to do RLS testing you need to setup the user JWT claims and change the running user to `anon` or `authenticated`.
@@ -140,7 +140,7 @@ set session role postgres;
 
 This will return results like:
 
-```
+```text
 Seq Scan on rlstest  (cost=0.00..4334.00 rows=1 width=35) (actual time=170.999..170.999 rows=0 loops=1)
 "  Filter: ((COALESCE(NULLIF(current_setting('request.jwt.claim.sub'::text, true), ''::text), ((NULLIF(current_setting('request.jwt.claims'::text, true), ''::text))::jsonb ->> 'sub'::text)))::uuid = user_id)"
   Rows Removed by Filter: 100000
@@ -173,7 +173,7 @@ console.log(data)
 
 This will return a result like:
 
-```
+```text
 Aggregate  (cost=8.18..8.20 rows=1 width=112) (actual time=0.017..0.018 rows=1 loops=1)
   ->  Index Scan using projects_pkey on projects  (cost=0.15..8.17 rows=1 width=40) (actual time=0.012..0.012 rows=0 loops=1)
         Index Cond: (id = 1)
@@ -200,7 +200,7 @@ This case times out with over 3 minutes as 1M rows must be searched and the func
 Changing to wrap the function (method 2) `team_id = ANY(ARRAY(select user_teams()))` is a big improvement but can still take seconds.
 Adding an index to team_id is the big win, but only with the second case. Without, the index case still times out.
 
-##### user_teams() function returning an array:
+#### user_teams() function returning an array:
 
 ```sql
 CREATE OR REPLACE FUNCTION user_teams()

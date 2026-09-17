@@ -1,7 +1,7 @@
 ---
 title: 'Slow Execution of ALTER TABLE on Large Table when changing column type'
 description: 'Offers a faster alternative to changing a column type with ALTER TABLE on large tables, using a new column, a data copy, and a drop.'
-topics: ['Tip', 'Database']
+topics: ['Troubleshooting', 'Database']
 github_url: 'https://github.com/orgs/supabase/discussions/19747'
 ---
 
@@ -30,7 +30,7 @@ The long execution time for the ALTER TABLE operation can be attributed to the l
 
 - Monitor currently blocked database transactions during the process using the provided script:
 
-```
+```sql
 create view  public.lock_monitor as
 select
   coalesce(

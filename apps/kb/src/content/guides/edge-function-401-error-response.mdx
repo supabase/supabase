@@ -1,6 +1,6 @@
 ---
 title: 'Edge Function 401 error response'
-description: 'Walks through triaging a 401 response from an Edge Function, covering custom 401s from function code versus built-in JWT check failures like invalid or missing keys.'
+description: 'Walks through triaging a 401 from an Edge Function, separating custom 401s in your code from built-in JWT check failures like invalid or missing keys.'
 topics: ['Troubleshooting', 'Edge Functions']
 ---
 
@@ -126,7 +126,7 @@ Your project uses the [new asymmetric keys](/blog/jwt-signing-keys) for authenti
 
 In the [Functions Dashboard](/dashboard/project/_/functions/), open the affected function's `detail tab` and toggle off JWT verification.
 
-![image](/kb/img/troubleshooting/401_edge_functions_toggle_off_JWT_check.png)
+![Verify JWT with legacy secret toggle in the function Details tab](/kb/img/troubleshooting/401_edge_functions_toggle_off_JWT_check.png)
 
 #### Method B: Supabase CLI
 

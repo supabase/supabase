@@ -56,21 +56,21 @@ The logger receives three parameters: `kind`, `msg`, and `data`.
 
 **`push`** - Messages sent to the server
 
-```
+```text
 push: realtime:chat heartbeat (42) {}
 push: realtime:chat phx_join (1) { config: {...} }
 ```
 
 **`receive`** - Messages received from server
 
-```
+```text
 receive: ok realtime:chat phx_reply (1) { response: {...} }
 receive: realtime:chat broadcast { event: 'message', payload: {...} }
 ```
 
 **`transport`** - Connection events
 
-```
+```text
 transport: connected to wss://project.supabase.co/realtime/v1
 transport: heartbeat timeout. Attempting to re-establish connection
 transport: close CloseEvent {...}
@@ -79,14 +79,14 @@ transport: leaving duplicate topic "realtime:chat"
 
 **`error`** - Error events
 
-```
+```text
 error: error in heartbeat callback Error: ...
 error: error waiting for auth on connect Error: ...
 ```
 
 **`worker`** - Web Worker events
 
-```
+```text
 worker: starting default worker
 worker: starting worker for from /worker.js
 worker: worker error message

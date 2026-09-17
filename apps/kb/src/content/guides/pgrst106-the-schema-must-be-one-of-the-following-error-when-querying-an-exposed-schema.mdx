@@ -1,7 +1,7 @@
 ---
 title: 'PGRST106: "The schema must be one of the following..." error when querying an exposed schema'
 description: "Fixes the PGRST106 PostgREST error by updating the authenticator role's pgrst.db_schemas setting to include the exposed schema."
-topics: ['Troubleshooting', 'Database']
+topics: ['Troubleshooting', 'Database', 'Data API']
 ---
 
 You may encounter a `PGRST106` error, stating `{"code":"PGRST106","message":"The schema must be one of the following: public"}`, when attempting to query a schema via the PostgREST API that you've recently exposed.

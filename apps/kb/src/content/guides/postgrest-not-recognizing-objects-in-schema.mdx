@@ -1,12 +1,12 @@
 ---
 title: 'PostgREST not recognizing the objects(tables/functions/views) in a schema even after adding it to the exposed schemas'
 description: 'Explains why PostgREST only resolves unqualified object names against the first exposed schema, and how to reorder schemas or scope requests instead.'
-topics: ['Troubleshooting', 'Database', 'PostgREST']
+topics: ['Troubleshooting', 'Database', 'Data API']
 ---
 
 PostgREST is returning errors by not recognizing the objects(tables/functions/views) in a schema and logging errors similar to:
 
-```
+```text
 Could not find the table 'X' in the schema cache
 ```
 

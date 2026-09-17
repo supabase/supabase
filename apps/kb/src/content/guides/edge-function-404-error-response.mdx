@@ -58,7 +58,7 @@ The difference between the two errors is:
 > [!NOTE]
 > Always configure an appropriate time frame when querying the logs
 >
-> ![image](/kb/img/troubleshooting/edge_function_404_set_timeframe.png)
+> ![Setting the time frame on a log query](/kb/img/troubleshooting/edge_function_404_set_timeframe.png)
 
 You cannot inspect the function dashboard to find platform 404 errors, instead, run the below query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%20distinct%0A%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%2C%0A%20%20case%0A%20%20%20%20when%20log_attributes%5B%27execution_id%27%5D%20%3D%20%27%27%20then%20%27FUNCTION_NOT_FOUND%27%0A%20%20%20%20else%20%27FUNCTION%20RECOGNIZED%3A%20custom%20404%20message%20in%20app%20logic%27%0A%20%20end%20as%20type_of_404%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27function_edge_logs%27%0A%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20404%0Alimit%2010%3B). The results show all requests that reached Supabase but were rejected as unrecognizable.
 
@@ -90,7 +90,7 @@ In your code, make sure your function name doesn't have any typos, such as:
 
 When selecting your function in the [Function Dashboard](/dashboard/project/_/functions), you should have the option to make a test call:
 
-![image](/kb/img/troubleshooting/edge_function_404_test_call.png)
+![Test call option in the Function Dashboard](/kb/img/troubleshooting/edge_function_404_test_call.png)
 
 If the call works, consider double checking your code for typos or to see if it is overwriting the function name dynamically. Otherwise, go on to step 4.
 
@@ -100,7 +100,7 @@ If step 3 fails, it may be a sign of an internal bug and it may be necessary to 
 
 This can be done within the [Function Dashboard](/dashboard/project/_/functions) under the respective function's code tab:
 
-![image](/kb/img/troubleshooting/edge_function_404_redeploy.png)
+![Redeploying a function from its code tab](/kb/img/troubleshooting/edge_function_404_redeploy.png)
 
 Alternatively, if you develop locally, you can redeploy the function with the [Supabase CLI](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos):
 

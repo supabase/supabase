@@ -15,7 +15,7 @@ If you're not able to run the CLI or cannot identify the cause, [open a support 
 
 **Example error**
 
-```
+```bash
 $ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID
 ```
 
@@ -23,7 +23,7 @@ $ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID
 
 From the details we can see it is exceeding the 20MB [Edge Function size limit](/docs/guides/functions/limits):
 
-```
+```bash
 $ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID --debug
 Deploying Function: FUNCTION_NAME (script size: 62.61MB)
 ```

@@ -42,7 +42,7 @@ In the [function dashboard's](/dashboard/project/_/functions/) `Logs` tab, you c
 - `Memory limit exceeded`
 - `CPU Time exceeded`
 
-![image](/kb/img/troubleshooting/limit_logs.png)
+![Function Logs tab filtered for "limit", showing Memory limit exceeded errors](/kb/img/troubleshooting/limit_logs.png)
 
 Alternatively, you can filter for the specific errors from the function using the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20fl.event_message%2C%0A%20%20fl.timestamp%2C%0A%20%20fel.function_name%2C%0A%20%20fel.status_code%0Afrom%0A%20%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20timestamp%2C%0A%20%20%20%20%20%20event_message%2C%0A%20%20%20%20%20%20log_attributes%5B%27execution_id%27%5D%20as%20execution_id%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_logs%27%0A%20%20%20%20%20%20and%20log_attributes%5B%27level%27%5D%20%3D%20%27error%27%0A%20%20%29%20as%20fl%0A%20%20inner%20join%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20log_attributes%5B%27execution_id%27%5D%20as%20execution_id%2C%0A%20%20%20%20%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20%20%20%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_edge_logs%27%0A%20%20%20%20%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20546%0A%20%20%29%20as%20fel%20on%20fl.execution_id%20%3D%20fel.execution_id%0Aorder%20by%20fl.timestamp%2C%20fel.function_name%0Alimit%2020%3B)
 
@@ -171,7 +171,7 @@ limit 24;
 ```
 
 The output may look like:
-![image](/kb/img/troubleshooting/546_errors_by_hour.png)
+![Query results showing 546 errors grouped by hour](/kb/img/troubleshooting/546_errors_by_hour.png)
 
 If the failures are concentrated to a specific time, you can check if you made any updates around that period or if users were engaging in atypical behavior, such as sending larger payloads.
 

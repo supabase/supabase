@@ -30,6 +30,11 @@ export const TOPICS = [
   },
   { name: 'Database', description: 'Postgres schemas, queries, and performance.', pinned: true },
   {
+    name: 'Data API',
+    description: 'Auto-generated REST endpoints for querying your database powered by PostgREST.',
+    pinned: false,
+  },
+  {
     name: 'Edge Functions',
     description: 'Deploying and running serverless functions.',
     pinned: false,

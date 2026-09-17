@@ -1,15 +1,14 @@
 ---
 title: 'Database Error: remaining connection slots are reserved for non-replication superuser connections'
-description: 'Explains that this error means the database has hit its max connection limit, and suggests optimizing connections, using the connection pooler, or upgrading compute.'
+description: 'Explains that this error means the database hit its max connection limit: optimize connections, use the connection pooler, or upgrade compute.'
 topics: ['Troubleshooting', 'Database']
 github_url: 'https://github.com/orgs/supabase/discussions/13995'
 ---
 
 This error usually occurs when the database reaches the maximum number of connections allowed based on the compute add-on.
 
-To overcome this, the connections need to be optimized as mentioned here: https://supabase.com/docs/guides/platform/performance#optimizing-the-number-of-connections
+To overcome this, the connections need to be optimized as mentioned [here](/docs/guides/platform/performance#optimizing-the-number-of-connections)
 
-Additionally, you can try using the connection pool to help solve this issue:
-https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works
+Additionally, you can try using the [connection pool](/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works) to help solve this issue.
 
-If you're already using connection pooling and still hitting the maximum connections, then it is suggested to upgrade your compute add-on that allows more connections: https://supabase.com/docs/guides/platform/compute-and-disk
+If you're already using connection pooling and still hitting the maximum connections, then it is suggested to upgrade your [compute add-on](/docs/guides/platform/compute-and-disk) that allows more connections

@@ -1,12 +1,13 @@
 ---
 title: 'SQLSTATE 40001 (serialization_failure) in an RPC function causes infinite retries'
-description: 'Explains why raising SQLSTATE 40001 in a PL/pgSQL function triggers PostgREST retry loops and high CPU, and how to fix the function and clear hanging backends.'
-topics: ['Troubleshooting', 'Database']
+description: 'Explains why raising SQLSTATE 40001 in a PL/pgSQL function triggers PostgREST retry loops and high CPU, and how to fix it and clear hanging backends.'
+topics: ['Troubleshooting', 'Database', 'Data API']
 ---
 
-A custom `raise exception` using SQLSTATE `40001` (`serialization_failure`) in your PL/pgSQL function tells PostgREST the failure is transient, so PostgREST retries the transaction. That floods your logs with duplicates and splits one API request into several independent Postgres transactions.
+> [!CAUTION]
+> This [bug](https://github.com/PostgREST/postgrest/pull/4222) is present in PostgREST 14 and is fixed in PostgREST 16. Follow the [Supabase changelog](/changelog) to get notified when PostgREST 16 is released.
 
-This [bug](https://github.com/PostgREST/postgrest/pull/4222) is present in PostgREST 14 and is fixed in PostgREST 16. Follow the [Supabase changelog](/changelog) to get notified when PostgREST 16 is released.
+A custom `raise exception` using SQLSTATE `40001` (`serialization_failure`) in your PL/pgSQL function tells PostgREST the failure is transient, so PostgREST retries the transaction. That floods your logs with duplicates and splits one API request into several independent Postgres transactions.
 
 ## How to resolve
 

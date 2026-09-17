@@ -15,13 +15,13 @@ A 500 error in Auth typically indicates an issue with an external dependency, su
 
 Ensure you have access to the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs), set the query source to **Logs**, and set the time range appropriately:
 
-![image](/kb/img/troubleshooting/152d65ad-f0ed-47cf-8dcb-1e31c6221e71.png)
+![Logs query in the SQL Editor with the time range selector highlighted](/kb/img/troubleshooting/152d65ad-f0ed-47cf-8dcb-1e31c6221e71.png)
 
 #### Improving log readability
 
 Logs are displayed in a table format, which can be challenging to read. Double-clicking on a row will expand it for easier viewing:
 
-![Screenshot 2024-08-14 at 1 15 26 PM](https://github.com/user-attachments/assets/6f4c833c-ae15-41e1-9aa8-48ebd58741a1)
+![Expanded log row displayed as readable JSON](https://github.com/user-attachments/assets/6f4c833c-ae15-41e1-9aa8-48ebd58741a1)
 
 ### Section 1: Checking for database-level errors
 
@@ -109,7 +109,7 @@ DROP FUNCTION <function name>() CASCADE;
 
 Get the function's definition with this query:
 
-```
+```sql
 select pg_get_functiondef(oid)
 from pg_proc
 where proname = '<FUNCTION NAME>';

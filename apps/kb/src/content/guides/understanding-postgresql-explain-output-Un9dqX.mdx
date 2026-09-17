@@ -1,7 +1,7 @@
 ---
 title: 'Understanding Postgres EXPLAIN Output'
 description: 'Explains how to read Postgres EXPLAIN and EXPLAIN ANALYZE output, including cost, rows, and timing, to diagnose and optimize slow queries.'
-topics: ['Tip', 'Database']
+topics: ['Troubleshooting', 'Database']
 github_url: 'https://github.com/orgs/supabase/discussions/22839'
 ---
 
@@ -27,11 +27,11 @@ The Postgres EXPLAIN command shows the execution plan of a SQL query. This plan 
 1. Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
 2. Once debugging is enabled, you can use the [EXPLAIN](/docs/reference/javascript/using-modifiers-explain?queryGroups=example&example=get-execution-plan-with-analyze-and-verbose) function in your application code. Here's how to use it
 
-```
+```js
 const { data, error } = await supabase
   .from('countries')
   .select()
-  .explain({analyze:true,verbose:true})
+  .explain({ analyze: true, verbose: true })
 ```
 
 ## Detailed breakdown of explain output components
@@ -67,7 +67,7 @@ const { data, error } = await supabase
 
 **Execution Time: 0.069 ms:** measures how long it took to execute the query, including retrieving the data, performing any sorts, joins, or other operations defined in the execution plan, and returning the final results. This time is measured in milliseconds.
 
-![image](/kb/img/troubleshooting/10950be3-264b-4a41-bc71-3d431c2756b2.png)
+![EXPLAIN plan annotated with start-up cost, total cost, rows, and row size](/kb/img/troubleshooting/10950be3-264b-4a41-bc71-3d431c2756b2.png)
 
 ## Detailed components in explain analyze
 
@@ -81,7 +81,7 @@ When running EXPLAIN ANALYZE, additional information is provided, including:
 
 Example of Detailed EXPLAIN ANALYZE Output
 
-```
+```text
 Seq Scan on users  (cost=0.00..19.00 rows=1 width=240) (actual time=0.026..0.026 rows=1 loops=1)
   Filter: (user_id = 1)
   Rows Removed by Filter: 999
@@ -110,7 +110,7 @@ First, you have to understand that a Postgres execution plan is a tree structure
 
 Here's an example:
 
-```
+```text
 Aggregate Node (Top Node)
 │
 └──> Sort Node
@@ -162,7 +162,7 @@ On top of that, you have to multiply the cost and the time with the number of �
   The estimated rows are 100, but the actual rows are 10,000. This discrepancy may lead the query planner to make inefficient choices, such as choosing a sequential scan over an index scan.
 - Find long-running sequential scans with a filter condition that removes many rows.
 
-```
+```text
 Seq Scan on products  (cost=0.00..100.00 rows=300 width=50) (actual time=50.000..100.000 rows=3 loops=1)
    Filter: (price > 1000)
    Rows Removed by Filter: 2997
@@ -187,8 +187,8 @@ So, the acceptable performance threshold can vary by application. For real-time 
 
 ## Tools to interpret explain analyze output
 
-Since reading a longer execution plan is quite cumbersome, you can use the website https://explain.depesz.com/ to better visualize the query. If you paste the execution plan in the text area and hit “Submit”, you will get output like this:
-![image](/kb/img/troubleshooting/830b81aa-ae52-44a4-aa49-32c2a6296af7.png)
+Since reading a longer execution plan is quite cumbersome, you can use the website [explain.depesz.com](https://explain.depesz.com/) to better visualize the query. If you paste the execution plan in the text area and hit “Submit”, you will get output like this:
+![Execution plan visualized on explain.depesz.com](/kb/img/troubleshooting/830b81aa-ae52-44a4-aa49-32c2a6296af7.png)
 
 ## Tips for optimizing queries
 
@@ -202,4 +202,4 @@ Since reading a longer execution plan is quite cumbersome, you can use the websi
 
 Understanding EXPLAIN and EXPLAIN ANALYZE output can significantly enhance your ability to write efficient SQL queries. Regularly analyze query performance and make adjustments as your dataset grows and changes.
 
-For more insights, you can also check out: https://aws.amazon.com/blogs/database/how-postgresql-processes-queries-and-how-to-analyze-them/.
+For more insights, you can also read [how Postgres processes queries](https://aws.amazon.com/blogs/database/how-postgresql-processes-queries-and-how-to-analyze-them/).

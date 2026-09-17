@@ -44,7 +44,7 @@ FROM pg_stat_activity where application_name ilike 'pg_cron scheduler';
 
 If the query does not return a row, the worker has died. To revive it, you must go to the [General Settings](/dashboard/project/_/settings/general) and initiate a fast reboot:
 
-![Screenshot 2024-10-29 at 12 27 24 AM](https://github.com/user-attachments/assets/d7a2956c-08e0-4ebc-be08-d14a2383f36b)
+![Fast reboot option in project General Settings](https://github.com/user-attachments/assets/d7a2956c-08e0-4ebc-be08-d14a2383f36b)
 
 #### Check the `cron.job_run_details` table for more information
 

@@ -33,7 +33,7 @@ They sit between the database and your client servers. They are solely optimized
 
 Supabase provides 3 database connection strings that can be used simultaneously if necessary. You can find them on the dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
-![Screenshot 2024-07-04 at 10 40 38 AM](https://github.com/supabase/supabase/assets/91111415/1d653203-84d9-406a-a7c9-1f7d097f5a29)
+![Connect dialog showing the three connection strings](https://github.com/supabase/supabase/assets/91111415/1d653203-84d9-406a-a7c9-1f7d097f5a29)
 
 ### Direct connections:
 
@@ -105,7 +105,7 @@ The modes are transaction (port 6543) and session (port 5432) mode.
 
 The "user+database+mode" combinations are formed from the above variables and are used within the connection string:
 
-```
+```text
 postgres://[USER].shfmmplnqscentnakbkl:[password]@aws-0-ca-central-1.pooler.supabase.com:[MODE]/[DATABASE]
 ```
 
@@ -125,7 +125,7 @@ No, it doesn't. See why:
 
 In the [Dashboard's Database Settings](/dashboard/project/_/database/settings), you can configure Supavisor's "Pool Size":
 
-![Screenshot 2024-02-25 at 10 06 25 PM](https://github.com/supabase/supabase/assets/91111415/ce9e9d28-67c2-4dd2-ac0a-0a0150e63b4f)
+![Pool Size field in Database Settings](https://github.com/supabase/supabase/assets/91111415/ce9e9d28-67c2-4dd2-ac0a-0a0150e63b4f)
 
 You can also change the pool size for PostgREST's (DB API) internal pooler at the bottom of the [application settings](/dashboard/project/_/settings/api).
 

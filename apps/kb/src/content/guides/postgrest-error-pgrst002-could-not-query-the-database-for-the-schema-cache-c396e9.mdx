@@ -1,7 +1,7 @@
 ---
 title: 'PostgREST error: {PGRST002: Could not query the database for the schema cache}'
 description: 'Fixes a PGRST002 schema cache error caused by dropping a schema that is still listed as exposed in the Data API settings.'
-topics: ['Troubleshooting', 'Database']
+topics: ['Troubleshooting', 'Database', 'Data API']
 ---
 
 A schema should first be removed from the **Exposed schemas** in Data API settings before dropping it from the database.

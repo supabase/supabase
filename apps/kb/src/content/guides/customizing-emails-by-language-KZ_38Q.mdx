@@ -1,7 +1,7 @@
 ---
 title: 'Customizing Emails by Language'
 description: 'Shows how to use user metadata and Go template conditionals in email templates to send auth emails in different languages.'
-topics: ['Tip', 'Auth']
+topics: ['Troubleshooting', 'Auth']
 github_url: 'https://github.com/orgs/supabase/discussions/21227'
 ---
 
@@ -9,7 +9,7 @@ When you register a user, you can create meta-data about them.
 
 Creating meta-data with the JS-Client's [signUp function](/docs/reference/javascript/auth-signup?example=sign-up-with-additional-user-metadata)
 
-```javascript
+```js
 const { data, error } = await supabase.auth.signUp({
   email: 'email@some_[email.com](http://email.com/)',
   password: 'example-password',

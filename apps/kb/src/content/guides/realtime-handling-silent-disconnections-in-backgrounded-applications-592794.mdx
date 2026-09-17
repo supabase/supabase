@@ -44,7 +44,7 @@ The `heartbeatCallback` option allows you to actively monitor the status of your
 - **Purpose:** To gain visibility into the connection's health and provide a mechanism for your application to explicitly reconnect when the connection is lost.
 - **How it works:** When initializing your `RealtimeClient`, you can provide a `heartbeatCallback` function. This function will be invoked whenever the Realtime client's internal heartbeat mechanism detects a change in the connection's status. By checking if the `status` passed to the callback is `'disconnected'`, you can then call `client.connect()` to attempt to re-establish the WebSocket connection.
 
-```javascript
+```js
 const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
   realtime: {
     heartbeatCallback: (status) => {
@@ -64,7 +64,7 @@ Enabling the Web Worker option helps prevent browser throttling from affecting y
 - **Purpose:** To ensure that heartbeat signals are sent consistently even when your application is running in the background, thereby preventing silent disconnections caused by browser throttling.
 - **How it works:** By setting `worker: true` in your Realtime client configuration, the heartbeat logic is offloaded to a **Web Worker**. Since Web Workers run in a separate thread, they are generally less susceptible to browser throttling than JavaScript execution on the main thread of an inactive tab. This allows heartbeats to be sent reliably in the background, keeping the WebSocket connection alive.
 
-```javascript
+```js
 const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
   realtime: {
     worker: true,

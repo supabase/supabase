@@ -9,6 +9,6 @@ If you see the error "insufficient privilege" when accessing [pg_stat_statements
 
 In this case, you can run the below command to allow the Postgres role to read all statistics from the system:
 
-```
+```sql
 grant pg_read_all_stats to postgres;
 ```

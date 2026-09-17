@@ -1,7 +1,7 @@
 ---
 title: 'How Postgres chooses which index to use'
-description: 'Explains how the Postgres planner decides whether to use an index versus a sequential scan, and covers multi-column, ordered, functional, and covering indexes.'
-topics: ['Tip', 'Database']
+description: 'Explains how the Postgres planner chooses between an index and a sequential scan, and covers multi-column, ordered, functional, and covering indexes.'
+topics: ['Troubleshooting', 'Database']
 github_url: 'https://github.com/orgs/supabase/discussions/26959'
 ---
 
@@ -83,7 +83,7 @@ In very rare cases, these statistics can become stale, and Postgres may opt to u
 
 You can see the query plan with the `EXPLAIN` keyword:
 
-```
+```sql
 EXPLAIN <your query>
 ```
 
@@ -120,9 +120,9 @@ where major = constant and minor = constant;
 
 If you're using an ORDER BY clause, [indexes can also be pre-sorted by DESC/ASC](https://www.postgresql.org/docs/current/indexes-ordering.html) for better performance.
 
-```
+```sql
 -- organizes the index in a DESC order, places NULL values at the end
-CREATE INDEX test3_desc_index ON test3 (id DESC NULLS LAST);
+create index test3_desc_index on test3 (id desc nulls last);
 ```
 
 ### Functional indexes

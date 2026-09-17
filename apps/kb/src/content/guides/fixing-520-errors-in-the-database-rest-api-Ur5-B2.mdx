@@ -1,7 +1,7 @@
 ---
 title: 'Fixing 520 Errors in the Database REST API'
 description: 'Explains that 520 errors come from exceeding the 16KB header/URL limit, such as with long in clauses, and shows how to use RPCs to avoid it.'
-topics: ['Troubleshooting', 'Database']
+topics: ['Troubleshooting', 'Database', 'Data API']
 github_url: 'https://github.com/orgs/supabase/discussions/23422'
 ---
 
@@ -9,7 +9,7 @@ In the context of the database API, [Cloudflare 520 errors](https://developers.c
 
 The API will include filters within the URL, so a request like so:
 
-```javascript
+```js
 const { data: countries, error } = await supabase.from('countries').select('name')
 ```
 
@@ -21,7 +21,7 @@ https://<project ref>.supabase.co/rest/v1/countries?select=name
 
 However, appending too much data to the URL can exceed the 16KB limitation, triggering a 520 failure. This typically occurs with lengthy `in` clauses, as demonstrated here:
 
-```javascript
+```js
 const { data, error } = await supabase
   .from('countries')
   .select()
@@ -46,6 +46,6 @@ $$;
 
 The [RPC](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-postgres-function-with-arguments) can then call the function with an array that contains more than 16KB of data
 
-```javascript
+```js
 const { data, error } = await supabase.rpc('example', { id: ['e2f34fb9-bbf9-4649-9b2f-09ec56e67a42', ...900 more UUIDs] })
 ```

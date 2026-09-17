@@ -35,7 +35,7 @@ If you don't know the name of your sequence, it's often formed based on a standa
 
 To check for gaps in the sequence of IDs in a Postgres table, you can use a SQL query that compares the sequence of IDs to a generated series of numbers that spans the same range:
 
-```
+```sql
 SELECT
     s.id AS missing_id
 FROM
@@ -57,7 +57,7 @@ This error suggests a discrepancy between the sequence-generated IDs and the act
 
 To address this, you can check the current value of your sequence or the highest ID in your table with:
 
-```
+```text
 postgres=# SELECT max(id) FROM <table_name>;
 
 postgres=# SELECT nextval('{table}_{column}_seq');

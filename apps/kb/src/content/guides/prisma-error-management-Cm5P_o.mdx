@@ -1,11 +1,11 @@
 ---
 title: 'Prisma Error Management'
 description: 'A guide covering common Prisma connection and migration errors on Supabase, plus recommendations for roles, pooling, and connection strings.'
-topics: ['Troubleshooting', 'Database', 'Deprecated']
+topics: ['Troubleshooting', 'Database']
 github_url: 'https://github.com/orgs/supabase/discussions/27395'
 ---
 
-> **Warning:**
+> [!CAUTION]
 > This guide has been deprecated. Use the troubleshooting guide in the [Supabase docs](/docs/guides/database/prisma/prisma-troubleshooting).
 
 ## Addressing specific errors
@@ -115,7 +115,7 @@ The below example gives Prisma full authority over all database objects in the p
 
 In the [Query Performance Advisor](/dashboard/project/_/database/query-performance), you can view long-running or frequently accessed queries by role:
 
-![Screenshot 2024-06-19 at 1 25 16 PM](https://github.com/supabase/supabase/assets/91111415/46e2feae-9fca-4436-a957-2c995eb5ca92)
+![Query Performance Advisor listing slow queries](https://github.com/supabase/supabase/assets/91111415/46e2feae-9fca-4436-a957-2c995eb5ca92)
 
 Selecting a query can reveal suggestions to improve its performance
 

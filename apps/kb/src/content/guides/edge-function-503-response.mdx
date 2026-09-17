@@ -50,7 +50,7 @@ Depending on the output, you can use this table to find the appropriate debuggin
 | ------------------ | --------------------------------------------------- |
 | `app_level`        | [app level error](#app-level-error)                 |
 | `boot_error`       | [boot error - function cannot compile](#boot-error) |
-| `internal_failure` | [platform issue](#platformissue)                    |
+| `internal_failure` | [platform issue](#platform-issue)                   |
 
 ## Step 2: Addressing the error
 
@@ -85,7 +85,7 @@ A [`SyntaxError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refere
 
 In the [Function Dashboard](/dashboard/project/_/functions), under the affected function's `Log` tab, you can filter for the key phrase `worker boot error:`. the log will tell you syntax error occurred:
 
-![image](/kb/img/troubleshooting/filter_503.png)
+![Function logs filtered for the phrase worker boot error](/kb/img/troubleshooting/filter_503.png)
 
 Alternatively, instead of using the Function Dashboard, you can programmatically find boot failure error messages in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20fl.event_message%2C%0A%20%20fl.timestamp%2C%0A%20%20fel.function_name%2C%0A%20%20fel.status_code%0Afrom%0A%20%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20timestamp%2C%0A%20%20%20%20%20%20event_message%2C%0A%20%20%20%20%20%20log_attributes%5B%27function_id%27%5D%20as%20function_id%2C%0A%20%20%20%20%20%20log_attributes%5B%27version%27%5D%20as%20version%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_logs%27%0A%20%20%20%20%20%20and%20log_attributes%5B%27event_type%27%5D%20%3D%20%27BootFailure%27%0A%20%20%29%20as%20fl%0A%20%20left%20join%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20log_attributes%5B%27function_id%27%5D%20as%20function_id%2C%0A%20%20%20%20%20%20log_attributes%5B%27version%27%5D%20as%20version%2C%0A%20%20%20%20%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%2C%0A%20%20%20%20%20%20log_attributes%5B%27response.status_code%27%5D%20as%20status_code%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_edge_logs%27%0A%20%20%29%20as%20fel%20on%20fl.function_id%20%3D%20fel.function_id%20and%20fl.version%20%3D%20fel.version%0Aorder%20by%20fl.timestamp%2C%20fel.function_name%0Alimit%2020%3B) with the below query:
 

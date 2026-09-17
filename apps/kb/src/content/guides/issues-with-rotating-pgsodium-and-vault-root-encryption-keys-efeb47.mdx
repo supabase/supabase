@@ -4,6 +4,9 @@ description: 'Explains how to properly rotate the pgsodium/Vault root encryption
 topics: ['Troubleshooting', 'Database']
 ---
 
+> [!CAUTION]
+> pgsodium is pending deprecation. Supabase Vault does not depend on pgsodium and is unaffected — see the [pgsodium docs](/docs/guides/database/extensions/pgsodium) before rotating keys.
+
 If you can still decrypt existing Vault secrets after an attempted key rotation, the project is still using the legacy root key. The Supabase Management API `/pgsodium` endpoint is the correct mechanism for key rotation, but it requires a specific format to trigger the update across the database instance.
 
 ## How to rotate the root key

@@ -1,12 +1,13 @@
 ---
 title: "Error: relation 'supabase_migrations.schema_migrations' does not exist"
-description: 'Explains that this Postgres log error comes from dashboard polling for migration history when the CLI-managed migrations table does not yet exist, and when to ignore it.'
+description: 'Explains that this Postgres log error comes from dashboard polling for migration history before the CLI migrations table exists, and when to ignore it.'
 topics: ['Troubleshooting', 'Supabase Platform', 'Database', 'CLI']
 ---
 
 If you are observing the error `relation "supabase_migrations.schema_migrations" does not exist` in your Postgres logs, it is typically caused by the Supabase dashboard polling for migration history.
 
 ## Why Does This Happen?
+
 The Supabase dashboard performs background queries to retrieve migration data from a table that is managed specifically by the Supabase CLI. If you are using a custom migration tool, a manual setup, or have not yet deployed migrations via the CLI, this table will not exist, causing the logs to report this error.
 
 ## How to Resolve:

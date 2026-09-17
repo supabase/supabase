@@ -6,7 +6,7 @@ topics: ['Troubleshooting', 'Database', 'Supabase Platform']
 
 If you are observing an `ERROR: HV000: guest fdw error: component verification failed` when querying a wrapper foreign tables, it indicates that the configured Wasm package metadata does not match the downloaded component. As a security measure, the Wrappers extension blocks the module when this mismatch occurs.
 
-To resolve this, update your foreign server configuration to use the correct package version and checksum. Details depend on the exact Wrapper and can be found here: https://fdw.dev/catalog/wasm/
+To resolve this, update your foreign server configuration to use the correct package version and checksum. Details depend on the exact Wrapper and can be found in the [Wrappers catalog](https://fdw.dev/catalog/wasm/)
 
 **How to fix the configuration:**
 Run the following SQL via the [SQL Editor](/dashboard/project/_/sql/new):

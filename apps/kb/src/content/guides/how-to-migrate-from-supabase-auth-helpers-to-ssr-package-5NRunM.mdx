@@ -15,26 +15,29 @@ Depending on your implementation, you may ignore some parts of this documentatio
 
 It's important that you don't use both `auth-helpers-nextjs` and `@supabase/ssr` packages in the same application to avoid running into authentication issues.
 
-```
+```bash
 npm uninstall @supabase/auth-helpers-nextjs @supabase/supabase-js
 npm install @supabase/ssr @supabase/supabase-js
 ```
 
 ## 2. Create the library functions to create Supabase clients
 
-```
+```ts
 // lib/supabase/client.ts
 
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-  );
+  )
 }
+```
 
+```ts
 // lib/supabase/server.ts
+
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -51,7 +54,9 @@ export async function createClient() {
         },
         setAll(cookiesToSet, _headers) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
           } catch {
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
@@ -62,8 +67,11 @@ export async function createClient() {
     }
   )
 }
+```
 
+```ts
 // lib/supabase/proxy.ts
+
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -87,7 +95,9 @@ export async function updateSession(request: NextRequest) {
           supabaseResponse = NextResponse.next({
             request,
           })
-          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
           Object.entries(headers).forEach(([key, value]) =>
             supabaseResponse.headers.set(key, value)
           )
@@ -136,11 +146,12 @@ export async function updateSession(request: NextRequest) {
 
 ## 3. Replace your proxy.ts file
 
-```
+```ts
 // proxy.ts
 
-import { type NextRequest } from "next/server"
-import { updateSession } from "@/lib/supabase/proxy"
+import { type NextRequest } from 'next/server'
+
+import { updateSession } from '@/lib/supabase/proxy'
 
 export async function proxy(request: NextRequest) {
   return await updateSession(request)
@@ -155,70 +166,70 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
 ```
 
 ## 4. Create your server actions to handle login and sign up
 
-```
+```ts
 // app/login/actions.ts
 
-'use server';
+'use server'
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server'
 
 export async function login(formData: FormData) {
-  const supabase = createClient();
+  const supabase = createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
-  };
+  }
 
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/error');
+    redirect('/error')
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/');
+  revalidatePath('/', 'layout')
+  redirect('/')
 }
 
 export async function signup(formData: FormData) {
-  const supabase = createClient();
+  const supabase = createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
-  };
-
-  const { error } = await supabase.auth.signUp(data);
-
-  if (error) {
-    redirect('/error');
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/');
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
 }
 ```
 
 ## 5. Use the server actions in your login page UI
 
-```
+```tsx
 // app/login/page.tsx
 
-import { login, signup } from './actions';
+import { login, signup } from './actions'
 
 export default function LoginPage() {
   return (
@@ -230,13 +241,13 @@ export default function LoginPage() {
       <button formAction={login}>Log in</button>
       <button formAction={signup}>Sign up</button>
     </form>
-  );
+  )
 }
 ```
 
 ## 6. Client components
 
-```
+```ts
 'use client';
 
 // replace this line
@@ -258,7 +269,7 @@ export default async function Page() {
 
 ## 7. Server components
 
-```
+```ts
 // replace
 import { cookies } from 'next/headers';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -282,7 +293,7 @@ export default async function Page() {
 
 ## 8. Route handlers
 
-```
+```ts
 // replace
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';

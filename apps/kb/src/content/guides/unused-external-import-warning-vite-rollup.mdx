@@ -6,7 +6,7 @@ topics: ['Troubleshooting', 'Supabase Platform']
 
 When bundling an application that uses `@supabase/supabase-js`, you may see warnings like:
 
-```
+```text
 "PostgrestError" is imported from external module "@supabase/postgrest-js" but never used in "...supabase-js/dist/index.mjs".
 "FunctionRegion", "FunctionsError", "FunctionsFetchError", "FunctionsHttpError" and "FunctionsRelayError" are imported from external module "@supabase/functions-js" but never used in "...".
 ```
@@ -22,7 +22,7 @@ When bundling an application that uses `@supabase/supabase-js`, you may see warn
 import { PostgrestClient, PostgrestError } from '@supabase/postgrest-js'
 ```
 
-```
+```text
 //       ^ used internally    ^ re-exported for you
 ```
 

@@ -26,7 +26,7 @@ ALTER ROLE postgres SET log_statement='mod';
 
 Setting it to `mod` tells Postgres to log all data-modifying statements. Once that's in place, try running something like a `TRUNCATE` from the Dashboard. In the logs, you'll see an entry similar to:
 
-```
+```text
 statement: TRUNCATE TABLE public.data;
 -- source: dashboard
 -- user: f8c2e1a9-3b4d-4f7e-8c9a-1d2e3f4a5b6c

@@ -1,6 +1,6 @@
 ---
 title: 'Error: "Connection refused" when trying to connect to Supabase database'
-description: 'Explains that ECONNREFUSED and connection-refused errors are usually caused by Fail2ban IP bans and how to view and remove banned IPs via the dashboard or CLI.'
+description: 'Explains that ECONNREFUSED and connection-refused errors usually come from Fail2ban IP bans, and how to view and remove banned IPs via the dashboard or CLI.'
 topics: ['Troubleshooting', 'Database', 'Supabase Platform', 'CLI']
 github_url: 'https://github.com/orgs/supabase/discussions/14929'
 ---
@@ -12,7 +12,7 @@ If you're not able to connect to the Supabase database and see one of the errors
 Is the server running on that host and accepting TCP/IP connections?`
 - `Circuit breaker open: Unable to establish connection to upstream database`
 
-These bans will clear after 30mins but you can unban the IPs using the Supabase CLI https://supabase.com/docs/guides/cli following the commands below.
+These bans will clear after 30mins but you can unban the IPs using the [Supabase CLI](/docs/guides/cli) following the commands below.
 
 ## Unban IPs using the Dashboard
 
@@ -22,12 +22,12 @@ Go to [Database Settings](/dashboard/project/_/database/settings#banned-ips) and
 
 How to list the banned IPs:
 
-```
+```bash
 % supabase network-bans get --project-ref <project_reference_id> --experimental
 ```
 
 How to unban the IPs:
 
-```
+```bash
 % supabase network-bans remove --db-unban-ip <ip_address> --project-ref <project_reference_id> --experimental
 ```

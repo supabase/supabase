@@ -15,7 +15,7 @@ Each ORM or library configures prepared statements differently. Here are setting
 
 add ?pgbouncer=true to end of connection string:
 
-```
+```text
 postgres://[db-user].[project-ref]:[db-password]@aws-0-[aws-region].pooler.supabase.com:6543/[db-name]?pgbouncer=true
 ```
 
@@ -53,7 +53,7 @@ Follow the recommendation in the [asyncpg docs](https://magicstack.github.io/asy
 
 Set [`prepareThreshold`](https://jdbc.postgresql.org/documentation/use/#connection-parameters) to `0`:
 
-```
+```text
 jdbc:postgresql://[POOLER-HOST]:6543/postgres?prepareThreshold=0
 ```
 

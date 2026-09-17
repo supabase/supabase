@@ -1,7 +1,7 @@
 ---
 title: 'High latency with supabase client'
 description: 'Reproduces and describes a case where querying through the Supabase client is much slower than querying Postgres directly via psycopg.'
-topics: ['Troubleshooting', 'Database']
+topics: ['Troubleshooting', 'Database', 'Data API']
 github_url: 'https://github.com/orgs/supabase/discussions/22100'
 ---
 
@@ -15,35 +15,36 @@ Querying a table using the Supabase client is much slower than querying against 
 
 ```sql
 -- Create table
-CREATE TABLE your_table_name (
-    id UUID PRIMARY KEY,
-    column1 TEXT,
-    column2 INT,
-    column3 BOOLEAN
+create table your_table_name (
+  id uuid primary key,
+  column1 text,
+  column2 int,
+  column3 boolean
 );
 
 -- Insert statements
-INSERT INTO your_table_name (id, column1, column2, column3) VALUES
-    (uuid_generate_v4(), 'value1', 10, TRUE),
-    (uuid_generate_v4(), 'value2', 20, FALSE),
-    (uuid_generate_v4(), 'value3', 15, TRUE),
-    (uuid_generate_v4(), 'value4', 8, FALSE),
-    (uuid_generate_v4(), 'value5', 25, TRUE),
-    (uuid_generate_v4(), 'value6', 12, FALSE),
-    (uuid_generate_v4(), 'value7', 18, TRUE),
-    (uuid_generate_v4(), 'value8', 30, FALSE),
-    (uuid_generate_v4(), 'value9', 22, TRUE),
-    (uuid_generate_v4(), 'value10', 5, FALSE),
-    (uuid_generate_v4(), 'value11', 17, TRUE),
-    (uuid_generate_v4(), 'value12', 9, FALSE),
-    (uuid_generate_v4(), 'value13', 14, TRUE),
-    (uuid_generate_v4(), 'value14', 28, FALSE),
-    (uuid_generate_v4(), 'value15', 11, TRUE),
-    (uuid_generate_v4(), 'value16', 7, FALSE),
-    (uuid_generate_v4(), 'value17', 19, TRUE),
-    (uuid_generate_v4(), 'value18', 26, FALSE),
-    (uuid_generate_v4(), 'value19', 16, TRUE),
-    (uuid_generate_v4(), 'value20', 21, FALSE);
+insert into your_table_name (id, column1, column2, column3)
+values
+  (uuid_generate_v4(), 'value1', 10, true),
+  (uuid_generate_v4(), 'value2', 20, false),
+  (uuid_generate_v4(), 'value3', 15, true),
+  (uuid_generate_v4(), 'value4', 8, false),
+  (uuid_generate_v4(), 'value5', 25, true),
+  (uuid_generate_v4(), 'value6', 12, false),
+  (uuid_generate_v4(), 'value7', 18, true),
+  (uuid_generate_v4(), 'value8', 30, false),
+  (uuid_generate_v4(), 'value9', 22, true),
+  (uuid_generate_v4(), 'value10', 5, false),
+  (uuid_generate_v4(), 'value11', 17, true),
+  (uuid_generate_v4(), 'value12', 9, false),
+  (uuid_generate_v4(), 'value13', 14, true),
+  (uuid_generate_v4(), 'value14', 28, false),
+  (uuid_generate_v4(), 'value15', 11, true),
+  (uuid_generate_v4(), 'value16', 7, false),
+  (uuid_generate_v4(), 'value17', 19, true),
+  (uuid_generate_v4(), 'value18', 26, false),
+  (uuid_generate_v4(), 'value19', 16, true),
+  (uuid_generate_v4(), 'value20', 21, false);
 ```
 
 2. Run the following script (you may need to `pip install psycopg[binary]` in addition to Supabase client.

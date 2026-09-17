@@ -1,7 +1,7 @@
 ---
 title: "PostgREST error: 400 'column example_table.example_column does not exist' when using OR operators"
 description: 'Explains a PostgREST bug that returns a false column does not exist error on mutation requests using an or() filter, with an upgrade or workaround fix.'
-topics: ['Troubleshooting', 'Database']
+topics: ['Troubleshooting', 'Database', 'Data API']
 ---
 
 If you receive a `400` error with the message `column example_table.example_column does not exist` only on mutation requests (`PATCH`, `POST`, `DELETE`) — while `SELECT` queries on the same column work fine — this is a known bug in PostgREST versions before 14.4 ([issue #3707](https://github.com/PostgREST/postgrest/issues/3707)).
@@ -28,13 +28,13 @@ Explicitly include the column referenced in the error in the `select` parameter 
 
 For example, if your request looks like:
 
-```
+```text
 PATCH /rest/v1/example_table?or=(example_column.eq.value1,example_column.eq.value2)
 ```
 
 Add `select=` with the affected column:
 
-```
+```text
 PATCH /rest/v1/example_table?or=(example_column.eq.value1,example_column.eq.value2)&select=id,example_column
 ```
 

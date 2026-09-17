@@ -63,7 +63,7 @@ The default connection values are set based on a solid understanding of Postgres
 
 This is a Grafana Chart of unhealthy memory usage:
 
-![image](/kb/img/troubleshooting/47685206-7914-440e-a010-da62f5c38186.png)
+![Grafana chart showing unhealthy memory usage](/kb/img/troubleshooting/47685206-7914-440e-a010-da62f5c38186.png)
 
 - Yellow: represents active memory
 - Red: represents SWAP, which is disk storage that the system treats as if it were memory
@@ -91,8 +91,8 @@ select
 
 The below chart is an example of what can occur to the CPU if 100s of connections are inappropriately opened/closed every second or many CPU intensive queries are run in parallel
 
-![image](/kb/img/troubleshooting/0e7f6842-78fd-44f9-b463-425507815fb6.png)
+![Grafana CPU chart spiking from rapid connection churn](/kb/img/troubleshooting/0e7f6842-78fd-44f9-b463-425507815fb6.png)
 
 If you plan on increasing your direct connection numbers, your database should have relatively predictable or low CPU usage, such as what the example displays below:
 
-![Screenshot 2024-06-11 at 3 09 03 PM](https://github.com/supabase/supabase/assets/91111415/ee3e4f4c-87a1-4ef8-9ca5-af9094fc1b93)
+![Grafana CPU chart showing low, predictable usage](https://github.com/supabase/supabase/assets/91111415/ee3e4f4c-87a1-4ef8-9ca5-af9094fc1b93)

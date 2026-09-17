@@ -1,12 +1,12 @@
 ---
 title: 'Realtime: WarnSendingBroadcastMessage when broadcasting from the database'
-description: 'Explains what triggers the WarnSendingBroadcastMessage warning when broadcasting from the database and how to tell a harmless case from a real delivery problem.'
+description: 'Explains what triggers the WarnSendingBroadcastMessage warning when broadcasting from the database, and how to tell a harmless case from a real problem.'
 topics: ['Troubleshooting', 'Realtime']
 ---
 
 If you broadcast from the database with `realtime.send` or `realtime.send_binary`, you may see this in your Postgres logs:
 
-```
+```text
 WARNING:  WarnSendingBroadcastMessage: <reason>
 ```
 

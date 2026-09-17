@@ -1,6 +1,6 @@
 ---
 title: 'Database error saving new user'
-description: 'Covers common causes of the Database error saving new user error, including NULL values in the auth schema and missing tables referenced by triggers, with fixes for each.'
+description: 'Covers causes of the Database error saving new user error, including NULL values in the auth schema and missing tables referenced by triggers, with fixes.'
 topics: ['Troubleshooting', 'Auth', 'Dashboard']
 github_url: 'https://github.com/orgs/supabase/discussions/13043'
 ---
@@ -33,7 +33,7 @@ If the Auth logs point to a database-level issue, open the [Postgres logs explor
 
 **Example Auth log error:**
 
-```
+```text
 500: Database error querying schema
 error finding user: sql: Scan error on column index 8, name "confirmation_token": converting NULL to string is unsupported
 ```
@@ -60,13 +60,13 @@ This sets all `NULL` values in that column to an empty string, which is what the
 
 **Example Auth log error:**
 
-```
+```text
 failed to close prepared statement: ERROR: current transaction is aborted, commands ignored until end of transaction block (SQLSTATE 25P02): ERROR: relation "profiles" does not exist (SQLSTATE 42P01)
 ```
 
 **Example Postgres log error:**
 
-```
+```text
 event_message: "relation "profiles" does not exist"
 context: "PL/pgSQL function public.handle_new_user() line 3 at SQL statement"
 ```

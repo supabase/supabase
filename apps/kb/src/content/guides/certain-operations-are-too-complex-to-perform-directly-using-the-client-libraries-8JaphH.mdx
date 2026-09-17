@@ -1,7 +1,7 @@
 ---
 title: 'Certain operations are too complex to perform directly using the client libraries.'
 description: 'Shows how to move a complex multi-join query into a Postgres stored function and call it from client code with supabase.rpc.'
-topics: ['Troubleshooting', 'Database']
+topics: ['Troubleshooting', 'Database', 'Data API']
 github_url: 'https://github.com/orgs/supabase/discussions/21294'
 ---
 
@@ -15,7 +15,7 @@ Follow these steps to create and run a stored function:
 Go to the [SQL query editor](/dashboard/project/_/sql/new) on your database dashboard.
 Run the following SQL script to create a stored function tailored to your specific complex query:
 
-```
+```sql
 DROP FUNCTION IF EXISTS get_my_complex_query;
 CREATE FUNCTION get_my_complex_query(parameter INT)
 RETURNS TABLE (column1 INTEGER, column2 VARCHAR, column3 DATE) AS
@@ -38,14 +38,15 @@ LANGUAGE plpgsql VOLATILE;
 
 Use the supabase.rpc method to call the stored function from your application code. Replace "get_my_complex_query" with the appropriate function name and provide the necessary parameters:
 
-```
-supabase.rpc("get_my_complex_query", { parameter: 1 })
-  .then(response => {
+```js
+supabase
+  .rpc('get_my_complex_query', { parameter: 1 })
+  .then((response) => {
     // Handle the response
   })
-  .catch(error => {
+  .catch((error) => {
     // Handle errors
-  });
+  })
 ```
 
 **Further Resources:**

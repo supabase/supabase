@@ -31,13 +31,13 @@ npx supabase secrets set --env-file ./supabase/.env --project-ref <PROJECT REF>
 
 5. Run the following CLI command to check secrets:
 
-```
+```bash
 npx supabase secrets list
 ```
 
 For security reasons, it is not advised to log secrets, but you can log a truncated version for the reassurance that they're being updated:
 
-```typescript
+```ts
 //logs the function call and the secrets
 console.log('Hello from Functions!')
 
@@ -61,6 +61,6 @@ After calling your function, you can check your [edge function logs](/dashboard/
 
 > Note: search filters are case sensitive and must be present in the event message.
 
-![image](/kb/img/troubleshooting/a360b417-e0cc-4706-8df4-89af63dcdc70.png)
+![Edge Function logs filtered by "logging", showing environment variable values](/kb/img/troubleshooting/a360b417-e0cc-4706-8df4-89af63dcdc70.png)
 
 > Note: excessively long JSON logs may be truncated. If this occurs, use the [JSON.stringify()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) function to convert the JSON object into text. You can then copy and paste the log into a [JSON beautifier.](https://jsonformatter.org/)

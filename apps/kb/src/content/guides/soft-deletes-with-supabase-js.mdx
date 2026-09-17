@@ -1,7 +1,7 @@
 ---
 title: 'Implementing soft deletes with supabase-js'
 description: 'Walks through implementing soft deletes in Supabase using a deleted_at column, a filtered view, and supabase-js queries.'
-topics: ['Troubleshooting', 'PostgREST']
+topics: ['Troubleshooting', 'Data API']
 github_url: 'https://github.com/orgs/supabase/discussions/32523'
 ---
 
@@ -43,7 +43,7 @@ With this view, you can now query `active_items` instead of `items` to get only 
 
 Instead of deleting a record, update its `deleted_at` column with the current timestamp. Using `supabase-js`, it looks like this:
 
-```javascript
+```js
 await supabase.from('items').update({ deleted_at: new Date().toISOString() }).eq('id', 123)
 ```
 
@@ -53,7 +53,7 @@ This sets the `deleted_at` column for the item with `id` 123.
 
 To fetch only non-deleted rows, query the `active_items` view instead of the `items` table. Here's how you do it with `supabase-js`:
 
-```javascript
+```js
 const { data, error } = await supabase
   .from('active_items') // Query the view, not the table
   .select('*')
@@ -66,7 +66,7 @@ else console.log('Active items:', data)
 
 To "restore" a soft-deleted record, set the `deleted_at` column back to `null`:
 
-```javascript
+```js
 await supabase.from('items').update({ deleted_at: null }).eq('id', 123)
 ```
 
@@ -82,7 +82,7 @@ This effectively un-deletes the record.
 
 Here’s a complete example of implementing soft deletes with `supabase-js`:
 
-```javascript
+```js
 // 1. Soft delete an item
 await supabase.from('items').update({ deleted_at: new Date().toISOString() }).eq('id', 123)
 
