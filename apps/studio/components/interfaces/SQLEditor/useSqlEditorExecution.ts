@@ -72,7 +72,7 @@ export function useSqlEditorExecution({
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
       refocusEditorAfterRunIfNeeded()
     },
-    onError(error: any, vars) {
+    onError(error, vars) {
       if (id) {
         editor.highlightErrorLine(error, hasSelection)
         sessionSnap.addResultError(id, error, vars.autoLimit)
@@ -125,8 +125,6 @@ export function useSqlEditorExecution({
         clearPendingRunRefocus()
         return toast.error('Unable to run query: Connection string is missing')
       }
-
-      console.log('RUN SQL', { db: databaseSelectorState.selectedDatabaseId })
 
       execute({
         ...buildExecuteParams({

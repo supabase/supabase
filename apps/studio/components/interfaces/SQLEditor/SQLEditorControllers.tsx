@@ -1,5 +1,5 @@
 import { type UntrustedSqlFragment } from '@supabase/pg-meta'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import {
   createContext,
   use,
@@ -25,22 +25,16 @@ import { useRunSource } from './useRunSource'
 import { useSnippetIdentity } from './useSnippetIdentity'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { useSqlEditorAi } from './useSqlEditorAi'
+import { useSqlEditorDatabaseSelection } from './useSqlEditorDatabaseSelection'
 import { useSqlEditorExecution } from './useSqlEditorExecution'
 import { useSqlEditorShortcuts } from './useSqlEditorShortcuts'
-import { isValidConnString } from '@/data/fetchers'
 import {
   untrustedLogSql,
   type SafeLogSqlFragment,
   type UntrustedLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
 import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import {
-  useDatabaseSelectorStateSnapshot,
-  useGetSelectedDatabaseId,
-} from '@/state/database-selector'
 import {
   getSqlEditorV2StateSnapshot,
   useSqlEditorV2StateSnapshot,
@@ -133,8 +127,6 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { setSelectedDatabaseId } = useDatabaseSelectorStateSnapshot()
-  const getSelectedDatabaseId = useGetSelectedDatabaseId()
 
   const diff = useSqlEditorDiff()
   const { isDiffOpen } = diff
@@ -151,16 +143,7 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   useAddDefinitions(id, monacoRef.current, { enabled: runSource._tag !== 'logs' })
 
-  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
-    {
-      projectRef: ref,
-    },
-    { enabled: isValidConnString(project?.connectionString) }
-  )
-  const [lastSelectedDatabase] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref ?? ''),
-    ''
-  )
+  useSqlEditorDatabaseSelection({ ref, connectionString: project?.connectionString })
 
   const { setAiTitle } = useSnippetTitleGenerator()
 
@@ -222,26 +205,6 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
     // Save the departing snippet's scroll position on unmount / snippet switch.
     return () => saveScrollPosition(id)
   }, [id])
-
-  useEffect(() => {
-    // Only set the initial selection once, when nothing has been selected yet.
-    if (isSuccessReadReplicas && getSelectedDatabaseId() === undefined) {
-      const lastSelectedIsStillValid = databases.some(
-        (db) => db.identifier === lastSelectedDatabase
-      )
-      const defaultDatabase = lastSelectedIsStillValid
-        ? lastSelectedDatabase
-        : databases.find((db) => db.identifier === ref)?.identifier
-      setSelectedDatabaseId(defaultDatabase)
-    }
-  }, [
-    isSuccessReadReplicas,
-    databases,
-    ref,
-    lastSelectedDatabase,
-    setSelectedDatabaseId,
-    getSelectedDatabaseId,
-  ])
 
   const snippetName =
     urlId === 'new'
