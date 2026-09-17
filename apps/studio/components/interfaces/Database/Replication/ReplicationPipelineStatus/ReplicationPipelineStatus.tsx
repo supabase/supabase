@@ -24,10 +24,8 @@ import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
 import { getStatusName } from '../Pipeline.utils'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
-import { SlotLagMetrics } from './ReplicationPipelineStatus.types'
+import { PipelineHealthSection } from './PipelineHealthSection'
 import { getDisabledStateConfig } from './ReplicationPipelineStatus.utils'
-import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
-import { SlotConnectionIndicator, SlotStatusBadge, SlotStatusLegend } from './SlotStatus'
 import { TableReplicationRow } from './TableReplicationRow'
 import { AlertError } from '@/components/ui/AlertError'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -122,11 +120,6 @@ export const ReplicationPipelineStatus = () => {
     [tableStatuses, searchString]
   )
 
-  const tablesWithLag = useMemo(
-    () => tableStatuses.filter((table) => Boolean(table.table_sync_lag)),
-    [tableStatuses]
-  )
-
   const erroredTables = useMemo(
     () => tableStatuses.filter((table) => table.state.name === 'error'),
     [tableStatuses]
@@ -183,57 +176,13 @@ export const ReplicationPipelineStatus = () => {
         )}
 
         {applyLagMetrics && (
-          <div className="border border-default rounded-lg bg-surface-100 px-4 py-4 space-y-3">
-            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-              <div>
-                <h4 className="text-sm font-semibold text-foreground">Pipeline metrics</h4>
-                <p className="text-xs text-foreground-light">
-                  Live metrics on how this pipeline is doing right now.
-                </p>
-              </div>
-              <div className="flex items-center gap-x-2.5">
-                <SlotConnectionIndicator isActive={applyLagMetrics.active} />
-                <span className="h-3.5 w-px bg-border" />
-                <SlotStatusBadge status={applyLagMetrics.wal_status} />
-                <SlotStatusLegend />
-              </div>
-            </div>
-
+          <PipelineHealthSection metrics={applyLagMetrics}>
             {isStatusError && (
               <p className="text-xs text-warning-700">
                 Unable to refresh data. Showing the last values we received.
               </p>
             )}
-
-            <SlotLagMetricsList metrics={applyLagMetrics} />
-
-            {tablesWithLag.length > 0 && (
-              <>
-                <div className="border-t border-default/40" />
-                <div className="space-y-3 text-xs text-foreground">
-                  <div className="flex items-start gap-2 rounded-md border border-default/50 bg-surface-200/60 px-3 py-2 text-foreground-light">
-                    <Info size={14} className="mt-0.5" />
-                    <span>
-                      During initial sync, tables can copy and stream independently before
-                      reconciling with the overall pipeline.
-                    </span>
-                  </div>
-                  <div className="rounded-sm border border-default/50 bg-surface-200/40">
-                    <ul className="divide-y divide-default/40">
-                      {tablesWithLag.map((table) => (
-                        <li key={table.id} className="px-3 py-2">
-                          <SlotLagMetricsInline
-                            tableName={`${table.schema}.${table.name}`}
-                            metrics={table.table_sync_lag as SlotLagMetrics}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
+          </PipelineHealthSection>
         )}
 
         {!isPipelineLoading && !isStatusLoading && hasTableData && (
