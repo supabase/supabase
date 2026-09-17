@@ -1,7 +1,10 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { useDatabaseChartDeepLink } from '@/pages/project/[ref]/observability/database'
+import {
+  useDatabaseChartDeepLink,
+  useDatabaseSelectionFromUrl,
+} from '@/pages/project/[ref]/observability/database'
 
 class MockResizeObserver implements ResizeObserver {
   static instances: MockResizeObserver[] = []
@@ -154,5 +157,22 @@ describe('useDatabaseChartDeepLink', () => {
     expect(diskTarget.scrollIntoView).toHaveBeenCalledTimes(1)
     expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
     expect(MockResizeObserver.instances[1].observe).toHaveBeenCalledWith(diskTarget.parentElement)
+  })
+})
+
+describe('useDatabaseSelectionFromUrl', () => {
+  test('selects the primary database when a deep link updates the database parameter', () => {
+    const setSelectedDatabaseId = vi.fn()
+    const { rerender } = renderHook(
+      ({ db }) => useDatabaseSelectionFromUrl(db, setSelectedDatabaseId),
+      { initialProps: { db: 'read-replica' } }
+    )
+
+    act(() => vi.advanceTimersByTime(100))
+    expect(setSelectedDatabaseId).toHaveBeenLastCalledWith('read-replica')
+
+    rerender({ db: 'project-ref' })
+    act(() => vi.advanceTimersByTime(100))
+    expect(setSelectedDatabaseId).toHaveBeenLastCalledWith('project-ref')
   })
 })

@@ -4,7 +4,7 @@ import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
@@ -134,6 +134,18 @@ export const useDatabaseChartDeepLink = (chart?: string) => {
 
     return stopDeepLink
   }, [chart])
+}
+
+export const useDatabaseSelectionFromUrl = (
+  db: string | undefined,
+  setSelectedDatabaseId: (databaseId: string) => void
+) => {
+  useEffect(() => {
+    if (db === undefined) return
+
+    const timeout = window.setTimeout(() => setSelectedDatabaseId(db), 100)
+    return () => window.clearTimeout(timeout)
+  }, [db, setSelectedDatabaseId])
 }
 
 const DatabaseUsage = () => {
@@ -273,20 +285,7 @@ const DatabaseUsage = () => {
     setShowDatePicker((open) => !open)
   })
 
-  const stateSyncedFromUrlRef = useRef(false)
-  useEffect(() => {
-    if (stateSyncedFromUrlRef.current) return
-    stateSyncedFromUrlRef.current = true
-
-    if (db !== undefined) {
-      setTimeout(() => {
-        // [Joshen] Adding a timeout here to support navigation from settings to reports
-        // Both are rendering different instances of ProjectLayout which is where the
-        // DatabaseSelectorContextProvider lies in (unless we reckon shifting the provider up one more level is better)
-        state.setSelectedDatabaseId(db)
-      }, 100)
-    }
-  }, [db, state])
+  useDatabaseSelectionFromUrl(db, state.setSelectedDatabaseId)
 
   // Loading charts above the target resize after the first scroll and can push it out of view.
   useDatabaseChartDeepLink(chart)
