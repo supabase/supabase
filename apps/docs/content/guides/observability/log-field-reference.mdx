@@ -1,12 +1,12 @@
 ---
 id: 'logs-field-reference'
 title: 'Log sources and fields'
-description: 'Log sources, ClickHouse fields, and event capture limits'
+description: 'Log sources, fields, and event capture limits'
 ---
 
-Each event is a row in the ClickHouse `logs` table. Filter the `source` column to select a service. The tables below list its fields; a field is not necessarily populated on every event.
+Each event is a row in the `logs` table. Filter the `source` column to select a service. The tables below list its fields; a field is not necessarily populated on every event.
 
-`id`, `timestamp`, `event_message`, `severity_text`, and `source` are top-level columns. Service fields are string values in `log_attributes`, even when the original event contains a number or boolean. Use the **ClickHouse query field** column directly. See [Query logs with SQL](/docs/guides/observability/advanced-log-filtering) for casting and field discovery.
+`id`, `timestamp`, `event_message`, `severity_text`, and `source` are top-level columns. Service fields are string values in `log_attributes`, even when the original event contains a number or boolean. See [Query logs with SQL](/docs/guides/observability/advanced-log-filtering) for casting and field discovery.
 
 ## Sources
 
@@ -99,7 +99,7 @@ Response headers:
                   )}
                   {!isTopLevel && (
                     <p className="text-xs text-foreground-muted font-mono m-0 break-all">
-                      {field.path} &rarr; {field.queryField}
+                      select log_attributes['{shortName}'] from logs
                     </p>
                   )}
                   {field.example && (
