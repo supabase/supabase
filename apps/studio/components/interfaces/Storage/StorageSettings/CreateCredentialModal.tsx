@@ -46,7 +46,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   )
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef })
-  const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
+  const isS3ConnectionEnabled = config?.features?.s3Protocol?.enabled
   const disableCreation = !isProjectActive || !canCreateCredentials || !isS3ConnectionEnabled
 
   const FormSchema = z.object({

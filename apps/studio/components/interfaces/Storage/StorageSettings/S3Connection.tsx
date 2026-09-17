@@ -119,7 +119,7 @@ export const S3Connection = () => {
   }
 
   useEffect(() => {
-    form.reset({ s3ConnectionEnabled: config?.features.s3Protocol.enabled })
+    form.reset({ s3ConnectionEnabled: config?.features?.s3Protocol?.enabled })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessStorageConfig])
