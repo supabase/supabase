@@ -34,6 +34,7 @@ export const PIPELINE_FIXTURE_SCENARIOS = [
   'starting',
   'no-tables',
   'status-unreachable',
+  'all-destinations',
   'bigquery-example',
   'ducklake-example',
   'clickhouse-example',
@@ -53,6 +54,7 @@ export const PIPELINE_FIXTURE_SCENARIO_LABEL: Record<PipelineFixtureScenario, st
   starting: 'Pipeline starting',
   'no-tables': 'Running, no tables yet',
   'status-unreachable': 'Live updates unreachable',
+  'all-destinations': 'All destinations',
   'bigquery-example': 'Screenshot: BigQuery',
   'ducklake-example': 'Screenshot: DuckLake',
   'clickhouse-example': 'Screenshot: ClickHouse',
@@ -110,6 +112,7 @@ const STATUS_BY_SCENARIO: Record<
   starting: 'starting',
   'no-tables': 'started',
   'status-unreachable': 'started',
+  'all-destinations': 'started',
   'bigquery-example': 'started',
   'ducklake-example': 'started',
   'clickhouse-example': 'started',
@@ -242,6 +245,7 @@ const TABLES_BY_SCENARIO: Record<PipelineFixtureScenario, TableStatus[]> = {
   starting: LIVE_TABLES,
   'no-tables': [],
   'status-unreachable': LIVE_TABLES,
+  'all-destinations': LIVE_TABLES,
   'bigquery-example': LIVE_TABLES,
   'ducklake-example': LIVE_TABLES,
   'clickhouse-example': LIVE_TABLES,
@@ -310,26 +314,34 @@ const getDestinationFixture = (): DestinationResponse =>
       : 'default'
   ]
 
+const ALL_DESTINATIONS = [
+  DESTINATION_BY_SCENARIO['bigquery-example'],
+  DESTINATION_BY_SCENARIO['snowflake-example'],
+  DESTINATION_BY_SCENARIO['clickhouse-example'],
+  DESTINATION_BY_SCENARIO['ducklake-example'],
+]
+
+const getDestinationFixtures = (): DestinationResponse[] =>
+  scenario === 'all-destinations' ? ALL_DESTINATIONS : [getDestinationFixture()]
+
 export const getDestinationsFixture = (): DestinationsResponse => ({
-  destinations: [getDestinationFixture()],
+  destinations: getDestinationFixtures(),
 })
 
-export const getDestinationByIdFixture = (destinationId: number): DestinationResponse => ({
-  ...getDestinationFixture(),
-  id: destinationId,
-})
+export const getDestinationByIdFixture = (destinationId: number): DestinationResponse => {
+  const destination = getDestinationFixtures().find(({ id }) => id === destinationId)
+  return destination ?? { ...getDestinationFixture(), id: destinationId }
+}
 
-const getPipelineFixture = (): PipelineResponse => {
-  const destination = getDestinationFixture()
-
+const getPipelineFixture = (destination: DestinationResponse, index = 0): PipelineResponse => {
   return {
-    id: 1_012,
+    id: 1_012 + index,
     tenant_id: 'fixture-tenant',
     source_id: 3_001,
     source_name: 'main',
     destination_id: destination.id,
     destination_name: destination.name,
-    replicator_id: 9_001,
+    replicator_id: 9_001 + index,
     config: {
       publication_name: 'supabase_realtime',
       table_sync_copy: { type: 'include_all_tables' },
@@ -337,12 +349,19 @@ const getPipelineFixture = (): PipelineResponse => {
   }
 }
 
-export const getPipelinesFixture = (): PipelinesResponse => ({ pipelines: [getPipelineFixture()] })
-
-export const getPipelineByIdFixture = (pipelineId: number): PipelineResponse => ({
-  ...getPipelineFixture(),
-  id: pipelineId,
+export const getPipelinesFixture = (): PipelinesResponse => ({
+  pipelines: getDestinationFixtures().map(getPipelineFixture),
 })
+
+export const getPipelineByIdFixture = (pipelineId: number): PipelineResponse => {
+  const pipelines = getPipelinesFixture().pipelines
+  return (
+    pipelines.find(({ id }) => id === pipelineId) ?? {
+      ...getPipelineFixture(getDestinationFixture()),
+      id: pipelineId,
+    }
+  )
+}
 
 export const getSourcesFixture = (projectRef: string): SourcesResponse => ({
   sources: [
