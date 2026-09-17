@@ -44,7 +44,7 @@ Since the wraparound prevention autovacuum cannot be stopped, the best approach 
 
 1.  **Upgrade your Database Compute Instance:**
     - **Action:** Temporarily scale up your instance's CPU.
-    - **Why it helps:** More CPU cores and processing power will help the autovacuum operation run faster, reducing the overall time it impacts your database.
+    - **Why it helps:** More processing power will help the autovacuum operation run faster, reducing the overall time it impacts your database.
     - **Considerations:** This usually causes a brief downtime (typically 1-2 minutes) as the instance restarts. However, the autovacuum process is designed to pause and resume automatically.
 
 2.  **Increase Disk Throughput/IOPS:**

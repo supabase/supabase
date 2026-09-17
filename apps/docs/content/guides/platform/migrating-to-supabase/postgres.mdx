@@ -119,8 +119,8 @@ tmux a -t migration || tmux new -s migration
 - **Row Level Security (RLS) status on tables is not migrated** - You'll need to enable RLS for tables after migration.
 
 **Resource Requirements**:
-| Database Size | Recommended Compute | Recommended VM | Action Required |
-|--------------|-------------------|----------------|-----------------|
+| Database Size | Recommended Compute | Recommended Migration VM | Action Required |
+|--------------|-------------------|--------------------------|-----------------|
 | < 10 GB | Default | 2 vCPUs, 4 GB RAM | None |
 | 10-100 GB | Default-Small | 4 vCPUs, 8 GB RAM | Consider compute upgrade |
 | 100-500 GB | Large compute | 8 vCPUs, 16 GB RAM, NVMe | Upgrade compute before restore |
@@ -210,7 +210,7 @@ export SUPABASE_DB_URL="Postgres://postgres.[ref]:[password]@aws-0-[region].pool
 # 4XL: 16 vCPUs → use -j 16
 # (larger sizes: match -j to the vCPU count shown on the pricing page)
 
-RESTORE_JOBS=2  # Safe for all compute sizes — increase per the guidance above
+RESTORE_JOBS=2  # Conservative starting point — adjust for your compute size and monitor CPU and disk IO
 
 # Restore the dump (parallel mode)
 # Note: -j cannot be used with --single-transaction
