@@ -17,7 +17,7 @@ Because the schema files are the source of truth, make every change by editing t
 
 <$Partial path="diff_engine_check.mdx" />
 
-This guide describes the workflow on `pg-delta`, the default engine. The `db schema declarative` commands require it. If you've opted out with `enabled = false`, they refuse to run unless you pass the `--experimental` flag for a single run. `db pull --declarative` runs regardless of the setting, but don't use it on a project that opted out, because it leaves `db diff` unable to run on `migra`. If your project has opted out, follow [Declarative schemas on the legacy `migra` engine](#declarative-schemas-on-the-legacy-migra-engine) instead.
+This guide describes the workflow on `pg-delta`. The `db schema declarative` commands require it and won't run on the legacy engine. For a single run of `sync` or `generate` without changing `config.toml`, pass the `--experimental` flag. `db pull --declarative` runs regardless of the `[experimental.pgdelta]` setting, but only use it on `pg-delta`. On the legacy engine it leaves `db diff` unable to run. If your project is still on `migra`, follow [Declarative schemas on the legacy `migra` engine](#declarative-schemas-on-the-legacy-migra-engine) instead.
 
 </Admonition>
 
@@ -52,13 +52,13 @@ create table "employees" (
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Generate a migration file">
-      Generate a migration file by diffing against your declared schema. The command also offers to apply the migration to your local database. Pass `--no-apply` to only generate the file. Both `--apply` and the global `--yes` flag apply it without prompting. Without one of those flags, a non-interactive run writes the file and silently skips the apply step.
+      Generate a migration file by diffing against your declared schema. This walkthrough passes `--no-apply` so the command only writes the file and the next step applies it. Without that flag, the command offers to apply the migration to your local database. Both `--apply` and the global `--yes` flag apply it without prompting, and a non-interactive run writes the file and silently skips the apply step.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
 ```bash name=Terminal
-supabase db schema declarative sync -f create_employees_table
+supabase db schema declarative sync -f create_employees_table --no-apply
 ```
 
     </StepHikeCompact.Code>
@@ -133,7 +133,7 @@ Some entities like views and enums expect columns to be declared in a specific o
     <StepHikeCompact.Code>
 
 ```bash name=Terminal
-supabase db schema declarative sync -f add_age
+supabase db schema declarative sync -f add_age --no-apply
 ```
 
     </StepHikeCompact.Code>
@@ -281,7 +281,7 @@ To set up declarative schemas on an existing project, export your production sch
 supabase db schema declarative generate --linked
 ```
 
-This writes per-object SQL files under `supabase/schemas/`, organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative`. It replaces the schema files without creating a migration or touching migration history.
+This writes per-object SQL files under `supabase/schemas/` (or the directory set by `experimental.pgdelta.declarative_schema_path`), organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative`. It replaces the schema files without creating a migration or touching migration history.
 
 `generate` writes schema files only. Because `sync` diffs your schema files against your migration history, that history must describe the same database before your first `sync`. If your project has no migrations yet, run `supabase db pull` first to create a baseline migration. Without a baseline, the first `sync` regenerates the entire schema as one migration. That migration can apply cleanly to an empty local database and still fail on `db push`, because the remote database already has those objects.
 
@@ -340,7 +340,7 @@ Two checks gate `sync` on a schema tree the CLI didn't generate:
 
 ## Declarative schemas on the legacy `migra` engine [#declarative-schemas-on-the-legacy-migra-engine]
 
-Projects that opted out of `pg-delta` with `[experimental.pgdelta] enabled = false` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
+Projects that haven't enabled `pg-delta` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
 
 <Admonition type="caution">
 
@@ -393,6 +393,6 @@ supabase db dump > supabase/schemas/prod.sql
 
 In addition to the caveats above, the legacy [`migra`](https://github.com/djrobstep/migra) engine has these limitations: [view owner and grants](https://github.com/djrobstep/migra/issues/160#issuecomment-1702983833), [security invoker on views](https://github.com/djrobstep/migra/issues/234) (the setting is silently dropped from the view definition), [indexes on a materialized view aren't restored when the view is recreated](https://github.com/djrobstep/migra/issues/194), [alter policy statements](https://github.com/djrobstep/schemainspect/blob/master/schemainspect/pg/obj.py#L228), [column privileges](https://github.com/djrobstep/schemainspect/pull/67), [comments](https://github.com/djrobstep/migra/issues/69), [roles](https://github.com/djrobstep/migra/issues/240), [`alter publication ... add table`](https://github.com/supabase/cli/issues/883), and [`create domain` statements](https://github.com/supabase/cli/issues/2137). Add those entities through versioned migrations instead.
 
-### Moving back to `pg-delta` [#switching-to-pg-delta]
+### Switching to `pg-delta` [#switching-to-pg-delta]
 
-Remove `enabled = false` from `[experimental.pgdelta]` in `config.toml`, or set it to `true`, then follow [Upgrade an existing project to `pg-delta`](/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta). For a declarative project, the steps that change your day-to-day work are removing `schema_paths`, replacing `db diff` with `db schema declarative sync` in scripts and CI, and dropping the `supabase stop` step.
+Follow [Switch an existing project to `pg-delta`](/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta). For a declarative project, the steps that change your day-to-day work are removing `schema_paths`, replacing `db diff` with `db schema declarative sync` in scripts and CI, and dropping the `supabase stop` step.

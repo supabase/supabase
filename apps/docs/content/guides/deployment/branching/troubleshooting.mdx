@@ -89,7 +89,7 @@ mv 20240101000000_old.sql 20240102000000_old.sql
 supabase db reset
 ```
 
-Migrations generated on the [`pg-delta`](/docs/guides/local-development/diff-engines) engine (`supabase db diff` or `db schema declarative sync`) don't need manual reordering because the engine orders statements by dependency. A single sync can write split files that share a name (`_1`/`_2` suffixes) with timestamps one second apart. The CLI applies them in timestamp order, so renaming one file of a split pair in a way that changes that order breaks the sequence. Regenerate the migration instead. See [Cleaning up generated migrations](/docs/guides/local-development/cli-workflows#cleaning-up-generated-migrations).
+Within a single migration generated on the [`pg-delta`](/docs/guides/local-development/diff-engines) engine (`supabase db diff` or `db schema declarative sync`), you don't need to reorder statements by hand, because the engine orders them by dependency. Migrations generated separately, such as on two branches that later merge, still need correct relative timestamps, so rename or regenerate them as shown above. A single sync can write split files that share a name (`_1`/`_2` suffixes) with timestamps one second apart. The CLI applies them in timestamp order, so renaming one file of a split pair in a way that changes that order breaks the sequence. Regenerate the migration instead. See [Cleaning up generated migrations](/docs/guides/local-development/cli-workflows#cleaning-up-generated-migrations).
 
 ## Connection issues
 
