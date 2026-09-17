@@ -261,6 +261,15 @@ export function gateLogTypeOptions<T extends { value: string; options?: Option[]
   })
 }
 
+/**
+ * Wraps a raw ILIKE/NOT ILIKE search term in `%...%` for a "contains" match,
+ * unless it already includes a `%` or `_` wildcard — in which case the user
+ * has crafted their own pattern and it's passed through unchanged.
+ */
+export function wrapIlikePattern(value: string): string {
+  return value.includes('%') || value.includes('_') ? value : `%${value}%`
+}
+
 export function gateLogTypeFilters(
   filters: string[] | null | undefined,
   visibility: Partial<Record<UnifiedLogType, boolean>>

@@ -298,8 +298,9 @@ export const calculateDiskSizeRequiredForIopsWithIo2 = (iops: number) => {
   return Math.max(4, Math.ceil(iops / 1000))
 }
 
+const MAX_GP3_THROUGHPUT = DISK_LIMITS[DiskType.GP3]['maxThroughput']
 export const calculateMaxThroughput = (iops: number) => {
-  return Math.min(0.256 * iops, 1000)
+  return Math.min(0.256 * iops, MAX_GP3_THROUGHPUT)
 }
 
 export const calculateIopsRequiredForThroughput = (throughput: number) => {

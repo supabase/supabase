@@ -16,7 +16,7 @@ async function getComputeInstance(
   if (!projectRef) throw new Error('projectRef is required')
   if (!name) throw new Error('name is required')
 
-  const { data, error } = await get('/v2/projects/{ref}/workers/{name}', {
+  const { data, error } = await get('/v2/projects/{ref}/compute/{name}', {
     params: { path: { ref: projectRef, name } },
     signal,
   })

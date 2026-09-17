@@ -97,6 +97,24 @@ describe('multi-select', () => {
     expect(badge).toHaveClass('normal-case', 'tracking-normal')
   })
 
+  it('supports wrapping badges with a numeric badge limit', () => {
+    render(
+      <MultiSelector
+        values={['Apple', 'Banana', 'Cherry', 'Date', 'Fig']}
+        onValuesChange={() => undefined}
+      >
+        <MultiSelectorTrigger badgeLimit={2} wrapBadges />
+      </MultiSelector>
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger.firstElementChild).toHaveClass('flex-wrap')
+    expect(trigger).toHaveTextContent('Apple')
+    expect(trigger).toHaveTextContent('Banana')
+    expect(trigger).toHaveTextContent('+3')
+    expect(trigger).not.toHaveTextContent('Cherry')
+  })
+
   it('opens the dropdown when the MultiSelectorTrigger is clicked', () => {
     render(<MultiSelectDemo />)
 

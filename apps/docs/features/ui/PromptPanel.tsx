@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from 'react'
 // shadcn tabs from packages/ui/src/components/shadcn/ui/tabs.tsx
-import { cn, copyToClipboard, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { cn, copyToClipboard, Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from 'ui'
 
 type PromptTitleProps = {
   children: ReactNode
@@ -248,12 +248,13 @@ function PromptPanel({ children, className }: PromptPanelProps) {
   const header = (
     <div className="flex h-11 items-center justify-between border-b bg-surface-75 px-4">
       {hasTabs ? (
-        <TabsList className="h-full gap-5 border-0">
+        <TabsList className="h-full gap-5 border-0 [--tab-track:transparent]">
           {prompts.map((prompt) => (
             <TabsTrigger key={prompt.value} value={prompt.value} className={tabTriggerClassName}>
               <TabLabel icon={prompt.icon}>{prompt.title}</TabLabel>
             </TabsTrigger>
           ))}
+          <TabsIndicator />
         </TabsList>
       ) : (
         <span
