@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getReportAttributesV2, shouldShowDiskIOBurstBalanceChart } from './database-charts'
+import { RESOURCE_WARNING_MESSAGES } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { Project } from '@/data/projects/project-detail-query'
 
 const PROJECT: Project = {
@@ -144,5 +145,20 @@ describe('shouldShowDiskIOBurstBalanceChart', () => {
 
   it('hides the chart when the project is unknown', () => {
     expect(shouldShowDiskIOBurstBalanceChart(undefined, true)).toBe(false)
+  })
+})
+
+describe('resource warning metrics chart IDs', () => {
+  it('keeps every configured chart target visible in the database report', () => {
+    const visibleChartIds = new Set(
+      getReportAttributesV2(ENTITLED_FEATURES, buildProject())
+        .filter((chart) => !chart.hide)
+        .map((chart) => chart.id)
+    )
+    const missingChartIds = Object.values(RESOURCE_WARNING_MESSAGES)
+      .flatMap((message) => message.metricsChartId ?? [])
+      .filter((chartId) => !visibleChartIds.has(chartId))
+
+    expect(missingChartIds).toEqual([])
   })
 })
