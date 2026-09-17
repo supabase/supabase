@@ -2,8 +2,8 @@
  * TEMPORARY — local design fixture. Do not merge.
  *
  * Short-circuits the replication status queries so the pipeline surfaces can be designed against
- * real-looking content without a live ETL pipeline. Switch states with the floating control in the
- * bottom-right of any replication page (PipelineFixtureController).
+ * real-looking content without a live ETL pipeline. Switch states from Pipeline fixtures in the
+ * account menu (PipelineFixtureController).
  *
  * Delete this file, its query call sites, and the controller to go back to live data.
  */

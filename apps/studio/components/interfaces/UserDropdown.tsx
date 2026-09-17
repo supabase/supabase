@@ -20,6 +20,7 @@ import {
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { PipelineFixtureController } from './Database/Replication/PipelineFixtureController'
 import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
@@ -146,6 +147,10 @@ export function UserDropdown({
         {shouldShowSectionSeparator && <DropdownMenuSeparator />}
 
         <DevToolbarMenuGroup />
+
+        <DropdownMenuGroup>
+          <PipelineFixtureController />
+        </DropdownMenuGroup>
 
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>

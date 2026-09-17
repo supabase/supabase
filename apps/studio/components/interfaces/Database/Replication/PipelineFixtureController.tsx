@@ -1,21 +1,18 @@
 /**
  * TEMPORARY — local design control. Do not merge.
  *
- * Floating switcher for the states in data/replication/dev-fixtures.ts, so every pipeline state can
- * be reviewed without a live ETL pipeline. Delete this file with the fixtures.
+ * Account-menu switcher for the states in data/replication/dev-fixtures.ts, so every pipeline state
+ * can be reviewed without a live ETL pipeline. Delete this file with the fixtures.
  */
 import { useQueryClient } from '@tanstack/react-query'
 import { FlaskConical } from 'lucide-react'
 import { useSyncExternalStore } from 'react'
 import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from 'ui'
 
 import {
@@ -44,19 +41,12 @@ export const PipelineFixtureController = () => {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="default"
-          icon={<FlaskConical />}
-          className="fixed bottom-4 right-4 z-50 shadow-lg"
-        >
-          {PIPELINE_FIXTURE_SCENARIO_LABEL[scenario]}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="end" className="w-72">
-        <DropdownMenuLabel>Pipeline state</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger className="flex cursor-pointer gap-2">
+        <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        Pipeline fixtures
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent className="max-h-[min(70vh,32rem)] w-72 overflow-y-auto">
         <DropdownMenuRadioGroup value={scenario} onValueChange={onSelectScenario}>
           {PIPELINE_FIXTURE_SCENARIOS.map((option) => (
             <DropdownMenuRadioItem key={option} value={option}>
@@ -64,11 +54,7 @@ export const PipelineFixtureController = () => {
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <p className="px-2 py-1.5 text-xs text-foreground-lighter">
-          Local fixture only. Not part of any reviewable branch.
-        </p>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownMenuSubContent>
+    </DropdownMenuSub>
   )
 }

@@ -14,7 +14,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
-import { PipelineFixtureController } from '@/components/interfaces/Database/Replication/PipelineFixtureController'
 import { PIPELINES_FEEDBACK_URL } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
@@ -96,8 +95,6 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
           </PageSection>
         )}
       </PageContainer>
-
-      <PipelineFixtureController />
     </PipelineRequestStatusProvider>
   )
 }
