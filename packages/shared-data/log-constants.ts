@@ -20,7 +20,7 @@ type LogSchema = {
   fields: {
     path: string
     type: string
-    description: string
+    description?: string
     example?: string
     containsPii?: boolean
   }[]
