@@ -92,7 +92,15 @@ Response headers:
                       <span className="text-xs font-mono text-foreground-lighter bg-surface-200 px-1.5 py-0.5 rounded">
                         {field.type}
                       </span>
+                      {field.containsPii && (
+                        <span className="text-[10px] font-medium uppercase tracking-wide text-warning border border-warning-500 rounded px-1.5 py-0.5 shrink-0">
+                          PII
+                        </span>
+                      )}
                     </div>
+                    {field.description && (
+                      <p className="mt-1 text-sm text-foreground-light">{field.description}</p>
+                    )}
                     {!isTopLevel && (
                       <div className="mt-2 flex flex-col gap-1">
                         <div className="flex items-baseline gap-2">
@@ -111,6 +119,16 @@ Response headers:
                             {field.queryField}
                           </code>
                         </div>
+                      </div>
+                    )}
+                    {field.example && (
+                      <div className="mt-1 flex items-baseline gap-2">
+                        <span className="text-[10px] font-medium uppercase tracking-wide text-foreground-lighter border rounded px-1.5 py-px shrink-0">
+                          example
+                        </span>
+                        <code className="text-xs text-foreground-lighter break-all">
+                          {field.example}
+                        </code>
                       </div>
                     )}
                   </div>
