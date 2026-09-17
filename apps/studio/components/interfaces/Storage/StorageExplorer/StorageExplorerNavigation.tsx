@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useEffectEvent,
+  useMemo,
   useRef,
   type PropsWithChildren,
 } from 'react'
@@ -201,63 +202,65 @@ export const StorageExplorerNavigationProvider = ({
     searchString,
   ])
 
-  const openFolderAtIndex = async (columnIndex: number, folder: StorageItem) => {
-    navigationHistoryModeRef.current = 'push'
-    await snap.openFolder(columnIndex, folder)
-  }
+  const context = useMemo(() => {
+    const openFolderAtIndex = async (columnIndex: number, folder: StorageItem) => {
+      navigationHistoryModeRef.current = 'push'
+      await snap.openFolder(columnIndex, folder)
+    }
 
-  const goUpOneLevel = () => {
-    navigationHistoryModeRef.current = 'push'
-    snap.popColumn()
-    snap.popOpenedFolders()
-    snap.setSelectedFilePreview(undefined)
-  }
+    const goUpOneLevel = () => {
+      navigationHistoryModeRef.current = 'push'
+      snap.popColumn()
+      snap.popOpenedFolders()
+      snap.setSelectedFilePreview(undefined)
+    }
 
-  const truncateToColumn = (columnIndex: number) => {
-    navigationHistoryModeRef.current = 'push'
-    snap.popColumnAtIndex(columnIndex)
-    snap.popOpenedFoldersAtIndex(columnIndex - 1)
-    snap.setSelectedFilePreview(undefined)
-    snap.clearSelectedItems()
-  }
+    const truncateToColumn = (columnIndex: number) => {
+      navigationHistoryModeRef.current = 'push'
+      snap.popColumnAtIndex(columnIndex)
+      snap.popOpenedFoldersAtIndex(columnIndex - 1)
+      snap.setSelectedFilePreview(undefined)
+      snap.clearSelectedItems()
+    }
 
-  const navigateToPath = (paths: string[]) => {
-    setUrlLocation({ paths, preview: null }, { history: 'push' })
-  }
+    const navigateToPath = (paths: string[]) => {
+      setUrlLocation({ paths, preview: null }, { history: 'push' })
+    }
 
-  const setPreviewedFile = (item: StorageItemWithColumn) => {
-    const paths = snap.openedFolders.slice(0, item.columnIndex).map((folder) => folder.name)
-    // Collapsing back to the file's own column is a navigation; previewing in place isn't.
-    const isCollapsingColumns = item.columnIndex < snap.openedFolders.length
+    const setPreviewedFile = (item: StorageItemWithColumn) => {
+      const paths = snap.openedFolders.slice(0, item.columnIndex).map((folder) => folder.name)
+      // Collapsing back to the file's own column is a navigation; previewing in place isn't.
+      const isCollapsingColumns = item.columnIndex < snap.openedFolders.length
 
-    snap.popColumnAtIndex(item.columnIndex)
-    snap.popOpenedFoldersAtIndex(item.columnIndex - 1)
-    snap.clearSelectedItems()
-    snap.setSelectedFilePreview(item)
-    // One write, so the URL never pairs the new file with the old, deeper path — a
-    // separate `preview` write would leave exactly that pairing behind in history.
-    setUrlLocation(
-      { paths, preview: item.name },
-      { history: isCollapsingColumns ? 'push' : 'replace' }
-    )
-  }
+      snap.popColumnAtIndex(item.columnIndex)
+      snap.popOpenedFoldersAtIndex(item.columnIndex - 1)
+      snap.clearSelectedItems()
+      snap.setSelectedFilePreview(item)
+      // One write, so the URL never pairs the new file with the old, deeper path — a
+      // separate `preview` write would leave exactly that pairing behind in history.
+      setUrlLocation(
+        { paths, preview: item.name },
+        { history: isCollapsingColumns ? 'push' : 'replace' }
+      )
+    }
 
-  const clearPreviewedFile = () => {
-    snap.setSelectedFilePreview(undefined)
-    setUrlPreview(null)
-  }
+    const clearPreviewedFile = () => {
+      snap.setSelectedFilePreview(undefined)
+      setUrlPreview(null)
+    }
+
+    return {
+      openFolderAtIndex,
+      navigateToPath,
+      goUpOneLevel,
+      truncateToColumn,
+      setPreviewedFile,
+      clearPreviewedFile,
+    }
+  }, [setUrlLocation, setUrlPreview, snap])
 
   return (
-    <StorageExplorerNavigationContext.Provider
-      value={{
-        openFolderAtIndex,
-        navigateToPath,
-        goUpOneLevel,
-        truncateToColumn,
-        setPreviewedFile,
-        clearPreviewedFile,
-      }}
-    >
+    <StorageExplorerNavigationContext.Provider value={context}>
       {children}
     </StorageExplorerNavigationContext.Provider>
   )

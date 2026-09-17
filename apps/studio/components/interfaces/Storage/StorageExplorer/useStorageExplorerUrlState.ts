@@ -1,4 +1,5 @@
 import { parseAsString, useQueryStates, type Options } from 'nuqs'
+import { useMemo } from 'react'
 
 import { parseStoragePath, serializeStoragePath } from './StorageExplorer.utils'
 
@@ -20,21 +21,24 @@ export function useStorageExplorerUrlState() {
     { history: 'push', clearOnDefault: true }
   )
 
-  return {
-    urlPath: path,
-    urlFolderPaths: parseStoragePath(path),
-    urlPreview: preview,
+  return useMemo(
+    () => ({
+      urlPath: path,
+      urlFolderPaths: parseStoragePath(path),
+      urlPreview: preview,
 
-    /**
-     * Writes both params at once. `preview` is always passed explicitly so a location
-     * write can carry an open preview along with it rather than clearing it.
-     */
-    setUrlLocation: (
-      { paths, preview: previewedName }: { paths: string[]; preview: string | null },
-      options?: Options
-    ) => setParams({ path: serializeStoragePath(paths), preview: previewedName ?? '' }, options),
+      /**
+       * Writes both params at once. `preview` is always passed explicitly so a location
+       * write can carry an open preview along with it rather than clearing it.
+       */
+      setUrlLocation: (
+        { paths, preview: previewedName }: { paths: string[]; preview: string | null },
+        options?: Options
+      ) => setParams({ path: serializeStoragePath(paths), preview: previewedName ?? '' }, options),
 
-    setUrlPreview: (name: string | null) =>
-      setParams({ preview: name ?? '' }, { history: 'replace' }),
-  }
+      setUrlPreview: (name: string | null) =>
+        setParams({ preview: name ?? '' }, { history: 'replace' }),
+    }),
+    [path, preview, setParams]
+  )
 }
