@@ -140,13 +140,13 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
   }, [resolvedUrl, publishableKey, jwksUrl, getSecretValue])
 
   useEffect(() => {
-    if (!isRevealed || !revealedSecret) return
+    if (!isRevealed || (!revealedSecret && !isServiceRoleKey)) return
     const timer = setTimeout(() => {
       setIsRevealed(false)
       clearReveal()
     }, AUTO_HIDE_MS)
     return () => clearTimeout(timer)
-  }, [isRevealed, revealedSecret, clearReveal])
+  }, [isRevealed, revealedSecret, isServiceRoleKey, clearReveal])
 
   return {
     isLoading: isLoadingUrl || isLoadingKeys || isLoadingPermission,
