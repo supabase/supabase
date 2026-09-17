@@ -150,7 +150,10 @@ export const ReplicationPipelineStatus = () => {
     data: replicationStatusData,
     isPending: isStatusLoading,
     isError: isStatusError,
-  } = useReplicationPipelineReplicationStatusQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
+  } = useReplicationPipelineReplicationStatusQuery(
+    { projectRef, pipelineId },
+    { enabled: !!pipelineId }
+  )
 
   const statusName = getStatusName(pipelineStatusData?.status)
   const config = getDisabledStateConfig({ requestStatus, statusName })

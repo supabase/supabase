@@ -11,8 +11,8 @@ import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
 import { replicationKeys } from '@/data/replication/keys'
 import {
-  PipelineStatusRequestStatus,
   PipelineRequestStatusProvider,
+  PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
