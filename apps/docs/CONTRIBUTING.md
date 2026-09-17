@@ -15,9 +15,71 @@ To make docs as clear as possible:
 - Write for the user. Think about what task they want to complete by reading your doc. Tell them what, and only what, they need to know.
 - Write like you talk. Conversational English is easier for a global audience to understand and localize. Many readers who use English as an additional language learn conversational rather than academic English. Use words and sentences that sound natural when speaking. Cut unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
 - Prefer short, direct sentences. Express one relationship at a time, and avoid unnecessary compound structures. This makes each sentence easier to understand, localize, and interpret consistently.
-- Cover one topic in each paragraph. Start a new paragraph whenever you change the topic. Don't worry about paragraphs being too short.
+- Cover one topic in each paragraph. Start a new paragraph whenever you change the topic, or when you move between [information types](#information-types). Don't worry about paragraphs being too short.
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
+
+## Information types
+
+Separating kinds of information helps a reader reach what they came for and retain it afterward. Someone scanning for a command shouldn't have to read past a definition to find it, and someone reading to understand shouldn't have to step around instructions. Blended prose slows down both, along with an AI agent trying to answer a question from the page, and little of it sticks.
+
+The [Information Mapping](https://support.informationmapping.com/hc/en-us/articles/213446789-Present-your-information-in-a-clear-and-consistent-way) method names six kinds, each answering a different reader question:
+
+| Type | Answers | Present with |
+| --- | --- | --- |
+| Procedure | How do I do it? | Numbered steps, or an if/then table |
+| Process | What is happening? How does it work? | A stage-by-stage description, or a when/then table |
+| Structure | What are its parts? | A part and description table, or a labeled diagram |
+| Principle | What should I do or not do? | Text, a list, or an admonition |
+| Concept | What is it? | Text, a list, or a diagram |
+| Fact | What are the facts? | Text, a list, or a table |
+
+### Recommendations
+
+- **Separate a procedure, a process, a structure, or a concept**: Each usually reads better in its own section. Procedure and process get blended most often, because both answer a question about how, and a reader following steps can't act on the process sentences.
+- **Keep context out of the action path**: A concept or a process tends to work better before the procedure or after it than threaded through the steps.
+- **Let a principle or a fact ride along**: Either is often a single sentence, so it can sit in the section it qualifies rather than getting one of its own. A fact about timing fits in the step it describes, and a principle can close the concept paragraph that motivates it.
+- **Look again at a long paragraph**: Past three or four sentences, it has often picked up a second kind of information. Label each sentence and see where the labels change.
+- **Leave connective prose alone**: An introduction, a transition, an outcome, and a navigation outline describe the page rather than the product, so none of this applies to them.
+
+### Examples
+
+Not recommended, because one paragraph blends a concept, a procedure, and a structure:
+
+```md
+Row Level Security is a Postgres feature that restricts which rows a user can read
+or write, and it's the main way to secure a table that several users share. Enable
+it by running `alter table profiles enable row level security`, which takes effect
+immediately. Be careful, because a table with Row Level Security enabled and no
+policy returns no rows to every client, so write a policy before you deploy. The
+`using` clause of a policy accepts any expression that returns a boolean.
+```
+
+Recommended, with each type in the presentation that suits it:
+
+```md
+## Row Level Security
+
+Row Level Security restricts which rows a user can read or write. It's the main way
+to secure a table that several users share.
+
+### Enable Row Level Security
+
+1. Run `alter table profiles enable row level security`. The change takes effect
+   immediately.
+2. Write a policy that grants the access your app needs.
+
+<Admonition type="caution">
+
+A table with Row Level Security enabled and no policy returns no rows to every
+client. Write a policy before you deploy.
+
+</Admonition>
+
+### Policy reference
+
+The `using` clause accepts any expression that returns a boolean.
+```
 
 ## AI agent skills for docs authoring
 
@@ -41,7 +103,7 @@ Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, st
 
 ## Document types
 
-Supabase docs contain 4 types of documents. Before you start writing, think about what type of doc you need.
+Supabase docs contain four types of documents. Before you start writing, think about what type of doc you need.
 
 ### Explainers
 
@@ -70,18 +132,55 @@ Guides are also goal-oriented, but they focus on shorter, more targeted tasks. F
 
 Guides contain mostly procedures: concise steps that readers can follow in sequence.
 
-Begin each guide with a sentence that declares its intent, such as `This guide explains how to set up email login.` This helps readers and agents confirm that the guide matches their goal and expected outcome.
+A value statement makes a good opener: name what the reader can do, and why it matters to them. That's what tells a reader or an agent whether the page matches their goal.
 
 Keep procedures focused on what the reader must do. Move substantial background or conceptual explanations into a separate section or an explainer. Cross-reference the authoritative explanation instead of repeating it in the procedure. This keeps the action path scannable, gives readers optional depth, and maintains one source of truth.
 
-- Recommended: `This guide explains how to enable Row Level Security. To learn how Row Level Security controls access, see [Row Level Security](...).`
-- Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the guide helps the reader do.
+- **Recommended**: `Restrict access to a shared table with Row Level Security. To learn how a policy is evaluated, see [Row Level Security](...).`
+- **Not recommended**: Begin with several paragraphs about how Row Level Security works before stating what the reader can do.
 
-**Mixed information types:** When a guide contains substantial context or reference material, group sections by information type. Keep contextual and reference sections separate from the procedure group so that background information doesn't interrupt the action path.
+**Mixed information types:** [Information types](#information-types) apply at the page level too. Group sections of related types together, and try to keep the procedure group unbroken so context doesn't interrupt the action path. A section serving two types can be split, with a cross-reference between the halves.
+
+Classify a section by what the reader is doing in it, not by what it's about. On a page about tables every section is about tables, so subject matter tells you nothing. A reader opens a section on schemas to understand something, so it's context.
+
+One order that works: a short concept opener, then procedures, then concept and process, then structure and fact.
+
+```text
+## What is a table?                    <- concept opener
+## Creating and managing tables        <- procedures
+### Creating tables
+### Securing your tables
+### Loading data
+## How tables are organized            <- concept and process
+### Primary keys
+### Relationships between tables
+### Schemas
+## Reference                           <- structure and fact
+### Data types
+```
 
 **Navigation:** Begin a long guide with a short outline of its major section groups. Link to each group and state when a reader should use it. Don't add section navigation to a short guide when the headings are already easy to scan.
 
+For example, an introduction to a long guide that mixes information types:
+
+```md
+Connect your app to Postgres through a connection pooler, a direct connection, or a
+Supabase client library.
+
+- [Choose a connection method](#choose-a-connection-method) compares the options and
+  their trade-offs. Start here if you aren't sure which one fits your app.
+- [Connect your app](#connect-your-app) has the steps for each method.
+- [Connection parameters](#connection-parameters) lists every parameter and its
+  default.
+```
+
+Each link says what the reader gets from that group, so someone who already knows which method they want goes straight to the procedures.
+
 **Cross-references and glue:** Connect contextual sections to their corresponding procedures when the relationship helps readers navigate. Add a brief introduction to each section group, a transition when the information type changes, and an outcome after a procedure. Add links selectively rather than linking every adjacent section.
+
+- Group introduction: `The following sections cover each connection method in turn. Every method needs your project reference, which you find on the project settings page.`
+- Transition where the type changes: `Those are the mechanics of opening a connection. To understand why a pooled connection behaves differently under load, see [Connection pooling](...).`
+- Outcome after a procedure: `Your app now connects through the pooler. Queries that used to fail at the connection limit queue instead.`
 
 For inspiration, see [an example of a guide](/docs/guides/auth/auth-email-passwordless).
 
@@ -203,8 +302,8 @@ Begin every admonition with its impact and purpose: the "so what." Use the first
 
 For example:
 
-- Recommended: `Deleting this project permanently removes its database and backups. Export any data that you want to keep before you continue.`
-- Not recommended: `Before you continue, there are a few things that you should know about project deletion.`
+- **Recommended**: `Deleting this project permanently removes its database and backups. Export any data that you want to keep before you continue.`
+- **Not recommended**: `Before you continue, there are a few things that you should know about project deletion.`
 
 Choose the appropriate `type` for your admonition:
 
@@ -267,7 +366,7 @@ Optionally highlight lines by using `mark=${lineNumber}`.
 
 Use **bold**, _italics_, and `code` formatting for distinct purposes. Don't use them interchangeably or to add visual emphasis alone.
 
-- **Bold**: Mark UI labels the reader interacts with, such as buttons, menu items, and field names. For example, `Click **Save**.` Also use bold for a term the reader must not miss, such as `**Never** commit your service role key.`
+- **Bold**: Mark UI labels the reader interacts with, such as buttons, menu items, and field names. For example, `Click **Save**.` Also use bold for a term the reader must not miss, such as `**Never** commit your service role key.` Bold is also the convention for an inline label that opens a paragraph or a list item, such as `**Recommended**:` or `**Navigation:**`.
 - _Italics_: Introduce a new term the first time you define it, or reference a title, such as a book or a third-party product name written in italics by convention. Use italics sparingly. Don't use italics for UI labels or for general emphasis.
 - `Code`: Mark anything the reader types or copies verbatim, or anything the system reads literally. This includes filenames, paths, commands, flags, environment variables, function and parameter names, configuration keys, and literal values. For example, `` Set `SUPABASE_URL` in your `.env` file. ``
 

@@ -87,7 +87,7 @@ export const telemetryHireAgent: ContentListingGroup = {
       title: monitoringAgents.health.name,
       href: '/guides/observability/automate-with-agents/health',
       subtitle: getScheduleLabel(monitoringAgents.health),
-      description: 'Watch logs for 5xx spikes and Auth failures.',
+      description: 'Check API and Auth server errors and connection pressure.',
     },
     {
       title: monitoringAgents.security.name,
@@ -99,13 +99,13 @@ export const telemetryHireAgent: ContentListingGroup = {
       title: monitoringAgents.performance.name,
       href: '/guides/observability/automate-with-agents/performance',
       subtitle: getScheduleLabel(monitoringAgents.performance),
-      description: 'Find slow queries, lock waits, and missing indexes.',
+      description: 'Review sessions, query regressions, and performance advisors.',
     },
     {
       title: monitoringAgents.usage.name,
       href: '/guides/observability/automate-with-agents/usage',
       subtitle: getScheduleLabel(monitoringAgents.usage),
-      description: 'Track request growth, error rates, and approaching limits.',
+      description: 'Track sizes, connections, request growth, and supported forecasts.',
     },
   ],
 }

@@ -52,3 +52,33 @@ export async function deleteAllBuckets(): Promise<void> {
     await deleteBucket(bucket.id)
   }
 }
+
+/**
+ * Uploads an object to a bucket, creating every folder in its path along the way. Storage has no
+ * standalone folders — a folder exists because an object sits under that prefix — so this is how
+ * a folder tree gets seeded.
+ *
+ * @param bucket - Bucket name / id
+ * @param objectPath - Path within the bucket, e.g. `reports/2024/q1/seed.txt`
+ * @param content - File contents (default: a short placeholder)
+ */
+export async function uploadObject(
+  bucket: string,
+  objectPath: string,
+  content: string = 'e2e fixture'
+): Promise<void> {
+  await storageRequest(`/object/${bucket}/${objectPath}`, { method: 'POST', body: content })
+}
+
+/**
+ * Seeds a bucket with a set of object paths. Creates the bucket first when it does not exist.
+ *
+ * @param bucket - Bucket name / id
+ * @param objectPaths - Paths within the bucket to create
+ */
+export async function seedBucket(bucket: string, objectPaths: string[]): Promise<void> {
+  await createBucket(bucket, false)
+  for (const objectPath of objectPaths) {
+    await uploadObject(bucket, objectPath)
+  }
+}
