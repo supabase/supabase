@@ -526,19 +526,19 @@ parameters:
       - name: 'OpenAI API Keys'
         link: 'https://platform.openai.com/api-keys'
 
-  - id: 'inbucket.enabled'
-    title: 'inbucket.enabled'
+  - id: 'local_smtp.enabled'
+    title: 'local_smtp.enabled'
     tags: ['local']
     required: false
     default: 'true'
     description: |
-      Enable the local InBucket service.
+      Enable the local SMTP testing server.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.port'
-    title: 'inbucket.port'
+  - id: 'local_smtp.port'
+    title: 'local_smtp.port'
     tags: ['local']
     required: false
     default: '54324'
@@ -547,11 +547,11 @@ parameters:
 
       Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.smtp_port'
-    title: 'inbucket.smtp_port'
+  - id: 'local_smtp.smtp_port'
+    title: 'local_smtp.smtp_port'
     tags: ['local']
     required: false
     default: '54325'
@@ -562,11 +562,11 @@ parameters:
 
       If set, you can access the SMTP server from this port.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.pop3_port'
-    title: 'inbucket.pop3_port'
+  - id: 'local_smtp.pop3_port'
+    title: 'local_smtp.pop3_port'
     tags: ['local']
     required: false
     default: '54326'
@@ -577,19 +577,19 @@ parameters:
 
       If set, you can access the POP3 server from this port.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.admin_email'
-    title: 'inbucket.admin_email'
+  - id: 'local_smtp.admin_email'
+    title: 'local_smtp.admin_email'
     tags: ['local']
     required: false
     default: 'admin@email.com'
     description: |
       Email used as the sender for emails sent from the application.
 
-  - id: 'inbucket.sender_name'
-    title: 'inbucket.sender_name'
+  - id: 'local_smtp.sender_name'
+    title: 'local_smtp.sender_name'
     tags: ['local']
     required: false
     default: 'Admin'
