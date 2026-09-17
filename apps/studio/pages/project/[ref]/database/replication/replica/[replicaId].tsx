@@ -27,7 +27,7 @@ const DatabaseReadReplicaRedirectPage: NextPageWithLayout = () => {
 
 DatabaseReadReplicaRedirectPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
+    <DatabaseLayout title="Pipelines">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

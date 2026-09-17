@@ -235,7 +235,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href={`/project/${projectRef}/database/replication`}>Replication</Link>
+                <Link href={`/project/${projectRef}/database/replication`}>Pipelines</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

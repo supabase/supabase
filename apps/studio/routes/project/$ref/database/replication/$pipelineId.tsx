@@ -5,7 +5,7 @@ import DatabaseReplicationPage from '@/pages/project/[ref]/database/replication/
 export const Route = createFileRoute('/project/$ref/database/replication/$pipelineId')({
   component: DatabaseReplicationPipelineRoute,
   staticData: {
-    databaseLayoutTitle: 'Replication',
+    databaseLayoutTitle: 'Pipelines',
   },
 })
 

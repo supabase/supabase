@@ -44,7 +44,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         <PageHeader size="large">
           <PageHeaderMeta>
             <PageHeaderSummary>
-              <PageHeaderTitle>Replication</PageHeaderTitle>
+              <PageHeaderTitle>Pipelines</PageHeaderTitle>
               <PageHeaderDescription>High Availability cluster topology</PageHeaderDescription>
             </PageHeaderSummary>
           </PageHeaderMeta>
@@ -68,7 +68,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Replication</PageHeaderTitle>
+            <PageHeaderTitle>Pipelines</PageHeaderTitle>
             <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
           </PageHeaderSummary>
 
@@ -104,7 +104,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
+    <DatabaseLayout title="Pipelines">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

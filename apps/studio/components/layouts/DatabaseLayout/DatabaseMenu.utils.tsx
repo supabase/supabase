@@ -123,7 +123,7 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
       items: [
         IS_PLATFORM &&
           showPgReplicate && {
-            name: 'Replication',
+            name: 'Pipelines',
             key: 'replication',
             url: getDatabaseURL('replication'),
             label: enablePgReplicate ? 'New' : undefined,

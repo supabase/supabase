@@ -89,8 +89,8 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         ? [
             {
               id: 'nav-database-replication',
-              name: 'Replication',
-              value: 'Database: Replication',
+              name: 'Pipelines',
+              value: 'Database: Pipelines',
               route: `/project/${ref}/database/replication`,
               defaultHidden: true,
             } as IRouteCommand,
