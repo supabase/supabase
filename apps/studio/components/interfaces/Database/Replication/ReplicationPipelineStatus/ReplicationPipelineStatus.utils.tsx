@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
 import { Badge } from 'ui'
 
 import { getPipelineDisplayState, normalizePipelineStatusName } from '../Pipeline.utils'
@@ -7,8 +6,6 @@ import { RetryPolicy, SlotWalStatus, TableState } from './ReplicationPipelineSta
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { formatBytes } from '@/lib/helpers'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
-
-dayjs.extend(duration)
 
 export const getStatusConfig = (state: TableState['state']) => {
   switch (state.name) {
