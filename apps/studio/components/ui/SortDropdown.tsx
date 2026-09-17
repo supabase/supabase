@@ -29,10 +29,7 @@ export const SortDropdown = ({ options, value, setValue }: SortDropdownProps) =>
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="default"
-          icon={sortOrder === 'desc' ? <ArrowDownWideNarrow /> : <ArrowDownNarrowWide />}
-        >
+        <Button icon={sortOrder === 'desc' ? <ArrowDownWideNarrow /> : <ArrowDownNarrowWide />}>
           Sorted by {columnLabel ?? sortColumn}
         </Button>
       </DropdownMenuTrigger>

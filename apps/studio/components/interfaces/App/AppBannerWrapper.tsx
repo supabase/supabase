@@ -8,11 +8,12 @@ import {
 } from 'ui-patterns/Banners/Select26Promotion'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
-import { isLogsOrObservabilityPath } from './AppBannerWrapper.utils'
+import { isLogsOrObservabilityPath, isOrganizationLandingPath } from './AppBannerWrapper.utils'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerLogsAllDeprecation } from '@/components/ui/BannerStack/Banners/BannerLogsAllDeprecation'
+import { BannerPrivacyPolicyUpdate } from '@/components/ui/BannerStack/Banners/BannerPrivacyPolicyUpdate'
 import { BannerSelect2026 } from '@/components/ui/BannerStack/Banners/BannerSelect2026'
 import {
   SELECT_26_BANNER_PRIORITY,
@@ -44,6 +45,9 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_UPDATE,
     false
   )
+
+  const [privacyPolicyUpdateAcknowledged, , { isSuccess: isPrivacyPolicyDismissalLoaded }] =
+    useLocalStorageQuery(LOCAL_STORAGE_KEYS.PRIVACY_POLICY_UPDATE, false)
 
   const [isSelect26BannerDismissed, , { isSuccess: isSelect26DismissalLoaded }] =
     useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
@@ -91,6 +95,27 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
       dismissBanner('tos-update-banner')
     }
   }, [TOSUpdateAcknowledged, isSuccess, addBanner, dismissBanner])
+
+  useEffect(() => {
+    if (!isPrivacyPolicyDismissalLoaded || pathname == null) return
+
+    if (isOrganizationLandingPath(pathname) && !privacyPolicyUpdateAcknowledged) {
+      addBanner({
+        id: BANNER_ID.PRIVACY_POLICY_UPDATE,
+        isDismissed: false,
+        content: <BannerPrivacyPolicyUpdate />,
+        priority: 0,
+      })
+    } else {
+      dismissBanner(BANNER_ID.PRIVACY_POLICY_UPDATE)
+    }
+  }, [
+    pathname,
+    privacyPolicyUpdateAcknowledged,
+    isPrivacyPolicyDismissalLoaded,
+    addBanner,
+    dismissBanner,
+  ])
 
   const [isLogsAllDeprecationDismissed, , { isSuccess: isLogsAllDeprecationLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LOGS_ALL_DEPRECATION_2026_09_23, false)

@@ -28,12 +28,7 @@ const WhatItTakesSection = ({ id, heading, items, className = '' }: WhatItTakesS
             className="flex flex-col gap-3 p-6 rounded-lg border border-default bg-surface-75"
           >
             <p className="text-foreground-light">{item.description}</p>
-            <Button
-              asChild
-              variant="default"
-              size="tiny"
-              icon={<ArrowUpRight className="w-3 h-3" />}
-            >
+            <Button asChild size="tiny" icon={<ArrowUpRight className="w-3 h-3" />}>
               <Link href={item.url}>{item.linkLabel ?? 'Read more'}</Link>
             </Button>
           </div>

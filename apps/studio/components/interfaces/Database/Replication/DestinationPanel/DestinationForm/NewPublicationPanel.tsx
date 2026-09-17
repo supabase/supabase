@@ -220,7 +220,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
               </Form>
             </SheetSection>
             <SheetFooter>
-              <Button variant="default" disabled={isCreatingPublication} onClick={confirmOnClose}>
+              <Button disabled={isCreatingPublication} onClick={confirmOnClose}>
                 Cancel
               </Button>
               <Button

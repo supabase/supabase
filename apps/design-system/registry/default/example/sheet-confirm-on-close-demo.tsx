@@ -168,9 +168,7 @@ export default function SheetConfirmOnCloseDemo() {
 
   return (
     <>
-      <Button variant="default" onClick={openSheet}>
-        Open endpoint sheet
-      </Button>
+      <Button onClick={openSheet}>Open endpoint sheet</Button>
 
       <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent className="flex flex-col gap-0">
@@ -210,9 +208,7 @@ export default function SheetConfirmOnCloseDemo() {
           </SheetSection>
           <Separator />
           <SheetFooter>
-            <Button variant="default" onClick={confirmOnClose}>
-              Cancel
-            </Button>
+            <Button onClick={confirmOnClose}>Cancel</Button>
             <Button variant="primary" onClick={saveChanges} disabled={!isDirty}>
               Save changes
             </Button>

@@ -7,9 +7,9 @@ import type { components } from '@/data/api'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type DatabaseDetailResponse = components['schemas']['DatabaseDetailResponse']
-type DatabaseStatusResponse = components['schemas']['DatabaseStatusResponse']
-type LoadBalancerDetailResponse = components['schemas']['LoadBalancerDetailResponse']
+type DatabaseDetailResponse = components['schemas']['DatabaseDetailResponse_Output']
+type DatabaseStatusResponse = components['schemas']['DatabaseStatusResponse_Output']
+type LoadBalancerDetailResponse = components['schemas']['LoadBalancerDetailResponse_Output']
 
 const { mockUseIsFeatureEnabled } = vi.hoisted(() => ({
   mockUseIsFeatureEnabled: vi.fn(() => ({ infrastructureReadReplicas: true })),
@@ -32,6 +32,8 @@ const addReplicaListMocks = () => {
         {
           cloud_provider: 'AWS',
           connectionString: 'postgresql://postgres:password@db.default.supabase.co:5432/postgres',
+          connection_string_read_only:
+            'postgresql://postgres:password@db.default.supabase.co:5432/postgres',
           db_host: 'db.default.supabase.co',
           db_name: 'postgres',
           db_port: 5432,

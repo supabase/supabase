@@ -353,7 +353,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 You may access this feature by enabling it under dashboard feature previews.
               </AlertDescription>
               <div className="mt-4">
-                <Button variant="default" onClick={() => toggleFeaturePreviewModal(true)}>
+                <Button onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>

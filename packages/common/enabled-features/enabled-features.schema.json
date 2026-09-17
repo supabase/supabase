@@ -354,6 +354,10 @@
       "type": "boolean",
       "description": "Show the advanced configuration option in the project creation flow"
     },
+    "project_creation:show_high_availability": {
+      "type": "boolean",
+      "description": "Show the high availability toggle in the project creation flow"
+    },
 
     "project_homepage:show_instance_size": {
       "type": "boolean",

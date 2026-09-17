@@ -223,7 +223,6 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     <div className="flex items-center justify-between">
                       <p className="text-sm">Columns</p>
                       <Button
-                        variant="default"
                         icon={<Plus />}
                         onClick={() => appendColumn({ name: '', type: 'string' })}
                       >
@@ -259,7 +258,6 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
             <SheetFooter>
               <Button
                 disabled={isCreating}
-                variant="default"
                 onClick={() => {
                   onOpenChange(false)
                   form.reset(defaultValues)

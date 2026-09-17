@@ -2,16 +2,85 @@
 
 import { ArrowRightFromLine, Check, Copy, WrapText, type LucideIcon } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
-import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
 import { Button, cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+type CodeAnnotation = Pick<NodeHover, 'text' | 'docs' | 'tags'>
+export type CodeToken = [
+  content: string,
+  className: string | undefined,
+  annotations?: Array<CodeAnnotation>,
+]
+
+export function CodeBlockTokens({
+  lines,
+  lineNumbers,
+}: {
+  lines: Array<Array<CodeToken>>
+  lineNumbers: boolean
+}) {
+  return (
+    <pre>
+      <code
+        className={cn(
+          '[contain:content]',
+          lineNumbers && 'grid grid-cols-[auto_1fr] w-fit min-w-full py-3',
+          '[--row-rest:var(--background-200)]',
+          '[--row-hover:color-mix(in_srgb,var(--foreground)_3%,var(--background-200))]'
+        )}
+      >
+        {lineNumbers ? (
+          lines.map((line, idx) => (
+            <div key={idx} className="group/row contents">
+              <div aria-hidden="true" className="code-line-number">
+                {idx + 1}
+              </div>
+              <div className="code-content code-line-content">
+                <CodeLine tokens={line} />
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="code-content p-6">
+            {lines.map((line, idx) => (
+              <CodeLine key={idx} tokens={line} />
+            ))}
+          </div>
+        )}
+      </code>
+    </pre>
+  )
+}
+
+function CodeLine({ tokens }: { tokens: Array<CodeToken> }) {
+  return (
+    <span className="block min-h-5 leading-5">
+      {tokens.map(([content, className, annotations], idx) =>
+        annotations ? (
+          <AnnotatedSpan
+            key={idx}
+            content={content}
+            className={className}
+            annotations={annotations}
+          />
+        ) : (
+          <span key={idx} className={className}>
+            {content}
+          </span>
+        )
+      )}
+    </span>
+  )
+}
+
 export function AnnotatedSpan({
-  token,
+  content,
+  className,
   annotations,
 }: {
-  token: ThemedToken
-  annotations: Array<NodeHover>
+  content: string
+  className: string | undefined
+  annotations: Array<CodeAnnotation>
 }) {
   const [open, setOpen] = useState(false)
 
@@ -45,13 +114,13 @@ export function AnnotatedSpan({
       <TooltipTrigger asChild onClick={handleClick}>
         <button
           tabIndex={0}
-          style={token.htmlStyle}
           className={cn(
+            className,
             isTouchDevice &&
               'underline underline-offset-4 decoration-dashed decoration-[rgba(from_currentColor_r_g_b/0.5)]'
           )}
         >
-          {token.content}
+          {content}
         </button>
       </TooltipTrigger>
       <TooltipContent className="max-w-[min(80vw,400px)] p-0 divide-y">
@@ -63,7 +132,7 @@ export function AnnotatedSpan({
   )
 }
 
-function Annotation({ annotation }: { annotation: NodeHover }) {
+function Annotation({ annotation }: { annotation: CodeAnnotation }) {
   const { text, docs, tags } = annotation
   return (
     <div className="flex flex-col gap-2">

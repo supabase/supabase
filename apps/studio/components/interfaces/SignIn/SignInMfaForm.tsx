@@ -122,10 +122,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         hideContactSupport
         additionalActions={
           <>
-            <Button asChild variant="default">
+            <Button asChild>
               <Link href="/sign-in">Back to sign in</Link>
             </Button>
-            <Button asChild variant="default">
+            <Button asChild>
               <a href={SUPPORT_EMAIL_HREF}>Email support</a>
             </Button>
           </>

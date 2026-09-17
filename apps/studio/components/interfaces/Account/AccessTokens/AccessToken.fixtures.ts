@@ -14,9 +14,9 @@ import type { Permission } from '@/types'
  */
 
 type AccessControlPermission = components['schemas']['AccessControlPermission']
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 type OrganizationProject = OrganizationProjectsResponse['projects'][number]
 
 /** Satisfies both Studio's `Permission` type and the API's `AccessControlPermission` row shape. */

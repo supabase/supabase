@@ -63,9 +63,9 @@ export function getLevelColor(
     case 'success':
       return {
         text: 'text-muted',
-        bg: 'bg-[var(--chart-success)] group-data-[state=selected]/row:bg-foreground-lighter',
+        bg: 'bg-[var(--chart-muted)] group-data-[state=selected]/row:bg-foreground-lighter',
         border:
-          'border-[var(--chart-success)] group-data-[state=selected]/row:border-foreground-lighter',
+          'border-[var(--chart-muted)] group-data-[state=selected]/row:border-foreground-lighter',
       }
     case 'warning':
       return {

@@ -105,7 +105,6 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="default"
             aria-label={`Query source: ${QUERY_SOURCE_LABELS[currentSource]}`}
             icon={<QuerySourceIcon source={currentSource} className="text-foreground-light" />}
             iconRight={<ChevronDown size={14} className="text-foreground-light" />}

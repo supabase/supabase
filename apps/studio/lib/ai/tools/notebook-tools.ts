@@ -464,7 +464,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
             projectRef: projectRef ?? '',
             id,
             name: notebook.name,
-            description: notebook.description,
+            description: notebook.description ?? undefined,
             content: { schema_version: result.notebook.schema_version, cells },
           },
           undefined,

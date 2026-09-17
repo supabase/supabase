@@ -2956,7 +2956,7 @@ export interface AuditLogDrainRemovedEvent {
 }
 
 type AdvisorCategory =
-  components['schemas']['GetProjectLintsResponse'][number]['categories'][number]
+  components['schemas']['GetProjectLintsResponse_Output'][number]['categories'][number]
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
@@ -3622,7 +3622,7 @@ export interface PricingPanelPlanPresentationExperimentExposedEvent {
   action: 'pricing_panel_plan_presentation_experiment_exposed'
   properties: {
     /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps'
+    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3681,7 +3681,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
-      | 'workers'
+      | 'compute'
   }
   groups: TelemetryGroups
 }
@@ -3855,6 +3855,39 @@ export interface HeaderLocalDropdownOpenedEvent {
 export interface HeaderLocalVersionPopoverOpenedEvent {
   action: 'header_local_version_popover_opened'
   groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User enabled Warehouse by submitting a schema and table selection.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseEnabledEvent {
+  action: 'warehouse_enabled'
+  properties: {
+    /** Where the user initiated Warehouse setup. */
+    source: 'integrations_overview'
+    /** Number of schemas replicated in full. */
+    schemaTargetCount: number
+    /** Number of tables replicated individually. */
+    tableTargetCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User disabled Warehouse for a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseDisabledEvent {
+  action: 'warehouse_disabled'
+  properties: {}
+  groups: TelemetryGroups
 }
 
 /**
@@ -4075,3 +4108,5 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | WarehouseEnabledEvent
+  | WarehouseDisabledEvent

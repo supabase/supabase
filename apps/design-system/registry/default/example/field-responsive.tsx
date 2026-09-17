@@ -48,9 +48,7 @@ export default function FieldResponsive() {
               <Button variant="primary" type="submit">
                 Submit
               </Button>
-              <Button type="button" variant="default">
-                Cancel
-              </Button>
+              <Button type="button">Cancel</Button>
             </Field>
           </FieldGroup>
         </FieldSet>

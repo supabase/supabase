@@ -29,7 +29,7 @@ const PoolerCardSubtitle = ({
   computeSize,
 }: {
   availabilityZone?: string
-  computeSize?: string
+  computeSize?: string | null
 }) => (
   <p className="flex items-center gap-x-1 text-sm text-foreground-light">
     {availabilityZone !== undefined && <span>{availabilityZone}</span>}
