@@ -42,12 +42,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
-import {
-  getPipelineDisplayState,
-  getRestartRequestStatus,
-  getStatusName,
-  PIPELINE_ACTIONABLE_STATES,
-} from './Pipeline.utils'
+import { getPipelineDisplayState, getRestartRequestStatus, getStatusName } from './Pipeline.utils'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
@@ -140,12 +135,12 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     isPipelineLoading || (pipeline !== undefined && isDestinationLoading)
   const hasUpdate = Boolean(versionData?.new_version)
   const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
-  const isActionable = PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
 
   // What the primary button offers for each state it can act on. Anything not listed here (a
   // pipeline mid-transition, or one in an unknown state) has no action, so the button falls back
   // to the display state's own label and renders no icon.
   const lifecycle = LIFECYCLE_BY_STATUS[statusName as PipelineStatusName]
+  const isActionable = lifecycle !== undefined
   const primaryAction: LifecycleAction | undefined = lifecycle?.action
   const lifecycleLabel = isTransitioning
     ? displayState.label
