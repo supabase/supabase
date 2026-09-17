@@ -98,7 +98,7 @@ const fixtures: Array<{ name: string; lang: BundledLanguage | null; code: string
   },
 ]
 
-describe('selective code block highlighting', () => {
+describe('shared code block highlighting', () => {
   let baseline: Awaited<ReturnType<typeof createHighlighter>>
   let createActualHighlighter: typeof createHighlighter
   const create = vi.mocked(createHighlighter)
@@ -112,23 +112,6 @@ describe('selective code block highlighting', () => {
     })
   })
 
-  beforeEach(() => {
-    vi.resetModules()
-    create.mockReset().mockImplementation(createActualHighlighter)
-  })
-
-  afterEach(async () => {
-    for (const result of create.mock.results) {
-      if (result.type === 'return') {
-        await result.value.then(
-          (highlighter) => highlighter.dispose(),
-          () => {}
-        )
-      }
-    }
-    vi.restoreAllMocks()
-  })
-
   afterAll(() => baseline.dispose())
 
   function expected({ code, lang }: (typeof fixtures)[number]) {
@@ -140,84 +123,95 @@ describe('selective code block highlighting', () => {
     }).tokens
   }
 
-  it('defers initialization until first use and reuses the theme and highlighter', async () => {
-    const { highlightCode } = await import('./CodeBlock.highlight')
-    expect(create).not.toHaveBeenCalled()
-
-    const first = fixtures[0]
-    expect((await highlightCode(first.code, first.lang)).tokens).toEqual(expected(first))
-    expect(create).toHaveBeenCalledTimes(1)
-    const highlighter = await create.mock.results[0].value
-    expect(highlighter.getLoadedLanguages()).toContain('bash')
-    expect(highlighter.getLoadedLanguages()).not.toContain('sql')
-    expect(highlighter.getLoadedLanguages()).not.toContain('markdown')
-    expect(highlighter.getLoadedLanguages()).not.toContain('typescript')
-
-    const loadLanguage = vi.spyOn(highlighter, 'loadLanguage')
-    const loadTheme = vi.spyOn(highlighter, 'loadTheme')
-    const second = fixtures.find(({ lang }) => lang === 'sql')!
-    await highlightCode(second.code, second.lang)
-    expect((await highlightCode(first.code, first.lang)).tokens).toEqual(expected(first))
-    expect(create).toHaveBeenCalledTimes(1)
-    expect(highlighter.getLoadedLanguages()).toContain('sql')
-    expect(loadLanguage.mock.calls.filter((args) => args.length)).toEqual([['sql']])
-    expect(loadTheme.mock.calls.every((args) => args.length === 0)).toBe(true)
-    expect(highlighter.getLoadedThemes()).toEqual(['Supabase Theme'])
-  })
-
-  it('shares initialization across concurrent languages and aliases', async () => {
-    const { highlightCode } = await import('./CodeBlock.highlight')
-    const selected = [fixtures[0], fixtures[0], fixtures[1], fixtures[6]]
-    const results = await Promise.all(selected.map(({ code, lang }) => highlightCode(code, lang)))
-    expect(results.map(({ tokens }) => tokens)).toEqual(selected.map(expected))
-    expect(create).toHaveBeenCalledTimes(1)
-  })
-
-  it.each(fixtures)(
-    'matches eager token colors, font flags, and offsets for $name',
-    async (fixture) => {
-      const { highlightCode } = await import('./CodeBlock.highlight')
-      const result = await highlightCode(fixture.code, fixture.lang)
-      expect(result.tokens).toEqual(expected(fixture))
-    }
-  )
-
-  it('keeps embedded tokens and CSS-variable colors stable across rendering order', async () => {
-    const { highlightCode } = await import('./CodeBlock.highlight')
-    const selected = fixtures.filter(({ lang }) =>
-      ['markdown', 'vue', 'html', 'typescript'].includes(lang || '')
-    )
-    const first = await Promise.all(selected.map(({ code, lang }) => highlightCode(code, lang)))
-    const reversed = await Promise.all(
-      [...selected].reverse().map(({ code, lang }) => highlightCode(code, lang))
-    )
-    expect(first.map(({ tokens }) => tokens)).toEqual(selected.map(expected))
-    expect(reversed.reverse().map(({ tokens }) => tokens)).toEqual(
-      first.map(({ tokens }) => tokens)
-    )
-    const colors = first.flatMap(({ tokens }) => tokens.flat().map(({ color }) => color))
-    expect(colors).toContain('var(--code-token-keyword)')
-    expect(colors.every((color) => !color || color.startsWith('var(--'))).toBe(true)
-  })
-
-  it('surfaces supported grammar loading failures', async () => {
-    const { highlightCode } = await import('./CodeBlock.highlight')
-    await highlightCode('echo hello', 'bash')
-    const highlighter = await create.mock.results[0].value
-    const failure = new Error('Grammar could not be loaded')
-    vi.spyOn(highlighter, 'loadLanguage').mockImplementation(async (...languages) => {
-      if (languages.length) throw failure
+  describe('initialization', () => {
+    beforeEach(() => {
+      vi.resetModules()
+      create.mockReset().mockResolvedValue(baseline)
     })
-    await expect(highlightCode('select 42', 'sql')).rejects.toBe(failure)
-    expect(create).toHaveBeenCalledTimes(1)
+
+    afterEach(() => vi.restoreAllMocks())
+
+    it('defers initialization until first use and reuses the theme and highlighter', async () => {
+      const { highlightCode } = await import('./CodeBlock.highlight')
+      expect(create).not.toHaveBeenCalled()
+
+      const first = fixtures[0]
+      expect((await highlightCode(first.code, first.lang)).tokens).toEqual(expected(first))
+      expect(create).toHaveBeenCalledExactlyOnceWith({
+        themes: [theme],
+        langs: Object.keys(bundledLanguages),
+      })
+
+      const loadLanguage = vi.spyOn(baseline, 'loadLanguage')
+      const loadTheme = vi.spyOn(baseline, 'loadTheme')
+      const second = fixtures.find(({ lang }) => lang === 'sql')!
+      await highlightCode(second.code, second.lang)
+      expect((await highlightCode(first.code, first.lang)).tokens).toEqual(expected(first))
+      expect(create).toHaveBeenCalledTimes(1)
+      expect(loadLanguage).not.toHaveBeenCalled()
+      expect(loadTheme).not.toHaveBeenCalled()
+    })
+
+    it('shares initialization across concurrent languages and aliases', async () => {
+      const { promise, resolve } = Promise.withResolvers<typeof baseline>()
+      create.mockReturnValue(promise)
+      const { highlightCode } = await import('./CodeBlock.highlight')
+      const selected = [fixtures[0], fixtures[0], fixtures[1], fixtures[6]]
+      const pending = selected.map(({ code, lang }) => highlightCode(code, lang))
+      expect(create).toHaveBeenCalledTimes(1)
+
+      resolve(baseline)
+      const results = await Promise.all(pending)
+      expect(results.map(({ tokens }) => tokens)).toEqual(selected.map(expected))
+    })
+
+    it('retains initialization failures without adding retries', async () => {
+      const failure = new Error('Highlighter could not be initialized')
+      create.mockRejectedValue(failure)
+      const { highlightCode } = await import('./CodeBlock.highlight')
+      await expect(highlightCode('echo hello', 'bash')).rejects.toBe(failure)
+      await expect(highlightCode('select 42', 'sql')).rejects.toBe(failure)
+      expect(create).toHaveBeenCalledTimes(1)
+    })
   })
 
-  it('retains native singleton initialization failure without adding retries', async () => {
-    const failure = new Error('Highlighter could not be initialized')
-    create.mockRejectedValue(failure)
-    const { highlightCode } = await import('./CodeBlock.highlight')
-    await expect(highlightCode('echo hello', 'bash')).rejects.toBe(failure)
-    await expect(highlightCode('select 42', 'sql')).rejects.toBe(failure)
-    expect(create).toHaveBeenCalledTimes(1)
+  describe('token output', () => {
+    let highlightCode: typeof import('./CodeBlock.highlight').highlightCode
+    let highlighter: Awaited<ReturnType<typeof createHighlighter>> | undefined
+
+    beforeAll(async () => {
+      vi.resetModules()
+      create.mockReset().mockImplementation(createActualHighlighter)
+      highlightCode = (await import('./CodeBlock.highlight')).highlightCode
+      await highlightCode('', null)
+      highlighter = await create.mock.results[0].value
+    })
+
+    afterAll(() => highlighter?.dispose())
+
+    it.each(fixtures)(
+      'matches eager token colors, font flags, and offsets for $name',
+      async (fixture) => {
+        const result = await highlightCode(fixture.code, fixture.lang)
+        expect(result.tokens).toEqual(expected(fixture))
+      }
+    )
+
+    it('keeps embedded tokens and CSS-variable colors stable across rendering order', async () => {
+      const selected = fixtures.filter(({ lang }) =>
+        ['markdown', 'vue', 'html', 'typescript'].includes(lang || '')
+      )
+      const first = await Promise.all(selected.map(({ code, lang }) => highlightCode(code, lang)))
+      const reversed = await Promise.all(
+        [...selected].reverse().map(({ code, lang }) => highlightCode(code, lang))
+      )
+      expect(first.map(({ tokens }) => tokens)).toEqual(selected.map(expected))
+      expect(reversed.reverse().map(({ tokens }) => tokens)).toEqual(
+        first.map(({ tokens }) => tokens)
+      )
+      const colors = first.flatMap(({ tokens }) => tokens.flat().map(({ color }) => color))
+      expect(colors).toContain('var(--code-token-keyword)')
+      expect(colors.every((color) => !color || color.startsWith('var(--'))).toBe(true)
+    })
   })
 })

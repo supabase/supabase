@@ -55,7 +55,7 @@ describe('code block serialization and rendering', () => {
   let highlighter: Awaited<ReturnType<typeof createHighlighter>>
 
   beforeAll(async () => {
-    // Shiki mutates theme.colors, so use a fresh raw theme for this independent tokenization.
+    // use a fresh raw theme for this independent tokenization
     const theme: ThemeRegistration = JSON.parse(
       await readFile(new URL('./supabase-2.json', import.meta.url), 'utf8')
     )
@@ -63,6 +63,9 @@ describe('code block serialization and rendering', () => {
       themes: [theme],
       langs: ['javascript', 'typescript', 'sql', 'shell', 'json'],
     })
+
+    // keep the shared highlighter's cold start outside the per-test timeout
+    await CodeBlock({ contents: '', skipTypeGeneration: true })
   })
 
   afterEach(() => vi.restoreAllMocks())
