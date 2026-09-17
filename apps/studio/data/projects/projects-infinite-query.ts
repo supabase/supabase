@@ -41,7 +41,7 @@ async function getProjects(
   if (error) handleError(error)
 
   const response = data as unknown as components['schemas']['ListProjectsPaginatedResponse_Output']
-  return { ...response, projects: response?.projects ?? [] }
+  return { ...response, projects: Array.isArray(response?.projects) ? response.projects : [] }
 }
 
 export type ProjectsInfiniteData = Awaited<ReturnType<typeof getProjects>>
