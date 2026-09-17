@@ -48,7 +48,12 @@ export const UpdateVersionModal = ({ visible, pipeline, onClose }: UpdateVersion
 
     try {
       await runWithRequestStatus(pipeline.id, requestStatus, () =>
-        updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
+        updatePipelineVersion({
+          projectRef,
+          pipelineId: pipeline.id,
+          versionId,
+          skipStatusInvalidation: true,
+        })
       )
     } catch {
       // The mutation reports errors and refreshes version info if the default image changed.
