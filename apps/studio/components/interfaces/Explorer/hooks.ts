@@ -187,16 +187,23 @@ export const useCreateQuery = () => {
   const { data: project } = useSelectedProjectQuery()
   const querySnap = useExplorerQueryStateSnapshot()
 
-  const createQuery = ({ sql, name }: { sql?: string; name?: string } = {}) => {
+  const createQuery = ({
+    sql,
+    name,
+    autoRun,
+    replace = false,
+  }: { sql?: string; name?: string; autoRun?: boolean; replace?: boolean } = {}) => {
     if (!project) return console.error('Project is required')
 
     const id = generateUuid()
-    querySnap.createDraft({ id, projectRef: project.ref, sql, name })
+    querySnap.createDraft({ id, projectRef: project.ref, sql, name, autoRun })
 
-    router.push(`/project/${project.ref}/explorer/query/${id}`)
+    const url = `/project/${project.ref}/explorer/query/${id}`
+    if (replace) router.replace(url)
+    else router.push(url)
 
     return id
   }
 
-  return { createQuery }
+  return { createQuery, projectRef: project?.ref }
 }

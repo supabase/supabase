@@ -20,7 +20,7 @@ const paramsFor = (ref: string, name: string): SecretsParams => ({
 
 const WRITE_DELAY_MS = 120
 
-const PROJECT: components['schemas']['ProjectDetailResponse'] = {
+const PROJECT: components['schemas']['ProjectDetailResponse_Output'] = {
   cloud_provider: 'AWS',
   db_host: 'db.example.supabase.co',
   high_availability: false,
@@ -37,6 +37,7 @@ const PROJECT: components['schemas']['ProjectDetailResponse'] = {
   status: 'ACTIVE_HEALTHY',
   subscription_id: 'sub_1',
   updated_at: '2026-01-01T00:00:00Z',
+  connectionString: '',
 }
 
 let writtenNames: string[] = []

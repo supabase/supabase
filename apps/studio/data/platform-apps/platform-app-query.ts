@@ -11,7 +11,7 @@ export type PlatformAppVariables = {
   id?: string
 }
 
-export type PlatformAppDetail = components['schemas']['GetPlatformAppResponse']
+export type PlatformAppDetail = components['schemas']['GetPlatformAppResponse_Output']
 
 export async function getPlatformApp({ slug, id }: PlatformAppVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('slug is required')

@@ -531,7 +531,7 @@ export const DestinationForm = ({
           )}
         </AnimatePresence>
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSaving} variant="default" onClick={onCancel}>
+          <Button disabled={isSaving} onClick={onCancel}>
             Cancel
           </Button>
           <Button

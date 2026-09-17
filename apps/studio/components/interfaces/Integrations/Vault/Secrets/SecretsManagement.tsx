@@ -144,12 +144,7 @@ export const SecretsManagement = () => {
             </div>
 
             <div className="flex items-center gap-x-2">
-              <Button
-                variant="default"
-                icon={<RefreshCw />}
-                loading={isRefetching}
-                onClick={() => refetch()}
-              >
+              <Button icon={<RefreshCw />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
               <DocsButton href={`${DOCS_URL}/guides/database/vault`} />

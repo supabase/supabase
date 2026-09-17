@@ -1418,6 +1418,7 @@ describe('SQLEditor.utils:hasBlockingIssues', () => {
 const buildDatabase = (overrides: Partial<Database> = {}): Database => ({
   cloud_provider: 'AWS',
   connectionString: 'postgres://primary',
+  connection_string_read_only: 'postgres://primary',
   db_host: 'db.example.com',
   db_name: 'postgres',
   db_port: 5432,

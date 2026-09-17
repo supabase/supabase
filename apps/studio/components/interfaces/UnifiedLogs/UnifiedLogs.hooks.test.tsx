@@ -11,10 +11,10 @@ describe('useFilterSearchSync', () => {
   it('defers platform filter synchronization until feature flags load', () => {
     vi.useFakeTimers()
     const applyFilterSearch = vi.fn()
-    const workersFilter = [{ id: 'log_type', value: ['workers'] }]
+    const computeFilter = [{ id: 'log_type', value: ['compute'] }]
     const { rerender } = renderHook(
       ({ enabled }) =>
-        useFilterSearchSync({ applyFilterSearch, columnFilters: workersFilter, enabled }),
+        useFilterSearchSync({ applyFilterSearch, columnFilters: computeFilter, enabled }),
       { initialProps: { enabled: false } }
     )
 

@@ -64,7 +64,7 @@ describe('AssistantNotebookPreview', () => {
     expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
     expect(screen.getByText('2 cells')).toBeInTheDocument()
     expect(screen.getByText('New notebook')).toBeInTheDocument()
-    expect(container.firstElementChild).toHaveClass('max-w-6xl')
+    expect(container.firstElementChild).toHaveClass('max-w-3xl')
   })
 
   it('surfaces a metadata-only database change after resolving the target', async () => {
@@ -72,7 +72,7 @@ describe('AssistantNotebookPreview', () => {
       method: 'get',
       path: '/platform/projects/:ref/databases',
       response: () =>
-        HttpResponse.json<components['schemas']['DatabaseDetailResponse'][]>([
+        HttpResponse.json<components['schemas']['DatabaseDetailResponse_Output'][]>([
           {
             identifier: 'default',
             region: 'us-east-1',
@@ -85,6 +85,8 @@ describe('AssistantNotebookPreview', () => {
             inserted_at: '2026-01-01T00:00:00.000Z',
             restUrl: 'https://default.supabase.co/rest/v1',
             size: 't4g.micro',
+            connectionString: '',
+            connection_string_read_only: '',
           },
           {
             identifier: 'default-replica-3',
@@ -98,6 +100,8 @@ describe('AssistantNotebookPreview', () => {
             inserted_at: '2026-01-01T00:00:00.000Z',
             restUrl: 'https://default-replica-3.supabase.co/rest/v1',
             size: 't4g.micro',
+            connectionString: '',
+            connection_string_read_only: '',
           },
         ]),
     })

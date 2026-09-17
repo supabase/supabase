@@ -11,9 +11,10 @@ export type GitHubConfigVariables = {
   branch?: string
 }
 
-type GithubConfigQueryResponse = components['schemas']['GetGitHubConnectionConfigResponse'] & {
-  config: z.infer<typeof gitHubConfigTomlSchema>
-}
+type GithubConfigQueryResponse =
+  components['schemas']['GetGitHubConnectionConfigResponse_Output'] & {
+    config: z.infer<typeof gitHubConfigTomlSchema>
+  }
 
 export const githubConfigKeys = {
   all: ['github-config'] as const,

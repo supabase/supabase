@@ -52,7 +52,6 @@ const getDisabledTooltip = (disabled: boolean, disabledTooltip?: string) =>
 
 const AllowAllAccessButton = ({ disabled, disabledTooltip, onClick }: AccessButtonProps) => (
   <ButtonTooltip
-    variant="default"
     disabled={disabled}
     onClick={() => onClick(true)}
     tooltip={{
@@ -69,7 +68,6 @@ const AllowAllAccessButton = ({ disabled, disabledTooltip, onClick }: AccessButt
 const DisallowAllAccessButton = ({ disabled, disabledTooltip, onClick }: AccessButtonProps) => (
   <ButtonTooltip
     disabled={disabled}
-    variant="default"
     onClick={() => onClick(true)}
     tooltip={{
       content: {
@@ -319,7 +317,6 @@ export const NetworkRestrictions = () => {
                                 <p className="text-sm font-mono">{ip}</p>
                               </div>
                               <ButtonTooltip
-                                variant="default"
                                 disabled={isSectionDisabled}
                                 onClick={() => setSelectedRestrictionToRemove(ip)}
                                 tooltip={{

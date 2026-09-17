@@ -509,7 +509,6 @@ export const SmtpForm = () => {
                 <div className="flex items-center gap-x-2">
                   {isDirty && (
                     <Button
-                      variant="default"
                       onClick={() => {
                         form.reset()
                       }}

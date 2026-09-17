@@ -211,7 +211,6 @@ export const WithStatements = ({
             >
               <Button
                 aria-label="Refresh"
-                variant="default"
                 size="tiny"
                 icon={<RefreshCw />}
                 onClick={handleRefresh}
@@ -225,7 +224,6 @@ export const WithStatements = ({
             >
               <Button
                 aria-label="Reset report"
-                variant="default"
                 size="tiny"
                 icon={<RotateCcw />}
                 onClick={() => setShowResetgPgStatStatements(true)}
@@ -275,11 +273,7 @@ export const WithStatements = ({
           <p className="text-xs text-foreground-light">
             Consider resetting the analysis after optimizing any queries
           </p>
-          <Button
-            variant="default"
-            className="mt-3! w-min"
-            onClick={() => setShowResetgPgStatStatements(true)}
-          >
+          <Button className="mt-3! w-min" onClick={() => setShowResetgPgStatStatements(true)}>
             Reset report
           </Button>
         </div>

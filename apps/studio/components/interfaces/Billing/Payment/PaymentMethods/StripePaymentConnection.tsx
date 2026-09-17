@@ -75,7 +75,7 @@ export function StripePaymentConnection({
           </p>
         )}
       </div>
-      <Button asChild variant="default" iconRight={<ExternalLink size={14} />}>
+      <Button asChild iconRight={<ExternalLink size={14} />}>
         <a
           href={`${STRIPE_PROJECTS_DOCS_URL}#manage-billing`}
           target="_blank"
