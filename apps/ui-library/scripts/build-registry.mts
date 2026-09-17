@@ -3,7 +3,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { registrySchema } from 'shadcn/schema'
+import { registrySchema, type RegistryItem } from 'shadcn/schema'
 
 import { resolveRegistryItem } from '../lib/registry-resolution'
 import { registry } from '../registry/index'
@@ -12,8 +12,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const registryPath = path.join(__dirname, '..', 'public', 'r', 'registry.json')
 
 registrySchema.parse(registry)
+const items = new Map<string, RegistryItem>()
 for (const item of registry.items) {
-  resolveRegistryItem(registry, item.name)
+  if (items.has(item.name)) throw new Error(`Duplicate registry item "${item.name}"`)
+  items.set(item.name, item)
+}
+for (const name of items.keys()) {
+  resolveRegistryItem((itemName) => items.get(itemName), name)
 }
 
 const cleanedRegistry = {

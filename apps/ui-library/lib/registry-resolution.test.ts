@@ -24,6 +24,10 @@ function item(name: string, overrides: Partial<RegistryItem> = {}): RegistryItem
   }
 }
 
+function lookup(items: readonly RegistryItem[]) {
+  return (name: string) => items.find((candidate) => candidate.name === name)
+}
+
 function treePaths(nodes: RegistryNode[]): string[] {
   return nodes.flatMap((node) =>
     node.type === 'file' ? [node.path.slice(1)] : treePaths(node.children ?? [])
@@ -41,50 +45,47 @@ describe('registry composition and resolution', () => {
     expect(composed.registryDependencies).toEqual([])
   })
 
-  it('resolves local dependency diamonds once and lists external UI dependencies separately', () => {
-    const definitions = {
-      items: [
-        item('root', {
-          registryDependencies: [
-            '@supabase/first',
-            'https://supabase.com/library/r/second.json',
-            'button',
-          ],
-        }),
-        item('first', { registryDependencies: ['@supabase/shared', 'card'] }),
-        item('second', { registryDependencies: ['@supabase/shared', 'button'] }),
-        item('shared'),
-      ],
-    }
-    const before = JSON.stringify(definitions)
-    const resolved = resolveRegistryItem(definitions, 'root')
-    expect(resolved.firstPartyDependencies).toEqual(['first', 'shared', 'second'])
-    expect(resolved.externalRegistryDependencies).toEqual(['card', 'button'])
-    expect(resolved.files.length).toBe(4)
-    expect(JSON.stringify(definitions)).toBe(before)
+  it('resolves local dependency diamonds once and skips external UI dependencies', () => {
+    const items = [
+      item('root', {
+        registryDependencies: [
+          '@supabase/first',
+          'https://supabase.com/library/r/second.json',
+          'button',
+        ],
+      }),
+      item('first', { registryDependencies: ['@supabase/shared', 'card'] }),
+      item('second', { registryDependencies: ['@supabase/shared', 'button'] }),
+      item('shared'),
+    ]
+    const before = JSON.stringify(items)
+    const resolved = resolveRegistryItem(lookup(items), 'root')
+    expect(resolved.files.map((file) => file.path)).toEqual([
+      'lib/root.ts',
+      'lib/first.ts',
+      'lib/shared.ts',
+      'lib/second.ts',
+    ])
+    expect(JSON.stringify(items)).toBe(before)
   })
 
   it('fails with context for missing local dependencies and cycles', () => {
     expect(() =>
       resolveRegistryItem(
-        { items: [item('root', { registryDependencies: ['@supabase/missing'] })] },
+        lookup([item('root', { registryDependencies: ['@supabase/missing'] })]),
         'root'
       )
     ).toThrow(/"root" references missing dependency "missing"/)
     expect(() =>
       resolveRegistryItem(
-        {
-          items: [
-            item('root', { registryDependencies: ['@supabase/child'] }),
-            item('child', { registryDependencies: ['@supabase/root'] }),
-          ],
-        },
+        lookup([
+          item('root', { registryDependencies: ['@supabase/child'] }),
+          item('child', { registryDependencies: ['@supabase/root'] }),
+        ]),
         'root'
       )
     ).toThrow(/Registry dependency cycle: root -> child -> root/)
-    expect(() => resolveRegistryItem({ items: [item('root'), item('root')] }, 'root')).toThrow(
-      /Duplicate registry item "root"/
-    )
+    expect(() => resolveRegistryItem(lookup([]), 'root')).toThrow(/Missing registry item "root"/)
   })
 
   it('rejects destination collisions across composed files and local dependencies', () => {
@@ -96,27 +97,10 @@ describe('registry composition and resolution', () => {
     )
     expect(() =>
       resolveRegistryItem(
-        {
-          items: [item('root', { registryDependencies: ['@supabase/dependency'] }), conflicting],
-        },
+        lookup([item('root', { registryDependencies: ['@supabase/dependency'] }), conflicting]),
         'root'
       )
     ).toThrow(/conflicting destination "lib\/root.ts"/)
-    expect(() =>
-      resolveRegistryItem(
-        {
-          items: [
-            item('root', {
-              files: [
-                { path: 'lib', target: 'lib', type: 'registry:file' },
-                { path: 'lib/client.ts', type: 'registry:lib' },
-              ],
-            }),
-          ],
-        },
-        'root'
-      )
-    ).toThrow(/file "lib" conflicts with directory/)
   })
 
   it('normalizes source packaging and explicit targets consistently', () => {
@@ -156,13 +140,12 @@ describe('registry composition and resolution', () => {
 
   it('validates the published registry definitions and includes safe-next-path in auth inventory', () => {
     registrySchema.parse(registry)
+    const getItem = lookup(registry.items)
     for (const definition of registry.items) {
-      resolveRegistryItem(registry, definition.name)
+      resolveRegistryItem(getItem, definition.name)
     }
-    const auth = resolveRegistryItem(registry, 'password-based-auth-nextjs')
+    const auth = resolveRegistryItem(getItem, 'password-based-auth-nextjs')
     expect(auth.files.some((file) => getInstalledPath(file) === 'lib/safe-next-path.ts')).toBe(true)
-    expect(auth.firstPartyDependencies).toEqual(['safe-next-path'])
-    expect(auth.externalRegistryDependencies).toEqual(['button', 'card', 'input', 'label'])
     const tree = generateRegistryTree(
       new URL('../public/r/password-based-auth-nextjs.json', import.meta.url).pathname
     )
@@ -187,7 +170,7 @@ describe('registry composition and resolution', () => {
       JSON.stringify(item('root', { registryDependencies: ['@supabase/child'] }))
     )
     expect(() => generateRegistryTree(registryPath)).toThrow(
-      /Registry item "root" requires dependency "child"/
+      /Registry item "root" references missing dependency "child"/
     )
     writeFileSync(path.join(directory, 'child.json'), JSON.stringify(item('child')))
     expect(treePaths(generateRegistryTree(registryPath)).sort()).toEqual([
@@ -199,7 +182,7 @@ describe('registry composition and resolution', () => {
       JSON.stringify(item('child', { files: [{ path: 'lib/child.ts', type: 'registry:lib' }] }))
     )
     expect(() => generateRegistryTree(registryPath)).toThrow(
-      /Registry item "root" requires dependency "child"/
+      /Registry item "root" references missing dependency "child"/
     )
   })
 })

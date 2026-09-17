@@ -69,67 +69,46 @@ export function uniqueInstalledFiles<
     }
     if (!previous) destinations.set(destination, file)
   }
-  for (const destination of destinations.keys()) {
-    const parts = destination.split('/')
-    for (let index = 1; index < parts.length; index++) {
-      const parent = parts.slice(0, index).join('/')
-      if (destinations.has(parent)) {
-        throw new Error(
-          `${context}: file "${parent}" conflicts with directory for "${destination}"`
-        )
-      }
-    }
-  }
   return [...destinations.values()]
 }
 
-export type ResolvedRegistryItem = RegistryItem & {
-  files: RegistryFile[]
-  firstPartyDependencies: string[]
-  externalRegistryDependencies: string[]
-}
-
-/** Resolve this registry's dependencies without fetching or pretending to inventory external UI kits. */
+/** Follow Supabase dependencies only; external UI kits are the installer's responsibility. */
 export function resolveRegistryItem(
-  registry: { items: readonly RegistryItem[] },
+  getItem: (name: string) => RegistryItem | undefined,
   name: string
-): ResolvedRegistryItem {
-  const items = new Map<string, RegistryItem>()
-  for (const item of registry.items) {
-    if (items.has(item.name)) throw new Error(`Duplicate registry item "${item.name}"`)
-    items.set(item.name, item)
-  }
-  const root = items.get(name)
+): RegistryItem & { files: RegistryFile[] } {
+  const root = getItem(name)
   if (!root) throw new Error(`Missing registry item "${name}"`)
 
   const visited = new Set<string>()
   const files: RegistryFile[] = []
-  const external = new Set<string>()
-  const visit = (itemName: string, ancestors: string[]) => {
-    if (ancestors.includes(itemName)) {
-      throw new Error(`Registry dependency cycle: ${[...ancestors, itemName].join(' -> ')}`)
-    }
-    if (visited.has(itemName)) return
-    const item = items.get(itemName)
-    if (!item) {
-      throw new Error(
-        `Registry item "${ancestors.at(-1)}" references missing dependency "${itemName}"`
-      )
-    }
-    visited.add(itemName)
+  const visit = (item: RegistryItem, ancestors: string[]) => {
+    if (visited.has(item.name)) return
+    visited.add(item.name)
     files.push(...(item.files ?? []))
+    const path = [...ancestors, item.name]
     for (const dependency of item.registryDependencies ?? []) {
       const localName = getFirstPartyDependencyName(dependency)
-      if (localName) visit(localName, [...ancestors, itemName])
-      else external.add(dependency)
+      if (!localName) continue
+      if (path.includes(localName)) {
+        throw new Error(`Registry dependency cycle: ${[...path, localName].join(' -> ')}`)
+      }
+      let dependencyItem: RegistryItem | undefined
+      try {
+        dependencyItem = getItem(localName)
+      } catch (error) {
+        throw new Error(
+          `Registry item "${item.name}" references missing dependency "${localName}"`,
+          { cause: error }
+        )
+      }
+      if (!dependencyItem) {
+        throw new Error(`Registry item "${item.name}" references missing dependency "${localName}"`)
+      }
+      visit(dependencyItem, path)
     }
   }
-  visit(name, [])
+  visit(root, [])
 
-  return {
-    ...root,
-    files: uniqueInstalledFiles(files, `Registry item "${name}"`),
-    firstPartyDependencies: [...visited].filter((itemName) => itemName !== name),
-    externalRegistryDependencies: [...external],
-  }
+  return { ...root, files: uniqueInstalledFiles(files, `Registry item "${name}"`) }
 }

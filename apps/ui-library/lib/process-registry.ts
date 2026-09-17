@@ -2,12 +2,7 @@ import * as fs from 'fs'
 import path from 'node:path'
 import { registryItemSchema, type RegistryItem } from 'shadcn/schema'
 
-import {
-  getFirstPartyDependencyName,
-  getInstalledPath,
-  resolveRegistryItem,
-  type RegistryFile,
-} from './registry-resolution'
+import { getInstalledPath, resolveRegistryItem, type RegistryFile } from './registry-resolution'
 
 export interface RegistryNode {
   name: string
@@ -38,26 +33,11 @@ export function readRegistryItem(registryPath: string): RegistryItem {
  */
 export function generateRegistryTree(registryPath: string): RegistryNode[] {
   const root = readRegistryItem(registryPath)
-  const items = new Map<string, RegistryItem>([[root.name, root]])
-  const readDependencies = (item: RegistryItem) => {
-    for (const dependency of item.registryDependencies ?? []) {
-      const name = getFirstPartyDependencyName(dependency)
-      if (!name || items.has(name)) continue
-      try {
-        const dependencyItem = readRegistryItem(
-          path.join(path.dirname(registryPath), `${name}.json`)
-        )
-        items.set(name, dependencyItem)
-        readDependencies(dependencyItem)
-      } catch (error) {
-        throw new Error(`Registry item "${item.name}" requires dependency "${name}"`, {
-          cause: error,
-        })
-      }
-    }
-  }
-  readDependencies(root)
-  const resolved = resolveRegistryItem({ items: [...items.values()] }, root.name)
+  const directory = path.dirname(registryPath)
+  const resolved = resolveRegistryItem(
+    (name) => (name === root.name ? root : readRegistryItem(path.join(directory, `${name}.json`))),
+    root.name
+  )
   return registryFilesToTree(resolved.files)
 }
 
