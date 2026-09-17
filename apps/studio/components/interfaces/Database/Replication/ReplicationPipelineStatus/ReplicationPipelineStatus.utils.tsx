@@ -279,7 +279,11 @@ export const getTableSyncLagLabel = (metrics: SlotLagMetrics): string[] => {
   const safeWalSizeBytes = metrics.safe_wal_size_bytes
   if (safeWalSizeBytes === null) {
     parts.push('Unlimited WAL retention')
-  } else if (typeof safeWalSizeBytes === 'number' && Number.isFinite(safeWalSizeBytes)) {
+  } else if (
+    typeof safeWalSizeBytes === 'number' &&
+    Number.isFinite(safeWalSizeBytes) &&
+    safeWalSizeBytes >= 0
+  ) {
     const formattedBytes = formatBytes(safeWalSizeBytes, safeWalSizeBytes < 1024 ? 0 : 1)
     parts.push(`${formattedBytes} WAL retention remaining`)
   }

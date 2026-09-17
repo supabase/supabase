@@ -62,4 +62,16 @@ describe('getTableSyncLagLabel', () => {
       })
     ).toEqual([])
   })
+
+  test('omits a negative WAL retention value', () => {
+    expect(
+      getTableSyncLagLabel({
+        active: true,
+        wal_status: 'reserved',
+        restart_lsn_bytes: 0,
+        confirmed_flush_lsn_bytes: 0,
+        safe_wal_size_bytes: -1,
+      })
+    ).toEqual([])
+  })
 })
