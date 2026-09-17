@@ -1,8 +1,6 @@
 import { type FeaturePreview } from '@/components/interfaces/App/FeaturePreview/useFeaturePreviews'
 
-export type FeaturePreviewToggleOutcome =
-  | { type: 'disabled' }
-  | { type: 'enabled'; route?: string }
+export type FeaturePreviewToggleOutcome = { type: 'disabled' } | { type: 'enabled'; route?: string }
 
 /**
  * Decides what should happen when a feature preview is toggled from the
