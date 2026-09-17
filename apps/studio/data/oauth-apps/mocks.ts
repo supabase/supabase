@@ -2,8 +2,10 @@ import type { OAuthAppsAuthorizeIdentity } from './oauth-apps-authorize-organiza
 import type { OAuthAppsAuthorizeRequest } from './oauth-apps-authorize-request-query'
 import type {
   OAuthAppGrantConfig,
+  OAuthAppMemberGrant,
   OAuthAppsAuthorizeApproveResult,
   OAuthAppsAuthorizeOrganizationProject,
+  OAuthAuthorizedApp,
   OAuthExistingGrant,
   OAuthGrantProjectScope,
   OAuthOrganizationRole,
@@ -299,6 +301,111 @@ const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationP
     { ref: 'tailspinwarehouse1', name: 'tailspin-warehouse', role: 'developer' },
   ],
   'contoso-labs': [],
+}
+
+const MOCK_AUTHORIZED_APPS: OAuthAuthorizedApp[] = [
+  {
+    id: 'authorized-vercel',
+    client_id: '1dab8a21-3498-4a05-b57a-f7fb7e9eab2a',
+    name: 'Vercel',
+    icon: null,
+    status: 'active',
+    member_grant_count: 33,
+    org_owned_compatibility_grant_count: 0,
+  },
+  {
+    id: 'authorized-northwind-mcp',
+    client_id: 'f1b130df-24b0-4dac-ad11-1c97b9f05b7d',
+    name: 'Northwind MCP',
+    icon: null,
+    status: 'active',
+    member_grant_count: 46,
+    org_owned_compatibility_grant_count: 1,
+  },
+  {
+    id: 'authorized-kemal-bot',
+    client_id: '229aec66-77c9-4ae9-96d7-e6f9e6a1284a',
+    name: 'kemal-bot',
+    icon: null,
+    status: 'revoked',
+    member_grant_count: 1,
+    org_owned_compatibility_grant_count: 0,
+  },
+  {
+    id: 'authorized-contoso-analytics',
+    client_id: 'b3c91e16-58db-4beb-8131-d1984dbbce12',
+    name: 'Contoso Analytics',
+    icon: null,
+    status: 'legacy',
+    member_grant_count: 4,
+    org_owned_compatibility_grant_count: 2,
+  },
+]
+
+const READ_WRITE_SCOPE_GROUP: OAuthScopeGroup = {
+  name: 'Project Settings, Action Runs, Logs, SQL Snippets',
+  level: 'read_write',
+  scopes: ['project_settings', 'action_runs', 'logs', 'sql_snippets'],
+}
+
+const READ_SCOPE_GROUP: OAuthScopeGroup = {
+  name: 'Database Webhooks, Development Branches, Production Branches',
+  level: 'read',
+  scopes: ['database_webhooks', 'development_branches', 'production_branches'],
+}
+
+const MOCK_APP_MEMBER_GRANTS: Record<string, OAuthAppMemberGrant[]> = {
+  'authorized-vercel': [
+    {
+      member_email: 'admin@example.com',
+      project_scope: {
+        target: 'selected_projects',
+        project_refs: ['northwindstorefront1', 'northwindcms1'],
+      },
+      scope_groups: [READ_WRITE_SCOPE_GROUP, READ_SCOPE_GROUP],
+      created_at: '2026-08-18T09:12:00.000Z',
+    },
+    {
+      member_email: 'developer@example.com',
+      project_scope: { target: 'selected_projects', project_refs: ['northwindcms1'] },
+      scope_groups: [READ_SCOPE_GROUP],
+      created_at: '2026-08-16T11:30:00.000Z',
+    },
+    {
+      member_email: 'analyst@example.com',
+      project_scope: {
+        target: 'selected_projects',
+        project_refs: ['northwindstorefront1', 'fabrikamapi1', 'fabrikamjobs1'],
+      },
+      scope_groups: [READ_WRITE_SCOPE_GROUP],
+      created_at: '2026-08-04T16:05:00.000Z',
+    },
+  ],
+  'authorized-northwind-mcp': [
+    {
+      member_email: 'ops@example.com',
+      project_scope: { target: 'selected_projects', project_refs: ['northwindstorefront1'] },
+      scope_groups: [READ_WRITE_SCOPE_GROUP, READ_SCOPE_GROUP],
+      created_at: '2026-09-01T08:45:00.000Z',
+    },
+  ],
+  'authorized-kemal-bot': [
+    {
+      member_email: 'admin@example.com',
+      project_scope: { target: 'selected_projects', project_refs: ['northwindcms1'] },
+      scope_groups: [READ_SCOPE_GROUP],
+      created_at: '2026-07-22T13:20:00.000Z',
+    },
+  ],
+  'authorized-contoso-analytics': [],
+}
+
+export function getMockOAuthAuthorizedApps(): OAuthAuthorizedApp[] {
+  return MOCK_AUTHORIZED_APPS
+}
+
+export function getMockOAuthAppMemberGrants(appId: string): OAuthAppMemberGrant[] {
+  return MOCK_APP_MEMBER_GRANTS[appId] ?? []
 }
 
 export function getMockOAuthAppsAuthorizeRequest(authId: string): OAuthAppsAuthorizeRequest {
