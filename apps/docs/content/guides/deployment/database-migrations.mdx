@@ -206,7 +206,7 @@ The SQL that `db diff` generates depends on your project's diff engine.
 
 <Admonition type="note">
 
-If you'd rather declare the state you want your database to be in and have migrations generated for you, manage your schema declaratively instead. Edit files in `supabase/schemas/` and generate migrations with `supabase db schema declarative sync`. Don't use `db diff` to generate migrations from declarative files, because it never uses `supabase/schemas/` as its baseline. See [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
+If you'd rather declare the state you want your database to be in and have migrations generated for you, manage your schema declaratively instead. On `pg-delta`, edit files in `supabase/schemas/` and generate migrations with `supabase db schema declarative sync`. Don't use `db diff` to generate migrations from declarative files on that engine, because it never uses `supabase/schemas/` as its baseline. On the legacy `migra` engine, `db schema declarative sync` won't run and `db diff` does read `supabase/schemas/`, so follow [Declarative schemas on the legacy `migra` engine](/docs/guides/local-development/declarative-database-schemas#declarative-schemas-on-the-legacy-migra-engine) instead. See [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
 
 </Admonition>
 
