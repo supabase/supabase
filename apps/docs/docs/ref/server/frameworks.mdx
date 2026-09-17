@@ -3,7 +3,7 @@ id: frameworks
 title: Frameworks
 ---
 
-`@supabase/server` middleware runs inside Hono, H3, Elysia, and NestJS through a bridge: one file you copy into your project. The bridge runs a `@supabase/middleware` entry array in the framework's own middleware slot. Your route handlers then read `supabase`, `jwtClaims`, and any other key the entries contribute from the place your framework keeps per-request state.
+`@supabase/server` middleware runs inside Hono, H3, Elysia, NestJS, and TanStack Start through a bridge: one file you copy into your project. The bridge runs a `@supabase/middleware` entry array in the framework's own middleware slot. Your route handlers then read `supabase`, `jwtClaims`, and any other key the entries contribute from the place your framework keeps per-request state.
 
 The framework adapters (`@supabase/server/adapters/*`) predate the middleware engine. We are moving off them, and they will be deprecated soon. The bridges on this page replace them. If you use an adapter today, read "Moving off the adapters" below before you change anything. One step in that migration can open an endpoint up without an error.
 
@@ -21,18 +21,19 @@ An entry does three jobs. How many of them survive depends on the framework.
 - Short-circuit. An entry can return a `Response`, and your route never runs. That is how `withRequiredClaims` rejects a request.
 - Response phase. An entry written as `async function*` can `yield`, see the response on the way out, and rewrite it. `withCors` needs this to stamp headers.
 
-| Framework | Context | Short-circuit | Response phase | Pattern           |
-| --------- | ------- | ------------- | -------------- | ----------------- |
-| Hono      | Yes     | Yes           | Yes            | middleware slot   |
-| H3 / Nuxt | Yes     | Yes           | Yes            | middleware slot   |
-| Elysia    | Yes     | Yes           | Yes            | wrap `app.handle` |
-| NestJS    | Yes     | Yes           | No             | guard             |
+| Framework      | Context | Short-circuit | Response phase | Pattern           |
+| -------------- | ------- | ------------- | -------------- | ----------------- |
+| Hono           | Yes     | Yes           | Yes            | middleware slot   |
+| H3 / Nuxt      | Yes     | Yes           | Yes            | middleware slot   |
+| Elysia         | Yes     | Yes           | Yes            | wrap `app.handle` |
+| NestJS         | Yes     | Yes           | No             | guard             |
+| TanStack Start | Yes     | Yes           | Yes            | middleware slot   |
 
 If you only read `supabase` inside a handler, every row works for you. Ignore the response-phase column.
 
 Each bridge folds the entry array once, when you call it, so entries keep their state across requests. Each bridge also checks the array at compile time. Two entries that contribute the same key, or an entry whose prerequisite is missing, fail to compile at the call site.
 
-The bridge files live in the server repository under [`examples/frameworks`](https://github.com/supabase/server/tree/main/examples/frameworks), next to a minimal app for each framework. Copy the file for your framework as is, comments included. Some lines look redundant and are not. The comments say why.
+The bridge files for the four frameworks that had adapters live in the server repository under [`examples/frameworks`](https://github.com/supabase/server/tree/main/examples/frameworks), next to a minimal app for each. The TanStack Start bridge is on this page. Copy the file for your framework as is, comments included. Some lines look redundant and are not. The comments say why.
 
 ### Hono
 
@@ -181,6 +182,139 @@ The bridge files live in the server repository under [`examples/frameworks`](htt
         return data
       }
     }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### TanStack Start
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    TanStack Start never had an adapter, so this section is integration guidance. The migration steps below do not apply to it, and the bridge lives on this page rather than in the server repository. Copy the first block into `src/lib/supabase-middleware.ts`.
+
+    `request` is already a Web `Request`, and `next()` resolves to an object carrying the downstream `Response`, so the fit is close. Two details in the bridge carry the typing. `.server<Contributions<Entries>>` is what types `context` downstream; the generic has no constraint, so leaving it off types the context as `undefined`. And `<const Entries>` keeps the tuple, so every `context.*` read stays typed.
+
+    `createMiddleware({ type: 'request' })` is the right kind here. Its server function may return a `Response`, which is what lets an entry short-circuit, and `createServerFn().middleware([...])` accepts request middleware.
+
+    On a server function, Start's fetcher returns any `application/json` body as the call's value without checking the status. A 401 from `withRequiredClaims()` would resolve the caller's promise with `{ message, code }` where it expects its own result type: the same silent-200 class of failure as the auth trap, one layer further out. So when an entry short-circuits on a server function, the bridge rethrows it as an error carrying `status` and `code`. Server routes get the `Response` back unchanged.
+
+    The file that calls `.middleware([...])` ships to the client, so the entry modules it references are client-reachable. Read configuration through `getEnv` per request and keep secrets out of module scope.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { createMiddleware } from '@tanstack/react-start'
+    import { pipeline, seedContext } from '@supabase/middleware'
+    import type {
+      AnyEntry,
+      Contributions,
+      ValidateEntries,
+    } from '@supabase/middleware'
+
+    /**
+     * Resolves to `unknown` when the entries compose, so the parameter type stays
+     * `Entries`. Otherwise it is the engine's error string, and the intersection
+     * makes the call fail with the `middleware-conflict` or `middleware-prereq`
+     * message.
+     */
+    type Validated<Entries extends readonly AnyEntry[]> = [
+      ValidateEntries<Entries>,
+    ] extends [true]
+      ? unknown
+      : ValidateEntries<Entries>
+
+    /** Per-request handoff from the Start middleware to the pipeline's terminal. */
+    const HANDOFF = Symbol('toTanStackStart.handoff')
+    interface Handoff {
+      next: (options: { context: Record<string, unknown> }) => unknown
+      ran: boolean
+    }
+
+    /**
+     * Runs an entry array as a TanStack Start request middleware.
+     *
+     * The pipeline folds once, when `toTanStackStart` is called, so entries keep
+     * their state across requests. Each request travels through the fold with
+     * Start's `next` under a symbol key, which the engine's context spreads
+     * preserve. The terminal hands the contributions to Start as the server
+     * context and returns the downstream response back up through the entries.
+     *
+     * `.server<Contributions<Entries>>` is what types `context` downstream. The
+     * generic has no constraint, so leaving it off types the context as
+     * `undefined`.
+     *
+     * On a server function, Start's fetcher returns any JSON body as the call's
+     * value without checking the status, so a 401 from `withRequiredClaims` would
+     * resolve the caller's promise with `{ message, code }`. A short-circuit on a
+     * server function is therefore rethrown as an error carrying `status` and
+     * `code`. Server routes get the `Response` back unchanged.
+     */
+    export function toTanStackStart<const Entries extends readonly AnyEntry[]>(
+      entries: Entries & Validated<Entries>,
+    ) {
+      const run = pipeline(entries as readonly AnyEntry[], async (_req, ctx) => {
+        const handoff = (ctx as Record<symbol, Handoff>)[HANDOFF]
+        handoff.ran = true
+        const context: Record<string, unknown> = {}
+        for (const [key, value] of Object.entries(ctx)) {
+          context[key] = value
+        }
+        const result = (await handoff.next({ context })) as { response: Response }
+        return result.response
+      })
+
+      return createMiddleware({ type: 'request' }).server<Contributions<Entries>>(
+        async ({ request, next, handlerType }) => {
+          const handoff: Handoff = { next, ran: false }
+          const response = await run(request, {
+            ...seedContext(),
+            [HANDOFF]: handoff,
+          })
+          if (handoff.ran || handlerType !== 'serverFn') return response
+
+          const body = (await response
+            .clone()
+            .json()
+            .catch(() => null)) as { message?: string; code?: string } | null
+          throw Object.assign(
+            new Error(
+              body?.message ?? `Request failed with status ${response.status}`,
+            ),
+            {
+              status: response.status,
+              statusCode: response.status,
+              ...(body?.code !== undefined && { code: body.code }),
+            },
+          )
+        },
+      )
+    }
+    ```
+
+    ```ts
+    import { createServerFn } from '@tanstack/react-start'
+    import { withRequiredClaims } from '@supabase/server/middleware/required-claims'
+    import { withSupabaseClient } from '@supabase/server/middleware/client'
+
+    import { toTanStackStart } from './lib/supabase-middleware.js'
+
+    const supabase = toTanStackStart([withRequiredClaims(), withSupabaseClient()])
+
+    export const getTodos = createServerFn()
+      .middleware([supabase])
+      .handler(async ({ context }) => {
+        const { data, error } = await context.supabase.from('todos').select()
+        if (error) throw error
+        return data
+      })
+
+    export const whoAmI = createServerFn()
+      .middleware([supabase])
+      .handler(async ({ context }) => ({ id: context.jwtClaims.sub }))
     ```
 
   </RefSubLayout.Examples>
