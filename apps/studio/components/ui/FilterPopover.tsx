@@ -271,7 +271,6 @@ export const FilterPopover = <T extends Record<string, any>>({
         <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
           <Button
             size="tiny"
-            variant="default"
             onClick={() => {
               onSaveFilters([])
               setSelectedOptions([])

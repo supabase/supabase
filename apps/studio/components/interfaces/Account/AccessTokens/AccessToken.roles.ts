@@ -95,6 +95,7 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   analytics_logs_read: 'readonly',
   analytics_usage_read: 'readonly',
   api_gateway_keys_read: 'developer',
+  api_gateway_keys_secret_read: 'developer',
   api_gateway_keys_write: 'administrator',
   auth_config_read: 'readonly',
   auth_config_write: 'developer',
@@ -113,6 +114,7 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   custom_domain_read: 'readonly',
   custom_domain_write: 'administrator',
   data_api_config_read: 'readonly',
+  data_api_config_secret_read: 'developer',
   data_api_config_write: 'administrator',
   database_read: 'readonly',
   database_write: 'developer',
@@ -156,6 +158,8 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   vanity_subdomain_write: 'administrator',
   platform_webhooks_projects_read: 'member',
   platform_webhooks_projects_write: 'administrator',
+  workers_read: 'readonly',
+  workers_write: 'developer',
 }
 
 /**

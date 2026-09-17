@@ -28,6 +28,7 @@
     "test:prettier": "SORT_IMPORTS=false prettier --config prettier.config.mjs --cache --check '{apps,packages,blocks,examples,i18n}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "format": "SORT_IMPORTS=false prettier --config prettier.config.mjs --cache --write '{apps,packages,blocks,examples,i18n}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
+    "test:kb": "turbo run test --filter=kb",
     "test:ui": "turbo run test --filter=ui",
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
@@ -50,6 +51,7 @@
     "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
+    "api:verify-types": "pnpm --filter=api-types run verify-production-types",
     "knip": "knip",
     "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.ts"
   },

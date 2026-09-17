@@ -59,7 +59,6 @@ describe('_handleRevalidateRequest', () => {
 
   afterEach(() => {
     process.env = originalEnv
-    vi.clearAllMocks()
     vi.useRealTimers()
   })
 

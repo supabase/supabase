@@ -106,6 +106,7 @@ module.exports = defineConfig([
       'vitest.config.ts',
       'postcss.config.js',
       'postcss.config.cjs',
+      'velite.config.js',
     ],
     rules: {
       'no-restricted-exports': [

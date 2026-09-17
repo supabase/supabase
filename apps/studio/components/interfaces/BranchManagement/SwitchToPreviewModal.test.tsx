@@ -17,7 +17,7 @@ vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }))
 
-type BranchUpdateResponse = components['schemas']['BranchUpdateResponse']
+type BranchUpdateResponse = components['schemas']['BranchUpdateResponse_Output']
 
 const PARENT_PROJECT_REF = 'parent-project-ref'
 const BRANCH_PROJECT_REF = 'branch-project-ref'

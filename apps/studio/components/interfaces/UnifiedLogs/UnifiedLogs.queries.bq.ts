@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -73,16 +74,18 @@ const buildConditions = (
       const likeOp = isNeq ? NOT_LIKE_OP : LIKE_OP
       const joinAndOr = isNeq ? ' AND ' : ' OR '
 
-      if (key === 'event_message' && (operator === '~~*' || operator === '!~~*')) {
+      if (
+        (key === 'event_message' || key === 'pathname') &&
+        (operator === '~~*' || operator === '!~~*')
+      ) {
         // BigQuery has no ILIKE; emulate via LOWER(col) (NOT) LIKE LOWER('%v%').
         // Auto-wrap with `%…%` unless the user already included one. Multiple
         // ILIKE values join with OR; NOT ILIKE joins with AND (row must contain
         // none of the given substrings).
-        const pattern = (v: string) => (v.includes('%') ? v : '%' + v + '%')
         const likeKeyword = operator === '!~~*' ? safeSql`NOT LIKE` : safeSql`LIKE`
         const join = operator === '!~~*' ? ' AND ' : ' OR '
         const branches = values.map(
-          (v) => safeSql`LOWER(${col}) ${likeKeyword} LOWER(${lit(pattern(v))})`
+          (v) => safeSql`LOWER(${col}) ${likeKeyword} LOWER(${lit(wrapIlikePattern(v))})`
         )
         conditions.push(safeSql`(${joinSqlFragments(branches, join)})`)
       } else if (key === 'host' || key === 'pathname') {

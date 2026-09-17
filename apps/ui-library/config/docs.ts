@@ -60,6 +60,14 @@ export const mcpBlocks: SidebarNavGroup = {
       new: true,
       commandItemLabel: 'MCP Server',
     },
+    {
+      title: 'Headless App',
+      supportedFrameworks: ['tanstack'],
+      href: '/docs/tanstack/headless-app',
+      items: [],
+      new: true,
+      commandItemLabel: 'Headless App',
+    },
   ],
 }
 

@@ -63,7 +63,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           </p>
         </div>
 
-        <Button asChild variant="default" className="w-min">
+        <Button asChild className="w-min">
           <Link
             href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(API_LOGS_QUERY(user.id ?? ''))}`}
           >
@@ -109,7 +109,6 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             </Button>
           </div>
           <Button
-            variant="default"
             loading={isLoadingAuthLogs}
             disabled={isLoadingAuthLogs}
             icon={<RefreshCw />}

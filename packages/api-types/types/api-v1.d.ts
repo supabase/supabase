@@ -40,8 +40,10 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Beta] Diffs a database branch
+     * Diffs a database branch
      * @description Diffs the specified database branch
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     get: operations['v1-diff-a-branch']
     put?: never
@@ -139,7 +141,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Authorize user through oauth */
+    /**
+     * Authorize user through oauth
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-authorize-user']
     put?: never
     post?: never
@@ -178,7 +185,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Revoke oauth app authorization and it's corresponding tokens */
+    /**
+     * Revoke oauth app authorization and it's corresponding tokens
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-revoke-token']
     delete?: never
     options?: never
@@ -196,8 +208,10 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * [Beta] Exchange auth code for user's access and refresh token
+     * Exchange auth code for user's access and refresh token
      * @description Supports `authorization_code`, `refresh_token`, and `urn:ietf:params:oauth:grant-type:jwt-bearer` grant types. The `jwt-bearer` grant type (IDJAG — identity-directed JWT assertion) is in beta and available on Team and Enterprise plans only.
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     post: operations['v1-exchange-oauth-token']
     delete?: never
@@ -471,7 +485,6 @@ export interface paths {
     }
     /**
      * Gets project performance advisors.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-performance-advisors']
@@ -492,7 +505,6 @@ export interface paths {
     }
     /**
      * Gets project security advisors.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-security-advisors']
@@ -807,9 +819,19 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Create a login role for CLI with temporary password */
+    /**
+     * Create a login role for CLI with temporary password
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-create-login-role']
-    /** [Beta] Delete existing login roles used by CLI */
+    /**
+     * Delete existing login roles used by CLI
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-delete-login-roles']
     options?: never
     head?: never
@@ -1127,11 +1149,21 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's custom hostname config */
+    /**
+     * Gets project's custom hostname config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-hostname-config']
     put?: never
     post?: never
-    /** [Beta] Deletes a project's custom hostname configuration */
+    /**
+     * Deletes a project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-Delete hostname config']
     options?: never
     head?: never
@@ -1147,7 +1179,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Activates a custom hostname for a project. */
+    /**
+     * Activates a custom hostname for a project.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-activate-custom-hostname']
     delete?: never
     options?: never
@@ -1164,7 +1201,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Updates project's custom hostname configuration */
+    /**
+     * Updates project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-update-hostname-config']
     delete?: never
     options?: never
@@ -1181,7 +1223,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Attempts to verify the DNS configuration for project's custom hostname configuration */
+    /**
+     * Attempts to verify the DNS configuration for project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-verify-dns-config']
     delete?: never
     options?: never
@@ -1305,7 +1352,6 @@ export interface paths {
     }
     /**
      * Gets database metadata for the given project.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-database-metadata']
@@ -1529,7 +1575,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Run sql query */
+    /**
+     * Run sql query
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-run-a-query']
     delete?: never
     options?: never
@@ -1547,8 +1598,10 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * [Beta] Run a sql query as supabase_read_only_user
+     * Run a sql query as supabase_read_only_user
      * @description All entity references must be schema qualified.
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     post: operations['v1-read-only-query']
     delete?: never
@@ -1566,7 +1619,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Enables Database Webhooks on the project */
+    /**
+     * Enables Database Webhooks on the project
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-enable-database-webhook']
     delete?: never
     options?: never
@@ -1695,9 +1753,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's temporary access configuration. */
+    /**
+     * Get project's temporary access configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-jit-access-config']
-    /** [Beta] Update project's temporary access configuration. */
+    /**
+     * Update project's temporary access configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-jit-access-config']
     post?: never
     delete?: never
@@ -1716,7 +1784,12 @@ export interface paths {
     get?: never
     put?: never
     post?: never
-    /** [Beta] Remove network bans. */
+    /**
+     * Remove network bans.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-delete-network-bans']
     options?: never
     head?: never
@@ -1732,7 +1805,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Gets project's network bans */
+    /**
+     * Gets project's network bans
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-list-all-network-bans']
     delete?: never
     options?: never
@@ -1749,7 +1827,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Gets project's network bans with additional information about which databases they affect */
+    /**
+     * Gets project's network bans with additional information about which databases they affect
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-list-all-network-bans-enriched']
     delete?: never
     options?: never
@@ -1764,14 +1847,24 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's network restrictions */
+    /**
+     * Gets project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-network-restrictions']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
-    /** [Alpha] Updates project's network restrictions by adding or removing CIDRs */
+    /**
+     * Updates project's network restrictions by adding or removing CIDRs
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
     patch: operations['v1-patch-network-restrictions']
     trace?: never
   }
@@ -1784,7 +1877,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Updates project's network restrictions */
+    /**
+     * Updates project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-update-network-restrictions']
     delete?: never
     options?: never
@@ -1816,9 +1914,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's pgsodium config */
+    /**
+     * Gets project's pgsodium config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-pgsodium-config']
-    /** [Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
+    /**
+     * Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-pgsodium-config']
     post?: never
     delete?: never
@@ -1854,7 +1962,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Remove a read replica */
+    /**
+     * Remove a read replica
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-remove-a-read-replica']
     delete?: never
     options?: never
@@ -1871,7 +1984,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Set up a read replica */
+    /**
+     * Set up a read replica
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-setup-a-read-replica']
     delete?: never
     options?: never
@@ -2000,9 +2118,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's SSL enforcement configuration. */
+    /**
+     * Get project's SSL enforcement configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-ssl-enforcement-config']
-    /** [Beta] Update project's SSL enforcement configuration. */
+    /**
+     * Update project's SSL enforcement configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-ssl-enforcement-config']
     post?: never
     delete?: never
@@ -2057,7 +2185,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Upgrades the project's Postgres version */
+    /**
+     * Upgrades the project's Postgres version
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-upgrade-postgres-version']
     delete?: never
     options?: never
@@ -2072,7 +2205,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Returns the project's eligibility for upgrades */
+    /**
+     * Returns the project's eligibility for upgrades
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-postgres-upgrade-eligibility']
     put?: never
     post?: never
@@ -2089,7 +2227,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets the latest status of the project's upgrade */
+    /**
+     * Gets the latest status of the project's upgrade
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-postgres-upgrade-status']
     put?: never
     post?: never
@@ -2106,11 +2249,21 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets current vanity subdomain config */
+    /**
+     * Gets current vanity subdomain config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-vanity-subdomain-config']
     put?: never
     post?: never
-    /** [Beta] Deletes a project's vanity subdomain configuration */
+    /**
+     * Deletes a project's vanity subdomain configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-deactivate-vanity-subdomain-config']
     options?: never
     head?: never
@@ -2126,7 +2279,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Activates a vanity subdomain for a project. */
+    /**
+     * Activates a vanity subdomain for a project.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-activate-vanity-subdomain-config']
     delete?: never
     options?: never
@@ -2143,7 +2301,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Checks vanity subdomain availability */
+    /**
+     * Checks vanity subdomain availability
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-check-vanity-subdomain-availability']
     delete?: never
     options?: never
@@ -2158,7 +2321,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets the list of available regions that can be used for a new project */
+    /**
+     * Gets the list of available regions that can be used for a new project
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-available-regions']
     put?: never
     post?: never
@@ -2215,7 +2383,7 @@ export interface components {
       email: string
       token: string
     }
-    ActionRunResponse: {
+    ActionRunResponse_Output: {
       branch_id: string
       check_run_id: number | null
       created_at: string
@@ -2232,10 +2400,10 @@ export interface components {
       updated_at: string
       workdir: string | null
     }
-    ActivateVanitySubdomainResponse: {
+    ActivateVanitySubdomainResponse_Output: {
       custom_domain: string
     }
-    AnalyticsResponse: {
+    AnalyticsResponse_Output: {
       error?:
         | string
         | {
@@ -2252,7 +2420,7 @@ export interface components {
           }
       result?: unknown[]
     }
-    ApiKeyResponse: {
+    ApiKeyResponse_Output: {
       api_key?: string | null
       description?: string | null
       hash?: string | null
@@ -2309,7 +2477,7 @@ export interface components {
         | ('pitr_7' | 'pitr_14' | 'pitr_28')
         | 'ipv4_default'
     }
-    AuthConfigResponse: {
+    AuthConfigResponse_Output: {
       api_max_request_duration: number | null
       custom_oauth_enabled: boolean
       custom_oauth_max_providers: number
@@ -2516,6 +2684,7 @@ export interface components {
       security_manual_linking_enabled: boolean | null
       security_refresh_token_reuse_interval: number | null
       security_sb_forwarded_for_enabled: boolean | null
+      security_update_password_require_current_password: boolean | null
       security_update_password_require_reauthentication: boolean | null
       sessions_inactivity_timeout: number | null
       sessions_single_per_user: boolean | null
@@ -2573,11 +2742,11 @@ export interface components {
     BranchActionBody: {
       migration_version?: string
     }
-    BranchDeleteResponse: {
+    BranchDeleteResponse_Output: {
       /** @enum {string} */
       message: 'ok'
     }
-    BranchDetailResponse: {
+    BranchDetailResponse_Output: {
       db_host: string
       db_pass?: string
       db_port: number
@@ -2605,7 +2774,7 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
-    BranchResponse: {
+    BranchResponse_Output: {
       /** Format: date-time */
       created_at: string
       /** Format: date-time */
@@ -2662,11 +2831,11 @@ export interface components {
       updated_at: string
       with_data: boolean
     }
-    BranchRestoreResponse: {
+    BranchRestoreResponse_Output: {
       /** @enum {string} */
       message: 'Branch restoration initiated'
     }
-    BranchUpdateResponse: {
+    BranchUpdateResponse_Output: {
       /** @enum {string} */
       message: 'ok'
       workflow_run_id: string
@@ -2697,7 +2866,7 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }[]
-    BulkUpdateFunctionResponse: {
+    BulkUpdateFunctionResponse_Output: {
       functions: {
         /** Format: int64 */
         created_at: number
@@ -2791,7 +2960,7 @@ export interface components {
     CreateOrganizationV1: {
       name: string
     }
-    CreateProjectClaimTokenResponse: {
+    CreateProjectClaimTokenResponse_Output: {
       created_at: string
       /** Format: uuid */
       created_by: string
@@ -2845,7 +3014,7 @@ export interface components {
        */
       type: 'saml'
     }
-    CreateProviderResponse: {
+    CreateProviderResponse_Output: {
       created_at?: string
       domains?: {
         created_at?: string
@@ -2882,7 +3051,7 @@ export interface components {
     CreateRoleBody: {
       read_only: boolean
     }
-    CreateRoleResponse: {
+    CreateRoleResponse_Output: {
       password: string
       role: string
       /** Format: int64 */
@@ -2994,7 +3163,7 @@ export interface components {
       jwks_url?: string
       oidc_issuer_url?: string
     }
-    DatabaseUpgradeStatusResponse: {
+    DatabaseUpgradeStatusResponse_Output: {
       databaseUpgradeStatus: {
         /** @enum {string} */
         error?:
@@ -3023,10 +3192,10 @@ export interface components {
           | '9_completed_upgrade'
           | '10_completed_post_physical_backup'
         status: number
-        target_version: number
+        target_version: string
       } | null
     }
-    DeleteProviderResponse: {
+    DeleteProviderResponse_Output: {
       created_at?: string
       domains?: {
         created_at?: string
@@ -3057,7 +3226,7 @@ export interface components {
       }
       updated_at?: string
     }
-    DeleteRolesResponse: {
+    DeleteRolesResponse_Output: {
       /** @enum {string} */
       message: 'ok'
     }
@@ -3065,7 +3234,7 @@ export interface components {
      *       "OPENAI_API_KEY"
      *     ] */
     DeleteSecretsBody: string[]
-    DeployFunctionResponse: {
+    DeployFunctionResponse_Output: {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
@@ -3082,7 +3251,7 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
-    DiskAutoscaleConfig: {
+    DiskAutoscaleConfig_Output: {
       /** @description Growth percentage for disk autoscaling */
       growth_percent: number | null
       /** @description Maximum limit the disk size will grow to in GB */
@@ -3114,7 +3283,7 @@ export interface components {
             type: 'io2'
           }
     }
-    DiskResponse: {
+    DiskResponse_Output: {
       attributes:
         | {
             iops: number
@@ -3131,7 +3300,7 @@ export interface components {
           }
       last_modified_at?: string
     }
-    DiskUtilMetricsResponse: {
+    DiskUtilMetricsResponse_Output: {
       metrics: {
         fs_avail_bytes: number
         fs_size_bytes: number
@@ -3159,7 +3328,7 @@ export interface components {
         verify_jwt?: boolean
       }
     }
-    FunctionResponse: {
+    FunctionResponse_Output: {
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
@@ -3176,7 +3345,7 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
-    FunctionSlugResponse: {
+    FunctionSlugResponse_Output: {
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
@@ -3193,7 +3362,7 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
-    GetProjectAvailableRestoreVersionsResponse: {
+    GetProjectAvailableRestoreVersionsResponse_Output: {
       available_versions: {
         /** @enum {string} */
         postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
@@ -3202,19 +3371,15 @@ export interface components {
         version: string
       }[]
     }
-    GetProjectDbMetadataResponse: {
-      databases: ({
+    GetProjectDbMetadataResponse_Output: {
+      databases: {
         name: string
-        schemas: ({
+        schemas: {
           name: string
-        } & {
-          [key: string]: unknown
-        })[]
-      } & {
-        [key: string]: unknown
-      })[]
+        }[]
+      }[]
     }
-    GetProviderResponse: {
+    GetProviderResponse_Output: {
       created_at?: string
       domains?: {
         created_at?: string
@@ -3281,7 +3446,7 @@ export interface components {
         role: string
       }[]
     }
-    InviteExternalUserJitResponse: {
+    InviteExternalUserJitResponse_Output: {
       /** Format: email */
       email: string
       /** Format: uuid */
@@ -3309,7 +3474,7 @@ export interface components {
       /** @enum {string} */
       state: 'enabled' | 'disabled'
     }
-    JitAccessResponse: {
+    JitAccessResponse_Output: {
       /** Format: uuid */
       user_id?: string
       user_roles: {
@@ -3328,9 +3493,10 @@ export interface components {
         role: string
       }[]
     }
-    JitAuthorizeAccessResponse: {
+    JitAuthorizeAccessResponse_Output: {
+      act?: string
       /** Format: uuid */
-      user_id: string
+      user_id?: string
       user_role: {
         allowed_networks?: {
           allowed_cidrs?: {
@@ -3347,7 +3513,7 @@ export interface components {
         role: string
       }
     }
-    JitListAccessResponse: {
+    JitListAccessResponse_Output: {
       items: (
         | {
             expires_at: null
@@ -3395,10 +3561,17 @@ export interface components {
           }
       )[]
     }
-    LegacyApiKeysResponse: {
+    /** @description Any JSON-serializable value */
+    JsonValue_Output:
+      | ((string | number | boolean) | null)
+      | components['schemas']['JsonValue_Output'][]
+      | {
+          [key: string]: components['schemas']['JsonValue_Output']
+        }
+    LegacyApiKeysResponse_Output: {
       enabled: boolean
     }
-    ListActionRunResponse: {
+    ListActionRunResponse_Output: {
       branch_id: string
       check_run_id: number | null
       created_at: string
@@ -3415,7 +3588,7 @@ export interface components {
       updated_at: string
       workdir: string | null
     }[]
-    ListProjectAddonsResponse: {
+    ListProjectAddonsResponse_Output: {
       available_addons: {
         name: string
         /** @enum {string} */
@@ -3457,7 +3630,7 @@ export interface components {
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
             | 'etl_pipeline_default'
-          meta?: components['schemas']['ListProjectAddonsResponseJsonValue']
+          meta?: components['schemas']['JsonValue_Output']
           name: string
           price: {
             amount: number
@@ -3509,7 +3682,7 @@ export interface components {
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
             | 'etl_pipeline_default'
-          meta?: components['schemas']['ListProjectAddonsResponseJsonValue']
+          meta?: components['schemas']['JsonValue_Output']
           name: string
           price: {
             amount: number
@@ -3522,14 +3695,7 @@ export interface components {
         }
       }[]
     }
-    /** @description Any JSON-serializable value */
-    ListProjectAddonsResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['ListProjectAddonsResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['ListProjectAddonsResponseJsonValue']
-        }
-    ListProvidersResponse: {
+    ListProvidersResponse_Output: {
       items: {
         created_at?: string
         domains?: {
@@ -3562,10 +3728,10 @@ export interface components {
         updated_at?: string
       }[]
     }
-    NetworkBanResponse: {
+    NetworkBanResponse_Output: {
       banned_ipv4_addresses: string[]
     }
-    NetworkBanResponseEnriched: {
+    NetworkBanResponseEnriched_Output: {
       banned_ipv4_addresses: {
         banned_address: string
         identifier: string
@@ -3606,7 +3772,7 @@ export interface components {
       dbAllowedCidrs?: string[]
       dbAllowedCidrsV6?: string[]
     }
-    NetworkRestrictionsResponse: {
+    NetworkRestrictionsResponse_Output: {
       /** Format: date-time */
       applied_at?: string
       /**
@@ -3646,7 +3812,7 @@ export interface components {
       /** Format: date-time */
       updated_at?: string
     }
-    NetworkRestrictionsV2Response: {
+    NetworkRestrictionsV2Response_Output: {
       /** Format: date-time */
       applied_at?: string
       /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
@@ -3714,7 +3880,7 @@ export interface components {
       resource?: string
       scope?: string
     }
-    OAuthTokenResponse: {
+    OAuthTokenResponse_Output: {
       access_token: string
       expires_in: number
       /** @description The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`. */
@@ -3722,7 +3888,7 @@ export interface components {
       /** @enum {string} */
       token_type: 'Bearer'
     }
-    OrganizationProjectClaimResponse: {
+    OrganizationProjectClaimResponse_Output: {
       created_at: string
       /** Format: uuid */
       created_by: string
@@ -3755,7 +3921,7 @@ export interface components {
         ref: string
       }
     }
-    OrganizationProjectsResponse: {
+    OrganizationProjectsResponse_Output: {
       pagination: {
         /** @description Total number of projects. Use this to calculate the total number of pages. */
         count: number
@@ -3838,7 +4004,7 @@ export interface components {
           | 'RESIZING'
       }[]
     }
-    OrganizationResponseV1: {
+    OrganizationResponseV1_Output: {
       /**
        * @deprecated
        * @description Deprecated: Use `slug` instead.
@@ -3854,7 +4020,7 @@ export interface components {
     /** @example {
      *       "root_key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
      *     } */
-    PgsodiumConfigResponse: {
+    PgsodiumConfigResponse_Output: {
       /** @description The pgsodium root key: 32 bytes, hex-encoded (64 characters). */
       root_key: string
     }
@@ -3874,7 +4040,7 @@ export interface components {
       /** @description Human-readable explanation of the plan gate */
       message: string
     }
-    PostgresConfigResponse: {
+    PostgresConfigResponse_Output: {
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -3920,7 +4086,7 @@ export interface components {
       wal_sender_timeout?: string
       work_mem?: string
     }
-    PostgrestConfigWithJWTSecretResponse: {
+    PostgrestConfigWithJWTSecretResponse_Output: {
       db_extra_search_path: string
       /** @description If `null`, the value is automatically configured based on compute size. */
       db_pool: number | null
@@ -3930,14 +4096,14 @@ export interface components {
       jwt_secret?: string
       max_rows: number
     }
-    ProjectClaimTokenResponse: {
+    ProjectClaimTokenResponse_Output: {
       created_at: string
       /** Format: uuid */
       created_by: string
       expires_at: string
       token_alias: string
     }
-    ProjectUpgradeEligibilityResponse: {
+    ProjectUpgradeEligibilityResponse_Output: {
       current_app_version: string
       /** @enum {string} */
       current_app_version_release_channel:
@@ -4051,15 +4217,15 @@ export interface components {
           }
       )[]
     }
-    ProjectUpgradeInitiateResponse: {
+    ProjectUpgradeInitiateResponse_Output: {
       tracking_id: string
     }
-    ReadOnlyStatusResponse: {
+    ReadOnlyStatusResponse_Output: {
       enabled: boolean
       override_active_until: string
       override_enabled: boolean
     }
-    RealtimeConfigResponse: {
+    RealtimeConfigResponse_Output: {
       /** @description Sets connection pool size for Realtime Authorization */
       connection_pool: number | null
       /** @description Sets maximum number of bytes per second rate per channel limit */
@@ -4085,7 +4251,7 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
-    RegionsInfo: {
+    RegionsInfo_Output: {
       all: {
         smartGroup: {
           /** @enum {string} */
@@ -4185,7 +4351,7 @@ export interface components {
     RemoveReadReplicaBody: {
       database_identifier: string
     }
-    SecretResponse: {
+    SecretResponse_Output: {
       name: string
       updated_at?: string
       value: string
@@ -4218,7 +4384,7 @@ export interface components {
         | 'ap-south-1'
         | 'sa-east-1'
     }
-    SigningKeyResponse: {
+    SigningKeyResponse_Output: {
       /** @enum {string} */
       algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
       /** Format: date-time */
@@ -4231,7 +4397,7 @@ export interface components {
       /** Format: date-time */
       updated_at: string
     }
-    SigningKeysResponse: {
+    SigningKeysResponse_Output: {
       keys: {
         /** @enum {string} */
         algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
@@ -4246,7 +4412,7 @@ export interface components {
         updated_at: string
       }[]
     }
-    SnippetList: {
+    SnippetList_Output: {
       cursor?: string
       data: {
         description: string | null
@@ -4273,7 +4439,7 @@ export interface components {
         visibility: 'user' | 'project' | 'org' | 'public'
       }[]
     }
-    SnippetResponse: {
+    SnippetResponse_Output: {
       content: {
         /**
          * @deprecated
@@ -4316,18 +4482,18 @@ export interface components {
         database: boolean
       }
     }
-    SslEnforcementResponse: {
+    SslEnforcementResponse_Output: {
       appliedSuccessfully: boolean
       currentConfig: {
         database: boolean
       }
     }
-    StorageConfigResponse: {
+    StorageConfigResponse_Output: {
       capabilities: {
         iceberg_catalog: boolean
         list_v2: boolean
+        object_versioning: boolean
       }
-      databasePoolMode: string
       external: {
         /** @enum {string} */
         upstreamTarget: 'main' | 'canary'
@@ -4356,13 +4522,13 @@ export interface components {
       }
       /** Format: int64 */
       fileSizeLimit: number
-      migrationVersion: string
+      migrationVersion: string | null
     }
     StreamableFile: Record<string, never>
-    SubdomainAvailabilityResponse: {
+    SubdomainAvailabilityResponse_Output: {
       available: boolean
     }
-    SupavisorConfigResponse: {
+    SupavisorConfigResponse_Output: {
       connection_string: string
       /** @description Use connection_string instead */
       connectionString: string
@@ -4379,7 +4545,7 @@ export interface components {
       /** @enum {string} */
       pool_mode: 'transaction' | 'session'
     }
-    ThirdPartyAuth: {
+    ThirdPartyAuth_Output: {
       custom_jwks?: unknown
       /** Format: uuid */
       id: string
@@ -4391,7 +4557,7 @@ export interface components {
       type: string
       updated_at: string
     }
-    TypescriptResponse: {
+    TypescriptResponse_Output: {
       types: string
     }
     /** @example {
@@ -4612,12 +4778,17 @@ export interface components {
       security_captcha_provider?: 'turnstile' | 'hcaptcha' | null
       security_captcha_secret?: string | null
       security_manual_linking_enabled?: boolean | null
+      /** @description Refresh token reuse interval in seconds. Maximum 300 seconds (5 minutes). */
       security_refresh_token_reuse_interval?: number | null
       security_sb_forwarded_for_enabled?: boolean | null
+      /** @description Require the user's current password when updating their password. */
+      security_update_password_require_current_password?: boolean | null
       security_update_password_require_reauthentication?: boolean | null
+      /** @description Session inactivity timeout in hours. Maximum 8760 hours (1 year). */
       sessions_inactivity_timeout?: number | null
       sessions_single_per_user?: boolean | null
       sessions_tags?: string | null
+      /** @description Session timebox in hours. Maximum 8760 hours (1 year). */
       sessions_timebox?: number | null
       site_url?: string | null
       sms_autoconfirm?: boolean | null
@@ -4694,31 +4865,31 @@ export interface components {
     UpdateCustomHostnameBody: {
       custom_hostname: string
     }
-    UpdateCustomHostnameResponse: {
-      custom_hostname: string
+    UpdateCustomHostnameResponse_Output: {
+      custom_hostname?: string
       data: {
-        errors: components['schemas']['UpdateCustomHostnameResponseJsonValue'][]
-        messages: components['schemas']['UpdateCustomHostnameResponseJsonValue'][]
+        errors: components['schemas']['JsonValue_Output'][]
+        messages: components['schemas']['JsonValue_Output'][]
         result: {
-          custom_origin_server: string
+          custom_origin_server?: string
           hostname: string
           id: string
-          ownership_verification: {
-            name: string
-            type: string
-            value: string
+          ownership_verification?: {
+            name?: string
+            type?: string
+            value?: string
           }
-          ssl: {
-            status: string
+          ssl?: {
+            status?: string
             validation_errors?: {
               message: string
             }[]
-            validation_records: {
-              txt_name: string
-              txt_value: string
+            validation_records?: {
+              txt_name?: string
+              txt_value?: string
             }[]
           }
-          status: string
+          status?: string
           verification_errors?: string[]
         }
         success: boolean
@@ -4731,13 +4902,6 @@ export interface components {
         | '4_origin_setup_completed'
         | '5_services_reconfigured'
     }
-    /** @description Any JSON-serializable value */
-    UpdateCustomHostnameResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['UpdateCustomHostnameResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['UpdateCustomHostnameResponseJsonValue']
-        }
     /** @example {
      *       "user_id": "55555555-5555-4555-8555-555555555555",
      *       "roles": [
@@ -4862,7 +5026,7 @@ export interface components {
         | 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
         | 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
     }
-    UpdateProviderResponse: {
+    UpdateProviderResponse_Output: {
       created_at?: string
       domains?: {
         created_at?: string
@@ -4946,7 +5110,7 @@ export interface components {
       /** @enum {string} */
       seed?: 'CREATED' | 'DEAD' | 'EXITED' | 'PAUSED' | 'REMOVING' | 'RESTARTING' | 'RUNNING'
     }
-    UpdateRunStatusResponse: {
+    UpdateRunStatusResponse_Output: {
       /** @enum {string} */
       message: 'ok'
     }
@@ -5007,7 +5171,7 @@ export interface components {
        */
       pool_mode?: 'transaction' | 'session'
     }
-    UpdateSupavisorConfigResponse: {
+    UpdateSupavisorConfigResponse_Output: {
       default_pool_size: number | null
       pool_mode: string
     }
@@ -5020,7 +5184,7 @@ export interface components {
       release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       target_version: string
     }
-    V1BackupScheduleResponse: {
+    V1BackupScheduleResponse_Output: {
       /**
        * @description Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.
        * @example 04:00:00
@@ -5033,7 +5197,7 @@ export interface components {
        */
       updated_at: string
     }
-    V1BackupsResponse: {
+    V1BackupsResponse_Output: {
       backups: {
         id: number
         inserted_at: string
@@ -5201,7 +5365,7 @@ export interface components {
        */
       template_url?: string
     }
-    V1GetMigrationResponse: {
+    V1GetMigrationResponse_Output: {
       created_by?: string
       idempotency_key?: string
       name?: string
@@ -5209,7 +5373,7 @@ export interface components {
       statements?: string[]
       version: string
     }
-    V1GetUsageApiCountResponse: {
+    V1GetUsageApiCountResponse_Output: {
       error?:
         | string
         | {
@@ -5233,7 +5397,7 @@ export interface components {
         total_storage_requests: number
       }[]
     }
-    V1GetUsageApiRequestsCountResponse: {
+    V1GetUsageApiRequestsCountResponse_Output: {
       error?:
         | string
         | {
@@ -5252,7 +5416,7 @@ export interface components {
         count: number
       }[]
     }
-    V1ListEntitlementsResponse: {
+    V1ListEntitlementsResponse_Output: {
       entitlements: {
         config:
           | {
@@ -5343,19 +5507,19 @@ export interface components {
         type: 'boolean' | 'numeric' | 'set'
       }[]
     }
-    V1ListMigrationsResponse: {
+    V1ListMigrationsResponse_Output: {
       name?: string
       version: string
     }[]
-    V1OrganizationMemberResponse: {
+    V1OrganizationMemberResponse_Output: {
       avatar_url: string | null
       email?: string
       mfa_enabled: boolean
-      role_name: string
+      role_name?: string
       user_id: string
       user_name: string
     }
-    V1OrganizationSlugResponse: {
+    V1OrganizationSlugResponse_Output: {
       allowed_release_channels: ('internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview')[]
       id: string
       name: string
@@ -5375,7 +5539,7 @@ export interface components {
       name?: string
       rollback?: string
     }
-    V1PgbouncerConfigResponse: {
+    V1PgbouncerConfigResponse_Output: {
       connection_string?: string
       default_pool_size?: number
       ignore_startup_parameters?: string
@@ -5387,7 +5551,7 @@ export interface components {
       server_idle_timeout?: number
       server_lifetime?: number
     }
-    V1PostgrestConfigResponse: {
+    V1PostgrestConfigResponse_Output: {
       db_extra_search_path: string
       /** @description If `null`, the value is automatically configured based on compute size. */
       db_pool: number | null
@@ -5396,13 +5560,13 @@ export interface components {
       db_schema: string
       max_rows: number
     }
-    V1ProfileResponse: {
+    V1ProfileResponse_Output: {
       gotrue_id: string
       primary_email: string
       username: string
     }
-    V1ProjectAdvisorsResponse: {
-      lints: ({
+    V1ProjectAdvisorsResponse_Output: {
+      lints: {
         cache_key: string
         categories: ('PERFORMANCE' | 'SECURITY' | 'HEALTH')[]
         description: string
@@ -5428,8 +5592,6 @@ export interface components {
             | 'extension'
             | 'compliance'
             | 'health'
-        } & {
-          [key: string]: unknown
         }
         /** @enum {string} */
         name:
@@ -5469,23 +5631,24 @@ export interface components {
           | 'instance_telemetry_lost'
           | 'instance_db_down'
           | 'instance_alert_firing'
-          | 'log_service_error_rate_high'
+          | 'log_data_api_error_rate_high'
+          | 'log_auth_error_rate_high'
+          | 'log_storage_error_rate_high'
+          | 'log_edge_function_error_rate_high'
           | 'project_not_active'
           | 'advisor_check_unavailable'
         /** Format: date-time */
         observed_at?: string
         remediation: string
         title: string
-      } & {
-        [key: string]: unknown
-      })[]
+      }[]
     }
-    V1ProjectRefResponse: {
+    V1ProjectRefResponse_Output: {
       id: number
       name: string
       ref: string
     }
-    V1ProjectResponse: {
+    V1ProjectResponse_Output: {
       /** @description Creation timestamp */
       created_at: string
       /**
@@ -5530,7 +5693,7 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
-    V1ProjectWithDatabaseResponse: {
+    V1ProjectWithDatabaseResponse_Output: {
       /** @description Creation timestamp */
       created_at: string
       database: {
@@ -5627,7 +5790,7 @@ export interface components {
       query: string
       read_only?: boolean
     }
-    V1ServiceHealthResponse: {
+    V1ServiceHealthResponse_Output: {
       error?: string
       /**
        * @deprecated
@@ -5667,7 +5830,7 @@ export interface components {
       /** @enum {string} */
       status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
     }
-    V1StorageBucketResponse: {
+    V1StorageBucketResponse_Output: {
       created_at: string
       id: string
       name: string
@@ -5707,7 +5870,7 @@ export interface components {
     V1UpdatePasswordBody: {
       password: string
     }
-    V1UpdatePasswordResponse: {
+    V1UpdatePasswordResponse_Output: {
       message: string
     }
     /** @example {
@@ -5744,7 +5907,7 @@ export interface components {
     VanitySubdomainBody: {
       vanity_subdomain: string
     }
-    VanitySubdomainConfigResponse: {
+    VanitySubdomainConfigResponse_Output: {
       custom_domain?: string
       /** @enum {string} */
       status: 'not-used' | 'custom-domain-used' | 'active'
@@ -5775,8 +5938,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchDetailResponse']
+          'application/json': components['schemas']['BranchDetailResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve database branch */
       500: {
@@ -5807,8 +5991,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchDeleteResponse']
+          'application/json': components['schemas']['BranchDeleteResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to delete database branch */
       500: {
@@ -5840,8 +6045,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchResponse']
+          'application/json': components['schemas']['BranchResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update database branch */
       500: {
@@ -5881,6 +6107,27 @@ export interface operations {
           'text/plain': string
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to diff database branch */
       500: {
         headers: {
@@ -5911,8 +6158,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchUpdateResponse']
+          'application/json': components['schemas']['BranchUpdateResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to merge database branch */
       500: {
@@ -5944,8 +6212,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchUpdateResponse']
+          'application/json': components['schemas']['BranchUpdateResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to push database branch */
       500: {
@@ -5977,8 +6266,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchUpdateResponse']
+          'application/json': components['schemas']['BranchUpdateResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to reset database branch */
       500: {
@@ -6001,13 +6311,34 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchRestoreResponse']
+          'application/json': components['schemas']['BranchRestoreResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to restore database branch */
       500: {
@@ -6042,6 +6373,27 @@ export interface operations {
     requestBody?: never
     responses: {
       204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }
@@ -6116,6 +6468,27 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   'v1-exchange-oauth-token': {
@@ -6136,8 +6509,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OAuthTokenResponse']
+          'application/json': components['schemas']['OAuthTokenResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -6155,7 +6549,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationResponseV1'][]
+          'application/json': components['schemas']['OrganizationResponseV1_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -6206,7 +6600,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationResponseV1']
+          'application/json': components['schemas']['OrganizationResponseV1_Output']
         }
       }
       /** @description Unauthorized */
@@ -6256,7 +6650,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1OrganizationSlugResponse']
+          'application/json': components['schemas']['V1OrganizationSlugResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6299,7 +6693,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ListEntitlementsResponse']
+          'application/json': components['schemas']['V1ListEntitlementsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6342,8 +6736,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1OrganizationMemberResponse'][]
+          'application/json': components['schemas']['V1OrganizationMemberResponse_Output'][]
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -6365,7 +6780,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationProjectClaimResponse']
+          'application/json': components['schemas']['OrganizationProjectClaimResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6463,7 +6878,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationProjectsResponse']
+          'application/json': components['schemas']['OrganizationProjectsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6510,7 +6925,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProfileResponse']
+          'application/json': components['schemas']['V1ProfileResponse_Output']
         }
       }
     }
@@ -6529,7 +6944,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectWithDatabaseResponse'][]
+          'application/json': components['schemas']['V1ProjectWithDatabaseResponse_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -6573,7 +6988,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectResponse']
+          'application/json': components['schemas']['V1ProjectResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6616,7 +7031,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectWithDatabaseResponse']
+          'application/json': components['schemas']['V1ProjectWithDatabaseResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6666,7 +7081,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectRefResponse']
+          'application/json': components['schemas']['V1ProjectRefResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6713,7 +7128,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectRefResponse']
+          'application/json': components['schemas']['V1ProjectRefResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6766,7 +7181,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListActionRunResponse']
+          'application/json': components['schemas']['ListActionRunResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6868,7 +7283,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ActionRunResponse']
+          'application/json': components['schemas']['ActionRunResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -6976,7 +7391,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateRunStatusResponse']
+          'application/json': components['schemas']['UpdateRunStatusResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7026,7 +7441,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectAdvisorsResponse']
+          'application/json': components['schemas']['V1ProjectAdvisorsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7071,7 +7486,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectAdvisorsResponse']
+          'application/json': components['schemas']['V1ProjectAdvisorsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7117,7 +7532,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['AnalyticsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7172,7 +7587,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['AnalyticsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7227,7 +7642,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AnalyticsResponse']
+          'application/json': components['schemas']['AnalyticsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7338,7 +7753,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1GetUsageApiCountResponse']
+          'application/json': components['schemas']['V1GetUsageApiCountResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7388,7 +7803,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1GetUsageApiRequestsCountResponse']
+          'application/json': components['schemas']['V1GetUsageApiRequestsCountResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7445,7 +7860,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiKeyResponse'][]
+          'application/json': components['schemas']['ApiKeyResponse_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -7499,7 +7914,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiKeyResponse']
+          'application/json': components['schemas']['ApiKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7550,7 +7965,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiKeyResponse']
+          'application/json': components['schemas']['ApiKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7600,7 +8015,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiKeyResponse']
+          'application/json': components['schemas']['ApiKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7655,7 +8070,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ApiKeyResponse']
+          'application/json': components['schemas']['ApiKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7698,7 +8113,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['LegacyApiKeysResponse']
+          'application/json': components['schemas']['LegacyApiKeysResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7748,7 +8163,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['LegacyApiKeysResponse']
+          'application/json': components['schemas']['LegacyApiKeysResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7791,7 +8206,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListProjectAddonsResponse']
+          'application/json': components['schemas']['ListProjectAddonsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7965,8 +8380,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchResponse'][]
+          'application/json': components['schemas']['BranchResponse_Output'][]
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve database branches */
       500: {
@@ -7998,8 +8434,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchResponse']
+          'application/json': components['schemas']['BranchResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to create database branch */
       500: {
@@ -8076,8 +8533,29 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BranchResponse']
+          'application/json': components['schemas']['BranchResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to fetch database branch */
       500: {
@@ -8105,7 +8583,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectClaimTokenResponse']
+          'application/json': components['schemas']['ProjectClaimTokenResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8148,7 +8626,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateProjectClaimTokenResponse']
+          'application/json': components['schemas']['CreateProjectClaimTokenResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8236,7 +8714,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateRoleResponse']
+          'application/json': components['schemas']['CreateRoleResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8286,7 +8764,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DeleteRolesResponse']
+          'application/json': components['schemas']['DeleteRolesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8336,7 +8814,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AuthConfigResponse']
+          'application/json': components['schemas']['AuthConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8390,7 +8868,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AuthConfigResponse']
+          'application/json': components['schemas']['AuthConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8440,7 +8918,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SigningKeysResponse']
+          'application/json': components['schemas']['SigningKeysResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8487,7 +8965,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SigningKeyResponse']
+          'application/json': components['schemas']['SigningKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8531,7 +9009,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SigningKeyResponse']
+          'application/json': components['schemas']['SigningKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8575,7 +9053,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SigningKeyResponse']
+          'application/json': components['schemas']['SigningKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8623,7 +9101,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SigningKeyResponse']
+          'application/json': components['schemas']['SigningKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8666,7 +9144,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SigningKeyResponse']
+          'application/json': components['schemas']['SigningKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8709,7 +9187,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SigningKeyResponse']
+          'application/json': components['schemas']['SigningKeyResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8752,7 +9230,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListProvidersResponse']
+          'application/json': components['schemas']['ListProvidersResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8806,7 +9284,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateProviderResponse']
+          'application/json': components['schemas']['CreateProviderResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8857,7 +9335,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetProviderResponse']
+          'application/json': components['schemas']['GetProviderResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8912,7 +9390,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateProviderResponse']
+          'application/json': components['schemas']['UpdateProviderResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -8963,7 +9441,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DeleteProviderResponse']
+          'application/json': components['schemas']['DeleteProviderResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9013,7 +9491,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ThirdPartyAuth'][]
+          'application/json': components['schemas']['ThirdPartyAuth_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -9060,7 +9538,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ThirdPartyAuth']
+          'application/json': components['schemas']['ThirdPartyAuth_Output']
         }
       }
       /** @description Unauthorized */
@@ -9104,7 +9582,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ThirdPartyAuth']
+          'application/json': components['schemas']['ThirdPartyAuth_Output']
         }
       }
       /** @description Unauthorized */
@@ -9148,7 +9626,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ThirdPartyAuth']
+          'application/json': components['schemas']['ThirdPartyAuth_Output']
         }
       }
       /** @description Unauthorized */
@@ -9191,7 +9669,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1PgbouncerConfigResponse']
+          'application/json': components['schemas']['V1PgbouncerConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9241,7 +9719,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SupavisorConfigResponse'][]
+          'application/json': components['schemas']['SupavisorConfigResponse_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -9295,7 +9773,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateSupavisorConfigResponse']
+          'application/json': components['schemas']['UpdateSupavisorConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9345,7 +9823,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
+          'application/json': components['schemas']['PostgresConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9399,7 +9877,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
+          'application/json': components['schemas']['PostgresConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9449,7 +9927,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DiskResponse']
+          'application/json': components['schemas']['DiskResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9551,7 +10029,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DiskAutoscaleConfig']
+          'application/json': components['schemas']['DiskAutoscaleConfig_Output']
         }
       }
       /** @description Unauthorized */
@@ -9601,7 +10079,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DiskUtilMetricsResponse']
+          'application/json': components['schemas']['DiskUtilMetricsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9652,7 +10130,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RealtimeConfigResponse']
+          'application/json': components['schemas']['RealtimeConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9789,7 +10267,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['StorageConfigResponse']
+          'application/json': components['schemas']['StorageConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9891,7 +10369,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateCustomHostnameResponse']
+          'application/json': components['schemas']['UpdateCustomHostnameResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -9992,7 +10470,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateCustomHostnameResponse']
+          'application/json': components['schemas']['UpdateCustomHostnameResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10046,7 +10524,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateCustomHostnameResponse']
+          'application/json': components['schemas']['UpdateCustomHostnameResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10096,7 +10574,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateCustomHostnameResponse']
+          'application/json': components['schemas']['UpdateCustomHostnameResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10146,7 +10624,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1BackupsResponse']
+          'application/json': components['schemas']['V1BackupsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10385,7 +10863,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1BackupScheduleResponse']
+          'application/json': components['schemas']['V1BackupScheduleResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10455,7 +10933,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1BackupScheduleResponse']
+          'application/json': components['schemas']['V1BackupScheduleResponse_Output']
         }
       }
       /** @description Invalid schedule_for format */
@@ -10573,7 +11051,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetProjectDbMetadataResponse']
+          'application/json': components['schemas']['GetProjectDbMetadataResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10616,7 +11094,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitAccessResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10670,7 +11148,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitAccessResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10724,7 +11202,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAuthorizeAccessResponse']
+          'application/json': components['schemas']['JitAuthorizeAccessResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10827,7 +11305,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['InviteExternalUserJitResponse']
+          'application/json': components['schemas']['InviteExternalUserJitResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -10930,7 +11408,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitAccessResponse_Output']
         }
       }
       /** @description Failed to accept invitation */
@@ -10959,7 +11437,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitListAccessResponse']
+          'application/json': components['schemas']['JitListAccessResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -11009,7 +11487,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ListMigrationsResponse']
+          'application/json': components['schemas']['V1ListMigrationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -11221,7 +11699,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1GetMigrationResponse']
+          'application/json': components['schemas']['V1GetMigrationResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -11381,7 +11859,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1UpdatePasswordResponse']
+          'application/json': components['schemas']['V1UpdatePasswordResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -11583,7 +12061,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['FunctionResponse'][]
+          'application/json': components['schemas']['FunctionResponse_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -11637,7 +12115,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BulkUpdateFunctionResponse']
+          'application/json': components['schemas']['BulkUpdateFunctionResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -11707,7 +12185,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['FunctionResponse']
+          'application/json': components['schemas']['FunctionResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -11766,7 +12244,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['FunctionSlugResponse']
+          'application/json': components['schemas']['FunctionSlugResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -11881,7 +12359,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['FunctionResponse']
+          'application/json': components['schemas']['FunctionSlugResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -11990,7 +12468,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DeployFunctionResponse']
+          'application/json': components['schemas']['DeployFunctionResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -12062,7 +12540,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ServiceHealthResponse'][]
+          'application/json': components['schemas']['V1ServiceHealthResponse_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -12123,6 +12601,7 @@ export interface operations {
                 state: 'unavailable'
                 /** @enum {string} */
                 unavailableReason:
+                  | 'platform_unsupported'
                   | 'postgres_upgrade_required'
                   | 'ssl_enforcement_required'
                   | 'temporarily_unavailable'
@@ -12191,6 +12670,7 @@ export interface operations {
                 state: 'unavailable'
                 /** @enum {string} */
                 unavailableReason:
+                  | 'platform_unsupported'
                   | 'postgres_upgrade_required'
                   | 'ssl_enforcement_required'
                   | 'temporarily_unavailable'
@@ -12296,7 +12776,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NetworkBanResponse']
+          'application/json': components['schemas']['NetworkBanResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -12346,7 +12826,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NetworkBanResponseEnriched']
+          'application/json': components['schemas']['NetworkBanResponseEnriched_Output']
         }
       }
       /** @description Unauthorized */
@@ -12396,7 +12876,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NetworkRestrictionsResponse']
+          'application/json': components['schemas']['NetworkRestrictionsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -12450,7 +12930,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NetworkRestrictionsV2Response']
+          'application/json': components['schemas']['NetworkRestrictionsV2Response_Output']
         }
       }
       /** @description Unauthorized */
@@ -12504,7 +12984,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NetworkRestrictionsResponse']
+          'application/json': components['schemas']['NetworkRestrictionsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -12595,7 +13075,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PgsodiumConfigResponse']
+          'application/json': components['schemas']['PgsodiumConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -12649,7 +13129,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PgsodiumConfigResponse']
+          'application/json': components['schemas']['PgsodiumConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -12699,7 +13179,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PostgrestConfigWithJWTSecretResponse']
+          'application/json': components['schemas']['PostgrestConfigWithJWTSecretResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -12753,7 +13233,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1PostgrestConfigResponse']
+          'application/json': components['schemas']['V1PostgrestConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -12916,7 +13396,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReadOnlyStatusResponse']
+          'application/json': components['schemas']['ReadOnlyStatusResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -13055,7 +13535,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetProjectAvailableRestoreVersionsResponse']
+          'application/json': components['schemas']['GetProjectAvailableRestoreVersionsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -13180,7 +13660,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SecretResponse'][]
+          'application/json': components['schemas']['SecretResponse_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -13334,7 +13814,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SslEnforcementResponse']
+          'application/json': components['schemas']['SslEnforcementResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -13388,7 +13868,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SslEnforcementResponse']
+          'application/json': components['schemas']['SslEnforcementResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -13438,7 +13918,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1StorageBucketResponse'][]
+          'application/json': components['schemas']['V1StorageBucketResponse_Output'][]
         }
       }
       /** @description Unauthorized */
@@ -13490,7 +13970,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['TypescriptResponse']
+          'application/json': components['schemas']['TypescriptResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -13544,7 +14024,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectUpgradeInitiateResponse']
+          'application/json': components['schemas']['ProjectUpgradeInitiateResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -13594,7 +14074,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectUpgradeEligibilityResponse']
+          'application/json': components['schemas']['ProjectUpgradeEligibilityResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -13646,7 +14126,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DatabaseUpgradeStatusResponse']
+          'application/json': components['schemas']['DatabaseUpgradeStatusResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -13696,7 +14176,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['VanitySubdomainConfigResponse']
+          'application/json': components['schemas']['VanitySubdomainConfigResponse_Output']
         }
       }
       /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
@@ -13807,7 +14287,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ActivateVanitySubdomainResponse']
+          'application/json': components['schemas']['ActivateVanitySubdomainResponse_Output']
         }
       }
       /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
@@ -13870,7 +14350,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SubdomainAvailabilityResponse']
+          'application/json': components['schemas']['SubdomainAvailabilityResponse_Output']
         }
       }
       /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
@@ -13952,7 +14432,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RegionsInfo']
+          'application/json': components['schemas']['RegionsInfo_Output']
         }
       }
     }
@@ -13978,7 +14458,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SnippetList']
+          'application/json': components['schemas']['SnippetList_Output']
         }
       }
       /** @description Unauthorized */
@@ -14027,7 +14507,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SnippetResponse']
+          'application/json': components['schemas']['SnippetResponse_Output']
         }
       }
       /** @description Unauthorized */

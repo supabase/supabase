@@ -237,10 +237,10 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
           </Form>
         </SheetSection>
         <SheetFooter>
-          <Button disabled={isCreating} variant="default" onClick={() => onOpenChange(false)}>
+          <Button disabled={isCreating} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button form={formId} type="submit" loading={isCreating}>
+          <Button variant="primary" form={formId} type="submit" loading={isCreating}>
             Create rule
           </Button>
         </SheetFooter>

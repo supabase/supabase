@@ -58,6 +58,7 @@ export function McpConfigurationOptions({
           <MultiSelectorTrigger
             className="w-full"
             label="Select features"
+            aria-label="Select features"
             badgeLimit="wrap"
             showIcon={true}
           />

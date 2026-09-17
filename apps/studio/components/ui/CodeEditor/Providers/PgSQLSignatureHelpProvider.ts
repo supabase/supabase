@@ -1,14 +1,20 @@
-import { RefObject } from 'react'
+import type { Monaco } from '@monaco-editor/react'
+import type { editor, Position } from 'monaco-editor'
+import type { RefObject } from 'react'
 
 import BackwardIterator from './BackwardIterator'
-import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import type { PgInfo } from './Providers.types'
 
-// [Joshen] Needs to be fixed
-
-export default function getPgsqlSignatureHelpProvider(_monaco: any, pgInfoRef: RefObject<any>) {
+export function getPgsqlSignatureHelpProvider(
+  _monaco: Monaco,
+  pgInfoRef: RefObject<PgInfo | null>
+) {
   return {
     signatureHelpTriggerCharacters: ['(', ','],
-    provideSignatureHelp: function (model: any, position: any) {
+    provideSignatureHelp: function (model: editor.ITextModel, position: Position) {
+      const pgInfo = pgInfoRef.current
+      if (!pgInfo) return null
+
       // position.column should minus 2 as it returns 2 for first char
       // position.lineNumber should minus 1
       const iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
@@ -19,7 +25,7 @@ export default function getPgsqlSignatureHelpProvider(_monaco: any, pgInfoRef: R
       let ident = iterator.readIdent()
       if (!ident || ident.match(/^\".*?\"$/)) return null
 
-      let fn = (pgInfoRef.current.functions as DatabaseFunction[]).find(
+      let fn = pgInfo.functions.find(
         (f) => f.name.toLocaleLowerCase() === ident.toLocaleLowerCase()
       )
       if (!fn) return null

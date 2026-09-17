@@ -22,10 +22,17 @@ describe('getIntervalGranularity', () => {
     expect(dayjs(to).diff(from, 'hour')).toBe(expectedBuckets)
   })
 
+  test('a 3-hour range uses two-minute intervals with minute-level SQL bucketing', () => {
+    const { from, to } = rangeOf(3, 'hour')
+    const interval = getIntervalGranularity(from, to)
+
+    expect(interval).toBe('2m')
+    expect(analyticsIntervalToGranularity(interval)).toBe('minute')
+  })
+
   test.each([
     [10, 'minute' as dayjs.ManipulateType, '1m'],
     [1, 'hour' as dayjs.ManipulateType, '1m'],
-    [3, 'hour' as dayjs.ManipulateType, '2m'],
     [14, 'day' as dayjs.ManipulateType, '1d'],
     [28, 'day' as dayjs.ManipulateType, '1d'],
   ])('leaves a %s-%s range on the %s interval', (value, unit, expected) => {

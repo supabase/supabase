@@ -180,11 +180,7 @@ export const ResetDbPasswordDialog = ({
           </FormItemLayout>
         </DialogSection>
         <DialogFooter>
-          <Button
-            variant="default"
-            disabled={isUpdatingPassword}
-            onClick={() => setShowResetDbPass(false)}
-          >
+          <Button disabled={isUpdatingPassword} onClick={() => setShowResetDbPass(false)}>
             Cancel
           </Button>
           <Button

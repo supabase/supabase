@@ -14,11 +14,11 @@ catalog:
   '@monaco-editor/react': 4.8.0-rc.3
   '@sentry/nextjs': ^10.59.0
   '@sentry/tanstackstart-react': ^10.59.0
-  '@supabase/auth-js': 2.112.4
-  '@supabase/postgrest-js': 2.112.4
-  '@supabase/realtime-js': 2.112.4
+  '@supabase/auth-js': 2.116.0
+  '@supabase/postgrest-js': 2.116.0
+  '@supabase/realtime-js': 2.116.0
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.112.4
+  '@supabase/supabase-js': 2.116.0
   '@tanstack/react-router': ^1.169.2
   '@tanstack/react-start': ^1.167.65
   '@tanstack/react-table': ^8.21.3
@@ -32,12 +32,12 @@ catalog:
   # https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
   '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
-  '@vitest/coverage-v8': ^4.1.4
-  '@vitest/ui': ^4.1.4
+  '@vitest/coverage-v8': ^5.0.0
+  '@vitest/ui': ^5.0.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   monaco-editor: 0.52.2
-  next: ^16.2.11
+  next: ^16.3.5
   next-themes: ^0.4.6
   postcss: ^8.5.18
   radix-ui: ^1.4.3
@@ -49,8 +49,8 @@ catalog:
   typescript: ~6.0.2
   valtio: ^2.3.2
   vite: ^8.0.16
-  vite-tsconfig-paths: ^6.1.1
-  vitest: ^4.1.4
+  velite: ^0.4.0
+  vitest: ^5.0.0
   zod: 3.25.76
 
 allowBuilds:
@@ -92,6 +92,16 @@ minimumReleaseAgeExclude:
   - react-use
   - '@astrojs/markdown-satteri@0.3.8'
   - astro@7.2.6
+  - next@16.3.5
+  - '@next/env@16.3.5'
+  - '@next/swc-darwin-arm64@16.3.5'
+  - '@next/swc-darwin-x64@16.3.5'
+  - '@next/swc-linux-arm64-gnu@16.3.5'
+  - '@next/swc-linux-arm64-musl@16.3.5'
+  - '@next/swc-linux-x64-gnu@16.3.5'
+  - '@next/swc-linux-x64-musl@16.3.5'
+  - '@next/swc-win32-arm64-msvc@16.3.5'
+  - '@next/swc-win32-x64-msvc@16.3.5'
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3

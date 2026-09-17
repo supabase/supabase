@@ -59,7 +59,7 @@ const levelsData = {
   },
   telemetry: {
     icon: 'telemetry',
-    name: 'Telemetry',
+    name: 'Observability',
   },
   realtime: {
     icon: 'realtime',
@@ -109,6 +109,10 @@ const levelsData = {
     icon: 'reference-javascript',
     name: 'Server Reference v1.0',
   },
+  reference_middleware_v1: {
+    icon: 'reference-javascript',
+    name: 'Middleware Reference v1.0',
+  },
   reference_javascript_v1: {
     icon: 'reference-javascript',
     name: 'JavaScript Reference v1.0',
@@ -132,6 +136,10 @@ const levelsData = {
   reference_csharp_v1: {
     icon: 'reference-csharp',
     name: 'C# Reference v1.0',
+  },
+  reference_csharp_v8: {
+    icon: 'reference-csharp',
+    name: 'C# Reference v8.0',
   },
   reference_python_v2: {
     icon: 'reference-python',
@@ -210,6 +218,8 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
           mobileMenuOpen && 'mt-0.5'
         )}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
+        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={mobileMenuOpen}
       >
         <div
           className={cn(

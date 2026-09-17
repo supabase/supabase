@@ -77,11 +77,11 @@ export const ExplorerNavHome = ({
       </nav>
 
       <section className="flex flex-col gap-px">
-        <h3 className="mb-2 px-3 font-mono text-sm font-normal uppercase text-foreground-lighter">
+        <h3 className="mb-2 px-2 font-mono text-sm font-normal uppercase text-foreground-lighter">
           Recently updated
         </h3>
         {recentItems.length === 0 ? (
-          <p className="px-3 text-xs text-foreground-lighter">Nothing edited yet</p>
+          <p className="px-2 text-xs text-foreground-lighter">Nothing edited yet</p>
         ) : (
           recentItems.map((item) => {
             const Icon = EXPLORER_SECTIONS.find((section) => section.type === item.type)?.icon

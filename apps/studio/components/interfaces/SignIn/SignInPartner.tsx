@@ -3,10 +3,16 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { InlineLink } from '@/components/ui/InlineLink'
+import { getIdentityProviderConfig } from '@/lib/external-identity-providers'
 import { auth } from '@/lib/gotrue'
+import { classifyApiError } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 export const SignInPartner = () => {
   const router = useRouter()
+  const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
 
   useEffect(() => {
     ;(async () => {
@@ -18,10 +24,21 @@ export const SignInPartner = () => {
       const { data } = await auth.getSession()
 
       if (!data.session && partner && token) {
+        // partner comes from the URL hash unauthenticated; only registry-known values may
+        // enter the method vocabulary, anything else would let a crafted link poison it
+        const knownPartner = getIdentityProviderConfig(partner)
+        const method = knownPartner?.id ?? 'unregistered_partner'
+        track('sign_in_submitted', {
+          category: 'account',
+          method,
+        })
         try {
-          await auth.signInWithIdToken({ provider: partner, token })
+          const { error } = await auth.signInWithIdToken({ provider: partner, token })
+          if (error) {
+            trackFunnelError('signin', classifyApiError('signin', error), 'form')
+          }
         } finally {
-          router.replace({ pathname: '/sign-in-mfa', query: { method: partner } })
+          router.replace({ pathname: '/sign-in-mfa', query: { method } })
         }
       } else {
         router.replace({ pathname: '/sign-in' })
