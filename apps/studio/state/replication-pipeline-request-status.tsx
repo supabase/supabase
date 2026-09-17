@@ -48,14 +48,18 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
         ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId }),
         staleTime: 0,
       }
-      // Mutations may finish while a status read from before their response is still in flight.
-      // Let that read finish, then fetch once more so the handoff uses a post-operation read.
-      // Keep metrics polling independently; never cancel or overlap status requests.
-      if (queryClient.getQueryState(options.queryKey)?.fetchStatus === 'fetching') {
-        await queryClient.fetchQuery(options).catch(() => {})
-      }
-      // Query consumers display refresh failures. Preserve the mutation's result or error.
+      // A status fetch that was already in flight started before this mutation resolved, so it
+      // may resolve with pre-mutation data. `fetchQuery` dedupes against it instead of starting
+      // a new request, so first wait for it to drain.
+      const hasFetchInFlight =
+        queryClient.getQueryState(options.queryKey)?.fetchStatus === 'fetching'
+      if (hasFetchInFlight) await queryClient.fetchQuery(options).catch(() => {})
+
+      // Nothing is in flight now, so this always starts a fresh request reflecting the
+      // post-mutation state. Errors are swallowed: query consumers already display fetch
+      // failures, and we don't want that to override the mutation's own result/error.
       await queryClient.fetchQuery(options).catch(() => {})
+
       setRequests((previous) => {
         if (previous[pipelineId]?.id !== id) return previous
         const { [pipelineId]: _removed, ...rest } = previous

@@ -23,7 +23,7 @@ interface PipelineStatePillProps {
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
-  requestStatus?: PipelineStatusRequestStatus
+  requestStatus: PipelineStatusRequestStatus
   projectRef?: string
   pipelineId?: number
 }
@@ -42,8 +42,7 @@ export const PipelineStatePill = ({
 }: PipelineStatePillProps) => {
   const statusName = getStatusName(pipelineStatus)
   const { type, message, label } = getPipelineDisplayState(requestStatus, statusName)
-  const isRequestPending =
-    requestStatus !== undefined && requestStatus !== PipelineStatusRequestStatus.None
+  const isRequestPending = requestStatus !== PipelineStatusRequestStatus.None
   const shouldShowError = isError && !isRequestPending
 
   const shouldShowLogsHint =

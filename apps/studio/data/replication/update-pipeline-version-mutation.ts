@@ -9,6 +9,7 @@ type UpdatePipelineVersionParams = {
   projectRef: string
   pipelineId: number
   versionId: number
+  skipStatusInvalidation?: boolean
 }
 
 async function updatePipelineVersion(
@@ -47,15 +48,19 @@ export const useUpdatePipelineVersionMutation = ({
   return useMutation<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>({
     mutationFn: (vars) => updatePipelineVersion(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, pipelineId } = variables
+      const { projectRef, pipelineId, skipStatusInvalidation = true } = variables
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
         }),
-        queryClient.invalidateQueries(
-          { queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId) },
-          { cancelRefetch: false }
-        ),
+        ...(skipStatusInvalidation
+          ? []
+          : [
+              queryClient.invalidateQueries(
+                { queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId) },
+                { cancelRefetch: false }
+              ),
+            ]),
       ])
       await onSuccess?.(data, variables, context)
     },

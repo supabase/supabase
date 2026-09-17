@@ -12,8 +12,8 @@ export const replicationPollingOptions = {
     if (state.fetchStatus === 'fetching') return false
     const retryAfter = state.error?.retryAfter
     if (retryAfter && retryAfter > 0) return Math.max(1_000, retryAfter * 1_000)
-    if (state.error?.code === 429) return 30_000
-    return 1_000
+    if (state.error?.code && state.error.code >= 500) return 30_000
+    return 5_000
   },
   refetchIntervalInBackground: false,
   retry: false,
