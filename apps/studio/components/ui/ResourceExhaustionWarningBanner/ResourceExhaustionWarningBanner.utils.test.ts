@@ -108,7 +108,7 @@ describe('getResourceWarningLabels', () => {
 describe('getResourceWarningMetricsHref', () => {
   it('links a warning to its chart over the last 3 hours', () => {
     expect(getResourceWarningMetricsHref('cpu_exhaustion', 'abc')).toBe(
-      '/project/abc/observability/database?chart=cpu-usage&isHelper=true&helperText=Last+3+hours'
+      '/project/abc/observability/database?chart=cpu-usage&isHelper=true&helperText=Last+3+hours#cpu-usage'
     )
   })
 

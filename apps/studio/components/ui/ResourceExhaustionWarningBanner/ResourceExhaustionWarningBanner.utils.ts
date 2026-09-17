@@ -118,7 +118,7 @@ export const getResourceWarningMetricsHref = (
     isHelper: 'true',
     helperText: REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
   })
-  return `/project/${projectRef}/observability/database?${params}`
+  return `/project/${projectRef}/observability/database?${params}#${chartId}`
 }
 
 export const getResourceWarningAiPrompt = (activeWarnings: string[]): string | undefined => {
