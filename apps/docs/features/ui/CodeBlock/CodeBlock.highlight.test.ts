@@ -173,6 +173,51 @@ describe('selective code block highlighting', () => {
     expect(create).toHaveBeenCalledTimes(1)
   })
 
+  it('loads a grammar once when concurrent callers request the same cold language', async () => {
+    const { highlightCode } = await import('./CodeBlock.highlight')
+    // Warm the highlighter on an unrelated language so we can spy before the
+    // language under test is requested.
+    await highlightCode('echo hello', 'bash')
+    const highlighter = await create.mock.results[0].value
+    const loadLanguage = vi.spyOn(highlighter, 'loadLanguage')
+
+    const fixture = { name: 'Swift', lang: 'swift' as BundledLanguage, code: 'let count = 42' }
+    const results = await Promise.all(
+      Array.from({ length: 8 }, () => highlightCode(fixture.code, fixture.lang))
+    )
+
+    // Shiki calls `loadLanguage()` with no arguments internally, so only count
+    // the loads we drive.
+    expect(loadLanguage.mock.calls.filter((args) => args.length)).toHaveLength(1)
+    expect(highlighter.getLoadedLanguages()).toContain('swift')
+    for (const { tokens } of results) {
+      expect(tokens).toEqual(expected(fixture))
+    }
+  })
+
+  it('loads each cold language once when concurrent callers request different ones', async () => {
+    const { highlightCode } = await import('./CodeBlock.highlight')
+    await highlightCode('echo hello', 'bash')
+    const highlighter = await create.mock.results[0].value
+    const loadLanguage = vi.spyOn(highlighter, 'loadLanguage')
+
+    const selected = [
+      { name: 'Swift', lang: 'swift' as BundledLanguage, code: 'let count = 42' },
+      { name: 'Kotlin', lang: 'kotlin' as BundledLanguage, code: 'val count = 42' },
+    ]
+    const results = await Promise.all(
+      selected.flatMap((fixture) =>
+        Array.from({ length: 4 }, () => highlightCode(fixture.code, fixture.lang))
+      )
+    )
+
+    expect(loadLanguage.mock.calls.filter((args) => args.length)).toHaveLength(selected.length)
+    expect(highlighter.getLoadedLanguages()).toEqual(expect.arrayContaining(['swift', 'kotlin']))
+    expect(results.map(({ tokens }) => tokens)).toEqual(
+      selected.flatMap((fixture) => Array.from({ length: 4 }, () => expected(fixture)))
+    )
+  })
+
   it.each(fixtures)(
     'matches eager token colors, font flags, and offsets for $name',
     async (fixture) => {
