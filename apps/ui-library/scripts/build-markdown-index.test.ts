@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'vitest'
 
 import { libraryBlocks, libraryCategories } from '../config/library'
-import { buildIndexMarkdown } from './build-index-md'
+import { buildIndexMarkdown } from './build-markdown-index'
 
 describe('index markdown', () => {
   const markdown = buildIndexMarkdown(new Date('2025-01-01T00:00:00.000Z'))
