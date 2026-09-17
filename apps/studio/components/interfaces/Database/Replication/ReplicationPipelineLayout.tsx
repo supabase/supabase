@@ -12,7 +12,7 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
-import { PropsWithChildren, useEffect, useState, type ReactNode } from 'react'
+import { PropsWithChildren, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   BreadcrumbItem,
@@ -44,11 +44,12 @@ import { DestinationLogo } from './DestinationLogo'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import {
   getPipelineDisplayState,
+  getRestartRequestStatus,
   getStatusName,
   PIPELINE_ACTIONABLE_STATES,
 } from './Pipeline.utils'
 import { PipelineStatePill } from './PipelineStatePill'
-import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -88,10 +89,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { getRequestStatus, getIsTableResetting, setRequestStatus, updatePipelineStatus } =
-    usePipelineRequestStatus()
+  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
-  const isTableResetting = getIsTableResetting(pipelineId)
+  const isPipelineRequestPending = isRequestPending(pipelineId)
 
   const {
     data: pipeline,
@@ -107,10 +107,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     isLoading: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
-  } = useReplicationPipelineStatusQuery(
-    { projectRef, pipelineId },
-    { enabled: !!pipelineId, refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  } = useReplicationPipelineStatusQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
   const { data: versionData } = useReplicationPipelineVersionQuery({
     projectRef,
     pipelineId: pipeline?.id,
@@ -163,8 +160,8 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
   const canUseMenuActions =
     isRunningOrFailed && !isTransitioning && !isPipelineStatusError && !!pipeline
-  const canRestart = canUseMenuActions && !isTableResetting && primaryAction !== 'restart'
-  const canStop = canUseMenuActions && !isTableResetting && primaryAction !== 'stop'
+  const canRestart = canUseMenuActions && !isPipelineRequestPending && primaryAction !== 'restart'
+  const canStop = canUseMenuActions && !isPipelineRequestPending && primaryAction !== 'stop'
 
   const onLifecycleAction = async (action?: LifecycleAction) => {
     const resolvedAction = action ?? primaryAction
@@ -172,17 +169,23 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
     try {
       if (resolvedAction === 'start') {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
-        await startPipeline({ projectRef, pipelineId: pipeline.id })
+        await runWithRequestStatus(
+          pipeline.id,
+          PipelineStatusRequestStatus.StartRequested,
+          () => startPipeline({ projectRef, pipelineId: pipeline.id })
+        )
       } else if (resolvedAction === 'stop') {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
-        await stopPipeline({ projectRef, pipelineId: pipeline.id })
+        await runWithRequestStatus(
+          pipeline.id,
+          PipelineStatusRequestStatus.StopRequested,
+          () => stopPipeline({ projectRef, pipelineId: pipeline.id })
+        )
       } else {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-        await restartPipeline({ projectRef, pipelineId: pipeline.id })
+        await runWithRequestStatus(pipeline.id, getRestartRequestStatus(statusName), () =>
+          restartPipeline({ projectRef, pipelineId: pipeline.id })
+        )
       }
     } catch (error) {
-      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(`Failed to ${resolvedAction} pipeline: ${(error as ResponseError).message}`)
     }
   }
@@ -209,10 +212,6 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       setIsDeleting(false)
     }
   }
-
-  useEffect(() => {
-    updatePipelineStatus(pipelineId, statusName)
-  }, [pipelineId, statusName, updatePipelineStatus])
 
   const logsUrl = `/project/${projectRef}/logs/replication-logs?f=${encodeURIComponent(
     JSON.stringify({ pipeline_id: pipelineId })
@@ -312,7 +311,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     variant="primary"
                     icon={<ArrowUpCircle />}
                     onClick={() => setShowUpdateVersionModal(true)}
-                    disabled={isTableResetting}
+                    disabled={isPipelineRequestPending || isTransitioning}
                   >
                     Update available
                   </Button>
@@ -335,7 +334,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     isPipelineStatusError ||
                     !pipeline ||
                     isTransitioning ||
-                    isTableResetting ||
+                    isPipelineRequestPending ||
                     !isActionable
                   }
                 >
@@ -348,7 +347,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       className="px-1.25 hit-area-2"
                       aria-label="Pipeline options"
                       icon={<MoreVertical />}
-                      disabled={isTableResetting}
+                      disabled={isPipelineRequestPending || isTransitioning}
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-52">
@@ -413,11 +412,6 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
         visible={showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
-        confirmLabel={
-          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-            ? 'Update and restart'
-            : 'Update version'
-        }
       />
     </div>
   )
