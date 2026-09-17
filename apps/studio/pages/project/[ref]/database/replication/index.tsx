@@ -17,7 +17,7 @@ import { Destinations } from '@/components/interfaces/Database/Replication/Desti
 import { PIPELINES_FEEDBACK_URL } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
-import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { ReplicationLayout } from '@/components/layouts/DatabaseLayout/ReplicationLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -100,7 +100,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
+    <ReplicationLayout>{page}</ReplicationLayout>
   </DefaultLayout>
 )
 
