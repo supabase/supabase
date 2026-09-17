@@ -39,6 +39,8 @@ type LinkedTroubleshootItem = Extract<TroubleshootItem, { kind: 'metrics' | 'doc
 
 const MULTIPLE_RESOURCE_WARNING_NO_AI_DESCRIPTION =
   'Use the Troubleshoot menu to review the affected resources and resolve these warnings.'
+const MULTIPLE_RESOURCE_MIXED_SEVERITY_TITLE =
+  "Resource warnings for {resources} are affecting your project's performance"
 
 const TroubleshootMenuItem = ({
   item,
@@ -124,6 +126,13 @@ export const ResourceExhaustionWarningBanner = () => {
           (x) => projectResourceWarnings[x as keyof typeof projectResourceWarnings] === 'critical'
         )
       : false
+  const hasWarningSeverity =
+    projectResourceWarnings !== undefined
+      ? activeWarnings.some(
+          (x) => projectResourceWarnings[x as keyof typeof projectResourceWarnings] === 'warning'
+        )
+      : false
+  const hasMixedWarningSeverities = hasCriticalWarning && hasWarningSeverity
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
 
   const warningContent =
@@ -137,14 +146,15 @@ export const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
+  const multipleWarningTitle = hasMixedWarningSeverities
+    ? MULTIPLE_RESOURCE_MIXED_SEVERITY_TITLE
+    : RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
+        hasCriticalWarning ? 'critical' : 'warning'
+      ].title
 
   const title = applyDiskIoBaseline(
     applyResourceList(
-      activeWarnings.length > 1
-        ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
-            hasCriticalWarning ? 'critical' : 'warning'
-          ].title
-        : warningContent?.title,
+      activeWarnings.length > 1 ? multipleWarningTitle : warningContent?.title,
       activeWarnings
     )
   )

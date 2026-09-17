@@ -165,6 +165,17 @@ describe('ResourceExhaustionWarningBanner', () => {
     })
   })
 
+  test('mixed-severity multi-resource banner does not describe every resource as exhausted', async () => {
+    renderBanner({ cpu_exhaustion: 'critical', disk_space_exhaustion: 'warning' })
+
+    expect(
+      await screen.findByText(
+        "Resource warnings for CPU and Disk space are affecting your project's performance"
+      )
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/has exhausted CPU and Disk space/)).not.toBeInTheDocument()
+  })
+
   test('single-resource banner keeps its title and adds View metrics', async () => {
     renderBanner({ cpu_exhaustion: 'warning' })
 
