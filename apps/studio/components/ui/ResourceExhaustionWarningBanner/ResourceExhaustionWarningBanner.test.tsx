@@ -98,7 +98,7 @@ const NO_WARNINGS: ProjectResourceWarningsResponse = {
 }
 
 const metricsHref = (chartId: string) =>
-  `/project/${PROJECT_REF}/observability/database?chart=${chartId}&isHelper=true&helperText=Last+3+hours#${chartId}`
+  `/project/${PROJECT_REF}/observability/database?chart=${chartId}&db=${PROJECT_REF}&isHelper=true&helperText=Last+3+hours#${chartId}`
 
 const renderBanner = (warnings: Partial<ProjectResourceWarningsResponse>) => {
   addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
