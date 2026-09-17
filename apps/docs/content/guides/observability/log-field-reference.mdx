@@ -75,7 +75,9 @@ Response headers:
   {(logConstants) =>
     logConstants.schemas.map((schema) => (
       <div key={schema.reference} className="mt-12 first:mt-0">
-        <h3 className="scroll-mt-24">{schema.name}</h3>
+        <h3 id={schema.reference} className="scroll-mt-24">
+          {schema.name}
+        </h3>
         <p className="text-sm text-foreground-lighter">
           Source: <code>{schema.reference}</code>
         </p>
@@ -98,8 +100,8 @@ Response headers:
                     <p className="text-sm text-foreground-lighter m-0">{field.description}</p>
                   )}
                   {!isTopLevel && (
-                    <p className="text-xs text-foreground-muted font-mono m-0 break-all">
-                      select log_attributes['{shortName}'] from logs
+                    <p className="text-[10px] text-foreground-muted font-mono m-0 break-all">
+                      select {field.queryField} from logs
                     </p>
                   )}
                   {field.example && (
