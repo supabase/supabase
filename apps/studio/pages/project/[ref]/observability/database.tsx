@@ -69,8 +69,6 @@ export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
 
 const REPORT_TITLE = 'Database'
-const CHART_TARGET_POLL_INTERVAL = 200
-const CHART_TARGET_POLL_ATTEMPTS = 25
 const CHART_LAYOUT_OBSERVATION_DURATION = 10_000
 const CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS = [
   'keydown',
@@ -92,14 +90,13 @@ export const useDatabaseChartDeepLink = (chart?: string) => {
   useEffect(() => {
     if (chart === undefined) return
 
-    let attempts = 0
-    let pollForChart: number | undefined
+    let chartTargetObserver: MutationObserver | undefined
     let resizeObserver: ResizeObserver | undefined
     let stopObservingTimer: number | undefined
 
     const stopDeepLink = () => {
-      if (pollForChart !== undefined) window.clearInterval(pollForChart)
       if (stopObservingTimer !== undefined) window.clearTimeout(stopObservingTimer)
+      chartTargetObserver?.disconnect()
       resizeObserver?.disconnect()
       CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS.forEach((eventName) =>
         window.removeEventListener(eventName, stopDeepLink, true)
@@ -110,20 +107,15 @@ export const useDatabaseChartDeepLink = (chart?: string) => {
       window.addEventListener(eventName, stopDeepLink, true)
     )
 
-    pollForChart = window.setInterval(() => {
-      attempts += 1
+    const scrollToChart = () => {
       const target = document.getElementById(chart)
+      if (target === null) return false
 
-      if (target === null) {
-        if (attempts >= CHART_TARGET_POLL_ATTEMPTS) stopDeepLink()
-        return
-      }
-
-      window.clearInterval(pollForChart)
+      chartTargetObserver?.disconnect()
       target.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
       const chartList = target.parentElement
-      if (chartList === null) return
+      if (chartList === null) return true
 
       resizeObserver = new ResizeObserver(() => {
         if (!isChartFullyVisible(target)) {
@@ -132,7 +124,13 @@ export const useDatabaseChartDeepLink = (chart?: string) => {
       })
       resizeObserver.observe(chartList)
       stopObservingTimer = window.setTimeout(stopDeepLink, CHART_LAYOUT_OBSERVATION_DURATION)
-    }, CHART_TARGET_POLL_INTERVAL)
+      return true
+    }
+
+    if (!scrollToChart()) {
+      chartTargetObserver = new MutationObserver(scrollToChart)
+      chartTargetObserver.observe(document.body, { childList: true, subtree: true })
+    }
 
     return stopDeepLink
   }, [chart])

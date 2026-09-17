@@ -18,6 +18,27 @@ class MockResizeObserver implements ResizeObserver {
   }
 }
 
+class MockMutationObserver implements MutationObserver {
+  static instances: MockMutationObserver[] = []
+
+  callback: MutationCallback
+  isDisconnected = false
+  disconnect = vi.fn(() => {
+    this.isDisconnected = true
+  })
+  observe = vi.fn()
+  takeRecords = vi.fn(() => [])
+
+  constructor(callback: MutationCallback) {
+    this.callback = callback
+    MockMutationObserver.instances.push(this)
+  }
+
+  notify() {
+    if (!this.isDisconnected) this.callback([], this)
+  }
+}
+
 const bounds = (top: number, bottom: number): DOMRect =>
   ({
     bottom,
@@ -41,7 +62,9 @@ const addChart = (id: string) => {
 
 beforeEach(() => {
   vi.useFakeTimers()
+  vi.stubGlobal('MutationObserver', MockMutationObserver)
   vi.stubGlobal('ResizeObserver', MockResizeObserver)
+  MockMutationObserver.instances = []
   MockResizeObserver.instances = []
 
   const scrollContainer = document.createElement('main')
@@ -90,15 +113,27 @@ describe('useDatabaseChartDeepLink', () => {
     expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
   })
 
-  test('stops polling after the user interacts before the chart mounts', () => {
+  test('stops waiting after the user interacts before the chart mounts', () => {
     renderHook(() => useDatabaseChartDeepLink('disk-size'))
 
     act(() => window.dispatchEvent(new Event('wheel')))
     const target = addChart('disk-size')
-    act(() => vi.advanceTimersByTime(200))
+    act(() => MockMutationObserver.instances[0].notify())
 
     expect(target.scrollIntoView).not.toHaveBeenCalled()
     expect(MockResizeObserver.instances).toHaveLength(0)
+  })
+
+  test('scrolls when a conditional chart mounts after the previous polling window', () => {
+    renderHook(() => useDatabaseChartDeepLink('disk-io-burst-balance'))
+
+    act(() => vi.advanceTimersByTime(6_000))
+    const target = addChart('disk-io-burst-balance')
+    act(() => MockMutationObserver.instances[0].notify())
+
+    expect(target.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' })
+    expect(MockMutationObserver.instances[0].disconnect).toHaveBeenCalled()
+    expect(MockResizeObserver.instances[0].observe).toHaveBeenCalledWith(target.parentElement)
   })
 
   test('starts a fresh observer when the chart query parameter changes', () => {
