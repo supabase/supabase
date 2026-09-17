@@ -1,13 +1,61 @@
-export type OAuthScope = string
+import type { components } from 'api-types'
 
-export type OrganizationRole = 'owner' | 'administrator' | 'developer' | 'read_only'
+/**
+ * The live authorization request contract, already called from
+ * `data/api-authorization`. Every field this folder can derive from it is
+ * derived rather than hand-written, so `pnpm api:codegen` fails the build when
+ * the backend contract moves instead of letting this folder drift silently.
+ */
+type LiveAuthorizeRequest = components['schemas']['GetOAuthAuthorizationResponse_Output']
+
+export type OAuthAppRegistrationType = LiveAuthorizeRequest['registration_type']
+
+/**
+ * Fields the live authorize endpoint already returns today.
+ *
+ * `domain` currently stands in for the publisher display name the design shows
+ * ("Vercel Inc."), derived from the app's callback URL in the fixtures. The live
+ * contract has no human publisher name; revisit when the real backend lands.
+ */
+export type OAuthAppsAuthorizeLiveFields = Pick<
+  LiveAuthorizeRequest,
+  'name' | 'website' | 'domain' | 'icon' | 'redirect_uri' | 'registration_type' | 'expires_at'
+>
+
+/**
+ * The coarse `resource:action` scopes the live endpoint returns, e.g.
+ * `database:read`. Kept for the compatibility path — grants authorized before
+ * project controls carry this vocabulary.
+ */
+export type OAuthLiveScope = NonNullable<LiveAuthorizeRequest['scopes']>[number]
+
+/**
+ * PROVISIONAL — a single scope in the new grant model, e.g. `sql_snippets`.
+ *
+ * Deliberately an opaque string: the RFC vocabulary is finer-grained than
+ * `OAuthLiveScope` and is not published yet. Do not confuse this with
+ * `OAuthScope` from `@supabase/shared-types/out/constants`, which is the live
+ * coarse enum that `data/api-authorization` consumes.
+ */
+export type OAuthScopeString = string
+
+/**
+ * PROVISIONAL — the role names the grant model reasons about.
+ *
+ * The platform API models roles as numeric ids with server-supplied names
+ * (`OrganizationRole` in `data/organization-members/organization-roles-query`),
+ * and organizations can define custom roles, so this closed union only holds
+ * for the default roles. Replace it with the generated role type once the RFC
+ * settles whether role even belongs in the grant contract.
+ */
+export type OAuthOrganizationRoleName = 'owner' | 'administrator' | 'developer' | 'read_only'
 
 export type OAuthScopeLevel = 'read' | 'write' | 'read_write'
 
 export type OAuthScopeGroup = {
   name: string
   level: OAuthScopeLevel
-  scopes: OAuthScope[]
+  scopes: OAuthScopeString[]
 }
 
 export type OAuthGrantKind = 'organization_bound' | 'user_bound' | 'compatibility'
@@ -17,20 +65,25 @@ export type OAuthProjectSelectionMode = 'off' | 'optional' | 'required'
 export type OAuthOrganizationRole = {
   slug: string
   name: string
-  default_role: OrganizationRole
+  default_role: OAuthOrganizationRoleName
 }
 
 export type OAuthAppsAuthorizeOrganizationProject = {
   ref: string
   name: string
-  role: OrganizationRole
+  role: OAuthOrganizationRoleName
 }
 
-/** PROVISIONAL — mirrors the app author settings panel; the backend contract is not published yet. */
+/**
+ * PROVISIONAL — mirrors the app author settings panel; the backend contract is
+ * not published yet.
+ *
+ * Dynamic-client-ness is deliberately absent: it arrives on the live response
+ * as `registration_type`, so it is read from there rather than mirrored here.
+ */
 export type OAuthAppGrantConfig = {
   bind_to_authorizing_user: boolean
   project_selection: OAuthProjectSelectionMode
-  is_dynamic_client: boolean
 }
 
 export type OAuthConsentModel = {
@@ -38,12 +91,19 @@ export type OAuthConsentModel = {
   project_selection: OAuthProjectSelectionMode
 }
 
-export function getOAuthConsentModel(config: OAuthAppGrantConfig): OAuthConsentModel {
-  const boundToUser = config.is_dynamic_client || config.bind_to_authorizing_user
+export function getOAuthConsentModel({
+  grantConfig,
+  registrationType,
+}: {
+  grantConfig: OAuthAppGrantConfig
+  registrationType: OAuthAppRegistrationType
+}): OAuthConsentModel {
+  const isDynamicClient = registrationType === 'dynamic'
+  const isBoundToUser = isDynamicClient || grantConfig.bind_to_authorizing_user
 
   return {
-    grant_kind: boundToUser ? 'user_bound' : 'organization_bound',
-    project_selection: config.is_dynamic_client ? 'required' : config.project_selection,
+    grant_kind: isBoundToUser ? 'user_bound' : 'organization_bound',
+    project_selection: isDynamicClient ? 'required' : grantConfig.project_selection,
   }
 }
 
@@ -90,29 +150,28 @@ export function getPreselectedProjectRefs({
 
 export type OAuthExistingGrant = {
   kind: OAuthGrantKind
-  approved_scopes: OAuthScope[] | null
+  approved_scopes: OAuthScopeString[] | null
   project_scope: OAuthGrantProjectScope
   created_at: string
   updated_at: string | null
 }
 
-export type OAuthAppsAuthorizeRedirect = {
-  url: string
-}
+export type OAuthAppsAuthorizeRedirect =
+  components['schemas']['ApproveAuthorizationResponse_Output']
 
 export type OAuthScopeValidationResult =
   | {
       scope_target: 'organization'
-      role: OrganizationRole
-      failed_scopes: OAuthScope[]
+      role: OAuthOrganizationRoleName
+      failed_scopes: OAuthScopeString[]
     }
   | {
       scope_target: 'projects'
       failures: Array<{
         ref: string
         name: string
-        role: OrganizationRole
-        failed_scopes: OAuthScope[]
+        role: OAuthOrganizationRoleName
+        failed_scopes: OAuthScopeString[]
       }>
     }
 

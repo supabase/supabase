@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 
 import type {
   OAuthAppGrantConfig,
+  OAuthAppRegistrationType,
   OAuthAppsAuthorizeOrganizationProject,
   OAuthExistingGrant,
 } from './types'
@@ -10,9 +11,13 @@ import { getOAuthConsentModel, getPreselectedProjectRefs, getScopedProjectRefs }
 const config = (overrides: Partial<OAuthAppGrantConfig> = {}): OAuthAppGrantConfig => ({
   bind_to_authorizing_user: false,
   project_selection: 'off',
-  is_dynamic_client: false,
   ...overrides,
 })
+
+const consentModel = (
+  grantConfig: OAuthAppGrantConfig,
+  registrationType: OAuthAppRegistrationType = 'manual'
+) => getOAuthConsentModel({ grantConfig, registrationType })
 
 describe('getOAuthConsentModel', () => {
   test.each([
@@ -21,19 +26,20 @@ describe('getOAuthConsentModel', () => {
     ['user_bound', config({ bind_to_authorizing_user: true })],
     ['user_bound', config({ bind_to_authorizing_user: true, project_selection: 'optional' })],
   ])('binds the grant to %s', (expected, grantConfig) => {
-    expect(getOAuthConsentModel(grantConfig).grant_kind).toBe(expected)
+    expect(consentModel(grantConfig).grant_kind).toBe(expected)
   })
 
   test.each(['off', 'optional', 'required'] as const)(
     'passes the %s selection mode through untouched',
     (mode) => {
-      expect(getOAuthConsentModel(config({ project_selection: mode })).project_selection).toBe(mode)
+      expect(consentModel(config({ project_selection: mode })).project_selection).toBe(mode)
     }
   )
 
   test('forces a dynamic client user-bound with a required selection, whatever the flags say', () => {
-    const model = getOAuthConsentModel(
-      config({ is_dynamic_client: true, bind_to_authorizing_user: false, project_selection: 'off' })
+    const model = consentModel(
+      config({ bind_to_authorizing_user: false, project_selection: 'off' }),
+      'dynamic'
     )
 
     expect(model.grant_kind).toBe('user_bound')
