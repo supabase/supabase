@@ -5,6 +5,7 @@ import {
   type BundledLanguage,
 } from 'shiki'
 
+import { measureAsync, measureSync } from './CodeBlock.profile'
 import theme from './supabase-2.json' with { type: 'json' }
 
 const getHighlighter = makeSingletonHighlighter(() =>
@@ -64,13 +65,15 @@ export async function highlightCode(code: string, lang: BundledLanguage | null) 
       pending = loadLanguageClosure(highlighter, lang)
       languageLoads.set(lang, pending)
     }
-    await pending
+    await measureAsync('shiki-load', lang, () => pending)
   }
 
-  return highlighter.codeToTokens(code, {
-    lang: lang || undefined,
-    theme: 'Supabase Theme',
-    tokenizeTimeLimit: 0,
-    tokenizeMaxLineLength: 100_000,
-  })
+  return measureSync('shiki-tokenize', lang ?? 'none', () =>
+    highlighter.codeToTokens(code, {
+      lang: lang || undefined,
+      theme: 'Supabase Theme',
+      tokenizeTimeLimit: 0,
+      tokenizeMaxLineLength: 100_000,
+    })
+  )
 }

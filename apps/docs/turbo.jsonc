@@ -35,6 +35,7 @@
       "dependsOn": ["^build", "codegen:examples", "codegen:references", "build:markdown"],
       "env": [
         "ANALYZE",
+        "DOCS_BUILD_PROFILE",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_MISC_URL",

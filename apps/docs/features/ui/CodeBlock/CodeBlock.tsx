@@ -5,6 +5,7 @@ import { cn } from 'ui'
 
 import { CodeBlockControls, CodeBlockTokens, type CodeToken } from './CodeBlock.client'
 import { highlightCode } from './CodeBlock.highlight'
+import { measureSync } from './CodeBlock.profile'
 import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.utils'
 import denoTypes from './types/lib.deno.d.ts.include'
 
@@ -43,7 +44,7 @@ export async function CodeBlock({
   let twoslashed = null as null | Map<number, Map<number, Array<NodeHover>>>
   if (!skipTypeGeneration && lang && TWOSLASHABLE_LANGS.includes(lang)) {
     try {
-      const { code: editedCode, nodes } = twoslasher(code)
+      const { code: editedCode, nodes } = measureSync('twoslash', lang, () => twoslasher(code))
       const hoverNodes: Array<NodeHover> = nodes.filter((node) => node.type === 'hover')
       twoslashed = annotationsByLine(hoverNodes)
       code = editedCode
