@@ -126,6 +126,8 @@ export function useSqlEditorExecution({
         return toast.error('Unable to run query: Connection string is missing')
       }
 
+      console.log('RUN SQL', { db: databaseSelectorState.selectedDatabaseId })
+
       execute({
         ...buildExecuteParams({
           sql,

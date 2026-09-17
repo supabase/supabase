@@ -36,7 +36,10 @@ import {
 import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import {
+  useDatabaseSelectorStateSnapshot,
+  useGetSelectedDatabaseId,
+} from '@/state/database-selector'
 import {
   getSqlEditorV2StateSnapshot,
   useSqlEditorV2StateSnapshot,
@@ -130,6 +133,7 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { setSelectedDatabaseId } = useDatabaseSelectorStateSnapshot()
+  const getSelectedDatabaseId = useGetSelectedDatabaseId()
 
   const diff = useSqlEditorDiff()
   const { isDiffOpen } = diff
@@ -215,11 +219,13 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   }, [id])
 
   useEffect(() => {
-    if (isSuccessReadReplicas) {
+    // Only set the default (primary) selection once, when nothing has been selected yet.
+    // Must not re-run on every `databases` refetch, or it'll clobber the user's replica choice.
+    if (isSuccessReadReplicas && getSelectedDatabaseId() === undefined) {
       const primaryDatabase = databases.find((db) => db.identifier === ref)
       setSelectedDatabaseId(primaryDatabase?.identifier)
     }
-  }, [isSuccessReadReplicas, databases, ref, setSelectedDatabaseId])
+  }, [isSuccessReadReplicas, databases, ref, setSelectedDatabaseId, getSelectedDatabaseId])
 
   const snippetName =
     urlId === 'new'
