@@ -276,6 +276,17 @@ describe('ConfigurationDriftPage', () => {
     expect(await screen.findByText('All compared settings match')).toBeInTheDocument()
   })
 
+  test('shows a config.toml decode error with the offending path', async () => {
+    mockConnectedProject()
+    mockProjectConfig({ disable_signup: false })
+    mockGitHubConfig({ api: { max_rows: 'abc' } })
+
+    customRender(<ConfigurationDriftPage />, { profileContext: PROFILE_CONTEXT })
+
+    expect(await screen.findByText('Could not read config.toml')).toBeInTheDocument()
+    expect(screen.getByText(/api\.max_rows/)).toBeInTheDocument()
+  })
+
   test('renders a drift row when the dashboard and config.toml disagree', async () => {
     mockConnectedProject()
     mockProjectConfig({ disable_signup: false })

@@ -217,7 +217,7 @@ function ConfigFieldSection({
 
 export function ConfigurationDriftPage() {
   const { ref: projectRef = '' } = useParams()
-  const { summary, isReady, isPending, isFetching, isError, error, refetch } =
+  const { summary, isReady, isPending, isFetching, isError, error, errorSource, refetch } =
     useSelectedGitHubConfigDrift()
   const driftRows = createConfigurationDriftRows(summary.driftedFields, projectRef)
   const comparableSettingCount = summary.matchedFields.length + driftRows.length
@@ -229,11 +229,19 @@ export function ConfigurationDriftPage() {
   }
 
   if (isError) {
+    const isConfigTomlError = errorSource === 'config-toml'
+    const subject = isConfigTomlError
+      ? 'Could not read config.toml'
+      : 'Could not check configuration drift'
+    const description = isConfigTomlError
+      ? 'Fix the listed values on the selected GitHub branch, then refresh.'
+      : 'Refresh to compare the supported settings with the selected GitHub branch again.'
+
     return (
       <AlertError
         projectRef={projectRef}
-        subject="Could not check configuration drift"
-        description="Refresh to compare the supported settings with the selected GitHub branch again."
+        subject={subject}
+        description={description}
         error={error}
         additionalActions={
           <Button size="small" loading={isFetching} onClick={() => refetch()}>
