@@ -115,7 +115,7 @@ export const TableReplicationRow = ({
                 icon={<MoreVertical />}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end" className="w-64">
+            <DropdownMenuContent side="bottom" align="end" className="w-44">
               <DropdownMenuItemTooltip
                 className="gap-x-2"
                 disabled={!canRestart}
