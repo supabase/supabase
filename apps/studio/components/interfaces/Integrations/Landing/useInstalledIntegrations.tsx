@@ -90,6 +90,10 @@ export const useInstalledIntegrations = () => {
       .filter((integration) => {
         if (integration.id === 'webhooks') return isHooksEnabled
         if (integration.id === 'data_api') return true
+        // Availability is already gated by the org allow-list in `useAvailableIntegrations`, and
+        // whether Warehouse is set up on this project is handled inside its tabs, following the same split
+        // Data API uses.
+        if (integration.id === 'warehouse') return true
         if (integration.id === 'stripe_sync_engine') {
           return isStripeSyncEngineInstalled(schemas)
         }

@@ -162,6 +162,8 @@ export const ProjectCreationForm = ({
       highAvailability: false,
       postgresVersion: '',
       instanceType: '',
+      kubernetesClusterId: '',
+      kubernetesClusterForce: false,
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
@@ -188,6 +190,8 @@ export const ProjectCreationForm = ({
     organization,
     projectName: watchedProjectName,
     highAvailability,
+    kubernetesClusterId: watchedKubernetesClusterId,
+    kubernetesClusterForce: watchedKubernetesClusterForce,
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
@@ -405,6 +409,8 @@ export const ProjectCreationForm = ({
       dbRegion,
       postgresVersion,
       instanceType,
+      kubernetesClusterId,
+      kubernetesClusterForce,
       instanceSize,
       dataApi,
       dataApiDefaultPrivileges,
@@ -527,14 +533,19 @@ export const ProjectCreationForm = ({
         : {}),
     }
 
-    if (customPostgresVersion || instanceType) {
+    if (customPostgresVersion || instanceType || kubernetesClusterId) {
       data['customSupabaseRequest'] = {
-        ami: {
-          ...(customPostgresVersion && {
-            search_tags: { 'tag:postgresVersion': customPostgresVersion },
-          }),
-          ...(instanceType && { instance_type: instanceType }),
-        },
+        ...((customPostgresVersion || instanceType) && {
+          ami: {
+            ...(customPostgresVersion && {
+              search_tags: { 'tag:postgresVersion': customPostgresVersion },
+            }),
+            ...(instanceType && { instance_type: instanceType }),
+          },
+        }),
+        ...(kubernetesClusterId && { kubernetes_cluster_id: kubernetesClusterId }),
+        ...(kubernetesClusterId &&
+          kubernetesClusterForce && { kubernetes_cluster_force: kubernetesClusterForce }),
       }
     }
 
@@ -592,6 +603,16 @@ export const ProjectCreationForm = ({
       })
     }
   }, [instanceSize, watchedInstanceSize, setValue])
+
+  useEffect(() => {
+    const isK8sProvider = cloudProvider === 'AWS_K8S' || cloudProvider === 'AWS_NIMBUS'
+    if (!isK8sProvider && watchedKubernetesClusterId) {
+      setValue('kubernetesClusterId', '', { shouldDirty: false, shouldValidate: false })
+    }
+    if ((!isK8sProvider || !watchedKubernetesClusterId) && watchedKubernetesClusterForce) {
+      setValue('kubernetesClusterForce', false, { shouldDirty: false, shouldValidate: false })
+    }
+  }, [cloudProvider, watchedKubernetesClusterId, watchedKubernetesClusterForce, setValue])
 
   useEffect(() => {
     if (!githubRepositoryName) return

@@ -37,32 +37,22 @@ Eval('Assistant', {
     const modelResponse = await getModel({ provider: 'openai', modelEntry })
     if (modelResponse.error) throw modelResponse.error
 
-    // Owns the lifecycle of the remote MCP client opened inside getMockTools:
-    // aborting once generation is done closes that connection.
-    const toolsAbortController = new AbortController()
-    try {
-      const result = await generateAssistantResponse({
-        ...modelResponse.modelParams,
-        isExplorerEnabled: true,
-        messages: [
-          {
-            id: '1',
-            role: 'user',
-            parts: [{ type: 'text', text: input.prompt }],
-          },
-        ],
-        tools: await getMockTools(
-          input.mockTables ? { list_tables: input.mockTables } : undefined,
-          toolsAbortController.signal
-        ),
-      })
+    const result = await generateAssistantResponse({
+      ...modelResponse.modelParams,
+      isExplorerEnabled: true,
+      messages: [
+        {
+          id: '1',
+          role: 'user',
+          parts: [{ type: 'text', text: input.prompt }],
+        },
+      ],
+      tools: await getMockTools(input.mockTables ? { list_tables: input.mockTables } : undefined),
+    })
 
-      const finishReason = await result.finishReason
-      const steps = await result.steps
-      return { finishReason, transcript: buildTranscript(input.prompt, steps) }
-    } finally {
-      toolsAbortController.abort()
-    }
+    const finishReason = await result.finishReason
+    const steps = await result.steps
+    return { finishReason, transcript: buildTranscript(input.prompt, steps) }
   },
   scores: [
     toolUsageScorer,

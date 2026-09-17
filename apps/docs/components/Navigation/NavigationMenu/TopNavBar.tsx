@@ -16,6 +16,7 @@ import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
+import { SearchV2Trigger, useSearchV2Variant } from '@/features/SearchV2'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
@@ -28,6 +29,7 @@ const TopNavBar: FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const user = useUser()
   const menu = useDropdownMenu(user)
+  const searchVariant = useSearchV2Variant()
 
   return (
     <>
@@ -47,15 +49,27 @@ const TopNavBar: FC = () => {
 
             <div className="flex gap-2 items-center">
               <DevToolbarTrigger />
-              <CommandMenuTriggerInput
-                className="[&>div>p]:text-foreground-lighter"
-                placeholder={
-                  <>
-                    Search
-                    <span className="hidden xl:inline ml-1"> docs...</span>
-                  </>
-                }
-              />
+              {searchVariant === 'search-v2-active' ? (
+                <SearchV2Trigger
+                  className="[&>div>p]:text-foreground-lighter"
+                  placeholder={
+                    <>
+                      Search
+                      <span className="hidden xl:inline ml-1"> docs...</span>
+                    </>
+                  }
+                />
+              ) : (
+                <CommandMenuTriggerInput
+                  className="[&>div>p]:text-foreground-lighter"
+                  placeholder={
+                    <>
+                      Search
+                      <span className="hidden xl:inline ml-1"> docs...</span>
+                    </>
+                  }
+                />
+              )}
               <button
                 tabIndex={0}
                 title="Menu dropdown button"
