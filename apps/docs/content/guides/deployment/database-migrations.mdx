@@ -487,7 +487,7 @@ What `db pull` captures in managed schemas depends on your project's diff engine
 
 <$Partial path="diff_engine_check.mdx" />
 
-On `pg-delta`, a plain `supabase db pull` captures your customizations automatically, such as triggers on `auth.users` or RLS policies on `storage.objects`. On the legacy `migra` engine, the initial pull's `pg_dump` skips those schemas, but the diff pass that follows appends your triggers and RLS policies there to the same migration, and later pulls diff them too. Older CLI versions excluded `auth` and `storage` entirely and printed a message saying so. If you see that message, capture existing customizations once with explicit pulls:
+On `pg-delta`, a plain `supabase db pull` captures your customizations automatically, such as a trigger on `auth.users` that calls a function in `public`, or RLS policies on `storage.objects`. A trigger whose function lives inside `auth` or `storage` is excluded even if you created it, so deliver it through a versioned migration. On the legacy `migra` engine, the initial pull's `pg_dump` skips those schemas, but the diff pass that follows appends your triggers and RLS policies there to the same migration, and later pulls diff them too. Older CLI versions excluded `auth` and `storage` entirely and printed a message saying so. If you see that message, capture existing customizations once with explicit pulls:
 
 ```bash name=Terminal
 supabase db pull --schema auth
