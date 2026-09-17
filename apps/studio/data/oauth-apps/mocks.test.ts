@@ -111,18 +111,23 @@ describe('oauth-apps mocks', () => {
 
   test('every request carries the grant config the consent flow reads', () => {
     Object.values(OAUTH_APPS_MOCK_SCENARIOS).forEach((scenario) => {
-      const { grant_config: grantConfig } = getMockOAuthAppsAuthorizeRequest(scenario)
+      const { grant_config: grantConfig, registration_type: registrationType } =
+        getMockOAuthAppsAuthorizeRequest(scenario)
 
       expect(typeof grantConfig.bind_to_authorizing_user).toBe('boolean')
       expect(['off', 'optional', 'required']).toContain(grantConfig.project_selection)
-      expect(typeof grantConfig.is_dynamic_client).toBe('boolean')
+      expect(['manual', 'dynamic']).toContain(registrationType)
     })
   })
 
   test('every consent model shape has a fixture', () => {
     const shapes = new Set(
       Object.values(OAUTH_APPS_MOCK_SCENARIOS).map((scenario) => {
-        const model = getOAuthConsentModel(getMockOAuthAppsAuthorizeRequest(scenario).grant_config)
+        const request = getMockOAuthAppsAuthorizeRequest(scenario)
+        const model = getOAuthConsentModel({
+          grantConfig: request.grant_config,
+          registrationType: request.registration_type,
+        })
         return `${model.grant_kind}:${model.project_selection}`
       })
     )
@@ -140,7 +145,7 @@ describe('oauth-apps mocks', () => {
 
   test('a dynamic client has a fixture', () => {
     const dynamic = Object.values(OAUTH_APPS_MOCK_SCENARIOS).filter(
-      (scenario) => getMockOAuthAppsAuthorizeRequest(scenario).grant_config.is_dynamic_client
+      (scenario) => getMockOAuthAppsAuthorizeRequest(scenario).registration_type === 'dynamic'
     )
 
     expect(dynamic.length).toBeGreaterThan(0)
