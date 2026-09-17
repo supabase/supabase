@@ -26,6 +26,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
+import type { ResponseError } from '@/types'
 
 const FormSchema = z.object({
   destinationProject: z.object({
@@ -38,7 +39,7 @@ type FormValues = z.infer<typeof FormSchema>
 interface WarehouseSetupFormProps {
   onSubmit: (body: WarehouseSetupBody) => void
   isSubmitting: boolean
-  error?: { message: string } | null
+  error?: ResponseError | null
 }
 
 export const WarehouseSetupForm = (props: WarehouseSetupFormProps) => {

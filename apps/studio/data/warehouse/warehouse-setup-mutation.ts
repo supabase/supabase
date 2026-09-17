@@ -46,9 +46,14 @@ export const useWarehouseSetupMutation = ({
   return useMutation<WarehouseSetupData, ResponseError, WarehouseSetupVariables>({
     mutationFn: (vars) => setupWarehouse(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries({
-        queryKey: warehouseKeys.setupStatus(variables.projectRef),
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: warehouseKeys.setupStatus(variables.projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.sources(variables.projectRef),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {

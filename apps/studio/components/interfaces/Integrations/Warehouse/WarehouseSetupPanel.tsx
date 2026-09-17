@@ -5,6 +5,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { buildRetryTargets, isWarehouseSettingUp } from './Warehouse.utils'
 import { WarehouseConnectSection } from './WarehouseConnectSection'
+import { WarehouseDisableCard } from './WarehouseDisableCard'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import { WarehouseSetupForm } from './WarehouseSetupForm'
 import {
@@ -18,9 +19,11 @@ import {
   type WarehouseSetupBody,
 } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const WarehouseSetupPanel = () => {
   const { ref: projectRef } = useParams()
+  const track = useTrack()
 
   const { data, isPending, isFetching, isError, error, refetch } = useWarehouseSetupStatusQuery(
     { projectRef },
@@ -36,8 +39,22 @@ export const WarehouseSetupPanel = () => {
 
   const handleSetup = (body: WarehouseSetupBody) => {
     if (!projectRef || body.targets.length === 0) return
+    const isInitialSetup = data?.setup_status !== 'complete'
 
-    setupMutation.mutate({ projectRef, body })
+    setupMutation.mutate(
+      { projectRef, body },
+      {
+        onSuccess: () => {
+          if (isInitialSetup) {
+            track('warehouse_enabled', {
+              source: 'integrations_overview',
+              schemaTargetCount: body.targets.filter((target) => target.type === 'schema').length,
+              tableTargetCount: body.targets.filter((target) => target.type === 'table').length,
+            })
+          }
+        },
+      }
+    )
   }
 
   if (isPending) return <GenericSkeletonLoader />
@@ -123,6 +140,7 @@ export const WarehouseSetupPanel = () => {
         error={setupMutation.error}
       />
       <WarehouseConnectSection />
+      <WarehouseDisableCard />
     </>
   )
 }

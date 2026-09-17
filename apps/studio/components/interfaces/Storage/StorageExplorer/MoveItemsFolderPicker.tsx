@@ -147,7 +147,7 @@ export const MoveItemsFolderPicker = ({
         </p>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="min-h-0 flex-1 overflow-hidden" data-testid="folder-picker-list">
         {isSearching && isPendingFolders && (
           <div className="flex flex-col gap-y-2 p-2.5">
             <ShimmeringLoader />
