@@ -71,6 +71,7 @@ vi.mock('./WarehouseSetupForm', () => ({
     <section>
       Replicated tables picker
       <button
+        tabIndex={0}
         onClick={() =>
           onSubmit({
             targets: [{ type: 'table', schema: 'public', name: 'orders' }],
