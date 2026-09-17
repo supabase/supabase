@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableHeadSort,
@@ -33,6 +32,7 @@ import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
 import { SlotConnectionIndicator, SlotStatusBadge, SlotStatusLegend } from './SlotStatus'
 import { TableReplicationRow } from './TableReplicationRow'
 import { AlertError } from '@/components/ui/AlertError'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import {
   useReplicationPipelineReplicationStatusQuery,
@@ -382,23 +382,12 @@ export const ReplicationPipelineStatus = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <tr className="sr-only" aria-live="polite" role="status">
-                      <td colSpan={4}>
-                        {filteredTableStatuses.length === 0 && searchString.length > 0
-                          ? `No results found for “${searchString}”`
-                          : ''}
-                      </td>
-                    </tr>
-                    {filteredTableStatuses.length === 0 && (
-                      <TableRow className="[&>td]:hover:bg-inherit">
-                        <TableCell colSpan={4}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-lighter">
-                            Your search for “{searchString}” did not return any results.
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
+                    <TableRowNoResults
+                      className="[&>td]:hover:bg-inherit"
+                      colSpan={4}
+                      search={searchString}
+                      isVisible={filteredTableStatuses.length === 0}
+                    />
                     {filteredTableStatuses.map((table) => {
                       const isRestarting = restartingTableIds.has(table.id)
                       const isErrorState = table.state.name === 'error'
