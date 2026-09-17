@@ -7,6 +7,7 @@ export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
+  EXPLORER_PREFERENCES: 'supabase-explorer-preferences',
   PROJECTS_VIEW: 'projects-view',
   PROJECTS_FILTER: 'projects-filter',
   PROJECTS_SORT: 'projects-sort',
@@ -180,6 +181,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+  LOCAL_STORAGE_KEYS.EXPLORER_PREFERENCES,
   LOCAL_STORAGE_KEYS.UI_TIMEZONE,
   LOCAL_STORAGE_KEYS.UI_THEME_OVERRIDES,
 ]

@@ -26,6 +26,8 @@ import {
 } from 'ui-patterns/PageSection'
 
 import { ThemeColorSettings } from './ThemeColorSettings'
+import { explorerHomeSchema, useExplorerPreferences } from './useExplorerPreferences'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DEFAULT_SIDEBAR_BEHAVIOR } from '@/components/interfaces/Sidebar'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { BASE_PATH } from '@/lib/constants'
@@ -72,6 +74,8 @@ const SingleThemeSelection = memo(function SingleThemeSelection({
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
+  const isExplorerEnabled = useIsExplorerEnabled()
+  const { home, setHome, isReady } = useExplorerPreferences()
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
@@ -136,6 +140,33 @@ export const ThemeSettings = () => {
               </Select>
             </FormItemLayout>
           </CardContent>
+          {isExplorerEnabled && (
+            <CardContent>
+              <FormItemLayout
+                isReactForm={false}
+                label="Explorer startup"
+                description="Choose how Explorer opens."
+                layout="flex-row-reverse"
+              >
+                <Select
+                  value={home}
+                  onValueChange={(value) => {
+                    const result = explorerHomeSchema.safeParse(value)
+                    if (result.success) setHome(result.data)
+                  }}
+                  disabled={!isReady}
+                >
+                  <SelectTrigger aria-label="Explorer startup">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="home">Start page</SelectItem>
+                    <SelectItem value="query">SQL query</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItemLayout>
+            </CardContent>
+          )}
         </Card>
       </PageSectionContent>
     </PageSection>
