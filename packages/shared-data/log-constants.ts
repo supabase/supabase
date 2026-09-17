@@ -90,8 +90,8 @@ const schemas: LogSchema[] = [
       { path: 'metadata.response.headers.sb_gateway_version', type: 'string' },
       { path: 'metadata.response.headers.transfer_encoding', type: 'string' },
       { path: 'metadata.response.headers.x_kong_proxy_latency', type: 'string' },
-      { path: 'metadata.response.origin_time', type: 'number' },
-      { path: 'metadata.response.status_code', type: 'number' },
+      { path: 'metadata.response.origin_time', type: 'number', description: "Time taken for origin server to respond to the edge gateway" },
+      { path: 'metadata.response.status_code', type: 'number', description: "HTTP status code returned by the edge gateway" },
     ],
   },
   {
