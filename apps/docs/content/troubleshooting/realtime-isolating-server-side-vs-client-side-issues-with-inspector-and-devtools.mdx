@@ -47,7 +47,7 @@ If the configuration and package versions are correct but events still do not ar
 
 #### Step 3: Inspect WebSocket traffic in Chrome DevTools
 
-1. Open your application in Chrome, then open DevTools on that tab and go to the Network tab.  
+1. Open your application in Chrome, then open DevTools on that tab and go to the Network tab.
 2. Trigger the action in your app that initiates the Realtime connection. Find the connection to `wss://<project-ref>.supabase.co/realtime/v1/websocket`.(Note: If your app connects on page load, refresh the page while DevTools is open).
 3. Select the connection, then open the **Messages** tab.
 4. Find the initial `phx_join` message and its corresponding `phx_reply`.
@@ -56,9 +56,9 @@ If the configuration and package versions are correct but events still do not ar
 
 Use the captured messages to determine what happened, then act accordingly:
 
-- *Channel joined, but the server never sent the event:* The subscription doesn't match what was tested in Step 1. Recheck it against Step 2.
-- *Server sent the event, but the application didn't process it:* The issue is in the client-side handler, not the subscription config. Check for a thrown error or rejected promise inside the callback that could be silently swallowing it.
-- *WebSocket connection didn't complete at all:* Continue to Step 4.
+- _Channel joined, but the server never sent the event:_ The subscription doesn't match what was tested in Step 1. Recheck it against Step 2.
+- _Server sent the event, but the application didn't process it:_ The issue is in the client-side handler, not the subscription config. Check for a thrown error or rejected promise inside the callback that could be silently swallowing it.
+- _WebSocket connection didn't complete at all:_ Continue to Step 4.
 
 #### Step 4: Check the network path
 
