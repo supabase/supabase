@@ -382,12 +382,20 @@ export const ReplicationPipelineStatus = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRowNoResults
-                      className="[&>td]:hover:bg-inherit"
-                      colSpan={4}
-                      search={searchString}
-                      isVisible={filteredTableStatuses.length === 0}
-                    />
+                    <TableRow className="sr-only" aria-live="polite" role="status">
+                      <td colSpan={4}>
+                        {filteredTableStatuses.length === 0 && searchString.length > 0
+                          ? `No results found for “${searchString}”`
+                          : ''}
+                      </td>
+                    </TableRow>
+                    {filteredTableStatuses.length === 0 && (
+                      <TableRowNoResults
+                        className="[&>td]:hover:bg-inherit"
+                        colSpan={4}
+                        search={searchString}
+                      />
+                    )}
                     {filteredTableStatuses.map((table) => {
                       const isRestarting = restartingTableIds.has(table.id)
                       const isErrorState = table.state.name === 'error'
