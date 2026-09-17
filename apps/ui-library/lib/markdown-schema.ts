@@ -4,7 +4,7 @@ import { getInstallCommands } from '../lib/install-command'
 import { generateRegistryTree, type RegistryNode } from '../lib/process-registry'
 import { resolveRegistryItem } from '../lib/registry-resolution'
 import { registry } from '../registry'
-import { toAgentHref } from '../scripts/library-documents'
+import { toAgentHref } from './library-documents'
 
 export type MarkdownOptions = {
   registryDirectory?: string

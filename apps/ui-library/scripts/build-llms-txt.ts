@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import { collectMdxFiles, getDocSlug, parseLibraryDocument } from './library-documents'
+import { collectMdxFiles, getDocSlug, parseLibraryDocument } from '../lib/library-documents'
 
 const BASE_URL = 'https://supabase.com/library/docs'
 

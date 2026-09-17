@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
+import { collectMdxFiles, getDocSlug } from '../lib/library-documents'
 import { transformLibraryMdx } from '../lib/library-mdx-to-markdown'
-import { collectMdxFiles, getDocSlug } from './library-documents'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'docs')
 const OUTPUT_DIR = path.join(process.cwd(), 'public', 'markdown', 'docs')
