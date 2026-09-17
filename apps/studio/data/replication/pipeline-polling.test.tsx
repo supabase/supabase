@@ -77,7 +77,7 @@ describe('pipeline polling', () => {
       })
       expect(requests).toBe(2)
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(1_000)
+        await vi.advanceTimersByTimeAsync(5_000)
       })
       expect(result.current.isSuccess).toBe(true)
       expect(requests).toBe(3)
@@ -86,7 +86,7 @@ describe('pipeline polling', () => {
   )
 
   test.each(['status', 'replication-status'] as const)(
-    'shares slow %s requests and polls one second after completion',
+    'shares slow %s requests and polls five seconds after completion',
     async (endpoint) => {
       const response = deferred<void>()
       const requests = vi.fn()
@@ -149,7 +149,7 @@ describe('pipeline polling', () => {
       expect(aborted).not.toHaveBeenCalled()
       expect(requests).toHaveBeenCalledTimes(1)
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(999)
+        await vi.advanceTimersByTimeAsync(4_999)
       })
       expect(result.current.first.isSuccess).toBe(true)
       expect(result.current.second.isSuccess).toBe(true)
