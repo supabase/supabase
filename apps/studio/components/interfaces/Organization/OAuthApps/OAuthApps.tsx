@@ -1,6 +1,8 @@
+import { useFlag } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { AuthorizedApps } from './AuthorizedApps'
+import { OAuthAppsAuthorizedList } from './OAuthAppsAuthorizedList'
 import { PublishableApps } from './PublishableApps'
 
 // [Joshen] Note on nav UX
@@ -9,12 +11,13 @@ import { PublishableApps } from './PublishableApps'
 // check in again after we wrap up Vercel integration
 
 export const OAuthApps = () => {
+  const oauthAppScopedGrants = useFlag('OauthAppScopedGrants')
+
   return (
     <>
       <PageContainer size="default" className="pb-16">
         <PublishableApps />
-        {/* Here we'll display the OAuth App Scoped Grants depending on the feature flag in future PRs */}
-        <AuthorizedApps />
+        {oauthAppScopedGrants ? <OAuthAppsAuthorizedList /> : <AuthorizedApps />}
       </PageContainer>
     </>
   )
