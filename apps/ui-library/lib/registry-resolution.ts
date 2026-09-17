@@ -72,15 +72,22 @@ export function uniqueInstalledFiles<
   return [...destinations.values()]
 }
 
+export type ResolvedRegistryItem = RegistryItem & {
+  files: RegistryFile[]
+  firstPartyDependencies: string[]
+  externalRegistryDependencies: string[]
+}
+
 /** Follow Supabase dependencies only; external UI kits are the installer's responsibility. */
 export function resolveRegistryItem(
   getItem: (name: string) => RegistryItem | undefined,
   name: string
-): RegistryItem & { files: RegistryFile[] } {
+): ResolvedRegistryItem {
   const root = getItem(name)
   if (!root) throw new Error(`Missing registry item "${name}"`)
 
   const visited = new Set<string>()
+  const external = new Set<string>()
   const files: RegistryFile[] = []
   const visit = (item: RegistryItem, ancestors: string[]) => {
     if (visited.has(item.name)) return
@@ -89,7 +96,10 @@ export function resolveRegistryItem(
     const path = [...ancestors, item.name]
     for (const dependency of item.registryDependencies ?? []) {
       const localName = getFirstPartyDependencyName(dependency)
-      if (!localName) continue
+      if (!localName) {
+        external.add(dependency)
+        continue
+      }
       if (path.includes(localName)) {
         throw new Error(`Registry dependency cycle: ${[...path, localName].join(' -> ')}`)
       }
@@ -110,5 +120,10 @@ export function resolveRegistryItem(
   }
   visit(root, [])
 
-  return { ...root, files: uniqueInstalledFiles(files, `Registry item "${name}"`) }
+  return {
+    ...root,
+    files: uniqueInstalledFiles(files, `Registry item "${name}"`),
+    firstPartyDependencies: [...visited].filter((itemName) => itemName !== name),
+    externalRegistryDependencies: [...external],
+  }
 }
