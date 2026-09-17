@@ -526,19 +526,21 @@ parameters:
       - name: 'OpenAI API Keys'
         link: 'https://platform.openai.com/api-keys'
 
-  - id: 'inbucket.enabled'
-    title: 'inbucket.enabled'
+  - id: 'local_smtp.enabled'
+    title: 'local_smtp.enabled'
     tags: ['local']
     required: false
     default: 'true'
     description: |
-      Enable the local InBucket service.
-    links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      Enable the local email testing server.
 
-  - id: 'inbucket.port'
-    title: 'inbucket.port'
+      Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
+    links:
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
+
+  - id: 'local_smtp.port'
+    title: 'local_smtp.port'
     tags: ['local']
     required: false
     default: '54324'
@@ -547,11 +549,11 @@ parameters:
 
       Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.smtp_port'
-    title: 'inbucket.smtp_port'
+  - id: 'local_smtp.smtp_port'
+    title: 'local_smtp.smtp_port'
     tags: ['local']
     required: false
     default: '54325'
@@ -562,11 +564,11 @@ parameters:
 
       If set, you can access the SMTP server from this port.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.pop3_port'
-    title: 'inbucket.pop3_port'
+  - id: 'local_smtp.pop3_port'
+    title: 'local_smtp.pop3_port'
     tags: ['local']
     required: false
     default: '54326'
@@ -577,8 +579,58 @@ parameters:
 
       If set, you can access the POP3 server from this port.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
+
+  - id: 'local_smtp.admin_email'
+    title: 'local_smtp.admin_email'
+    tags: ['local']
+    required: false
+    default: 'admin@email.com'
+    description: |
+      Email used as the sender for emails sent from the application.
+
+  - id: 'local_smtp.sender_name'
+    title: 'local_smtp.sender_name'
+    tags: ['local']
+    required: false
+    default: 'Admin'
+    description: |
+      Display name used as the sender for emails sent from the application.
+
+  - id: 'inbucket.enabled'
+    title: 'inbucket.enabled'
+    tags: ['local']
+    required: false
+    default: 'true'
+    description: |
+      Deprecated: use `local_smtp.enabled` instead.
+
+      The `inbucket` section is still accepted, but the CLI prints a deprecation warning and reads its values as `local_smtp`.
+
+  - id: 'inbucket.port'
+    title: 'inbucket.port'
+    tags: ['local']
+    required: false
+    default: '54324'
+    description: |
+      Deprecated: use `local_smtp.port` instead.
+
+  - id: 'inbucket.smtp_port'
+    title: 'inbucket.smtp_port'
+    tags: ['local']
+    required: false
+    default: '54325'
+    description: |
+      Deprecated: use `local_smtp.smtp_port` instead.
+
+  - id: 'inbucket.pop3_port'
+    title: 'inbucket.pop3_port'
+    tags: ['local']
+    required: false
+    default: '54326'
+    description: |
+      Deprecated: use `local_smtp.pop3_port` instead.
 
   - id: 'inbucket.admin_email'
     title: 'inbucket.admin_email'
@@ -586,7 +638,7 @@ parameters:
     required: false
     default: 'admin@email.com'
     description: |
-      Email used as the sender for emails sent from the application.
+      Deprecated: use `local_smtp.admin_email` instead.
 
   - id: 'inbucket.sender_name'
     title: 'inbucket.sender_name'
@@ -594,7 +646,7 @@ parameters:
     required: false
     default: 'Admin'
     description: |
-      Display name used as the sender for emails sent from the application.
+      Deprecated: use `local_smtp.sender_name` instead.
 
   - id: 'storage.enabled'
     title: 'storage.enabled'
