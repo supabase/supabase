@@ -911,7 +911,6 @@ parameters:
     title: 'auth.email.smtp.host'
     tags: ['auth']
     required: false
-    default: 'inbucket'
     description: |
       Hostname or IP address of the SMTP server.
 
