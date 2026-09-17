@@ -82,7 +82,7 @@ const PipelineOverviewSkeleton = () => (
         <Card>
           <CardContent className="pb-5">
             <div className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2" aria-hidden>
-              {[0, 1, 2, 3, 4].map((index) => (
+              {Array.from({ length: 5 }, (_, index) => (
                 <div key={index} className="space-y-2">
                   <ShimmeringLoader className="h-3 w-24 py-0" delayIndex={index} />
                   <ShimmeringLoader className="h-4 w-32 py-0" delayIndex={index} />
