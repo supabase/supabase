@@ -54,12 +54,15 @@ export const OAuthAppsAuthorizeScreen = ({
   suggestedProjectRefs = [],
   navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
-  const model = getOAuthConsentModel(request.grant_config)
+  const model = getOAuthConsentModel({
+    grantConfig: request.grant_config,
+    registrationType: request.registration_type,
+  })
   const grantKind = model.grant_kind
   const projectSelection = model.project_selection
   const showProjectPicker = projectSelection !== 'off'
   const allowAllProjects = projectSelection === 'optional'
-  const isDynamicClient = request.grant_config.is_dynamic_client
+  const isDynamicClient = request.registration_type === 'dynamic'
 
   const { data: identity } = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
 
@@ -177,7 +180,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const hasRoleFailure = flaggedRefs.length > 0
   const primaryActionLabel = hasRoleFailure
     ? `Deselect ${flaggedRefs.length} ${flaggedRefs.length === 1 ? 'project' : 'projects'}`
-    : `Authorize ${request.app_name}`
+    : `Authorize ${request.name}`
   const primaryActionVariant = hasRoleFailure || isSubmitting ? 'default' : 'primary'
 
   const usesSelectedProjects = showProjectPicker && !allProjectsSelected
@@ -190,13 +193,13 @@ export const OAuthAppsAuthorizeScreen = ({
   if (approveRedirect) {
     return (
       <InterstitialLayout
-        logo={<DestinationLogo name={request.app_name} />}
-        title={`${request.app_name} is connected`}
+        logo={<DestinationLogo name={request.name} />}
+        title={`${request.name} is connected`}
         titleClassName="text-2xl"
-        description={`You can return to ${request.app_name} to continue`}
+        description={`You can return to ${request.name} to continue`}
       >
         <AuthorizeSuccessScreen
-          appName={request.app_name}
+          appName={request.name}
           grant={{
             email: identity.email,
             organization_slug: memberOrg.slug,
@@ -243,10 +246,8 @@ export const OAuthAppsAuthorizeScreen = ({
 
   return (
     <InterstitialLayout
-      logo={
-        <LogoPair left={<DestinationLogo name={request.app_name} />} right={<SupabaseLogo />} />
-      }
-      title={`Authorize ${request.app_name}`}
+      logo={<LogoPair left={<DestinationLogo name={request.name} />} right={<SupabaseLogo />} />}
+      title={`Authorize ${request.name}`}
       description="This application wants to access your Supabase Account"
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
@@ -258,7 +259,7 @@ export const OAuthAppsAuthorizeScreen = ({
           <Admonition
             type="destructive"
             title={CONSENT_COPY.roleFailure.title(flaggedRefs.length)}
-            description={CONSENT_COPY.roleFailure.description(request.app_name)}
+            description={CONSENT_COPY.roleFailure.description(request.name)}
           />
         )}
 
@@ -271,7 +272,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
           {isBlockedOnProjects && (
             <NoProjectsNotice
-              appName={request.app_name}
+              appName={request.name}
               organizationSlug={orgSlug}
               onSwitchOrg={handleSwitchOrg}
             />
@@ -296,16 +297,13 @@ export const OAuthAppsAuthorizeScreen = ({
 
           {canProceed && (
             <>
-              <ScopeGroupCard appName={request.app_name} scopeGroups={request.scope_groups} />
+              <ScopeGroupCard appName={request.name} scopeGroups={request.scope_groups} />
 
               {!showProjectPicker && (
                 <Admonition
                   type="default"
                   title={CONSENT_COPY.coversEveryProject.title}
-                  description={CONSENT_COPY.coversEveryProject.description(
-                    request.app_name,
-                    orgSlug
-                  )}
+                  description={CONSENT_COPY.coversEveryProject.description(request.name, orgSlug)}
                 />
               )}
 
@@ -318,7 +316,7 @@ export const OAuthAppsAuthorizeScreen = ({
                   type="default"
                   title={CONSENT_COPY.organizationBoundGrant.title}
                   description={CONSENT_COPY.organizationBoundGrant.description(
-                    request.app_name,
+                    request.name,
                     orgSlug
                   )}
                 />
