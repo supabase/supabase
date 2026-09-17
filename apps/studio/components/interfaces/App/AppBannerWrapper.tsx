@@ -19,12 +19,9 @@ import {
   SELECT_26_BANNER_PRIORITY,
   shouldShowSelect26Banner,
 } from '@/components/ui/BannerStack/Banners/BannerSelect2026.utils'
-import { BannerTOSUpdate } from '@/components/ui/BannerStack/Banners/BannerTOSUpdate'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
-
-const TOSUpdateExpiry = new Date('2026-08-29T00:00:00Z')
 
 // Update this whenever the banner content changes so old client bundles stop
 // displaying the notice after the removal date passes.
@@ -40,11 +37,6 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { addBanner, dismissBanner } = useBannerStack()
   const pathname = usePathname()
   const track = useTrack()
-
-  const [TOSUpdateAcknowledged, , { isSuccess }] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_UPDATE,
-    false
-  )
 
   const [privacyPolicyUpdateAcknowledged, , { isSuccess: isPrivacyPolicyDismissalLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.PRIVACY_POLICY_UPDATE, false)
@@ -80,21 +72,6 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     addBanner,
     dismissBanner,
   ])
-
-  useEffect(() => {
-    if (Date.now() >= TOSUpdateExpiry.getTime()) return
-
-    if (isSuccess && !TOSUpdateAcknowledged) {
-      addBanner({
-        id: 'tos-update-banner',
-        isDismissed: false,
-        content: <BannerTOSUpdate />,
-        priority: 0,
-      })
-    } else {
-      dismissBanner('tos-update-banner')
-    }
-  }, [TOSUpdateAcknowledged, isSuccess, addBanner, dismissBanner])
 
   useEffect(() => {
     if (!isPrivacyPolicyDismissalLoaded || pathname == null) return
