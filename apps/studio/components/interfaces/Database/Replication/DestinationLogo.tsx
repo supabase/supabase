@@ -15,7 +15,7 @@ const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, string>> = {
 
 const SIZE_CLASS_NAME = {
   small: { frame: 'h-8 w-8 rounded-md', mark: 'h-4 w-4', icon: 16 },
-  large: { frame: 'h-14 w-14 rounded-lg', mark: 'h-6 w-6', icon: 24 },
+  large: { frame: 'h-14 w-14 rounded-lg', mark: 'h-8 w-8', icon: 32 },
 } as const
 
 interface DestinationLogoProps {
