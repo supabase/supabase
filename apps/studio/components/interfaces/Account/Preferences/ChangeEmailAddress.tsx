@@ -17,7 +17,7 @@ export const GitHubChangeEmailAddress = () => {
         Email addresses for GitHub identities should be updated through GitHub
       </p>
       <ol className="flex flex-col gap-y-0.5 text-sm ml-4 pl-2 list-decimal text-foreground-light">
-        <li>Log out of Supabase</li>
+        <li>Sign out of Supabase</li>
         <li>
           Change your Primary Email in{' '}
           <InlineLink href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/changing-your-primary-email-address">
@@ -25,9 +25,9 @@ export const GitHubChangeEmailAddress = () => {
           </InlineLink>{' '}
           (your primary email)
         </li>
-        <li>Log out of GitHub</li>
-        <li>Log back into GitHub (with the new, desired email set as primary)</li>
-        <li>Log back into Supabase</li>
+        <li>Sign out of GitHub</li>
+        <li>Sign back into GitHub (with the new, desired email set as primary)</li>
+        <li>Sign back into Supabase</li>
       </ol>
     </DialogSection>
   )
@@ -113,10 +113,10 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
         </DialogSection>
 
         <DialogFooter>
-          <Button variant="default" disabled={isPending} onClick={onClose}>
+          <Button disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" loading={isPending} disabled={isPending}>
+          <Button variant="primary" type="submit" loading={isPending} disabled={isPending}>
             Confirm
           </Button>
         </DialogFooter>

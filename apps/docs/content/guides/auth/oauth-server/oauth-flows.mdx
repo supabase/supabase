@@ -35,7 +35,7 @@ The flow consists of several steps:
 
 1. **Client initiates authorization** - Third-party app redirects user to Supabase Auth's authorize endpoint
 2. **Supabase validates and redirects** - Supabase Auth validates OAuth parameters and redirects user to your configured authorization URL
-3. **User authenticates and authorizes** - Your frontend checks if user is logged in, shows consent screen, and handles approval/denial
+3. **User authenticates and authorizes** - Your frontend checks if user is signed in, shows consent screen, and handles approval/denial
 4. **Authorization code issued** - Supabase Auth generates a short-lived authorization code and redirects back to client
 5. **Code exchange** - Client exchanges the code for tokens
 6. **Access granted** - Client receives access token, refresh token, and ID token
@@ -184,7 +184,7 @@ Your frontend application at the authorization path should:
 
 1. **Extract authorization_id** - Get the `authorization_id` from the URL query parameters
 2. **Fetch authorization details** - Call `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to retrieve information about the OAuth client and request parameters
-3. **Check user authentication** - Verify if the user is logged in; if not, redirect to your login page (preserving the full authorization path including the `authorization_id`). After successful login, redirect the user back to the authorization path with the same `authorization_id` query parameter
+3. **Check user authentication** - Verify if the user is signed in; if not, redirect to your sign-in page (preserving the full authorization path including the `authorization_id`). After successful sign-in, redirect the user back to the authorization path with the same `authorization_id` query parameter
 4. **Display consent screen** - Show the user information about the requesting client (name, redirect URI, scopes)
 5. **Handle user decision** - When the user approves or denies:
    - Call `supabase.auth.oauth.approveAuthorization(authorization_id)` to approve

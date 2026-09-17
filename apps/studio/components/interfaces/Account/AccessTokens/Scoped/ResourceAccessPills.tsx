@@ -1,6 +1,6 @@
 import { Box, Boxes } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 import { OrganizationsData } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
@@ -14,41 +14,53 @@ export interface ResourceAccessPillItem {
 export const OrganizationAccessPill = ({
   slug,
   organization,
-  isInaccessible = false,
 }: {
   slug: string
   organization: OrganizationsData[number] | undefined
-  isInaccessible?: boolean
-}) => (
-  <div
-    className={cn(
-      'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-xs',
-      isInaccessible ? 'border-destructive-500 text-destructive' : 'border-strong text-foreground'
-    )}
-  >
-    <Boxes size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-    {organization?.name ?? slug}
-  </div>
-)
-
-export const ProjectAccessPill = ({
-  projectRef,
-  isInaccessible = false,
-}: {
-  projectRef: string
-  isInaccessible?: boolean
 }) => {
-  const { data } = useProjectDetailQuery({ ref: projectRef })
+  const isInaccessible = organization == null
   return (
-    <div
-      className={cn(
-        'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-xs',
-        isInaccessible ? 'border-destructive-500 text-destructive' : 'border-strong text-foreground'
-      )}
+    <Badge
+      variant={isInaccessible ? 'destructive' : 'default'}
+      className={cn('normal-case text-xs font-normal tracking-normal pr-2', {
+        'border-destructive-500': isInaccessible,
+        'text-foreground': !isInaccessible,
+      })}
     >
-      <Box size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-      {data?.name ?? projectRef}
-    </div>
+      <Boxes
+        size={14}
+        strokeWidth={1.5}
+        className={cn('shrink-0', {
+          'text-foreground-lighter': !isInaccessible,
+        })}
+      />
+      {organization?.name ?? slug}
+      {isInaccessible ? <span role="status"> - revoked</span> : null}
+    </Badge>
+  )
+}
+
+export const ProjectAccessPill = ({ projectRef }: { projectRef: string }) => {
+  const { data: project, isPending } = useProjectDetailQuery({ ref: projectRef })
+  const isInaccessible = project == null && !isPending
+  return (
+    <Badge
+      variant={isInaccessible ? 'destructive' : 'default'}
+      className={cn('normal-case text-xs font-normal tracking-normal pr-2', {
+        'border-destructive-500': isInaccessible,
+        'text-foreground': !isInaccessible,
+      })}
+    >
+      <Box
+        size={14}
+        strokeWidth={1.5}
+        className={cn('shrink-0', {
+          'text-foreground-lighter': !isInaccessible,
+        })}
+      />
+      {project?.name ?? projectRef}
+      {isInaccessible ? <span role="status"> - revoked</span> : null}
+    </Badge>
   )
 }
 

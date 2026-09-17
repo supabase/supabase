@@ -1788,12 +1788,7 @@ function createStorageExplorerState({
           progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${formatTime(remainingTime)} remaining – ` : ''}`}
           action={
             toastId && (
-              <Button
-                size="tiny"
-                variant="default"
-                className="ml-6"
-                onClick={() => state.abortUploads(toastId)}
-              >
+              <Button size="tiny" className="ml-6" onClick={() => state.abortUploads(toastId)}>
                 Cancel
               </Button>
             )
@@ -1898,6 +1893,16 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     isSuccessSettings,
     bucket,
   ])
+
+  // [Monica] The effect above only refreshes `selectedBucket` when the project changes, so
+  // editing the current bucket (e.g. toggling public/private) doesn't update it there. This
+  // keeps `selectedBucket` synced to the bucket query on every change, so Get URL always
+  // uses the current public/private state instead of a stale one from initial load.
+  useEffect(() => {
+    if (bucket && state.projectRef === project?.ref) {
+      state.selectedBucket = bucket
+    }
+  }, [bucket, project?.ref, state.projectRef])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>

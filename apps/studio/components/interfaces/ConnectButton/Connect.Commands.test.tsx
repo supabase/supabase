@@ -39,7 +39,6 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 
 describe('useConnectCommands', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { status: PROJECT_STATUS.ACTIVE_HEALTHY },
     })

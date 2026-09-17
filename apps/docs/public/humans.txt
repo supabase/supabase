@@ -7,6 +7,7 @@ Aaron Byrne
 Adam Mohammed
 Adam Mokan
 Adam Whitlock
+Aditya Maruvada
 AJ Matias
 Akash Manimaran
 Akilesh Sethu
@@ -28,6 +29,7 @@ Angelico de los Reyes
 Anna Baker
 Ant Evans
 Ant Wilson
+Anthony Lio
 Ariuna K
 Arshdeep Singh
 Artur Zakirov
@@ -38,10 +40,10 @@ Barry Roodt
 Beng Eu
 Benjamin Coenen
 Beth Long
-Bo Lu
 Bobbie Soedirgo
 Brad Gyger
 Brendan Stephens
+Brent Graveland
 Brent Newson
 Brian Cullen
 Brent Schroeter
@@ -102,7 +104,6 @@ Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
 Evan Cummack
-Eyal Ehrlich
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
@@ -134,10 +135,13 @@ Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
 Inian P
+Iryna Deans
 Ivan Vasilov
 Jamie Boyd
+Jake Ng
 Jared Patterson
 Jason Farber
+Jason Voegele
 Jean-Paul Argudo
 Jeff Smick
 Jefferson Venerando
@@ -265,6 +269,7 @@ Ryan Goulet
 Ryan Senior
 Ruan Maia
 Saba Pochkhua
+Safa Orhan
 Sagar Shedge
 Sam Meech-Ward
 Sam Rome
@@ -281,7 +286,6 @@ Sean Thompson
 Sergio Cioban Filho
 Shaii O
 Shane Adams
-Shane E
 Shaun Newman
 Shardul Borhade
 Shreekar Shetty
@@ -313,6 +317,7 @@ Tom Ashley
 Tom G
 Tomás Pozo
 Tomás Torgal
+Tomohiro Mitani
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert

@@ -301,6 +301,10 @@ const MessagePart = {
   NotebookRun: MessagePartNotebookRun,
 } as const
 
+// Wide parts share the default width for now; the split stays so a part can diverge again.
+const MESSAGE_PART_WIDTH = 'max-w-3xl'
+const WIDE_MESSAGE_PART_WIDTH = 'max-w-3xl'
+
 function MessagePartContainer({
   children,
   isWide = false,
@@ -308,7 +312,11 @@ function MessagePartContainer({
   children: ReactNode
   isWide?: boolean
 }) {
-  return <div className={cn('w-full mx-auto', isWide ? 'max-w-6xl' : 'max-w-3xl')}>{children}</div>
+  return (
+    <div className={cn('w-full mx-auto', isWide ? WIDE_MESSAGE_PART_WIDTH : MESSAGE_PART_WIDTH)}>
+      {children}
+    </div>
+  )
 }
 
 const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>

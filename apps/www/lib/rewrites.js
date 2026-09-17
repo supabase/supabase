@@ -40,6 +40,14 @@ const rewrites = [
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
   },
   {
+    source: '/kb',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}`,
+  },
+  {
+    source: '/kb/:path*',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}/:path*`,
+  },
+  {
     source: '/evals',
     destination: 'https://supabase-evals.vercel.app',
   },

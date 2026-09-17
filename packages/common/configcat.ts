@@ -56,6 +56,25 @@ async function getClient() {
   }
 }
 
+/**
+ * Reads a ConfigCat string-array-style flag, targeted by `targetingKey` rather than user email. The
+ * flag value is a comma-separated list, or the `'none'` sentinel for an empty list.
+ */
+export async function getStringArrayFlag(flagKey: string, targetingKey: string): Promise<string[]> {
+  const client = await getClient()
+  if (!client) return []
+
+  await client.waitForReady()
+
+  const rawValue = await client.getValueAsync(flagKey, '', new configcat.User(targetingKey))
+  if (!rawValue || rawValue === 'none') return []
+
+  return rawValue
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+}
+
 export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
   const client = await getClient()
   const _customAttributes = {

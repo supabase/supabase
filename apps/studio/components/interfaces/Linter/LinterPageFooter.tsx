@@ -55,7 +55,6 @@ export const LinterPageFooter = ({
           align="start"
         >
           <Button
-            variant="default"
             className="mt-3! w-min"
             disabled={isLoading || isRefetching}
             loading={isLoading || isRefetching}
@@ -87,7 +86,7 @@ export const LinterPageFooter = ({
           <Markdown
             className="text-xs"
             content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](${DOCS_URL}/guides/database/inspect).`}
+            potential issues. [Learn more here](${DOCS_URL}/guides/observability/inspect).`}
           />
         </div>
       )}

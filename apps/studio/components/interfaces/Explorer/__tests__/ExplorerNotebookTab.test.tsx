@@ -131,12 +131,15 @@ afterEach(() => {
 })
 
 describe('ExplorerNotebookTab', () => {
-  it('hides SQL by default for saved notebooks and caps query cells at 6xl', () => {
+  it('hides SQL by default for saved notebooks and caps query cells from their sortable row', () => {
     renderNotebookTab()
 
     const queryCells = Array.from(document.querySelectorAll('[data-slot="explorer-query"]'))
     expect(queryCells).toHaveLength(2)
-    queryCells.forEach((cell) => expect(cell).toHaveClass('max-w-6xl'))
+    queryCells.forEach((cell) => {
+      expect(cell).not.toHaveClass('max-w-6xl')
+      expect(cell.closest('[style*="max-width"]')).not.toBeNull()
+    })
 
     expect(screen.queryByRole('textbox', { name: 'SQL editor' })).not.toBeInTheDocument()
   })
@@ -359,7 +362,7 @@ describe('ExplorerNotebookTab', () => {
     renderNotebookTab()
 
     const runNotebookButton = await screen.findByRole('button', { name: 'Run notebook' })
-    expect(runNotebookButton).toBeDisabled()
+    expect(runNotebookButton).toBeAriaDisabled()
   })
 
   it('toggles and persists the Intellisense enabled preference from "More options"', async () => {

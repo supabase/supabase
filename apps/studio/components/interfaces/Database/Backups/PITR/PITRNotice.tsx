@@ -30,7 +30,6 @@ export const PITRNotice = () => {
           <ButtonTooltip
             asChild
             disabled={!canUpdateSubscription}
-            variant="default"
             tooltip={{
               content: {
                 side: 'bottom',

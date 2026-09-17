@@ -131,7 +131,7 @@ export const SecuritySettings = () => {
                   title="Enable MFA on your account first"
                   description="You need to set up multi-factor authentication (MFA) on your own account before you can enforce it on your organization."
                   actions={
-                    <Button asChild variant="default">
+                    <Button asChild>
                       <Link href="/account/security">Set up MFA</Link>
                     </Button>
                   }
@@ -176,7 +176,6 @@ export const SecuritySettings = () => {
                     <CardFooter className="justify-end space-x-2">
                       {form.formState.isDirty && (
                         <Button
-                          variant="default"
                           disabled={isLoadingMfa || isUpdatingMfa}
                           onClick={() =>
                             form.reset({ enforceMfa: hasAccessToEnforceMfa ? mfaConfig : false })

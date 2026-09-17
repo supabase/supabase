@@ -132,6 +132,16 @@ const nextConfig = {
    */
   async redirects() {
     return [
+      {
+        source: '/guides/observability/access-data',
+        destination: '/guides/observability',
+        permanent: true,
+      },
+      {
+        source: '/guides/observability/access-data.md',
+        destination: '/guides/observability.md',
+        permanent: true,
+      },
       // Redirect root to docs base path in dev/preview envs
       {
         source: '/',
@@ -187,6 +197,16 @@ const nextConfig = {
         destination: '/guides/database/replication/pipelines-faq',
         permanent: true,
       },
+      {
+        source: '/guides/database/inspect',
+        destination: '/guides/monitoring-and-debugging/inspect',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/database-advisors',
+        destination: '/guides/observability/advisors',
+        permanent: true,
+      },
     ]
   },
   typescript: {
@@ -213,6 +233,9 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'docs',
+  unstable_sentryWebpackPluginOptions: {
+    applicationKey: 'supabase-docs',
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
