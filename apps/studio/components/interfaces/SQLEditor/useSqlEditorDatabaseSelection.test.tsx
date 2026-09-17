@@ -2,15 +2,22 @@ import { QueryClient } from '@tanstack/react-query'
 import { act, waitFor } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, it } from 'vitest'
 import { subscribe } from 'valtio'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { useSqlEditorDatabaseSelection } from './useSqlEditorDatabaseSelection'
 import { replicaKeys } from '@/data/read-replicas/keys'
 import { useReadReplicasQuery, type Database } from '@/data/read-replicas/replicas-query'
-import { createDatabaseSelectorState, useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import {
+  createDatabaseSelectorState,
+  useDatabaseSelectorStateSnapshot,
+} from '@/state/database-selector'
 import { addAPIMock } from '@/tests/lib/msw'
-import { renderSqlEditorHook, resetSqlEditorStores, setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
+import {
+  renderSqlEditorHook,
+  resetSqlEditorStores,
+  setupSqlEditorMocks,
+} from '@/tests/lib/sql-editor-test-utils'
 
 const REF = 'default'
 const CONNECTION_STRING = 'postgresql://postgres@localhost:5432/postgres'
@@ -113,14 +120,20 @@ describe('useSqlEditorDatabaseSelection', () => {
     // true) while the local-storage read is still in flight, the effect used to
     // fire immediately, default to the primary, and then the "only once" guard
     // blocked the persisted replica choice from ever being applied once it loaded.
-    localStorage.setItem(LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(REF), JSON.stringify('replica-1'))
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(REF),
+      JSON.stringify('replica-1')
+    )
     // Also mock the endpoint (not just the cache) so a refetch-on-mount — triggered
     // because seeded data via `setQueryData` is immediately stale — doesn't clobber
     // the seeded replica with the default single-database response.
     mockDatabasesWithReplica()
 
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-    queryClient.setQueryData(replicaKeys.list(REF), [buildDatabase(REF), buildDatabase('replica-1')])
+    queryClient.setQueryData(replicaKeys.list(REF), [
+      buildDatabase(REF),
+      buildDatabase('replica-1'),
+    ])
 
     const databaseSelectorState = createDatabaseSelectorState()
     const selectionsSeen: (string | undefined)[] = []
