@@ -18,7 +18,6 @@
     "test:headless-tools": "tsx scripts/test-headless-tools.mts",
     "start": "next start",
     "lint": "eslint .",
-    "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite",
     "typecheck": "run-p build:content build:markdown && tsc --noEmit -p tsconfig.json"
   },
@@ -28,7 +27,6 @@
     "@react-router/fs-routes": "^7.4.0",
     "@supabase-labs/y-supabase": "0.1.0",
     "@supabase/postgrest-js": "catalog:",
-    "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "@supabase/vue-blocks": "workspace:*",
     "@tanstack/react-query": "~5.83.0",
     "@xyflow/react": "^12.10.1",
