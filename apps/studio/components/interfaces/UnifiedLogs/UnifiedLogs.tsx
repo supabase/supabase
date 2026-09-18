@@ -132,6 +132,8 @@ export const UnifiedLogs = () => {
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  // Last row the user toggled, used as the start of a shift-click range
+  const selectionAnchorRef = useRef<string | null>(null)
   const [openRowId, setOpenRowId] = useState<string | undefined>(search.id ?? undefined)
 
   const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
@@ -257,7 +259,7 @@ export const UnifiedLogs = () => {
 
   // Generate dynamic columns based on current data
   const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
-    return generateDynamicColumns({ data: flatData })
+    return generateDynamicColumns({ data: flatData, selectionAnchorRef })
   }, [flatData])
 
   const table: Table<ColumnSchema> = useReactTable({
