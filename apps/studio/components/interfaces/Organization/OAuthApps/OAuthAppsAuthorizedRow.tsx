@@ -10,13 +10,10 @@ import {
   TableRow,
 } from 'ui'
 
-import type {
-  OAuthAuthorizedApp,
-  OAuthAuthorizedAppStatus,
-} from '@/data/oauth-apps/oauth-apps-authorized-apps-query'
+import type { OAuthAppOverviewItem } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsAuthorizedRowProps {
-  app: OAuthAuthorizedApp
+  app: OAuthAppOverviewItem
   canRevoke: boolean
   onSelectViewGrants: () => void
   onSelectRevoke: () => void
@@ -40,14 +37,9 @@ export const OAuthAppsAuthorizedRow = ({
           >
             {!!app.icon ? '' : app.name[0]}
           </div>
-          <div className="min-w-0">
-            <p className="truncate" title={app.name}>
-              {app.name}
-            </p>
-            <p className="truncate font-mono text-xs text-foreground-lighter" title={app.client_id}>
-              {app.client_id}
-            </p>
-          </div>
+          <p className="min-w-0 truncate" title={app.name}>
+            {app.name}
+          </p>
         </div>
       </TableCell>
       <TableCell>
@@ -73,13 +65,12 @@ export const OAuthAppsAuthorizedRow = ({
   )
 }
 
-function getStatusVariant(status: OAuthAuthorizedAppStatus) {
+function getStatusVariant(status: OAuthAppOverviewItem['status']) {
   if (status === 'active') return 'success' as const
-  if (status === 'legacy') return 'warning' as const
-  return 'default' as const
+  return 'warning' as const
 }
 
-function getGrantsLabel(app: OAuthAuthorizedApp) {
+function getGrantsLabel(app: OAuthAppOverviewItem) {
   if (app.status === 'legacy') return 'Authorized before project controls'
   if (app.member_grant_count === 1) return '1 member grant'
   return `${app.member_grant_count} member grants`
