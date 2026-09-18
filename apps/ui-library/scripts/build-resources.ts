@@ -25,7 +25,10 @@ async function generate() {
   const manifest: Record<string, unknown> = {}
 
   for (const item of items) {
-    const resolved = resolveRegistryItem({ items }, item.name)
+    const resolved = resolveRegistryItem(
+      (name) => items.find((candidate) => candidate.name === name),
+      item.name
+    )
     const files = resolved.files.map((file) => ({
       path: getInstalledPath(file),
       content: file.content,

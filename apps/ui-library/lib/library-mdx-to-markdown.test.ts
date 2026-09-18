@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 import { getBlockArchitecture } from '../lib/block-architecture'
-import { collectMdxFiles, getDocSlug } from '../scripts/library-documents'
+import { collectMdxFiles, getDocSlug } from './library-documents'
 import { transformLibraryMdx } from './library-mdx-to-markdown'
 
 describe('transformLibraryMdx', () => {
@@ -17,8 +17,11 @@ describe('transformLibraryMdx', () => {
     )
     const output = transformLibraryMdx(source)
     assert.equal(output.match(/^## Installation$/gm)?.length, 1)
-    assert.match(output, /cd my-app\nnpx shadcn@latest init --base radix/)
-    assert.ok(output.indexOf('npx create-next-app') < output.indexOf('npx shadcn@latest add'))
+    assert.match(
+      output,
+      /npx shadcn@latest init --template next --base radix --name my-app\ncd my-app/
+    )
+    assert.ok(output.indexOf('npx shadcn@latest init') < output.indexOf('npx shadcn@latest add'))
     assert.ok(output.indexOf('npx shadcn@latest add') < output.indexOf('## Configure Supabase'))
     assert.match(output, /Keep the generated package lockfile/)
     assert.doesNotMatch(output, /<BlockItem|<BlockOverview/)
