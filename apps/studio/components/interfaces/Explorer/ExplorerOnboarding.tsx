@@ -34,7 +34,7 @@ const ONBOARDING_STEPS: Array<{
     icon: NotebookText,
     title: 'Notebooks',
     description:
-      'Save queries with notes and context for you, your team, or Assistant to run later, replacing snippets over time.',
+      'Snippets have evolved into notebooks. Combine multiple queries with markdown notes for you, your team, or Assistant to run later.',
   },
   {
     icon: MessageSquare,
