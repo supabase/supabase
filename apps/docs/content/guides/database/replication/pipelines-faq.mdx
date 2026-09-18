@@ -64,12 +64,14 @@ Delete all pipelines first, then follow [Disabling Pipelines](/docs/guides/datab
 
 Check that:
 
-- The table is published and the pipeline was [restarted after the publication change](/docs/guides/database/replication/pipelines#adding-or-removing-tables).
+- The table is published. If you added it after starting the pipeline, [restart the pipeline to discover it](/docs/guides/database/replication/pipelines#adding-or-removing-tables).
 - The table and published columns satisfy the destination's primary-key and replica-identity requirements.
-- Publication row filters include the expected rows.
+- [Publication row filters](/docs/guides/database/replication/pipelines#filtering-rows-with-a-predicate) include the expected rows.
 - Missing columns aren't generated; Pipelines skips generated columns.
 
-If new changes arrive but existing rows are missing, check the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy). If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements).
+If new changes arrive but existing rows are missing, check the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy). [Changing a row filter](/docs/guides/database/replication/pipelines#other-publication-changes) also does not copy newly included historical rows.
+
+If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements).
 
 ## Why is a pipeline failed or stopped?
 

@@ -158,7 +158,8 @@ These examples use the `pub_users_orders` publication from the [SQL example](#pu
 1. Add existing source tables to your explicit table-list publication using SQL:
 
    ```sql
-   alter publication pub_users_orders add table products, categories;
+   alter publication pub_users_orders
+   add table products, categories;
    ```
 
 2. Review the [initial sync selection](#choosing-which-tables-to-copy) for the added tables, then select **Restart pipeline** from the pipeline's actions menu.
@@ -168,18 +169,32 @@ These examples use the `pub_users_orders` publication from the [SQL example](#pu
 1. Remove the table from your Postgres publication using SQL:
 
    ```sql
-   alter publication pub_users_orders drop table orders, products;
+   alter publication pub_users_orders
+   drop table orders, products;
    ```
 
 2. Select **Restart pipeline** from the pipeline's actions menu.
 
-After a pipeline restart, removed tables stop replicating but their destination data remains. You can then delete those destination tables. **Don't modify or delete tables still managed by Pipelines**; doing so can stop replication and require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+After the restart, Pipelines removes its replication state for those tables. Source tables and destination tables, including data already replicated, remain unchanged. Other pipelines using publications that still include the tables are unaffected. If multiple pipelines use the changed publication, restart each one.
+
+You can delete the destination tables yourself after the restart. **Don't modify or delete tables still managed by Pipelines**; doing so can stop replication and require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 ### Other publication changes
 
-Stop and restart the pipeline after changing row filters, published operations, or `publish_via_partition_root`. A filter change does not copy newly included historical rows or remove existing destination rows. To rebuild data with the new filter, include the affected tables in initial sync and restart their replication.
+Publication changes do not all require a pipeline restart:
 
-Column-list changes for already tracked tables can be applied while the pipeline runs, subject to the destination's [schema-change restrictions](#schema-change-support).
+| Change                                                                 | When it takes effect                                                                                                                                |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add or remove published columns on an already tracked table            | Applied while the pipeline runs, subject to the destination's [schema-change restrictions](#schema-change-support).                                 |
+| Change a row filter                                                    | Postgres applies the new filter to ongoing changes without a pipeline restart.                                                                      |
+| Change published operations (`insert`, `update`, `delete`, `truncate`) | Postgres changes which operations it sends without a pipeline restart. Previously omitted operations are not replayed.                              |
+| Change `publish_via_partition_root`                                    | Stop the pipeline before changing this option, then restart it to discover the new table identities. See [Partitioned tables](#partitioned-tables). |
+
+Changing a row filter does not copy newly included historical rows or remove previously copied rows that no longer match. A pipeline restart does not rebuild this historical data. To rebuild destination data with the new filter, include the affected tables in initial sync and [restart their replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+
+Wait for initial sync to finish before changing its filter; changing a filter does not update a copy already in progress.
+
+When changing column lists or row filters with `ALTER PUBLICATION ... SET TABLE`, include every table you want to keep in the publication. `SET TABLE` replaces the publication's table list; omitted tables are removed.
 
 ### Schema change support
 
@@ -196,8 +211,6 @@ Pipelines has the following limitations:
 - **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
 - **Arrays**: Only one-dimensional arrays are supported. Non-default lower bounds are not preserved. Check the destination guide for additional array restrictions.
 - **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
-- **At-least-once processing**: Recovery can process acknowledged data again. See [delivery and replay behavior](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once).
-- **Automatic stop on repeated failure**: Supabase stops a pipeline after repeated failures. Fix the cause and restart it manually. See [Why is a pipeline failed or stopped?](/docs/guides/database/replication/pipelines-faq#why-is-a-pipeline-failed-or-stopped).
 
 Destination-specific limitations, such as row size and type mappings, are documented in each destination guide.
 
@@ -256,16 +269,29 @@ You can filter which rows to replicate using a `WHERE` clause. These examples co
 ```sql
 -- Only replicate active users
 create publication pub_active_users
-for table users where (status = 'active')
+for table users
+where (status = 'active')
 with (publish = 'insert');
 
 -- Only replicate recent orders
 create publication pub_recent_orders
-for table orders where (created_at > '2024-01-01')
+for table orders
+where (created_at > '2024-01-01')
 with (publish = 'insert');
 ```
 
 To also publish updates and deletes, every column used in the row filter must be covered by the table's replica identity. For example, `REPLICA IDENTITY FULL` covers all columns, at the cost of more WAL. Review [Postgres row-filter restrictions](https://www.postgresql.org/docs/15/logical-replication-row-filter.html) and your destination's source table requirements before enabling those operations.
+
+Postgres evaluates the filter before sending changes. A row matches only when the expression is `true`; `false` and `NULL` do not match. For an update, it checks both the old and new row:
+
+| Old row matches | New row matches | Change sent to Pipelines |
+| --------------- | --------------- | ------------------------ |
+| Yes             | Yes             | Update                   |
+| No              | Yes             | Insert                   |
+| Yes             | No              | Delete                   |
+| No              | No              | No change                |
+
+This applies when updates are published. Row filters do not limit `TRUNCATE`: a published truncate affects the whole destination table. See [Other publication changes](#other-publication-changes) before changing a filter on an existing pipeline.
 
 #### Partitioned tables
 
@@ -282,12 +308,12 @@ Schema-wide publications follow the same rule for partitioned tables; regular ta
 For example, if `orders` is partitioned by month:
 
 ```sql
--- Replicate the whole partition hierarchy as the parent table.
+-- Publish all partitions as the parent table.
 create publication pub_orders_root
 for table orders
 with (publish_via_partition_root = true);
 
--- Replicate each leaf partition as its own table.
+-- Publish each leaf as a separate table.
 create publication pub_orders_leaves
 for table orders
 with (publish_via_partition_root = false);
@@ -295,15 +321,27 @@ with (publish_via_partition_root = false);
 
 Publications created from the Dashboard replication flow default to `publish_via_partition_root = true`. Clear **Publish partitions as the parent table** to use `false`. If you create or alter a publication manually with SQL, set this option explicitly so the destination shape matches what you expect.
 
-On Postgres 15 and later, row filters on partition publications apply during both the initial sync and ongoing replication. Pipelines uses the row filter attached to the effective publication table entry: the published partition root when `publish_via_partition_root = true`, and the published leaf relation when `publish_via_partition_root = false`.
+On Postgres 15 and later, row filters apply during both initial sync and ongoing replication:
+
+- With `publish_via_partition_root = true`, the published parent's filter and column list apply, even if a leaf has its own filter or column list.
+- With `false`, each leaf's filter and column list apply. Define row filters on the leaves; Postgres rejects them on the partitioned parent in this mode.
+
+See [Postgres partition row filters](https://www.postgresql.org/docs/15/logical-replication-row-filter.html#LOGICAL-REPLICATION-ROW-FILTER-PARTITIONED-TABLE) for examples.
 
 The publication setting controls which Postgres relation becomes a destination table. It does not copy the source table's physical partitioning configuration, partition key, or partition bounds to the destination.
 
+Choose the mode before starting replication:
+
+- With `true`, new changes in a newly created or attached partition flow through the already tracked parent without a restart. Attaching a partition does not copy rows that were already in it.
+- With `false`, a new leaf partition has its own table identity. Restart the pipeline to discover it; its existing rows are copied only if it is selected for initial sync.
+
+Changing this option can switch between parent and leaf tables. Stop the pipeline before changing it, review the **Initial sync** selection for the new tables, then restart. Pipelines removes state for tables no longer tracked and discovers the new ones, copying their current source rows only if selected for initial sync. Old destination tables and their data remain; they are not merged or split automatically.
+
 <Admonition type="note">
 
-With `publish_via_partition_root = true`, truncating an individual leaf partition is not replicated as a truncate event for the published parent. This is useful for append-only data such as events: you can truncate old leaf partitions to keep Postgres storage bounded while retaining the rows already copied to the destination. If you want the destination to be truncated too, run `TRUNCATE` on the published partition root.
+With `publish_via_partition_root = true`, truncating a leaf partition keeps destination rows; truncating the published parent clears them.
 
-Rows retained only in the destination aren't a permanent archive. A table restart discards the retained destination rows. It copies the rows that still exist in Postgres only if the table is selected for initial sync.
+A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) discards retained rows. It copies current source data again only if the table is selected for initial sync.
 
 </Admonition>
 
