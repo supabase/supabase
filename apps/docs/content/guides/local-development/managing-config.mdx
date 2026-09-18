@@ -57,6 +57,52 @@ secret = "env(GITHUB_SECRET)"
 redirect_uri = "" # Overrides the default auth redirectUrl.
 ```
 
+## Pushing config to a hosted project
+
+`config.toml` also configures your hosted project. [`supabase config push`](/docs/reference/cli/supabase-config-push) writes the properties your file declares to the linked project through the Management API. This lets you keep Auth, API, database, and Storage settings in version control instead of changing them in the Dashboard.
+
+### What a push changes
+
+- Only properties that `config.toml` declares are written. A section or key that is missing from the file leaves the hosted value unchanged.
+- A declared value replaces the hosted value, including values set in the Dashboard. For example, `[auth.external.google]` with `enabled = false` disables Google sign-in on the hosted project, even if it is enabled in the Dashboard.
+- Before each write, the CLI prints the change for the affected resource (`api`, `db.settings`, `db.network_restrictions`, `db.ssl_enforcement`, `auth`, `storage`) and asks for confirmation.
+
+<Admonition type="caution">
+
+The file that `supabase init` generates declares local development values, such as `site_url = "http://127.0.0.1:3000"`, `minimum_password_length = 6`, and OAuth providers with `enabled = false`. Pushing it unchanged applies those values to the hosted project and reverts settings made in the Dashboard. Preview the diff before you push, and confirm only the changes you expect.
+
+</Admonition>
+
+### Preview and push
+
+1. Link the project:
+
+   ```bash
+   supabase link --project-ref <project-id>
+   ```
+
+2. If the hosted project was configured in the Dashboard, pull its configuration into `config.toml` first, so the file starts from the hosted values:
+
+   ```bash
+   supabase config pull
+   ```
+
+3. Preview what a push would change, without writing anything:
+
+   ```bash
+   supabase config diff
+   ```
+
+4. Push, and confirm each resource:
+
+   ```bash
+   supabase config push
+   ```
+
+To verify the hosted Auth settings after a push, open Authentication settings in the Dashboard or call [Get auth service config](/docs/reference/api/v1-get-auth-service-config) in the Management API.
+
+`config diff`, `config pull`, and per-resource confirmation are available from CLI v2.117.0. Update the CLI before you follow these steps.
+
 ### Going further
 
 For more advanced secrets management workflows, including:
