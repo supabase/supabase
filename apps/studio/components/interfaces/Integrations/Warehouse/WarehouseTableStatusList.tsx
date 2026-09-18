@@ -1,5 +1,17 @@
 import dayjs from 'dayjs'
-import { Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
@@ -62,35 +74,50 @@ interface WarehouseTableStatusListProps {
 const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => {
   return (
     <Card>
-      <CardContent className="p-0 divide-y">
-        {tables.map((table) => {
-          const state = TABLE_STATE[table.state]
-          return (
-            <div
-              key={`${table.schema}.${table.name}`}
-              className="flex items-center gap-4 px-3 py-2.5"
-            >
-              <span className="flex-1 truncate text-sm">
-                <span className="text-foreground-lighter">{table.schema}.</span>
-                <span className="text-foreground">{table.name}</span>
-              </span>
-              <TableLag table={table} />
-              {table.warehouse_size_bytes !== undefined && (
-                <span className="text-sm text-foreground-light tabular-nums">
-                  {formatBytes(table.warehouse_size_bytes)}
-                </span>
-              )}
-              <StateDot variant={state.variant} isPulsing={state.isPulsing}>
-                {state.label}
-              </StateDot>
-            </div>
-          )
-        })}
-        {tables.length === 0 && (
-          <p className="px-3 py-2.5 text-sm text-foreground-lighter">
-            No tables are being copied yet.
-          </p>
-        )}
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Table</TableHead>
+              <TableHead className="w-36">Lag</TableHead>
+              <TableHead className="w-28">Size</TableHead>
+              <TableHead className="w-36">Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tables.map((table) => {
+              const state = TABLE_STATE[table.state]
+              return (
+                <TableRow key={`${table.schema}.${table.name}`}>
+                  <TableCell>
+                    <span className="text-foreground-lighter">{table.schema}.</span>
+                    <span className="text-foreground">{table.name}</span>
+                  </TableCell>
+                  <TableCell>
+                    <TableLag table={table} />
+                  </TableCell>
+                  <TableCell className="text-foreground-light tabular-nums">
+                    {table.warehouse_size_bytes !== undefined
+                      ? formatBytes(table.warehouse_size_bytes)
+                      : null}
+                  </TableCell>
+                  <TableCell>
+                    <StateDot variant={state.variant} isPulsing={state.isPulsing}>
+                      {state.label}
+                    </StateDot>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+            {tables.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-foreground-lighter">
+                  No tables are being copied yet.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   )

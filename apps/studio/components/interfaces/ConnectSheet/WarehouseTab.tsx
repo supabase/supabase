@@ -50,6 +50,8 @@ export const WarehouseTab = () => {
   const { data, isPending, isFetching, isError, error, refetch } = useWarehouseSetupStatusQuery({
     projectRef,
   })
+  const hasLiveTables = data?.tables.some((table) => table.state === 'live') ?? false
+  const canShowConnectionDetails = isWarehouseProvisioned(data?.setup_status) || hasLiveTables
 
   let content: React.ReactNode
 
@@ -76,7 +78,7 @@ export const WarehouseTab = () => {
         }
       />
     )
-  } else if (!isWarehouseProvisioned(data?.setup_status)) {
+  } else if (!canShowConnectionDetails) {
     const { type, title, description, action } = getNotProvisionedContent(data?.setup_status)
 
     content = (
@@ -95,9 +97,26 @@ export const WarehouseTab = () => {
   } else {
     return (
       <div>
+        {isWarehouseSettingUp(data?.setup_status) && (
+          <div className="px-8 pt-8">
+            <Admonition
+              type="default"
+              layout="responsive"
+              title="Warehouse setup is still running"
+              description="Some tables are ready to query. The remaining tables will become available as their backfills finish."
+              actions={[
+                <Button key="view-progress" asChild variant="default">
+                  <Link href={`/project/${projectRef}/integrations/warehouse/overview`}>
+                    View progress
+                  </Link>
+                </Button>,
+              ]}
+            />
+          </div>
+        )}
         <WarehouseConnectionCard variant="sheet" />
         <div className="border-t px-8 py-4">
-          <Button asChild variant="text" size="tiny" className="px-0">
+          <Button asChild variant="default" size="tiny">
             <Link href={`/project/${projectRef}/integrations/warehouse/overview`}>
               Manage Warehouse
             </Link>

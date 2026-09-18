@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 
 import { getPipelineDisplayState, normalizePipelineStatusName } from '../Pipeline.utils'
-import type { StateDotVariant } from '../StateDot'
+import type { StateDotVariant } from '@/components/ui/StateDot'
 import {
   RetryPolicy,
   SlotLagMetrics,

@@ -78,6 +78,30 @@ describe('WarehouseTab', () => {
     expect(screen.getByRole('link', { name: 'View progress' })).toBeInTheDocument()
   })
 
+  test('shows connection details once the first table is live while setup continues', async () => {
+    mockSetupStatus({
+      setup_status: 'copying',
+      tables: [
+        { schema: 'public', name: 'orders', copy_name: 'public.orders', state: 'live' },
+        { schema: 'public', name: 'customers', copy_name: 'public.customers', state: 'syncing' },
+      ],
+    })
+
+    customRender(<WarehouseTab />)
+
+    expect(await screen.findByText('Warehouse setup is still running')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Some tables are ready to query. The remaining tables will become available as their backfills finish.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByDisplayValue('default.warehouse.supabase.io')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View progress' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
+  })
+
   test('points to the integration when setup reports an error', async () => {
     mockSetupStatus({ setup_status: 'error' })
 

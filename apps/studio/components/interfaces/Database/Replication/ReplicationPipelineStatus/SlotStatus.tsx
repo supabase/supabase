@@ -1,6 +1,6 @@
-import { StateDot } from '../StateDot'
 import { SlotWalStatus } from './ReplicationPipelineStatus.types'
 import { getWalStatusMeta } from './ReplicationPipelineStatus.utils'
+import { StateDot } from '@/components/ui/StateDot'
 
 export const SLOT_STATUS_TOOLTIP =
   'How safely your database is keeping the changes this pipeline’s main replication slot still needs'
