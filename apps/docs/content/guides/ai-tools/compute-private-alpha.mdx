@@ -83,6 +83,7 @@ Add these CIDRs — Compute's production egress ranges — to the project's allo
 - `44.246.156.159/32`
 - `52.27.88.146/32`
 - `44.237.218.47/32`
+- `2600:1f14:777:fa00::/56`
 
 Use [`network-restrictions update`](/docs/reference/cli/supabase-network-restrictions-update) with `--append` so the existing allowlist is kept:
 
@@ -91,6 +92,7 @@ supabase network-restrictions update --project-ref <ref> \
   --db-allow-cidr 44.246.156.159/32 \
   --db-allow-cidr 52.27.88.146/32 \
   --db-allow-cidr 44.237.218.47/32 \
+  --db-allow-cidr 2600:1f14:777:fa00::/56 \
   --append \
   --experimental
 ```
