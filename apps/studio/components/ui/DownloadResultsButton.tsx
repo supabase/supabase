@@ -15,6 +15,7 @@ import {
   KeyboardShortcut,
 } from 'ui'
 
+import { ButtonTooltip } from './ButtonTooltip'
 import {
   convertResultsToCSV,
   convertResultsToJSON,
@@ -127,15 +128,21 @@ export const DownloadResultsButton = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant={variant}
-          icon={iconOnly ? <Download /> : undefined}
-          iconRight={iconOnly ? undefined : <ChevronDown />}
-          disabled={results.length === 0}
-          className={iconOnly ? 'w-7' : ''}
-        >
-          {!iconOnly && text}
-        </Button>
+        {iconOnly ? (
+          <ButtonTooltip
+            variant={variant}
+            aria-label="Download results"
+            aria-describedby={undefined}
+            icon={<Download />}
+            disabled={results.length === 0}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Download results' } }}
+          />
+        ) : (
+          <Button variant={variant} iconRight={<ChevronDown />} disabled={results.length === 0}>
+            {text}
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align} className={enableCopyShortcuts ? 'w-60' : 'w-44'}>
         {isLogs && IS_PLATFORM && (
