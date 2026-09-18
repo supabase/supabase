@@ -3,6 +3,8 @@ id: 'manage-usage-pipelines'
 title: 'Manage Pipelines usage'
 ---
 
+Understand [Pipelines charges](#what-you-are-charged-for), compare [billing examples](#billing-examples), and [reduce unnecessary usage](#optimize-usage).
+
 ## What you are charged for
 
 Pipelines has three charges:
@@ -15,32 +17,15 @@ Tables excluded from **Initial sync** do not incur an initial sync data charge. 
 
 Destination-provider charges are separate. For example, Google Cloud can charge for BigQuery ingestion, storage, and CDC compute.
 
-## How data processed is measured
+## Pricing
 
-Data processed measures logical Postgres row data accepted by the destination, independent of physical storage size or destination encoding.
+<$Partial path="billing/pricing/pricing_pipelines.mdx" />
 
-The measurement includes:
-
-- **Initial sync and resynchronization**: Row data emitted by Postgres COPY.
-- **Ongoing replication**: Row values Postgres emits for inserts, updates, and deletes. Updates include new row values and any previous identity values Postgres emits. Deletes include the emitted identity values.
-
-Failed destination write attempts that Pipelines retries are not counted. Data is counted only after the destination acknowledges successful processing. In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count the same data again.
-
-Data successfully processed again after [restarting table replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables), repeating an interrupted initial sync, or recovering a lost main slot is also counted again. **Restart pipeline** normally resumes saved progress, but [startup recovery](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery) can require copying data again.
-
-### Cost estimates
+## Cost estimates
 
 The Dashboard estimates initial sync volume and cost from source table metadata without scanning all rows. You can create a pipeline or restart table replication even if an estimate is unavailable.
 
 Estimates are planning guidance, not exact quotes. Actual charges reflect row data copied after publication column and row filters and accepted by the destination.
-
-### Usage on your invoice
-
-Usage is shown as "ETL Pipeline Hours", "ETL Copy Backfill Data GB", and "ETL Replicated Data GB" on your invoice.
-
-## Pricing
-
-<$Partial path="billing/pricing/pricing_pipelines.mdx" />
 
 ## Billing examples
 
@@ -100,3 +85,20 @@ Pipeline hours are billed in arrears. Deleting the pipeline after 24 hours ends 
 - Include only the tables and columns that you need at the destination.
 - Keep high-churn tables out of the publication when their changes are not needed for analytics.
 - If you no longer require replication, delete the pipeline through your [project's replication settings](/dashboard/project/_/database/replication) to stop pipeline-hour charges.
+
+## How data processed is measured
+
+Data processed measures logical Postgres row data accepted by the destination, independent of physical storage size or destination encoding.
+
+The measurement includes:
+
+- **Initial sync and resynchronization**: Row data emitted by Postgres COPY.
+- **Ongoing replication**: Row values Postgres emits for inserts, updates, and deletes. Updates include new row values and any previous identity values Postgres emits. Deletes include the emitted identity values.
+
+Failed destination write attempts that Pipelines retries are not counted. Data is counted only after the destination acknowledges successful processing. In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count the same data again.
+
+Data successfully processed again after [restarting table replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables), repeating an interrupted initial sync, or recovering a lost main slot is also counted again. **Restart pipeline** normally resumes saved progress, but [startup recovery](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery) can require copying data again.
+
+## Usage on your invoice
+
+Usage is shown as "ETL Pipeline Hours", "ETL Copy Backfill Data GB", and "ETL Replicated Data GB" on your invoice.

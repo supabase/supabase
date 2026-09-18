@@ -8,30 +8,36 @@ sidebar_label: 'Setting up'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-Supabase Pipelines replicates Postgres data to a destination you configure in the Dashboard. Supabase runs the pipeline using the open-source [ETL engine](https://github.com/supabase/etl).
+Supabase Pipelines replicates Postgres data to a destination you configure in the Dashboard. Supabase runs the pipeline using the open-source [Supabase ETL](https://github.com/supabase/etl).
 
-Pipelines has two replication phases:
+**Initial sync** copies existing rows from selected tables. **Ongoing replication** uses change data capture (CDC) to apply subsequent inserts, updates, deletes, and truncates.
 
-- Initial sync copies existing rows from the tables you select.
-- Ongoing replication uses change data capture (CDC) to apply subsequent inserts, updates, deletes, and truncates.
+[Create a pipeline](#setup-overview), then refer to [settings](#pipeline-settings), [management](#managing-your-pipeline), or [advanced publication options](#advanced-publication-options) as needed.
 
-Use this guide to [create a pipeline](#setup-overview), [change its settings](#pipeline-settings), or [manage publication tables](#adding-or-removing-tables). For destination data models, see the [comparison](/docs/guides/database/replication#supported-destinations).
+## Before you start
 
-## Pricing
+Check the [plan and access requirements](/docs/guides/database/replication/pipelines-faq#which-plans-support-pipelines) and [compare destination data models](/docs/guides/database/replication#supported-destinations).
+
+### Region
+
+Managed Pipelines run in AWS `eu-central-1` (Frankfurt), independently of your source and destination regions. This region is fixed. Choose nearby destination resources to reduce latency and replication lag.
+
+### Pricing
 
 Pipelines charges for configured pipeline hours, initial sync data, and ongoing replication data. Destination-provider charges are separate. See [rates, estimates, and billing examples](/docs/guides/platform/manage-your-usage/pipelines).
 
 ## Setup overview
 
-You need a Postgres publication that selects the data to replicate and a destination with the required credentials. Check [plan and access requirements](/docs/guides/database/replication/pipelines-faq#which-plans-support-pipelines) before starting.
+Prepare your destination, then enable and configure Pipelines in the Dashboard. A Postgres publication selects the data to replicate; you can create one during setup.
 
-### Step 1: Create a Postgres publication
+### Step 1: Prepare your destination [#step-1-create-a-postgres-publication]
 
-Choose one of these options:
+Follow your destination guide to prepare its resources and credentials, and check its source table requirements:
 
-- Use an existing publication and continue to [Step 2](#step-2-enable-pipelines).
-- Create one in the Dashboard during [Step 3](#step-3-configure-a-destination).
-- [Create a publication with SQL](#creating-a-publication-with-sql) for schema-wide replication, column lists, row filters, or partition settings.
+- [BigQuery](/docs/guides/database/replication/bigquery)
+- [ClickHouse](/docs/guides/database/replication/clickhouse)
+- [DuckLake](/docs/guides/database/replication/ducklake)
+- [Snowflake](/docs/guides/database/replication/snowflake)
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -50,13 +56,9 @@ Pipelines installs an `etl` schema and a database event trigger to track replica
 
 ### Step 3: Configure a destination
 
-1. In the destination form, enter a **Name** and select a **Publication**. To create a publication, click **New publication**, enter a name, and select at least one table.
-2. Choose which tables copy existing rows under **Initial sync**. Leave **All tables** selected unless you only need future changes for some tables. See [Choosing which tables to copy](#choosing-which-tables-to-copy).
-3. Configure credentials and destination-specific settings using the relevant guide:
-   - [BigQuery](/docs/guides/database/replication/bigquery)
-   - [ClickHouse](/docs/guides/database/replication/clickhouse)
-   - [DuckLake](/docs/guides/database/replication/ducklake)
-   - [Snowflake](/docs/guides/database/replication/snowflake)
+1. Enter a **Name** and select a **Publication**. Use an existing publication, or click **New publication**, name it, and select at least one table. For schema-wide replication or advanced options, [create the publication with SQL](#creating-a-publication-with-sql).
+2. Under **Initial sync**, keep **All tables** to copy existing rows, or [choose which tables to copy](#choosing-which-tables-to-copy) if you only need future changes for some tables.
+3. Enter the credentials and destination-specific settings prepared in Step 1.
 4. Optionally expand **Advanced settings** to change [batching, initial sync concurrency, or slot recovery](#advanced-settings).
 5. Click **Create and start pipeline**. Fix any **Required** issues. For **Warnings**, review the risk, click **Create and start pipeline anyway**, and confirm that you want to continue.
 6. Review the estimated initial sync cost and ongoing charges, then confirm creation.
@@ -74,34 +76,11 @@ The pipeline copies the selected tables' existing rows and begins ongoing replic
 
 ### Step 4: Monitor your pipeline
 
-Click the pipeline in the list to inspect [pipeline and table states, replication lag, and logs](/docs/guides/database/replication/pipelines-monitoring).
+Open the pipeline and check that tables progress to **Live** and replication lag catches up. See [pipeline states, metrics, and logs](/docs/guides/database/replication/pipelines-monitoring) to assess progress and diagnose problems.
 
 ## Pipeline settings
 
-### Region
-
-Managed Pipelines run in AWS `eu-central-1` in Frankfurt. This region is fixed and separate from your source database and destination regions. Choose nearby destination resources to reduce network latency and replication lag.
-
-### Advanced settings
-
-Leave these settings at their defaults unless you need to tune latency, initial sync speed, or recovery behavior.
-
-| Setting                                | Default              | Effect                                                                                                                                                              |
-| -------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Batch wait time**                    | `10000` milliseconds | Maximum wait after the first buffered row or change before flushing a partial batch. Size and memory limits can flush earlier. Accepts whole milliseconds from `0`. |
-| **Table sync workers**                 | `4`                  | Maximum tables copied concurrently. Each active worker uses an additional replication slot. Accepts whole numbers greater than `0`.                                 |
-| **Initial sync connections per table** | `4`                  | Maximum source connections copying one table. Total connection use increases with both concurrency settings. Accepts whole numbers greater than `0`.                |
-| **Invalidated slot behavior**          | **Block startup**    | **Block startup** requires manual recovery. **Recreate slot** rebuilds an invalid main slot and restarts replication for all tables from scratch on the next start. |
-
-Lower batch wait times reduce batching delay; higher values can improve write efficiency. For concurrency tradeoffs, see [Initial sync and table-sync slots](/docs/guides/database/replication/pipelines-monitoring#initial-sync-and-table-sync-slots).
-
-**Recreate slot replaces every destination table**, including tables excluded from initial sync. Review [lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) before enabling it.
-
-### Creation checks
-
-Before creation, the Dashboard checks source access, logical replication settings and capacity, the publication, destination connectivity, and destination-specific table requirements. The publication must contain at least one table and exclude the internal `etl` schema. `FOR ALL TABLES` publications are rejected.
-
-A warning can recommend increasing `max_slot_wal_keep_size` so Postgres retains changes during initial sync. Higher retention uses more source storage; check available disk before applying the recommendation. See [WAL configuration](/docs/guides/database/replication#logical-replication-configuration) and [monitoring](/docs/guides/database/replication/pipelines-monitoring#replication-lag-metrics).
+Review initial sync choices and creation checks before tuning advanced settings.
 
 ### Choosing which tables to copy
 
@@ -114,9 +93,30 @@ A warning can recommend increasing `max_slot_wal_keep_size` so Postgres retains 
 | **Selected tables only**       | Only the tables you include                    |
 | **No tables**                  | None; replicate new changes only               |
 
-Changes to this setting affect tables whose initial sync has not completed. To copy existing rows for a table that already finished syncing, include it here, apply the settings, and [restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Selection changes affect unfinished initial syncs. To copy a completed table again, include it here, apply the settings, and [restart its replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-Skipping initial sync does not preserve or attach to data previously loaded into a managed destination table. A table restart erases that table's destination data even when its initial sync is skipped.
+Skipping initial sync does not preserve or attach to previously loaded destination data. A table restart erases destination data even when initial sync is skipped.
+
+### Creation checks
+
+The Dashboard checks source access, logical replication settings and capacity, the publication, destination connectivity, and destination table requirements. Publications must contain at least one table and exclude the internal `etl` schema. `FOR ALL TABLES` is rejected.
+
+A warning can recommend increasing `max_slot_wal_keep_size` so Postgres retains changes during initial sync. Higher retention uses more source storage; check available disk before applying the recommendation. See [WAL configuration](/docs/guides/database/replication#logical-replication-configuration) and [monitoring](/docs/guides/database/replication/pipelines-monitoring#replication-lag-metrics).
+
+### Advanced settings
+
+Leave these settings at their defaults unless you need to tune latency, initial sync speed, or recovery behavior.
+
+| Setting                                | Behavior                                                                                                                                                                                           |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Batch wait time**                    | Default: `10000` milliseconds. Maximum wait after the first buffered row or change before flushing a partial batch. Size and memory limits can flush earlier. Accepts whole milliseconds from `0`. |
+| **Table sync workers**                 | Default: `4`. Maximum tables copied concurrently. Each active worker uses an additional replication slot. Accepts whole numbers greater than `0`.                                                  |
+| **Initial sync connections per table** | Default: `4`. Maximum source connections copying one table. Total connection use increases with both concurrency settings. Accepts whole numbers greater than `0`.                                 |
+| **Invalidated slot behavior**          | Default: **Block startup**, which requires manual recovery. **Recreate slot** rebuilds an invalid main slot and restarts replication for all tables from scratch on the next start.                |
+
+Lower batch wait times reduce batching delay; higher values can improve write efficiency. For concurrency tradeoffs, see [Initial sync and table-sync slots](/docs/guides/database/replication/pipelines-monitoring#initial-sync-and-table-sync-slots).
+
+**Recreate slot replaces every destination table**, including tables excluded from initial sync. Review [lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) before enabling it.
 
 ## Managing your pipeline
 
@@ -129,19 +129,9 @@ Use the three-dot actions menu on a pipeline row:
 - **Edit pipeline**: Modify settings like credentials, initial sync selection, or advanced options. Click **Apply and restart pipeline** for an active pipeline or **Apply and start pipeline** for a stopped pipeline.
 - **Delete pipeline**: Delete the pipeline and stop replication. Already replicated data remains at the destination.
 
-### Pipeline restarts and recovery
+### Viewing publications in the Dashboard
 
-A pipeline restart does not request a fresh copy of every table. Tables that completed initial sync resume from saved progress. An interrupted initial sync can start again from scratch: Pipelines deletes the partial destination data and copies the table again according to the **Initial sync** selection. This can also happen to an unfinished table when another table's restart temporarily stops the pipeline.
-
-If the main replication slot is lost and **Recreate slot** is enabled, startup rebuilds all replicated tables. Review [lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) for its data-loss and billing effects. To deliberately rebuild specific tables, use [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-### Disabling Pipelines
-
-To turn off Pipelines for a project, delete all pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
-
-For cleanup details, see [What happens when you disable Pipelines?](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines).
+View publications and their tables in [**Database > Publications**](/dashboard/project/_/database/publications).
 
 ### Adding or removing tables
 
@@ -179,40 +169,19 @@ After the restart, Pipelines removes its replication state for those tables. Sou
 
 You can delete the destination tables yourself after the restart. **Don't modify or delete tables still managed by Pipelines**; doing so can stop replication and require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-### Other publication changes
+### Pipeline restarts and recovery
 
-Publication changes do not all require a pipeline restart:
+A pipeline restart does not request a fresh copy of every table. Tables that completed initial sync resume from saved progress. An interrupted initial sync can start again from scratch: Pipelines deletes the partial destination data and copies the table again according to the **Initial sync** selection. This can also happen to an unfinished table when another table's restart temporarily stops the pipeline.
 
-| Change                                                                 | When it takes effect                                                                                                                                |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add or remove published columns on an already tracked table            | Applied while the pipeline runs, subject to the destination's [schema-change restrictions](#schema-change-support).                                 |
-| Change a row filter                                                    | Postgres applies the new filter to ongoing changes without a pipeline restart.                                                                      |
-| Change published operations (`insert`, `update`, `delete`, `truncate`) | Postgres changes which operations it sends without a pipeline restart. Previously omitted operations are not replayed.                              |
-| Change `publish_via_partition_root`                                    | Stop the pipeline before changing this option, then restart it to discover the new table identities. See [Partitioned tables](#partitioned-tables). |
+If the main replication slot is lost and **Recreate slot** is enabled, startup rebuilds all replicated tables. Review [lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) for its data-loss and billing effects. To deliberately rebuild specific tables, use [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-Changing a row filter does not copy newly included historical rows or remove previously copied rows that no longer match. A pipeline restart does not rebuild this historical data. To rebuild destination data with the new filter, include the affected tables in initial sync and [restart their replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-Wait for initial sync to finish before changing its filter; changing a filter does not update a copy already in progress.
+### Disabling Pipelines
 
-When changing column lists or row filters with `ALTER PUBLICATION ... SET TABLE`, include every table you want to keep in the publication. `SET TABLE` replaces the publication's table list; omitted tables are removed.
+Delete all pipelines first. Then open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
 
-### Schema change support
-
-Changing a replicated column's type or type modifiers leaves the destination type unchanged and logs a warning. Later schema changes or writes can fail. [Restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) after a type change; restarting table replication replaces destination data.
-
-Other schema-change support is destination-specific. See the [BigQuery](/docs/guides/database/replication/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/snowflake#schema-change-support) guide for the exact behavior.
-
-### Limitations
-
-Pipelines has the following limitations:
-
-- **Source tables**: Primary-key, replica-identity, and publication-column requirements depend on the destination. See its destination guide before creating the pipeline.
-- **Transformations**: Pipelines maps names and types for the destination but does not run user-defined transformations.
-- **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
-- **Arrays**: Only one-dimensional arrays are supported. Non-default lower bounds are not preserved. Check the destination guide for additional array restrictions.
-- **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
-
-Destination-specific limitations, such as row size and type mappings, are documented in each destination guide.
+For cleanup details, see [What happens when you disable Pipelines?](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines).
 
 ## Creating a publication with SQL
 
@@ -247,11 +216,13 @@ Both schemas must already exist. This includes their existing and future tables 
 
 ### Publication for all tables
 
-Postgres supports `FOR ALL TABLES`, but Pipelines rejects these publications because they also include the [internal `etl` tables it installs](/docs/guides/database/replication/pipelines-faq#what-does-pipelines-install-in-the-database). Replicating those tables can interfere with Pipelines' own replication state. Use `FOR TABLES IN SCHEMA` with only your application schemas, as shown above, or list application tables explicitly. If you already have a `FOR ALL TABLES` publication, create a replacement with a supported scope; Postgres cannot narrow it in place.
+Pipelines rejects `FOR ALL TABLES` because it includes the [internal `etl` tables](/docs/guides/database/replication/pipelines-faq#what-does-pipelines-install-in-the-database). Replicating them can interfere with replication state. Use `FOR TABLES IN SCHEMA` for application schemas or list tables explicitly. Replace any existing `FOR ALL TABLES` publication; Postgres cannot narrow it in place.
 
-### Advanced publication options
+## Advanced publication options
 
-#### Selecting specific columns
+Use these options to control which data is published and how partitioned tables appear at the destination.
+
+### Selecting specific columns
 
 You can replicate only a subset of columns from a table:
 
@@ -262,7 +233,7 @@ for table users (id, email, created_at);
 
 For updates and deletes, the column list must include all replica-identity columns. With `REPLICA IDENTITY FULL`, that means all columns, so you cannot publish a subset. Also check your destination's source table requirements.
 
-#### Filtering rows with a predicate
+### Filtering rows with a predicate
 
 You can filter which rows to replicate using a `WHERE` clause. These examples copy matching existing rows during initial sync and then replicate matching inserts only:
 
@@ -293,7 +264,7 @@ Postgres evaluates the filter before sending changes. A row matches only when th
 
 This applies when updates are published. Row filters do not limit `TRUNCATE`: a published truncate affects the whole destination table. See [Other publication changes](#other-publication-changes) before changing a filter on an existing pipeline.
 
-#### Partitioned tables
+### Partitioned tables
 
 `publish_via_partition_root` controls whether partition changes arrive as one parent table or separate leaf tables:
 
@@ -335,7 +306,7 @@ Choose the mode before starting replication:
 - With `true`, new changes in a newly created or attached partition flow through the already tracked parent without a restart. Attaching a partition does not copy rows that were already in it.
 - With `false`, a new leaf partition has its own table identity. Restart the pipeline to discover it; its existing rows are copied only if it is selected for initial sync.
 
-Changing this option can switch between parent and leaf tables. Stop the pipeline before changing it, review the **Initial sync** selection for the new tables, then restart. Pipelines removes state for tables no longer tracked and discovers the new ones, copying their current source rows only if selected for initial sync. Old destination tables and their data remain; they are not merged or split automatically.
+To change modes, stop the pipeline, change the option, review **Initial sync** for the new table identities, then restart. Pipelines removes state for untracked tables and discovers new ones, copying existing rows only if selected for initial sync. Old destination tables remain; their data is not merged or split automatically.
 
 <Admonition type="note">
 
@@ -345,6 +316,37 @@ A [table restart](/docs/guides/database/replication/pipelines-monitoring#restart
 
 </Admonition>
 
-### Viewing publications in the Dashboard
+### Other publication changes
 
-View publications and their tables in [**Database > Publications**](/dashboard/project/_/database/publications).
+Publication changes do not all require a pipeline restart:
+
+| Change                                                                 | When it takes effect                                                                                                                                |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add or remove published columns on an already tracked table            | Applied while the pipeline runs, subject to the destination's [schema-change restrictions](#schema-change-support).                                 |
+| Change a row filter                                                    | Postgres applies the new filter to ongoing changes without a pipeline restart.                                                                      |
+| Change published operations (`insert`, `update`, `delete`, `truncate`) | Postgres changes which operations it sends without a pipeline restart. Previously omitted operations are not replayed.                              |
+| Change `publish_via_partition_root`                                    | Stop the pipeline before changing this option, then restart it to discover the new table identities. See [Partitioned tables](#partitioned-tables). |
+
+Changing a row filter affects future changes only: it neither copies newly included historical rows nor removes rows that no longer match. A pipeline restart does not rebuild history. To rebuild it, include affected tables in initial sync and [restart their replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+
+Wait for initial sync to finish before changing its filter; changing a filter does not update a copy already in progress.
+
+`ALTER PUBLICATION ... SET TABLE` replaces the table list. When changing column lists or filters, include every table you want to keep; omitted tables are removed.
+
+## Schema change support
+
+Changing a replicated column's type or type modifiers leaves the destination type unchanged and logs a warning. Later schema changes or writes can fail. [Restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) after a type change; restarting table replication replaces destination data.
+
+Other schema-change support is destination-specific. See the [BigQuery](/docs/guides/database/replication/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/snowflake#schema-change-support) guide for the exact behavior.
+
+## Limitations
+
+Pipelines has the following limitations:
+
+- **Source tables**: Primary-key, replica-identity, and publication-column requirements depend on the destination. See its destination guide before creating the pipeline.
+- **Transformations**: Pipelines maps names and types for the destination but does not run user-defined transformations.
+- **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
+- **Arrays**: Only one-dimensional arrays are supported. Non-default lower bounds are not preserved. Check the destination guide for additional array restrictions.
+- **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
+
+Destination-specific limitations, such as row size and type mappings, are documented in each destination guide.

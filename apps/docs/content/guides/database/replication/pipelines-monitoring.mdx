@@ -41,6 +41,19 @@ Click a pipeline in the list to inspect its metrics and table states.
   zoomable
 />
 
+### Table states
+
+| State             | Meaning                                                              |
+| ----------------- | -------------------------------------------------------------------- |
+| **Queued**        | Waiting to begin initial sync                                        |
+| **Copying**       | Copying existing rows                                                |
+| **Copied**        | Copy finished; changes made during the copy still need to be applied |
+| **Live**          | Following WAL changes, including catch-up after copying              |
+| **Error**         | Replication encountered an error                                     |
+| **Restarting**    | Restarting replication for the table from scratch                    |
+| **Not Available** | State is temporarily unavailable during a pipeline state change      |
+| **Unknown**       | The Dashboard does not recognize the reported state                  |
+
 ### Replication lag metrics
 
 These metrics come from Postgres replication slot state. The pipeline list also shows a byte-based lag value: **Caught up** means no gap between the confirmed flush position and current WAL position at measurement time. It does not guarantee that every table has finished initial sync or that data is visible to destination queries.
@@ -71,18 +84,21 @@ The main slot tracks ongoing replication. [Table-sync slots](#initial-sync-and-t
 
 See [Respond based on the slot status](#respond-based-on-the-slot-status) for recovery actions.
 
-### Table states
+## Viewing logs
 
-| State             | Meaning                                                              |
-| ----------------- | -------------------------------------------------------------------- |
-| **Queued**        | Waiting to begin initial sync                                        |
-| **Copying**       | Copying existing rows                                                |
-| **Copied**        | Copy finished; changes made during the copy still need to be applied |
-| **Live**          | Following WAL changes, including catch-up after copying              |
-| **Error**         | Replication encountered an error                                     |
-| **Restarting**    | Restarting replication for the table from scratch                    |
-| **Not Available** | State is temporarily unavailable during a pipeline state change      |
-| **Unknown**       | The Dashboard does not recognize the reported state                  |
+Open [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) for errors, retries, and performance warnings. Include the pipeline ID and relevant errors when [contacting support](/dashboard/support/new).
+
+## Handling errors
+
+Table errors can pause one table while others continue replicating. Pipeline errors affect the overall process.
+
+### Table errors
+
+Open the pipeline, inspect the table error and any scheduled retry, and fix the cause. If replication cannot safely resume from its saved state, [restart replication for the affected tables](#restarting-tables).
+
+### Pipeline errors
+
+A **Failed** pipeline can recover automatically. Check logs for persistent connectivity, permission, schema, or destination errors, fix the cause, and restart if needed. Supabase stops pipelines after repeated failures; a **Stopped** pipeline requires a manual start.
 
 ## Dealing with replication lag
 
@@ -125,6 +141,8 @@ To recover a lost main slot, open **Edit pipeline > Advanced settings** and set 
 
 **This replaces every destination table.** Existing source rows are copied only for tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy); excluded tables resume with new changes only. Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
+Alternatively, stop and delete the pipeline, then [create a new one](/docs/guides/database/replication/pipelines#setup-overview). Deletion automatically removes that pipeline's main slot, table-sync slots, and saved replication state when the source database is reachable. It leaves source tables, existing destination data, and the [shared Pipelines installation](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines) in place.
+
 ### Reduce future lag risk
 
 - Review the [WAL retention recommendation](/docs/guides/database/replication/pipelines#creation-checks) at creation and continue monitoring retention after startup.
@@ -160,19 +178,3 @@ Before restarting, use **Edit pipeline** to check the **Initial sync** selection
 3. Confirm **Restart all tables** or **Restart failed tables**, matching the scope you chose.
 
 If a table restart fails, refresh the pipeline and table states before retrying. Start the pipeline explicitly if it remains **Stopped**.
-
-## Handling errors
-
-Table errors can pause one table while others continue replicating. Pipeline errors affect the overall process.
-
-### Table errors
-
-Open the pipeline, inspect the table error and any scheduled retry, and fix the cause. If replication cannot safely resume from its saved state, [restart replication for the affected tables](#restarting-tables).
-
-### Pipeline errors
-
-A **Failed** pipeline can recover automatically. Check logs for persistent connectivity, permission, schema, or destination errors, fix the cause, and restart if needed. Supabase stops pipelines after repeated failures; a **Stopped** pipeline requires a manual start.
-
-## Viewing logs
-
-Open [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) for errors, retries, and performance warnings. Include the pipeline ID and relevant errors when [contacting support](/dashboard/support/new).

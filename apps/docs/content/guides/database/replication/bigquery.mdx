@@ -8,7 +8,13 @@ sidebar_label: 'BigQuery'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-Replicate Postgres tables to [BigQuery](https://cloud.google.com/bigquery) for analytics. [Prepare Google Cloud resources](#prepare-gcp-resources), [configure the destination](#configure-bigquery-as-a-destination), then review [source requirements](#source-table-requirements) and [schema-change support](#schema-change-support).
+Replicate Postgres tables to [BigQuery](https://cloud.google.com/bigquery) for analytics. [Prepare Google Cloud resources](#prepare-gcp-resources), [configure the destination](#configure-bigquery-as-a-destination), then [query replicated data](#query-replicated-data).
+
+## Source table requirements
+
+Each source table needs a primary key of at most 16 columns, all included in the publication. Pipelines declares it as a BigQuery `NOT ENFORCED` primary key so CDC can match upserts and deletes. Keep source keys unique and non-null.
+
+Check [replica identity and complete update rows](#replica-identity), especially for tables with large text or JSON values.
 
 ## Prepare GCP resources
 
@@ -27,36 +33,21 @@ Prepare these Google Cloud Platform (GCP) resources:
 
    Treat the downloaded JSON as a secret. Don't commit or share it, and [rotate or revoke the key](https://cloud.google.com/iam/docs/key-rotation) if it is exposed.
 
-These roles provide the permissions Pipelines needs to inspect and manage destination tables, write data through the Storage Write API, and run BigQuery jobs. If you use a custom IAM role, it must provide:
-
-- `bigquery.datasets.get`
-- `bigquery.jobs.create`
-- `bigquery.tables.create`
-- `bigquery.tables.delete`
-- `bigquery.tables.get`
-- `bigquery.tables.getData`
-- `bigquery.tables.list`
-- `bigquery.tables.update`
-- `bigquery.tables.updateData`
+If you use a custom IAM role, see the [required permissions](#custom-iam-permissions).
 
 ## Configure BigQuery as a destination
 
 Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) to enable Pipelines, select **BigQuery**, and configure the publication and initial sync. Then enter:
 
-| Field                   | Value                                                                                     |
-| ----------------------- | ----------------------------------------------------------------------------------------- |
-| **Project ID**          | The Google Cloud project identifier                                                       |
-| **Dataset ID**          | The dataset name without the project prefix: use `my_dataset` for `my-project.my_dataset` |
-| **Service account key** | The downloaded service account JSON                                                       |
+| Field                   | Value                                                                            |
+| ----------------------- | -------------------------------------------------------------------------------- |
+| **Project ID**          | The Google Cloud project identifier                                              |
+| **Dataset ID**          | The dataset name without the project prefix: use `dataset` for `project.dataset` |
+| **Service account key** | The downloaded service account JSON                                              |
 
-Expand **Advanced settings** for BigQuery-specific options:
+Optionally adjust [destination settings](#destination-settings) and [table partitioning and clustering](#table-partitioning-and-clustering) before creation.
 
-| Setting                  | Default          | Description                                                                                                                                                                                                                                              |
-| ------------------------ | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Connection pool size** | `4` connections  | Storage Write API connections for destination writes. More connections can improve throughput but use more resources.                                                                                                                                    |
-| **Maximum staleness**    | Freshest results | Maximum data age in whole minutes while BigQuery applies CDC changes. For example, `15` allows results up to 15 minutes stale and can reduce query-time merge cost. Unset gives the freshest results. Applies only when a table is created or recreated. |
-
-Review the [source table requirements](#source-table-requirements), then click **Create and start pipeline** and complete the validation and cost confirmations.
+Click **Create and start pipeline** and complete the validation and cost confirmations.
 
 Supabase Pipelines charges and Google Cloud charges are separate. BigQuery can charge for Storage Write API ingestion, storage, and the compute used to apply CDC changes. See [BigQuery CDC pricing](https://cloud.google.com/bigquery/docs/change-data-capture#pricing).
 
@@ -64,20 +55,44 @@ Supabase Pipelines charges and Google Cloud charges are separate. BigQuery can c
 
 Pipelines creates current-state BigQuery tables using destination-compatible names and types, then applies published inserts, updates, deletes, and truncates. These tables do not retain a history of row versions to query. Truncates and table restarts replace destination data.
 
+## Query replicated data
+
 Query the generated view for each source table. Its name combines the source schema and table with an underscore, doubling any existing underscores: `public.orders` becomes `public_orders`, and `my_schema.orders` becomes `my__schema_orders`. Pipelines manages versioned physical tables behind the view and updates its target after a truncate. Queries tied directly to a physical table version can become stale or fail when that version is removed.
 
-## Source table requirements
+## Destination settings
 
-Each source table needs a primary key of at most 16 columns, all included in the publication. Pipelines declares it as a BigQuery `NOT ENFORCED` primary key so CDC can match upserts and deletes. Keep source keys unique and non-null.
+Expand **Advanced settings** for BigQuery-specific options:
+
+| Setting                  | Behavior                                                                                                                                                                                                                                                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Connection pool size** | Default: `4` connections. Storage Write API connections for destination writes. More connections can improve throughput but use more resources.                                                                                                                                     |
+| **Maximum staleness**    | Default: Freshest results. Maximum data age in whole minutes while BigQuery applies CDC changes. For example, `15` allows results up to 15 minutes stale and can reduce query-time merge cost. Unset gives the freshest results. Applies only when a table is created or recreated. |
+
+## Table partitioning and clustering
+
+You can configure BigQuery partitioning and clustering for individual replicated tables under **Advanced settings > Table layout** to control their physical layout and improve query performance and cost.
+
+The publication determines [which source partitions become destination tables](/docs/guides/database/replication/pipelines#partitioned-tables). BigQuery layout is configured separately; Pipelines does not copy Postgres partition keys or bounds.
+
+Layout settings apply only when a destination table is created or recreated, including after a table restart or source truncate. A pipeline restart that resumes a table's saved progress does not apply new layout settings. [Restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to apply them, which replaces its data.
+
+Set either option, both, or neither:
+
+- **Partitioning**: Partition by a `date`, `timestamp`, or `timestamptz` column with `hour`, `day`, `month`, or `year` granularity, by an integer range, or by ingestion time. Date columns cannot use hourly granularity; integer ranges need a start, end, and interval.
+- **Clustering**: Cluster by one to four ordered, distinct replicated columns. BigQuery validates whether the clustering column types are supported.
+
+See the BigQuery documentation for [partition expressions](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#partition_expression) and [clustering column requirements](https://cloud.google.com/bigquery/docs/creating-clustered-tables#clustered_column_requirements).
+
+## Replica identity
 
 Choose a supported Postgres replica identity:
 
-| Source table setting                          | BigQuery support | Guidance                                                                                                                                                        |
-| --------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `REPLICA IDENTITY DEFAULT` with a primary key | Supported        | Recommended for most tables. BigQuery uses the replicated source primary key to apply upserts and deletes.                                                      |
-| `REPLICA IDENTITY FULL`                       | Supported        | Recommended for tables with large `text`, `jsonb`, `bytea`, or other values that Postgres may store out-of-line using TOAST, especially when those rows update. |
-| `REPLICA IDENTITY USING INDEX`                | Limited          | Supported only when the selected unique index contains exactly the source primary-key columns. An alternative unique-key identity is not supported.             |
-| `REPLICA IDENTITY NOTHING`                    | Insert-only      | Inserts can be replicated, but updates and deletes do not include enough row identity for BigQuery to apply them safely.                                        |
+| Source table setting                          | Guidance                                                                                                                                                        |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `REPLICA IDENTITY DEFAULT` with a primary key | Recommended for most tables. BigQuery uses the replicated source primary key to apply upserts and deletes.                                                      |
+| `REPLICA IDENTITY FULL`                       | Recommended for tables with large `text`, `jsonb`, `bytea`, or other values that Postgres may store out-of-line using TOAST, especially when those rows update. |
+| `REPLICA IDENTITY USING INDEX`                | Supported only when the selected unique index contains exactly the source primary-key columns. An alternative unique-key identity is not supported.             |
+| `REPLICA IDENTITY NOTHING`                    | Insert-only. Inserts can be replicated, but updates and deletes do not include enough row identity for BigQuery to apply them safely.                           |
 
 ### Complete update rows and TOAST
 
@@ -113,21 +128,6 @@ alter table public.your_table replica identity full;
 Pipelines converts ASCII uppercase letters to lowercase and preserves other supported characters. For example, `Name` and `name` conflict; `Ä` and `ä` remain distinct. Avoid ASCII case-only differences.
 
 BigQuery supports [flexible column names](https://cloud.google.com/bigquery/docs/schemas#flexible-column-names), including spaces, Unicode letters, and selected punctuation. Its reserved prefixes and unsupported-character restrictions still apply.
-
-## Table partitioning and clustering
-
-You can configure BigQuery partitioning and clustering for individual replicated tables under **Advanced settings > Table layout** to control their physical layout and improve query performance and cost.
-
-The publication determines [which source partitions become destination tables](/docs/guides/database/replication/pipelines#partitioned-tables). BigQuery layout is configured separately; Pipelines does not copy Postgres partition keys or bounds.
-
-Layout settings apply only when a destination table is created or recreated, including after a table restart or source truncate. A pipeline restart that resumes a table's saved progress does not apply new layout settings. [Restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to apply them, which replaces its data.
-
-Set either option, both, or neither:
-
-- **Partitioning**: Partition by a `date`, `timestamp`, or `timestamptz` column with `hour`, `day`, `month`, or `year` granularity, by an integer range, or by ingestion time. Date columns cannot use hourly granularity; integer ranges need a start, end, and interval.
-- **Clustering**: Cluster by one to four ordered, distinct replicated columns. BigQuery validates whether the clustering column types are supported.
-
-See the BigQuery documentation for [partition expressions](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#partition_expression) and [clustering column requirements](https://cloud.google.com/bigquery/docs/creating-clustered-tables#clustered_column_requirements).
 
 ## Schema change support
 
@@ -174,6 +174,24 @@ Column-list changes for tracked tables follow the [schema rules](#schema-change-
 - **Numeric and JSON values**: BigQuery applies its destination [data-type limits](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types). Values can be rounded or rejected when they exceed the supported precision or range; Postgres values are not guaranteed to retain their exact representation.
 - **BigQuery CDC tables**: While CDC is active, BigQuery doesn't support mutating DML such as `UPDATE`, `DELETE`, or `MERGE`, wildcard table queries, or search indexes on the destination table. See [BigQuery CDC limitations](https://cloud.google.com/bigquery/docs/change-data-capture#limitations) for the complete list.
 - **Managed objects**: Follow the [removal procedure](/docs/guides/database/replication/pipelines#removing-tables-from-replication) before deleting destination tables or views.
+
+## Custom IAM permissions
+
+Pipelines needs permission to inspect and manage destination tables, write data through the Storage Write API, and run BigQuery jobs. A custom IAM role must provide:
+
+- `bigquery.datasets.get`
+- `bigquery.jobs.create`
+- `bigquery.tables.create`
+- `bigquery.tables.delete`
+- `bigquery.tables.get`
+- `bigquery.tables.getData`
+- `bigquery.tables.list`
+- `bigquery.tables.update`
+- `bigquery.tables.updateData`
+
+## Troubleshooting
+
+Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors. For update failures, check [replica identity and TOAST](#complete-update-rows-and-toast). For schema failures, review [changes that require extra action](#changes-that-require-extra-action).
 
 ## Additional resources
 

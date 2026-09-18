@@ -8,14 +8,6 @@ sidebar_label: 'Overview'
 
 Replication keeps data synchronized with another location. Logical replication products such as Supabase Pipelines use change data capture (CDC) to read database changes and apply them to a destination.
 
-## Use cases
-
-You might use database replication for:
-
-- **Analytics and data warehousing**: Run analytical queries on replicated data in a separate platform. Initial sync and ongoing replication still use resources on the source database.
-- **Data integration**: Keep your data synchronized across different systems and services in your tech stack.
-- **Operational reporting**: Maintain a copy of selected application data that you can query in another system.
-
 ## Replication methods
 
 Supabase supports three replication methods. Choose based on whether you need another Supabase Postgres database, a managed replication pipeline to a destination system, or full control over your own logical replication setup.
@@ -36,25 +28,30 @@ Supabase Pipelines is a managed CDC product for moving data from Supabase Postgr
 
 See [Set up Pipelines](/docs/guides/database/replication/pipelines).
 
-#### Supported destinations
-
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-BigQuery is available as a managed destination. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
-
-Choose resources near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
-
-| Destination                                                | Insert       | Update                    | Delete                       | Truncate     | Schema change        | Data model                                                                         |
-| ---------------------------------------------------------- | ------------ | ------------------------- | ---------------------------- | ------------ | -------------------- | ---------------------------------------------------------------------------------- |
-| [BigQuery](/docs/guides/database/replication/bigquery)     | ✅ Supported | ✅ Supported              | ✅ Supported                 | ✅ Supported | Limited beta         | Current-state tables.                                                              |
-| [ClickHouse](/docs/guides/database/replication/clickhouse) | ✅ Supported | Complete new row required | Primary-key or full identity | ✅ Supported | Limited Early Access | Current-state tables by default, or append-only CDC history.                       |
-| [DuckLake](/docs/guides/database/replication/ducklake)     | ✅ Supported | Row identity required     | Row identity required        | ✅ Supported | Limited Early Access | Current-state lakehouse tables backed by a SQL catalog and object storage.         |
-| [Snowflake](/docs/guides/database/replication/snowflake)   | ✅ Supported | `REPLICA IDENTITY FULL`   | Row identity required        | ✅ Supported | Limited Early Access | Append-only CDC history. Source `TRUNCATE` operations and table restarts erase it. |
-
 ### Manual replication
 
 Manual replication uses the same underlying Postgres logical replication features as Pipelines, but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
 
 See [Set up manual replication](/docs/guides/database/replication/manual-replication-setup).
+
+## Supported destinations
+
+| Destination                                                | Status        |
+| ---------------------------------------------------------- | ------------- |
+| [BigQuery](/docs/guides/database/replication/bigquery)     | Public alpha  |
+| [ClickHouse](/docs/guides/database/replication/clickhouse) | Private alpha |
+| [DuckLake](/docs/guides/database/replication/ducklake)     | Private alpha |
+| [Snowflake](/docs/guides/database/replication/snowflake)   | Private alpha |
+
+[Request access](/go/supabase-pipelines-new-destinations) to destinations in private alpha.
+
+## Use cases
+
+You might use database replication for:
+
+- **Analytics and data warehousing**: Run analytical queries on replicated data in a separate platform. Initial sync and ongoing replication still use resources on the source database.
+- **Data integration**: Keep your data synchronized across different systems and services in your tech stack.
+- **Operational reporting**: Maintain a copy of selected application data that you can query in another system.
 
 ## Related features
 

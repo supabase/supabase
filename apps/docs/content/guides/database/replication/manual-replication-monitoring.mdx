@@ -16,23 +16,6 @@ Use source-side slot metrics to monitor any logical replication consumer. If the
 
 Run these queries on the source database.
 
-### Replication status and lag
-
-The `pg_stat_replication` table shows the status of any replicas connected to the primary database.
-
-```sql
-select
-  pid,
-  application_name,
-  state,
-  sent_lsn,
-  write_lsn,
-  flush_lsn,
-  replay_lsn,
-  sync_state
-from pg_stat_replication;
-```
-
 ### Replication slot status
 
 A replication slot has separate connection and WAL availability fields:
@@ -54,6 +37,23 @@ from pg_replication_slots;
 ```
 
 An inactive slot can still retain WAL. Investigate a slot whose retained WAL keeps growing, whose remaining retention keeps shrinking, or whose `wal_status` becomes `unreserved`. A `lost` slot can't continue from its previous position and usually requires a new initial sync.
+
+### Replication status and lag
+
+The `pg_stat_replication` table shows the status of any replicas connected to the primary database.
+
+```sql
+select
+  pid,
+  application_name,
+  state,
+  sent_lsn,
+  write_lsn,
+  flush_lsn,
+  replay_lsn,
+  sync_state
+from pg_stat_replication;
+```
 
 ### WAL size
 

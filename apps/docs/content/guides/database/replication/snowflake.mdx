@@ -14,7 +14,25 @@ The Snowflake destination is in Early Access and available only to approved orga
 
 [Snowflake](https://www.snowflake.com/) is a managed data platform. Supabase Pipelines writes an append-only change history for each replicated Postgres table to Snowflake.
 
-[Prepare credentials](#prepare-snowflake-resources), [configure the destination](#configure-snowflake-as-a-destination), and review the [append-only data model](#append-only-change-history) before using the replicated data.
+[Prepare resources](#prepare-snowflake-resources), [configure the destination](#configure-snowflake-as-a-destination), then [query replicated data](#query-replicated-data).
+
+## Source table requirements
+
+Required `REPLICA IDENTITY` depends on the operations enabled in the Postgres publication:
+
+| Published operations | Required replica identity                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `INSERT` only        | No row identity is required.                                                                               |
+| `DELETE`             | A primary key, an identity index (`USING INDEX`), or full identity (`FULL`). Publish all identity columns. |
+| `UPDATE`             | `REPLICA IDENTITY FULL`.                                                                                   |
+
+Set full replica identity before publishing updates:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+`REPLICA IDENTITY FULL` increases WAL volume, but lets Pipelines construct complete new rows when Postgres omits unchanged out-of-line TOAST values. The setting applies only to new WAL records. If retained WAL already contains an incompatible update, restart replication for the affected table after changing the setting.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -107,17 +125,17 @@ Enter the result as **Account ID**, for example `MYORG-MYACCOUNT`. Do not enter 
 
 Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) and select **Snowflake**. Enter these settings:
 
-| Field                      | Value                                                                                                        |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Account ID**             | Organization-account identifier, such as `MYORG-MYACCOUNT`                                                   |
-| **User**                   | Unquoted service user, such as `PIPELINES_USER`                                                              |
-| **Database**               | Destination database, such as `PIPELINES_DB`                                                                 |
-| **Schema**                 | Dedicated destination schema, such as `REPLICATED`                                                           |
-| **Role**                   | Empty or equal to the user's `DEFAULT_ROLE`; see [role alignment](#keep-the-sql-and-streaming-roles-aligned) |
-| **Private key**            | Complete PEM, including begin and end lines                                                                  |
-| **Private key passphrase** | Only for an encrypted PKCS #8 key                                                                            |
+| Field                      | Value                                                                                                           |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Account ID**             | `MYORG-MYACCOUNT`, for example; use an organization-account identifier                                          |
+| **User**                   | `PIPELINES_USER`, or your unquoted service user                                                                 |
+| **Database**               | `PIPELINES_DB`, or your destination database                                                                    |
+| **Schema**                 | `REPLICATED`, or your dedicated destination schema                                                              |
+| **Role**                   | The service user's default role name, or empty; see [role alignment](#keep-the-sql-and-streaming-roles-aligned) |
+| **Private key**            | Complete PEM, including begin and end lines                                                                     |
+| **Private key passphrase** | Only for an encrypted PKCS #8 key                                                                               |
 
-Review the [source requirements](#source-table-requirements), then click **Create and start pipeline**.
+Click **Create and start pipeline** and complete the validation and cost confirmations.
 
 Enter the database and schema identifiers exactly as stored in Snowflake. Unquoted identifiers are stored in uppercase. Choose an account near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
@@ -156,29 +174,13 @@ Snowflake tables are an event history, not a current-state replica:
 - A delete appends the complete old row for `REPLICA IDENTITY FULL`. For a primary-key or `USING INDEX` identity, it appends only the identity columns and sets all other source columns to `NULL`.
 - A source `TRUNCATE` truncates the Snowflake table, resets its streaming state, and does not append a truncate event.
 
+A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops the Snowflake table and managed streaming state, erasing its history. It cannot recover past events. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination history in place.
+
+## Query replicated data
+
 To derive current state, group by a unique source identity whose value never changes, select the latest `_cdc_sequence_number`, and exclude identities whose latest operation is `delete`. An update that changes the identity does not emit a deletion for the old identity, so this query pattern would leave the old row visible.
 
 The sequence number orders changes but is not a globally unique event ID. Snowpipe committed offsets suppress routine replay; consumers must still tolerate [duplicate processing](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once).
-
-A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops the Snowflake table and managed streaming state, erasing its history. It cannot recover past events. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination history in place.
-
-## Source table requirements
-
-Required `REPLICA IDENTITY` depends on the operations enabled in the Postgres publication:
-
-| Published operations | Required replica identity                                                                                      |
-| -------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `INSERT` only        | No row identity is required.                                                                                   |
-| `DELETE`             | A primary key, `REPLICA IDENTITY USING INDEX`, or `REPLICA IDENTITY FULL`. Identity columns must be published. |
-| `UPDATE`             | `REPLICA IDENTITY FULL`.                                                                                       |
-
-Set full replica identity before publishing updates:
-
-```sql
-alter table public.your_table replica identity full;
-```
-
-`REPLICA IDENTITY FULL` increases WAL volume, but lets Pipelines construct complete new rows when Postgres omits unchanged out-of-line TOAST values. The setting applies only to new WAL records. If retained WAL already contains an incompatible update, restart replication for the affected table after changing the setting.
 
 ## Type mapping
 

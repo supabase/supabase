@@ -12,7 +12,26 @@ sidebar_label: 'ClickHouse'
 
 The ClickHouse destination is in Early Access and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
-Replicate Postgres changes to [ClickHouse](https://clickhouse.com/) as current-state tables or an append-only history. [Prepare resources](#prepare-clickhouse-resources), [configure the destination](#configure-clickhouse-as-a-destination), and [choose a table engine](#choose-a-table-engine).
+Replicate Postgres changes to [ClickHouse](https://clickhouse.com/) as current-state tables or an append-only history. [Choose a table engine](#choose-a-table-engine), [prepare resources](#prepare-clickhouse-resources), then [configure the destination](#configure-clickhouse-as-a-destination).
+
+## Source table requirements
+
+`ReplacingMergeTree` requires a source primary key. `MergeTree` can replicate insert-only tables without one. Include all primary-key columns in the publication when the table has a key.
+
+Check the [replica-identity and array requirements](#replica-identity-and-arrays) for your source tables.
+
+### Choose a table engine
+
+The table engine controls how ClickHouse represents changes. It is selected for the entire destination.
+
+Choose the engine before creating the pipeline. Changing **Table engine** later does not convert existing destination tables; writes fail if their engine differs from the configured one. Restore the previous setting to resume using those tables.
+
+| Engine               | Data model and query pattern                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| `ReplacingMergeTree` | Current-state tables. Requires a primary key. Query the generated `__current` view.              |
+| `MergeTree`          | Append-only CDC history. A primary key is optional for insert-only tables. Query the base table. |
+
+During Early Access, source primary-key values must remain immutable when using `ReplacingMergeTree`. Updating a primary-key value can leave the old key visible in the generated current-state view.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -47,11 +66,13 @@ Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-over
 | **Database**     | Existing target database                                                   |
 | **Table engine** | `replacing_merge_tree` for current state or `merge_tree` for event history |
 
-Review the [source requirements](#source-table-requirements), then click **Create and start pipeline**.
+Click **Create and start pipeline** and complete the validation and cost confirmations.
 
 Place ClickHouse near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
-## How table names are mapped
+## Query replicated data
+
+### How table names are mapped
 
 Pipelines maps each Postgres schema and table pair to one ClickHouse table. Existing underscores are doubled, and the schema and table names are joined with one underscore:
 
@@ -61,17 +82,6 @@ Pipelines maps each Postgres schema and table pair to one ClickHouse table. Exis
 | `my_schema.logs` | `my__schema_logs` |
 
 Postgres schema and table names cannot start or end with `_` or contain `"` or `;` when replicating to ClickHouse.
-
-## Choose a table engine
-
-The table engine controls how ClickHouse represents changes. It is selected for the entire destination.
-
-Choose the engine before creating the pipeline. Changing **Table engine** later does not convert existing destination tables; writes fail if their engine differs from the configured one. Restore the previous setting to resume using those tables.
-
-| Engine               | Data model                    | Source primary key              | Query pattern                               |
-| -------------------- | ----------------------------- | ------------------------------- | ------------------------------------------- |
-| `ReplacingMergeTree` | Current-state tables          | Required                        | Query the generated `<table>__current` view |
-| `MergeTree`          | Append-only CDC event history | Optional for insert-only tables | Query the base table                        |
 
 ### ReplacingMergeTree
 
@@ -83,8 +93,6 @@ Choose the engine before creating the pipeline. Changing **Table engine** later 
 - Creates a `<table>__current` view that runs the base table with `FINAL` and removes deleted rows
 
 The `_etl_version` and `_etl_deleted` names are reserved and can't be used by source columns.
-
-During Early Access, source primary-key values must remain immutable when using `ReplacingMergeTree`. Updating a primary-key value can leave the old key visible in the generated current-state view.
 
 Query the generated view for the current state:
 
@@ -116,9 +124,7 @@ A source `TRUNCATE` truncates the ClickHouse table for either engine, then ongoi
 
 Restarting replication for a table drops and recreates its table and, for `ReplacingMergeTree`, its generated view. A table restart erases the accumulated destination data and copies existing source rows only if the table is [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy).
 
-## Source table requirements
-
-`ReplacingMergeTree` requires a source primary key. `MergeTree` can replicate insert-only tables without one. Include all primary-key columns in the publication when the table has a key.
+## Replica identity and arrays
 
 | Published operation                        | Required replica identity                                                               |
 | ------------------------------------------ | --------------------------------------------------------------------------------------- |

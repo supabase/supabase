@@ -8,6 +8,12 @@ sidebar_label: 'FAQ'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## Which plans support Pipelines?
+
+Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Replication** or contact your account manager.
+
 ## What destinations are supported?
 
 BigQuery is available. ClickHouse, DuckLake, and Snowflake require Early Access approval. See [supported destinations](/docs/guides/database/replication#supported-destinations) for the comparison and access request.
@@ -15,12 +21,6 @@ BigQuery is available. ClickHouse, DuckLake, and Snowflake require Early Access 
 ## Does the destination's region affect performance?
 
 Yes. Distance between the source, pipeline, and destination adds network latency and can reduce throughput. Choose resources near the [managed pipeline region](/docs/guides/database/replication/pipelines#region), prioritizing the destination if you can optimize only one side.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-## Which plans support Pipelines?
-
-Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Replication** or contact your account manager.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -52,13 +52,11 @@ The Dashboard validates source access, replication capacity, publication tables,
 
 Support differs by destination. Check the [schema-change guides](/docs/guides/database/replication/pipelines#schema-change-support) before changing column types, defaults, keys, or constraints.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+## Can data be processed more than once?
 
-## What happens when you disable Pipelines?
+Yes. Pipelines provides at-least-once processing: recovery can replay acknowledged data, and consumers of append-only histories must tolerate repeated events. Destination deduplication does not provide an exactly-once processing guarantee.
 
-Disabling Pipelines removes its database event trigger and the entire Pipelines-managed `etl` schema, including its tables and helper functions. Your source application tables and existing destination data remain.
-
-Delete all pipelines first, then follow [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines). Deleting the pipelines alone does not remove the shared database installation.
+See the data models for [BigQuery](/docs/guides/database/replication/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
 ## Why is a table not being replicated?
 
@@ -73,6 +71,10 @@ If new changes arrive but existing rows are missing, check the [initial sync sel
 
 If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements).
 
+## Why is a table in error state?
+
+An initial sync or ongoing replication operation failed, for example after an unsupported schema change. Some errors retry automatically; others require restarting replication for the affected tables from scratch. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for diagnosis and [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) for the procedure and its effects.
+
 ## Why is a pipeline failed or stopped?
 
 **Failed** reports a startup or runtime error and can recover automatically. **Stopped** requires a manual start. Follow [pipeline error recovery](/docs/guides/database/replication/pipelines-monitoring#pipeline-errors) to diagnose the cause before restarting.
@@ -85,20 +87,18 @@ Postgres is producing WAL faster than Pipelines confirms progress. Follow [Inves
 
 Required WAL is gone, so replication cannot continue from that slot. Follow [slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status); recovery scope depends on whether the main slot or a table-sync slot was lost.
 
-## Why is a table in error state?
+## What happens if a table is deleted at the destination?
 
-An initial sync or ongoing replication operation failed, for example after an unsupported schema change. Some errors retry automatically; others require restarting replication for the affected tables from scratch. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for diagnosis and [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) for the procedure and its effects.
+Deleting or modifying managed objects can stop replication and require a new initial sync. To remove one safely, [remove the source table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) and restart the pipeline before deleting its destination table.
 
 ## What happens when a project becomes inactive or moves to the Free Plan?
 
 Project inactivity stops its pipelines. Start them manually after restarting the project. Downgrading to the Free Plan deletes its pipelines.
 
-## What happens if a table is deleted at the destination?
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-Deleting or modifying managed objects can stop replication and require a new initial sync. To remove one safely, [remove the source table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) and restart the pipeline before deleting its destination table.
+## What happens when you disable Pipelines?
 
-## Can data be processed more than once?
+Disabling Pipelines removes its database event trigger and the entire Pipelines-managed `etl` schema, including its tables and helper functions. Your source application tables and existing destination data remain.
 
-Yes. Pipelines provides at-least-once processing: recovery can replay acknowledged data, and consumers of append-only histories must tolerate repeated events. Destination deduplication does not provide an exactly-once processing guarantee.
-
-See the data models for [BigQuery](/docs/guides/database/replication/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+Delete all pipelines first, then follow [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines). Deleting the pipelines alone does not remove the shared database installation.

@@ -8,21 +8,11 @@ sidebar_label: 'FAQ'
 
 ## Which connection string should be used?
 
-Always use the direct connection string for logical replication.
-
-Connections through a pooler, such as Supavisor, will not work.
+Use the direct connection string for logical replication. Connections through a pooler, such as Supavisor, will not work.
 
 ## The tool in use does not support IPv6
 
 You can enable the [IPv4 add-on](/docs/guides/platform/ipv4-address) for your project.
-
-## What is XMIN and should it be used?
-
-Xmin is a different form of replication from logical replication and should only be used if logical replication is not available for your database, such as with older versions of Postgres.
-
-Xmin performs replication by checking the [xmin system column](https://www.postgresql.org/docs/current/ddl-system-columns.html) and determining if that row has already been synchronized.
-
-It does not capture deletion of data and is **not recommended**, particularly for larger databases.
 
 ## Can replication be configured in the Dashboard?
 
@@ -42,3 +32,11 @@ Some of the more important options to be aware of are:
 - `max_wal_senders`: Maximum number of concurrent WAL sender processes for standby servers, logical replication consumers, and streaming backups.
 
 Size WAL retention for the consumer's maximum expected lag or downtime and the database's WAL generation rate. Higher values reduce the risk that a consumer needs a new initial sync, but can use more database storage. Monitor each slot's retained WAL and `wal_status` instead of treating a configured limit as a guarantee.
+
+## What is XMIN and should it be used?
+
+Xmin is a different form of replication from logical replication and should only be used if logical replication is not available for your database, such as with older versions of Postgres.
+
+Xmin performs replication by checking the [xmin system column](https://www.postgresql.org/docs/current/ddl-system-columns.html) and determining if that row has already been synchronized.
+
+It does not capture deletion of data and is **not recommended**, particularly for larger databases.
