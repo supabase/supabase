@@ -71,12 +71,7 @@ describe('Explorer home onboarding', () => {
   it('explains Explorer without asking for a startup preference', async () => {
     renderHome()
     await screen.findByRole('heading', { name: 'Welcome to Explorer' })
-    for (const name of [
-      'Run SQL',
-      'Chat with your project',
-      'Save to notebooks',
-      'Snippets and reports',
-    ]) {
+    for (const name of ['Run SQL', 'Chat with your project', 'Save to notebooks']) {
       expect(screen.getByRole('heading', { name })).toBeVisible()
     }
     expect(screen.queryByRole('radio')).not.toBeInTheDocument()

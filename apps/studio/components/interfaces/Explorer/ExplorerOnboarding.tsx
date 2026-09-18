@@ -1,11 +1,4 @@
-import {
-  ArrowRight,
-  FileClock,
-  MessageSquare,
-  NotebookText,
-  SquareCode,
-  type LucideIcon,
-} from 'lucide-react'
+import { ArrowRight, MessageSquare, NotebookText, SquareCode, type LucideIcon } from 'lucide-react'
 import { Badge, Button } from 'ui'
 
 import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
@@ -14,26 +7,17 @@ const ONBOARDING_POINTS: Array<{ icon: LucideIcon; title: string; description: s
   {
     icon: SquareCode,
     title: 'Run SQL',
-    description:
-      'Query your database or logs, then view the results as a table or chart. Save a query to a notebook to keep it.',
+    description: 'Query your database or logs and view the results as a table or chart.',
   },
   {
     icon: MessageSquare,
     title: 'Chat with your project',
-    description:
-      "Ask Assistant to write queries, explain results, or check your project's health. Your organization's AI settings control what it can access.",
+    description: 'Ask Assistant to write queries, explain results, or build notebooks for you.',
   },
   {
     icon: NotebookText,
     title: 'Save to notebooks',
-    description:
-      'Combine queries, charts, and notes in one document that your team can open and rerun. Assistant can create notebooks and run them for you.',
-  },
-  {
-    icon: FileClock,
-    title: 'Snippets and reports',
-    description:
-      'Notebooks will replace snippets and custom reports over time. In the meantime, both are still available in the old SQL Editor and Observability.',
+    description: 'Keep queries and notes for your team. Notebooks will replace snippets over time.',
   },
 ]
 
