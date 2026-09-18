@@ -207,6 +207,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/monitoring-and-debugging.md',
+    destination: '/docs/guides/observability.md',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/monitoring-and-debugging/resolve-issues',
     destination: '/docs/guides/observability/detecting',
   },
