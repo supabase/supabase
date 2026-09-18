@@ -900,6 +900,15 @@ describe('generateUpdateRowPayload', () => {
     expect(payload).toEqual({ name: 'b' })
   })
 
+  it('should not re-send a null json column saved as the string "null"', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'payload', format: 'jsonb', value: 'null' }),
+    ]
+    const payload = generateUpdateRowPayload({ id: '1', payload: null }, fields)
+    expect(payload).toEqual({})
+  })
+
   it('should send json columns whose text was edited', () => {
     const fields: RowField[] = [
       createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
