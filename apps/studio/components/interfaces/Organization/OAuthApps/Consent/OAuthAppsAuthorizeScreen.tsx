@@ -24,17 +24,16 @@ import {
   useOAuthAppsAuthorizeOrganizationProjectsQuery,
 } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 import { useOAuthAppsAuthorizeOrganizationsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organizations-query'
-import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
+import { useOAuthOrgAppDetailsQuery } from '@/data/oauth-apps/oauth-apps-org-app-details-query'
 import type {
   OAuthAppsAuthorizeRedirect,
+  OAuthAppsAuthorizeRequest,
   OAuthAppsAuthorizeRoleValidationFailure,
-  OAuthGrantProjectScope,
+  OAuthAuthorizeApproveRequest,
 } from '@/data/oauth-apps/types'
 import {
   getFailedProjects,
-  getOAuthConsentModel,
   getPreselectedProjectRefs,
-  isAllProjectsScope,
   isRoleValidationFailure,
 } from '@/data/oauth-apps/types'
 import { useSignOut } from '@/lib/auth'
@@ -43,7 +42,7 @@ export interface OAuthAppsAuthorizeScreenProps {
   authId: string
   request: OAuthAppsAuthorizeRequest
   organizationSlug?: string
-  suggestedProjectRefs?: string[]
+  projectRef?: string | null
   navigate: (destination: string) => void
 }
 
@@ -51,18 +50,13 @@ export const OAuthAppsAuthorizeScreen = ({
   authId,
   request,
   organizationSlug,
-  suggestedProjectRefs = [],
+  projectRef = null,
   navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
-  const model = getOAuthConsentModel({
-    grantConfig: request.grant_config,
-    registrationType: request.registration_type,
-  })
-  const grantKind = model.grant_kind
-  const projectSelection = model.project_selection
-  const showProjectPicker = projectSelection !== 'off'
-  const allowAllProjects = projectSelection === 'optional'
-  const isDynamicClient = request.registration_type === 'dynamic'
+  const grantKind = request.grant_kind
+  const projectScopingMode = request.project_scoping_mode
+  const showProjectPicker = projectScopingMode !== 'off'
+  const allowAllProjects = projectScopingMode === 'optional'
 
   const { data: identity } = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
 
@@ -73,13 +67,10 @@ export const OAuthAppsAuthorizeScreen = ({
     null
   )
 
-  const suggestedRefs =
-    suggestedProjectRefs.length > 0 ? suggestedProjectRefs : request.suggested_project_refs
-
   const needsOrgResolution =
     showProjectPicker &&
     !organizationSlug &&
-    suggestedRefs.length > 0 &&
+    projectRef !== null &&
     (identity?.organizations.length ?? 0) > 1
 
   const orgProjectsQueries = useQueries({
@@ -96,14 +87,8 @@ export const OAuthAppsAuthorizeScreen = ({
   const resolvedOrgSlug = (() => {
     if (!needsOrgResolution || !orgResolutionSettled || !identity) return undefined
 
-    const orgRefSets = orgProjectsQueries.map(
-      (query) => new Set((query.data ?? []).map((project) => project.ref))
-    )
-    const resolvingRefs = suggestedRefs.filter((ref) => orgRefSets.some((refs) => refs.has(ref)))
-    if (resolvingRefs.length === 0) return undefined
-
     const owners = identity.organizations.filter((_, index) =>
-      resolvingRefs.every((ref) => orgRefSets[index].has(ref))
+      (orgProjectsQueries[index].data ?? []).some((project) => project.ref === projectRef)
     )
     return owners.length === 1 ? owners[0].slug : undefined
   })()
@@ -115,33 +100,37 @@ export const OAuthAppsAuthorizeScreen = ({
     id: authId,
     slug: orgSlug,
   })
+  const { data: orgAppDetails } = useOAuthOrgAppDetailsQuery({
+    slug: orgSlug,
+    appId: request.app_id,
+  })
 
   const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !projects || !orgResolutionSettled) return
+    if (seeded.current || !projects || !orgAppDetails || !orgResolutionSettled) return
     seeded.current = true
+    if (!showProjectPicker) return
 
-    const grant = request.existing_grant
-    if (grant && isAllProjectsScope(grant.project_scope)) {
-      if (allowAllProjects) setAllProjectsSelected(true)
+    const grant = orgAppDetails.existing_grant
+    const hasAllProjectsGrant = grant !== null && grant.project_refs.length === 0
+    if (hasAllProjectsGrant && allowAllProjects) {
+      setAllProjectsSelected(true)
       return
     }
-    if (!showProjectPicker) return
 
     const refs = getPreselectedProjectRefs({
       existingGrant: grant,
-      suggestedRefs,
+      projectRef,
       liveProjects: projects,
-      max: MAX_SELECTED_PROJECTS,
     })
-    if (refs.length > 0) setSelectedProjectRefs(refs)
+    if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
   }, [
-    request.existing_grant,
+    orgAppDetails,
     projects,
     orgResolutionSettled,
     allowAllProjects,
     showProjectPicker,
-    suggestedRefs,
+    projectRef,
   ])
 
   const signOut = useSignOut()
@@ -165,7 +154,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const isSubmitting = approveMutation.isPending
   const hasProjects = (projects?.length ?? 0) > 0
 
-  if (!identity || !orgSlug || !memberOrg || !orgResolutionSettled) return null
+  if (!identity || !orgSlug || !memberOrg || !orgResolutionSettled || !orgAppDetails) return null
 
   const isBlockedOnProjects = showProjectPicker && !hasProjects
   const canProceed = !isBlockedOnProjects
@@ -186,9 +175,9 @@ export const OAuthAppsAuthorizeScreen = ({
   const usesSelectedProjects = showProjectPicker && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
-  const projectScope: OAuthGrantProjectScope = usesSelectedProjects
-    ? { target: 'selected_projects', project_refs: selectedProjectRefs }
-    : { target: 'all_projects' }
+  const approveBody: OAuthAuthorizeApproveRequest = usesSelectedProjects
+    ? { project_refs: selectedProjectRefs }
+    : {}
 
   if (approveRedirect) {
     return (
@@ -203,9 +192,9 @@ export const OAuthAppsAuthorizeScreen = ({
           grant={{
             email: identity.email,
             organization_slug: memberOrg.slug,
-            project_scope: projectScope,
+            project_refs: usesSelectedProjects ? selectedProjectRefs : null,
             projects: grantedProjects,
-            scope_groups: request.scope_groups,
+            scope_groups: request.scopes,
           }}
           onReturn={() => {
             window.location.href = approveRedirect.url
@@ -227,11 +216,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const handleApprove = () => {
     if (hasNoSelection) return
-    approveMutation.mutate({
-      auth_id: authId,
-      slug: orgSlug,
-      project_scope: projectScope,
-    })
+    approveMutation.mutate({ auth_id: authId, slug: orgSlug, body: approveBody })
   }
 
   const handleDeny = () => {
@@ -251,10 +236,6 @@ export const OAuthAppsAuthorizeScreen = ({
       description="This application wants to access your Supabase Account"
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
-        {!request.is_verified && (
-          <Admonition type="warning" description={CONSENT_COPY.unverifiedPublisher} />
-        )}
-
         {hasRoleFailure && (
           <Admonition
             type="destructive"
@@ -297,7 +278,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
           {canProceed && (
             <>
-              <ScopeGroupCard appName={request.name} scopeGroups={request.scope_groups} />
+              <ScopeGroupCard appName={request.name} scopeGroups={request.scopes} />
 
               {!showProjectPicker && (
                 <Admonition
@@ -305,10 +286,6 @@ export const OAuthAppsAuthorizeScreen = ({
                   title={CONSENT_COPY.coversEveryProject.title}
                   description={CONSENT_COPY.coversEveryProject.description(request.name, orgSlug)}
                 />
-              )}
-
-              {request.reuses_grant_across_workspaces && (
-                <Admonition type="default" description={CONSENT_COPY.workspaceReuse} />
               )}
 
               {grantKind === 'organization_bound' && (
@@ -324,8 +301,6 @@ export const OAuthAppsAuthorizeScreen = ({
             </>
           )}
         </fieldset>
-
-        {isDynamicClient && <Admonition type="default" description={CONSENT_COPY.dynamicClient} />}
 
         <div className="flex flex-col gap-2">
           {canProceed ? (
@@ -357,7 +332,7 @@ export const OAuthAppsAuthorizeScreen = ({
           ) : (
             <>
               <p>
-                {grantKind === 'user_bound' &&
+                {grantKind === 'member_bound' &&
                   'No admin approval is needed if your role permits this access. '}
                 This authorization will appear in Authorized apps.
               </p>

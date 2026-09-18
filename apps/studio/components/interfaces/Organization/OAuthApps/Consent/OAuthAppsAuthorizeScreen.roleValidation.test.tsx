@@ -18,8 +18,6 @@ function renderScreen(authId: string) {
   )
 }
 
-// northwind-traders roles: northwind-storefront (administrator), northwind-cms (developer),
-// fabrikam-api and fabrikam-jobs (both read_only, so both fail the write-scope check).
 const READ_ONLY_PROJECTS = ['fabrikam-api', 'fabrikam-jobs']
 const WRITABLE_PROJECT = 'northwind-cms'
 
@@ -122,7 +120,7 @@ describe('OAuthAppsAuthorizeScreen post-submit role validation', () => {
       <OAuthAppsAuthorizeScreen
         authId={OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation}
         request={getMockOAuthAppsAuthorizeRequest(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation)}
-        suggestedProjectRefs={['fabrikamapi1']}
+        projectRef="fabrikamapi1"
         navigate={vi.fn()}
       />
     )
