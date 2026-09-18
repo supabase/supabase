@@ -79,8 +79,8 @@ export const RestartTableDialog = ({
   }
 
   const consequence = willCopyTable
-    ? 'Destination data for this table will be deleted and existing rows will sync again. The pipeline restarts automatically if it is running. Otherwise, it remains stopped.'
-    : 'Destination data for this table will be deleted. Initial sync is skipped for this table, so replication resumes with new changes only. The pipeline restarts automatically if it is running. Otherwise, it remains stopped.'
+    ? 'This resets the table, deletes its destination data, and syncs existing rows again. If the pipeline is running, it restarts automatically to apply the reset.'
+    : 'This resets the table and deletes its destination data. Initial sync is skipped, so replication resumes with new changes only. If the pipeline is running, it restarts automatically to apply the reset.'
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

@@ -96,7 +96,7 @@ describe('BatchRestartDialog', () => {
     expect(screen.getByText(/This resets 3 failed tables/)).toBeInTheDocument()
     expect(
       screen.getByText(
-        /2 of 3 tables will sync existing rows again. The remaining 1 table will skip initial sync/
+        /Existing rows sync again for 2 of 3 tables, while the remaining table skips initial sync/
       )
     ).toBeInTheDocument()
     expect(screen.getByTestId('copy-targets')).toHaveTextContent('public.table_1,public.table_2')
@@ -107,6 +107,26 @@ describe('BatchRestartDialog', () => {
 
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
     expect(requests).toEqual([{ target: { type: 'all_errored_tables' } }])
+  })
+
+  it('uses singular copy when resetting the only table', () => {
+    customRender(
+      <PipelineRequestStatusProvider>
+        <BatchRestartDialog
+          open
+          onOpenChange={vi.fn()}
+          mode="all"
+          tables={[table(1, { name: 'following_wal' })]}
+          tableSyncCopy={{ type: 'include_tables', table_ids: [1] }}
+        />
+      </PipelineRequestStatusProvider>
+    )
+
+    expect(
+      screen.getByText(
+        'This resets the table, deletes its destination data, and syncs existing rows again. If the pipeline is running, it restarts automatically to apply the reset.'
+      )
+    ).toBeInTheDocument()
   })
 
   it.each([

@@ -94,24 +94,36 @@ export const BatchRestartDialog = ({
   const count = affectedTables.length
   const tableWord = count === 1 ? 'table' : 'tables'
   const remainingTableCount = count - copiedTables.length
-  const remainingTableWord = remainingTableCount === 1 ? 'table' : 'tables'
-  const initialSyncDescription =
-    copiedTables.length === 0
-      ? 'Initial sync is skipped, so replication resumes with new changes only.'
-      : copiedTables.length === affectedTables.length
-        ? 'Existing rows will sync again.'
-        : `${copiedTables.length} of ${count} ${tableWord} will sync existing rows again. The remaining ${remainingTableCount} ${remainingTableWord} will skip initial sync and resume with new changes only.`
+  let resetScope = `${count} failed ${tableWord}`
+  if (mode === 'all') {
+    resetScope = count === 1 ? 'the table' : `all ${count} tables`
+  }
+  const destinationData = count === 1 ? 'its destination data' : 'their destination data'
+
+  let resetDescription = `This resets ${resetScope} and deletes ${destinationData}. Initial sync is skipped, so replication resumes with new changes only.`
+  if (copiedTables.length === affectedTables.length) {
+    resetDescription = `This resets ${resetScope}, deletes ${destinationData}, and syncs existing rows again.`
+  } else if (copiedTables.length > 0) {
+    const remainingTables =
+      remainingTableCount === 1
+        ? 'the remaining table'
+        : `the remaining ${remainingTableCount} tables`
+    const remainingAction = remainingTableCount === 1 ? 'skips' : 'skip'
+    resetDescription = `This resets ${resetScope} and deletes ${destinationData}. Existing rows sync again for ${copiedTables.length} of ${count} ${tableWord}, while ${remainingTables} ${remainingAction} initial sync and resume with new changes only.`
+  }
+
+  const description = `${resetDescription} If the pipeline is running, it restarts automatically to apply the reset.`
 
   const dialogContent =
     mode === 'all'
       ? {
           title: 'Reset all tables',
-          description: `This resets all ${count} ${tableWord}. Destination data will be deleted. ${initialSyncDescription} The pipeline restarts automatically if it is running. Otherwise, it remains stopped.`,
+          description,
           action: 'Reset all tables',
         }
       : {
           title: 'Reset failed tables',
-          description: `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted. ${initialSyncDescription} The pipeline restarts automatically if it is running. Otherwise, it remains stopped.`,
+          description,
           action: 'Reset failed tables',
         }
 
