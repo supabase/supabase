@@ -127,7 +127,7 @@
     "openai": "^4.104.0",
     "openapi-fetch": "0.12.4",
     "papaparse": "^5.3.1",
-    "path-to-regexp": "^8.0.0",
+    "path-to-regexp": "^8.4.2",
     "radix-ui": "catalog:",
     "randombytes": "^2.1.0",
     "react": "catalog:",
@@ -163,7 +163,7 @@
   "devDependencies": {
     "@babel/core": "*",
     "@eslint/compat": "^2.1.0",
-    "@faker-js/faker": "^9.9.0",
+    "@faker-js/faker": "^10.5.0",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@tailwindcss/postcss": "^4.2.4",
