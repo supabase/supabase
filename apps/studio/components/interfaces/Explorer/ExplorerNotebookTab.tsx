@@ -477,8 +477,8 @@ export const ExplorerNotebookTab = () => {
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
             >
               <div className="flex items-center gap-x-2">
-                <Button onClick={() => onSelectAddCell('query')}>Add query cell</Button>
-                <Button onClick={() => onSelectAddCell('markdown')}>Add markdown cell</Button>
+                <Button onClick={() => onSelectAddCell('query')}>Add query</Button>
+                <Button onClick={() => onSelectAddCell('markdown')}>Add markdown</Button>
               </div>
             </EmptyStatePresentational>
           )}
@@ -513,17 +513,19 @@ export const ExplorerNotebookTab = () => {
               <div className="flex items-center justify-center gap-x-2 mt-4">
                 <ButtonTooltip
                   variant="outline"
+                  size="small"
                   icon={<SquareCode />}
-                  className="w-7"
+                  className="w-[34px]"
                   onClick={() => onSelectAddCell('query')}
-                  tooltip={{ content: { side: 'bottom', text: 'Add query cell' } }}
+                  tooltip={{ content: { side: 'bottom', text: 'Add query' } }}
                 />
                 <ButtonTooltip
                   variant="outline"
+                  size="small"
                   icon={<FileText />}
-                  className="w-7"
+                  className="w-[34px]"
                   onClick={() => onSelectAddCell('markdown')}
-                  tooltip={{ content: { side: 'bottom', text: 'Add markdown cell' } }}
+                  tooltip={{ content: { side: 'bottom', text: 'Add markdown' } }}
                 />
               </div>
             </>

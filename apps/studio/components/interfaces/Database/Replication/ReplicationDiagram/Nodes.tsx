@@ -6,7 +6,6 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DestinationLogo } from '../DestinationLogo'
 import { getStatusName } from '../Pipeline.utils'
-import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { getReplicationDestinationType } from './Nodes.utils'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -66,10 +65,10 @@ export const ReplicationNode = ({ id }: { id: string }) => {
     projectRef,
   })
   const pipeline = (pipelinesData?.pipelines ?? []).find((x) => x.destination_id.toString() === id)
-  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
-    { projectRef, pipelineId: pipeline?.id },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
   const statusName = getStatusName(pipelineStatusData?.status)
 
   const type = getReplicationDestinationType(destination?.config)

@@ -1,45 +1,14 @@
-import { Info } from 'lucide-react'
-import {
-  Badge,
-  cn,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-
+import { StateDot } from '../StateDot'
 import { SlotWalStatus } from './ReplicationPipelineStatus.types'
-import { getWalStatusMeta, WAL_STATUS_LEGEND } from './ReplicationPipelineStatus.utils'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { DOCS_URL } from '@/lib/constants'
+import { getWalStatusMeta } from './ReplicationPipelineStatus.utils'
 
-export type SlotStatusContext = 'pipeline' | 'table'
+export const SLOT_STATUS_TOOLTIP =
+  'How safely your database is keeping the changes this pipeline’s main replication slot still needs'
 
-const CONNECTION_TEXT: Record<SlotStatusContext, { active: string; inactive: string }> = {
-  pipeline: {
-    active: "This pipeline's replication slot is active and being used right now.",
-    inactive: "This pipeline's replication slot is not active right now.",
-  },
-  table: {
-    active: "This table's replication slot is active and being used right now.",
-    inactive: "This table's replication slot is not active right now.",
-  },
-}
-
-/**
- * Colored badge for a slot's WAL status, with the plain-language meaning on hover.
- * Pass `context="table"` in the per-table inline view to show table-specific descriptions.
- */
-export const SlotStatusBadge = ({
-  status,
-  context = 'pipeline',
-}: {
-  status?: SlotWalStatus | null
-  context?: SlotStatusContext
-}) => {
+/** How safely Postgres is keeping the changes the slot still needs. */
+export const SlotWalStatusValue = ({ status }: { status?: SlotWalStatus | null }) => {
   const meta = getWalStatusMeta(status)
+<<<<<<< HEAD
   const description = context === 'table' ? meta.tableDescription : meta.description
   return (
     <Tooltip>
@@ -133,4 +102,7 @@ export const SlotConnectionIndicator = ({
       </TooltipContent>
     </Tooltip>
   )
+=======
+  return <StateDot variant={meta.variant}>{meta.label}</StateDot>
+>>>>>>> origin/master
 }

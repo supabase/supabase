@@ -29,7 +29,11 @@ function toAgentHref(href: string): string {
 function BlockItem({ props }: HandlerContext): string {
   const name = String(props.name ?? '')
   if (!name) return ''
-  const command = getInstallCommands(name, { production: true }).npm
+  const framework = props.framework ?? 'react'
+  if (framework !== 'react' && framework !== 'vue') {
+    throw new Error(`Unsupported install framework for ${name}: ${String(framework)}`)
+  }
+  const command = getInstallCommands(name, { framework, production: true }).npm
   return ['Install this block:', '', '```bash', command, '```'].join('\n')
 }
 

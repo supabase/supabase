@@ -119,8 +119,8 @@ tmux a -t migration || tmux new -s migration
 - **Row Level Security (RLS) status on tables is not migrated** - You'll need to enable RLS for tables after migration.
 
 **Resource Requirements**:
-| Database Size | Recommended Compute | Recommended VM | Action Required |
-|--------------|-------------------|----------------|-----------------|
+| Database Size | Recommended Compute | Recommended Migration VM | Action Required |
+|--------------|-------------------|--------------------------|-----------------|
 | < 10 GB | Default | 2 vCPUs, 4 GB RAM | None |
 | 10-100 GB | Default-Small | 4 vCPUs, 8 GB RAM | Consider compute upgrade |
 | 100-500 GB | Large compute | 8 vCPUs, 16 GB RAM, NVMe | Upgrade compute before restore |
@@ -203,13 +203,14 @@ Run `pg_dump --help` for a full list of options.
 export SUPABASE_DB_URL="Postgres://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
 
 # Determine restore parallelization based on your Supabase compute size:
-# Free tier: 2 cores → use -j 2
-# Small compute: 2 cores → use -j 2
-# Medium compute: 4 cores → use -j 4
-# Large compute: 8 cores → use -j 8
-# XL compute: 16 cores → use -j 16
+# Micro–Medium (shared compute): use -j 2
+# Large: 2 vCPUs → use -j 2
+# XL: 4 vCPUs → use -j 4
+# 2XL: 8 vCPUs → use -j 8
+# 4XL: 16 vCPUs → use -j 16
+# (larger sizes: match -j to the vCPU count shown on the pricing page)
 
-RESTORE_JOBS=8  # Adjust based on your Supabase compute size
+RESTORE_JOBS=2  # Conservative starting point — adjust for your compute size and monitor CPU and disk IO
 
 # Restore the dump (parallel mode)
 # Note: -j cannot be used with --single-transaction

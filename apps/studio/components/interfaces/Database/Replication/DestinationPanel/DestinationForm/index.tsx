@@ -280,9 +280,7 @@ export const DestinationForm = ({
 
   const getSubmitButtonText = () => {
     if (editMode) {
-      return existingDestination?.enabled
-        ? 'Apply and restart pipeline'
-        : 'Apply and start pipeline'
+      return existingDestination?.enabled ? 'Apply and restart pipeline' : 'Apply changes'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
         return 'Create and start pipeline anyway'
@@ -290,6 +288,13 @@ export const DestinationForm = ({
 
       return 'Create and start pipeline'
     }
+  }
+
+  const getSavingMessage = () => {
+    if (isValidating) return 'Validating destination configuration...'
+    if (!editMode) return 'Creating pipeline...'
+    if (existingDestination?.enabled) return 'Updating destination and restarting pipeline...'
+    return 'Updating destination...'
   }
 
   // Stages the form values and opens the cost-estimation dialog, which is the final gate before
@@ -467,21 +472,25 @@ export const DestinationForm = ({
 
                 <DialogSectionSeparator />
 
-                {selectedType === 'BigQuery' && etlEnableBigQuery ? (
+                {selectedType === 'BigQuery' && etlEnableBigQuery && (
                   <BigQueryFields form={form} editMode={editMode} />
-                ) : selectedType === 'Analytics Bucket' && etlEnableIceberg ? (
+                )}
+                {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
                   <AnalyticsBucketFields
                     form={form}
                     editMode={editMode}
                     onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                   />
-                ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
+                )}
+                {selectedType === 'DuckLake' && etlEnableDucklake && (
                   <DuckLakeFields form={form} editMode={editMode} />
-                ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
+                )}
+                {selectedType === 'Snowflake' && etlEnableSnowflake && (
                   <SnowflakeFields form={form} editMode={editMode} />
-                ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
+                )}
+                {selectedType === 'ClickHouse' && etlEnableClickHouse && (
                   <ClickHouseFields form={form} editMode={editMode} />
-                ) : null}
+                )}
 
                 <DialogSectionSeparator />
 
@@ -516,15 +525,7 @@ export const DestinationForm = ({
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               <Loader2 className="animate-spin" size={14} />
-              <p className="text-foreground-light text-sm">
-                {isValidating
-                  ? 'Validating destination configuration...'
-                  : editMode
-                    ? existingDestination?.enabled
-                      ? 'Updating destination and restarting pipeline...'
-                      : 'Updating destination and starting pipeline...'
-                    : 'Creating pipeline...'}
-              </p>
+              <p className="text-foreground-light text-sm">{getSavingMessage()}</p>
             </motion.div>
           ) : (
             <div />
