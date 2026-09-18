@@ -16,6 +16,7 @@ import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNavHome = ({
   onSelectSection,
@@ -24,6 +25,7 @@ export const ExplorerNavHome = ({
 }) => {
   const { ref } = useParams()
   const { openChat } = useCreateChat()
+  const tabs = useTabsStateSnapshot()
 
   const { data: notebooksData } = useNotebooksInfiniteQuery({ projectRef: ref, limit: 100 })
   const notebooks = notebooksData?.pages.flatMap((page) => page.content) ?? []
@@ -102,6 +104,7 @@ export const ExplorerNavHome = ({
                 tabIndex={0}
                 className={rowClassName(false)}
                 onClick={() => openChat(item.id)}
+                onDoubleClick={() => tabs.makeTabPermanent(createTabId('chat', { id: item.id }))}
               >
                 {content}
               </button>
@@ -110,6 +113,9 @@ export const ExplorerNavHome = ({
                 key={item.id}
                 href={`/project/${ref}/explorer/notebook/${item.id}`}
                 className={rowClassName(false)}
+                onDoubleClick={() =>
+                  tabs.makeTabPermanent(createTabId('notebook', { id: item.id }))
+                }
               >
                 {content}
               </Link>
