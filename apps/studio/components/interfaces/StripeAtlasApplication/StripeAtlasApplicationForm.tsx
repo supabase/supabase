@@ -4,6 +4,8 @@ import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import type { StripeAtlasApplicationData } from '@/data/stripe-atlas/stripe-atlas-application-query'
+
 const FormSchema = z.object({
   firstname: z.string().trim().min(1, 'First name is required').max(100, 'Maximum 100 characters'),
   lastname: z.string().trim().min(1, 'Last name is required').max(100, 'Maximum 100 characters'),
@@ -23,20 +25,20 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>
 
 type StripeAtlasApplicationFormProps = {
-  stripeAtlasToken: string
+  application: StripeAtlasApplicationData
 }
 
-/** Mockup only — submitting runs validation and stops there, nothing is sent. */
-export const StripeAtlasApplicationForm = (_props: StripeAtlasApplicationFormProps) => {
-  // todo(@juleswritescode): fetch data from API via props.stripeAtlasToken; currently just a mockup.
+/** Prefilled from the Stripe Atlas application — submitting runs validation and stops there. */
+export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicationFormProps) => {
+  // todo(@juleswritescode): submit via the /platform/stripe/atlas/application/complete endpoint.
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      firstname: 'Mockey',
-      lastname: 'Mockupson',
-      companyName: 'Acmo Ck.',
-      email: 'me@mo.ck',
+      firstname: application.firstname ?? '',
+      lastname: application.lastname ?? '',
+      companyName: application.companyName ?? '',
+      email: application.email ?? '',
     },
   })
 
