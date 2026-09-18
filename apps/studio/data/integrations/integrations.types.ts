@@ -265,6 +265,7 @@ export type GitHubConnection = {
   branch_limit: number
   installation_id: number
   new_branch_per_pr: boolean
+  comment_on_no_changes: boolean
   supabase_changes_only: boolean
   workdir: string
   project: {
