@@ -23,7 +23,6 @@ const MOCK_SCENARIOS: Record<string, { authId: string; organizationSlug?: string
     organizationSlug: 'contoso-labs',
   },
   dynamic_client: { authId: OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient },
-  suggested_projects: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects },
   org_bound: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot },
   org_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide },
   user_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects },
@@ -42,13 +41,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const organizationSlug = organization_slug ?? mockScenario?.organizationSlug
 
   const projectRefParam = router.query.project_ref
-  const suggestedProjectRefs = (
-    Array.isArray(projectRefParam)
-      ? projectRefParam
-      : typeof projectRefParam === 'string'
-        ? [projectRefParam]
-        : []
-  ).slice(0, 10)
+  const projectRef = (Array.isArray(projectRefParam) ? projectRefParam[0] : projectRefParam) ?? null
 
   const { data: request } = useOAuthAppsAuthorizeRequestQuery(
     { id: authId },
@@ -87,7 +80,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           authId={authId}
           request={request}
           organizationSlug={organizationSlug}
-          suggestedProjectRefs={suggestedProjectRefs}
+          projectRef={projectRef}
           navigate={(destination) => router.push(destination)}
         />
       </>

@@ -1,190 +1,146 @@
 import { describe, expect, test } from 'vitest'
 
-import type {
-  OAuthAppGrantConfig,
-  OAuthAppMemberGrant,
-  OAuthAppRegistrationType,
-  OAuthAppsAuthorizeOrganizationProject,
-  OAuthExistingGrant,
-} from './types'
-import {
-  getMemberGrantPermissionCount,
-  getMemberGrantScopeGroupsByLevel,
-  getOAuthConsentModel,
-  getPreselectedProjectRefs,
-  getScopedProjectRefs,
-} from './types'
-
-const config = (overrides: Partial<OAuthAppGrantConfig> = {}): OAuthAppGrantConfig => ({
-  bind_to_authorizing_user: false,
-  project_selection: 'off',
-  ...overrides,
-})
-
-const consentModel = (
-  grantConfig: OAuthAppGrantConfig,
-  registrationType: OAuthAppRegistrationType = 'manual'
-) => getOAuthConsentModel({ grantConfig, registrationType })
-
-describe('getOAuthConsentModel', () => {
-  test.each([
-    ['organization_bound', config()],
-    ['organization_bound', config({ project_selection: 'required' })],
-    ['user_bound', config({ bind_to_authorizing_user: true })],
-    ['user_bound', config({ bind_to_authorizing_user: true, project_selection: 'optional' })],
-  ])('binds the grant to %s', (expected, grantConfig) => {
-    expect(consentModel(grantConfig).grant_kind).toBe(expected)
-  })
-
-  test.each(['off', 'optional', 'required'] as const)(
-    'passes the %s selection mode through untouched',
-    (mode) => {
-      expect(consentModel(config({ project_selection: mode })).project_selection).toBe(mode)
-    }
-  )
-
-  test('forces a dynamic client user-bound with a required selection, whatever the flags say', () => {
-    const model = consentModel(
-      config({ bind_to_authorizing_user: false, project_selection: 'off' }),
-      'dynamic'
-    )
-
-    expect(model.grant_kind).toBe('user_bound')
-    expect(model.project_selection).toBe('required')
-  })
-})
-
-describe('getScopedProjectRefs', () => {
-  test('returns the refs of a selection', () => {
-    expect(
-      getScopedProjectRefs({ target: 'selected_projects', project_refs: ['abc', 'def'] })
-    ).toEqual(['abc', 'def'])
-  })
-
-  test('degrades an all-projects grant to nothing to preselect', () => {
-    expect(getScopedProjectRefs({ target: 'all_projects' })).toEqual([])
-  })
-})
+import { DEVELOPER_ROLE, READ_ONLY_ROLE } from './mocks'
+import type { OAuthAppsAuthorizeOrganizationProject, OAuthExistingGrant } from './types'
+import { getFailedProjects, getPreselectedProjectRefs, isRoleValidationFailure } from './types'
 
 const project = (ref: string): OAuthAppsAuthorizeOrganizationProject => ({
   ref,
   name: ref,
-  role: 'developer',
+  role: DEVELOPER_ROLE,
 })
 
-const selectedGrant = (refs: string[]): OAuthExistingGrant => ({
-  kind: 'user_bound',
-  approved_scopes: ['project_settings'],
-  project_scope: { target: 'selected_projects', project_refs: refs },
-  created_at: '2026-08-14T09:12:00.000Z',
-  updated_at: null,
+const grant = (refs: string[]): OAuthExistingGrant => ({
+  approved_scopes: ['projects:read'],
+  project_refs: refs,
+  approved_at: '2026-08-14T09:12:00.000Z',
 })
-
-const ALL_PROJECTS_GRANT: OAuthExistingGrant = {
-  kind: 'user_bound',
-  approved_scopes: ['project_settings'],
-  project_scope: { target: 'all_projects' },
-  created_at: '2026-08-14T09:12:00.000Z',
-  updated_at: null,
-}
 
 describe('getPreselectedProjectRefs', () => {
   const live = ['alpha', 'bravo', 'charlie', 'delta'].map(project)
 
-  test('drops suggested refs that do not resolve against live projects', () => {
+  test('preselects the project_ref query param when it resolves against live projects', () => {
     expect(
-      getPreselectedProjectRefs({
-        existingGrant: null,
-        suggestedRefs: ['alpha', 'ghost', 'bravo'],
-        liveProjects: live,
-      })
-    ).toEqual(['alpha', 'bravo'])
+      getPreselectedProjectRefs({ existingGrant: null, projectRef: 'alpha', liveProjects: live })
+    ).toEqual(['alpha'])
   })
 
-  test('existing-grant refs come before suggested refs and survive the cap', () => {
+  test('drops a project_ref that does not resolve against live projects', () => {
     expect(
-      getPreselectedProjectRefs({
-        existingGrant: selectedGrant(['charlie', 'delta']),
-        suggestedRefs: ['alpha', 'bravo'],
-        liveProjects: live,
-        max: 3,
-      })
-    ).toEqual(['charlie', 'delta', 'alpha'])
+      getPreselectedProjectRefs({ existingGrant: null, projectRef: 'ghost', liveProjects: live })
+    ).toEqual([])
   })
 
-  test('dedupes a suggested ref that the existing grant already carries', () => {
+  test('returns nothing when there is neither a grant nor a project_ref', () => {
     expect(
-      getPreselectedProjectRefs({
-        existingGrant: selectedGrant(['alpha']),
-        suggestedRefs: ['alpha', 'bravo'],
-        liveProjects: live,
-      })
-    ).toEqual(['alpha', 'bravo'])
+      getPreselectedProjectRefs({ existingGrant: null, projectRef: null, liveProjects: live })
+    ).toEqual([])
   })
 
-  test('truncates at the cap when oversupplied', () => {
+  test('existing-grant refs win over the project_ref query param', () => {
+    expect(
+      getPreselectedProjectRefs({
+        existingGrant: grant(['charlie', 'delta']),
+        projectRef: 'alpha',
+        liveProjects: live,
+      })
+    ).toEqual(['charlie', 'delta'])
+  })
+
+  test('filters stale refs out of the existing grant', () => {
+    expect(
+      getPreselectedProjectRefs({
+        existingGrant: grant(['alpha', 'ghost']),
+        projectRef: null,
+        liveProjects: live,
+      })
+    ).toEqual(['alpha'])
+  })
+
+  test('falls back to the project_ref when the existing grant carries no refs', () => {
+    expect(
+      getPreselectedProjectRefs({
+        existingGrant: grant([]),
+        projectRef: 'bravo',
+        liveProjects: live,
+      })
+    ).toEqual(['bravo'])
+  })
+
+  test('does not cap the number of preselected refs', () => {
     const manyProjects = Array.from({ length: 15 }, (_, index) => project(`ref-${index}`))
     const manyRefs = manyProjects.map((entry) => entry.ref)
 
-    const result = getPreselectedProjectRefs({
-      existingGrant: null,
-      suggestedRefs: manyRefs,
-      liveProjects: manyProjects,
-    })
-
-    expect(result).toHaveLength(10)
-    expect(result).toEqual(manyRefs.slice(0, 10))
-  })
-
-  test('returns nothing for an all-projects existing grant', () => {
     expect(
       getPreselectedProjectRefs({
-        existingGrant: ALL_PROJECTS_GRANT,
-        suggestedRefs: ['alpha'],
-        liveProjects: live,
+        existingGrant: grant(manyRefs),
+        projectRef: null,
+        liveProjects: manyProjects,
       })
-    ).toEqual([])
+    ).toEqual(manyRefs)
   })
 
   test('returns nothing when there are no live projects', () => {
     expect(
       getPreselectedProjectRefs({
-        existingGrant: selectedGrant(['alpha']),
-        suggestedRefs: ['alpha'],
+        existingGrant: grant(['alpha']),
+        projectRef: 'alpha',
         liveProjects: [],
       })
     ).toEqual([])
   })
 })
 
-const memberGrant = (): OAuthAppMemberGrant => ({
-  member_email: 'admin@example.com',
-  project_scope: { target: 'selected_projects', project_refs: ['alpha', 'bravo'] },
-  scope_groups: [
-    { name: 'Project Settings, Logs', level: 'read_write', scopes: ['project_settings', 'logs'] },
-    { name: 'Database Webhooks', level: 'read', scopes: ['database_webhooks'] },
-  ],
-  created_at: '2026-08-18T09:12:00.000Z',
-})
-
-describe('getMemberGrantPermissionCount', () => {
-  test('counts individual scopes across every group', () => {
-    expect(getMemberGrantPermissionCount(memberGrant())).toBe(3)
+describe('isRoleValidationFailure', () => {
+  test('recognises a role validation failure', () => {
+    expect(
+      isRoleValidationFailure({
+        error_code: 'role_validation_failed',
+        message: 'nope',
+        validation: { scope_target: 'organization', role: READ_ONLY_ROLE, failed_scopes: [] },
+      })
+    ).toBe(true)
   })
 
-  test('counts nothing for a grant with no groups', () => {
-    expect(getMemberGrantPermissionCount({ ...memberGrant(), scope_groups: [] })).toBe(0)
+  test('treats a redirect as a success', () => {
+    expect(isRoleValidationFailure({ url: 'https://vercel.com/callback?code=abc' })).toBe(false)
   })
 })
 
-describe('getMemberGrantScopeGroupsByLevel', () => {
-  test('returns only the groups at the requested level', () => {
-    expect(getMemberGrantScopeGroupsByLevel(memberGrant(), 'read_write')).toEqual([
-      { name: 'Project Settings, Logs', level: 'read_write', scopes: ['project_settings', 'logs'] },
-    ])
+describe('getFailedProjects', () => {
+  test('returns the failures of a projects-level failure', () => {
+    const failure = {
+      ref: 'alpha',
+      name: 'alpha',
+      role: READ_ONLY_ROLE,
+      failed_scopes: ['database:write' as const],
+    }
+
+    expect(
+      getFailedProjects({
+        error_code: 'role_validation_failed',
+        message: 'nope',
+        validation: { scope_target: 'projects', failures: [failure] },
+      })
+    ).toEqual([failure])
   })
 
-  test('returns nothing for a level the grant does not hold, so the block can be skipped', () => {
-    expect(getMemberGrantScopeGroupsByLevel(memberGrant(), 'write')).toEqual([])
+  test('is empty for an organization-level failure', () => {
+    expect(
+      getFailedProjects({
+        error_code: 'role_validation_failed',
+        message: 'nope',
+        validation: {
+          scope_target: 'organization',
+          role: READ_ONLY_ROLE,
+          failed_scopes: ['database:write'],
+        },
+      })
+    ).toEqual([])
+  })
+
+  test('is empty when there is no failure', () => {
+    expect(getFailedProjects(null)).toEqual([])
+    expect(getFailedProjects(undefined)).toEqual([])
   })
 })

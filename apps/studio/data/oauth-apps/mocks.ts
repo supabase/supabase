@@ -1,17 +1,19 @@
 import type { OAuthAppsAuthorizeIdentity } from './oauth-apps-authorize-organizations-query'
-import type { OAuthAppsAuthorizeRequest } from './oauth-apps-authorize-request-query'
 import type {
-  OAuthAppGrantConfig,
-  OAuthAppMemberGrant,
+  ListAppGrantsResponse,
+  ListBlockedAppsResponse,
+  ListOAuthAppsOverviewResponse,
   OAuthAppsAuthorizeApproveResult,
   OAuthAppsAuthorizeOrganizationProject,
-  OAuthAuthorizedApp,
+  OAuthAppsAuthorizeRequest,
   OAuthExistingGrant,
-  OAuthGrantProjectScope,
   OAuthOrganizationRole,
+  OAuthOrgAppDetails,
+  OAuthScope,
   OAuthScopeGroup,
   OAuthScopeLevel,
 } from './types'
+import type { OrganizationRole } from '@/data/organization-members/organization-roles-query'
 
 const ENABLE_MOCKS = true
 export const USE_MOCKS = ENABLE_MOCKS && process.env.NODE_ENV !== 'production'
@@ -20,197 +22,191 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   vercelDeveloper: 'mock-vercel-developer',
   vercelReadOnly: 'mock-vercel-readonly',
   vercelReconsent: 'mock-vercel-reconsent',
-  vercelCrossWorkspace: 'mock-vercel-cross-workspace',
   vercelOrgAdmin: 'mock-vercel-org-admin',
   vercelManyProjects: 'mock-vercel-many-projects',
   vercelRoleValidation: 'mock-vercel-role-validation',
-  kemalBot: 'mock-kemal-bot',
+  vercelBlocked: 'mock-vercel-blocked',
   vercelOptionalProjects: 'mock-vercel-optional-projects',
   vercelAllProjects: 'mock-vercel-all-projects',
   vercelReconsentAllProjects: 'mock-vercel-reconsent-all-projects',
+  kemalBot: 'mock-kemal-bot',
   kemalBotOrgWide: 'mock-kemal-bot-org-wide',
   dynamicMcpClient: 'mock-dynamic-mcp-client',
-  vercelSuggestedProjects: 'mock-vercel-suggested-projects',
 } as const
 
-const USER_BOUND_REQUIRED_PROJECTS: OAuthAppGrantConfig = {
-  bind_to_authorizing_user: true,
-  project_selection: 'required',
+export const OWNER_ROLE: OrganizationRole = {
+  id: 1,
+  base_role_id: 1,
+  name: 'Owner',
+  description: null,
+  projects: [],
+}
+
+export const ADMINISTRATOR_ROLE: OrganizationRole = {
+  id: 2,
+  base_role_id: 2,
+  name: 'Administrator',
+  description: null,
+  projects: [],
+}
+
+export const DEVELOPER_ROLE: OrganizationRole = {
+  id: 3,
+  base_role_id: 3,
+  name: 'Developer',
+  description: null,
+  projects: [],
+}
+
+export const READ_ONLY_ROLE: OrganizationRole = {
+  id: 4,
+  base_role_id: 4,
+  name: 'Read-only',
+  description: null,
+  projects: [],
 }
 
 const VERCEL_SCOPE_GROUPS: OAuthScopeGroup[] = [
   {
-    name: 'Project Settings, Action Runs, Logs, SQL Snippets',
+    name: 'Database, Environment, Secrets',
     level: 'read_write',
-    scopes: ['project_settings', 'action_runs', 'logs', 'sql_snippets'],
+    scopes: [
+      'database:read',
+      'database:write',
+      'environment:read',
+      'environment:write',
+      'secrets:read',
+      'secrets:write',
+    ],
   },
   {
-    name: 'Database Webhooks, Development Branches, Production Branches',
+    name: 'Projects, Edge Functions, Storage',
     level: 'read',
-    scopes: ['database_webhooks', 'development_branches', 'production_branches'],
+    scopes: ['projects:read', 'edge_functions:read', 'storage:read'],
   },
 ]
 
 const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
-  client_id: 'vercel',
+  app_id: 'vercel',
+  app_name: 'Vercel',
   name: 'Vercel',
   website: 'https://vercel.com',
   domain: 'vercel.com',
-  is_verified: true,
   redirect_uri: 'https://vercel.com/api/integrations/supabase/callback',
   registration_type: 'manual',
   expires_at: '2026-09-17T12:00:00.000Z',
-  scope_groups: VERCEL_SCOPE_GROUPS,
-  reuses_grant_across_workspaces: false,
-  suggested_project_refs: [],
-  grant_config: USER_BOUND_REQUIRED_PROJECTS,
-  existing_grant: null,
-}
-
-const VERCEL_EXISTING_GRANT: OAuthExistingGrant = {
-  kind: 'user_bound',
-  approved_scopes: ['project_settings', 'logs'],
-  project_scope: {
-    target: 'selected_projects',
-    project_refs: ['northwindstorefront1', 'northwindcms1', 'northwinddeleted1'],
-  },
-  created_at: '2026-08-14T09:12:00.000Z',
-  updated_at: '2026-08-29T16:40:00.000Z',
-}
-
-const VERCEL_RECONSENT_REQUEST: OAuthAppsAuthorizeRequest = {
-  ...VERCEL_REQUEST,
-  existing_grant: VERCEL_EXISTING_GRANT,
-}
-
-const VERCEL_CROSS_WORKSPACE_REQUEST: OAuthAppsAuthorizeRequest = {
-  ...VERCEL_REQUEST,
-  reuses_grant_across_workspaces: true,
+  grant_kind: 'member_bound',
+  project_scoping_mode: 'required',
+  allow_partial_grants: false,
+  scopes: VERCEL_SCOPE_GROUPS,
 }
 
 const VERCEL_OPTIONAL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
-  grant_config: { ...USER_BOUND_REQUIRED_PROJECTS, project_selection: 'optional' },
+  app_id: 'vercel-optional',
+  project_scoping_mode: 'optional',
+  allow_partial_grants: true,
 }
 
 const VERCEL_ALL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
-  grant_config: { ...USER_BOUND_REQUIRED_PROJECTS, project_selection: 'off' },
-}
-
-const VERCEL_ALL_PROJECTS_EXISTING_GRANT: OAuthExistingGrant = {
-  ...VERCEL_EXISTING_GRANT,
-  project_scope: { target: 'all_projects' },
-}
-
-const VERCEL_RECONSENT_ALL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
-  ...VERCEL_OPTIONAL_PROJECTS_REQUEST,
-  existing_grant: VERCEL_ALL_PROJECTS_EXISTING_GRANT,
+  app_id: 'vercel-org-wide',
+  project_scoping_mode: 'off',
 }
 
 const DYNAMIC_MCP_CLIENT_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
-  client_id: 'dynamic-mcp-client',
+  app_id: 'dynamic-mcp-client',
+  app_name: 'Northwind MCP',
   name: 'Northwind MCP',
   website: 'https://mcp.northwind.example',
   domain: 'mcp.northwind.example',
-  is_verified: false,
   redirect_uri: 'https://mcp.northwind.example/callback',
   registration_type: 'dynamic',
-  grant_config: {
-    bind_to_authorizing_user: false,
-    project_selection: 'off',
-  },
 }
 
 const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
-  client_id: 'kemal-bot',
+  app_id: 'kemal-bot',
+  app_name: 'kemal-bot',
   name: 'kemal-bot',
   website: 'https://kemal.lol',
   domain: 'kemal.lol',
-  is_verified: false,
   redirect_uri: 'https://kemal.lol/hollerback',
   registration_type: 'manual',
   expires_at: '2026-09-17T12:00:00.000Z',
-  scope_groups: [
+  grant_kind: 'organization_bound',
+  project_scoping_mode: 'required',
+  allow_partial_grants: false,
+  scopes: [
     {
-      name: 'Project Settings',
+      name: 'Projects',
       level: 'read',
-      scopes: ['project_settings'],
+      scopes: ['projects:read'],
     },
   ],
-  reuses_grant_across_workspaces: false,
-  suggested_project_refs: [],
-  grant_config: {
-    bind_to_authorizing_user: false,
-    project_selection: 'required',
-  },
-  existing_grant: null,
-}
-
-const VERCEL_SUGGESTED_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
-  ...VERCEL_REQUEST,
-  suggested_project_refs: ['northwindstorefront1', 'northwindcms1', 'northwindghost1'],
 }
 
 const KEMAL_BOT_ORG_WIDE_REQUEST: OAuthAppsAuthorizeRequest = {
   ...KEMAL_BOT_REQUEST,
-  grant_config: {
-    bind_to_authorizing_user: false,
-    project_selection: 'off',
-  },
+  app_id: 'kemal-bot-org-wide',
+  project_scoping_mode: 'off',
 }
 
 const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReadOnly]: VERCEL_REQUEST,
-  [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent]: VERCEL_RECONSENT_REQUEST,
-  [OAUTH_APPS_MOCK_SCENARIOS.vercelCrossWorkspace]: VERCEL_CROSS_WORKSPACE_REQUEST,
+  [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOrgAdmin]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelManyProjects]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation]: VERCEL_REQUEST,
-  [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: KEMAL_BOT_REQUEST,
+  [OAUTH_APPS_MOCK_SCENARIOS.vercelBlocked]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects]: VERCEL_OPTIONAL_PROJECTS_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: VERCEL_ALL_PROJECTS_REQUEST,
-  [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: VERCEL_RECONSENT_ALL_PROJECTS_REQUEST,
+  [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: VERCEL_OPTIONAL_PROJECTS_REQUEST,
+  [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: KEMAL_BOT_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: KEMAL_BOT_ORG_WIDE_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient]: DYNAMIC_MCP_CLIENT_REQUEST,
-  [OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects]: VERCEL_SUGGESTED_PROJECTS_REQUEST,
 }
 
 const NORTHWIND_TRADERS_DEVELOPER: OAuthOrganizationRole = {
   slug: 'northwind-traders',
   name: 'Northwind Traders',
-  default_role: 'developer',
+  default_role: DEVELOPER_ROLE,
 }
 
 const NORTHWIND_TRADERS_READ_ONLY: OAuthOrganizationRole = {
   ...NORTHWIND_TRADERS_DEVELOPER,
-  default_role: 'read_only',
+  default_role: READ_ONLY_ROLE,
 }
 
 const CONTOSO_LABS: OAuthOrganizationRole = {
   slug: 'contoso-labs',
   name: 'Contoso Labs',
-  default_role: 'owner',
+  default_role: OWNER_ROLE,
 }
 
 const TAILSPIN_TOYS_ADMIN: OAuthOrganizationRole = {
   slug: 'tailspin-toys',
   name: 'Tailspin Toys',
-  default_role: 'administrator',
+  default_role: ADMINISTRATOR_ROLE,
 }
 
 const FABRIKAM_OWNER: OAuthOrganizationRole = {
   slug: 'fabrikam-industries',
   name: 'Fabrikam Industries',
-  default_role: 'owner',
+  default_role: OWNER_ROLE,
 }
 
 const WINGTIP_TOYS_DEVELOPER: OAuthOrganizationRole = {
   slug: 'wingtip-toys',
   name: 'Wingtip Toys',
-  default_role: 'developer',
+  default_role: DEVELOPER_ROLE,
+}
+
+const LITWARE_DEVELOPER: OAuthOrganizationRole = {
+  slug: 'litware-inc',
+  name: 'Litware Inc.',
+  default_role: DEVELOPER_ROLE,
 }
 
 const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
@@ -224,11 +220,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
-  },
-  [OAUTH_APPS_MOCK_SCENARIOS.vercelCrossWorkspace]: {
-    email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS, TAILSPIN_TOYS_ADMIN],
+    organizations: [TAILSPIN_TOYS_ADMIN, NORTHWIND_TRADERS_DEVELOPER],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOrgAdmin]: {
     email: 'admin@example.com',
@@ -242,13 +234,9 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
-  [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: {
+  [OAUTH_APPS_MOCK_SCENARIOS.vercelBlocked]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
-  },
-  [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: {
-    email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
+    organizations: [LITWARE_DEVELOPER, NORTHWIND_TRADERS_DEVELOPER],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects]: {
     email: 'admin@example.com',
@@ -256,17 +244,21 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
+    organizations: [NORTHWIND_TRADERS_READ_ONLY, CONTOSO_LABS, FABRIKAM_OWNER],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
+    organizations: [TAILSPIN_TOYS_ADMIN, NORTHWIND_TRADERS_DEVELOPER],
   },
-  [OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient]: {
+  [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
-  [OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects]: {
+  [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: {
+    email: 'admin@example.com',
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, FABRIKAM_OWNER],
+  },
+  [OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
@@ -274,138 +266,209 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
 
 const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationProject[]> = {
   'northwind-traders': [
-    { ref: 'northwindstorefront1', name: 'northwind-storefront', role: 'administrator' },
-    { ref: 'northwindcms1', name: 'northwind-cms', role: 'developer' },
-    { ref: 'fabrikamapi1', name: 'fabrikam-api', role: 'read_only' },
-    { ref: 'fabrikamjobs1', name: 'fabrikam-jobs', role: 'read_only' },
+    { ref: 'northwindstorefront1', name: 'northwind-storefront', role: ADMINISTRATOR_ROLE },
+    { ref: 'northwindcms1', name: 'northwind-cms', role: DEVELOPER_ROLE },
+    { ref: 'fabrikamapi1', name: 'fabrikam-api', role: READ_ONLY_ROLE },
+    { ref: 'fabrikamjobs1', name: 'fabrikam-jobs', role: READ_ONLY_ROLE },
   ],
   'wingtip-toys': [
-    { ref: 'wingtipweb1', name: 'wingtip-web', role: 'administrator' },
-    { ref: 'wingtipapi1', name: 'wingtip-api', role: 'developer' },
-    { ref: 'wingtipadmin1', name: 'wingtip-admin', role: 'developer' },
-    { ref: 'wingtipjobs1', name: 'wingtip-jobs', role: 'developer' },
-    { ref: 'wingtipsearch1', name: 'wingtip-search', role: 'read_only' },
-    { ref: 'wingtipbilling1', name: 'wingtip-billing', role: 'administrator' },
-    { ref: 'wingtipmail1', name: 'wingtip-mail', role: 'developer' },
-    { ref: 'wingtipmedia1', name: 'wingtip-media', role: 'developer' },
-    { ref: 'wingtipmetrics1', name: 'wingtip-metrics', role: 'read_only' },
-    { ref: 'wingtipstaging1', name: 'wingtip-staging', role: 'developer' },
-    { ref: 'wingtippreview1', name: 'wingtip-preview', role: 'developer' },
-    { ref: 'wingtipsandbox1', name: 'wingtip-sandbox', role: 'read_only' },
+    { ref: 'wingtipweb1', name: 'wingtip-web', role: ADMINISTRATOR_ROLE },
+    { ref: 'wingtipapi1', name: 'wingtip-api', role: DEVELOPER_ROLE },
+    { ref: 'wingtipadmin1', name: 'wingtip-admin', role: DEVELOPER_ROLE },
+    { ref: 'wingtipjobs1', name: 'wingtip-jobs', role: DEVELOPER_ROLE },
+    { ref: 'wingtipsearch1', name: 'wingtip-search', role: READ_ONLY_ROLE },
+    { ref: 'wingtipbilling1', name: 'wingtip-billing', role: ADMINISTRATOR_ROLE },
+    { ref: 'wingtipmail1', name: 'wingtip-mail', role: DEVELOPER_ROLE },
+    { ref: 'wingtipmedia1', name: 'wingtip-media', role: DEVELOPER_ROLE },
+    { ref: 'wingtipmetrics1', name: 'wingtip-metrics', role: READ_ONLY_ROLE },
+    { ref: 'wingtipstaging1', name: 'wingtip-staging', role: DEVELOPER_ROLE },
+    { ref: 'wingtippreview1', name: 'wingtip-preview', role: DEVELOPER_ROLE },
+    { ref: 'wingtipsandbox1', name: 'wingtip-sandbox', role: READ_ONLY_ROLE },
   ],
   'fabrikam-industries': [
-    { ref: 'fabrikamledger1', name: 'fabrikam-ledger', role: 'administrator' },
+    { ref: 'fabrikamledger1', name: 'fabrikam-ledger', role: ADMINISTRATOR_ROLE },
   ],
   'tailspin-toys': [
-    { ref: 'tailspinshop1', name: 'tailspin-shop', role: 'administrator' },
-    { ref: 'tailspinwarehouse1', name: 'tailspin-warehouse', role: 'developer' },
+    { ref: 'tailspinshop1', name: 'tailspin-shop', role: ADMINISTRATOR_ROLE },
+    { ref: 'tailspinwarehouse1', name: 'tailspin-warehouse', role: DEVELOPER_ROLE },
   ],
+  'litware-inc': [{ ref: 'litwarecrm1', name: 'litware-crm', role: DEVELOPER_ROLE }],
   'contoso-labs': [],
 }
 
-const MOCK_AUTHORIZED_APPS: OAuthAuthorizedApp[] = [
-  {
-    id: 'authorized-vercel',
-    client_id: '1dab8a21-3498-4a05-b57a-f7fb7e9eab2a',
-    name: 'Vercel',
-    icon: null,
-    status: 'active',
-    member_grant_count: 33,
-    org_owned_compatibility_grant_count: 0,
-  },
-  {
-    id: 'authorized-northwind-mcp',
-    client_id: 'f1b130df-24b0-4dac-ad11-1c97b9f05b7d',
-    name: 'Northwind MCP',
-    icon: null,
-    status: 'active',
-    member_grant_count: 46,
-    org_owned_compatibility_grant_count: 1,
-  },
-  {
-    id: 'authorized-kemal-bot',
-    client_id: '229aec66-77c9-4ae9-96d7-e6f9e6a1284a',
-    name: 'kemal-bot',
-    icon: null,
-    status: 'revoked',
-    member_grant_count: 1,
-    org_owned_compatibility_grant_count: 0,
-  },
-  {
-    id: 'authorized-contoso-analytics',
-    client_id: 'b3c91e16-58db-4beb-8131-d1984dbbce12',
-    name: 'Contoso Analytics',
-    icon: null,
-    status: 'legacy',
-    member_grant_count: 4,
-    org_owned_compatibility_grant_count: 2,
-  },
-]
-
-const READ_WRITE_SCOPE_GROUP: OAuthScopeGroup = {
-  name: 'Project Settings, Action Runs, Logs, SQL Snippets',
-  level: 'read_write',
-  scopes: ['project_settings', 'action_runs', 'logs', 'sql_snippets'],
+const TAILSPIN_VERCEL_EXISTING_GRANT: OAuthExistingGrant = {
+  approved_scopes: ['database:read', 'database:write', 'projects:read'],
+  project_refs: ['tailspinshop1', 'tailspindeleted1'],
+  approved_at: '2026-08-14T09:12:00.000Z',
 }
 
-const READ_SCOPE_GROUP: OAuthScopeGroup = {
-  name: 'Database Webhooks, Development Branches, Production Branches',
-  level: 'read',
-  scopes: ['database_webhooks', 'development_branches', 'production_branches'],
+const TAILSPIN_VERCEL_OPTIONAL_EXISTING_GRANT: OAuthExistingGrant = {
+  approved_scopes: ['database:read', 'projects:read'],
+  project_refs: [],
+  approved_at: '2026-08-29T16:40:00.000Z',
 }
 
-const MOCK_APP_MEMBER_GRANTS: Record<string, OAuthAppMemberGrant[]> = {
-  'authorized-vercel': [
+const DEFAULT_ORG_APP_DETAILS: OAuthOrgAppDetails = {
+  organization_settings: { require_project_scoping: false },
+  blocked_reason: null,
+  existing_grant: null,
+}
+
+const FABRIKAM_ORG_APP_DETAILS: OAuthOrgAppDetails = {
+  organization_settings: { require_project_scoping: true },
+  blocked_reason: null,
+  existing_grant: null,
+}
+
+const MOCK_ORG_APP_DETAILS: Record<string, Record<string, OAuthOrgAppDetails>> = {
+  'tailspin-toys': {
+    vercel: { ...DEFAULT_ORG_APP_DETAILS, existing_grant: TAILSPIN_VERCEL_EXISTING_GRANT },
+    'vercel-optional': {
+      ...DEFAULT_ORG_APP_DETAILS,
+      existing_grant: TAILSPIN_VERCEL_OPTIONAL_EXISTING_GRANT,
+    },
+  },
+  'fabrikam-industries': {
+    vercel: FABRIKAM_ORG_APP_DETAILS,
+    'vercel-org-wide': {
+      ...FABRIKAM_ORG_APP_DETAILS,
+      blocked_reason: 'org_requires_project_scoping',
+    },
+    'kemal-bot-org-wide': {
+      ...FABRIKAM_ORG_APP_DETAILS,
+      blocked_reason: 'org_requires_project_scoping',
+    },
+  },
+  'litware-inc': {
+    vercel: { ...DEFAULT_ORG_APP_DETAILS, blocked_reason: 'app_blocked_for_organization' },
+  },
+}
+
+const MOCK_APPS_OVERVIEW: ListOAuthAppsOverviewResponse = {
+  data: [
     {
-      member_email: 'admin@example.com',
-      project_scope: {
-        target: 'selected_projects',
+      id: 'vercel',
+      name: 'Vercel',
+      icon: null,
+      status: 'active',
+      member_grant_count: 33,
+      last_used_at: '2026-09-16T08:12:00.000Z',
+      org_grant: null,
+    },
+    {
+      id: 'dynamic-mcp-client',
+      name: 'Northwind MCP',
+      icon: null,
+      status: 'active',
+      member_grant_count: 1,
+      last_used_at: '2026-09-01T08:45:00.000Z',
+      org_grant: null,
+    },
+    {
+      id: 'contoso-analytics',
+      name: 'Contoso Analytics',
+      icon: null,
+      status: 'legacy',
+      member_grant_count: 0,
+      last_used_at: '2026-07-02T10:00:00.000Z',
+      org_grant: {
+        grant_id: 'grant-contoso-analytics-org',
+        approved_scopes: ['analytics:read', 'projects:read'],
+        approved_at: '2025-11-03T14:20:00.000Z',
+        last_used_at: '2026-07-02T10:00:00.000Z',
+      },
+    },
+  ],
+  pagination: { next_cursor: null },
+}
+
+const MOCK_BLOCKED_APPS: ListBlockedAppsResponse = {
+  data: [
+    {
+      app_id: 'kemal-bot',
+      name: 'kemal-bot',
+      icon: null,
+      blocked_at: '2026-09-10T15:30:00.000Z',
+      blocked_by: { gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000001', email: 'admin@example.com' },
+    },
+  ],
+  pagination: { next_cursor: null },
+}
+
+const MOCK_APP_GRANTS: Record<string, ListAppGrantsResponse> = {
+  vercel: {
+    data: [
+      {
+        grant_id: 'grant-vercel-admin',
+        kind: 'member_bound',
+        user: {
+          gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000001',
+          email: 'admin@example.com',
+        },
         project_refs: ['northwindstorefront1', 'northwindcms1'],
+        approved_scopes: ['database:read', 'database:write', 'projects:read'],
+        approved_at: '2026-08-18T09:12:00.000Z',
+        last_used_at: '2026-09-16T08:12:00.000Z',
       },
-      scope_groups: [READ_WRITE_SCOPE_GROUP, READ_SCOPE_GROUP],
-      created_at: '2026-08-18T09:12:00.000Z',
-    },
-    {
-      member_email: 'developer@example.com',
-      project_scope: { target: 'selected_projects', project_refs: ['northwindcms1'] },
-      scope_groups: [READ_SCOPE_GROUP],
-      created_at: '2026-08-16T11:30:00.000Z',
-    },
-    {
-      member_email: 'analyst@example.com',
-      project_scope: {
-        target: 'selected_projects',
-        project_refs: ['northwindstorefront1', 'fabrikamapi1', 'fabrikamjobs1'],
+      {
+        grant_id: 'grant-vercel-developer',
+        kind: 'member_bound',
+        user: {
+          gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000002',
+          email: 'developer@example.com',
+          avatar_url: 'https://avatars.example/developer.png',
+        },
+        project_refs: ['northwindcms1'],
+        approved_scopes: ['projects:read'],
+        approved_at: '2026-08-16T11:30:00.000Z',
+        last_used_at: null,
       },
-      scope_groups: [READ_WRITE_SCOPE_GROUP],
-      created_at: '2026-08-04T16:05:00.000Z',
-    },
-  ],
-  'authorized-northwind-mcp': [
-    {
-      member_email: 'ops@example.com',
-      project_scope: { target: 'selected_projects', project_refs: ['northwindstorefront1'] },
-      scope_groups: [READ_WRITE_SCOPE_GROUP, READ_SCOPE_GROUP],
-      created_at: '2026-09-01T08:45:00.000Z',
-    },
-  ],
-  'authorized-kemal-bot': [
-    {
-      member_email: 'admin@example.com',
-      project_scope: { target: 'selected_projects', project_refs: ['northwindcms1'] },
-      scope_groups: [READ_SCOPE_GROUP],
-      created_at: '2026-07-22T13:20:00.000Z',
-    },
-  ],
-  'authorized-contoso-analytics': [],
+    ],
+    pagination: { next_cursor: null },
+  },
+  'dynamic-mcp-client': {
+    data: [
+      {
+        grant_id: 'grant-northwind-mcp-ops',
+        kind: 'member_bound',
+        user: {
+          gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000003',
+          email: 'ops@example.com',
+        },
+        project_refs: ['northwindstorefront1'],
+        approved_scopes: ['database:read', 'database:write'],
+        approved_at: '2026-09-01T08:45:00.000Z',
+        last_used_at: '2026-09-01T08:45:00.000Z',
+      },
+    ],
+    pagination: { next_cursor: null },
+  },
+  'contoso-analytics': {
+    data: [
+      {
+        grant_id: 'grant-contoso-analytics-org',
+        kind: 'organization_bound',
+        user: null,
+        project_refs: null,
+        approved_scopes: ['analytics:read', 'projects:read'],
+        approved_at: '2025-11-03T14:20:00.000Z',
+        last_used_at: '2026-07-02T10:00:00.000Z',
+      },
+    ],
+    pagination: { next_cursor: null },
+  },
 }
 
-export function getMockOAuthAuthorizedApps(): OAuthAuthorizedApp[] {
-  return MOCK_AUTHORIZED_APPS
+export function getMockOAuthAppsOverview(): ListOAuthAppsOverviewResponse {
+  return MOCK_APPS_OVERVIEW
 }
 
-export function getMockOAuthAppMemberGrants(appId: string): OAuthAppMemberGrant[] {
-  return MOCK_APP_MEMBER_GRANTS[appId] ?? []
+export function getMockOAuthBlockedApps(): ListBlockedAppsResponse {
+  return MOCK_BLOCKED_APPS
+}
+
+export function getMockOAuthAppGrants(appId: string): ListAppGrantsResponse {
+  return MOCK_APP_GRANTS[appId] ?? { data: [], pagination: { next_cursor: null } }
 }
 
 export function getMockOAuthAppsAuthorizeRequest(authId: string): OAuthAppsAuthorizeRequest {
@@ -424,6 +487,10 @@ export function getMockOAuthAppsAuthorizeOrganizationProjects(
   slug: string
 ): OAuthAppsAuthorizeOrganizationProject[] {
   return MOCK_ORGANIZATION_PROJECTS[slug] ?? []
+}
+
+export function getMockOAuthOrgAppDetails(slug: string, appId: string): OAuthOrgAppDetails {
+  return MOCK_ORG_APP_DETAILS[slug]?.[appId] ?? DEFAULT_ORG_APP_DETAILS
 }
 
 const MOCK_OAUTH_STATE = 'mock_state_9f2c1b'
@@ -460,28 +527,43 @@ const ROLE_VALIDATED_SCENARIOS = new Set<string>([
 
 const WRITE_SCOPE_LEVELS: OAuthScopeLevel[] = ['write', 'read_write']
 
+function isReadOnlyRole(role: OrganizationRole) {
+  return role.id === READ_ONLY_ROLE.id
+}
+
 export function getMockOAuthAppsAuthorizeApproveResult(
   authId: string,
-  { slug, projectScope }: { slug: string; projectScope: OAuthGrantProjectScope }
+  { slug, projectRefs }: { slug: string; projectRefs: string[] | undefined }
 ): OAuthAppsAuthorizeApproveResult {
   const approved = getMockOAuthAppsAuthorizeRedirect(authId, { approved: true })
   if (!ROLE_VALIDATED_SCENARIOS.has(authId)) return approved
 
-  const writeGroups = getMockOAuthAppsAuthorizeRequest(authId).scope_groups.filter((scopeGroup) =>
-    WRITE_SCOPE_LEVELS.includes(scopeGroup.level)
+  const failedScopes: OAuthScope[] = getMockOAuthAppsAuthorizeRequest(authId)
+    .scopes.filter((scopeGroup) => WRITE_SCOPE_LEVELS.includes(scopeGroup.level))
+    .flatMap((scopeGroup) => scopeGroup.scopes)
+  if (failedScopes.length === 0) return approved
+
+  if (projectRefs === undefined) {
+    const organization = getMockOAuthAppsAuthorizeIdentity(authId).organizations.find(
+      (candidate) => candidate.slug === slug
+    )
+    if (!organization || !isReadOnlyRole(organization.default_role)) return approved
+
+    return {
+      error_code: 'role_validation_failed',
+      message: `Your ${organization.default_role.name} role cannot grant write access to this organization.`,
+      validation: {
+        scope_target: 'organization',
+        role: organization.default_role,
+        failed_scopes: failedScopes,
+      },
+    }
+  }
+
+  const blocked = getMockOAuthAppsAuthorizeOrganizationProjects(slug).filter(
+    (project) => projectRefs.includes(project.ref) && isReadOnlyRole(project.role)
   )
-  if (writeGroups.length === 0) return approved
-
-  const orgProjects = getMockOAuthAppsAuthorizeOrganizationProjects(slug)
-  const submitted =
-    projectScope.target === 'all_projects'
-      ? orgProjects
-      : orgProjects.filter((project) => projectScope.project_refs.includes(project.ref))
-
-  const blocked = submitted.filter((project) => project.role === 'read_only')
   if (blocked.length === 0) return approved
-
-  const failedScopes = writeGroups.flatMap((scopeGroup) => scopeGroup.scopes)
 
   return {
     error_code: 'role_validation_failed',
