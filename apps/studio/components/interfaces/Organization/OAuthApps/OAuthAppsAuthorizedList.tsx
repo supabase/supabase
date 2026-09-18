@@ -17,16 +17,14 @@ import { OAuthAppsMemberGrantsDialog } from './OAuthAppsMemberGrantsDialog'
 import { OAuthAppsRevokeDialog } from './OAuthAppsRevokeDialog'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
-import {
-  useOAuthAuthorizedAppsQuery,
-  type OAuthAuthorizedApp,
-} from '@/data/oauth-apps/oauth-apps-authorized-apps-query'
+import { useOAuthAuthorizedAppsQuery } from '@/data/oauth-apps/oauth-apps-authorized-apps-query'
+import type { OAuthAppOverviewItem } from '@/data/oauth-apps/types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const OAuthAppsAuthorizedList = () => {
   const { slug } = useParams()
-  const [selectedAppForGrants, setSelectedAppForGrants] = useState<OAuthAuthorizedApp>()
-  const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<OAuthAuthorizedApp>()
+  const [selectedAppForGrants, setSelectedAppForGrants] = useState<OAuthAppOverviewItem>()
+  const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<OAuthAppOverviewItem>()
 
   const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -79,7 +77,7 @@ export const OAuthAppsAuthorizedList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {apps.length === 0 ? (
+                {apps.data.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
                     <TableCell colSpan={4}>
                       <p className="text-sm text-foreground-lighter">
@@ -88,7 +86,7 @@ export const OAuthAppsAuthorizedList = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  apps.map((app) => (
+                  apps.data.map((app) => (
                     <OAuthAppsAuthorizedRow
                       key={app.id}
                       app={app}

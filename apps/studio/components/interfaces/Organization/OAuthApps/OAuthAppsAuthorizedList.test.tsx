@@ -47,8 +47,8 @@ describe('OAuthAppsAuthorizedList', () => {
     customRender(<OAuthAppsAuthorizedList />)
 
     expect(await screen.findAllByText('ACTIVE')).toHaveLength(2)
-    expect(await screen.findByText('REVOKED')).toBeInTheDocument()
     expect(await screen.findByText('LEGACY')).toBeInTheDocument()
+    expect(screen.queryByText('REVOKED')).not.toBeInTheDocument()
 
     expect(await screen.findByText('Authorized before project controls')).toBeInTheDocument()
     expect(await screen.findByText('1 member grant')).toBeInTheDocument()
@@ -67,11 +67,6 @@ describe('OAuthAppsAuthorizedList', () => {
     canRevoke = true
     customRender(<OAuthAppsAuthorizedList />)
 
-    await openRowMenu('kemal-bot')
-    expect(await screen.findByText('View grants')).toBeInTheDocument()
-    expect(screen.queryByText('Revoke')).not.toBeInTheDocument()
-    await userEvent.keyboard('{Escape}')
-
     await openRowMenu('Contoso Analytics')
     expect(await screen.findByText('View grants')).toBeInTheDocument()
     expect(screen.queryByText('Revoke')).not.toBeInTheDocument()
@@ -87,11 +82,19 @@ describe('OAuthAppsAuthorizedList', () => {
     await userEvent.click(await screen.findByText('admin@example.com'))
 
     expect(await screen.findByText('northwindstorefront1, northwindcms1')).toBeInTheDocument()
-    expect(await screen.findByText('READ-WRITE')).toBeInTheDocument()
     expect(
-      await screen.findByText('Project Settings, Action Runs, Logs, SQL Snippets')
+      await screen.findByText('database:read, database:write, projects:read')
     ).toBeInTheDocument()
-    expect(await screen.findByText('READ')).toBeInTheDocument()
+  })
+
+  test('labels an organization-bound grant and reports it as covering all projects', async () => {
+    customRender(<OAuthAppsAuthorizedList />)
+
+    await openRowMenu('Contoso Analytics')
+    await userEvent.click(await screen.findByText('View grants'))
+
+    expect(await screen.findByText('Organization-wide')).toBeInTheDocument()
+    expect(await screen.findByText(/All projects/)).toBeInTheDocument()
   })
 
   test('renders the revoke caveats and revokes on confirm', async () => {
@@ -101,7 +104,9 @@ describe('OAuthAppsAuthorizedList', () => {
     await userEvent.click(await screen.findByText('Revoke'))
 
     expect(await screen.findByText('Revoke access for Vercel')).toBeInTheDocument()
-    expect(await screen.findByText(/org-owned compatibility grant/)).toBeInTheDocument()
+    expect(await screen.findByText(/33 member grants will be revoked/)).toBeInTheDocument()
+    expect(screen.queryByText(/organization-wide grant will be revoked/)).not.toBeInTheDocument()
+    expect(await screen.findByText(/stays blocked for this organization/)).toBeInTheDocument()
     expect(
       await screen.findByText('Every member loses access on the apps next request.')
     ).toBeInTheDocument()

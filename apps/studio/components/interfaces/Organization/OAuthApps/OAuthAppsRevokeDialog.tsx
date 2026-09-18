@@ -10,11 +10,11 @@ import {
   DialogTitle,
 } from 'ui'
 
-import type { OAuthAuthorizedApp } from '@/data/oauth-apps/oauth-apps-authorized-apps-query'
 import { useOAuthAppRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-mutation'
+import type { OAuthAppOverviewItem } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsRevokeDialogProps {
-  app?: OAuthAuthorizedApp
+  app?: OAuthAppOverviewItem
   onClose: () => void
 }
 
@@ -27,7 +27,8 @@ export const OAuthAppsRevokeDialog = ({ app, onClose }: OAuthAppsRevokeDialogPro
     },
   })
 
-  const compatibilityGrantCount = app?.org_owned_compatibility_grant_count ?? 0
+  const memberGrantCount = app?.member_grant_count ?? 0
+  const hasOrgGrant = Boolean(app?.org_grant)
 
   return (
     <Dialog open={Boolean(app)} onOpenChange={(open) => !open && onClose()}>
@@ -49,12 +50,19 @@ export const OAuthAppsRevokeDialog = ({ app, onClose }: OAuthAppsRevokeDialogPro
               <li className="flex gap-x-2">
                 <span aria-hidden>–</span>
                 <span>
-                  {compatibilityGrantCount}{' '}
-                  {compatibilityGrantCount === 1
-                    ? 'org-owned compatibility grant'
-                    : 'org-owned compatibility grants'}{' '}
+                  {memberGrantCount} {memberGrantCount === 1 ? 'member grant' : 'member grants'}{' '}
                   will be revoked.
                 </span>
+              </li>
+              {hasOrgGrant && (
+                <li className="flex gap-x-2">
+                  <span aria-hidden>–</span>
+                  <span>The organization-wide grant will be revoked.</span>
+                </li>
+              )}
+              <li className="flex gap-x-2">
+                <span aria-hidden>–</span>
+                <span>The app stays blocked for this organization until an admin unblocks it.</span>
               </li>
               <li className="flex gap-x-2">
                 <span aria-hidden>–</span>

@@ -1,39 +1,33 @@
 import { useParams } from 'common'
-import { ChevronDown, ChevronUp, User } from 'lucide-react'
+import { Building2, ChevronDown, ChevronUp, User } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from 'ui'
 
-import { ScopeGroupCard } from './Consent/ScopeGroupCard'
-import type { OAuthAuthorizedApp } from '@/data/oauth-apps/oauth-apps-authorized-apps-query'
 import { useOAuthAppMemberGrantsQuery } from '@/data/oauth-apps/oauth-apps-member-grants-query'
-import {
-  getMemberGrantPermissionCount,
-  getScopedProjectRefs,
-  isAllProjectsScope,
-} from '@/data/oauth-apps/types'
+import type { OAuthAppOverviewItem, OAuthGrantItem } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsMemberGrantsDialogProps {
-  app?: OAuthAuthorizedApp
+  app?: OAuthAppOverviewItem
   onClose: () => void
 }
 
 export const OAuthAppsMemberGrantsDialog = ({ app, onClose }: OAuthAppsMemberGrantsDialogProps) => {
   const { slug } = useParams()
-  const [expandedEmails, setExpandedEmails] = useState<string[]>([])
+  const [expandedGrantIds, setExpandedGrantIds] = useState<string[]>([])
 
-  const { data: grants = [] } = useOAuthAppMemberGrantsQuery(
-    { slug, appId: app?.id },
-    { enabled: Boolean(app) }
-  )
+  const { data } = useOAuthAppMemberGrantsQuery({ slug, appId: app?.id }, { enabled: Boolean(app) })
+  const grants = data?.data ?? []
 
   const handleClose = () => {
-    setExpandedEmails([])
+    setExpandedGrantIds([])
     onClose()
   }
 
-  const handleToggle = (email: string) => {
-    setExpandedEmails((previous) =>
-      previous.includes(email) ? previous.filter((entry) => entry !== email) : [...previous, email]
+  const handleToggle = (grantId: string) => {
+    setExpandedGrantIds((previous) =>
+      previous.includes(grantId)
+        ? previous.filter((entry) => entry !== grantId)
+        : [...previous, grantId]
     )
   }
 
@@ -46,22 +40,27 @@ export const OAuthAppsMemberGrantsDialog = ({ app, onClose }: OAuthAppsMemberGra
 
         <div className="max-h-80 divide-y overflow-y-auto px-4">
           {grants.map((grant) => {
-            const isExpanded = expandedEmails.includes(grant.member_email)
-            const projectRefs = getScopedProjectRefs(grant.project_scope)
-            const permissionCount = getMemberGrantPermissionCount(grant)
+            const isExpanded = expandedGrantIds.includes(grant.grant_id)
+            const isOrganizationBound = grant.kind === 'organization_bound'
+            const projectRefs = grant.project_refs ?? []
+            const permissionCount = grant.approved_scopes.length
 
             return (
-              <div key={grant.member_email} className="py-3">
+              <div key={grant.grant_id} className="py-3">
                 <button
                   type="button"
                   className="flex w-full items-center gap-x-3 text-left"
-                  onClick={() => handleToggle(grant.member_email)}
+                  onClick={() => handleToggle(grant.grant_id)}
                 >
-                  <User size={16} className="shrink-0 text-foreground-lighter" />
+                  {isOrganizationBound ? (
+                    <Building2 size={16} className="shrink-0 text-foreground-lighter" />
+                  ) : (
+                    <User size={16} className="shrink-0 text-foreground-lighter" />
+                  )}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-foreground">{grant.member_email}</p>
+                    <p className="truncate text-sm text-foreground">{getGrantLabel(grant)}</p>
                     <p className="text-xs text-foreground-lighter">
-                      {isAllProjectsScope(grant.project_scope)
+                      {grant.project_refs === null
                         ? 'All projects'
                         : `${projectRefs.length} ${projectRefs.length === 1 ? 'project' : 'projects'}`}
                       {' · '}
@@ -81,11 +80,12 @@ export const OAuthAppsMemberGrantsDialog = ({ app, onClose }: OAuthAppsMemberGra
                         <p className="text-xs text-foreground">{projectRefs.join(', ')}</p>
                       </div>
                     )}
-                    <ScopeGroupCard
-                      appName={app?.name ?? ''}
-                      scopeGroups={grant.scope_groups}
-                      showHeading={false}
-                    />
+                    <div className="flex flex-col gap-1">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-foreground-light">
+                        Permissions
+                      </p>
+                      <p className="text-xs text-foreground">{grant.approved_scopes.join(', ')}</p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -101,4 +101,9 @@ export const OAuthAppsMemberGrantsDialog = ({ app, onClose }: OAuthAppsMemberGra
       </DialogContent>
     </Dialog>
   )
+}
+
+function getGrantLabel(grant: OAuthGrantItem) {
+  if (grant.user) return grant.user.email
+  return 'Organization-wide'
 }
