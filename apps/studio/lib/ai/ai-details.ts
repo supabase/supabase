@@ -15,8 +15,6 @@ export type AIDetails = {
   planId: string | undefined
   region: string | undefined
   isSensitive: boolean | null | undefined
-  // True when HIPAA forced the opt-in level to `disabled`, rather than the org choosing it.
-  isRestrictedByHipaa: boolean
 }
 
 // Resolves the AI opt-in level, model access and tracing inputs for one org/project pair.
@@ -63,17 +61,13 @@ export const getAIDetails = async ({
       planId: undefined,
       region,
       isSensitive,
-      isRestrictedByHipaa: false,
     }
   }
 
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
-  // Mirrors the client-side gate in useOrgAiOptInLevel, which had no server-side equivalent
-  const isRestrictedByHipaa = hasHipaaAddon && isSensitive !== false
-
   return {
-    aiOptInLevel: isRestrictedByHipaa ? 'disabled' : getAiOptInLevel(selectedOrg.opt_in_tags),
+    aiOptInLevel: getAiOptInLevel(selectedOrg.opt_in_tags),
     hasAccessToAdvanceModel: advanceModelAccess.hasAccess,
     hasHipaaAddon,
     orgId: selectedOrg.id,
@@ -81,6 +75,5 @@ export const getAIDetails = async ({
     planId: selectedOrg.plan.id,
     region,
     isSensitive,
-    isRestrictedByHipaa,
   }
 }
