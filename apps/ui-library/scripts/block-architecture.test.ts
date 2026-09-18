@@ -5,9 +5,9 @@ import { describe, it } from 'vitest'
 
 import { starterSources, type StarterSourceSnapshot } from '../config/starter-sources'
 import { getBlockArchitecture } from '../lib/block-architecture'
+import { collectMdxFiles } from '../lib/library-documents'
 import { getInstalledPath, resolveRegistryItem } from '../lib/registry-resolution'
 import { registry } from '../registry'
-import { collectMdxFiles } from './library-documents'
 
 const resourceKinds = new Set(['table', 'edge-function', 'api-route', 'page'])
 
@@ -40,7 +40,10 @@ describe('generated block architecture', () => {
         assert.ok(resource.files.length > 0, `${name}: ${resource.id} has no source files`)
       }
       if (/<BlockOverview\b[^>]*\bshowFiles\b/.test(source)) {
-        const resolved = resolveRegistryItem(registry, name)
+        const resolved = resolveRegistryItem(
+          (itemName) => registry.items.find((item) => item.name === itemName),
+          name
+        )
         const installedPaths = new Set(resolved.files.map(getInstalledPath))
         assert.equal(architecture.fileCount, installedPaths.size, name)
         for (const resource of architecture.resources) {
