@@ -15,9 +15,9 @@
  * preview and local builds don't break on GitHub rate limits.
  */
 
-import { existsSync, promises as fs } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { existsSync, promises as fs } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', 'public', '.well-known', 'agent-skills')
@@ -55,7 +55,7 @@ main().catch((err) => {
   console.error(err)
   const canFallBack = process.env.VERCEL_ENV !== 'production'
   const hasPreviousWrite = existsSync(join(OUT_DIR, 'index.json'))
-    
+
   if (canFallBack && hasPreviousWrite) {
     console.warn('Done — keeping committed public/.well-known/agent-skills/index.json')
     process.exit(0)
