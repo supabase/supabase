@@ -78,7 +78,7 @@ const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => 
           <TableHeader>
             <TableRow>
               <TableHead>Table</TableHead>
-              <TableHead className="w-36">Lag</TableHead>
+              <TableHead className="w-48">Lag</TableHead>
               <TableHead className="w-36">Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -91,7 +91,7 @@ const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => 
                     <span className="text-foreground-lighter">{table.schema}.</span>
                     <span className="text-foreground">{table.name}</span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <TableLag table={table} />
                   </TableCell>
                   <TableCell>
