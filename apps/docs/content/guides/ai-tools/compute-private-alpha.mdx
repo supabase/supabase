@@ -74,6 +74,39 @@ Machine-readable output: `status` and `list` take `-o json`; the other compute c
 - Python: set `ENV PYTHONUNBUFFERED=1` in the Dockerfile so `print` output reaches `logs` even when the process is killed mid-way.
 - Never guess at failures: `status` carries `state_reason` for a failed build, and `logs --kind builds` its history.
 
+## Network restrictions
+
+If the project has [Postgres network restrictions](/docs/guides/platform/network-restrictions) enabled, a compute instance's direct connections to Postgres (or its pooler) are blocked unless the Compute egress ranges are on the allowlist. Network restrictions apply only to direct database connections — access through the Data API (PostgREST, Storage, Auth, etc.) is unaffected, so a compute instance calling the Data API keeps working either way.
+
+Add these CIDRs — Compute's production egress ranges — to the project's allowlist:
+
+- `44.246.156.159/32`
+- `52.27.88.146/32`
+- `44.237.218.47/32`
+
+Use [`network-restrictions update`](/docs/reference/cli/supabase-network-restrictions-update) with `--append` so the existing allowlist is kept:
+
+```bash
+supabase network-restrictions update --project-ref <ref> \
+  --db-allow-cidr 44.246.156.159/32 \
+  --db-allow-cidr 52.27.88.146/32 \
+  --db-allow-cidr 44.237.218.47/32 \
+  --append \
+  --experimental
+```
+
+Confirm with [`network-restrictions get`](/docs/reference/cli/supabase-network-restrictions-get):
+
+```bash
+supabase network-restrictions get --project-ref <ref> --experimental
+```
+
+<Admonition type="caution">
+
+Omitting `--append` replaces the whole allowlist with only the CIDRs passed in that command. Always pass `--append`, or re-list any existing CIDRs alongside the Compute ranges above.
+
+</Admonition>
+
 ## Examples
 
 The workflow above used `node`. These two show what the other runtimes are for.
