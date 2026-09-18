@@ -815,6 +815,18 @@ Describe the concrete action. The linter suggests:
 Choose a different precise verb if the suggested replacement doesn't match the
 actual operation.
 
+### vCPU
+
+Use _vCPU_ (plural _vCPUs_) for the CPU resources of Supabase compute sizes.
+Don't describe Supabase compute in _cores_.
+
+_Core_ remains correct for hardware the reader owns or manages, such as
+self-hosting requirements or a migration VM, and in general CPU discussion.
+
+- Recommended: The 16XL compute size has 64 vCPUs.
+- Recommended: Run the migration from a VM with 8 CPU cores.
+- Not recommended: The 16XL compute size has 64 cores.
+
 ### versus
 
 Write _versus_ in prose, not _vs._ Use `vs` only when it is part of a literal name

@@ -2,8 +2,7 @@ import { useParams } from 'common'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { getStatusName } from './Pipeline.utils'
-import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { getRestartRequestStatus, getStatusName } from './Pipeline.utils'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
@@ -12,35 +11,25 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import { type ResponseError } from '@/types'
 
 interface UpdateVersionModalProps {
   visible: boolean
   pipeline?: Pipeline
-  confirmLabel?: string
-  confirmLabelLoading?: string
   onClose: () => void
 }
 
-export const UpdateVersionModal = ({
-  visible,
-  pipeline,
-  confirmLabel,
-  confirmLabelLoading = 'Updating…',
-  onClose,
-}: UpdateVersionModalProps) => {
+export const UpdateVersionModal = ({ visible, pipeline, onClose }: UpdateVersionModalProps) => {
   const { ref: projectRef } = useParams()
-  const { setRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus()
 
-  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
-    { projectRef, pipelineId: pipeline?.id },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
-  // Treat an unresolved/unknown status as stopped so we don't optimistically claim a restart
-  // for a pipeline whose active state hasn't been confirmed yet.
-  const isStopped = statusName === undefined || statusName === PipelineStatusName.STOPPED
+  const requestStatus = getRestartRequestStatus(statusName)
+  const shouldRestart = requestStatus === PipelineStatusRequestStatus.StopRequested
 
   const { data: versionData, isPending: isLoadingVersion } = useReplicationPipelineVersionQuery({
     projectRef,
@@ -58,42 +47,41 @@ export const UpdateVersionModal = ({
     if (!versionId) return
 
     try {
-      await updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
-    } catch (e) {
-      // 404: default changed; version cache will refresh via mutation onError. Keep dialog open.
-      if ((e as ResponseError)?.code === 404) return
+      await runWithRequestStatus(pipeline.id, requestStatus, () =>
+        updatePipelineVersion({
+          projectRef,
+          pipelineId: pipeline.id,
+          versionId,
+          skipStatusInvalidation: true,
+        })
+      )
+    } catch {
+      // The mutation reports errors and refreshes version info if the default image changed.
       return
     }
 
-    if (!isStopped) {
-      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-      toast.success('Pipeline successfully updated and is currently restarting')
-    } else {
-      toast.success('Pipeline successfully updated')
-    }
+    toast.success('Pipeline version updated.')
 
     onClose()
   }
 
-  const resolvedConfirmLabel = confirmLabel ?? (isStopped ? 'Update version' : 'Update and restart')
-
   return (
     <ConfirmationModal
       size="small"
-      variant={isStopped ? 'default' : 'warning'}
+      variant={shouldRestart ? 'warning' : 'default'}
       visible={visible}
       title="Update available"
-      confirmLabel={resolvedConfirmLabel}
-      confirmLabelLoading={confirmLabelLoading}
+      confirmLabel={shouldRestart ? 'Update and restart' : 'Update version'}
+      confirmLabelLoading="Updating version..."
       loading={isUpdating}
       onCancel={onClose}
       onConfirm={onConfirmUpdate}
     >
       <div className="flex flex-col gap-y-3">
         <p className="text-sm text-foreground-light">
-          {isStopped
-            ? 'A newer pipeline version is available with improvements and bug fixes.'
-            : 'A newer pipeline version is available with improvements and bug fixes. The pipeline will restart and continue from where it left off.'}
+          {shouldRestart
+            ? 'A newer pipeline version is available with improvements and bug fixes. The pipeline will restart and continue from where it left off.'
+            : 'A newer pipeline version is available with improvements and bug fixes.'}
         </p>
         <div className="overflow-hidden rounded-md border">
           <table className="w-full text-sm">

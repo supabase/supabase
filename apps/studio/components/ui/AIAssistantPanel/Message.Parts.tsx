@@ -235,12 +235,7 @@ function MessagePartNotebookProposal({
   const { addToolApprovalResponse } = useMessageActionsContext()
 
   if (state === 'input-streaming') {
-    return (
-      <div className="my-4 mx-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
-        {NOTEBOOK_DRAFTING_LABEL[mode]}
-      </div>
-    )
+    return <ToolDisplayExecuteSqlLoading label={NOTEBOOK_DRAFTING_LABEL[mode]} />
   }
 
   const { confirmState, onApprove, onDeny, denyWithReason } = getManualToolApprovalHandlers({
@@ -324,6 +319,7 @@ const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'tool-query_logs' ||
   part.type === 'tool-create_notebook' ||
   part.type === 'tool-update_notebook' ||
+  part.type === 'tool-delete_notebook' ||
   part.type === 'tool-run_notebook' ||
   (part.type === 'dynamic-tool' && part.toolName === 'query_logs') ||
   // Unlabelled code fences resolve to SQL in MessageMarkdown, too.
