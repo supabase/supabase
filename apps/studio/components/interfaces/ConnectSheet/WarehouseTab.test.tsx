@@ -103,7 +103,10 @@ describe('WarehouseTab', () => {
   })
 
   test('points to the integration when setup reports an error', async () => {
-    mockSetupStatus({ setup_status: 'error' })
+    mockSetupStatus({
+      setup_status: 'error',
+      tables: [{ schema: 'public', name: 'orders', copy_name: 'public.orders', state: 'live' }],
+    })
 
     customRender(<WarehouseTab />)
 
@@ -115,6 +118,7 @@ describe('WarehouseTab', () => {
       'href',
       '/project/default/integrations/warehouse/overview'
     )
+    expect(screen.queryByDisplayValue('default.warehouse.supabase.io')).not.toBeInTheDocument()
   })
 
   test('renders connection details and offers catalog access only for DuckDB', async () => {
