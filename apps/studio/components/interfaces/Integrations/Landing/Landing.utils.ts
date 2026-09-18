@@ -51,6 +51,7 @@ function permissionSafeData<TData, TDefault>(
   defaultVal: TDefault
 ): TData | TDefault {
   if (isPermissionError(error)) return defaultVal
+  if (Array.isArray(defaultVal) && !Array.isArray(data)) return defaultVal
   return data ?? defaultVal
 }
 

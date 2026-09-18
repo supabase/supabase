@@ -210,8 +210,8 @@ export const StorageSettings = () => {
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
       features: {
+        ...config.features,
         imageTransformation: { enabled: data.imageTransformationEnabled },
-        s3Protocol: { enabled: config.features.s3Protocol.enabled },
       },
     })
   }

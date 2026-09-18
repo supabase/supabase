@@ -44,7 +44,7 @@ export const AnalyticsBuckets = () => {
   )
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef: ref })
-  const maxAnalyticsBuckets = config?.features.icebergCatalog.maxCatalogs ?? 2
+  const maxAnalyticsBuckets = config?.features?.icebergCatalog?.maxCatalogs ?? 2
 
   const {
     data: buckets = [],

@@ -1,11 +1,13 @@
+import { waitFor } from '@testing-library/react'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
+import { useProjectOAuthIntegrationData } from '@/components/interfaces/Integrations/Landing/Landing.utils'
 import { MarketplaceDetail } from '@/components/interfaces/Integrations/Marketplace/MarketplaceDetail'
 import { type components } from '@/data/api'
 import { type APIKey } from '@/data/api-keys/api-keys-query'
 import { type ProjectSecret } from '@/data/secrets/secrets-query'
-import { customRender } from '@/tests/lib/custom-render'
+import { customRender, customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
@@ -150,5 +152,26 @@ describe('MarketplaceDetail', () => {
     // A settled 403 should only ever be fetched once (the initial attempt) - not retried
     // in an endless mount/unmount cycle driven by its own `isLoading` flag.
     expect(authConfigRequests).toBeLessThanOrEqual(1)
+  })
+
+  test('an array-typed resource that answers with a non-array body degrades to an empty array', async () => {
+    mockProjectResources()
+
+    let secretsRequests = 0
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/secrets',
+      response: () => {
+        secretsRequests++
+        return HttpResponse.json<APIErrorBody>({ message: 'Something went wrong' })
+      },
+    })
+
+    const { result } = customRenderHook(() => useProjectOAuthIntegrationData('default'))
+
+    await waitFor(() => expect(secretsRequests).toBeGreaterThan(0))
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(result.current.data.edgeFunctionSecrets).toEqual([])
   })
 })

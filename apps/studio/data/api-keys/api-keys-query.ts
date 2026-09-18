@@ -62,7 +62,7 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
   if (error) handleError(error)
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
-  return data as unknown as APIKey[]
+  return (Array.isArray(data) ? data : []) as unknown as APIKey[]
 }
 
 export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
