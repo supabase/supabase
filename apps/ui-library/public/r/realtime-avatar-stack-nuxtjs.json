@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "realtime-avatar-stack-nuxtjs",
-  "type": "registry:block",
   "title": "Realtime Avatar Stack",
   "description": "Component which stack of avatars, tracked by realtime presence.",
   "dependencies": [
@@ -42,5 +41,6 @@
       "type": "registry:component",
       "target": "app/composables/useRealtimePresenceRoom.ts"
     }
-  ]
+  ],
+  "type": "registry:block"
 }
