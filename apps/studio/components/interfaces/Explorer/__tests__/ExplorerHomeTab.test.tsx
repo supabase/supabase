@@ -54,10 +54,22 @@ beforeEach(() => {
 afterEach(() => localStorage.clear())
 
 describe('Explorer home onboarding', () => {
-  it('lets the user complete onboarding with the start page and does not show it on return', async () => {
+  it('steps through onboarding, completes it with the start page, and does not show it on return', async () => {
     const user = userEvent.setup()
     const first = renderHome()
     expect(await screen.findByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
+    expect(screen.getByText('Step 1 of 4')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+
+    for (const name of ['Run SQL', 'Notebooks', 'Chat with your project']) {
+      await user.click(screen.getByRole('button', { name: 'Next' }))
+      expect(screen.getByRole('heading', { name })).toBeVisible()
+    }
+    expect(screen.getByText('Step 4 of 4')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Skip' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+
     await user.click(screen.getByRole('button', { name: 'Continue to Explorer' }))
     expect(await screen.findByLabelText('Start page chat')).toBeInTheDocument()
     first.unmount()
@@ -68,22 +80,22 @@ describe('Explorer home onboarding', () => {
     expect(createQuery).not.toHaveBeenCalled()
   })
 
-  it('explains Explorer without asking for a startup preference', async () => {
+  it('goes back to the previous step', async () => {
+    const user = userEvent.setup()
     renderHome()
     await screen.findByRole('heading', { name: 'Welcome to Explorer' })
-    for (const name of ['Run SQL', 'Chat with your project', 'Save to notebooks']) {
-      expect(screen.getByRole('heading', { name })).toBeVisible()
-    }
-    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+    expect(screen.getByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
   })
 
-  it('opens a query after onboarding when the saved preference is a query', async () => {
+  it('opens a query when onboarding is skipped and the saved preference is a query', async () => {
     const user = userEvent.setup()
     seedPreferences('query', false)
     renderHome()
     expect(await screen.findByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
     expect(createQuery).not.toHaveBeenCalled()
-    await user.click(screen.getByRole('button', { name: 'Continue to Explorer' }))
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
     await waitFor(() => expect(createQuery).toHaveBeenCalledExactlyOnceWith({ replace: true }))
   })
 
