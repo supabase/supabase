@@ -28,7 +28,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           add custom code to set the <code>authenticated</code> role to all your present and future
           users. You can read more in the{' '}
           <a
-            className="hover:decoration-brand underline hover:text-foreground transition"
+            className="hover:decoration-primary underline hover:text-foreground transition"
             href={`${DOCS_URL}/guides/auth`}
           >
             documentation
@@ -43,7 +43,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           Allow users to use Supabase with Auth0 project. Additional setup may be required. You can
           read more in the{' '}
           <a
-            className="hover:decoration-brand underline hover:text-foreground transition"
+            className="hover:decoration-primary underline hover:text-foreground transition"
             href={`${DOCS_URL}/guides/auth`}
           >
             documentation
@@ -57,7 +57,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           Allow users to use Supabase with an Amazon Cognito. Additional setup may be required. You
           can read more in the{' '}
           <a
-            className="hover:decoration-brand underline hover:text-foreground transition"
+            className="hover:decoration-primary underline hover:text-foreground transition"
             href={`${DOCS_URL}/guides/auth/third-party/aws-cognito`}
           >
             documentation
@@ -72,7 +72,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           Allow users to use Supabase with Clerk. Additional setup may be required. You can read
           more in the{' '}
           <a
-            className="hover:decoration-brand underline hover:text-foreground transition"
+            className="hover:decoration-primary underline hover:text-foreground transition"
             href={`${DOCS_URL}/guides/auth/third-party/clerk`}
           >
             documentation
@@ -87,7 +87,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           Allow users to use Supabase with WorkOS. Additional setup may be required. You can read
           more in the{' '}
           <a
-            className="hover:decoration-brand underline hover:text-foreground transition"
+            className="hover:decoration-primary underline hover:text-foreground transition"
             href={`${DOCS_URL}/guides/auth/third-party/workos`}
           >
             documentation

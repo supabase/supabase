@@ -186,7 +186,7 @@ export const FeaturePreviewModal = () => {
                   <SelectTrigger id="feature-preview-select">
                     <div className="flex items-center gap-x-2">
                       {(flags[selectedFeature.key] ?? false) ? (
-                        <Eye size={14} strokeWidth={2} className="text-brand" />
+                        <Eye size={14} strokeWidth={2} className="text-primary" />
                       ) : (
                         <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
                       )}
@@ -320,7 +320,7 @@ const FeaturePreviewItem = ({
     >
       <div className="flex items-center gap-x-3">
         {isEnabled ? (
-          <Eye size={14} strokeWidth={2} className="text-brand" />
+          <Eye size={14} strokeWidth={2} className="text-primary" />
         ) : (
           <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
         )}

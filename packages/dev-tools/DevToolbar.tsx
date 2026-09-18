@@ -91,7 +91,7 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
             <span
               className={cn(
                 'font-mono text-xs uppercase',
-                event.source === 'client' ? 'text-brand' : 'text-foreground-light'
+                event.source === 'client' ? 'text-primary' : 'text-foreground-light'
               )}
             >
               {event.source}

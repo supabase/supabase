@@ -113,7 +113,7 @@ function ConfigurationValuePanel({
     <div className="min-w-0 rounded-md border border-border bg-surface-100 p-3">
       <div className="mb-2 flex items-center gap-2 text-xs font-medium text-foreground-light">
         <Icon
-          className={kind === 'dashboard' ? 'h-3.5 w-3.5 text-warning' : 'h-3.5 w-3.5 text-brand'}
+          className={kind === 'dashboard' ? 'h-3.5 w-3.5 text-warning' : 'h-3.5 w-3.5 text-primary'}
         />
         <span>{label}</span>
       </div>
@@ -329,7 +329,7 @@ export function ConfigurationDriftPage() {
       ) : driftRows.length === 0 ? (
         <Card className="flex min-h-44 items-center justify-center px-6 text-center">
           <div className="max-w-lg">
-            <CheckCircle2 className="mx-auto mb-3 h-6 w-6 text-brand" />
+            <CheckCircle2 className="mx-auto mb-3 h-6 w-6 text-primary" />
             <h2 className="text-sm font-medium">All compared settings match</h2>
             <p className="mt-1 text-sm text-foreground-light">
               The current environment matches all {summary.managedCount} comparable settings in this

@@ -329,7 +329,7 @@
 }
 
 .sb-grid-column-header__inner svg {
-  @apply border-brand-default text-brand;
+  @apply border-brand-default text-primary;
 }
 
 /*

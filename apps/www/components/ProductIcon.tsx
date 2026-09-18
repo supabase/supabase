@@ -15,12 +15,12 @@ function ProductIcon({ icon, color }: ProductIcon) {
         }
       case 'alt':
         return {
-          container: 'bg-brand-200 text-brand',
+          container: 'bg-brand-200 text-primary',
           svg: 'stroke-brand-default',
         }
       case 'gray':
         return {
-          container: 'bg- text-brand',
+          container: 'bg- text-primary',
           svg: 'stroke-brand-default',
         }
       case 'black':
@@ -39,8 +39,8 @@ function ProductIcon({ icon, color }: ProductIcon) {
         !color || color === 'black' ? 'bg-foreground text-background-alternative' : '',
         color && color === 'gray' ? 'bg-border-strong text-foreground-light' : '',
         color && color === 'green' ? 'bg-brand-default text-brand-100' : '',
-        color && color === 'alt' ? 'bg-alternative text-brand' : '',
-        // color && color === 'alt' ? 'bg-surface-300 text-brand' : '',
+        color && color === 'alt' ? 'bg-alternative text-primary' : '',
+        // color && color === 'alt' ? 'bg-surface-300 text-primary' : '',
       ].join(' ')}
     >
       <svg

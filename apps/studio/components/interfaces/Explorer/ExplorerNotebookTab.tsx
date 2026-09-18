@@ -402,7 +402,7 @@ export const ExplorerNotebookTab = () => {
             icon={
               <AiIconAnimation
                 size={16}
-                className="text-tertiary-foreground group-hover:text-brand"
+                className="text-tertiary-foreground group-hover:text-primary"
               />
             }
             loading={isCreating}
@@ -436,7 +436,7 @@ export const ExplorerNotebookTab = () => {
                     <Keyboard size={14} />
                     <span>Intellisense enabled</span>
                   </div>
-                  {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+                  {isIntellisenseEnabled && <Check className="text-primary" size={16} />}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
                   <Copy size={14} />

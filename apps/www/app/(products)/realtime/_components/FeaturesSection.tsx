@@ -141,7 +141,7 @@ function DatabaseChangesSkeleton() {
               <tr className="bg-surface-200">
                 <th className="border-b border-r border-default px-3 py-1.5 text-left font-normal">
                   <div className="flex items-center gap-1.5 overflow-hidden">
-                    <Key size={12} strokeWidth={2} className="text-brand rotate-45 shrink-0" />
+                    <Key size={12} strokeWidth={2} className="text-primary rotate-45 shrink-0" />
                     <span className="text-foreground text-xs font-medium">id</span>
                     <span className="text-foreground-light text-xs">int8</span>
                   </div>
@@ -568,7 +568,7 @@ function BroadcastSkeleton() {
             height="14"
             viewBox="0 0 24 24"
             fill="none"
-            className="text-brand"
+            className="text-primary"
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden
@@ -628,7 +628,7 @@ function BroadcastSkeleton() {
             key={i}
             className={cn(
               'absolute bottom-6 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-xl border bg-surface-100 shadow-xs dark:shadow-sm transition-all duration-300',
-              isFlashing ? 'border-brand-default text-brand' : 'border-border text-foreground-muted'
+              isFlashing ? 'border-brand-default text-primary' : 'border-border text-foreground-muted'
             )}
             style={{ left: `${xPercent}%` }}
           >
