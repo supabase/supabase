@@ -4,6 +4,7 @@ export const LOCAL_STORAGE_KEYS = {
   /**
    * STUDIO
    */
+  LOG_PRICING_ANNOUNCEMENT_DISMISSED: 'log-pricing-announcement-dismissed',
   AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',

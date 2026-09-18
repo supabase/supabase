@@ -34,9 +34,7 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_SIZE_GB_HOURS_GP3,
   PricingMetric.DISK_SIZE_GB_HOURS_IO2,
   PricingMetric.DISK_THROUGHPUT_GP3,
-  PricingMetric.LOG_INGESTION,
   PricingMetric.LOG_STORAGE,
-  PricingMetric.LOG_QUERYING,
   PricingMetric.ACTIVE_COMPUTE_HOURS,
   PricingMetric.ETL_PIPELINE,
   PricingMetric.ETL_REPLICATED_DATA,
@@ -90,17 +88,28 @@ export const TotalUsage = ({
   const sortedBillingMetrics = useMemo(() => {
     if (!usage) return []
 
-    const breakdownMetrics = BILLING_BREAKDOWN_METRICS.filter((metric) =>
-      usage.usages.some((usage) => usage.metric === metric.key)
-    ).filter((metric) => {
-      if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
+    const breakdownMetrics = BILLING_BREAKDOWN_METRICS(subscription)
+      .filter((metric) => usage.usages.some((usage) => usage.metric === metric.key))
+      .filter((metric) => {
+        if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
 
-      const metricUsage = usage.usages.find((it) => it.metric === metric.key)
+        const metricUsage = usage.usages.find((it) => it.metric === metric.key)
 
-      return metricUsage && metricUsage.usage > 0
-    })
+        return metricUsage && metricUsage.usage > 0
+      })
+
+    const PINNED_METRICS = [PricingMetric.LOG_INGESTION, PricingMetric.LOG_QUERYING]
 
     return breakdownMetrics.slice().sort((a, b) => {
+      const pinnedIndexA = PINNED_METRICS.indexOf(a.key as PricingMetric)
+      const pinnedIndexB = PINNED_METRICS.indexOf(b.key as PricingMetric)
+
+      if (pinnedIndexA !== -1 || pinnedIndexB !== -1) {
+        if (pinnedIndexA === -1) return 1
+        if (pinnedIndexB === -1) return -1
+        return pinnedIndexA - pinnedIndexB
+      }
+
       const usageMetaA = usage.usages.find((x) => x.metric === a.key)
       const usageRatioA =
         typeof usageMetaA !== 'number'
@@ -199,6 +208,7 @@ export const TotalUsage = ({
                 )}
               </p>
             )}
+
             <div className="grid grid-cols-2 mt-3 gap-px bg-border">
               {sortedBillingMetrics.map((metric, i) => {
                 return (

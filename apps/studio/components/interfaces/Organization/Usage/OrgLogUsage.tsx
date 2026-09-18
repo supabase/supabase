@@ -42,12 +42,21 @@ const OrgLogUsage = ({
       margin: 20,
       isLoading: isLoadingOrgDailyStats,
     },
-    [PricingMetric.LOG_STORAGE]: {
-      data: dailyUsageToDataPoints(orgDailyStats, (metric) => metric === PricingMetric.LOG_STORAGE),
-      margin: 0,
-      isLoading: isLoadingOrgDailyStats,
-    },
+    ...(subscription?.plan.id === 'platform'
+      ? {
+          [PricingMetric.LOG_STORAGE]: {
+            data: dailyUsageToDataPoints(
+              orgDailyStats,
+              (metric) => metric === PricingMetric.LOG_STORAGE
+            ),
+            margin: 0,
+            isLoading: isLoadingOrgDailyStats,
+          },
+        }
+      : {}),
   }
+
+  console.log(JSON.stringify(chartMeta, null, 2))
 
   return (
     <UsageSection
