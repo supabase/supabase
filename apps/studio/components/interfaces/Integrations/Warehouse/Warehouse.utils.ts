@@ -6,9 +6,9 @@ import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 export type WarehouseSetupTarget = WarehouseSetupBody['targets'][number]
 export type WarehouseSetupStatus =
-  components['schemas']['WarehouseSetupStatusResponse']['setup_status']
+  components['schemas']['WarehouseSetupStatusResponse_Output']['setup_status']
 export type WarehouseSetupTable =
-  components['schemas']['WarehouseSetupStatusResponse']['tables'][number]
+  components['schemas']['WarehouseSetupStatusResponse_Output']['tables'][number]
 
 export function isWarehouseProvisioned(setupStatus?: WarehouseSetupStatus): boolean {
   return setupStatus === 'complete'
@@ -143,5 +143,5 @@ export function buildRetryTargets(
 }
 
 export type WarehouseCatalogCredentials = NonNullable<
-  components['schemas']['WarehouseCatalogResponse']['credentials']
+  components['schemas']['WarehouseCatalogResponse_Output']['credentials']
 >

@@ -132,6 +132,16 @@ const nextConfig = {
    */
   async redirects() {
     return [
+      {
+        source: '/guides/observability/access-data',
+        destination: '/guides/observability',
+        permanent: true,
+      },
+      {
+        source: '/guides/observability/access-data.md',
+        destination: '/guides/observability.md',
+        permanent: true,
+      },
       // Redirect root to docs base path in dev/preview envs
       {
         source: '/',

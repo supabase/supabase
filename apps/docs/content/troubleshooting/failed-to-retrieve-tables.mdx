@@ -25,8 +25,8 @@ Trying to connect to the project via the API will often result in a 522 or 525 r
 
 Out of memory errors usually happen because of a sudden spike in database activity, or a sustained high level of activity, either due to a high volume of queries or very complex queries (or a combination of both).
 
-Note that Nano, Micro, Small and Medium compute instances have 30 minutes of burst capacity on a daily basis so may be able to handle sustained high activity for a short period of time,
-but not sudden spikes.
+Note that compute sizes up to 2XL can burst disk IO above their baseline for a total of about 30 minutes per day, so they may be able to handle high activity for a short period of time,
+but not sustained spikes.
 
 ## Next steps and preventative measures
 
