@@ -197,4 +197,25 @@ describe('DestinationTypeSelection', () => {
     expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
     expect(screen.queryByText('Read replicas have moved')).not.toBeInTheDocument()
   })
+
+  test('radio variant uses the shared radio group and clusters early access destinations', async () => {
+    mockBigQueryEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(true)
+    mockDucklakeEnabled.mockReturnValue(true)
+    mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
+    customRender(<DestinationTypeSelection variant="radio" />)
+
+    expect(await screen.findByRole('group', { name: 'Destination type' })).toBeInTheDocument()
+    expect(screen.getByText('Public Alpha')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /BigQuery/ })).toBeInTheDocument()
+    expect(screen.getByText('Early Access')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /DuckLake/ })).toBeInTheDocument()
+    expect(screen.getByText('Deprecated')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Analytics Bucket/ })).toBeInTheDocument()
+    expect(screen.queryByText('Cannot be changed after creation.')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Leave feedback' })).not.toBeInTheDocument()
+  })
 })

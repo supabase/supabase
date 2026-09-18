@@ -245,6 +245,7 @@ import { Route as ProjectRefDatabaseTriggersEventRouteImport } from './routes/pr
 import { Route as ProjectRefDatabaseTriggersDataRouteImport } from './routes/project/$ref/database/triggers/data'
 import { Route as ProjectRefDatabaseTablesIdRouteImport } from './routes/project/$ref/database/tables/$id'
 import { Route as ProjectRefDatabaseReplicationPipelineIdRouteImport } from './routes/project/$ref/database/replication/$pipelineId'
+import { Route as ProjectRefDatabaseReplicationNewRouteImport } from './routes/project/$ref/database/replication/new'
 import { Route as ProjectRefDatabasePublicationsIdRouteImport } from './routes/project/$ref/database/publications/$id'
 import { Route as ProjectRefDatabaseBackupsScheduledRouteImport } from './routes/project/$ref/database/backups/scheduled'
 import { Route as ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport } from './routes/project/$ref/database/backups/restore-to-new-project'
@@ -1619,6 +1620,12 @@ const ProjectRefDatabaseReplicationPipelineIdRoute =
     path: '/$pipelineId',
     getParentRoute: () => ProjectRefDatabaseReplicationRoute,
   } as any)
+const ProjectRefDatabaseReplicationNewRoute =
+  ProjectRefDatabaseReplicationNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => ProjectRefDatabaseReplicationRoute,
+  } as any)
 const ProjectRefDatabasePublicationsIdRoute =
   ProjectRefDatabasePublicationsIdRouteImport.update({
     id: '/publications/$id',
@@ -2366,6 +2373,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
+  '/project/$ref/database/replication/new': typeof ProjectRefDatabaseReplicationNewRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
@@ -2673,6 +2681,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
+  '/project/$ref/database/replication/new': typeof ProjectRefDatabaseReplicationNewRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
@@ -2998,6 +3007,7 @@ export interface FileRoutesById {
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
+  '/project/$ref/database/replication/new': typeof ProjectRefDatabaseReplicationNewRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
@@ -3322,6 +3332,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/replication/$pipelineId'
+    | '/project/$ref/database/replication/new'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
@@ -3629,6 +3640,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/replication/$pipelineId'
+    | '/project/$ref/database/replication/new'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
@@ -3953,6 +3965,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/replication/$pipelineId'
+    | '/project/$ref/database/replication/new'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
@@ -5822,6 +5835,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabaseReplicationPipelineIdRouteImport
       parentRoute: typeof ProjectRefDatabaseReplicationRoute
     }
+    '/project/$ref/database/replication/new': {
+      id: '/project/$ref/database/replication/new'
+      path: '/new'
+      fullPath: '/project/$ref/database/replication/new'
+      preLoaderRoute: typeof ProjectRefDatabaseReplicationNewRouteImport
+      parentRoute: typeof ProjectRefDatabaseReplicationRoute
+    }
     '/project/$ref/database/publications/$id': {
       id: '/project/$ref/database/publications/$id'
       path: '/publications/$id'
@@ -6675,6 +6695,7 @@ const ProjectRefComputeRouteWithChildren =
 
 interface ProjectRefDatabaseReplicationRouteChildren {
   ProjectRefDatabaseReplicationPipelineIdRoute: typeof ProjectRefDatabaseReplicationPipelineIdRoute
+  ProjectRefDatabaseReplicationNewRoute: typeof ProjectRefDatabaseReplicationNewRoute
   ProjectRefDatabaseReplicationIndexRoute: typeof ProjectRefDatabaseReplicationIndexRoute
   ProjectRefDatabaseReplicationReplicaReplicaIdRoute: typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
 }
@@ -6683,6 +6704,8 @@ const ProjectRefDatabaseReplicationRouteChildren: ProjectRefDatabaseReplicationR
   {
     ProjectRefDatabaseReplicationPipelineIdRoute:
       ProjectRefDatabaseReplicationPipelineIdRoute,
+    ProjectRefDatabaseReplicationNewRoute:
+      ProjectRefDatabaseReplicationNewRoute,
     ProjectRefDatabaseReplicationIndexRoute:
       ProjectRefDatabaseReplicationIndexRoute,
     ProjectRefDatabaseReplicationReplicaReplicaIdRoute:

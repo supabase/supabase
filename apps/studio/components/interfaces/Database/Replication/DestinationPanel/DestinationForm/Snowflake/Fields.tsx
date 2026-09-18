@@ -1,24 +1,31 @@
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { Button, FormControl, FormField, Input, TextArea } from 'ui'
+import { Button, cn, FormControl, FormField, Input, TextArea } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  SNOWFLAKE_ACCOUNT_ID_FIELD_COPY,
+  SNOWFLAKE_DATABASE_FIELD_COPY,
+  SNOWFLAKE_SCHEMA_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 
 export const SnowflakeFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const [showPrivateKeyPassphrase, setShowPrivateKeyPassphrase] = useState(false)
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">Snowflake settings</p>
 
       <div className="flex flex-col gap-y-1">
@@ -35,8 +42,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Account ID"
-              description="Snowflake account identifier, for example ORGNAME-ACCOUNTNAME"
+              label={SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.label}
+              description={SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="MYORG-MYACCOUNT" value={field.value ?? ''} />
@@ -67,8 +74,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Database"
-              description="Snowflake database where replicated tables will be created"
+              label={SNOWFLAKE_DATABASE_FIELD_COPY.label}
+              description={SNOWFLAKE_DATABASE_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="ANALYTICS" value={field.value ?? ''} />
@@ -83,8 +90,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Schema"
-              description="Snowflake schema where replicated tables will be created"
+              label={SNOWFLAKE_SCHEMA_FIELD_COPY.label}
+              description={SNOWFLAKE_SCHEMA_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="PUBLIC" value={field.value ?? ''} />

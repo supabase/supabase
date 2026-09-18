@@ -3,6 +3,7 @@ import { FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
+import { PIPELINE_NAME_FIELD_COPY } from './DestinationFormFieldCopy'
 
 type DestinationNameInputProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
@@ -15,9 +16,9 @@ export const DestinationNameInput = ({ form }: DestinationNameInputProps) => {
       name="name"
       render={({ field }) => (
         <FormItemLayout
-          label="Name"
+          label={PIPELINE_NAME_FIELD_COPY.label}
           layout="horizontal"
-          description="Used to identify this pipeline in Supabase."
+          description={PIPELINE_NAME_FIELD_COPY.description}
         >
           <FormControl>
             <Input

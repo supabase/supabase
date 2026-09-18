@@ -2,6 +2,7 @@ import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -24,6 +25,11 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  getCreatePipelineHref,
+  getFirstEnabledPipelineType,
+  isPipelineDestinationType,
+} from './CreatePipeline/CreatePipelineWizard.utils'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
@@ -95,6 +101,7 @@ const compareStatusNames = (
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -106,17 +113,14 @@ export const Destinations = () => {
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
 
-  const newDestinationDefaultType: DestinationType | null = etlEnableBigQuery
-    ? 'BigQuery'
-    : etlEnableIceberg
-      ? 'Analytics Bucket'
-      : etlEnableDucklake
-        ? 'DuckLake'
-        : etlEnableSnowflake
-          ? 'Snowflake'
-          : etlEnableClickHouse
-            ? 'ClickHouse'
-            : null
+  const firstPipelineType = getFirstEnabledPipelineType({
+    BigQuery: etlEnableBigQuery,
+    'Analytics Bucket': etlEnableIceberg,
+    DuckLake: etlEnableDucklake,
+    Snowflake: etlEnableSnowflake,
+    ClickHouse: etlEnableClickHouse,
+  })
+  const newDestinationDefaultType = firstPipelineType
 
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -124,7 +128,7 @@ export const Destinations = () => {
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
-  const [, setDestinationType] = useQueryState(
+  const [urlDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
@@ -230,10 +234,15 @@ export const Destinations = () => {
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
   const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
-  const openDestinationPanel = () => {
-    if (!newDestinationDefaultType) return
-    setDestinationType(newDestinationDefaultType)
+  const openCreate = () => {
+    if (!projectRef || !firstPipelineType) return
+    router.push(getCreatePipelineHref(projectRef, firstPipelineType))
   }
+
+  useEffect(() => {
+    if (!projectRef || !isPipelineDestinationType(urlDestinationType)) return
+    router.replace(getCreatePipelineHref(projectRef, urlDestinationType))
+  }, [projectRef, router, urlDestinationType])
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
@@ -337,7 +346,7 @@ export const Destinations = () => {
           <Shortcut
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
             label="Add pipeline"
-            onTrigger={openDestinationPanel}
+            onTrigger={openCreate}
             options={{ enabled: !!newDestinationDefaultType }}
             side="bottom"
           >
@@ -345,7 +354,7 @@ export const Destinations = () => {
               variant="primary"
               icon={<Plus />}
               disabled={!newDestinationDefaultType}
-              onClick={openDestinationPanel}
+              onClick={openCreate}
             >
               Add pipeline
             </Button>
@@ -421,7 +430,7 @@ export const Destinations = () => {
               variant="default"
               icon={<Plus />}
               disabled={!newDestinationDefaultType}
-              onClick={openDestinationPanel}
+              onClick={openCreate}
             >
               Add pipeline
             </Button>
