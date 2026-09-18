@@ -23,7 +23,7 @@ function Logo() {
         height={18}
         alt="Supabase logo"
       />
-      <span className="font-mono text-sm font-medium text-brand-link mb-px">KB</span>
+      <span className="font-mono text-sm font-medium text-brand mb-px">KB</span>
     </a>
   )
 }

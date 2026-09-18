@@ -99,7 +99,7 @@ Use the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-do
 
 ### Edit existing pages
 
-Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, structure, or brevity on an existing page when you are not changing the product story. 
+Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, structure, or brevity on an existing page when you are not changing the product story.
 
 ## Document types
 

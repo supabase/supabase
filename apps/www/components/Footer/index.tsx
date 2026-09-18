@@ -89,7 +89,7 @@ const Footer = (props: Props) => {
         <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 py-6! md:py-10! text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
-            <Link href="/security" className="text-brand-link hover:underline">
+            <Link href="/security" className="text-brand hover:underline">
               More on Security
             </Link>
           </div>
@@ -168,7 +168,7 @@ const Footer = (props: Props) => {
             <div>
               {newsletterStatus === 'success' ? (
                 <div className="flex flex-col gap-1">
-                  <p className="text-brand-link text-sm">Thanks for subscribing!</p>
+                  <p className="text-brand text-sm">Thanks for subscribing!</p>
                   <p className="text-foreground-lighter text-xs">
                     You'll hear from us when we publish our next newsletter issue.
                   </p>
