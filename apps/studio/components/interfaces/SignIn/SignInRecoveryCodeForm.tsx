@@ -4,7 +4,7 @@ import { useAuthError, useFeatureFlags, useFlag } from 'common'
 import { EyeIcon, EyeOffIcon, LockIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
@@ -98,6 +98,8 @@ export const SignInRecoveryCodeForm = () => {
   const error = useAuthError()
 
   const [isCodeRevealed, setIsCodeRevealed] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+
   if (error) {
     return (
       <AlertError
@@ -134,6 +136,7 @@ export const SignInRecoveryCodeForm = () => {
       {recoveryCodesStatus?.status === 'available' && (
         <Form {...form}>
           <form
+            ref={formRef}
             id={formId}
             method="POST"
             className="flex flex-col gap-4"
@@ -157,6 +160,15 @@ export const SignInRecoveryCodeForm = () => {
                         spellCheck="false"
                         placeholder="****************"
                         type={isCodeRevealed ? 'text' : 'password'}
+                        onPaste={(event) => {
+                          // If users paste something, it's most probably a valid code so we can safely try submitting it immediately
+                          // onPaste is triggered before the paste operation is complete so we have to emulate it to avoid using an unreliable setTimeout
+                          event.preventDefault()
+                          field.onChange(event.clipboardData.getData('text'))
+                          formRef.current?.dispatchEvent(
+                            new Event('submit', { cancelable: true, bubbles: true })
+                          )
+                        }}
                       />
                     </FormControl>
                     <InputGroupAddon align="inline-start">
