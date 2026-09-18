@@ -7,7 +7,7 @@ const ONBOARDING_POINTS: Array<{ icon: LucideIcon; title: string; description: s
   {
     icon: SquareCode,
     title: 'Run SQL',
-    description: 'Query your database or logs and view the results as a table or chart.',
+    description: 'Run any SQL on your database or query your logs, and chart the results.',
   },
   {
     icon: MessageSquare,
