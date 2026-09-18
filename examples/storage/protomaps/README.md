@@ -13,12 +13,12 @@ Take note of the [file size limits](https://supabase.com/docs/guides/storage/upl
 
 ## Proxy through Edge Functions
 
-You can use [Supabase Edge Functions](https://supabase.com/edge-functions) to set up fine grained access controls. Use the [/supabase/functions/maps-private/index.ts](/supabase/functions/maps-private/index.ts).
+You can use [Supabase Edge Functions](https://supabase.com/edge-functions) to set up fine grained access controls. Use the [/supabase/functions/maps-private/index.ts](./supabase/functions/maps-private/index.ts).
 
 You can also use Edge Functions with Supabase Auth JWTs to only render Maps for authenticated users for example. [Read the docs](https://supabase.com/docs/guides/functions/auth).
 
 1. Deploy the function to your Supabase project: `supabase functions deploy maps-private --no-verify-jwt`.
-2. Update the `protomaps.url` in the [index.html](/index.html) file.
+2. Update the `protomaps.url` in the [index.html](./index.html) file.
 
 ## Start simple web server
 
