@@ -9,15 +9,12 @@ Start with a Next.js App Router project, then install the Library's password-bas
 
 ### Create the app
 
-Use [create-next-app](https://nextjs.org/docs/app/api-reference/cli/create-next-app) to scaffold the framework:
+Use the [shadcn CLI](https://ui.shadcn.com/docs/cli#init) to create a Next.js app with Tailwind CSS and Radix-based components:
 
 ```bash
-npx create-next-app@latest my-app --ts --tailwind --eslint --app --no-src-dir --import-alias "@/*" --use-npm --yes
+npx shadcn@latest init --template next --base radix --name my-app
 cd my-app
-npx shadcn@latest init --base radix
 ```
-
-This creates the app at the project root with the import alias expected by the block.
 
 ### Install the block
 
