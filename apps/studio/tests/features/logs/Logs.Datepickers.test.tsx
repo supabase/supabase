@@ -134,7 +134,10 @@ describe('generateHelpersFromInput', () => {
 
   test('never returns a helper whose calcFrom throws', () => {
     expect(generateHelpersFromInput('999999999')).toBeNull()
-    for (const helper of generateHelpersFromInput('99999999') ?? []) {
+
+    const helpers = generateHelpersFromInput('99999999')
+    expect(helpers).not.toBeNull()
+    for (const helper of helpers!) {
       expect(() => helper.calcFrom()).not.toThrow()
     }
   })
