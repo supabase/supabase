@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2, NotebookText, SquareCode } from 'lucide-react'
+import { Loader2, NotebookText, Play, SquareCode } from 'lucide-react'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -55,6 +55,7 @@ const ExplorerHomeContent = () => {
   const { createChat } = useCreateChat()
 
   const [value, setValue] = useState<string>('')
+  const isSqlQuery = isSqlStatement(value)
 
   return (
     <div className="flex flex-col h-full">
@@ -80,6 +81,8 @@ const ExplorerHomeContent = () => {
                 ? createQuery({ sql: message, autoRun: true })
                 : createChat({ initialMessage: message })
             }
+            submitIcon={isSqlQuery ? <Play /> : undefined}
+            submitLabel={isSqlQuery ? 'Run SQL query' : undefined}
           />
           <AssistantAgentHarnessFooter />
 

@@ -1,6 +1,6 @@
 import { useBreakpoint } from 'common'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
-import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
+import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, ReactNode, useRef } from 'react'
 import { cn, ExpandingTextArea } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -49,6 +49,10 @@ export interface FormProps {
   selectedModel?: AssistantModelId
   /* Callback when a model is chosen */
   onSelectModel?: (model: AssistantModelId) => void
+  /* Icon for the submit button when not loading, defaults to an up arrow */
+  submitIcon?: ReactNode
+  /* Label for the submit button when not loading, used for both aria-label and tooltip text, defaults to "Send message" */
+  submitLabel?: string
 }
 
 const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
@@ -70,6 +74,8 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       isEditing = false,
       selectedModel,
       onSelectModel,
+      submitIcon = <ArrowUp />,
+      submitLabel = 'Send message',
       ...props
     },
     _ref
@@ -162,14 +168,14 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
                 <ButtonTooltip
                   type="submit"
                   variant={canSubmit ? 'primary' : 'default'}
-                  aria-label="Send message"
-                  icon={<ArrowUp />}
+                  aria-label={submitLabel}
+                  icon={submitIcon}
                   disabled={!canSubmit}
                   className={cn(
                     'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
                     !canSubmit ? 'opacity-50' : 'opacity-100'
                   )}
-                  tooltip={{ content: { side: 'top', text: 'Send message' } }}
+                  tooltip={{ content: { side: 'top', text: submitLabel } }}
                 />
               )}
             </div>
