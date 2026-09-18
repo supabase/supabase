@@ -244,7 +244,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_READ_ONLY, FABRIKAM_OWNER],
+    organizations: [NORTHWIND_TRADERS_READ_ONLY, CONTOSO_LABS, FABRIKAM_OWNER],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: {
     email: 'admin@example.com',
