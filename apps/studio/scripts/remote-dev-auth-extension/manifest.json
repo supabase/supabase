@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Supabase Studio Remote-Dev Auth Sync",
+  "version": "0.1.0",
+  "description": "Copy your Supabase dashboard session token from the hosted dashboard into a local Studio dev server so local Studio can talk to real projects. Dev tool — do not distribute.",
+  "permissions": ["scripting", "tabs", "storage"],
+  "host_permissions": [
+    "https://supabase.com/*",
+    "https://*.supabase.com/*",
+    "https://supabase.green/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Sync Supabase auth to local Studio"
+  }
+}

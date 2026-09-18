@@ -46,6 +46,29 @@ const marketplaceApiProtocol: 'http' | 'https' | null =
       ? 'http'
       : null
 
+// Remote-dev proxy rules. Opt-in via REMOTE_DEV=true. Forwards Studio's
+// control-plane (`/platform`, `/v1`) and auth (`/auth/v1`) paths to a hosted
+// Supabase backend so a locally-running Studio can talk to real projects while
+// the browser only ever makes same-origin requests (no CORS; the bearer token
+// is forwarded upstream). Full rationale + safety notes in
+// REMOTE_DEV.md.
+function getRemoteDevRewrites() {
+  if (process.env.REMOTE_DEV !== 'true') return []
+
+  // Origin of the hosted control-plane API (mgmt-api). Defaults to production.
+  const apiOrigin = (process.env.REMOTE_API_URL ?? 'https://api.supabase.com').replace(/\/$/, '')
+  // Full base URL of the hosted dashboard GoTrue (e.g. https://<host>/auth/v1).
+  // Optional: if unset, sign-in must target a GoTrue URL that already allows the
+  // dev origin. When set, auth is proxied same-origin like the control plane.
+  const gotrueUrl = process.env.REMOTE_GOTRUE_URL?.replace(/\/$/, '')
+
+  return [
+    { source: '/platform/:path*', destination: `${apiOrigin}/platform/:path*` },
+    { source: '/v1/:path*', destination: `${apiOrigin}/v1/:path*` },
+    ...(gotrueUrl ? [{ source: '/auth/v1/:path*', destination: `${gotrueUrl}/:path*` }] : []),
+  ]
+}
+
 // Use `satisfies` instead of `: NextConfig` so TypeScript preserves narrow
 // inferred types (e.g. async headers → Promise). This avoids TS2345 when
 // wrapper functions (bundle-analyzer, sentry) resolve their `next` peer
@@ -64,6 +87,13 @@ const nextConfig = {
         destination: `https://supabase.com/.well-known/vercel/flags`,
         basePath: false as const,
       },
+      // Remote-dev proxy (opt-in via REMOTE_DEV=true): run Studio locally against
+      // a hosted Supabase backend. These rewrites forward the control-plane and
+      // auth paths to hosted services server-side, so the browser only ever makes
+      // same-origin requests — no CORS, and the client's `Authorization: Bearer`
+      // (from getAccessToken) is forwarded upstream. See REMOTE_DEV.md.
+      // Never enabled in a production Studio build (gate is a dev-only env var).
+      ...getRemoteDevRewrites(),
     ]
   },
   async redirects() {
