@@ -8,8 +8,6 @@ sidebar_label: 'ClickHouse'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
-
 <Admonition type="note" label="Early Access">
 
 The ClickHouse destination is in Early Access and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
@@ -17,8 +15,6 @@ The ClickHouse destination is in Early Access and available only to approved org
 </Admonition>
 
 [ClickHouse](https://clickhouse.com/) is a column-oriented database for analytics. Supabase Pipelines can maintain current-state tables in ClickHouse or write an append-only change history, depending on the selected table engine.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Prepare ClickHouse resources
 
@@ -36,8 +32,6 @@ Before creating the destination:
 Keep the database otherwise empty. Pipelines manages the replicated tables and current-state views. Don't pre-create or manually alter those objects.
 
 The default `ReplacingMergeTree` engine requires ClickHouse **23.5 or newer**. The `MergeTree` event-log engine does not have this minimum-version requirement.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Configure ClickHouse as a destination
 

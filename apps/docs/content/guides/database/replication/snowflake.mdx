@@ -6,8 +6,6 @@ subtitle: 'Replicate Supabase Postgres changes to Snowflake.'
 sidebar_label: 'Snowflake'
 ---
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
-
 <$Partial path="pipelines-public-alpha.mdx" />
 
 <Admonition type="note" label="Early Access">
@@ -17,8 +15,6 @@ The Snowflake destination is in Early Access and available only to approved orga
 </Admonition>
 
 [Snowflake](https://www.snowflake.com/) is a managed data platform. Supabase Pipelines writes an append-only change history for each replicated Postgres table to Snowflake.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Prepare Snowflake resources
 
@@ -98,8 +94,6 @@ select current_organization_name() || '-' || current_account_name();
 ```
 
 Enter the result as **Account ID**, for example `MYORG-MYACCOUNT`. Do not enter a full URL or dotted locator-and-region hostname. Account IDs can contain up to 63 characters. Legacy one-part account locators are also accepted. See [Snowflake account identifiers](https://docs.snowflake.com/en/user-guide/admin-account-identifier) for details.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Configure Snowflake as a destination
 

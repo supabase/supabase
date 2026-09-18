@@ -59,9 +59,6 @@ git diff --name-only master...HEAD
 3. **Run type-specific checks** from the matching sections below on the current branch (no checkout step). Typical commands:
 
 ```bash
-# Content / tutorial MDX (lints the whole content/ tree; no per-file scoping)
-cd apps/docs && pnpm lint:mdx
-
 # Pipeline / schema handler
 cd apps/docs && pnpm build:guides-markdown
 # inspect public/markdown/guides/ for affected pages
@@ -205,13 +202,12 @@ Verify both guides and reference output when `generate-reference-markdown.ts` or
 
 MDX prose, partials, navigation — no pipeline or example changes.
 
-```bash
-cd apps/docs
-pnpm lint:mdx    # lints the whole content/ tree; filter the output to your changed paths
-```
+Check the prose against [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) and
+[`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md) yourself. No tool checks terminology.
 
 Checklist:
 
+- [ ] Prose follows CONTRIBUTING.md and the word list
 - [ ] Frontmatter valid (`title`, `description` where required)
 - [ ] Internal links resolve (`/docs/guides/...`, not broken anchors)
 - [ ] `$CodeSample` paths match existing example directories
@@ -228,9 +224,6 @@ Compare PR preview URL (from Vercel/deployment comment) against production for v
 Tutorial MDX plus matching example app. **Read [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md)** for full platform E2E — review is not complete without it when auth flows are involved.
 
 ```bash
-# MDX lint
-cd apps/docs && pnpm lint:mdx    # then check output for content/guides/getting-started/tutorials/<path>
-
 # Example build (from work-linear-issue)
 cd examples/<example-dir>
 npm install && npm run build
