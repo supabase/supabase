@@ -67,6 +67,7 @@ describe('Explorer home onboarding', () => {
     }
     expect(screen.getByText('Step 4 of 4')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Skip' })).not.toBeInTheDocument()
     expect(screen.queryByRole('radio')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Continue to Explorer' }))
@@ -88,16 +89,13 @@ describe('Explorer home onboarding', () => {
     expect(screen.getByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
   })
 
-  it('opens a query after onboarding when the saved preference is a query', async () => {
+  it('opens a query when onboarding is skipped and the saved preference is a query', async () => {
     const user = userEvent.setup()
     seedPreferences('query', false)
     renderHome()
     expect(await screen.findByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
     expect(createQuery).not.toHaveBeenCalled()
-    for (let step = 0; step < 3; step++) {
-      await user.click(screen.getByRole('button', { name: 'Next' }))
-    }
-    await user.click(screen.getByRole('button', { name: 'Continue to Explorer' }))
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
     await waitFor(() => expect(createQuery).toHaveBeenCalledExactlyOnceWith({ replace: true }))
   })
 
