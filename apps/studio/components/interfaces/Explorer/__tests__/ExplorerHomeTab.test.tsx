@@ -58,8 +58,7 @@ describe('Explorer home onboarding', () => {
     const user = userEvent.setup()
     const first = renderHome()
     expect(await screen.findByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
-    expect(screen.getByRole('radio', { name: /^Start page/ })).toBeChecked()
-    await user.click(screen.getByRole('button', { name: 'Open Explorer' }))
+    await user.click(screen.getByRole('button', { name: 'Continue to Explorer' }))
     expect(await screen.findByLabelText('Start page chat')).toBeInTheDocument()
     first.unmount()
 
@@ -69,26 +68,28 @@ describe('Explorer home onboarding', () => {
     expect(createQuery).not.toHaveBeenCalled()
   })
 
-  it('supports keyboard selection and waits for completion before opening a query', async () => {
-    const user = userEvent.setup()
+  it('explains Explorer without asking for a startup preference', async () => {
     renderHome()
-    const startPage = await screen.findByRole('radio', { name: /^Start page/ })
-    await user.click(startPage)
-    // Radix defers moving focus; keep the key down until that focus event selects the radio.
-    await user.keyboard('{ArrowRight>}')
-    await waitFor(() => expect(screen.getByRole('radio', { name: /^SQL query/ })).toBeChecked())
-    await user.keyboard('{/ArrowRight}')
-    expect(createQuery).not.toHaveBeenCalled()
-    await user.click(screen.getByRole('button', { name: 'Open Explorer' }))
-    await waitFor(() => expect(createQuery).toHaveBeenCalledExactlyOnceWith({ replace: true }))
+    await screen.findByRole('heading', { name: 'Welcome to Explorer' })
+    for (const name of [
+      'Run SQL',
+      'Chat with your project',
+      'Save to notebooks',
+      'Snippets and reports',
+    ]) {
+      expect(screen.getByRole('heading', { name })).toBeVisible()
+    }
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
   })
 
-  it('shows onboarding for an unfinished query preference', async () => {
+  it('opens a query after onboarding when the saved preference is a query', async () => {
+    const user = userEvent.setup()
     seedPreferences('query', false)
     renderHome()
     expect(await screen.findByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
-    expect(screen.getByRole('radio', { name: /^SQL query/ })).toBeChecked()
     expect(createQuery).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: 'Continue to Explorer' }))
+    await waitFor(() => expect(createQuery).toHaveBeenCalledExactlyOnceWith({ replace: true }))
   })
 
   it('opens one query for a returning user, even under Strict Mode', async () => {
@@ -115,16 +116,4 @@ describe('Explorer home onboarding', () => {
       await waitFor(() => expect(createQuery).toHaveBeenCalledExactlyOnceWith({ replace: true }))
     }
   )
-
-  it('keeps Learn more collapsed initially and supports expanding and collapsing with the keyboard', async () => {
-    const user = userEvent.setup()
-    renderHome()
-    const trigger = await screen.findByRole('button', { name: 'Learn more' })
-    expect(trigger).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.queryByText('Where did my snippets go?')).not.toBeInTheDocument()
-    await user.click(trigger)
-    expect(screen.getByText('Where did my snippets go?')).toBeVisible()
-    await user.keyboard('{Enter}')
-    expect(trigger).toHaveAttribute('aria-expanded', 'false')
-  })
 })

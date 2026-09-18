@@ -1,32 +1,85 @@
-import { Button } from 'ui'
+import {
+  ArrowRight,
+  FileClock,
+  MessageSquare,
+  NotebookText,
+  SquareCode,
+  type LucideIcon,
+} from 'lucide-react'
+import { Badge, Button } from 'ui'
 
-import { ExplorerOnboardingLearnMore } from './ExplorerOnboardingLearnMore'
-import { ExplorerHomePreference } from '@/components/interfaces/Account/Preferences/ExplorerHomePreference'
 import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 
+const ONBOARDING_POINTS: Array<{ icon: LucideIcon; title: string; description: string }> = [
+  {
+    icon: SquareCode,
+    title: 'Run SQL',
+    description:
+      'Query your database or logs, then view the results as a table or chart. Save a query to a notebook to keep it.',
+  },
+  {
+    icon: MessageSquare,
+    title: 'Chat with your project',
+    description:
+      "Ask Assistant to write queries, explain results, or check your project's health. Your organization's AI settings control what it can access.",
+  },
+  {
+    icon: NotebookText,
+    title: 'Save to notebooks',
+    description:
+      'Combine queries, charts, and notes in one document that your team can open and rerun. Assistant can create notebooks and run them for you.',
+  },
+  {
+    icon: FileClock,
+    title: 'Snippets and reports',
+    description:
+      'Notebooks will replace snippets and custom reports over time. In the meantime, both are still available in the old SQL Editor and Observability.',
+  },
+]
+
 export const ExplorerOnboarding = () => {
-  const { home, setHome, completeOnboarding, isReady } = useExplorerPreferences()
+  const { completeOnboarding, isReady } = useExplorerPreferences()
 
   return (
     <div className="flex h-full min-h-0 flex-col items-center overflow-y-auto bg-surface-100 px-6">
       <div className="my-auto w-full max-w-xl shrink-0 space-y-8 py-12">
         <div className="space-y-3">
-          <h1 className="heading-section">Welcome to Explorer</h1>
-          <p className="text-sm leading-relaxed text-foreground-light">
+          <div className="flex items-center gap-2">
+            <h1 className="heading-section">Welcome to Explorer</h1>
+            <Badge variant="default">Preview</Badge>
+          </div>
+          <p className="text-base leading-relaxed text-foreground-light">
             Interact with your database and logs in one place. Run SQL, chat with Assistant, or
             combine queries and notes in notebooks.
           </p>
         </div>
 
-        <div className="space-y-3">
-          <h2 className="text-sm font-medium">Choose how Explorer opens</h2>
-          <ExplorerHomePreference value={home} onValueChange={setHome} disabled={!isReady} />
-        </div>
+        <ul className="space-y-5">
+          {ONBOARDING_POINTS.map(({ icon: Icon, title, description }) => (
+            <li key={title} className="flex items-start gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border bg-surface-200">
+                <Icon
+                  size={20}
+                  strokeWidth={1.5}
+                  className="text-foreground-muted"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="space-y-0.5">
+                <h2 className="text-sm text-foreground">{title}</h2>
+                <p className="text-sm leading-relaxed text-foreground-light">{description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
 
-        <ExplorerOnboardingLearnMore />
-
-        <Button variant="primary" onClick={completeOnboarding} disabled={!isReady}>
-          Open Explorer
+        <Button
+          variant="primary"
+          iconRight={<ArrowRight />}
+          onClick={completeOnboarding}
+          disabled={!isReady}
+        >
+          Continue to Explorer
         </Button>
       </div>
     </div>
