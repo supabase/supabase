@@ -248,7 +248,11 @@ function RLSSkeleton() {
                   >
                     <div className="flex items-center gap-1.5 overflow-hidden">
                       {col.isPrimaryKey && (
-                        <Key size={12} strokeWidth={2} className="text-primary rotate-45 shrink-0" />
+                        <Key
+                          size={12}
+                          strokeWidth={2}
+                          className="text-primary rotate-45 shrink-0"
+                        />
                       )}
                       <span className="text-foreground text-xs truncate font-medium">
                         {col.name}

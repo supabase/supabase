@@ -252,7 +252,9 @@ export function RotateKeyDialog({
                           <code>Authorization</code> header signed with the{' '}
                           <em className="text-primary not-italic">legacy JWT secret</em>. Rotation
                           causes{' '}
-                          <em className="text-primary not-italic">invocations by signed-in users</em>{' '}
+                          <em className="text-primary not-italic">
+                            invocations by signed-in users
+                          </em>{' '}
                           to fail with HTTP 401 Unauthorized, as the JWT no longer meets this
                           requirement.
                           <br />

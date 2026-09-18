@@ -130,7 +130,10 @@ stripe projects env --sync`,
           >
             Stripe CLI install docs
           </a>
-          <a href="https://docs.stripe.com/stripe-projects" className="text-primary hover:underline">
+          <a
+            href="https://docs.stripe.com/stripe-projects"
+            className="text-primary hover:underline"
+          >
             Stripe Projects docs
           </a>
           <a href="https://supabase.com/docs" className="text-primary hover:underline">

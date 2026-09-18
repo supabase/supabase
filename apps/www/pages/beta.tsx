@@ -444,7 +444,11 @@ const Security = () => {
               </li>
               <li className="mb-5">
                 Adopted the{' '}
-                <a href="https://snyk.io/" target="_blank" className="text-primary hover:text-primary">
+                <a
+                  href="https://snyk.io/"
+                  target="_blank"
+                  className="text-primary hover:text-primary"
+                >
                   Snyk
                 </a>{' '}
                 dependency monitor as part of our SSDLC on several key component of our system, to
