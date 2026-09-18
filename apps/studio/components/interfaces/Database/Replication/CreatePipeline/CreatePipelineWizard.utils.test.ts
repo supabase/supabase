@@ -24,7 +24,7 @@ const emptyForm = {
   publicationName: '',
   tableSyncCopyMode: 'include_all_tables',
   tableSyncCopyTableIds: [],
-} as DestinationPanelSchemaType
+} as unknown as DestinationPanelSchemaType
 
 describe('getFirstEnabledPipelineType', () => {
   it('returns the first enabled pipeline type in product order', () => {

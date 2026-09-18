@@ -180,70 +180,6 @@ describe('useDestinationForm', () => {
     ])
   })
 
-  it('validates only the destination while authorising the connection', async () => {
-    const { result } = renderHook(() => useDestinationForm({ selectedType: 'BigQuery' }))
-
-    await act(async () => {
-      await result.current.validateDestinationConfiguration({
-        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
-        onValidationFail: vi.fn(),
-      })
-    })
-
-    expect(mocks.validateDestination).toHaveBeenCalledWith({
-      projectRef: 'project-ref',
-      destinationConfig: expect.any(Object),
-    })
-    expect(mocks.validatePipeline).not.toHaveBeenCalled()
-  })
-
-  it('shows destination request errors as persistent validation failures', async () => {
-    mocks.validateDestination.mockRejectedValue(new Error('Invalid validation request'))
-    const onValidationFail = vi.fn()
-    const { result } = renderHook(() => useDestinationForm({ selectedType: 'BigQuery' }))
-
-    await act(async () => {
-      await result.current.validateDestinationConfiguration({
-        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
-        onValidationFail,
-      })
-    })
-
-    expect(result.current.destinationValidationFailures).toEqual([
-      {
-        failure_type: 'critical',
-        name: 'Could not test connection',
-        reason:
-          "We couldn't test this destination. Check your credentials and connection settings, then try again.",
-      },
-    ])
-    expect(onValidationFail).toHaveBeenCalledOnce()
-  })
-
-  it('blocks the connection step when destination validation returns a critical failure', async () => {
-    const failure = {
-      failure_type: 'critical',
-      name: 'BigQuery connection failed',
-      reason: 'Check the destination credentials.',
-    }
-    mocks.validateDestination.mockResolvedValue({ validation_failures: [failure] })
-    const onValidationFail = vi.fn()
-    const { result } = renderHook(() => useDestinationForm({ selectedType: 'BigQuery' }))
-
-    let validationResult: Awaited<
-      ReturnType<typeof result.current.validateDestinationConfiguration>
-    >
-    await act(async () => {
-      validationResult = await result.current.validateDestinationConfiguration({
-        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
-        onValidationFail,
-      })
-    })
-
-    expect(validationResult!).toEqual({ canContinue: false, warnings: [] })
-    expect(onValidationFail).toHaveBeenCalledOnce()
-  })
-
   it('blocks creation when pipeline validation returns a critical failure', async () => {
     validationResponse = {
       validation_failures: [
@@ -349,5 +285,85 @@ describe('useDestinationForm', () => {
     expect(onClose).not.toHaveBeenCalled()
     expect(startRequests).not.toHaveBeenCalled()
     expect(result.current.requestStatus).toBe(PipelineStatusRequestStatus.None)
+  })
+
+  it('validates only the destination while authorising the connection', async () => {
+    const destinationValidateRequests: unknown[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: async ({ request }) => {
+        destinationValidateRequests.push(await request.json())
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [],
+        })
+      },
+    })
+    const { result } = await renderDestinationForm()
+    await act(async () => {
+      expect(
+        await result.current.validateDestinationConfiguration({
+          data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+          onValidationFail: vi.fn(),
+        })
+      ).toEqual({ canContinue: true, warnings: [] })
+    })
+    expect(destinationValidateRequests).toHaveLength(1)
+    expect(validationRequests).toHaveLength(0)
+  })
+
+  it('shows destination request errors as persistent validation failures', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Invalid validation request' }, { status: 400 }),
+    })
+    const onValidationFail = vi.fn()
+    const { result } = await renderDestinationForm()
+    await act(async () => {
+      await result.current.validateDestinationConfiguration({
+        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+        onValidationFail,
+      })
+    })
+    expect(result.current.destinationValidationFailures).toEqual([
+      {
+        failure_type: 'critical',
+        name: 'Could not test connection',
+        reason:
+          "We couldn't test this destination. Check your credentials and connection settings, then try again.",
+      },
+    ])
+    expect(onValidationFail).toHaveBeenCalledOnce()
+  })
+
+  it('blocks the connection step when destination validation returns a critical failure', async () => {
+    const failure = {
+      failure_type: 'critical' as const,
+      name: 'BigQuery connection failed',
+      reason: 'Check the destination credentials.',
+    }
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: () =>
+        HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [failure],
+        }),
+    })
+    const onValidationFail = vi.fn()
+    const { result } = await renderDestinationForm()
+    let validationResult: Awaited<
+      ReturnType<typeof result.current.validateDestinationConfiguration>
+    >
+    await act(async () => {
+      validationResult = await result.current.validateDestinationConfiguration({
+        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+        onValidationFail,
+      })
+    })
+    expect(validationResult!).toEqual({ canContinue: false, warnings: [] })
+    expect(onValidationFail).toHaveBeenCalledOnce()
   })
 })

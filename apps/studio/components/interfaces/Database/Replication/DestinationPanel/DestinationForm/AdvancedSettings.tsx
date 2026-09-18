@@ -5,7 +5,6 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Badge,
   cn,
   FormControl,
   FormField,
@@ -21,6 +20,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
@@ -65,9 +65,9 @@ export const AdvancedSettings = ({
         : ALL_DESCRIPTION
 
   const handleNumberChange =
-    (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value
-      field.onChange(val === '' ? undefined : Number(val))
+    (field: { onChange: (value: number | '') => void }) => (e: ChangeEvent<HTMLInputElement>) => {
+      const parsed = e.target.valueAsNumber
+      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? '' : parsed)
     }
 
   return (
@@ -225,18 +225,13 @@ export const AdvancedSettings = ({
                   name="connectionPoolSize"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={
-                        group === 'all' ? (
-                          <div className="flex flex-col gap-y-2">
-                            <span>Connection pool size</span>
-                            <Badge className="w-min">BigQuery only</Badge>
-                          </div>
-                        ) : (
-                          'Connection pool size'
-                        )
-                      }
+                      label="Connection pool size"
                       layout="horizontal"
-                      description="Number of BigQuery connections used for destination writes."
+                      description={
+                        group === 'all'
+                          ? 'BigQuery only. Number of BigQuery connections used for destination writes.'
+                          : 'Number of BigQuery connections used for destination writes.'
+                      }
                     >
                       <FormControl>
                         <InputGroup>
@@ -263,18 +258,13 @@ export const AdvancedSettings = ({
                   name="maxStalenessMins"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={
-                        group === 'all' ? (
-                          <div className="flex flex-col gap-y-2">
-                            <span>Maximum staleness</span>
-                            <Badge className="w-min">BigQuery only</Badge>
-                          </div>
-                        ) : (
-                          'Maximum staleness'
-                        )
-                      }
+                      label="Maximum staleness"
                       layout="horizontal"
-                      description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
+                      description={
+                        group === 'all'
+                          ? 'BigQuery only. Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results.'
+                          : 'Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results.'
+                      }
                     >
                       <FormControl>
                         <InputGroup>
@@ -295,6 +285,19 @@ export const AdvancedSettings = ({
                   )}
                 />
               </>
+            )}
+
+            {showData && type === 'BigQuery' && (
+              <div className="flex flex-col gap-y-3">
+                <div className="flex flex-col gap-y-1">
+                  <span className="text-sm text-foreground">Table layout</span>
+                  <p className="text-sm text-foreground-lighter">
+                    Partitioning and clustering for each BigQuery table. Applied when a destination
+                    table is first created or reset.
+                  </p>
+                </div>
+                <TableOptions control={form.control} />
+              </div>
             )}
           </AccordionContent>
         </AccordionItem>

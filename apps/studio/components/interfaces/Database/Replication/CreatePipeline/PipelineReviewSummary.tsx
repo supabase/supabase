@@ -42,9 +42,9 @@ import {
   PipelineValidationAdmonition,
   SANDWICHED_ADMONITION_CLASS,
 } from './PipelineValidationAdmonition'
-import type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
 import type { ReplicationPublicationData } from '@/data/replication/publication-query'
+import type { TableSyncCopyConfig } from '@/data/replication/types'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 const tableLabel = ({ schema, name }: { schema: string; name: string }) => `${schema}.${name}`
@@ -95,9 +95,7 @@ export const PipelineReviewSummary = ({
     publication && publication.name === values.publicationName ? publication.tables : []
   const selectedTables = values.tableSyncCopyTableIds
     .map((id) => publicationTables.find((table) => String(table.id) === id))
-    .filter(
-      (table): table is ReplicationPublicationData['tables'][number] => table != null
-    )
+    .filter((table): table is ReplicationPublicationData['tables'][number] => table != null)
     .map(tableLabel)
 
   const namespace =

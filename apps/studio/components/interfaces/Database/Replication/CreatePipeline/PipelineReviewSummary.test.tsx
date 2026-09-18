@@ -13,7 +13,7 @@ const values = {
   tableSyncCopyTableIds: [],
   projectId: 'gcp-project',
   datasetId: 'dataset',
-} as DestinationPanelSchemaType
+} as unknown as DestinationPanelSchemaType
 
 describe('PipelineReviewSummary', () => {
   test('jumps to the matching step from each Edit control', () => {

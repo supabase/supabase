@@ -36,7 +36,10 @@ import {
 import { BigQueryFields } from '../DestinationPanel/DestinationForm/BigQuery/Fields'
 import { getClickHouseValidationIssues } from '../DestinationPanel/DestinationForm/ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from '../DestinationPanel/DestinationForm/ClickHouse/Fields'
-import { DestinationPanelFormSchema as FormSchema } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
+import {
+  DestinationPanelFormSchema as FormSchema,
+  type DestinationPanelSchemaType,
+} from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import {
   areValidationFailuresEqual,
   buildTableSyncCopyConfig,
@@ -279,13 +282,11 @@ export const CreatePipelineWizard = () => {
   })
 
   const { isDirty } = form.formState
-  const formValues = useWatch({ control: form.control }) ?? defaultValues
-  const reviewValues = { ...defaultValues, ...formValues }
+  const formValues = useWatch({ control: form.control })
+  const reviewValues = { ...defaultValues, ...formValues } as DestinationPanelSchemaType
   const { publicationName } = formValues
-  const {
-    data: selectedPublication,
-    isSuccess: isSuccessPublication,
-  } = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
+  const { data: selectedPublication, isSuccess: isSuccessPublication } =
+    useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
   const connectionSignature = JSON.stringify([
     selectedType,
     ...(selectedType === null

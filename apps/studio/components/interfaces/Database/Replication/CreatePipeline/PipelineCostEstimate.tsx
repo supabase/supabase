@@ -15,10 +15,10 @@ import {
   getTableCopyTargets,
   summarizeTableCopyEstimate,
   type ReplicationTableIdentity,
-  type TableSyncCopyConfig,
 } from '../TableSyncCopy.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
+import type { TableSyncCopyConfig } from '@/data/replication/types'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
 
