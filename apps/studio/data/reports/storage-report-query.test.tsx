@@ -9,12 +9,14 @@ import { useStorageReport } from './storage-report-query'
 import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
+const route = vi.hoisted(() => ({ ref: undefined as string | undefined }))
+
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return {
     ...actual,
     IS_PLATFORM: true,
-    useParams: () => ({ ref: 'default' }),
+    useParams: () => ({ ref: route.ref }),
   }
 })
 
@@ -26,23 +28,29 @@ vi.mock('@/lib/constants', async (importOriginal) => {
 type AnalyticsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
 describe('useStorageReport', () => {
-  it('waits for flags before sending matching ClickHouse SQL to the OTEL endpoint', async () => {
-    const legacySql: string[] = []
-    const otelSql: string[] = []
+  it('waits for a project ref before sending matching ClickHouse SQL to the OTEL endpoint', async () => {
+    const legacyRequests: Array<{ projectRef: string; sql: string }> = []
+    const otelRequests: Array<{ projectRef: string; sql: string }> = []
 
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref/analytics/endpoints/logs.all',
-      response: ({ request }) => {
-        legacySql.push(new URL(request.url).searchParams.get('sql') ?? '')
+      response: ({ request, params }) => {
+        legacyRequests.push({
+          projectRef: String(params.ref),
+          sql: new URL(request.url).searchParams.get('sql') ?? '',
+        })
         return HttpResponse.json<AnalyticsResponse>({ result: [] })
       },
     })
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
-      response: ({ request }) => {
-        otelSql.push(new URL(request.url).searchParams.get('sql') ?? '')
+      response: ({ request, params }) => {
+        otelRequests.push({
+          projectRef: String(params.ref),
+          sql: new URL(request.url).searchParams.get('sql') ?? '',
+        })
         return HttpResponse.json<AnalyticsResponse>({ result: [] })
       },
     })
@@ -50,32 +58,38 @@ describe('useStorageReport', () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     })
-    let flags: FeatureFlagContextType = { configcat: {}, posthog: {}, hasLoaded: false }
+    const flags: FeatureFlagContextType = {
+      configcat: { otelReports: true },
+      posthog: {},
+      hasLoaded: true,
+    }
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <FeatureFlagContext.Provider value={flags}>
         <CustomWrapper queryClient={queryClient}>{children}</CustomWrapper>
       </FeatureFlagContext.Provider>
     )
 
-    const { result, rerender } = renderHook(() => useStorageReport(), { wrapper })
+    route.ref = undefined
+    const { rerender } = renderHook(() => useStorageReport(), { wrapper })
 
     await act(async () => {
       await Promise.resolve()
-      await result.current.refresh()
     })
 
-    expect(result.current.isLoading).toBe(true)
-    expect(legacySql).toHaveLength(0)
-    expect(otelSql).toHaveLength(0)
+    expect(queryClient.isFetching()).toBe(0)
+    expect(legacyRequests).toHaveLength(0)
+    expect(otelRequests).toHaveLength(0)
 
-    flags = { configcat: { otelReports: true }, posthog: {}, hasLoaded: true }
+    route.ref = 'real-project-ref'
     rerender()
 
-    await waitFor(() => expect(otelSql.length).toBeGreaterThan(0))
+    await waitFor(() => expect(otelRequests).toHaveLength(9))
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
 
-    expect(legacySql).toHaveLength(0)
-    for (const sql of otelSql) {
+    expect(legacyRequests).toHaveLength(0)
+    expect(otelRequests).toHaveLength(9)
+    for (const { projectRef, sql } of otelRequests) {
+      expect(projectRef).toBe('real-project-ref')
       expect(sql).toContain('from logs')
       expect(sql).toContain("source = 'edge_logs'")
       expect(sql).not.toContain('from edge_logs')

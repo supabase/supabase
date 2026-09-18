@@ -47,7 +47,7 @@ type PresetHooks = Record<keyof PresetConfig['queries'], () => PresetHookResult>
  */
 export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
-  projectRef: string,
+  projectRef?: string,
   useOtel = false,
   enabled = true
 ): PresetHooks => {

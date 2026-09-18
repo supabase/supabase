@@ -15,25 +15,26 @@ export const useStorageReport = () => {
   const state = useDatabaseSelectorStateSnapshot()
   const desiredUseOtel = useFlag('otelReports')
   const { hasLoaded: hasLoadedFlags } = useContext(FeatureFlagContext)
-  const [appliedUseOtel, setAppliedUseOtel] = useState<boolean | null>(() =>
-    IS_PLATFORM ? null : false
-  )
+  const [appliedUseOtel, setAppliedUseOtel] = useState<boolean | null>(null)
 
   const identifier = state.selectedDatabaseId
   const hasAppliedQueryMode = appliedUseOtel !== null
   const useOtel = appliedUseOtel ?? false
+  const resolvedProjectRef = IS_PLATFORM ? projectRef : (projectRef ?? 'default')
+  const hasResolvedProjectRef = !IS_PLATFORM || projectRef !== undefined
+  const areQueriesReady = hasAppliedQueryMode && hasResolvedProjectRef
 
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
     PRESET_CONFIG.api.queries,
-    projectRef ?? 'default',
+    resolvedProjectRef,
     useOtel,
-    hasAppliedQueryMode
+    areQueriesReady
   )
   const storageQueryHooks = queriesFactory<keyof typeof PRESET_CONFIG.storage.queries>(
     PRESET_CONFIG.storage.queries,
-    projectRef ?? 'default',
+    resolvedProjectRef,
     useOtel,
-    hasAppliedQueryMode
+    areQueriesReady
   )
   const totalRequests = queryHooks.totalRequests()
   const topRoutes = queryHooks.topRoutes()
@@ -57,7 +58,7 @@ export const useStorageReport = () => {
   ]
 
   const handleRefresh = async () => {
-    if (!hasAppliedQueryMode) return
+    if (!areQueriesReady) return
     activeHooks.forEach((hook) => hook.runQuery())
   }
   const handleSetParams = (params: Partial<LogsEndpointParams>) => {
@@ -155,7 +156,7 @@ export const useStorageReport = () => {
     setAppliedUseOtel(nextUseOtel)
   }, [JSON.stringify(formattedFilters), desiredUseOtel, hasLoadedFlags])
 
-  const isLoading = !hasAppliedQueryMode || activeHooks.some((hook) => hook.isLoading)
+  const isLoading = !areQueriesReady || activeHooks.some((hook) => hook.isLoading)
 
   return {
     data: {
