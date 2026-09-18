@@ -262,7 +262,12 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
       // don't update if the value is truncated. This is to enable the user to change cell values on rows which have
       // truncated JSON values. If the user
       const isTruncated = isValueTruncated(field?.value, field?.format)
-      if (!isTruncated) {
+      // only send edited values: re-sending an untouched json/jsonb value passes it through
+      // JSON.parse, which rounds integers above 2^53 and turns values beyond 1.8e308 into null
+      const originalValue = parseValue(originalRow[property], type)
+      // The JSON editor saves NULL as the string "null"
+      const editedValue = field?.value === 'null' ? null : field?.value
+      if (!isTruncated && editedValue !== originalValue) {
         payload[property] = rowObject[property]
       }
     } else {
