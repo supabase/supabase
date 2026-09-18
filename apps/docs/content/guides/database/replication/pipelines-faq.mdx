@@ -26,7 +26,21 @@ Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availab
 
 ## What does Pipelines install in the database?
 
-An event trigger detects supported schema changes, and tables in the `etl` schema track replication state. Disabling Pipelines removes these objects.
+Pipelines installs objects in your project's Postgres database to track replication and support schema changes:
+
+- An `etl` schema containing internal tables for replication state and progress, source table schemas, destination mappings, and migration history.
+- Helper functions in `etl` that read table definitions and prepare schema-change messages.
+- A database event trigger, `supabase_etl_ddl_message_trigger`, that runs after `ALTER TABLE` and `ALTER PUBLICATION`. It writes schema-change information for published tables to the write-ahead log (WAL), so Pipelines can process supported changes alongside row changes.
+
+Each pipeline also uses replication slots to track its position in WAL. See [initial sync and table-sync slots](/docs/guides/database/replication/pipelines-monitoring#initial-sync-and-table-sync-slots) for how these retain changes during replication.
+
+<Admonition type="caution">
+
+The `etl` schema is reserved for Pipelines. If your application already uses a schema named `etl`, rename it and update references to it before enabling Pipelines. Do not add application objects to the Pipelines-managed schema or include it in a publication.
+
+</Admonition>
+
+To remove the installed objects, delete all pipelines, then [disable Pipelines](#what-happens-when-you-disable-pipelines).
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -42,7 +56,9 @@ Support differs by destination. Check the [schema-change guides](/docs/guides/da
 
 ## What happens when you disable Pipelines?
 
-Pipelines removes its event trigger and replication state tables from Postgres. Existing destination data remains. Delete all pipelines first, then follow [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines).
+Disabling Pipelines removes its database event trigger and the entire Pipelines-managed `etl` schema, including its tables and helper functions. Your source application tables and existing destination data remain.
+
+Delete all pipelines first, then follow [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines). Deleting the pipelines alone does not remove the shared database installation.
 
 ## Why is a table not being replicated?
 

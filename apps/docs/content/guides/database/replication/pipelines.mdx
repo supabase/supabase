@@ -37,6 +37,12 @@ Choose one of these options:
 
 ### Step 2: Enable Pipelines
 
+<Admonition type="note">
+
+Pipelines installs an `etl` schema and a database event trigger to track replication and schema changes. If your application already has an `etl` schema, rename it before enabling Pipelines. See [what Pipelines installs and how to remove it](/docs/guides/database/replication/pipelines-faq#what-does-pipelines-install-in-the-database).
+
+</Admonition>
+
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add pipeline** to show the replication side panel
 3. Select a destination available to your organization
@@ -217,9 +223,18 @@ for tables in schema public;
 
 This tracks changes for all existing and future tables in the `public` schema.
 
+To include multiple application schemas, pass a comma-separated list. For example, if your tables are in `public` and `analytics`:
+
+```sql
+create publication pub_application_schemas
+for tables in schema public, analytics;
+```
+
+Both schemas must already exist. This includes their existing and future tables without including the internal `etl` schema. Restart the pipeline after adding new tables so it discovers them. See [Postgres schema publications](https://www.postgresql.org/docs/15/sql-createpublication.html) for syntax and requirements.
+
 ### Publication for all tables
 
-Postgres supports `FOR ALL TABLES`, but Pipelines rejects these publications because they also include its internal `etl` metadata tables. Use `FOR TABLES IN SCHEMA public` or list application tables explicitly. If you already have a `FOR ALL TABLES` publication, create a replacement with a supported scope; Postgres cannot narrow it in place.
+Postgres supports `FOR ALL TABLES`, but Pipelines rejects these publications because they also include the [internal `etl` tables it installs](/docs/guides/database/replication/pipelines-faq#what-does-pipelines-install-in-the-database). Replicating those tables can interfere with Pipelines' own replication state. Use `FOR TABLES IN SCHEMA` with only your application schemas, as shown above, or list application tables explicitly. If you already have a `FOR ALL TABLES` publication, create a replacement with a supported scope; Postgres cannot narrow it in place.
 
 ### Advanced publication options
 
