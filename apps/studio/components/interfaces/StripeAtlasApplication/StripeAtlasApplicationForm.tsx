@@ -1,10 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button, Form, FormControl, FormField, Input } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import type { StripeAtlasApplicationData } from '@/data/stripe-atlas/stripe-atlas-application-query'
+import {
+  useStripeAtlasApplicationCompleteMutation,
+  type StripeAtlasApplicationData,
+} from '@/data/stripe-atlas/stripe-atlas-application-query'
 
 const FormSchema = z.object({
   firstname: z.string().trim().min(1, 'First name is required').max(100, 'Maximum 100 characters'),
@@ -28,10 +32,8 @@ type StripeAtlasApplicationFormProps = {
   application: StripeAtlasApplicationData
 }
 
-/** Prefilled from the Stripe Atlas application — submitting runs validation and stops there. */
+/** Prefilled from the Stripe Atlas application the token resolves to. */
 export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicationFormProps) => {
-  // todo(@juleswritescode): submit via the /platform/stripe/atlas/application/complete endpoint.
-
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -42,9 +44,32 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
     },
   })
 
+  const {
+    mutate: completeApplication,
+    isPending,
+    isSuccess,
+    variables,
+  } = useStripeAtlasApplicationCompleteMutation()
+
+  if (isSuccess) {
+    return (
+      <Admonition
+        type="success"
+        title="Application confirmed"
+        description={<p>We've sent your credit code to {variables.email}.</p>}
+      />
+    )
+  }
+
   return (
     <Form {...form}>
-      <form noValidate className="flex flex-col gap-4" onSubmit={form.handleSubmit(() => {})}>
+      <form
+        noValidate
+        className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit((values) =>
+          completeApplication({ ...values, stripeAtlasToken: application.stripeAtlasToken })
+        )}
+      >
         <div className="grid grid-cols-2 gap-3">
           <FormField
             control={form.control}
@@ -99,8 +124,8 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
           )}
         />
 
-        <Button block size="medium" type="submit">
-          Submit Application
+        <Button block size="medium" type="submit" loading={isPending} disabled={isPending}>
+          {isPending ? 'Confirming application...' : 'Confirm application'}
         </Button>
       </form>
     </Form>
