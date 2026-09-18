@@ -221,7 +221,6 @@ export default process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VER
   ? withSentryConfig(platformConfig, {
       silent: false,
       debug: true,
-      sourcemaps: { disable: true },
 
       // For all available options, see:
       // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
