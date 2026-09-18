@@ -48,6 +48,19 @@ export function getPathAlongFoldersToIndex(
 }
 
 /**
+ * Splits a `?path` query param value into folder segments.
+ */
+export function parseStoragePath(value: string | null | undefined): string[] {
+  if (!value) return []
+  return value.split('/').filter((segment) => segment.length > 0)
+}
+
+/** Joins folder segments into `?path`; empty at the root so nuqs' `clearOnDefault` strips it. */
+export function serializeStoragePath(paths: string[]): string {
+  return paths.filter((segment) => segment.length > 0).join('/')
+}
+
+/**
  * Returns an error message string if the folder name contains invalid characters,
  * or null if the name is valid.
  */
