@@ -32,7 +32,6 @@ type StripeAtlasApplicationFormProps = {
   application: StripeAtlasApplicationData
 }
 
-/** Prefilled from the Stripe Atlas application the token resolves to. */
 export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicationFormProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),

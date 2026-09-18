@@ -1,19 +1,10 @@
 import { queryOptions, useMutation } from '@tanstack/react-query'
+import type { platformComponents } from 'api-types'
 import { toast } from 'sonner'
-import { z } from 'zod'
 
 import { stripeAtlasKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
-
-/** Mirrors `PerkApplicationDataSchema` in the platform API. */
-const stripeAtlasApplicationSchema = z.object({
-  stripeAtlasToken: z.string(),
-  firstname: z.string().optional(),
-  lastname: z.string().optional(),
-  email: z.string().optional(),
-  companyName: z.string().optional(),
-})
 
 export type StripeAtlasApplicationVariables = {
   stripeAtlasToken?: string
@@ -27,17 +18,16 @@ async function getStripeAtlasApplication(
     throw new Error('stripeAtlasToken is required')
   }
 
-  const { data, error } = await post(
-    // @ts-expect-error waiting for API PR
-    '/platform/stripe/atlas/application',
-    { body: { stripeAtlasToken }, signal }
-  )
+  const { data, error } = await post('/platform/stripe/atlas/application', {
+    body: { stripeAtlasToken },
+    signal,
+  })
 
   if (error) {
     handleError(error)
   }
 
-  return stripeAtlasApplicationSchema.parse(data)
+  return data
 }
 
 export type StripeAtlasApplicationData = Awaited<ReturnType<typeof getStripeAtlasApplication>>
@@ -51,23 +41,17 @@ export const stripeAtlasApplicationQueryOptions = ({
     enabled: typeof stripeAtlasToken !== 'undefined',
   })
 
-export type CompleteStripeAtlasApplicationVariables = {
-  stripeAtlasToken: string
-  firstname: string
-  lastname: string
-  companyName: string
-  email: string
-}
+export type CompleteStripeAtlasApplicationVariables =
+  platformComponents['schemas']['StripeAtlasCompleteApplicationRequestBody']
 
 async function completeStripeAtlasApplication(
   payload: CompleteStripeAtlasApplicationVariables,
   signal?: AbortSignal
 ) {
-  const { data, error } = await post(
-    // @ts-expect-error waiting for API PR
-    '/platform/stripe/atlas/application/complete',
-    { body: payload, signal }
-  )
+  const { data, error } = await post('/platform/stripe/atlas/application/complete', {
+    body: payload,
+    signal,
+  })
 
   if (error) {
     handleError(error)

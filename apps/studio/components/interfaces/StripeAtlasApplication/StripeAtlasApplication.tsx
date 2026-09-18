@@ -38,10 +38,6 @@ const base64DataSchema = z.discriminatedUnion('type', [
 ])
 type Base64Data = z.infer<typeof base64DataSchema>
 
-/**
- * The submit mutation is still unwired — the form prefills from the API, but submitting only
- * runs validation.
- */
 export const StripeAtlasApplicationScreen = () => {
   const params = useParams()
 
