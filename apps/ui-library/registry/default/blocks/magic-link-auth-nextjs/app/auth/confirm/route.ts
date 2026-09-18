@@ -9,16 +9,20 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
   const _next = searchParams.get('next')
-  // only follow relative paths or same-origin URLs to prevent open redirects
+  // only follow local paths or same-origin URLs to prevent open redirects
+  const isLocalPath = (path: string) =>
+    path.startsWith('/') && !path.startsWith('//') && !path.startsWith('/\\')
   let next = '/'
   if (_next) {
-    if (_next.startsWith('/') && !_next.startsWith('//') && !_next.startsWith('/\\')) {
+    if (isLocalPath(_next)) {
       next = _next
     } else {
       try {
         const nextUrl = new URL(_next)
-        if (nextUrl.origin === origin) {
-          next = nextUrl.pathname + nextUrl.search + nextUrl.hash
+        const candidate = nextUrl.pathname + nextUrl.search + nextUrl.hash
+        // same-origin URLs can still carry a protocol-relative path: https://app.com//evil.com
+        if (nextUrl.origin === origin && isLocalPath(candidate)) {
+          next = candidate
         }
       } catch {
         // not a valid URL, keep the default
