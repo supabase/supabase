@@ -1,9 +1,4 @@
 export const CONSENT_COPY = {
-  unverifiedPublisher:
-    'Publishers are currently not verified by Supabase. Only continue if you trust this entity.',
-  workspaceReuse:
-    "Some clients may reuse one authorization across workspaces. Check your client's workspace or account settings if project access does not behave as expected.",
-  dynamicClient: 'This client was registered automatically. Supabase sets its access settings.',
   allProjectsOption: 'All current and future projects',
   selectionRequired: 'Must select at least one project to authorize.',
   maxProjectsReached: 'Maximum reached. Deselect a project to choose a different one.',

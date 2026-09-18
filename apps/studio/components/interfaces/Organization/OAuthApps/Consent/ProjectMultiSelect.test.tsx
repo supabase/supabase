@@ -2,12 +2,13 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { ProjectMultiSelect } from './ProjectMultiSelect'
-import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
+import { ADMINISTRATOR_ROLE, DEVELOPER_ROLE } from '@/data/oauth-apps/mocks'
+import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
 import { customRender } from '@/tests/lib/custom-render'
 
 const PROJECTS: OAuthAppsAuthorizeOrganizationProject[] = [
-  { ref: 'project-1', name: 'production', role: 'administrator' },
-  { ref: 'project-2', name: 'staging', role: 'developer' },
+  { ref: 'project-1', name: 'production', role: ADMINISTRATOR_ROLE },
+  { ref: 'project-2', name: 'staging', role: DEVELOPER_ROLE },
 ]
 
 const MANY_PROJECTS: OAuthAppsAuthorizeOrganizationProject[] = Array.from(
@@ -15,7 +16,7 @@ const MANY_PROJECTS: OAuthAppsAuthorizeOrganizationProject[] = Array.from(
   (_, index) => ({
     ref: `project-${index + 1}`,
     name: `project ${index + 1}`,
-    role: 'developer' as const,
+    role: DEVELOPER_ROLE,
   })
 )
 

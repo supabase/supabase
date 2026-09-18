@@ -4,15 +4,13 @@ import { Button } from 'ui'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import type {
   OAuthAppsAuthorizeOrganizationProject,
-  OAuthGrantProjectScope,
   OAuthScopeGroup,
 } from '@/data/oauth-apps/types'
-import { isAllProjectsScope } from '@/data/oauth-apps/types'
 
 export type AuthorizeSuccessGrant = {
   email: string
   organization_slug: string
-  project_scope: OAuthGrantProjectScope
+  project_refs: string[] | null
   projects: OAuthAppsAuthorizeOrganizationProject[]
   scope_groups: OAuthScopeGroup[]
 }
@@ -35,13 +33,15 @@ export const AuthorizeSuccessScreen = ({
   grant,
   onReturn,
 }: AuthorizeSuccessScreenProps) => {
+  const hasAllProjects = grant.project_refs === null
+
   return (
     <div className="flex flex-col gap-6 px-6 pb-6">
       <div className="divide-y rounded-md border bg-surface-75 px-4">
         <DetailRow label="Authorized by">{grant.email}</DetailRow>
         <DetailRow label="Organization">{grant.organization_slug}</DetailRow>
         <DetailRow label="Projects">
-          {isAllProjectsScope(grant.project_scope) ? (
+          {hasAllProjects ? (
             'All projects, including ones created later'
           ) : (
             <span className="flex flex-wrap justify-end gap-x-1">

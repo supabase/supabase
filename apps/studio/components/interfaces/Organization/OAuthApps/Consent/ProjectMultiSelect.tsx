@@ -10,7 +10,7 @@ import {
 } from 'ui-patterns/multi-select'
 
 import { CONSENT_COPY } from './OAuthAppsAuthorizeScreen.utils'
-import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
+import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
 
 export const MAX_SELECTED_PROJECTS = 10
 
