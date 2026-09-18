@@ -22,18 +22,22 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ExplorerToolbarAction } from './ExplorerToolbar'
 import { useCreateNotebook } from './hooks'
-import { createQueryCellSkeleton } from './utils'
+import { createLogCellSkeleton, createQueryCellSkeleton } from './utils'
 import { getNotebook } from '@/data/content/notebooks/notebook-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
 interface SaveQueryDropdownProps {
   query: { title: string; sql: string }
+  /** Saves as a log cell when the query targets logs. Defaults to a database cell. */
+  source?: QuerySourceBinding
 }
 
 export const SaveQueryDropdown = ({
   children,
   query,
+  source,
 }: PropsWithChildren<SaveQueryDropdownProps>) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -53,9 +57,14 @@ export const SaveQueryDropdown = ({
     return items
   }, [notebooksData?.pages])
 
+  const createCell = () =>
+    source?._tag === 'logs'
+      ? createLogCellSkeleton({ ...query, time_range: source.time_range })
+      : createQueryCellSkeleton(query)
+
   const onAddToNewNotebook = () => {
     createNotebook({
-      cells: [createQueryCellSkeleton(query)],
+      cells: [createCell()],
     })
   }
 
@@ -69,7 +78,7 @@ export const SaveQueryDropdown = ({
 
       notebooksSnap.insertCellAfter({
         id: notebookId,
-        cell: createQueryCellSkeleton(query),
+        cell: createCell(),
       })
       notebooksSnap.requestScrollToBottom(notebookId)
 
