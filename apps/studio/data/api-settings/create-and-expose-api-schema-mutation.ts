@@ -77,6 +77,7 @@ export const useCreateAndExposeAPISchemaMutation = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) }),
         queryClient.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },
