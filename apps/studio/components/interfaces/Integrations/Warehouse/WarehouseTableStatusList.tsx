@@ -25,7 +25,6 @@ import {
 import type { WarehouseSetupTable } from './Warehouse.utils'
 import { StateDot, type StateDotVariant } from '@/components/ui/StateDot'
 import type { WarehouseSetupStatusResponse } from '@/data/warehouse/warehouse-setup-status-query'
-import { formatBytes } from '@/lib/helpers'
 
 const TABLE_STATE: Record<
   WarehouseSetupTable['state'],
@@ -80,7 +79,6 @@ const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => 
             <TableRow>
               <TableHead>Table</TableHead>
               <TableHead className="w-36">Lag</TableHead>
-              <TableHead className="w-28">Size</TableHead>
               <TableHead className="w-36">Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -96,11 +94,6 @@ const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => 
                   <TableCell>
                     <TableLag table={table} />
                   </TableCell>
-                  <TableCell className="text-foreground-light tabular-nums">
-                    {table.warehouse_size_bytes !== undefined
-                      ? formatBytes(table.warehouse_size_bytes)
-                      : null}
-                  </TableCell>
                   <TableCell>
                     <StateDot variant={state.variant} isPulsing={state.isPulsing}>
                       {state.label}
@@ -111,7 +104,7 @@ const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => 
             })}
             {tables.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="text-foreground-lighter">
+                <TableCell colSpan={3} className="text-foreground-lighter">
                   No tables are being copied yet.
                 </TableCell>
               </TableRow>

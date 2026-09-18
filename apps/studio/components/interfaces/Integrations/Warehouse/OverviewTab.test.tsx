@@ -225,6 +225,8 @@ describe('WarehouseOverviewTab', () => {
     expect(screen.getByText('Live')).toBeInTheDocument()
     expect(screen.getByText('Backfilling')).toBeInTheDocument()
     expect(screen.getByText('Error')).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Lag' })).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: 'Size' })).not.toBeInTheDocument()
 
     const headings = screen
       .getAllByRole('heading')
