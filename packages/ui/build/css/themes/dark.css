@@ -1,7 +1,7 @@
 [data-theme='dark'],
 .dark {
   --helpers-os-appearance: Dark;
-  --hue: 159;
+  --hue: 157.5;
   --chroma: 0.005;
   --surface: 0.19;
   --elevation-step: 0.025;

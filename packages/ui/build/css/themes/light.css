@@ -1,7 +1,7 @@
 [data-theme='light'],
 .light {
   --helpers-os-appearance: Light;
-  --hue: 159;
+  --hue: 157.5;
   --surface-hue: 34;
   --chroma: 0;
   /*
@@ -16,14 +16,20 @@
   --foreground-lightness: 0.1;
   --muted-foreground-level: 0.65;
   --tertiary-foreground-level: 0.5;
-  --primary: oklch(0.545 0.10433 var(--primary-hue));
+  /*
+   * Light primary tracks brand-text lightness/chroma: 
+   * slightly darker for ~5:1 white-label contrast, richer chroma. 
+   * Hue comes from --primary-hue.
+   */
+  --primary: oklch(0.525 0.12 var(--primary-hue));
   --primary-foreground: oklch(0.99 0.00275 var(--primary-hue));
   /*
    * Expressive fills run darker than the dark-theme anchors so they hold contrast
    * against the near-white surface (a light amber on white disappears). Lightness
    * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
-  --warning-lightness: 0.68;
+  --warning-hue: 58;
+  --warning-lightness: 0.58;
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;
 

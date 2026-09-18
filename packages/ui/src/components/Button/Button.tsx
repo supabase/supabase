@@ -44,10 +44,10 @@ const buttonVariants = cva(
         default: `
           text-foreground
           border-0
-          bg-card hover:bg-accent dark:bg-muted
+          bg-card hover:bg-muted dark:bg-muted dark:hover:bg-accent
           dark:bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
           shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_-1px_0_0_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
-          data-[state=open]:bg-popover dark:data-[state=open]:bg-accent
+          data-[state=open]:bg-muted dark:data-[state=open]:bg-accent
           `,
         secondary: `
           bg-foreground
@@ -87,20 +87,22 @@ const buttonVariants = cva(
           border-transparent
         `,
         danger: `
-          text-foreground
-          bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
-          border-border-destructive hover:border-destructive
-          hover:text-hi-contrast
-          data-[state=open]:border-destructive
-          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive/50
+          border-0
+          bg-destructive
+          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          text-destructive-foreground
+          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          hover:bg-[var(--destructive-hover)]
+          data-[state=open]:bg-[var(--destructive-hover)]
         `,
         warning: `
-          text-foreground
-          bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
-          border-border-warning hover:border-warning
-          hover:text-hi-contrast
-          data-[state=open]:border-warning
-          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning/50
+          border-0
+          bg-warning
+          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          text-warning-foreground
+          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          hover:bg-[var(--warning-hover)]
+          data-[state=open]:bg-[var(--warning-hover)]
         `,
       },
       block: {
@@ -109,10 +111,10 @@ const buttonVariants = cva(
       size: {
         // Larger sizes use a softer curve so radius stays proportional to height.
         tiny: `${SIZE_VARIANTS.tiny} rounded-md`,
-        small: `${SIZE_VARIANTS.small} rounded-md`,
-        medium: `${SIZE_VARIANTS.medium} rounded-lg`,
-        large: `${SIZE_VARIANTS.large} rounded-lg`,
-        xlarge: `${SIZE_VARIANTS.xlarge} rounded-xl`,
+        small: `${SIZE_VARIANTS.small} rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]`,
+        medium: `${SIZE_VARIANTS.medium} rounded-[calc(var(--radius-md)*(1+(38/26-1)*0.35))]`,
+        large: `${SIZE_VARIANTS.large} rounded-[calc(var(--radius-md)*(1+(42/26-1)*0.35))]`,
+        xlarge: `${SIZE_VARIANTS.xlarge} rounded-[calc(var(--radius-md)*(1+(50/26-1)*0.35))]`,
       },
       overlay: {
         base: `absolute inset-0 bg-background opacity-50`,
@@ -158,8 +160,8 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-lighter',
-      danger: 'text-destructive',
-      warning: 'text-warning',
+      danger: 'text-destructive-foreground/50',
+      warning: 'text-warning-foreground/50',
     },
   },
 })
@@ -176,8 +178,8 @@ const loadingVariants = cva('', {
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-muted',
-      danger: 'text-destructive',
-      warning: 'text-warning',
+      danger: 'text-destructive-foreground/50',
+      warning: 'text-warning-foreground/50',
     },
     loading: {
       default: '',
