@@ -1,0 +1,183 @@
+---
+title = "Import Lovable Cloud Data into Your Own Supabase Project"
+topics = [ "ai", "database" ]
+keywords = [ "lovable", "lovable cloud", "pg_restore", "import", "migration", "export" ]
+---
+
+## Overview
+
+Lovable Cloud provides a native data export that lets you move your project to a Supabase project you own. This guide covers the full migration, with special attention to the import step: restoring the export file and the manual fixes it needs afterwards.
+
+The order below is deliberate: you secure everything first (code, database export, storage files), then build and verify the new project, and only remove Lovable Cloud at the end. Your app keeps running on Cloud until its replacement is verified.
+
+| Step | What                                         | Why                                                             |
+| ---- | -------------------------------------------- | --------------------------------------------------------------- |
+| 0    | Connect GitHub                               | Your code, edge functions included, safe in your own repository |
+| 1    | Export your database and download the file   | Schema, data, policies, and users                               |
+| 2    | Download your storage files                  | Files don't travel in the export                                |
+| 3    | Create your new Supabase project             | The new home                                                    |
+| 4    | Restore the export                           | One command, plus three post-restore checks                     |
+| 5    | Upload your storage files                    | Into the restored buckets                                       |
+| 6    | Redeploy edge functions and re-enter secrets | Code from the repo, secrets by hand                             |
+| 7    | Remove Lovable Cloud                         | Only now, with everything safe                                  |
+| 8    | Connect your own Supabase project            | And keep building                                               |
+
+## What the export includes
+
+The export is a `pg_dump` archive in custom format with `zstd` compression, delivered as a `.zip` containing a `.backup` file. It includes:
+
+- Full schema: tables, indexes, sequences, and extensions
+- All table data
+- Row Level Security (RLS) policy definitions (verify that RLS is enabled on your tables after the restore)
+- Database functions and triggers
+- Auth users and identities, **including password hashes** — migrated users keep their original credentials
+
+It does **not** include:
+
+- Storage files (bucket and object metadata are restored, but the actual files don't travel)
+- Edge function code (it lives in your project's GitHub repository, under `supabase/functions/`)
+- Edge function secrets (never exportable; `vault.secrets` rows restore but can't be decrypted in another project)
+
+## Step 0: Connect GitHub
+
+The export carries your database but not your edge function code — that lives in your project's repository. In Lovable, open the menu next to the chat input and choose **GitHub > Connect**. Lovable creates a repository and keeps it in sync with your project. Your edge functions live in the `supabase/functions/` folder of that repository.
+
+![GitHub option in the Lovable editor menu](/docs/img/troubleshooting/import-lovable-cloud-data-to-supabase-0.png)
+
+## Step 1: Export your database
+
+In Lovable, open the project panel (layers icon in the top bar) and go to **Cloud > Overview > Advanced settings > Export project data**. Exports are limited to 5 GB, and you can request one export every 24 hours.
+
+![Export, Pause, and Remove options in Lovable Cloud Advanced settings](/docs/img/troubleshooting/import-lovable-cloud-data-to-supabase-1.png)
+
+The export is saved into your project's Cloud storage as a `database_export_DD_MM_YY` bucket:
+
+![Export bucket created in Cloud storage](/docs/img/troubleshooting/import-lovable-cloud-data-to-supabase-2.png)
+
+**Download the `.zip` now** and unzip it so you have the `.backup` file:
+
+![Download option for the export file](/docs/img/troubleshooting/import-lovable-cloud-data-to-supabase-3.png)
+
+<Admonition type="danger">
+
+The export is saved into the same Lovable Cloud storage you are about to remove. Download it **before** removing Lovable Cloud — once Cloud is removed, the export is deleted with it.
+
+</Admonition>
+
+## Step 2: Download your storage files
+
+The export carries your bucket and file listings, but not the files themselves. Download your files from **Cloud > Storage**, keeping the folder structure. You'll re-upload them in step 5.
+
+![Storage buckets in the Lovable Cloud panel](/docs/img/troubleshooting/import-lovable-cloud-data-to-supabase-4.png)
+
+## Step 3: Create your new Supabase project
+
+Create a project from the [Supabase Dashboard](/dashboard). Get its connection string under **Connect** — use the session pooler connection string.
+
+## Step 4: Restore the export
+
+This is the import itself, and it runs from a terminal.
+
+<Admonition type="note">
+
+The `.backup` file can't be imported through the Dashboard. The Table Editor's CSV import and the SQL editor can't carry password hashes, RLS policies, or the auth schema — the restore has to run with `pg_restore`.
+
+You need **`pg_restore` version 16 or newer, built with `zstd` support**. Older versions fail with `unsupported compression algorithm: zstd`. On macOS, `brew install libpq` provides a current build.
+
+</Admonition>
+
+Run from the folder containing the `.backup` file:
+
+```bash
+pg_restore --no-owner --no-privileges \
+  -d "postgresql://postgres.[project-ref]:[password]@[pooler-host]:5432/postgres" \
+  your-export.backup
+```
+
+Expect a long list of errors like `relation already exists` — this is normal. Your new Supabase project already ships with managed `auth` and `storage` schemas, and the archive tries to recreate them. Those statements fail harmlessly and your data restores around them.
+
+When the command finishes, your tables and data are visible in **Dashboard > Table Editor**. Then run these three checks:
+
+### Check 1: Auth identities
+
+Supabase stores users in `auth.users` and their login methods in `auth.identities`. Due to foreign key ordering during the restore, identities can fail to insert on the first pass. Check both counts:
+
+```sql
+select
+  (select count(*) from auth.users) as users,
+  (select count(*) from auth.identities) as identities;
+```
+
+If identities are missing, run a targeted second pass:
+
+```bash
+pg_restore --data-only -n auth -t identities \
+  -d "postgresql://postgres.[project-ref]:[password]@[pooler-host]:5432/postgres" \
+  your-export.backup
+```
+
+After this, migrated users can sign in with their original passwords.
+
+### Check 2: Scheduled jobs (cron)
+
+The export contains your `cron.job` rows, but the restore can't write them into the protected `cron` schema (`permission denied`). Recreate each job manually: enable the `pg_cron` extension (**Dashboard > Database > Extensions**), then in the SQL editor:
+
+```sql
+select cron.schedule('job-name', '0 4 * * *', $$ your job command $$);
+```
+
+<Admonition type="caution">
+
+If a job calls an edge function by URL, the command from the old project still points at the Lovable Cloud instance. The job appears to run but hits a dead endpoint. Check for stale URLs:
+
+```sql
+select jobname, command from cron.job where command like '%supabase.co%';
+```
+
+Update any matches with `cron.alter_job()`, using your new project's URL.
+
+</Admonition>
+
+### Check 3: Storage metadata without files
+
+The restore brings your buckets and object **metadata**, but not the files themselves. The app looks intact — bucket structure and file listings are all there — but every file returns 404 until you upload the actual files (step 5).
+
+If you prefer to start a bucket clean instead of re-uploading, delete the restored object rows through the [Storage API](/docs/reference/javascript/storage-from-remove) — deleting them with SQL is blocked by a protective trigger on `storage.objects`.
+
+## Step 5: Upload your storage files
+
+Your buckets already exist (the restore brought them). Upload the files from step 2 into **Dashboard > Storage**, keeping the same folder structure. With the [Supabase CLI](/docs/reference/cli/supabase-storage-cp) it's one command per bucket.
+
+## Step 6: Redeploy edge functions and re-enter secrets
+
+- **Edge functions:** the code is in your repository under `supabase/functions/`. Deploy with the [Supabase CLI](/docs/guides/functions/deploy), or ask the Lovable agent to deploy them after step 8.
+- **Secrets:** they were never exportable. Re-enter them under **Edge Functions > Secrets** in the Dashboard, or with `supabase secrets set`.
+- **Auth configuration:** reconfigure providers, redirect URLs, and email settings under **Authentication** in the Dashboard.
+
+## Step 7: Remove Lovable Cloud
+
+Only now, with your data, files, and functions verified on the new project: in Lovable, go to **Cloud > Overview > Advanced settings > Remove Lovable Cloud**. Lovable asks you to confirm the warnings and type the project name.
+
+![Remove Lovable Cloud confirmation dialog](/docs/img/troubleshooting/import-lovable-cloud-data-to-supabase-5.png)
+
+<Admonition type="danger">
+
+Removing Lovable Cloud permanently deletes the Cloud instance, including your database, users, storage, edge functions, secrets, and any exports still stored in it. This cannot be undone.
+
+</Admonition>
+
+## Step 8: Connect your own Supabase project
+
+After removal, connect the new project: in the Lovable project panel, use **"Already have a Supabase project? Connect it here"**, or follow Lovable's guide: [Connect to Supabase (Lovable Docs)](https://docs.lovable.dev/integrations/supabase).
+
+![Connect your own Supabase project after removing Lovable Cloud](/docs/img/troubleshooting/import-lovable-cloud-data-to-supabase-6.png)
+
+## Verify the migration
+
+- Sign in with an existing user and their original password
+- Compare table row counts against your pre-migration inventory
+- Confirm RLS is enabled on your tables (**Database > Tables**) — if any table shows RLS as disabled, enable it from the table's settings
+- Confirm scheduled jobs are listed and pointing at the new project: `select * from cron.job;`
+- Open a few storage files from the app
+
+For the context around this flow (why Cloud projects don't appear in your Dashboard, and what removing Cloud means), see [Can't Access Supabase Project When Using Lovable Cloud](/docs/guides/troubleshooting/cant-access-supabase-project-lovable-cloud).
