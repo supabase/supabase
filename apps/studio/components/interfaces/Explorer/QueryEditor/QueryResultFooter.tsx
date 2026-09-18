@@ -31,6 +31,7 @@ export const QueryResultFooter = ({
       {results && results.length > 0 && (
         <DownloadResultsButton
           enableCopyShortcuts={false}
+          align="end"
           variant="text"
           results={results}
           fileName={fileName ?? 'Results'}
