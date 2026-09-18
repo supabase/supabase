@@ -20,7 +20,6 @@ const buttonVariants = cva(
   font-medium
   ease-[cubic-bezier(0.22,1,0.36,1)]
   duration-200
-  rounded-md
   transition-[background-color,border-color,color,scale]
   motion-safe:active:scale-[0.97]
   focus-ring
@@ -108,7 +107,12 @@ const buttonVariants = cva(
         true: 'w-full flex items-center justify-center',
       },
       size: {
-        ...SIZE_VARIANTS,
+        // Larger sizes use a softer curve so radius stays proportional to height.
+        tiny: `${SIZE_VARIANTS.tiny} rounded-md`,
+        small: `${SIZE_VARIANTS.small} rounded-md`,
+        medium: `${SIZE_VARIANTS.medium} rounded-lg`,
+        large: `${SIZE_VARIANTS.large} rounded-lg`,
+        xlarge: `${SIZE_VARIANTS.xlarge} rounded-xl`,
       },
       overlay: {
         base: `absolute inset-0 bg-background opacity-50`,
