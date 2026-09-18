@@ -13,7 +13,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { DestinationIcon } from '../DestinationIcon'
+import { DestinationLogo } from '../DestinationLogo'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -170,12 +170,8 @@ export const DestinationTypeSelection = ({
                   id={`destination-type-${option.value}`}
                   value={option.value}
                   label={
-                    <span className="flex items-center gap-x-2">
-                      <DestinationIcon
-                        type={option.value}
-                        size={16}
-                        className="shrink-0 text-foreground-light"
-                      />
+                    <span className="flex items-center gap-x-3">
+                      <DestinationLogo type={option.value} />
                       {option.label}
                     </span>
                   }
@@ -215,11 +211,7 @@ export const DestinationTypeSelection = ({
           <SelectTrigger className="h-auto py-2">
             {selectedOption ? (
               <div className="flex items-center gap-x-3 text-left">
-                <DestinationIcon
-                  type={selectedOption.value}
-                  size={20}
-                  className="shrink-0 text-foreground-light"
-                />
+                <DestinationLogo type={selectedOption.value} />
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
               </div>
             ) : (
@@ -234,11 +226,7 @@ export const DestinationTypeSelection = ({
                 {group.options.map((option) => (
                   <SelectItem key={option.value} value={option.value} className="py-2">
                     <div className="flex items-center gap-x-3">
-                      <DestinationIcon
-                        type={option.value}
-                        size={20}
-                        className="shrink-0 text-foreground-light"
-                      />
+                      <DestinationLogo type={option.value} />
                       <div className="flex flex-col gap-y-0.5">
                         <span className="text-foreground">{option.label}</span>
                         <span className="text-xs text-foreground-lighter">
