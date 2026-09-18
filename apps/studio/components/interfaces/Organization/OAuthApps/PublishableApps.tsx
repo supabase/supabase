@@ -93,7 +93,7 @@ export const PublishableApps = () => {
     <PageSection id="published-apps" className="pt-12">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Published apps</PageSectionTitle>
+          <PageSectionTitle>Publishable apps</PageSectionTitle>
           <PageSectionDescription>
             Build integrations that extend Supabase's functionality
           </PageSectionDescription>
