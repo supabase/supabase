@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { motion } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Plus, SquareCode } from 'lucide-react'
 import Link from 'next/link'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -12,7 +12,7 @@ import {
   rowClassName,
 } from './ExplorerLayout.constants'
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
-import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
+import { useCreateChat, useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
@@ -26,6 +26,7 @@ export const ExplorerNavHome = ({
   const { ref } = useParams()
   const { openChat } = useCreateChat()
   const tabs = useTabsStateSnapshot()
+  const { createQuery } = useCreateQuery()
 
   const { data: notebooksData } = useNotebooksInfiniteQuery({ projectRef: ref, limit: 100 })
   const notebooks = notebooksData?.pages.flatMap((page) => page.content) ?? []
@@ -52,6 +53,16 @@ export const ExplorerNavHome = ({
       className="absolute inset-0 flex flex-col gap-4 overflow-y-auto p-3"
     >
       <nav className="flex flex-col gap-px">
+        <button
+          type="button"
+          tabIndex={0}
+          className={rowClassName(false)}
+          onClick={() => createQuery()}
+        >
+          <SquareCode size={14} className="shrink-0" />
+          <span className="flex-1 text-left">Run SQL</span>
+          <Plus size={14} className="shrink-0 text-foreground-muted" />
+        </button>
         {EXPLORER_SECTIONS.map(({ type, label, icon: Icon }) => {
           return (
             <button

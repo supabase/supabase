@@ -55,6 +55,7 @@ const ExplorerHomeContent = () => {
   const { createChat } = useCreateChat()
 
   const [value, setValue] = useState<string>('')
+  const isSqlQuery = isSqlStatement(value)
 
   return (
     <div className="flex flex-col h-full">
@@ -75,10 +76,14 @@ const ExplorerHomeContent = () => {
             placeholder="Explore your data, check project health, create a notebook..."
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(message) =>
-              isSqlStatement(message)
-                ? createQuery({ sql: message, autoRun: true })
-                : createChat({ initialMessage: message })
+            onSubmit={(message) => createChat({ initialMessage: message })}
+            secondaryAction={
+              isSqlQuery
+                ? {
+                    label: 'Run SQL',
+                    onClick: () => createQuery({ sql: value, autoRun: true }),
+                  }
+                : undefined
             }
           />
           <AssistantAgentHarnessFooter />
