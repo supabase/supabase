@@ -121,7 +121,7 @@ const PrefilledApplication = ({ stripeAtlasToken }: { stripeAtlasToken: string }
 
   return (
     <CardContent className="border-none">
-      <StripeAtlasApplicationForm application={application} />
+      <StripeAtlasApplicationForm key={application.stripeAtlasToken} application={application} />
     </CardContent>
   )
 }
