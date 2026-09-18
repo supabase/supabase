@@ -19,7 +19,7 @@ import {
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
@@ -231,6 +231,59 @@ describe('BatchRestartDialog', () => {
           target: target === 'all' ? { type: 'all_tables' } : { type: 'single_table', table_id: 1 },
         },
       ])
+    }
+  )
+
+  it.each(['all', 'single'] as const)(
+    'keeps the $target reset dialog open after an error',
+    async (target) => {
+      const onOpenChange = vi.fn()
+      const onResetStart = vi.fn()
+      const onResetComplete = vi.fn()
+
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+        response: () =>
+          HttpResponse.json<ReplicationPipelineStatusResponse>({
+            pipeline_id: 9,
+            status: { name: 'started' },
+          }),
+      })
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/pipelines/:pipeline_id/rollback-tables',
+        response: () =>
+          HttpResponse.json<APIErrorBody>({ message: 'Unable to reset tables' }, { status: 500 }),
+      })
+
+      customRender(
+        <PipelineRequestStatusProvider>
+          <RestartDialogWithStatus
+            target={target}
+            onOpenChange={onOpenChange}
+            onResetStart={onResetStart}
+            onResetComplete={onResetComplete}
+          />
+        </PipelineRequestStatusProvider>
+      )
+
+      await screen.findByText('Running')
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: target === 'all' ? 'Reset all tables' : 'Reset table',
+        })
+      )
+
+      await waitFor(() => {
+        expect(onResetComplete).toHaveBeenCalledWith(target === 'all' ? [1] : 1)
+      })
+      expect(onOpenChange).not.toHaveBeenCalled()
+      expect(
+        screen.getByRole('button', {
+          name: target === 'all' ? 'Reset all tables' : 'Reset table',
+        })
+      ).toBeEnabled()
     }
   )
 })

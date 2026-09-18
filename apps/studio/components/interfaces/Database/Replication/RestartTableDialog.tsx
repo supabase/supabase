@@ -50,8 +50,6 @@ export const RestartTableDialog = ({
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(`Resetting "${tableName}"`)
-    },
-    onSettled: () => {
       onOpenChange(false)
     },
     onError: (error) => {
@@ -72,7 +70,6 @@ export const RestartTableDialog = ({
           target: { type: 'single_table', table_id: table.id },
         })
       )
-    } catch (error) {
     } finally {
       onResetComplete?.(table.id)
     }

@@ -65,8 +65,6 @@ export const BatchRestartDialog = ({
     onSuccess: (data) => {
       const count = data.tables.length
       toast.success(`Resetting ${count} table${count > 1 ? 's' : ''}`)
-    },
-    onSettled: () => {
       onOpenChange(false)
     },
     onError: (error) => {
@@ -85,7 +83,6 @@ export const BatchRestartDialog = ({
           target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
         })
       )
-    } catch (error) {
     } finally {
       onResetComplete?.(affectedTableIds)
     }
