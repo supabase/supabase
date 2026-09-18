@@ -112,6 +112,10 @@ describe('WarehouseTab', () => {
         'flightsql://postgres:[YOUR-PASSWORD]@default.warehouse.supabase.io:443?tls=enabled'
       )
     ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Manage Warehouse' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
 
     // FlightSQL is the default engine and needs no catalog access, so nothing here provisions.
     expect(screen.queryByRole('switch')).not.toBeInTheDocument()

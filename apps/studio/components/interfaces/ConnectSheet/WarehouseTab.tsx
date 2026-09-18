@@ -93,7 +93,18 @@ export const WarehouseTab = () => {
       />
     )
   } else {
-    return <WarehouseConnectionCard variant="sheet" />
+    return (
+      <div>
+        <WarehouseConnectionCard variant="sheet" />
+        <div className="border-t px-8 py-4">
+          <Button asChild variant="text" size="tiny" className="px-0">
+            <Link href={`/project/${projectRef}/integrations/warehouse/overview`}>
+              Manage Warehouse
+            </Link>
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return <div className="p-8">{content}</div>
