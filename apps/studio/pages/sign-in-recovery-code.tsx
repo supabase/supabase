@@ -1,4 +1,4 @@
-import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
+import { SignInRecoveryCodeForm } from '@/components/interfaces/SignIn/SignInRecoveryCodeForm'
 import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
 import type { NextPageWithLayout } from '@/types'
 
@@ -10,7 +10,7 @@ const SignInRecoveryCodePage: NextPageWithLayout = () => {
       logoLinkToMarketingSite={true}
     >
       <div className="flex flex-col gap-5">
-        <SignInMfaForm />
+        <SignInRecoveryCodeForm />
       </div>
     </SignInLayout>
   )

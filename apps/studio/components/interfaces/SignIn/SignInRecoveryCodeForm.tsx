@@ -27,7 +27,7 @@ const formId = 'sign-in-recovery-code-form'
 
 const SUPPORT_EMAIL_HREF = `mailto:support@supabase.com?subject=${encodeURIComponent('Unable to sign in via MFA')}`
 
-export const SignInMfaForm = () => {
+export const SignInRecoveryCodeForm = () => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
