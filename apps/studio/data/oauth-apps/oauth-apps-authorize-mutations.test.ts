@@ -3,15 +3,11 @@ import { describe, expect, test } from 'vitest'
 import { OAUTH_APPS_MOCK_SCENARIOS } from './mocks'
 import { approveOAuthAppsAuthorize } from './oauth-apps-authorize-approve-mutation'
 import { denyOAuthAppsAuthorize } from './oauth-apps-authorize-deny-mutation'
-import type { OAuthGrantProjectScope } from './types'
 import { isRoleValidationFailure } from './types'
 
 const AUTH_ID = OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper
 const SLUG = 'northwind-traders'
-const PROJECT_SCOPE: OAuthGrantProjectScope = {
-  target: 'selected_projects',
-  project_refs: ['northwindstorefront1'],
-}
+const BODY = { project_refs: ['northwindstorefront1'] }
 
 async function approveExpectingRedirect(
   variables: Parameters<typeof approveOAuthAppsAuthorize>[0]
@@ -23,11 +19,7 @@ async function approveExpectingRedirect(
 
 describe('approveOAuthAppsAuthorize', () => {
   test('returns a redirect url carrying both code and state', async () => {
-    const { url } = await approveExpectingRedirect({
-      slug: SLUG,
-      auth_id: AUTH_ID,
-      project_scope: PROJECT_SCOPE,
-    })
+    const { url } = await approveExpectingRedirect({ slug: SLUG, auth_id: AUTH_ID, body: BODY })
 
     const params = new URL(url).searchParams
     expect(params.get('code')).toBeTruthy()
@@ -35,35 +27,21 @@ describe('approveOAuthAppsAuthorize', () => {
     expect(params.get('error')).toBeNull()
   })
 
-  test('rejects an empty selection', async () => {
-    await expect(
-      approveOAuthAppsAuthorize({
-        slug: SLUG,
-        auth_id: AUTH_ID,
-        project_scope: { target: 'selected_projects', project_refs: [] },
-      })
-    ).rejects.toThrow('At least one project is required')
-  })
-
-  test('accepts an all-projects scope, which carries no refs by design', async () => {
-    const { url } = await approveExpectingRedirect({
-      slug: SLUG,
-      auth_id: AUTH_ID,
-      project_scope: { target: 'all_projects' },
-    })
+  test('accepts a body without project_refs', async () => {
+    const { url } = await approveExpectingRedirect({ slug: SLUG, auth_id: AUTH_ID, body: {} })
 
     expect(new URL(url).searchParams.get('code')).toBeTruthy()
   })
 
   test('requires an authorization request id', async () => {
     await expect(
-      approveOAuthAppsAuthorize({ slug: SLUG, auth_id: '', project_scope: PROJECT_SCOPE })
+      approveOAuthAppsAuthorize({ slug: SLUG, auth_id: '', body: BODY })
     ).rejects.toThrow('Authorization request id is required')
   })
 
   test('requires an organization slug', async () => {
     await expect(
-      approveOAuthAppsAuthorize({ slug: '', auth_id: AUTH_ID, project_scope: PROJECT_SCOPE })
+      approveOAuthAppsAuthorize({ slug: '', auth_id: AUTH_ID, body: BODY })
     ).rejects.toThrow('Organization slug is required')
   })
 
@@ -73,7 +51,7 @@ describe('approveOAuthAppsAuthorize', () => {
     const { url } = await approveExpectingRedirect({
       slug: SLUG,
       auth_id: AUTH_ID,
-      project_scope: { target: 'selected_projects', project_refs: manyRefs },
+      body: { project_refs: manyRefs },
     })
 
     expect(url).toBeTruthy()

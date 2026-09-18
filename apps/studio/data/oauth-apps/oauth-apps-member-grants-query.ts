@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
-import { getMockOAuthAppMemberGrants, USE_MOCKS } from './mocks'
+import { getMockOAuthAppGrants, USE_MOCKS } from './mocks'
+import type { ListAppGrantsResponse } from './types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppMemberGrantsVariables = {
@@ -9,14 +10,17 @@ export type OAuthAppMemberGrantsVariables = {
   appId?: string
 }
 
-export type { OAuthAppMemberGrant } from './types'
+export type { ListAppGrantsResponse, OAuthGrantItem } from './types'
 
-export async function getOAuthAppMemberGrants({ slug, appId }: OAuthAppMemberGrantsVariables) {
+export async function getOAuthAppMemberGrants({
+  slug,
+  appId,
+}: OAuthAppMemberGrantsVariables): Promise<ListAppGrantsResponse> {
   if (!slug) throw new Error('Organization slug is required')
   if (!appId) throw new Error('App id is required')
   if (!USE_MOCKS) throw new Error('OAuth app member grants are not yet implemented')
 
-  return getMockOAuthAppMemberGrants(appId)
+  return getMockOAuthAppGrants(appId)
 }
 
 export type OAuthAppMemberGrantsData = Awaited<ReturnType<typeof getOAuthAppMemberGrants>>
