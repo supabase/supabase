@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useAuthError, useFlag } from 'common'
+import { useAuthError, useFeatureFlags, useFlag } from 'common'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -31,6 +31,7 @@ export const SignInRecoveryCodeForm = () => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
+  const { hasLoaded } = useFeatureFlags()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
   const {
     data: recoveryCodesStatus,
@@ -77,10 +78,10 @@ export const SignInRecoveryCodeForm = () => {
 
   useEffect(() => {
     // if users wander into this page and he has no recovery code setup or is on platform where it's not enabled
-    if (!enableAuthRecoveryCodes || recoveryCodesStatus?.status === 'unenrolled') {
+    if (hasLoaded && (!enableAuthRecoveryCodes || recoveryCodesStatus?.status === 'unenrolled')) {
       queryClient.resetQueries().then(() => router.push(getReturnToPath()))
     }
-  }, [enableAuthRecoveryCodes, recoveryCodesStatus, router, queryClient])
+  }, [hasLoaded, enableAuthRecoveryCodes, recoveryCodesStatus, router, queryClient])
 
   const error = useAuthError()
 
