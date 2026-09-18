@@ -11,11 +11,12 @@ import type {
   UseCustomInfiniteQueryOptions,
 } from '@/types'
 
-export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
+export type SnippetFolderResponse =
+  components['schemas']['GetUserContentFolderResponse_Output']['data']
 export type SnippetFolder =
-  components['schemas']['GetUserContentFolderResponse']['data']['folders'][number]
+  components['schemas']['GetUserContentFolderResponse_Output']['data']['folders'][number]
 export type Snippet =
-  components['schemas']['GetUserContentFolderResponse']['data']['contents'][number]
+  components['schemas']['GetUserContentFolderResponse_Output']['data']['contents'][number]
 
 // The SQL editor's loaded-snippet type. Discriminated on `type` so database SQL
 // (`SqlSnippets.Content`, Postgres brand) and logs SQL (`LogSqlSnippets.Content`,

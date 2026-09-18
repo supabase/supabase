@@ -76,8 +76,8 @@ export const DestinationPanel = () => {
           <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
             <SheetHeader className="flex items-center justify-between">
               <div>
-                <SheetTitle>Edit destination</SheetTitle>
-                <SheetDescription>Update the configuration for this destination.</SheetDescription>
+                <SheetTitle>Edit pipeline</SheetTitle>
+                <SheetDescription>Update how this pipeline sends data to its destination.</SheetDescription>
               </div>
               <DocsButton
                 href={docsUrl}

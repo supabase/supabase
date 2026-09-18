@@ -73,9 +73,9 @@ export const getApiSuccessRates = (metrics: AuthMetricsResponse | undefined) => 
     'apiErrorRequests'
   )
   const current =
-    apiTotalCurrent > 0 ? Math.max(0, 100 - (apiErrorCurrent / apiTotalCurrent) * 100) : 0
+    apiTotalCurrent > 0 ? Math.max(0, 100 - (apiErrorCurrent / apiTotalCurrent) * 100) : null
   const previous =
-    apiTotalPrevious > 0 ? Math.max(0, 100 - (apiErrorPrevious / apiTotalPrevious) * 100) : 0
+    apiTotalPrevious > 0 ? Math.max(0, 100 - (apiErrorPrevious / apiTotalPrevious) * 100) : null
   return { current, previous }
 }
 
@@ -89,17 +89,25 @@ export const getAuthSuccessRates = (metrics: AuthMetricsResponse | undefined) =>
   const current =
     authTotalRequestsCurrent > 0
       ? Math.max(0, 100 - (authTotalErrorsCurrent / authTotalRequestsCurrent) * 100)
-      : 0
+      : null
   const previous =
     authTotalRequestsPrevious > 0
       ? Math.max(0, 100 - (authTotalErrorsPrevious / authTotalRequestsPrevious) * 100)
-      : 0
+      : null
   return { current, previous }
 }
 
-export const calculatePercentageChange = (current: number, previous: number): number => {
-  if (previous === 0) return current > 0 ? 100 : 0
+export const calculatePercentageChange = (current: number, previous: number): number | null => {
+  if (previous === 0) return null
   return ((current - previous) / previous) * 100
+}
+
+export const calculatePercentagePointChange = (
+  current: number | null,
+  previous: number | null
+): number | null => {
+  if (current === null || previous === null) return null
+  return current - previous
 }
 
 export const getChangeColor = (percentageChange: number): string => {

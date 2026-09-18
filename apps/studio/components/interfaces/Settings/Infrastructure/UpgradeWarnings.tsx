@@ -20,7 +20,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
       title="A newer version of Postgres is available"
       description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
       actions={
-        <Button asChild variant="default">
+        <Button asChild>
           <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
         </Button>
       }
@@ -124,7 +124,7 @@ const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValida
         <p className="text-foreground-lighter text-xs">{description}</p>
       </div>
       {manageLink && (
-        <Button size="tiny" variant="default" asChild>
+        <Button size="tiny" asChild>
           <Link href={manageLink}>Manage</Link>
         </Button>
       )}
@@ -164,6 +164,8 @@ const getWarningTitle = (warning: ProjectUpgradeEligibilityWarning): string => {
       return 'ltree indexes must be reindexed after this upgrade'
     case 'operator_estimator_gate':
       return 'Custom operators may need attention after this upgrade'
+    case 'btree_gist_nan_reindex':
+      return 'btree_gist indexes on float columns must be reindexed after this upgrade'
   }
 }
 
@@ -175,6 +177,8 @@ const getWarningDescription = (warning: ProjectUpgradeEligibilityWarning): strin
       return 'After upgrading, ltree indexes on this database can return incomplete results until they are rebuilt. Run `REINDEX INDEX CONCURRENTLY` on the affected indexes — this runs online with no downtime.'
     case 'operator_estimator_gate':
       return 'After upgrading, recreating an operator that references a non-built-in selectivity estimator (for example during a restore or branch) requires superuser and may fail. Most projects are not affected.'
+    case 'btree_gist_nan_reindex':
+      return 'After upgrading, btree_gist indexes on float columns can return wrong results for rows containing NaN until they are rebuilt. If those columns may contain NaN values, run `REINDEX INDEX CONCURRENTLY` on the affected indexes — this runs online with no downtime.'
   }
 }
 
@@ -186,6 +190,8 @@ const getWarningLink = (warning: ProjectUpgradeEligibilityWarning): string => {
       return `${DOCS_URL}/guides/platform/upgrading#ltree-indexes-require-reindexing-after-upgrade`
     case 'operator_estimator_gate':
       return `${DOCS_URL}/guides/platform/upgrading#custom-operator-selectivity-estimators`
+    case 'btree_gist_nan_reindex':
+      return `${DOCS_URL}/guides/platform/upgrading#btree_gist-indexes-on-float-columns-require-reindexing-after-upgrade`
   }
 }
 
@@ -203,7 +209,7 @@ export const ValidationWarningsAdmonition = ({
       title={getWarningTitle(warning)}
       description={getWarningDescription(warning)}
     >
-      <Button asChild variant="default" className="mt-2">
+      <Button asChild className="mt-2">
         <Link href={getWarningLink(warning)} target="_blank" rel="noreferrer">
           Read upgrade notes
         </Link>

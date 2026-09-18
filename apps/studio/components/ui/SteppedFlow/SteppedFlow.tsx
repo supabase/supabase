@@ -116,7 +116,6 @@ export const SteppedFlow = ({
             {currentIndex > 0 ? (
               <Button
                 type="button"
-                variant="default"
                 disabled={navigationDisabled}
                 onClick={() => onStepChange(steps[currentIndex - 1].id)}
               >
@@ -124,12 +123,7 @@ export const SteppedFlow = ({
               </Button>
             ) : null}
             {currentIndex === 0 && showCancel ? (
-              <Button
-                type="button"
-                variant="default"
-                disabled={navigationDisabled}
-                onClick={onCancel}
-              >
+              <Button type="button" disabled={navigationDisabled} onClick={onCancel}>
                 {cancelLabel}
               </Button>
             ) : null}

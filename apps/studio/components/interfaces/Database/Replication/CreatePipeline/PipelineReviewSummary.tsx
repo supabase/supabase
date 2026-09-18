@@ -44,7 +44,7 @@ import {
 } from './PipelineValidationAdmonition'
 import type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
-import type { ReplicationPublication } from '@/data/replication/publications-query'
+import type { ReplicationPublicationData } from '@/data/replication/publication-query'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 const tableLabel = ({ schema, name }: { schema: string; name: string }) => `${schema}.${name}`
@@ -65,7 +65,7 @@ type ReviewSection = {
 export const PipelineReviewSummary = ({
   type,
   values,
-  publications,
+  publication,
   connectionFailures = [],
   dataFailures = [],
   editDisabled = false,
@@ -78,7 +78,7 @@ export const PipelineReviewSummary = ({
 }: {
   type: PipelineDestinationType
   values: DestinationPanelSchemaType
-  publications: ReplicationPublication[]
+  publication?: ReplicationPublicationData
   connectionFailures?: ValidationFailure[]
   dataFailures?: ValidationFailure[]
   editDisabled?: boolean
@@ -91,11 +91,13 @@ export const PipelineReviewSummary = ({
   tableSyncCopy?: TableSyncCopyConfig
   onGoToStep: (step: PipelineCreateStepId) => void
 }) => {
-  const publication = publications.find(({ name }) => name === values.publicationName)
-  const publicationTables = publication?.tables ?? []
+  const publicationTables =
+    publication && publication.name === values.publicationName ? publication.tables : []
   const selectedTables = values.tableSyncCopyTableIds
     .map((id) => publicationTables.find((table) => String(table.id) === id))
-    .filter((table): table is ReplicationPublication['tables'][number] => table != null)
+    .filter(
+      (table): table is ReplicationPublicationData['tables'][number] => table != null
+    )
     .map(tableLabel)
 
   const namespace =

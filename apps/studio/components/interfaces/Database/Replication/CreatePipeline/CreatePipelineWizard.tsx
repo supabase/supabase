@@ -98,7 +98,8 @@ import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import {
   useReplicationSourceId,
   useReplicationSourcesQuery,
@@ -190,10 +191,11 @@ export const CreatePipelineWizard = () => {
 
   const sourceId = useReplicationSourceId({ projectRef })
   const {
-    data: publications = [],
+    data: publicationNameRows = [],
     isSuccess: isSuccessPublications,
     refetch: refetchPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  } = useReplicationPublicationNamesQuery({ projectRef, sourceId })
+  const publicationNamesList = publicationNameRows.map((publication) => publication.name)
 
   const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },
@@ -239,18 +241,11 @@ export const CreatePipelineWizard = () => {
 
         if (!selectedType) return
 
-        const selectedPublicationTableIds = pruneStaleSelectedTableIds({
-          mode: data.tableSyncCopyMode,
-          selectedTableIds: data.tableSyncCopyTableIds,
-          publications,
-          publicationName: data.publicationName,
-        })
-
         if (
           isSuccessPublications &&
           (data.tableSyncCopyMode === 'include_tables' ||
             data.tableSyncCopyMode === 'skip_tables') &&
-          selectedPublicationTableIds.length === 0
+          data.tableSyncCopyTableIds.length === 0
         ) {
           addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table.')
         }
@@ -287,6 +282,10 @@ export const CreatePipelineWizard = () => {
   const formValues = useWatch({ control: form.control }) ?? defaultValues
   const reviewValues = { ...defaultValues, ...formValues }
   const { publicationName } = formValues
+  const {
+    data: selectedPublication,
+    isSuccess: isSuccessPublication,
+  } = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
   const connectionSignature = JSON.stringify([
     selectedType,
     ...(selectedType === null
@@ -295,7 +294,7 @@ export const CreatePipelineWizard = () => {
   ])
   const isConnectionVerified = verifiedConnectionSignature === connectionSignature
 
-  const publicationNames = useMemo(() => publications.map((pub) => pub.name), [publications])
+  const publicationNames = publicationNamesList
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
@@ -384,7 +383,7 @@ export const CreatePipelineWizard = () => {
       : 'primary'
 
   const onSubmit = async (rawData: z.infer<typeof FormSchema>) => {
-    if (!isSuccessPublications) {
+    if (!isSuccessPublications || !isSuccessPublication || !selectedPublication) {
       toast.error('Publication tables are unavailable. Refresh and try again.')
       return
     }
@@ -394,7 +393,7 @@ export const CreatePipelineWizard = () => {
       tableSyncCopyTableIds: pruneStaleSelectedTableIds({
         mode: rawData.tableSyncCopyMode,
         selectedTableIds: rawData.tableSyncCopyTableIds,
-        publications,
+        publication: selectedPublication,
         publicationName: rawData.publicationName,
       }),
     }
@@ -737,7 +736,7 @@ export const CreatePipelineWizard = () => {
                 <PipelineReviewSummary
                   type={selectedType}
                   values={reviewValues}
-                  publications={publications}
+                  publication={selectedPublication}
                   connectionFailures={destinationValidationFailures}
                   dataFailures={pipelineValidationFailures}
                   editDisabled={isSaving || isValidating}

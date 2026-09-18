@@ -21,7 +21,9 @@ const normalizeTextLines = (value: string) => {
 const getStepTextContent = (contentElement: HTMLElement) => {
   const clone = contentElement.cloneNode(true) as HTMLElement
   clone
-    .querySelectorAll('pre, button, svg, input, textarea, select, [aria-hidden="true"]')
+    .querySelectorAll(
+      'pre, button, svg, input, textarea, select, [aria-hidden="true"], [data-connect-prompt-ignore]'
+    )
     .forEach((element) => {
       element.remove()
     })
@@ -45,6 +47,7 @@ const getStepCodeSnippets = (contentElement: HTMLElement) => {
   }
 
   const getSnippet = (element: Element) => {
+    if (element.closest('[data-connect-prompt-ignore]')) return undefined
     const copyValueElement = element.closest('[data-connect-copy-value]') as HTMLElement | null
     return copyValueElement?.dataset.connectCopyValue?.trim() || element.textContent?.trim()
   }
@@ -62,7 +65,7 @@ const getStepCodeSnippets = (contentElement: HTMLElement) => {
     if (tabSnippets.length === 0) {
       const inlineSnippets = Array.from(tabContent.querySelectorAll('code'))
         .filter((code) => !code.closest('pre') && code.closest('.font-mono'))
-        .map((code) => code.textContent?.trim())
+        .map(getSnippet)
         .filter((snippet): snippet is string => Boolean(snippet))
       inlineSnippets.forEach((snippet, index) => {
         const inlineLabel = inlineSnippets.length > 1 ? `${label} (part ${index + 1})` : label
@@ -87,7 +90,7 @@ const getStepCodeSnippets = (contentElement: HTMLElement) => {
     if (code.closest('pre')) return
     if (code.closest('[data-connect-tab-content]')) return
     if (!code.closest('.font-mono')) return
-    const snippet = code.textContent?.trim()
+    const snippet = getSnippet(code)
     if (snippet) addSnippet('Code', snippet)
   })
 
@@ -135,22 +138,25 @@ export function CopyPromptButton({ stepsContainerRef, customPrompt }: CopyPrompt
   }, [showCopied])
 
   return (
-    <ButtonTooltip
-      variant="default"
-      icon={showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />}
-      onClick={() => {
-        const textToCopy = customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
-        setShowCopied(true)
-        copyToClipboard(textToCopy)
-      }}
-      tooltip={{
-        content: {
-          side: 'left',
-          text: 'Copy these steps for your coding agent',
-        },
-      }}
-    >
-      {showCopied ? 'Copied' : 'Copy prompt'}
-    </ButtonTooltip>
+    <>
+      <ButtonTooltip
+        icon={showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />}
+        onClick={() => {
+          const textToCopy = customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
+          copyToClipboard(textToCopy, () => setShowCopied(true))
+        }}
+        tooltip={{
+          content: {
+            side: 'left',
+            text: 'Copy these steps for your coding agent',
+          },
+        }}
+      >
+        {showCopied ? 'Copied' : 'Copy prompt'}
+      </ButtonTooltip>
+      <span className="sr-only" role="status" aria-live="polite">
+        {showCopied ? 'Copied' : ''}
+      </span>
+    </>
   )
 }

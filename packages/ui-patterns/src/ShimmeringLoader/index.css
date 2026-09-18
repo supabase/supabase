@@ -29,3 +29,10 @@
     background-position: 1000px 0;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmering-loader,
+  .dark .shimmering-loader {
+    animation: none;
+  }
+}

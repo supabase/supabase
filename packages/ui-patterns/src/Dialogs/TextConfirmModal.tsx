@@ -14,6 +14,7 @@ import {
   copyToClipboard,
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
@@ -26,7 +27,6 @@ import {
   FormMessage,
   Input,
 } from 'ui'
-import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
 import { Admonition } from '../Admonition'
@@ -109,8 +109,6 @@ export const TextConfirmModal = forwardRef<
       },
     })
 
-    const isFormValid = form.formState.isValid
-
     // 2. Define a submit handler.
     function onSubmit(_values: z.infer<typeof formSchema>) {
       // Do something with the form values.
@@ -121,6 +119,10 @@ export const TextConfirmModal = forwardRef<
     useEffect(() => {
       if (confirmString) form.reset()
     }, [confirmString])
+
+    useEffect(() => {
+      if (visible) form.reset()
+    }, [visible])
 
     useEffect(() => {
       if (!showCopied) return
@@ -137,6 +139,7 @@ export const TextConfirmModal = forwardRef<
         {...props}
         onOpenChange={() => {
           if (visible) {
+            form.reset()
             onCancel()
           }
         }}
@@ -183,19 +186,27 @@ export const TextConfirmModal = forwardRef<
                     <FormLabel {...label} enableSelection={!enableCopy}>
                       Type{' '}
                       {enableCopy ? (
-                        <Button
-                          variant="default"
-                          className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
-                          iconRight={
-                            showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
-                          }
-                          onClick={() => {
-                            setShowCopied(true)
-                            copyToClipboard(confirmString)
-                          }}
-                        >
-                          {confirmString}
-                        </Button>
+                        <>
+                          <Button
+                            className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
+                            iconRight={
+                              showCopied ? (
+                                <Check strokeWidth={2} className="text-brand" />
+                              ) : (
+                                <Copy />
+                              )
+                            }
+                            onClick={() => {
+                              setShowCopied(true)
+                              copyToClipboard(confirmString)
+                            }}
+                          >
+                            {confirmString}
+                          </Button>
+                          <span className="sr-only" role="status">
+                            {showCopied ? `${confirmString} copied to clipboard` : ''}
+                          </span>
+                        </>
                       ) : (
                         <span className="text-foreground break-all whitespace-pre">
                           {confirmString}
@@ -218,13 +229,7 @@ export const TextConfirmModal = forwardRef<
               />
               <div className="flex gap-2">
                 {!blockDeleteButton && (
-                  <Button
-                    size="medium"
-                    block
-                    variant="default"
-                    disabled={loading}
-                    onClick={onCancel}
-                  >
+                  <Button size="medium" block disabled={loading} onClick={onCancel}>
                     {cancelLabel}
                   </Button>
                 )}
@@ -240,7 +245,7 @@ export const TextConfirmModal = forwardRef<
                   }
                   type="submit"
                   loading={loading}
-                  disabled={!isFormValid || loading}
+                  disabled={loading}
                   className="truncate"
                 >
                   {confirmLabel}

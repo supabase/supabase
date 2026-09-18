@@ -21,16 +21,15 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { START_PIPELINE_LABEL } from './DestinationForm.constants'
 import {
   getTableCopyTargets,
   summarizeTableCopyEstimate,
   type ReplicationTableIdentity,
-  type TableSyncCopyConfig,
 } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
+import type { TableSyncCopyConfig } from '@/data/replication/types'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
@@ -103,9 +102,9 @@ export const PipelineCostDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Confirm to start pipeline</DialogTitle>
+          <DialogTitle>Create and start pipeline</DialogTitle>
           <DialogDescription>
-            Review the estimated costs before you start the pipeline.
+            Review the estimated costs before you create and start the pipeline.
           </DialogDescription>
         </DialogHeader>
 
@@ -270,7 +269,7 @@ export const PipelineCostDialog = ({
         )}
 
         <DialogFooter>
-          <Button variant="default" disabled={isConfirming} onClick={() => onOpenChange(false)}>
+          <Button disabled={isConfirming} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
@@ -279,7 +278,7 @@ export const PipelineCostDialog = ({
             disabled={isConfirming || isLoading || isError}
             onClick={onConfirm}
           >
-            {START_PIPELINE_LABEL}
+            Create and start pipeline
           </Button>
         </DialogFooter>
       </DialogContent>

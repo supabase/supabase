@@ -17,7 +17,6 @@ export const ReportSettings = ({ chartId }: ReportSettingsProps) => {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <ButtonTooltip
-          variant="default"
           icon={<Settings />}
           className="w-7"
           tooltip={{ content: { side: 'bottom', text: 'Report settings' } }}

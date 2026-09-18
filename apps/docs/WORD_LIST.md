@@ -20,8 +20,8 @@ meaning.
 
 Don't use `+` to mean _or later_.
 
-- Recommended: Postgres 15 or later
-- Not recommended: Postgres 15+
+- **Recommended**: Postgres 15 or later
+- **Not recommended**: Postgres 15+
 
 ### `&`
 
@@ -71,9 +71,9 @@ is familiar with the term.
 Use _allowlist_ and _denylist_ as nouns. Prefer a precise verb that describes the
 action instead of using either term as a verb.
 
-- Recommended: Allow requests from the IP address.
-- Recommended: Add the IP address to the allowlist.
-- Not recommended: Allowlist the IP address.
+- **Recommended**: Allow requests from the IP address.
+- **Recommended**: Add the IP address to the allowlist.
+- **Not recommended**: Allowlist the IP address.
 
 Don't use _blacklist_ or _whitelist_. The linter reports these terms as errors.
 When a literal code item contains one of them, format the item as code and explain
@@ -83,9 +83,9 @@ what it does.
 
 Use _lets you_, or make the reader the subject of the sentence.
 
-- Recommended: You can query the table.
-- Recommended: The API lets you query the table.
-- Not recommended: The API allows you to query the table.
+- **Recommended**: You can query the table.
+- **Recommended**: The API lets you query the table.
+- **Not recommended**: The API allows you to query the table.
 
 ### alpha and beta
 
@@ -265,9 +265,9 @@ _disabled_ to mean that something is broken or unavailable.
 
 _Display_ is a transitive verb and requires an object.
 
-- Recommended: The Dashboard displays the query results.
-- Recommended: The query results appear.
-- Not recommended: The query results display.
+- **Recommended**: The Dashboard displays the query results.
+- **Recommended**: The query results appear.
+- **Not recommended**: The query results display.
 
 ### docs
 
@@ -400,8 +400,8 @@ is clearer.
 
 Use _impact_ as a noun. Prefer _affect_ as the verb.
 
-- Recommended: The change affects performance.
-- Not recommended: The change impacts performance.
+- **Recommended**: The change affects performance.
+- **Not recommended**: The change impacts performance.
 
 ### index
 
@@ -455,8 +455,8 @@ literal commands, signals, and established technical operations.
 
 Use _later_ and _earlier_ for version ranges.
 
-- Recommended: Version 2.2 or later
-- Not recommended: Version 2.2 or higher
+- **Recommended**: Version 2.2 or later
+- **Not recommended**: Version 2.2 or higher
 
 ### latest, new, and soon
 
@@ -473,11 +473,8 @@ Write _lifecycle_, not _life cycle_ or _life-cycle_.
 
 ### login and log in
 
-Use _login_ as a noun or adjective and _log in_ as a verb. Follow the terminology
-in the product UI when it uses _sign in_.
-
-- Recommended: Open the login page, and then log in.
-- Not recommended: Login to the Dashboard.
+Don't use _login_ or _log in_ in prose. Use _sign in_. See
+[sign in and sign-in](#sign-in-and-sign-in).
 
 ## M
 
@@ -520,12 +517,39 @@ Use _might_ for possibility or an uncertain outcome.
 
 Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation.
 
+### Multigres
+
+Use _Multigres_ for the product name. Don't write _multi-gres_ or _MultiGres_.
+
 ## N
 
 ### native
 
 Use a more precise term when possible, such as _built-in_,
 _platform-specific_, or _compiled_. Don't use _native_ to describe people.
+
+### numbers
+
+Spell out zero through nine. Use numerals for 10 and greater. Use numerals
+regardless for versions, technical quantities, step and page numbers, prices, and
+percentages, and throughout a sentence that mixes a number under 10 with a larger
+one.
+
+- **Recommended**: four options, 24 hours, version 3, 128 bits, step 2, 40%
+- **Not recommended**: 4 options, twenty-four hours
+
+Spell out ordinals. Group digits in large numbers with commas, counting left from
+the decimal point. Write fractions as decimals where practical. Use a hyphen with
+no spaces for a range.
+
+- **Recommended**: first, forty-third, 1,532,784 bytes, 0.75, 2012-2016
+- **Not recommended**: 1st, 1532784 bytes, three-quarters, 2012 - 2016
+
+Omit a count of steps or items unless the count helps the reader plan. Name the
+action or link the heading rather than citing a step or section number.
+
+- **Recommended**: To connect to your database:
+- **Recommended**: After you create the project, copy the project URL.
 
 ### numbers in product versions
 
@@ -562,9 +586,9 @@ memory_, or _handles more concurrent connections_.
 
 Avoid using _persist_ as a transitive verb.
 
-- Recommended: Store the session.
-- Recommended: Make the session persistent.
-- Not recommended: Persist the session.
+- **Recommended**: Store the session.
+- **Recommended**: Make the session persistent.
+- **Not recommended**: Persist the session.
 
 ### plain text and plaintext
 
@@ -652,8 +676,23 @@ risk or control.
 
 Use _setup_ as a noun or adjective and _set up_ as a verb.
 
-- Recommended: Complete the setup to set up authentication.
-- Not recommended: Setup authentication.
+- **Recommended**: Complete the setup to set up authentication.
+- **Not recommended**: Setup authentication.
+
+### shard
+
+Use _shard_ as a noun and _sharding_ for the practice of splitting data across
+nodes.
+
+### sign in and sign-in
+
+Use _sign in_, _sign out_, and _sign up_ as verbs. Use the hyphenated forms
+_sign-in_, _sign-out_, and _sign-up_ as nouns or adjectives. Match the product UI
+labels **Sign in**, **Sign out**, and **Sign up**.
+
+Keep _login_, _log in_, _logout_, _log out_, and `logOut` when quoting
+third-party UI or when they are part of code, routes, URL slugs, CLI commands, or
+established feature names such as _social login_.
 
 ### singular they
 
@@ -678,9 +717,9 @@ examples unless uppercase is required by the surrounding convention.
 
 Don't use _SSH_ or `ssh` as a verb.
 
-- Recommended: Connect to the server by using SSH.
-- Recommended: Use the `ssh` command.
-- Not recommended: SSH into the server.
+- **Recommended**: Connect to the server by using SSH.
+- **Recommended**: Use the `ssh` command.
+- **Not recommended**: SSH into the server.
 
 ### startup and start up
 
@@ -716,8 +755,8 @@ either form with `3rd`.
 
 Add a noun after _this_ or _that_ when the reference could be unclear.
 
-- Recommended: This setting controls connection pooling.
-- Not recommended: This controls connection pooling.
+- **Recommended**: This setting controls connection pooling.
+- **Not recommended**: This controls connection pooling.
 
 ### timeout and time out
 
@@ -776,10 +815,26 @@ Describe the concrete action. The linter suggests:
 Choose a different precise verb if the suggested replacement doesn't match the
 actual operation.
 
+### vCPU
+
+Use _vCPU_ (plural _vCPUs_) for the CPU resources of Supabase compute sizes.
+Don't describe Supabase compute in _cores_.
+
+_Core_ remains correct for hardware the reader owns or manages, such as
+self-hosting requirements or a migration VM, and in general CPU discussion.
+
+- Recommended: The 16XL compute size has 64 vCPUs.
+- Recommended: Run the migration from a VM with 8 CPU cores.
+- Not recommended: The 16XL compute size has 64 cores.
+
 ### versus
 
 Write _versus_ in prose, not _vs._ Use `vs` only when it is part of a literal name
 or when space is constrained.
+
+### Vitess
+
+Use _Vitess_ for the product name.
 
 ## W
 

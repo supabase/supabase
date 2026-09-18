@@ -23,7 +23,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         onGoToStep={onGoToStep}
       />
     )
@@ -43,7 +43,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         onGoToStep={vi.fn()}
       />
     )
@@ -58,7 +58,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         onGoToStep={vi.fn()}
       />
     )
@@ -73,7 +73,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         onGoToStep={vi.fn()}
       />
     )
@@ -86,7 +86,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         editDisabled
         onGoToStep={vi.fn()}
       />
@@ -102,7 +102,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         onGoToStep={vi.fn()}
       />
     )
@@ -116,7 +116,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         onGoToStep={vi.fn()}
       />
     )
@@ -132,7 +132,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         connectionFailures={[
           {
             name: 'BigQuery Authentication Failed',
@@ -163,7 +163,7 @@ describe('PipelineReviewSummary', () => {
       <PipelineReviewSummary
         type="BigQuery"
         values={values}
-        publications={[]}
+        publication={undefined}
         dataFailures={[
           {
             name: 'Low Slot WAL Retention',

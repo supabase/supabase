@@ -70,6 +70,7 @@ const WebhooksContent = () => {
         endpoint
       </p>
       <ButtonTooltip
+        variant="primary"
         className="mt-2 w-fit"
         onClick={() => enableHooksForProject()}
         disabled={isEnablingHooks}

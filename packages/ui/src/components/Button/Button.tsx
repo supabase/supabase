@@ -8,11 +8,6 @@ import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
-import {
-  ComboboxTrigger,
-  isChevronsUpDownIcon,
-  shouldUseComboboxTrigger,
-} from '../shadcn/ui/select-trigger'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -25,7 +20,8 @@ const buttonVariants = cva(
   ease-out
   duration-200
   rounded-md
-  transition-colors
+  transition-[background-color,border-color,color,scale]
+  [&:not([aria-haspopup])]:motion-safe:active:scale-[0.97]
   focus-ring
   border
   `,
@@ -112,6 +108,9 @@ const buttonVariants = cva(
       disabled: {
         true: 'opacity-50 cursor-not-allowed pointer-events-none',
       },
+      focusableWhenDisabled: {
+        true: 'opacity-50 cursor-not-allowed',
+      },
       rounded: {
         true: 'rounded-full',
       },
@@ -188,6 +187,12 @@ export interface ButtonProps
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
   rounded?: boolean
+  /**
+   * Keeps a disabled button keyboard-focusable by using `aria-disabled`
+   * instead of native `disabled`. Use this when the control needs a tooltip
+   * or other explanation.
+   */
+  focusableWhenDisabled?: boolean
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -195,7 +200,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       asChild = false,
       size = 'tiny',
-      variant = 'primary',
+      variant = 'default',
       children,
       loading,
       block,
@@ -204,55 +209,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       iconLeft,
       type = 'button',
       rounded,
+      focusableWhenDisabled: focusableWhenDisabledProp,
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot.Slot : 'button'
-    const { className, tabIndex, role, disabled: disabledProp, onClick, ...restProps } = props
+    const { className, tabIndex, disabled: disabledProp, onClick, ...rest } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
+    const isLoading = loading === true
     // if loading, button is disabled
-    const disabled = loading === true || disabledProp
+    const disabled = isLoading || disabledProp === true
+    const focusableWhenDisabled = disabled && focusableWhenDisabledProp === true
+    const nativeDisabled = disabled && !focusableWhenDisabled
 
-    const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
-
-    const useComboboxTrigger = shouldUseComboboxTrigger({
-      asChild,
-      role,
-      variant,
-      iconRight,
-    })
-
-    if (useComboboxTrigger) {
-      const trailingIcon = loading ? (
-        <Loader2 className={cn('h-4 w-4 animate-spin', loadingVariants({ loading, variant }))} />
-      ) : iconRight && !isChevronsUpDownIcon(iconRight) ? (
-        iconRight
-      ) : undefined
-
-      return (
-        <ComboboxTrigger
-          ref={ref}
-          size={size}
-          type={type}
-          role="combobox"
-          disabled={disabled}
-          tabIndex={computedTabIndex}
-          leadingIcon={_iconLeft ?? undefined}
-          icon={trailingIcon}
-          className={cn(block && 'w-full', className)}
-          onClick={(e) => {
-            if (disabled) return e.preventDefault()
-            onClick?.(e)
-          }}
-          {...restProps}
-        >
-          {children}
-        </ComboboxTrigger>
-      )
-    }
+    const computedTabIndex = getExplicitTabIndex(tabIndex, nativeDisabled)
 
     const renderIconContainer = (content: ReactNode) => (
       <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
@@ -260,27 +233,48 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       </div>
     )
 
+    const handleActivation = (e: React.MouseEvent, childOnClick?: React.MouseEventHandler) => {
+      if (disabled) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+
+      childOnClick?.(e)
+      if (!e.defaultPrevented) {
+        onClick?.(e as React.MouseEvent<HTMLButtonElement>)
+      }
+    }
+
     return (
       <Comp
         ref={ref}
         data-size={size}
         type={type}
-        role={role}
-        {...restProps}
-        disabled={disabled}
+        {...rest}
+        aria-disabled={focusableWhenDisabled || undefined}
+        disabled={nativeDisabled}
         tabIndex={computedTabIndex}
-        className={cn(buttonVariants({ variant, size, disabled, block, rounded }), className)}
-        onClick={(e) => {
-          // [Joshen] Prevents redirecting if Button is used with a link-based child element
-          if (disabled) return e.preventDefault()
-          else onClick?.(e)
-        }}
+        className={cn(
+          buttonVariants({
+            variant,
+            size,
+            disabled: nativeDisabled,
+            focusableWhenDisabled,
+            block,
+            rounded,
+          }),
+          className
+        )}
+        onClick={asChild ? undefined : (e) => handleActivation(e)}
       >
         {asChild ? (
-          isValidElement<{ children: ReactNode }>(children) ? (
+          isValidElement<{ children: ReactNode; onClick?: React.MouseEventHandler }>(children) ? (
             cloneElement(
               children,
-              undefined,
+              {
+                onClick: (e) => handleActivation(e, children.props.onClick),
+              },
               showIcon &&
                 (loading
                   ? renderIconContainer(

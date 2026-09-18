@@ -108,17 +108,12 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
 
         <TableCell>
           <div className="flex items-center justify-end gap-x-2">
-            <Button
-              asChild
-              variant="default"
-              className="relative"
-              disabled={status === 'GOING_DOWN'}
-            >
+            <Button asChild className="relative" disabled={status === 'GOING_DOWN'}>
               <Link href={getReadReplicaPath(ref, replica.identifier)}>View replica</Link>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" icon={<MoreVertical />} className="w-7" />
+                <Button icon={<MoreVertical />} className="w-7" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem

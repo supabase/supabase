@@ -1,6 +1,9 @@
+import { MessageSquare } from 'lucide-react'
+import { Button } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
+  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
@@ -11,15 +14,17 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
+import { PIPELINES_FEEDBACK_URL } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { ReplicationLayout } from '@/components/layouts/DatabaseLayout/ReplicationLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
@@ -57,13 +62,22 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   }
 
   return (
-    <PipelineRequestStatusProvider>
+    <>
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Replication</PageHeaderTitle>
             <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
           </PageHeaderSummary>
+
+          <PageHeaderAside>
+            <Button asChild variant="default" icon={<MessageSquare />}>
+              <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
+                Leave feedback
+              </a>
+            </Button>
+            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+          </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
 
@@ -80,13 +94,13 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
           </PageSection>
         )}
       </PageContainer>
-    </PipelineRequestStatusProvider>
+    </>
   )
 }
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
+    <ReplicationLayout>{page}</ReplicationLayout>
   </DefaultLayout>
 )
 

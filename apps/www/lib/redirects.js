@@ -107,13 +107,63 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/security',
+    destination: '/docs/guides/storage/security/ownership',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/serving',
+    destination: '/docs/guides/storage/serving/downloads',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/management',
+    destination: '/docs/guides/storage/management/copy-move-objects',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/s3',
+    destination: '/docs/guides/storage/s3/authentication',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/debugging',
+    destination: '/docs/guides/storage/debugging/logs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/schema',
+    destination: '/docs/guides/storage/schema/design',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/production',
+    destination: '/docs/guides/storage/production/scaling',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/vector',
+    destination: '/docs/guides/storage/vector/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/analytics/examples',
+    destination: '/docs/guides/storage/analytics/examples/duckdb',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgrest',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/storage/image-transformations',
     destination: '/docs/guides/storage/serving/image-transformations',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/access-control',
-    destination: 'docs/guides/storage/security/access-control',
+    destination: '/docs/guides/storage/security/access-control',
   },
   {
     permanent: true,
@@ -137,13 +187,43 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/observability/access-data',
+    destination: '/docs/guides/observability',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/observability/access-data.md',
+    destination: '/docs/guides/observability.md',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/reports/:match*',
     destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: true,
     source: '/docs/guides/telemetry/:match*',
-    destination: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging.md',
+    destination: '/docs/guides/observability.md',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/resolve-issues',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/debugging',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: false,
@@ -2758,8 +2838,18 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/inspect',
+    destination: '/docs/guides/observability/inspect',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/database-linter',
-    destination: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/observability/advisors',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/observability/advisors',
   },
   {
     permanent: true,

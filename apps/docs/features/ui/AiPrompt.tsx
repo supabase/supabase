@@ -8,6 +8,8 @@ import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from './P
 type AiPromptProps = {
   /** Looks up prompt text from `aiPrompts`. */
   id: AiPromptId | string
+  /** Includes the prompt body in generated guide Markdown. */
+  includeInMarkdown?: boolean
 }
 
 /**
@@ -16,8 +18,8 @@ type AiPromptProps = {
  * boundary (where child types arrive as `react.lazy` and the panel
  * would otherwise render nothing).
  *
- * Prompt text lives in `~/data/ai-prompts.data`. Markdown export
- * intentionally omits this component (HTML-only copy panel).
+ * Prompt text lives in `~/data/ai-prompts.data`. Markdown export is opt-in so
+ * existing quickstarts do not duplicate their instructions in bulk exports.
  */
 function AiPrompt({ id }: AiPromptProps) {
   const prompt = aiPrompts[id as AiPromptId]

@@ -10,7 +10,7 @@ import { pruneStaleSelectedTableIds } from '../DestinationPanel/DestinationForm/
 import { getDucklakeValidationIssues } from '../DestinationPanel/DestinationForm/DuckLake/DuckLake.utils'
 import { getSnowflakeValidationIssues } from '../DestinationPanel/DestinationForm/Snowflake/Snowflake.utils'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
-import type { ReplicationPublication } from '@/data/replication/publications-query'
+import type { ReplicationPublicationData } from '@/data/replication/publication-query'
 import { DOCS_URL } from '@/lib/constants'
 
 export const PIPELINE_CREATE_DOCS_URL = `${DOCS_URL}/guides/database/replication#pipelines`
@@ -172,22 +172,23 @@ export const hasValidDataStep = ({
   publicationName,
   tableSyncCopyMode,
   tableSyncCopyTableIds,
-  publications,
+  publicationNames,
+  publication,
 }: {
   publicationName: string
   tableSyncCopyMode: DestinationPanelSchemaType['tableSyncCopyMode']
   tableSyncCopyTableIds: string[]
-  publications: ReplicationPublication[]
+  publicationNames: string[]
+  publication?: ReplicationPublicationData
 }): boolean => {
   if (!publicationName) return false
-
-  const publicationNames = publications.map((publication) => publication.name)
   if (!publicationNames.includes(publicationName)) return false
+  if (!publication || publication.name !== publicationName) return false
 
   const selectedTableIds = pruneStaleSelectedTableIds({
     mode: tableSyncCopyMode,
     selectedTableIds: tableSyncCopyTableIds,
-    publications,
+    publication,
     publicationName,
   })
 

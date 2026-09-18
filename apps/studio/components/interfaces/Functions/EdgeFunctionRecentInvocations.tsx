@@ -40,7 +40,6 @@ export const EdgeFunctionRecentInvocations = ({
           </p>
         </div>
         <Button
-          variant="default"
           loading={isLoading}
           disabled={isLoading}
           icon={<RefreshCw size={14} />}

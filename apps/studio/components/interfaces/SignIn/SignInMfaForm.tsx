@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { useAuthError } from 'common'
+import { useAuthError, useParams } from 'common'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -13,10 +13,12 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { AlertError } from '@/components/ui/AlertError'
+import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useSignOut } from '@/lib/auth'
 import { getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   code: z.string().min(1, 'MFA Code is required'),
@@ -39,6 +41,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
+  const { method: signInMethod = 'unknown' } = useParams()
+
+  const track = useTrack()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
   const form = useForm<z.infer<typeof schema>>({
@@ -61,6 +67,11 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     isSuccess,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: async () => {
+      if (context === 'sign-in') {
+        track('sign_in', { category: 'account', method: signInMethod })
+        addLoginEvent({})
+      }
+
       await queryClient.resetQueries()
 
       if (context === 'forgot-password') {
@@ -111,10 +122,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         hideContactSupport
         additionalActions={
           <>
-            <Button asChild variant="default">
+            <Button asChild>
               <Link href="/sign-in">Back to sign in</Link>
             </Button>
-            <Button asChild variant="default">
+            <Button asChild>
               <a href={SUPPORT_EMAIL_HREF}>Email support</a>
             </Button>
           </>
@@ -197,6 +208,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 block
                 form={formId}
                 type="submit"

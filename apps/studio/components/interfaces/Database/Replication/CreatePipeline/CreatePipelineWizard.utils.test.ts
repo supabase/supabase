@@ -256,12 +256,11 @@ describe('hasValidConnection', () => {
 })
 
 describe('hasValidDataStep', () => {
-  const publications = [
-    {
-      name: 'analytics',
-      tables: [{ id: 101, schema: 'public', name: 'orders' }],
-    },
-  ]
+  const publicationNames = ['analytics']
+  const publication = {
+    name: 'analytics',
+    tables: [{ id: 101, schema: 'public', name: 'orders' }],
+  } as any
 
   it('rejects a missing publication', () => {
     expect(
@@ -269,7 +268,8 @@ describe('hasValidDataStep', () => {
         publicationName: '',
         tableSyncCopyMode: 'include_all_tables',
         tableSyncCopyTableIds: [],
-        publications,
+        publicationNames,
+        publication,
       })
     ).toBe(false)
   })
@@ -280,7 +280,8 @@ describe('hasValidDataStep', () => {
         publicationName: 'gone',
         tableSyncCopyMode: 'include_all_tables',
         tableSyncCopyTableIds: [],
-        publications,
+        publicationNames,
+        publication,
       })
     ).toBe(false)
   })
@@ -291,7 +292,8 @@ describe('hasValidDataStep', () => {
         publicationName: 'analytics',
         tableSyncCopyMode: 'include_tables',
         tableSyncCopyTableIds: [],
-        publications,
+        publicationNames,
+        publication,
       })
     ).toBe(false)
   })
@@ -302,7 +304,8 @@ describe('hasValidDataStep', () => {
         publicationName: 'analytics',
         tableSyncCopyMode: 'include_all_tables',
         tableSyncCopyTableIds: [],
-        publications,
+        publicationNames,
+        publication,
       })
     ).toBe(true)
   })

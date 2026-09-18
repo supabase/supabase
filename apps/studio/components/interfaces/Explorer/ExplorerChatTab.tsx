@@ -65,9 +65,7 @@ export const ExplorerChatTab = () => {
             This chat may have been deleted or is no longer available.
           </p>
         </div>
-        <Button variant="default" onClick={() => router.push(`/project/${ref}/explorer`)}>
-          Back to Explorer
-        </Button>
+        <Button onClick={() => router.push(`/project/${ref}/explorer`)}>Back to Explorer</Button>
       </div>
     )
   }
@@ -85,6 +83,7 @@ export const ExplorerChatTab = () => {
       onNewChat={() => createChat()}
       onSelectChat={openChat}
       onBranchChat={handleBranchChat}
+      composerContext={{ initialInput: aiAssistant.initialInput }}
       onInputChange={() => tabs.makeTabPermanent(createTabId('chat', { id }))}
       renderHeader={(headerProps) => (
         <ExplorerChatToolbar {...headerProps} chatId={id} shortcutsEnabled={shortcutsEnabled} />
