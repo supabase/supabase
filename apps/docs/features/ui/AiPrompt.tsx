@@ -1,18 +1,24 @@
 'use client'
 
 import { aiPrompts, type AiPromptId } from '~/data/ai-prompts.data'
-import { type DocsAiPromptSource } from 'common/telemetry-constants'
 import { Sparkles } from 'lucide-react'
 
-import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from './PromptPanel'
+import {
+  Prompt,
+  PromptContent,
+  PromptCopy,
+  PromptPanel,
+  PromptTitle,
+  type PromptPanelTelemetry,
+} from './PromptPanel'
 
 type AiPromptProps = {
   /** Looks up prompt text from `aiPrompts`. */
   id: AiPromptId | string
   /** Includes the prompt body in generated guide Markdown. */
   includeInMarkdown?: boolean
-  /** Surface reported to telemetry. MDX usages are guides. */
-  source?: DocsAiPromptSource
+  /** Surface reported when the prompt is copied. */
+  telemetry: Omit<PromptPanelTelemetry, 'promptId'>
 }
 
 /**
@@ -24,14 +30,14 @@ type AiPromptProps = {
  * Prompt text lives in `~/data/ai-prompts.data`. Markdown export is opt-in so
  * existing quickstarts do not duplicate their instructions in bulk exports.
  */
-function AiPrompt({ id, source = 'guide' }: AiPromptProps) {
+function AiPrompt({ id, telemetry }: AiPromptProps) {
   const prompt = aiPrompts[id as AiPromptId]
   if (!prompt) {
     throw new Error(`Unknown AiPrompt id: ${id}`)
   }
 
   return (
-    <PromptPanel telemetry={{ source, promptId: id }}>
+    <PromptPanel telemetry={{ ...telemetry, promptId: id }}>
       <Prompt value="prompt" expandable>
         <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
         <PromptCopy>{prompt}</PromptCopy>
