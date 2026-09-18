@@ -1,20 +1,23 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
-import { getMockOAuthAuthorizedApps, USE_MOCKS } from './mocks'
+import { getMockOAuthAppsOverview, USE_MOCKS } from './mocks'
+import type { ListOAuthAppsOverviewResponse } from './types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OAuthAuthorizedAppsVariables = {
   slug?: string
 }
 
-export type { OAuthAuthorizedApp, OAuthAuthorizedAppStatus } from './types'
+export type { ListOAuthAppsOverviewResponse, OAuthAppOverviewItem } from './types'
 
-export async function getOAuthAuthorizedApps({ slug }: OAuthAuthorizedAppsVariables) {
+export async function getOAuthAuthorizedApps({
+  slug,
+}: OAuthAuthorizedAppsVariables): Promise<ListOAuthAppsOverviewResponse> {
   if (!slug) throw new Error('Organization slug is required')
   if (!USE_MOCKS) throw new Error('OAuth authorized apps are not yet implemented')
 
-  return getMockOAuthAuthorizedApps()
+  return getMockOAuthAppsOverview()
 }
 
 export type OAuthAuthorizedAppsData = Awaited<ReturnType<typeof getOAuthAuthorizedApps>>
