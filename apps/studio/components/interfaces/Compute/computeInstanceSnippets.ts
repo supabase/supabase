@@ -72,6 +72,8 @@ export function buildComputeInstanceSnippets(
   const aiPrompt = [
     `Scaffold and deploy a Supabase Compute instance named "${name}" using the ${runtimeMeta.label} runtime:`,
     ``,
+    `If Agent Skills are supported, check whether the \`supabase\` skill is installed. If not, ask the user whether to install it with \`npx skills add supabase/agent-skills --skill supabase\`.`,
+    ``,
     `Run \`export SUPABASE_EXPERIMENTAL_COMPUTE=1\` in the current shell before running any Supabase CLI commands. Use \`npx supabase@beta\` for every Supabase CLI command.`,
     ``,
     `1. Create a supabase/${CLI_NAME}/${name}/ directory with a ${runtimeMeta.label} entrypoint (${entrypointFile}) that responds with "Hello, world!".`,
