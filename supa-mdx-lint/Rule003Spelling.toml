@@ -545,6 +545,10 @@ allow_list = [
     "[Ww]alkthrough",
     "watchOS",
     "WebCrypto",
+    "[Ww]orktrees?",
+    "glibc",
+    "musl",
+    "checksums?",
     "[Xx]min",
     "[Bb]ackfills?"
 ]

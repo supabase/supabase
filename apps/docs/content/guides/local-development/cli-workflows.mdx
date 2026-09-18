@@ -16,6 +16,8 @@ There are two starting points, both leading to the same place: database schema a
 
 You need the Supabase CLI installed and a Docker-compatible runtime running. If you haven't set these up yet, see [Install and run the CLI](/docs/guides/local-development/cli/getting-started) for installation across macOS, Windows, and Linux, and for the details of what `supabase start` brings up and how to access each service.
 
+This guide assumes one running local project. If you work on several apps or git worktrees at once and need a local project for each, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
+
 Keep in mind that **the local stack is for development only**. It is not hardened for production use and must never be exposed to external traffic. It has no TLS, no rate limiting, and default credentials. Use it to develop and test, then deploy to the [Supabase Platform](https://supabase.com) or a proper self-hosted setup for anything beyond that.
 
 <Admonition type="note" label="`supabase` vs. `npx supabase`">
@@ -478,3 +480,7 @@ supabase start
 ```
 
 If problems persist, `supabase stop --no-backup` for a clean restart (this removes local database data).
+
+**`supabase start` fails because a port is already allocated**
+
+Another local Supabase project is using the default ports. Stop it with `supabase stop` from its directory, or run both projects at the same time with the experimental `supabase stack` commands. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).

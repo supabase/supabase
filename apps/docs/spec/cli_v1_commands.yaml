@@ -84,6 +84,20 @@ flags:
       - id: yaml
         name: yaml
         type: '[ env | pretty | json | toml | yaml ]'
+  - id: output-format
+    name: --output-format <[ text | json | stream-json ]>
+    description: output format of command results, such as the endpoints printed by supabase stack start
+    default_value: text
+    accepted_values:
+      - id: text
+        name: text
+        type: '[ text | json | stream-json ]'
+      - id: json
+        name: json
+        type: '[ text | json | stream-json ]'
+      - id: stream-json
+        name: stream-json
+        type: '[ text | json | stream-json ]'
   - id: profile
     name: --profile <string>
     description: use a specific profile for connecting to Supabase API
@@ -550,6 +564,8 @@ commands:
       Health checks are automatically added to verify the started containers. Use `--ignore-health-check` flag to ignore these errors.
 
       > If the CLI is running inside a dev container with the Docker socket bind-mounted, set the `SUPABASE_SERVICES_HOSTNAME` environment variable to the hostname reachable from inside that container, such as `host.docker.internal`.
+
+      `supabase start` runs one local project per machine. To run several local projects at the same time, or to run without Docker, use the experimental `supabase stack start` command. Setting `stack = true` under `[experimental]` in `supabase/config.toml` makes `supabase start` and `supabase stop` behave like `supabase stack start` and `supabase stack stop`.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -587,6 +603,155 @@ commands:
         name: --ignore-health-check
         description: Ignore unhealthy services and exit 0
         default_value: 'false'
+  - id: supabase-stack
+    title: supabase stack
+    summary: Run multiple local projects at the same time (experimental)
+    description: |2
+
+      Runs more than one local Supabase project on the same machine. Each local project is the same set of services you get from `supabase start`. The CLI identifies each one by your app's directory, the current git branch, and an optional `--stack` name, so several apps or git worktrees can run at the same time on one machine.
+
+      The CLI assigns ports from the range 20000 to 32767 and keeps them the same across restarts. It requests ports written in `supabase/config.toml` exactly as written.
+
+      A local project runs in the Docker runtime or the native runtime, which runs services as processes on your machine without Docker. The CLI records the runtime when it creates the local project and reuses it on later starts.
+
+      > These commands are experimental. Their flags and output can change between releases, and the CLI compatibility promise doesn't cover them. Local projects started with these commands keep separate data from projects started with `supabase start`.
+    tags:
+      - local-dev
+    links:
+      - name: Running multiple local projects
+        link: https://supabase.com/docs/guides/local-development/running-multiple-local-projects
+    subcommands:
+      - supabase-stack-start
+      - supabase-stack-stop
+      - supabase-stack-destroy
+    flags: []
+  - id: supabase-stack-start
+    title: supabase stack start
+    summary: Create or resume a local project
+    description: |2
+
+      Creates or resumes the local project for the current app directory, or the named one given with `--stack`. Uses `supabase/config.toml` when present and default settings otherwise, without creating a file.
+
+      The command returns after Postgres is ready and prints the ID, runtime, endpoints, and the services that are dormant. Dormant services start on their first request. Pass `--eager` to start every enabled service before the command returns.
+
+      For a new local project, the default `--runtime auto` selects Docker when the `docker` command is installed and native otherwise. A stopped Docker daemon still selects Docker. Explicit `--runtime docker` and `--runtime native` never fall back to the other runtime. The native runtime is available on macOS on Apple silicon and on Linux `amd64` and `arm64`.
+
+      Pass `--output-format json` to get the endpoints in a machine-readable form. The output doesn't include the database password or API keys.
+
+      Running the command again while the local project is running prints its status without restarting it, as long as `--exclude` and `--eager` match the running local project. Different flags fail with a message to stop the local project first.
+    examples:
+      - id: basic-usage
+        name: Start the local project for the current app directory
+        code: supabase stack start
+        response: |
+          Stack 0ba318251dca1166ef42014502b4dbbb31400706c688febd80d4722719ec0348
+          Runtime: container
+          Lifecycle: running
+          Endpoints:
+            api: http://127.0.0.1:26199
+            database: tcp://127.0.0.1:26456
+            studio: http://127.0.0.1:26713
+            mailUi: http://127.0.0.1:26970
+          Dormant capabilities: rest, auth, realtime, storage, functions, studio, mail, analytics
+      - id: named-docker
+        name: Start a named local project in the Docker runtime
+        code: supabase stack start --stack feature-a --runtime docker
+      - id: exclude
+        name: Start without Studio and the email testing server
+        code: supabase stack start --exclude studio,mail
+    tags:
+      - local-dev
+    links: []
+    usage: supabase stack start [flags]
+    subcommands: []
+    flags:
+      - id: exclude
+        name: -x, --exclude <strings>
+        description: |
+          Capabilities to leave disabled. [rest, auth, realtime, storage, functions, studio, mail, analytics, pooler]. The database can't be excluded. Excluding rest or analytics also disables studio.
+        default_value: '[]'
+      - id: stack
+        name: --stack <string>
+        description: Name this local project. Defaults to the app directory's default local project.
+        default_value: ''
+      - id: stack-id
+        name: --stack-id <string>
+        description: Open an existing local project by its ID. Can't be combined with --stack.
+        default_value: ''
+      - id: runtime
+        name: --runtime <string>
+        description: Runtime to use for a new local project. [auto, docker, native]. auto uses Docker when the docker command is installed and native otherwise. See https://supabase.com/docs/guides/local-development/docker-and-native-runtimes
+        default_value: 'auto'
+      - id: preparation
+        name: --preparation <string>
+        description: Artifact preparation policy. [background, on-demand]
+        default_value: 'background'
+      - id: eager
+        name: --eager
+        description: Activate all enabled capabilities before returning.
+        default_value: 'false'
+      - id: output-format
+        name: --output-format <string>
+        description: Output format for the endpoints and status the command prints. [text, json, stream-json]. This is a global CLI flag and can be passed to any command.
+        default_value: 'text'
+  - id: supabase-stack-stop
+    title: supabase stack stop
+    summary: Stop a local project started with supabase stack start, keeping its data
+    description: |2
+
+      Stops the local project for the current app directory, or the named one given with `--stack`, and keeps its data. Pass `--all` to stop every local project on the machine across all apps. With `--all`, the command continues past failures and prints a summary of stopped, failed, and skipped projects.
+    examples:
+      - id: basic-usage
+        name: Stop the local project for the current app directory
+        code: supabase stack stop
+      - id: named
+        name: Stop a named local project
+        code: supabase stack stop --stack feature-a
+      - id: all
+        name: Stop every local project on the machine
+        code: supabase stack stop --all
+    tags:
+      - local-dev
+    links: []
+    usage: supabase stack stop [flags]
+    subcommands: []
+    flags:
+      - id: all
+        name: --all
+        description: Stop every local project started with supabase stack start. Can't be combined with --stack or --stack-id.
+        default_value: 'false'
+      - id: stack
+        name: --stack <string>
+        description: Stop the local project with this name. Defaults to the app directory's default local project.
+        default_value: ''
+      - id: stack-id
+        name: --stack-id <string>
+        description: Stop an existing local project by its ID.
+        default_value: ''
+  - id: supabase-stack-destroy
+    title: supabase stack destroy
+    summary: Permanently delete a local project started with supabase stack start and its data
+    description: |2
+
+      Permanently deletes one local project and all of its data. The command asks for confirmation. Pass `--yes` to skip the prompt in a script. There is no bulk destroy.
+    examples:
+      - id: basic-usage
+        name: Destroy a named local project without a prompt
+        code: supabase stack destroy --stack feature-a --yes
+    tags:
+      - local-dev
+    links: []
+    usage: supabase stack destroy [flags]
+    subcommands: []
+    flags:
+      - id: stack
+        name: --stack <string>
+        description: Destroy the local project with this name. Defaults to the app directory's default local project.
+        default_value: ''
+      - id: stack-id
+        name: --stack-id <string>
+        description: Destroy an existing local project by its ID.
+        default_value: ''
   - id: supabase-sso
     title: supabase sso
     summary: Manage Single Sign-On (SSO) authentication for projects

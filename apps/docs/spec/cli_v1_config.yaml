@@ -63,6 +63,8 @@ parameters:
     description: |
       A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
 
+      Local projects started with the experimental `supabase stack start` command are identified by your app's directory, git branch, and `--stack` name instead. See [Running multiple local projects](https://supabase.com/docs/guides/local-development/running-multiple-local-projects).
+
   - id: 'api.enabled'
     title: 'api.enabled'
     tags: ['api']
@@ -1735,6 +1737,19 @@ parameters:
     links:
       - name: Self-hosted Logflare Configuration
         link: https://supabase.com/docs/reference/self-hosting-analytics/list-endpoints#getting-started
+
+  - id: 'experimental.stack'
+    title: 'experimental.stack'
+    tags: ['experimental']
+    required: false
+    default: 'false'
+    description: |
+      Makes the top-level `supabase start` and `supabase stop` commands behave like `supabase stack start` and `supabase stack stop`. With this setting, several local projects can run at the same time on one machine. On supported platforms a local project can also run without Docker.
+      Local projects started this way keep their own data, separate from local projects started with the default `supabase start`. This setting doesn't affect `supabase status`. The environment variable `SUPABASE_EXPERIMENTAL_STACK=1` or `0` overrides this value.
+      Note: This is an experimental feature and may change in future releases.
+    links:
+      - name: 'Running multiple local projects'
+        link: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects'
 
   - id: 'experimental.webhooks.enabled'
     title: 'experimental.webhooks.enabled'
