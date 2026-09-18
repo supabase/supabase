@@ -26,7 +26,7 @@ const markdownComponents = {
     return (
       <a
         href={href}
-        className="text-brand-link hover:underline"
+        className="text-primary hover:underline"
         {...(external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
       >
         {children}
@@ -59,7 +59,7 @@ function HarnessBody({ harness }: { harness: MonitoringAgentHarnessSetup }) {
       <p>
         <a
           href={harness.docsUrl}
-          className="text-brand-link hover:underline"
+          className="text-primary hover:underline"
           target="_blank"
           rel="noreferrer noopener"
         >

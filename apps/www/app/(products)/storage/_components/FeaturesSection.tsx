@@ -97,7 +97,7 @@ function InteroperableSkeleton() {
             height="34"
             viewBox="0 0 24 24"
             fill="none"
-            className="relative z-10 text-brand"
+            className="relative z-10 text-primary"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -183,7 +183,7 @@ function CDNSkeleton() {
             height="48"
             viewBox="0 0 24 24"
             fill="none"
-            className="relative z-10 text-brand"
+            className="relative z-10 text-primary"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -217,7 +217,7 @@ function BucketsSkeleton() {
       name: 'Files',
       label: 'images, videos, docs',
       icon: 'folder' as const,
-      colorClass: 'text-brand',
+      colorClass: 'text-primary',
     },
     {
       name: 'Analytics',

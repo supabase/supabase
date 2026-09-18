@@ -58,7 +58,7 @@ function LinkSupportTicketSuccess() {
     <div className="w-full flex flex-col items-center">
       <div className="flex flex-col items-center gap-y-4 py-8">
         <div className="relative">
-          <Mail strokeWidth={1.5} size={60} className="text-brand" />
+          <Mail strokeWidth={1.5} size={60} className="text-primary" />
           <div className="h-6 w-6 rounded-full bg-brand-default absolute bottom-1 -right-1.5 flex items-center justify-center">
             <Check strokeWidth={4} size={16} className="text-contrast" />
           </div>

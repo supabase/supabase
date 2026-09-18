@@ -378,7 +378,7 @@ export const FileExplorerHeader = ({
                     <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {view === option.key && <Check size={16} className="text-brand" />}
+                        {view === option.key && <Check size={16} className="text-primary" />}
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -390,7 +390,7 @@ export const FileExplorerHeader = ({
                         <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
-                            {sortBy === option.key && <Check size={16} className="text-brand" />}
+                            {sortBy === option.key && <Check size={16} className="text-primary" />}
                           </div>
                         </DropdownMenuItem>
                       ))}
@@ -407,7 +407,7 @@ export const FileExplorerHeader = ({
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" />
+                              <Check size={16} className="text-primary" />
                             )}
                           </div>
                         </DropdownMenuItem>

@@ -64,7 +64,7 @@ const ProductHeaderCentered = (props: Types) => (
               {props.icon && <ProductIcon icon={props.icon} />}
               {props.title && (
                 <span
-                  className="text-brand font-mono uppercase tracking-widest text-sm"
+                  className="text-primary font-mono uppercase tracking-widest text-sm"
                   key={`product-name-${props.title}`}
                 >
                   {props.title}
