@@ -146,10 +146,6 @@ export const SignInRecoveryCodeForm = () => {
                         autoCapitalize="none"
                         spellCheck="false"
                         placeholder="****************"
-                        onPaste={() => {
-                          // If users pasted a code, it's most probably a complete one so we can submit right away
-                          form.handleSubmit(onSubmit)
-                        }}
                       />
                     </div>
                   </FormControl>
