@@ -2,8 +2,9 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 
 import { useLocalStorageQuery } from './useLocalStorage'
 
-type DashboardHistory = { editor?: string; sql?: string }
-const DEFAULT_HISTORY = { editor: undefined, sql: undefined }
+type ExplorerHistoryEntry = { type: 'notebook' | 'query' | 'chat'; id: string }
+type DashboardHistory = { editor?: string; sql?: string; explorer?: ExplorerHistoryEntry }
+const DEFAULT_HISTORY = { editor: undefined, sql: undefined, explorer: undefined }
 
 export const useDashboardHistory = () => {
   // [Joshen] History should always refer to the project that the user is currently on
@@ -22,6 +23,10 @@ export const useDashboardHistory = () => {
     setHistory({ ...history, sql: id })
   }
 
+  const setLastVisitedExplorerTab = (entry?: ExplorerHistoryEntry) => {
+    setHistory({ ...history, explorer: entry })
+  }
+
   /**
    * Purge the last-visited snippet when it's one of the deleted snippets, so that
    * navigating back to the SQL editor doesn't resurrect a deleted snippet.
@@ -38,6 +43,7 @@ export const useDashboardHistory = () => {
     history,
     setLastVisitedTable,
     setLastVisitedSnippet,
+    setLastVisitedExplorerTab,
     clearSnippetsFromHistory,
     isHistoryLoaded: isSuccess,
   }

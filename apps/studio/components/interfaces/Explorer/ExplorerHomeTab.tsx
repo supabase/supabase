@@ -23,7 +23,7 @@ export const ExplorerHomeTab = () => {
   return <ExplorerHomeContent />
 }
 
-const ExplorerHomeLoading = () => (
+export const ExplorerHomeLoading = () => (
   <div
     role="status"
     aria-label="Opening Explorer"
