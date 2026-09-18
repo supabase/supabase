@@ -22,18 +22,15 @@ Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. For the best perfor
 
 If you can only optimize one side, prioritize placing your **destination** close to the pipeline's region. Replicated data continuously streams out to the destination, so latency on that leg has a bigger impact on overall replication lag than latency between the pipeline and the source.
 
-
 ## Which plans support Pipelines?
 
 Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, access is being rolled out gradually, so an eligible plan does not guarantee that Pipelines is enabled for every organization yet. If it is not available, request access from the **Database > Replication** page or contact your account manager.
-
 
 ## What happened to Analytics Buckets replication?
 
 We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
 
 As a result, replication into Analytics Buckets via Pipelines is no longer supported. Separately, **BigQuery** is currently available as a managed Pipelines destination, and **ClickHouse**, **DuckLake**, and **Snowflake** are in Early Access. DuckLake here is a Pipelines replication destination, not the Warehouse product described above.
-
 
 ## What does Pipelines install in the database?
 
@@ -63,7 +60,6 @@ Snowflake Early Access supports adding, renaming, and dropping columns. It doesn
 ClickHouse Early Access supports adding, renaming, and dropping columns, dropping `NOT NULL`, and supported default changes. It doesn't apply column type changes or `SET NOT NULL`. Changing a source primary-key column isn't supported for `ReplacingMergeTree`. ClickHouse DDL is not transactional, so an interrupted multi-column change can be partially applied. See [ClickHouse schema change support](/docs/guides/database/replication/clickhouse#schema-change-support) for details.
 
 DuckLake Early Access supports adding, renaming, and dropping columns, dropping `NOT NULL`, and supported default changes. It doesn't apply column type changes or `SET NOT NULL`. New columns are made nullable, and each multi-column schema change is applied in a transaction. See [DuckLake schema change support](/docs/guides/database/replication/ducklake#schema-change-support) for details.
-
 
 ## What happens when you disable Pipelines?
 
