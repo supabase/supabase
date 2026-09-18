@@ -8,7 +8,6 @@ sidebar_label: 'ClickHouse'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
 
 The ClickHouse destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
@@ -33,7 +32,6 @@ Choose the engine before creating the pipeline. Changing **Table engine** later 
 
 Updating a source primary-key value removes the old key from the current-state view and writes the row under its new key. Changing the primary-key definition is a separate [schema change](#schema-change-support).
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Prepare ClickHouse resources
 
@@ -52,7 +50,6 @@ Keep the database otherwise empty. Pipelines manages the replicated tables and c
 
 The default `ReplacingMergeTree` engine requires ClickHouse 23.5 or later. The `MergeTree` event-log engine does not have this minimum-version requirement.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Configure ClickHouse as a destination
 

@@ -25,7 +25,6 @@ On a fresh Postgres 17 deployment, the `pg_graphql` extension is **disabled by d
 
 </Admonition>
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 If the new Postgres 17 container fails to start, make sure to check for an old `db-config` Docker volume. See [Postgres 17 fails to start with a leftover db-config volume](#postgres-17-fails-to-start-with-a-leftover-db-config-volume) for details.
 
 ## Upgrade an existing Postgres 15 deployment
@@ -199,7 +198,6 @@ After both phases, the upgrade script applies migrations that normally run only 
 
 ## Troubleshooting
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### pg_upgrade fails with replication slot errors
 
@@ -223,7 +221,6 @@ docker compose run --rm db \
 chown -R postgres:postgres /var/lib/postgresql/data
 ```
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### pgsodium / Supabase Vault errors
 
@@ -253,7 +250,6 @@ sudo TMPDIR=/mnt/my-tmp bash utils/upgrade-pg17.sh
 
 If you run out of space mid-upgrade, the safest path is to roll back and free up disk space before retrying.
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
 ### Postgres 17 fails to start with a leftover db-config volume
 
