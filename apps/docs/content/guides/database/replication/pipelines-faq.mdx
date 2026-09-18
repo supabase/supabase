@@ -12,7 +12,6 @@ sidebar_label: 'FAQ'
 
 **BigQuery** is currently available as a managed destination. **ClickHouse**, **DuckLake**, and **Snowflake** are in Early Access. See the [ClickHouse](/docs/guides/database/replication/clickhouse), [DuckLake](/docs/guides/database/replication/ducklake), and [Snowflake](/docs/guides/database/replication/snowflake) destination guides for setup instructions and data-model details.
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 [Request Early Access](/go/supabase-pipelines-new-destinations) for ClickHouse, DuckLake, or Snowflake. Supported destinations can be Supabase-managed or third-party systems as support expands.
 
 ## Does the destination's region affect performance?
@@ -23,13 +22,11 @@ Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. For the best perfor
 
 If you can only optimize one side, prioritize placing your **destination** close to the pipeline's region. Replicated data continuously streams out to the destination, so latency on that leg has a bigger impact on overall replication lag than latency between the pipeline and the source.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Which plans support Pipelines?
 
 Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, access is being rolled out gradually, so an eligible plan does not guarantee that Pipelines is enabled for every organization yet. If it is not available, request access from the **Database > Replication** page or contact your account manager.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What happened to Analytics Buckets replication?
 
@@ -37,7 +34,6 @@ We are currently working on a new Supabase Warehouse product designed to address
 
 As a result, replication into Analytics Buckets via Pipelines is no longer supported. Separately, **BigQuery** is currently available as a managed Pipelines destination, and **ClickHouse**, **DuckLake**, and **Snowflake** are in Early Access. DuckLake here is a Pipelines replication destination, not the Warehouse product described above.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What does Pipelines install in the database?
 
@@ -68,7 +64,6 @@ ClickHouse Early Access supports adding, renaming, and dropping columns, droppin
 
 DuckLake Early Access supports adding, renaming, and dropping columns, dropping `NOT NULL`, and supported default changes. It doesn't apply column type changes or `SET NOT NULL`. New columns are made nullable, and each multi-column schema change is applied in a transaction. See [DuckLake schema change support](/docs/guides/database/replication/ducklake#schema-change-support) for details.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What happens when you disable Pipelines?
 
