@@ -77,7 +77,9 @@ export const DestinationPanel = () => {
             <SheetHeader className="flex items-center justify-between">
               <div>
                 <SheetTitle>Edit pipeline</SheetTitle>
-                <SheetDescription>Update how this pipeline sends data to its destination.</SheetDescription>
+                <SheetDescription>
+                  Update how this pipeline sends data to its destination.
+                </SheetDescription>
               </div>
               <DocsButton
                 href={docsUrl}
