@@ -75,6 +75,18 @@ export const formatUsersData = (users: User[]) => {
   })
 }
 
+/**
+ * A user is verified once they've confirmed an email/phone (confirmed_at), or once
+ * they've successfully signed in at least once (last_sign_in_at).
+ *
+ * confirmed_at alone isn't enough: it's a Postgres generated column derived only from
+ * email_confirmed_at/phone_confirmed_at, so it stays null forever for a user who signed
+ * in via an OAuth/OIDC provider configured to allow users without an email or phone
+ * (e.g. Telegram) - even though that sign-in was successfully verified by the provider.
+ */
+export const isUserVerified = (user: Pick<User, 'confirmed_at' | 'last_sign_in_at'>) =>
+  Boolean(user.confirmed_at) || Boolean(user.last_sign_in_at)
+
 const providers = {
   social: [
     { email: 'email-icon2' },
@@ -330,7 +342,7 @@ export const formatUserColumns = ({
         const value = row?.[col.id as keyof FormattedUserRow]
         const user = users?.find((u) => u.id === row.id)
 
-        const isConfirmed = !!user?.confirmed_at
+        const isConfirmed = !!user && isUserVerified(user)
         const isDateBasedValue =
           value !== null &&
           ['created_at', 'last_sign_in_at'].includes(col.id) &&
