@@ -29,9 +29,8 @@ export const parseCustomInput = (input: string): ParsedCustomInput => {
   const [, numStr, unitStr] = match
   const value = Number.parseInt(numStr, 10)
 
-  // Only finite positive values may reach generateDynamicHelper(): Number.isFinite
-  // rejects NaN and Infinity outright, and the <= 0 guard keeps out non-positive.
-  if (!Number.isFinite(value) || value <= 0) return { type: 'invalid' }
+  const exceedsDateRange = !dayjs().subtract(value, 'day').isValid()
+  if (!Number.isFinite(value) || value <= 0 || exceedsDateRange) return { type: 'invalid' }
 
   if (!unitStr) {
     return { type: 'number', value }
