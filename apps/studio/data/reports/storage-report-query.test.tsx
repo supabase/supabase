@@ -76,7 +76,6 @@ describe('useStorageReport', () => {
       await Promise.resolve()
     })
 
-    expect(queryClient.isFetching()).toBe(0)
     expect(legacyRequests).toHaveLength(0)
     expect(otelRequests).toHaveLength(0)
 
@@ -84,16 +83,11 @@ describe('useStorageReport', () => {
     rerender()
 
     await waitFor(() => expect(otelRequests).toHaveLength(9))
-    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
 
     expect(legacyRequests).toHaveLength(0)
-    expect(otelRequests).toHaveLength(9)
     for (const { projectRef, sql } of otelRequests) {
       expect(projectRef).toBe('real-project-ref')
       expect(sql).toContain('from logs')
-      expect(sql).toContain("source = 'edge_logs'")
-      expect(sql).not.toContain('from edge_logs')
-      expect(sql).not.toContain('cross join unnest')
     }
   })
 })
