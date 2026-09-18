@@ -559,7 +559,7 @@ That said, a few rules help keep the docs concise, consistent, and clear:
 
 Use American English. If in doubt, consult the [Merriam-Webster dictionary](https://www.merriam-webster.com/).
 
-Follow the [Supabase documentation word list](./WORD_LIST.md) for preferred spelling, capitalization, and usage. The word list includes the terminology rules checked by `supa-mdx-lint`. Run `pnpm lint:mdx` in `apps/docs` to check your changes.
+Follow the [Supabase documentation word list](./WORD_LIST.md) for preferred spelling, capitalization, and usage. No tool checks terminology, so check your own prose against the list, or let `/edit-the-docs` do it.
 
 ## Search
 
