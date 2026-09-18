@@ -1,12 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthError, useFeatureFlags, useFlag } from 'common'
-import { Lock } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, LockIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Button, Form, FormControl, FormField, Input } from 'ui'
+import {
+  Button,
+  Form,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
@@ -85,6 +97,7 @@ export const SignInRecoveryCodeForm = () => {
 
   const error = useAuthError()
 
+  const [isCodeRevealed, setIsCodeRevealed] = useState(false)
   if (error) {
     return (
       <AlertError
@@ -132,24 +145,44 @@ export const SignInRecoveryCodeForm = () => {
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="code" label="Recovery code">
-                  <FormControl>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
-                        <Lock />
-                      </div>
-                      <Input
-                        id="code"
-                        className="pl-10 font-mono"
+                  <InputGroup>
+                    <FormControl>
+                      <FormInputGroupInput
                         {...field}
+                        className="pl-10 font-mono"
                         autoFocus
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="none"
                         spellCheck="false"
                         placeholder="****************"
+                        type={isCodeRevealed ? 'text' : 'password'}
                       />
-                    </div>
-                  </FormControl>
+                    </FormControl>
+                    <InputGroupAddon align="inline-start">
+                      <LockIcon />
+                    </InputGroupAddon>
+                    <InputGroupAddon align="inline-end" className="pr-1 has-[>button]:mr-0">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InputGroupButton
+                            aria-label={isCodeRevealed ? 'Hide code' : 'Show code'}
+                            aria-describedby={undefined}
+                            onClick={() => setIsCodeRevealed((previous) => !previous)}
+                          >
+                            {isCodeRevealed ? (
+                              <EyeIcon className="size-4" />
+                            ) : (
+                              <EyeOffIcon className="size-4" />
+                            )}
+                          </InputGroupButton>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {isCodeRevealed ? 'Hide code' : 'Show code'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </InputGroupAddon>
+                  </InputGroup>
                 </FormItemLayout>
               )}
             />
@@ -160,7 +193,7 @@ export const SignInRecoveryCodeForm = () => {
                 variant="outline"
                 size="large"
                 onClick={onClickLogout}
-                loading={isVerifying || isSuccess}
+                disabled={isVerifying || isSuccess}
                 className="opacity-80 hover:opacity-100 transition"
               >
                 Cancel
