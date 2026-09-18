@@ -428,7 +428,7 @@ For `supabase` and `supabaseAdmin` the rewrite is mechanical. For claims it is n
 | `.appMetadata`          | `.app_metadata`          |
 | `.userMetadata`         | `.user_metadata`         |
 
-A blanket rename of `userClaims` to `jwtClaims` fails to compile in TypeScript. In plain JavaScript, or behind an `as`, `user.id` is `undefined` with no error, and `.id` is usually the value rows get written with. Rewrite each read against the table.
+A blanket rename of `userClaims` to `jwtClaims` fails to compile in TypeScript. In plain JavaScript, or behind an `as`, `jwtClaims.id` is `undefined` with no error, and `.id` is usually the value rows get written with. Rewrite each read against the table.
 
 ### Step by step
 
@@ -515,7 +515,7 @@ Do the steps in order. The auth inventory comes before any code change, because 
 
     ```bash
     mkdir -p src/lib
-    curl -o src/lib/supabase-middleware.ts \
+    curl --fail -o src/lib/supabase-middleware.ts \
       https://raw.githubusercontent.com/supabase/server/main/examples/frameworks/hono/supabase-middleware.ts
     ```
 
