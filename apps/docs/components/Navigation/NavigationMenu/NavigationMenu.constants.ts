@@ -2538,6 +2538,10 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/declarative-database-schemas' as `/${string}`,
         },
         {
+          name: 'Diff engines',
+          url: '/guides/local-development/diff-engines' as `/${string}`,
+        },
+        {
           name: 'Seeding your database',
           url: '/guides/local-development/seeding-your-database' as `/${string}`,
         },
