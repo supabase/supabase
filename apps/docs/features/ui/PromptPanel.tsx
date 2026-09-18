@@ -1,21 +1,15 @@
 'use client'
 
-import { Check, Copy } from 'lucide-react'
-import {
-  Children,
-  isValidElement,
-  useEffect,
-  useId,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from 'react'
+import { ChevronDown } from 'lucide-react'
+import { Children, isValidElement, useId, useState, type ReactElement, type ReactNode } from 'react'
+import ReactMarkdown from 'react-markdown'
 // shadcn tabs from packages/ui/src/components/shadcn/ui/tabs.tsx
-import { cn, copyToClipboard, Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from 'ui'
+import { cn, Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from 'ui'
+
+import { CodeCopyButton } from './CodeBlock/CodeBlock.client'
 
 type PromptTitleProps = {
   children: ReactNode
-  icon?: ReactNode
 }
 
 type PromptCopyProps = {
@@ -44,7 +38,6 @@ type PromptPanelProps = {
 type CollectedPrompt = {
   value: string
   title: ReactNode
-  icon?: ReactNode
   copyValue: string
   content: ReactNode
   expandable: boolean
@@ -82,16 +75,13 @@ function isElementOfType(child: ReactNode, type: { displayName?: string }) {
 
 function collectPrompt(prompt: ReactElement<PromptProps>, index: number): CollectedPrompt {
   let title: ReactNode = `Prompt ${index + 1}`
-  let icon: ReactNode | undefined
   let copyValue = ''
   let content: ReactNode = null
   let shimmer = true
 
   Children.forEach(prompt.props.children, (child) => {
     if (isElementOfType(child, PromptTitle)) {
-      const props = (child as ReactElement<PromptTitleProps>).props
-      title = props.children
-      icon = props.icon
+      title = (child as ReactElement<PromptTitleProps>).props.children
     } else if (isElementOfType(child, PromptCopy)) {
       copyValue = (child as ReactElement<PromptCopyProps>).props.children
     } else if (isElementOfType(child, PromptContent)) {
@@ -104,7 +94,6 @@ function collectPrompt(prompt: ReactElement<PromptProps>, index: number): Collec
   return {
     value: prompt.props.value ?? `prompt-${index}`,
     title,
-    icon,
     copyValue,
     content,
     expandable: Boolean(prompt.props.expandable),
@@ -120,24 +109,59 @@ function collectPrompts(children: ReactNode): CollectedPrompt[] {
 
 function ExpandableContent({ children }: { children: ReactNode }) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isHoverRevealPaused, setIsHoverRevealPaused] = useState(false)
+
+  const handleReelPointerLeave = () => setIsHoverRevealPaused(false)
+  const handleToggle = () => {
+    if (isExpanded) setIsHoverRevealPaused(true)
+    setIsExpanded((expanded) => !expanded)
+  }
 
   return (
-    <div>
-      <div className="relative">
-        <div className={cn(!isExpanded && 'max-h-28 overflow-hidden')}>{children}</div>
-        {!isExpanded && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent" />
+    <div
+      className="group/expand relative h-full px-4 py-3.5"
+      onPointerLeave={handleReelPointerLeave}
+    >
+      <div
+        className={cn(
+          'overflow-hidden [interpolate-size:allow-keywords] transition-[max-height] duration-300 ease-out motion-reduce:transition-none',
+          isExpanded ? 'max-h-max' : 'max-h-28'
         )}
-      </div>
-      <button
-        tabIndex={0}
-        type="button"
-        onClick={() => setIsExpanded((expanded) => !expanded)}
-        className="mt-2 cursor-pointer text-sm text-brand-link transition-colors hover:text-foreground focus-ring"
-        aria-expanded={isExpanded}
       >
-        {isExpanded ? 'Show less' : 'Show more'}
-      </button>
+        {children}
+      </div>
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-x-4 bottom-3.5 h-16 bg-gradient-to-t from-background-200 to-transparent',
+          'transition-opacity duration-300 ease-out motion-reduce:transition-none',
+          isExpanded && 'opacity-0'
+        )}
+      />
+      <div
+        className={cn('flex justify-center', isExpanded ? 'mt-3' : 'absolute inset-x-0 bottom-3.5')}
+      >
+        <button
+          key={String(isExpanded)}
+          tabIndex={0}
+          type="button"
+          onClick={handleToggle}
+          className={cn(
+            'inline-flex cursor-pointer items-center gap-1.5 rounded-full pl-2.5 pr-3 py-1 text-xs text-foreground',
+            'bg-surface-200/90 shadow-sm ring-1 ring-foreground/10 backdrop-blur-sm',
+            'transition-[opacity,translate,background-color,scale] duration-200 ease-out',
+            'hover:bg-surface-300 active:scale-[0.96] focus-ring',
+            !isExpanded &&
+              'translate-y-1 opacity-0 focus-visible:translate-y-0 focus-visible:opacity-100 pointer-coarse:translate-y-0 pointer-coarse:opacity-100 motion-reduce:translate-y-0',
+            !isExpanded &&
+              !isHoverRevealPaused &&
+              'group-hover/expand:translate-y-0 group-hover/expand:opacity-100'
+          )}
+          aria-expanded={isExpanded}
+        >
+          <ChevronDown aria-hidden="true" size={14} className={cn(isExpanded && 'rotate-180')} />
+          {isExpanded ? 'Show less' : 'Show more'}
+        </button>
+      </div>
     </div>
   )
 }
@@ -167,54 +191,42 @@ function PromptBody({
   )
 
   return (
-    <div className="px-4 py-3.5 text-sm leading-6 text-foreground-light font-normal">
+    <div
+      className={cn(
+        'h-full bg-200 text-sm leading-6 text-foreground-light font-normal',
+        !prompt.expandable && 'px-4 py-3.5'
+      )}
+    >
       {prompt.expandable ? <ExpandableContent>{content}</ExpandableContent> : content}
     </div>
   )
 }
 
-function CopyButton({ label, value }: { label: string; value: string }) {
-  const [copied, setCopied] = useState(false)
-
-  useEffect(() => {
-    if (!copied) return
-
-    const timeout = window.setTimeout(() => setCopied(false), 2000)
-    return () => window.clearTimeout(timeout)
-  }, [copied])
-
+/** Renders a Markdown prompt string as the panel body, with backticks as code chips. */
+function PromptMarkdown({ children }: { children: string }) {
   return (
-    <button
-      tabIndex={0}
-      type="button"
-      onClick={() => {
-        copyToClipboard(value, () => {
-          setCopied(true)
-        })
-      }}
-      className="cursor-pointer rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
-      aria-label={copied ? `${label} copied` : `Copy ${label}`}
-      title={copied ? 'Copied' : 'Copy to clipboard'}
-    >
-      {copied ? <Check size={14} /> : <Copy size={14} />}
-    </button>
+    <div className="not-prose flex flex-col gap-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li+li]:mt-1">
+      <ReactMarkdown components={MARKDOWN_COMPONENTS}>{children}</ReactMarkdown>
+    </div>
   )
 }
 
-function TabLabel({ icon, children }: { icon?: ReactNode; children: ReactNode }) {
+/** Inline code chip for prompt bodies; opts out of the text shimmer. */
+function PromptCode({ children }: { children?: ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
-      {icon && (
-        <span aria-hidden="true" className="text-tertiary-foreground [&_svg]:size-3.5">
-          {icon}
-        </span>
-      )}
+    <code className="shimmer-none rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
       {children}
-    </span>
+    </code>
   )
 }
 
-const tabTriggerClassName = 'h-full px-0 py-0 text-xs shadow-none data-[state=active]:shadow-none'
+const MARKDOWN_COMPONENTS = { code: PromptCode }
+
+const tabTriggerClassName = cn(
+  'h-full px-0 py-0 text-xs shadow-none data-[state=active]:shadow-none',
+  'group-has-[[data-tab-indicator]]/list:border-b',
+  'group-data-[tab-indicator-ready]/list:data-[state=active]:border-b-transparent'
+)
 
 /**
  * Copyable prompt card. Compose one or more `<Prompt>` children; multiple
@@ -225,7 +237,7 @@ const tabTriggerClassName = 'h-full px-0 py-0 text-xs shadow-none data-[state=ac
  * ```tsx
  * <PromptPanel>
  *   <Prompt value="prompt" expandable>
- *     <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
+ *     <PromptTitle>Agent Prompt</PromptTitle>
  *     <PromptCopy>Plain text copied to the clipboard</PromptCopy>
  *     <PromptContent>Rich content shown in the panel</PromptContent>
  *   </Prompt>
@@ -245,13 +257,14 @@ function PromptPanel({ children, className }: PromptPanelProps) {
   const hasTabs = prompts.length > 1
   const dismissShimmer = () => setShimmerEnabled(false)
 
+  const copyTarget = typeof activePrompt.title === 'string' ? activePrompt.title : 'content'
   const header = (
-    <div className="flex h-11 items-center justify-between border-b bg-surface-75 px-4">
+    <div className="flex h-11 items-center justify-between pl-4 pr-2 shadow-[inset_0_-1px_0_0_var(--border-default)] [--btn-active:color-mix(in_srgb,var(--foreground)_4%,var(--background-200))]">
       {hasTabs ? (
         <TabsList className="h-full gap-5 border-0 [--tab-track:transparent]">
           {prompts.map((prompt) => (
             <TabsTrigger key={prompt.value} value={prompt.value} className={tabTriggerClassName}>
-              <TabLabel icon={prompt.icon}>{prompt.title}</TabLabel>
+              {prompt.title}
             </TabsTrigger>
           ))}
           <TabsIndicator />
@@ -264,13 +277,14 @@ function PromptPanel({ children, className }: PromptPanelProps) {
             tabTriggerClassName
           )}
         >
-          <TabLabel icon={prompts[0].icon}>{prompts[0].title}</TabLabel>
+          {prompts[0].title}
         </span>
       )}
-      <CopyButton
+      <CodeCopyButton
         key={activePrompt.value}
-        label={typeof activePrompt.title === 'string' ? activePrompt.title : 'content'}
-        value={activePrompt.copyValue}
+        content={activePrompt.copyValue}
+        label={`Copy ${copyTarget}`}
+        copiedLabel={`${copyTarget} copied`}
       />
     </div>
   )
@@ -283,7 +297,7 @@ function PromptPanel({ children, className }: PromptPanelProps) {
         onFocusCapture={dismissShimmer}
         onPointerEnter={dismissShimmer}
         className={cn(
-          'w-full overflow-hidden rounded-lg border bg-background shadow-sm',
+          'w-full overflow-hidden rounded-lg border border-default shadow-codeblock',
           className
         )}
       >
@@ -301,7 +315,10 @@ function PromptPanel({ children, className }: PromptPanelProps) {
       activationMode="manual"
       onFocusCapture={dismissShimmer}
       onPointerEnter={dismissShimmer}
-      className={cn('w-full overflow-hidden rounded-lg border bg-background shadow-sm', className)}
+      className={cn(
+        'w-full overflow-hidden rounded-lg border border-default shadow-codeblock',
+        className
+      )}
     >
       {header}
       {/* Stack panes in one grid cell so the panel keeps the tallest tab's height. */}
@@ -314,6 +331,8 @@ function PromptPanel({ children, className }: PromptPanelProps) {
               key={prompt.value}
               value={prompt.value}
               forceMount
+              // pane's own controls remain reachable
+              tabIndex={-1}
               inert={!isActive}
               aria-hidden={!isActive}
               className="col-start-1 row-start-1 m-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
@@ -327,5 +346,5 @@ function PromptPanel({ children, className }: PromptPanelProps) {
   )
 }
 
-export { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle }
+export { Prompt, PromptCode, PromptContent, PromptCopy, PromptMarkdown, PromptPanel, PromptTitle }
 export type { PromptContentProps, PromptCopyProps, PromptPanelProps, PromptProps, PromptTitleProps }

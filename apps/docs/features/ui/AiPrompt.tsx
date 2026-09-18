@@ -1,9 +1,15 @@
 'use client'
 
 import { aiPrompts, type AiPromptId } from '~/data/ai-prompts.data'
-import { Sparkles } from 'lucide-react'
 
-import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from './PromptPanel'
+import {
+  Prompt,
+  PromptContent,
+  PromptCopy,
+  PromptMarkdown,
+  PromptPanel,
+  PromptTitle,
+} from './PromptPanel'
 
 type AiPromptProps = {
   /** Looks up prompt text from `aiPrompts`. */
@@ -30,9 +36,11 @@ function AiPrompt({ id }: AiPromptProps) {
   return (
     <PromptPanel>
       <Prompt value="prompt" expandable>
-        <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
+        <PromptTitle>Agent Prompt</PromptTitle>
         <PromptCopy>{prompt}</PromptCopy>
-        <PromptContent>{prompt}</PromptContent>
+        <PromptContent>
+          <PromptMarkdown>{prompt}</PromptMarkdown>
+        </PromptContent>
       </Prompt>
     </PromptPanel>
   )
