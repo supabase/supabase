@@ -42,7 +42,7 @@ pnpm api:codegen             # platform Management API types → packages/api-ty
 
 ## CI
 
-Every PR must pass typecheck + lint (one workflow), Prettier, and a typos check. Other checks are path-filtered: Studio unit tests/build and the lint ratchet (ESLint warning count must not increase) run on `apps/studio/**` changes; app-specific test suites run on their own paths.
+Every PR must pass typecheck + lint (one workflow) and Prettier. Other checks are path-filtered: Studio unit tests/build and the lint ratchet (ESLint warning count must not increase) run on `apps/studio/**` changes; app-specific test suites run on their own paths.
 
 Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.gen.ts`, `**/__generated__/**`, `apps/docs/features/docs/generated/**`, `apps/www/.generated/**`, `supabase/functions/common/database-types.ts`, `apps/docs/content/_partials/access-control/scoped_pat_*.mdx` (run `make -C apps/docs/spec generate.partials.access-control`).
 

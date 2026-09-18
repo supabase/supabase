@@ -15,7 +15,6 @@ PR opened / updated
     ├── Docs Tests                 (pnpm test:docs on relevant docs code/spec changes)
     ├── TypeScript & Lint          (tsc + eslint)
     ├── Prettier                   (format check)
-    ├── reviewdog                  (inline annotations)
     ├── Validate pull request      (PR metadata)
     └── Authorize Vercel Deploys → Vercel builds preview deploy → Preview on CDN
 
@@ -55,11 +54,7 @@ Format checking across the whole repo including `apps/docs`.
 Gates Vercel preview deployment on a GitHub-side check first. Prevents
 arbitrary forks from triggering Vercel builds.
 
-### 5. reviewdog
-
-Inline code review annotations via reviewdog.
-
-### 6. Validate pull request
+### 5. Validate pull request
 
 PR metadata validation (title format, labels, etc.).
 
@@ -95,8 +90,8 @@ Before adding a new GitHub Actions workflow:
    it.
 2. **Can `Docs Tests` absorb it?** — TypeScript / vitest checks for new
    functionality fit here.
-3. **Is it cross-cutting?** — typecheck, prettier, and reviewdog already
-   cover the cross-cutting cases.
+3. **Is it cross-cutting?** — typecheck and prettier already cover the
+   cross-cutting cases.
 4. **Last resort** — a new workflow file. Use a Blacksmith runner, sparse
    checkout, pinned action hashes, and a concurrency group. Add a clear
    trigger filter so it doesn't run on unrelated PRs.

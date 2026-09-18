@@ -15,7 +15,6 @@ Our CI pipeline already validates the following. **Never comment on these topics
 - **Formatting or whitespace** — Prettier runs on every PR
 - **Linting issues** — ESLint with auto-fix runs on every PR
 - **Type errors** — TypeScript strict-mode typecheck runs on every PR
-- **Typos or spelling** — Automated typo detection runs on every PR
 - **Missing tests for trivial changes** — Handled by topic-specific test instructions
 - **Import ordering or grouping** — Handled by linter
 - **Naming style preferences** (camelCase vs snake_case debates) — Follow existing file conventions
