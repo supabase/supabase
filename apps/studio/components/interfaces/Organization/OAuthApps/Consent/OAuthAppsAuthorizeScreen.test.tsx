@@ -7,28 +7,28 @@ import {
   getMockOAuthAppsAuthorizeRequest,
   OAUTH_APPS_MOCK_SCENARIOS,
 } from '@/data/oauth-apps/mocks'
-import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
+import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
 import { customRender } from '@/tests/lib/custom-render'
 
 type RenderScreenOptions = {
   authId?: string
   request?: OAuthAppsAuthorizeRequest
   organizationSlug?: string
-  suggestedProjectRefs?: string[]
+  projectRef?: string
 }
 
 function renderScreen({
   authId = OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
   request,
   organizationSlug,
-  suggestedProjectRefs,
+  projectRef,
 }: RenderScreenOptions = {}) {
   return customRender(
     <OAuthAppsAuthorizeScreen
       authId={authId}
       request={request ?? getMockOAuthAppsAuthorizeRequest(authId)}
       organizationSlug={organizationSlug}
-      suggestedProjectRefs={suggestedProjectRefs}
+      projectRef={projectRef}
       navigate={vi.fn()}
     />
   )
@@ -102,28 +102,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toBeInTheDocument()
   })
 
-  test('renders the publisher warning for an unverified app', async () => {
-    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
-
-    expect(
-      await screen.findByText(
-        'Publishers are currently not verified by Supabase. Only continue if you trust this entity.'
-      )
-    ).toBeInTheDocument()
-  })
-
-  test('shows no publisher warning and no verified tick for a verified app', async () => {
-    renderScreen()
-
-    await screen.findByText('Permissions requested')
-    expect(
-      screen.queryByText(
-        'Publishers are currently not verified by Supabase. Only continue if you trust this entity.'
-      )
-    ).not.toBeInTheDocument()
-    expect(screen.queryByRole('img', { name: 'Verified' })).not.toBeInTheDocument()
-  })
-
   test('renders the success screen after the approve mutation resolves', async () => {
     renderScreen()
 
@@ -150,12 +128,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(
-      screen.getByText('Project Settings, Action Runs, Logs, SQL Snippets')
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('Database Webhooks, Development Branches, Production Branches')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Database, Environment, Secrets')).toBeInTheDocument()
+    expect(screen.getByText('Projects, Edge Functions, Storage')).toBeInTheDocument()
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
@@ -183,7 +157,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toHaveLength(1)
   })
 
-  test('keeps the no-admin-approval footer line for a user-bound grant', async () => {
+  test('keeps the no-admin-approval footer line for a member-bound grant', async () => {
     renderScreen()
 
     expect(
@@ -201,7 +175,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     ).toBeInTheDocument()
   })
 
-  test('shows no shared-grant messaging for a user-bound grant', async () => {
+  test('shows no shared-grant messaging for a member-bound grant', async () => {
     renderScreen()
 
     await screen.findByText('Permissions requested')
@@ -262,23 +236,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText('All projects, including ones created later')).toBeInTheDocument()
   })
 
-  test('renders the cross-workspace notice for a client that reuses one grant', async () => {
-    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelCrossWorkspace })
-
-    expect(
-      await screen.findByText(
-        "Some clients may reuse one authorization across workspaces. Check your client's workspace or account settings if project access does not behave as expected."
-      )
-    ).toBeInTheDocument()
-  })
-
-  test('hides the cross-workspace notice for a client that does not reuse a grant', async () => {
-    renderScreen()
-
-    await screen.findByText('Permissions requested')
-    expect(screen.queryByText(/reuse one authorization across workspaces/)).not.toBeInTheDocument()
-  })
-
   test('the many-projects fixture offers enough projects to reach the selection cap', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelManyProjects })
 
@@ -290,7 +247,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('re-consent preselects the still-live projects from the existing grant', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent })
 
-    expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
+    expect(await screen.findByText('tailspin-shop')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
     expect(
       screen.queryByText('Must select at least one project to authorize.')
@@ -300,23 +257,33 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('re-consent submits only the still-live preselected projects', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent })
 
-    await screen.findByText('northwind-storefront')
+    await screen.findByText('tailspin-shop')
     fireEvent.click(screen.getByRole('button', { name: /Authorize Vercel/ }))
 
     await screen.findByText('Vercel is connected')
 
-    expect(screen.getByText(/northwind-storefront/)).toBeInTheDocument()
-    expect(screen.getByText(/northwind-cms/)).toBeInTheDocument()
-    expect(screen.queryByText(/northwind-deleted/)).not.toBeInTheDocument()
+    expect(screen.getByText(/tailspin-shop/)).toBeInTheDocument()
+    expect(screen.queryByText(/tailspin-warehouse/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/tailspin-deleted/)).not.toBeInTheDocument()
   })
 
-  test('offers the all-projects choice only when project selection is optional', async () => {
+  test('the existing grant does not leak into an organization it was not granted for', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
+      organizationSlug: 'northwind-traders',
+    })
+
+    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
+    expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
+  })
+
+  test('offers the all-projects choice only when project scoping is optional', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects })
 
     expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
   })
 
-  test('hides the all-projects choice when project selection is required', async () => {
+  test('hides the all-projects choice when project scoping is required', async () => {
     renderScreen()
 
     await screen.findByRole('combobox')
@@ -351,37 +318,26 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
   })
 
-  test('shows the fixed-settings note for a dynamic client, with a required picker', async () => {
+  test('a dynamic client renders the same required picker as an authored app', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient })
 
-    expect(
-      await screen.findByText(
-        'This client was registered automatically. Supabase sets its access settings.'
-      )
-    ).toBeInTheDocument()
-    expect(screen.getByRole('combobox')).toBeInTheDocument()
+    expect(await screen.findByRole('combobox')).toBeInTheDocument()
     expect(screen.queryByText('All current and future projects')).not.toBeInTheDocument()
+    expect(screen.queryByText(/registered automatically/)).not.toBeInTheDocument()
   })
 
-  test('preselects the projects named by repeated project_ref params', async () => {
-    renderScreen({ suggestedProjectRefs: ['northwindstorefront1', 'northwindcms1'] })
+  test('preselects the project named by the project_ref param', async () => {
+    renderScreen({ projectRef: 'northwindcms1' })
 
-    expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
+    expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
     expect(
       screen.queryByText('Must select at least one project to authorize.')
     ).not.toBeInTheDocument()
   })
 
-  test('preselects a single project_ref param', async () => {
-    renderScreen({ suggestedProjectRefs: ['northwindcms1'] })
-
-    expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
-  })
-
   test('an unknown project_ref preselects nothing and shows no notice', async () => {
-    renderScreen({ suggestedProjectRefs: ['no-such-ref'] })
+    renderScreen({ projectRef: 'no-such-ref' })
 
     expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
     expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
@@ -389,11 +345,11 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
-  test('a project_selection off app ignores project_ref params', async () => {
+  test('a project_scoping_mode off app ignores the project_ref param', async () => {
     renderScreen({
       authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects,
       organizationSlug: 'contoso-labs',
-      suggestedProjectRefs: ['northwindstorefront1'],
+      projectRef: 'northwindstorefront1',
     })
 
     fireEvent.click(await screen.findByRole('button', { name: /Authorize Vercel/ }))
@@ -403,27 +359,24 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.queryByText(/northwind-storefront/)).not.toBeInTheDocument()
   })
 
-  test('the suggested-projects fixture preselects only its live refs', async () => {
-    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects })
-
-    expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
-  })
-
-  test('url project_ref params override the fixture suggestion when present', async () => {
+  test('resolves the organization that owns the project_ref when none is given', async () => {
     renderScreen({
-      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelSuggestedProjects,
-      suggestedProjectRefs: ['fabrikamapi1'],
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelManyProjects,
+      projectRef: 'northwindcms1',
     })
 
-    expect(await screen.findByText('fabrikam-api')).toBeInTheDocument()
-    expect(screen.queryByText('northwind-storefront')).not.toBeInTheDocument()
+    expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
+    expect(screen.getByText('northwind-traders')).toBeInTheDocument()
   })
 
-  test('shows no fixed-settings note for an authored app', async () => {
-    renderScreen()
+  test('the existing grant wins over the project_ref param', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
+      organizationSlug: 'tailspin-toys',
+      projectRef: 'tailspinwarehouse1',
+    })
 
-    await screen.findByRole('combobox')
-    expect(screen.queryByText(/registered automatically/)).not.toBeInTheDocument()
+    expect(await screen.findByText('tailspin-shop')).toBeInTheDocument()
+    expect(screen.getByRole('combobox')).not.toHaveTextContent('tailspin-warehouse')
   })
 })

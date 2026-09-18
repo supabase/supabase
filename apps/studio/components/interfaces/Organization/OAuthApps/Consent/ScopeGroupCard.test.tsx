@@ -7,14 +7,14 @@ import { customRender } from '@/tests/lib/custom-render'
 
 const SCOPE_GROUPS: OAuthScopeGroup[] = [
   {
-    name: 'Project Settings, Action Runs, Logs, SQL Snippets',
+    name: 'Database, Environment, Secrets',
     level: 'read_write',
-    scopes: ['project_settings', 'action_runs', 'logs', 'sql_snippets'],
+    scopes: ['database:read', 'database:write', 'environment:read', 'environment:write'],
   },
   {
-    name: 'Database Webhooks, Development Branches, Production Branches',
+    name: 'Projects, Edge Functions, Storage',
     level: 'read',
-    scopes: ['database_webhooks', 'development_branches', 'production_branches'],
+    scopes: ['projects:read', 'edge_functions:read', 'storage:read'],
   },
 ]
 
@@ -40,7 +40,7 @@ describe('ScopeGroupCard', () => {
     customRender(
       <ScopeGroupCard
         appName="Vercel"
-        scopeGroups={[{ name: 'Logs', level: 'write', scopes: ['logs'] }]}
+        scopeGroups={[{ name: 'Analytics', level: 'write', scopes: ['analytics:write'] }]}
       />
     )
 
