@@ -94,7 +94,7 @@ const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => 
 }
 
 export const WarehouseReplicatedTablesSection = ({ tables }: WarehouseTableStatusListProps) => (
-  <PageSection className="pt-0!">
+  <PageSection className="pt-5!">
     <PageSectionMeta>
       <PageSectionSummary>
         <PageSectionTitle>Status</PageSectionTitle>
@@ -119,7 +119,7 @@ export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressP
       : `Backfilling selected tables. ${syncedTableCount} of ${status.tables.length} tables synced.`
 
   return (
-    <PageSection className="pt-0!">
+    <PageSection className="pt-5!">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Status</PageSectionTitle>

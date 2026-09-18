@@ -235,12 +235,7 @@ function MessagePartNotebookProposal({
   const { addToolApprovalResponse } = useMessageActionsContext()
 
   if (state === 'input-streaming') {
-    return (
-      <div className="my-4 mx-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
-        {NOTEBOOK_DRAFTING_LABEL[mode]}
-      </div>
-    )
+    return <ToolDisplayExecuteSqlLoading label={NOTEBOOK_DRAFTING_LABEL[mode]} />
   }
 
   const { confirmState, onApprove, onDeny, denyWithReason } = getManualToolApprovalHandlers({
@@ -301,6 +296,10 @@ const MessagePart = {
   NotebookRun: MessagePartNotebookRun,
 } as const
 
+// Wide parts share the default width for now; the split stays so a part can diverge again.
+const MESSAGE_PART_WIDTH = 'max-w-3xl'
+const WIDE_MESSAGE_PART_WIDTH = 'max-w-3xl'
+
 function MessagePartContainer({
   children,
   isWide = false,
@@ -308,7 +307,11 @@ function MessagePartContainer({
   children: ReactNode
   isWide?: boolean
 }) {
-  return <div className={cn('w-full mx-auto', isWide ? 'max-w-6xl' : 'max-w-3xl')}>{children}</div>
+  return (
+    <div className={cn('w-full mx-auto', isWide ? WIDE_MESSAGE_PART_WIDTH : MESSAGE_PART_WIDTH)}>
+      {children}
+    </div>
+  )
 }
 
 const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
@@ -316,6 +319,7 @@ const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'tool-query_logs' ||
   part.type === 'tool-create_notebook' ||
   part.type === 'tool-update_notebook' ||
+  part.type === 'tool-delete_notebook' ||
   part.type === 'tool-run_notebook' ||
   (part.type === 'dynamic-tool' && part.toolName === 'query_logs') ||
   // Unlabelled code fences resolve to SQL in MessageMarkdown, too.

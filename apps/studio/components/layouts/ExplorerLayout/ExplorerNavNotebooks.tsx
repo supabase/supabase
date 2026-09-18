@@ -17,6 +17,7 @@ import {
   NotebookRow,
   useNotebooksInfiniteQuery,
 } from '@/data/content/notebooks/notebooks-infinite-query'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 const NOTEBOOK_ROW_HEIGHT = 28
 
@@ -32,12 +33,14 @@ const NotebookListItem = ({
   activeNotebookId,
 }: NotebookListItemProps) => {
   const isActive = activeNotebookId === notebook.id
+  const tabs = useTabsStateSnapshot()
 
   return (
     <Link
       href={`/project/${projectRef}/explorer/notebook/${notebook.id}`}
       className={rowClassName(isActive)}
       style={style}
+      onDoubleClick={() => tabs.makeTabPermanent(createTabId('notebook', { id: notebook.id }))}
     >
       <NotebookText size={14} className={cn('shrink-0', isActive && 'text-foreground')} />
       <span className="truncate text-left">{notebook.name}</span>
@@ -75,7 +78,7 @@ export const ExplorerNavNotebooks = () => {
 
   return (
     <ExplorerNavResourceWrapper type="notebook" search={search} setSearch={setSearch}>
-      <div className="flex flex-1 min-h-0 flex-col px-3 pb-3">
+      <div className="flex flex-1 min-h-0 flex-col p-3">
         {isPending ? (
           <GenericSkeletonLoader />
         ) : notebooks.length === 0 ? (

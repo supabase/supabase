@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { ChevronRight, Minus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { TableCell, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -10,7 +10,7 @@ import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DetailSubtext } from './DetailSubtext'
 import { PipelineStatePill } from './PipelineStatePill'
-import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { PipelineStatusName } from './Replication.constants'
 import {
   getFormattedLagValue,
   getInitialSyncProgress,
@@ -59,30 +59,26 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     isPending: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
-  } = useReplicationPipelineStatusQuery(
-    {
-      projectRef,
-      pipelineId: pipeline?.id,
-    },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
-  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
+  const { getRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
+  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({
+    onError: () => {},
+  })
 
   // Fetch table-level replication status to surface errors in list view
   const {
     data: replicationStatusData,
     isPending: isReplicationStatusLoading,
     isError: isReplicationStatusError,
-  } = useReplicationPipelineReplicationStatusQuery(
-    { projectRef, pipelineId: pipeline?.id },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  } = useReplicationPipelineReplicationStatusQuery({ projectRef, pipelineId: pipeline?.id }, {})
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
   const applyLag = replicationStatusData?.apply_lag
@@ -96,10 +92,10 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const { syncingCount } = getInitialSyncProgress(tableStatuses)
   const isInitialSyncRunning = syncingCount > 0
   const isCaughtUp = lagBytes === 0
-  // Only show errors when pipeline is running (not when stopped or restarting)
+  // Hide old table errors while an optimistic lifecycle action is displayed.
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
-  const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
-  const hasTableErrors = errorCount > 0 && !isPipelineStopped && !isRestarting
+  const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
+  const hasTableErrors = errorCount > 0 && !isPipelineStopped && !isTransitioning
 
   // Check if a newer pipeline version is available (one-time check cached for session)
   const { data: versionData } = useReplicationPipelineVersionQuery({
@@ -122,7 +118,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
 
     try {
       setIsDeleting(true)
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      await stopPipeline({ projectRef, pipelineId: pipeline.id, waitUntilStopped: true })
       await deleteDestinationPipeline({
         projectRef,
         destinationId: destinationId,
@@ -137,12 +133,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       setIsDeleting(false)
     }
   }
-
-  useEffect(() => {
-    if (pipeline?.id) {
-      updatePipelineStatus(pipeline.id, statusName)
-    }
-  }, [pipeline?.id, statusName, updatePipelineStatus])
 
   // Five distinct states, so early returns rather than a ternary chain. The row only renders once
   // a pipeline exists, so there is no "no pipeline" case to handle here.
@@ -285,11 +275,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
         visible={showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
-        confirmLabel={
-          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-            ? 'Update and restart'
-            : 'Update version'
-        }
       />
     </>
   )

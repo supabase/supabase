@@ -17,7 +17,7 @@ import { Destinations } from '@/components/interfaces/Database/Replication/Desti
 import { PIPELINES_FEEDBACK_URL } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { ReplicationLayout } from '@/components/layouts/DatabaseLayout/ReplicationLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -25,7 +25,6 @@ import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
@@ -63,7 +62,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   }
 
   return (
-    <PipelineRequestStatusProvider>
+    <>
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
@@ -95,13 +94,13 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
           </PageSection>
         )}
       </PageContainer>
-    </PipelineRequestStatusProvider>
+    </>
   )
 }
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
+    <ReplicationLayout>{page}</ReplicationLayout>
   </DefaultLayout>
 )
 

@@ -1,26 +1,28 @@
 ---
 id: 'automate-with-agents-usage'
 title: 'Capacity monitor'
-subtitle: 'Capacity monitor is a read-only agent. It trends API request volume and error rates, then warns before traffic or errors look like a capacity problem.'
-description: 'A capacity agent that tracks API request growth, error rates, and approaching resource ceilings.'
+subtitle: 'A read-only agent that tracks resource and request growth and estimates when a confirmed limit could be reached.'
+description: 'Daily monitoring for resource growth and approaching limits'
 ---
 
 ```mermaid
 flowchart TD
-  Schedule([Once each morning]) --> Inspect[query_logs and usage APIs]
-  Inspect --> Signals["Request growth, error rates, resource trends"]
-  Signals --> Limit{Likely to hit a limit?}
-  Limit -->|Yes| Report["Trend, projected date, scaling guide"]
-  Limit -->|No| Silent[Stay silent]
+  Schedule([Once each morning]) --> Inspect[execute_sql and query_logs]
+  Inspect --> Signals["Resource measurements and request growth"]
+  Signals --> Review{Anything new to report?}
+  Review -->|Yes| Report[Finding and next step]
+  Review -->|No| Silent[Stay silent]
+  Inspect -->|Missing data or access| Gap[Report new or changed gaps]
 ```
 
 ## What it watches
 
-- API request growth against a recent baseline
-- Server-error rate increases
-- Disk, connection, or table growth when database inspection is available
+- Database and table sizes, including indexes
+- Current connection counts by role and state
+- API request growth across the last two complete UTC days
+- Resource growth toward a confirmed limit, when enough history is available
 
-It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp) and the [Management API usage endpoints](/docs/reference/api/v1-get-project-usage-api-count) when those are already authorized. It does not change billing, compute, or plan settings. MCP does not expose organization billing totals.
+It uses read-only `execute_sql` and `query_logs` on project-scoped [Supabase MCP](/docs/guides/ai-tools/mcp). Request counts do not establish billing totals.
 
 ## When it watches
 
@@ -28,10 +30,14 @@ It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai
 
 ## What it will output
 
-Capacity monitor reports request growth, error-rate changes, and resource trends. If a metric looks likely to hit a limit within 14 days, it flags the date and the relevant scaling guide.
+Capacity monitor reports new or changed request-growth signals and resource-limit risks. When saved measurements support a forecast within 14 days, it includes the estimated date, calculation, and scaling guide. If history or a matching limit is missing, it explains what it needs instead of inventing a date. See [what triggers a capacity report](/docs/guides/observability/detecting#usage).
+
+If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 
 <$Partial path="monitoring_agent_output.mdx" />
 
 ## Set up the agent
+
+Allow the agent to read the documentation linked in its prompt. Configure your harness to save measurements and alert state, then reload them on each run. Forecasts need at least seven daily measurements and a confirmed limit for the same resource and units.
 
 <AgentSetup id="usage" />
