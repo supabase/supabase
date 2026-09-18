@@ -50,7 +50,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
       expect(where).toContain(
-        `log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')`
+        `log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')`
       )
       expect(where).not.toContain(`source = 'compute'`)
     })
@@ -58,7 +58,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     it('classifies every worker OTEL stream as compute in the projected log type', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
       expect(sql).toContain(
-        `WHEN log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs') THEN 'compute'`
+        `WHEN log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs') THEN 'compute'`
       )
     })
 
@@ -66,14 +66,14 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:neq:compute'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
       expect(where).toContain(
-        `NOT (log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs'))`
+        `NOT (log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs'))`
       )
     })
 
     it('projects only Compute fields that exist on worker logs', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
-        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+        "log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
 
       expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
       expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.method'])`)
@@ -338,7 +338,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     it('does not classify Compute rows into a severity bucket', () => {
       const sql = getLogsChartQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
-        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+        "log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
 
       expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
       expect(sql).not.toContain(`WHEN ${workerCondition} THEN 'success'`)
