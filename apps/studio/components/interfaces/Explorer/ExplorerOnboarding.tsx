@@ -92,11 +92,6 @@ export const ExplorerOnboarding = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {!isLastStep && (
-              <Button type="button" variant="text" onClick={completeOnboarding} disabled={!isReady}>
-                Skip
-              </Button>
-            )}
             {!isFirstStep && (
               <Button type="button" variant="default" onClick={() => setStepIndex(stepIndex - 1)}>
                 Back
