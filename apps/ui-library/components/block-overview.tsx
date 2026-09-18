@@ -17,7 +17,7 @@ export function BlockOverview({
   showFiles?: boolean
 }) {
   const resolved = registry.items.some((item) => item.name === name)
-    ? resolveRegistryItem(registry, name)
+    ? resolveRegistryItem((itemName) => registry.items.find((item) => item.name === itemName), name)
     : undefined
 
   return (
