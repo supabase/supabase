@@ -10,6 +10,14 @@ type ConversationProps = Omit<ComponentProps<typeof StickToBottom>, 'children'> 
 type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>
 type ConversationScrollButtonProps = ComponentProps<typeof Button>
 
+/**
+ * Horizontal gutter the conversation reserves around its content. The fades overlay the scroll
+ * container, whose scrollbar runs down the right edge, so they stop at this gutter instead of
+ * spanning the full width.
+ */
+const CONTENT_GUTTER = 'px-7'
+const FADE_GUTTER = 'inset-x-7'
+
 export const Conversation = ({ className, children, ...props }: ConversationProps) => (
   <StickToBottom
     className={cn('relative flex-1 overflow-y-auto', className)}
@@ -20,18 +28,24 @@ export const Conversation = ({ className, children, ...props }: ConversationProp
   >
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-linear-to-b from-card to-transparent"
+      className={cn(
+        'pointer-events-none absolute top-0 z-10 h-8 bg-linear-to-b from-card to-transparent',
+        FADE_GUTTER
+      )}
     />
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-linear-to-t from-card to-transparent"
+      className={cn(
+        'pointer-events-none absolute bottom-0 z-10 h-8 bg-linear-to-t from-card to-transparent',
+        FADE_GUTTER
+      )}
     />
     {children}
   </StickToBottom>
 )
 
 export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (
-  <StickToBottom.Content className={cn('p-4', className)} {...props} />
+  <StickToBottom.Content className={cn(CONTENT_GUTTER, 'py-4', className)} {...props} />
 )
 
 export const ConversationScrollButton = ({

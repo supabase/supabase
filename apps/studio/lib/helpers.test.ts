@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 import { v4 as _uuidV4 } from 'uuid'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -30,6 +31,10 @@ import {
   tryParseJson,
   uuidv4,
 } from './helpers'
+
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn(), success: vi.fn() },
+}))
 
 vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mocked-uuid'),
@@ -217,6 +222,30 @@ describe('copyToClipboard', () => {
     ;(navigator.clipboard as any).write = undefined
     await copyToClipboard('hello')
     expect(writeTextMock).toHaveBeenCalledWith('hello')
+  })
+
+  it('resolves and reports when clipboard.write is denied', async () => {
+    writeMock.mockRejectedValue(
+      new DOMException("Failed to execute 'write' on 'Clipboard': Write permission denied.")
+    )
+    const callback = vi.fn()
+
+    const promise = copyToClipboard('hello', callback)
+    vi.runAllTimers()
+
+    await expect(promise).resolves.toBeUndefined()
+    expect(callback).not.toHaveBeenCalled()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
+
+  it('resolves and reports when writeText is denied', async () => {
+    writeTextMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    vi.stubGlobal('navigator', { clipboard: { writeText: writeTextMock } })
+    const callback = vi.fn()
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(callback).not.toHaveBeenCalled()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
   })
 })
 
