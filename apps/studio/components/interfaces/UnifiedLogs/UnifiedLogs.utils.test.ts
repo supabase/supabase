@@ -108,7 +108,7 @@ describe('getRawLogData', () => {
         launch_id: '1788424715503435269',
         log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
         log_stream: 'launch-1788424715503435269',
-        source: 'worker_guest_logs',
+        subservice: 'worker_guest_logs',
         worker: 'api',
       },
       project: 'cxkpapyhaaywrtudnqpl',
