@@ -1,7 +1,7 @@
 [data-theme='classic-dark'],
 .classic-dark {
   --helpers-os-appearance: Dark;
-  --hue: 159;
+  --hue: 157.5;
   --chroma: 0.014;
   --surface: 0.205;
   --foreground-lightness: 0.97;
@@ -18,9 +18,6 @@
   --secondary-default: 0deg 0% 100%;
   --secondary-400: 0deg 0% 100%;
   --secondary-200: 0deg 0% 100%;
-  /* Branded text is mode-aware and independent from brand fills and borders. */
-  --brand-text: 153.1deg 60.2% 52.7%;
-  --brand-text-display: 153.1deg 60.2% 52.7%;
   --brand-default: 153.1deg 60.2% 52.7%;
   --brand-600: 153deg 59.5% 70%;
   --brand-500: 153.5deg 61.8% 21.6%;
