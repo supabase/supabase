@@ -26,11 +26,11 @@ The measurement includes:
 
 Failed destination write attempts that Pipelines retries are not counted. Data is counted only after the destination acknowledges successful processing. In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count the same data again.
 
-Data successfully processed again as part of a user-requested resynchronization, table restart, or pipeline reset is also counted again.
+Data successfully processed again after [restarting table replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables), repeating an interrupted initial sync, or recovering a lost main slot is also counted again. **Restart pipeline** normally resumes saved progress, but [startup recovery](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery) can require copying data again.
 
 ### Cost estimates
 
-The Dashboard estimates initial sync volume and cost from source table metadata without scanning all rows. You can create a pipeline or reset tables even if an estimate is unavailable.
+The Dashboard estimates initial sync volume and cost from source table metadata without scanning all rows. You can create a pipeline or restart table replication even if an estimate is unavailable.
 
 Estimates are planning guidance, not exact quotes. Actual charges reflect row data copied after publication column and row filters and accepted by the destination.
 

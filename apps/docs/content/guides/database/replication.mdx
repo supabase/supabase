@@ -43,12 +43,12 @@ BigQuery is available as a managed destination. ClickHouse, DuckLake, and Snowfl
 
 Choose resources near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
-| Destination                                                | Insert       | Update                  | Delete                       | Truncate     | Schema change        | Data model                                                                       |
-| ---------------------------------------------------------- | ------------ | ----------------------- | ---------------------------- | ------------ | -------------------- | -------------------------------------------------------------------------------- |
-| [BigQuery](/docs/guides/database/replication/bigquery)     | ✅ Supported | ✅ Supported            | ✅ Supported                 | ✅ Supported | Limited beta         | Current-state tables.                                                            |
-| [ClickHouse](/docs/guides/database/replication/clickhouse) | ✅ Supported | `REPLICA IDENTITY FULL` | Primary-key or full identity | ✅ Supported | Limited Early Access | Current-state tables by default, or append-only CDC history.                     |
-| [DuckLake](/docs/guides/database/replication/ducklake)     | ✅ Supported | Row identity required   | Row identity required        | ✅ Supported | Limited Early Access | Current-state lakehouse tables backed by a SQL catalog and object storage.       |
-| [Snowflake](/docs/guides/database/replication/snowflake)   | ✅ Supported | `REPLICA IDENTITY FULL` | Row identity required        | ✅ Supported | Limited Early Access | Append-only CDC history. Source `TRUNCATE` operations and table resets erase it. |
+| Destination                                                | Insert       | Update                    | Delete                       | Truncate     | Schema change        | Data model                                                                         |
+| ---------------------------------------------------------- | ------------ | ------------------------- | ---------------------------- | ------------ | -------------------- | ---------------------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/bigquery)     | ✅ Supported | ✅ Supported              | ✅ Supported                 | ✅ Supported | Limited beta         | Current-state tables.                                                              |
+| [ClickHouse](/docs/guides/database/replication/clickhouse) | ✅ Supported | Complete new row required | Primary-key or full identity | ✅ Supported | Limited Early Access | Current-state tables by default, or append-only CDC history.                       |
+| [DuckLake](/docs/guides/database/replication/ducklake)     | ✅ Supported | Row identity required     | Row identity required        | ✅ Supported | Limited Early Access | Current-state lakehouse tables backed by a SQL catalog and object storage.         |
+| [Snowflake](/docs/guides/database/replication/snowflake)   | ✅ Supported | `REPLICA IDENTITY FULL`   | Row identity required        | ✅ Supported | Limited Early Access | Append-only CDC history. Source `TRUNCATE` operations and table restarts erase it. |
 
 ### Manual replication
 

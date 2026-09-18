@@ -39,13 +39,13 @@ The default `ReplacingMergeTree` engine requires ClickHouse 23.5 or later. The `
 
 Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) and select **ClickHouse**. Enter these destination settings:
 
-| Field            | Value                                                                   |
-| ---------------- | ----------------------------------------------------------------------- |
-| **URL**          | Public HTTPS endpoint, including its port when required                 |
-| **User**         | Dedicated ClickHouse user                                               |
-| **Password**     | User's password, if required                                            |
-| **Database**     | Existing target database                                                |
-| **Table engine** | `ReplacingMergeTree` for current state or `MergeTree` for event history |
+| Field            | Value                                                                      |
+| ---------------- | -------------------------------------------------------------------------- |
+| **URL**          | Public HTTPS endpoint, including its port when required                    |
+| **User**         | Dedicated ClickHouse user                                                  |
+| **Password**     | User's password, if required                                               |
+| **Database**     | Existing target database                                                   |
+| **Table engine** | `replacing_merge_tree` for current state or `merge_tree` for event history |
 
 Review the [source requirements](#source-table-requirements), then click **Create and start pipeline**.
 
@@ -65,6 +65,8 @@ Postgres schema and table names cannot start or end with `_` or contain `"` or `
 ## Choose a table engine
 
 The table engine controls how ClickHouse represents changes. It is selected for the entire destination.
+
+Choose the engine before creating the pipeline. Changing **Table engine** later does not convert existing destination tables; writes fail if their engine differs from the configured one. Restore the previous setting to resume using those tables.
 
 | Engine               | Data model                    | Source primary key              | Query pattern                               |
 | -------------------- | ----------------------------- | ------------------------------- | ------------------------------------------- |
@@ -104,22 +106,30 @@ Pipelines does not run `OPTIMIZE ... FINAL CLEANUP`. ClickHouse operators remain
 
 The `cdc_operation` and `cdc_lsn` names are reserved and can't be used by source columns.
 
+Inserts and updates append the complete new row. Deletes append the old row when the source uses `REPLICA IDENTITY FULL`. With primary-key identity, a delete contains the key values; other fields use `NULL` for nullable scalars or placeholders such as zero, empty strings, and empty arrays. Those placeholders are not the deleted row's original values.
+
 Read the base table to analyze the event history. Multiple changes committed in one Postgres transaction can share the same `cdc_lsn`, so it is not a unique event ID or a total ordering for reconstructing current state.
 
-A source `TRUNCATE` truncates the ClickHouse table for either engine, then ongoing replication continues. It does not start a new initial sync. Resetting a table drops and recreates its table and, for `ReplacingMergeTree`, its generated view. A reset erases the accumulated destination data and copies existing source rows only if the table is [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy).
+### Truncates and table restarts
+
+A source `TRUNCATE` truncates the ClickHouse table for either engine, then ongoing replication continues. It does not start a new initial sync.
+
+Restarting replication for a table drops and recreates its table and, for `ReplacingMergeTree`, its generated view. A table restart erases the accumulated destination data and copies existing source rows only if the table is [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy).
 
 ## Source table requirements
 
 `ReplacingMergeTree` requires a source primary key. `MergeTree` can replicate insert-only tables without one. Include all primary-key columns in the publication when the table has a key.
 
-| Published operation                        | Required replica identity                                           |
-| ------------------------------------------ | ------------------------------------------------------------------- |
-| Insert                                     | None; `ReplacingMergeTree` still requires a primary key             |
-| Update                                     | `REPLICA IDENTITY FULL` to reconstruct unchanged out-of-line values |
-| Delete                                     | Primary-key identity or `REPLICA IDENTITY FULL`                     |
-| Delete with `REPLICA IDENTITY USING INDEX` | The index must contain exactly the source primary-key columns       |
+| Published operation                        | Required replica identity                                                               |
+| ------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Insert                                     | None; `ReplacingMergeTree` still requires a primary key                                 |
+| Update                                     | Primary-key identity or `REPLICA IDENTITY FULL`; updates must contain complete new rows |
+| Delete                                     | Primary-key identity or `REPLICA IDENTITY FULL`                                         |
+| Delete with `REPLICA IDENTITY USING INDEX` | The index must contain exactly the source primary-key columns                           |
 
 `REPLICA IDENTITY NOTHING` cannot support updates or deletes.
+
+Use `REPLICA IDENTITY FULL` for tables whose updates can omit unchanged out-of-line TOAST values. It lets Pipelines reconstruct the complete new row. Changing replica identity affects only new WAL; incompatible retained updates can still require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 Array elements can be `NULL`, but a top-level array value cannot. Replace top-level `NULL` values and enforce `NOT NULL`, or ensure producers always supply an array. Empty arrays are supported.
 
@@ -168,20 +178,20 @@ New scalar columns are made nullable when ClickHouse needs a value for historica
 
 Changing the publication's column list for an already tracked table is supported while the pipeline runs. A previously excluded scalar column is added as nullable without a default, so historical rows remain `NULL`. Removing a published column drops its destination values; adding it again does not restore them.
 
-Publishing a previously excluded array column requires a new initial sync because ClickHouse cannot represent a nullable array. Include the table in **Initial sync**, then open **View pipeline**, click the table's restart icon, and confirm **Restart replication**. This [table reset](/docs/guides/database/replication/pipelines-monitoring#table-errors) deletes destination data and repeats initial sync.
+Publishing a previously excluded array column requires a new initial sync because ClickHouse cannot represent a nullable array. Include the table in **Initial sync**, then [restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to replace destination data and copy existing rows again.
 
 For type changes, follow the shared [schema-change recovery guidance](/docs/guides/database/replication/pipelines#schema-change-support).
 
-ClickHouse DDL is not transactional. An interrupted multi-column schema change can leave a partially applied destination schema. Don't repair managed tables or views manually. If the pipeline remains failed after a restart, [contact support](/dashboard/support/new).
+ClickHouse DDL is not transactional. An interrupted multi-column schema change can leave a partially applied destination schema. Don't repair managed tables or views manually. If the pipeline remains failed after a pipeline restart, [contact support](/dashboard/support/new).
 
 ## Troubleshooting
 
-| Issue                                      | Resolution                                                                                                                                            |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| URL or connection fails                    | Use a reachable public HTTPS endpoint with the correct port and credentials. Private endpoints are unsupported.                                       |
-| Validation passes but setup or writes fail | Check [permissions and resource requirements](#prepare-clickhouse-resources), including table ownership and the server version.                       |
-| Updates, deletes, or arrays fail           | Check the [source table requirements](#source-table-requirements).                                                                                    |
-| A schema change fails                      | Check [supported changes](#schema-change-support). Don't repair managed objects manually; contact support if restarting does not resolve the failure. |
+| Issue                                      | Resolution                                                                                                                                                         |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| URL or connection fails                    | Use a reachable public HTTPS endpoint with the correct port and credentials. Private endpoints are unsupported.                                                    |
+| Validation passes but setup or writes fail | Check [permissions and resource requirements](#prepare-clickhouse-resources), including table ownership and the server version.                                    |
+| Updates, deletes, or arrays fail           | Check the [source table requirements](#source-table-requirements).                                                                                                 |
+| A schema change fails                      | Check [supported changes](#schema-change-support). Don't repair managed objects manually; contact support if restarting the pipeline does not resolve the failure. |
 
 Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors and include the pipeline ID when [contacting support](/dashboard/support/new).
 

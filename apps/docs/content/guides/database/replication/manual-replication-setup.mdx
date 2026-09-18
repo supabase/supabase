@@ -10,7 +10,7 @@ This guide covers setting up **manual logical replication** using your own tools
 
 <Admonition type="note">
 
-This guide is for replicating data to destination systems using your own tools. For deploying read-only databases across multiple regions, see [read replicas](/docs/guides/platform/read-replicas) instead.
+For deploying read-only databases across multiple regions, see [read replicas](/docs/guides/platform/read-replicas).
 
 </Admonition>
 
@@ -21,7 +21,7 @@ To set up replication, the following is recommended:
 - Instance size of XL or greater
 - [IPv4 add-on](/docs/guides/platform/ipv4-address) enabled
 
-To create a replication slot, you will need to use the `postgres` user and follow the instructions in the [logical replication example](/docs/guides/database/postgres/setup-replication-external).
+Follow the [logical replication example](/docs/guides/database/postgres/setup-replication-external) to create a publication and replication slot.
 
 <Admonition type="note">
 
@@ -71,9 +71,7 @@ You can follow those steps with the following modifications:
 
 Materialize has the following [documentation](https://materialize.com/docs/sql/create-source/postgres/) on setting up Postgres as a source.
 
-You can follow those steps with the following modifications:
-
-1. Follow the steps in the [logical replication example](/docs/guides/database/postgres/setup-replication-external) to create a publication slot
+Use the [logical replication example](/docs/guides/database/postgres/setup-replication-external) for the Supabase publication and replication slot setup.
 
 </TabPanel>
 

@@ -59,16 +59,20 @@ Set the pipeline role as the service user's `DEFAULT_ROLE`. Leave **Role** empty
 
 ### Generate a key pair
 
-Pipelines authenticates with an RSA key pair. Snowflake requires a key of at least 2048 bits and recommends PKCS #8. Generate an unencrypted private key:
+Pipelines authenticates with an RSA key pair. Snowflake requires a key of at least 2048 bits and recommends PKCS #8. Choose one of the following commands to generate `rsa_key.p8`.
+
+For an unencrypted private key:
 
 ```bash
-openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8 -nocrypt
+openssl genrsa 2048 | openssl pkcs8 -topk8 \
+  -inform PEM -out rsa_key.p8 -nocrypt
 ```
 
-To use a passphrase, generate an encrypted PKCS #8 private key:
+Or, for a passphrase-protected private key:
 
 ```bash
-openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 -inform PEM -out rsa_key.p8
+openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 \
+  -inform PEM -out rsa_key.p8
 ```
 
 Derive the public key:
@@ -119,7 +123,7 @@ Enter the database and schema identifiers exactly as stored in Snowflake. Unquot
 
 ## How it works
 
-Pipelines uses Snowflake's SQL REST API to validate the database and schema, create, evolve, and reset destination tables, and apply source `TRUNCATE` operations. It sends initial and ongoing row data through Snowpipe Streaming.
+Pipelines uses Snowflake's SQL REST API to validate the database and schema, create, evolve, and recreate destination tables, and apply source `TRUNCATE` operations. It sends initial and ongoing row data through Snowpipe Streaming.
 
 Validation checks authentication, database and schema visibility, and that `QUOTED_IDENTIFIERS_IGNORE_CASE` is `FALSE`. It does not verify that the role can create or own tables, create pipes, or write through Snowpipe Streaming.
 
@@ -152,9 +156,11 @@ Snowflake tables are an event history, not a current-state replica:
 - A delete appends the complete old row for `REPLICA IDENTITY FULL`. For a primary-key or `USING INDEX` identity, it appends only the identity columns and sets all other source columns to `NULL`.
 - A source `TRUNCATE` truncates the Snowflake table, resets its streaming state, and does not append a truncate event.
 
-To derive current state, group by a stable source identity, select the latest `_cdc_sequence_number`, and exclude identities whose latest operation is `delete`. The sequence number orders changes but is not a globally unique event ID. Snowpipe committed offsets suppress routine replay; consumers must still tolerate [duplicate processing](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once).
+To derive current state, group by a unique source identity whose value never changes, select the latest `_cdc_sequence_number`, and exclude identities whose latest operation is `delete`. An update that changes the identity does not emit a deletion for the old identity, so this query pattern would leave the old row visible.
 
-A [table reset](/docs/guides/database/replication/pipelines-monitoring#table-errors) drops the Snowflake table and managed streaming state, erasing its history. It cannot recover past events. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination history in place.
+The sequence number orders changes but is not a globally unique event ID. Snowpipe committed offsets suppress routine replay; consumers must still tolerate [duplicate processing](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once).
+
+A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops the Snowflake table and managed streaming state, erasing its history. It cannot recover past events. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination history in place.
 
 ## Source table requirements
 
@@ -172,7 +178,7 @@ Set full replica identity before publishing updates:
 alter table public.your_table replica identity full;
 ```
 
-`REPLICA IDENTITY FULL` increases WAL volume, but lets Pipelines construct complete new rows when Postgres omits unchanged out-of-line TOAST values. The setting applies only to new WAL records. If retained WAL already contains an incompatible update, reset the affected table after changing the setting.
+`REPLICA IDENTITY FULL` increases WAL volume, but lets Pipelines construct complete new rows when Postgres omits unchanged out-of-line TOAST values. The setting applies only to new WAL records. If retained WAL already contains an incompatible update, restart replication for the affected table after changing the setting.
 
 ## Type mapping
 
@@ -220,7 +226,7 @@ Changing the publication's column list for an already tracked table is supported
 
 For type changes, follow the shared [schema-change recovery guidance](/docs/guides/database/replication/pipelines#schema-change-support).
 
-Snowflake DDL changes existing history. Adding a column with a default can populate older rows. Renaming a column changes the historical schema. Dropping a column removes it from old events. Snowflake DDL is not transactional, so an interrupted multi-column change can leave a partially applied schema. Do not alter managed destination objects manually. If the pipeline remains failed after a restart, [contact support](/dashboard/support/new).
+Snowflake DDL changes existing history. Adding a column with a default can populate older rows. Renaming a column changes the historical schema. Dropping a column removes it from old events. Snowflake DDL is not transactional, so an interrupted multi-column change can leave a partially applied schema. Do not alter managed destination objects manually. If the pipeline remains failed after a pipeline restart, [contact support](/dashboard/support/new).
 
 ## Troubleshooting
 

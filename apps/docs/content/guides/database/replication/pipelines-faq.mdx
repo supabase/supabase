@@ -42,7 +42,7 @@ Support differs by destination. Check the [schema-change guides](/docs/guides/da
 
 ## What happens when you disable Pipelines?
 
-Pipelines removes its event trigger and replication state tables from Postgres. Existing destination data remains. Delete all destinations first, then follow [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines).
+Pipelines removes its event trigger and replication state tables from Postgres. Existing destination data remains. Delete all pipelines first, then follow [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines).
 
 ## Why is a table not being replicated?
 
@@ -69,7 +69,7 @@ Required WAL is gone, so replication cannot continue from that slot. Follow [slo
 
 ## Why is a table in error state?
 
-An initial sync or ongoing replication operation failed, for example after an unsupported schema change. Some errors retry automatically; others require a reset. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for diagnosis and the effects of resetting.
+An initial sync or ongoing replication operation failed, for example after an unsupported schema change. Some errors retry automatically; others require restarting replication for the affected tables from scratch. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for diagnosis and [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) for the procedure and its effects.
 
 ## What happens when a project becomes inactive or moves to the Free Plan?
 
