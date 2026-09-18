@@ -212,14 +212,15 @@ describe('WarehouseSchemaTablePicker', () => {
     customRender(<WarehousePickerHarness isEditing />)
 
     expect(await screen.findByText('2 tables selected')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('combobox', { name: 'Select tables to replicate' }))
     await userEvent.click(screen.getByText('customers'))
 
     expect(screen.getByText('1 table selected')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(screen.getByText('2 tables selected')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('combobox', { name: 'Select tables to replicate' }))
     await userEvent.click(screen.getByText('customers'))

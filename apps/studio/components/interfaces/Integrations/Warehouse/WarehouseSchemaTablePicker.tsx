@@ -316,10 +316,10 @@ export const WarehouseSchemaTablePicker = ({
               from here would destroy a project's Warehouse with no confirmation. Disabling keeps
               teardown on the dedicated action, which asks first.
             */}
-            {isEditing && (
+            {isEditing && hasChanges && (
               <Button
                 variant="default"
-                disabled={!hasChanges || isSubmitting}
+                disabled={isSubmitting}
                 onClick={() => setSelectionOverride(null)}
               >
                 Cancel
