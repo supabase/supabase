@@ -21,7 +21,7 @@ function item(name: string, overrides: Partial<RegistryItem> = {}): RegistryItem
       { path: `lib/${name}.ts`, type: 'registry:lib', content: `export const ${name} = true` },
     ],
     ...overrides,
-  }
+  } as RegistryItem
 }
 
 function lookup(items: readonly RegistryItem[]) {
