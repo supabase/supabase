@@ -17,7 +17,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-type TokenResponse = components['schemas']['GetScopedAccessTokenResponse']
+type TokenResponse = components['schemas']['GetScopedAccessTokenResponse_Output']
 
 mockAnimationsApi()
 

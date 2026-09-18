@@ -17,7 +17,7 @@ _Self-serve first ([agent skills](../../../../apps/docs/CONTRIBUTING.md#ai-agent
 - The **why** is explicit: a reader learns what problem this solves and when to reach for it, not only the steps.
 - The content **type is deliberate** and consistent within the page.
 - **Audience and prerequisites** are stated up front.
-- **Examples are runnable and have been tested** (commands, code, expected result) — verify with `/test-the-docs` against a Docker-isolated local stack, not production.
+- **Examples are runnable and have been tested** (commands, code, expected result)
 - **Correct stage** like GA is stated; limitations are named honestly.
 - The page **lives in the right place** in the IA and links to and from related pages.
 - Terminology and formatting match existing docs (and style guide once it lands).
@@ -47,8 +47,6 @@ _Skill:_ `/write-the-docs` to draft net-new content grounded in Linear and the c
 - [ ] P/E: Cross-repo behavior confirmed via universe when accessible, else public `gh search` / named product repos when the feature is not confined to `supabase/supabase` (lookup via `/pm-the-docs`, not `/ask-the-docs`)
 - [ ] E: Contribute technical depth and verify accuracy (APIs, limits, edge cases)
 - [ ] P: Call out the current stage inline and any known limitations
-
-When the work is improving an existing page (restructure, reorder, connective text, brevity) rather than authoring net-new content, use `/edit-the-docs` instead of `/write-the-docs`.
 
 ### 4. Self-review against the bar
 
@@ -81,4 +79,4 @@ _Skill:_ `/review-the-docs` to triage, classify, verify the build, and report.
 
 ## Resources
 
-Skills for this checklist: [AI agent skills for docs authoring](../../../../apps/docs/CONTRIBUTING.md#ai-agent-skills-for-docs-authoring) (`/pm-the-docs`, `/ask-the-docs`, `/write-the-docs`, `/edit-the-docs`, `/test-the-docs`, `/review-the-docs`).
+Skills for this checklist: [AI agent skills for docs authoring](../../../../apps/docs/CONTRIBUTING.md#ai-agent-skills-for-docs-authoring) (`/pm-the-docs`, `/ask-the-docs`, `/write-the-docs`, `/test-the-docs`, `/review-the-docs`).

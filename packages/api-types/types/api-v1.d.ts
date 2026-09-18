@@ -40,8 +40,10 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Beta] Diffs a database branch
+     * Diffs a database branch
      * @description Diffs the specified database branch
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     get: operations['v1-diff-a-branch']
     put?: never
@@ -139,7 +141,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Authorize user through oauth */
+    /**
+     * Authorize user through oauth
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-authorize-user']
     put?: never
     post?: never
@@ -178,7 +185,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Revoke oauth app authorization and it's corresponding tokens */
+    /**
+     * Revoke oauth app authorization and it's corresponding tokens
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-revoke-token']
     delete?: never
     options?: never
@@ -196,8 +208,10 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * [Beta] Exchange auth code for user's access and refresh token
+     * Exchange auth code for user's access and refresh token
      * @description Supports `authorization_code`, `refresh_token`, and `urn:ietf:params:oauth:grant-type:jwt-bearer` grant types. The `jwt-bearer` grant type (IDJAG — identity-directed JWT assertion) is in beta and available on Team and Enterprise plans only.
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     post: operations['v1-exchange-oauth-token']
     delete?: never
@@ -471,7 +485,6 @@ export interface paths {
     }
     /**
      * Gets project performance advisors.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-performance-advisors']
@@ -492,7 +505,6 @@ export interface paths {
     }
     /**
      * Gets project security advisors.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-security-advisors']
@@ -807,9 +819,19 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Create a login role for CLI with temporary password */
+    /**
+     * Create a login role for CLI with temporary password
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-create-login-role']
-    /** [Beta] Delete existing login roles used by CLI */
+    /**
+     * Delete existing login roles used by CLI
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-delete-login-roles']
     options?: never
     head?: never
@@ -1127,11 +1149,21 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's custom hostname config */
+    /**
+     * Gets project's custom hostname config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-hostname-config']
     put?: never
     post?: never
-    /** [Beta] Deletes a project's custom hostname configuration */
+    /**
+     * Deletes a project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-Delete hostname config']
     options?: never
     head?: never
@@ -1147,7 +1179,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Activates a custom hostname for a project. */
+    /**
+     * Activates a custom hostname for a project.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-activate-custom-hostname']
     delete?: never
     options?: never
@@ -1164,7 +1201,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Updates project's custom hostname configuration */
+    /**
+     * Updates project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-update-hostname-config']
     delete?: never
     options?: never
@@ -1181,7 +1223,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Attempts to verify the DNS configuration for project's custom hostname configuration */
+    /**
+     * Attempts to verify the DNS configuration for project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-verify-dns-config']
     delete?: never
     options?: never
@@ -1305,7 +1352,6 @@ export interface paths {
     }
     /**
      * Gets database metadata for the given project.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-database-metadata']
@@ -1529,7 +1575,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Run sql query */
+    /**
+     * Run sql query
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-run-a-query']
     delete?: never
     options?: never
@@ -1547,8 +1598,10 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * [Beta] Run a sql query as supabase_read_only_user
+     * Run a sql query as supabase_read_only_user
      * @description All entity references must be schema qualified.
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     post: operations['v1-read-only-query']
     delete?: never
@@ -1566,7 +1619,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Enables Database Webhooks on the project */
+    /**
+     * Enables Database Webhooks on the project
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-enable-database-webhook']
     delete?: never
     options?: never
@@ -1695,9 +1753,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's temporary access configuration. */
+    /**
+     * Get project's temporary access configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-jit-access-config']
-    /** [Beta] Update project's temporary access configuration. */
+    /**
+     * Update project's temporary access configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-jit-access-config']
     post?: never
     delete?: never
@@ -1716,7 +1784,12 @@ export interface paths {
     get?: never
     put?: never
     post?: never
-    /** [Beta] Remove network bans. */
+    /**
+     * Remove network bans.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-delete-network-bans']
     options?: never
     head?: never
@@ -1732,7 +1805,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Gets project's network bans */
+    /**
+     * Gets project's network bans
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-list-all-network-bans']
     delete?: never
     options?: never
@@ -1749,7 +1827,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Gets project's network bans with additional information about which databases they affect */
+    /**
+     * Gets project's network bans with additional information about which databases they affect
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-list-all-network-bans-enriched']
     delete?: never
     options?: never
@@ -1764,14 +1847,24 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's network restrictions */
+    /**
+     * Gets project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-network-restrictions']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
-    /** [Alpha] Updates project's network restrictions by adding or removing CIDRs */
+    /**
+     * Updates project's network restrictions by adding or removing CIDRs
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
     patch: operations['v1-patch-network-restrictions']
     trace?: never
   }
@@ -1784,7 +1877,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Updates project's network restrictions */
+    /**
+     * Updates project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-update-network-restrictions']
     delete?: never
     options?: never
@@ -1816,9 +1914,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's pgsodium config */
+    /**
+     * Gets project's pgsodium config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-pgsodium-config']
-    /** [Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
+    /**
+     * Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-pgsodium-config']
     post?: never
     delete?: never
@@ -1854,7 +1962,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Remove a read replica */
+    /**
+     * Remove a read replica
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-remove-a-read-replica']
     delete?: never
     options?: never
@@ -1871,7 +1984,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Set up a read replica */
+    /**
+     * Set up a read replica
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-setup-a-read-replica']
     delete?: never
     options?: never
@@ -2000,9 +2118,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's SSL enforcement configuration. */
+    /**
+     * Get project's SSL enforcement configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-ssl-enforcement-config']
-    /** [Beta] Update project's SSL enforcement configuration. */
+    /**
+     * Update project's SSL enforcement configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-ssl-enforcement-config']
     post?: never
     delete?: never
@@ -2057,7 +2185,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Upgrades the project's Postgres version */
+    /**
+     * Upgrades the project's Postgres version
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-upgrade-postgres-version']
     delete?: never
     options?: never
@@ -2072,7 +2205,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Returns the project's eligibility for upgrades */
+    /**
+     * Returns the project's eligibility for upgrades
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-postgres-upgrade-eligibility']
     put?: never
     post?: never
@@ -2089,7 +2227,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets the latest status of the project's upgrade */
+    /**
+     * Gets the latest status of the project's upgrade
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-postgres-upgrade-status']
     put?: never
     post?: never
@@ -2106,11 +2249,21 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets current vanity subdomain config */
+    /**
+     * Gets current vanity subdomain config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-vanity-subdomain-config']
     put?: never
     post?: never
-    /** [Beta] Deletes a project's vanity subdomain configuration */
+    /**
+     * Deletes a project's vanity subdomain configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-deactivate-vanity-subdomain-config']
     options?: never
     head?: never
@@ -2126,7 +2279,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Activates a vanity subdomain for a project. */
+    /**
+     * Activates a vanity subdomain for a project.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-activate-vanity-subdomain-config']
     delete?: never
     options?: never
@@ -2143,7 +2301,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Checks vanity subdomain availability */
+    /**
+     * Checks vanity subdomain availability
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-check-vanity-subdomain-availability']
     delete?: never
     options?: never
@@ -2158,7 +2321,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets the list of available regions that can be used for a new project */
+    /**
+     * Gets the list of available regions that can be used for a new project
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-available-regions']
     put?: never
     post?: never
@@ -3326,8 +3494,9 @@ export interface components {
       }[]
     }
     JitAuthorizeAccessResponse_Output: {
+      act?: string
       /** Format: uuid */
-      user_id: string
+      user_id?: string
       user_role: {
         allowed_networks?: {
           allowed_cidrs?: {
