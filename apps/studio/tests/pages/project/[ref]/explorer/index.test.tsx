@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import mockRouter from 'next-router-mock'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import ProjectExplorerPage from './index'
+import ProjectExplorerPage from '@/pages/project/[ref]/explorer/index'
 import { customRender } from '@/tests/lib/custom-render'
 
 // `common`'s useParams and `next/router` are globally mocked in vitestSetup.ts
@@ -70,7 +70,7 @@ describe('ProjectExplorerPage', () => {
       setLastVisitedExplorerTab: mocks.setLastVisitedExplorerTab,
     })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mocks.activatePinnedTab).not.toHaveBeenCalled()
     expect(screen.getByText('Checking last tab')).toBeInTheDocument()
@@ -79,7 +79,7 @@ describe('ProjectExplorerPage', () => {
   it('activates the Home tab when there is no last visited Explorer tab', () => {
     mockHistory(undefined)
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mocks.activatePinnedTab).toHaveBeenCalled()
     expect(mockRouter.replace).not.toHaveBeenCalled()
@@ -90,7 +90,7 @@ describe('ProjectExplorerPage', () => {
     mocks.restoreDraft.mockReturnValue(true)
     mockHistory({ type: 'query', id: 'query-1' })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mocks.restoreDraft).toHaveBeenCalledWith({ id: 'query-1', projectRef: 'default' })
     expect(mockRouter.replace).toHaveBeenCalledWith('/project/default/explorer/query/query-1')
@@ -101,7 +101,7 @@ describe('ProjectExplorerPage', () => {
     mocks.restoreDraft.mockReturnValue(false)
     mockHistory({ type: 'query', id: 'query-1' })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mockRouter.replace).not.toHaveBeenCalled()
     expect(mocks.setLastVisitedExplorerTab).toHaveBeenCalledWith(undefined)
@@ -115,7 +115,7 @@ describe('ProjectExplorerPage', () => {
     })
     mockHistory({ type: 'chat', id: 'chat-1' })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mockRouter.replace).toHaveBeenCalledWith('/project/default/explorer/chat/chat-1')
   })
@@ -124,7 +124,7 @@ describe('ProjectExplorerPage', () => {
     mocks.assistantSnapshot.mockReturnValue({ isInitialized: false, chats: {} })
     mockHistory({ type: 'chat', id: 'chat-1' })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mockRouter.replace).not.toHaveBeenCalled()
     expect(mocks.activatePinnedTab).not.toHaveBeenCalled()
@@ -135,7 +135,7 @@ describe('ProjectExplorerPage', () => {
     mocks.assistantSnapshot.mockReturnValue({ isInitialized: true, chats: {} })
     mockHistory({ type: 'chat', id: 'chat-1' })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mockRouter.replace).not.toHaveBeenCalled()
     expect(mocks.setLastVisitedExplorerTab).toHaveBeenCalledWith(undefined)
@@ -146,7 +146,7 @@ describe('ProjectExplorerPage', () => {
     mocks.useLoadNotebook.mockReturnValue({ isNotFound: false, isLoading: true })
     mockHistory({ type: 'notebook', id: 'notebook-1' })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mockRouter.replace).not.toHaveBeenCalled()
     expect(screen.getByText('Checking last tab')).toBeInTheDocument()
@@ -156,7 +156,7 @@ describe('ProjectExplorerPage', () => {
     mocks.useLoadNotebook.mockReturnValue({ isNotFound: false, isLoading: false })
     mockHistory({ type: 'notebook', id: 'notebook-1' })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mockRouter.replace).toHaveBeenCalledWith('/project/default/explorer/notebook/notebook-1')
   })
@@ -165,7 +165,7 @@ describe('ProjectExplorerPage', () => {
     mocks.useLoadNotebook.mockReturnValue({ isNotFound: true, isLoading: false })
     mockHistory({ type: 'notebook', id: 'notebook-1' })
 
-    customRender(<ProjectExplorerPage />)
+    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
 
     expect(mockRouter.replace).not.toHaveBeenCalled()
     expect(mocks.setLastVisitedExplorerTab).toHaveBeenCalledWith(undefined)
