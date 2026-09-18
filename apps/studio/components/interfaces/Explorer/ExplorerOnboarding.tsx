@@ -21,7 +21,7 @@ const ONBOARDING_STEPS: Array<{
     icon: Compass,
     title: 'Welcome to Explorer',
     description:
-      'Interact with your database and logs in one place. Run SQL, save your work to notebooks, and chat with Assistant.',
+      'Interact with your database and logs in one place. Run SQL, save your work to Notebooks, and chat with Assistant.',
     isPreview: true,
   },
   {
@@ -34,13 +34,13 @@ const ONBOARDING_STEPS: Array<{
     icon: NotebookText,
     title: 'Notebooks',
     description:
-      'Snippets have evolved into notebooks. Combine multiple queries with markdown notes for you, your team, or Assistant to run later.',
+      'Snippets have evolved into Notebooks. Combine multiple queries with markdown notes for you, your team, or Assistant to run later.',
   },
   {
     icon: MessageSquare,
     title: 'Chat with your project',
     description:
-      'Ask Assistant to write queries, explain results, or build notebooks for you. Your organization’s AI settings control what it can access.',
+      'Ask Assistant to write queries, explain results, or build Notebooks for you. Your organization’s AI settings control what it can access.',
   },
 ]
 
