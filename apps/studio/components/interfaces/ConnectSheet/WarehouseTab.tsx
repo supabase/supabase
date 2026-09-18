@@ -52,8 +52,7 @@ export const WarehouseTab = () => {
   })
   const hasLiveTables = data?.tables.some((table) => table.state === 'live') ?? false
   const canShowConnectionDetails =
-    data?.setup_status !== 'error' &&
-    (isWarehouseProvisioned(data?.setup_status) || hasLiveTables)
+    data?.setup_status !== 'error' && (isWarehouseProvisioned(data?.setup_status) || hasLiveTables)
 
   let content: React.ReactNode
 
