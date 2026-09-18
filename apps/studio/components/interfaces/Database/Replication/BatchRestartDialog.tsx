@@ -19,7 +19,10 @@ import { getTableCopyTargets } from './TableSyncCopy.utils'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 import type { TableSyncCopyConfig } from '@/data/replication/types'
-import { usePipelineRequestStatus } from '@/state/replication-pipeline-request-status'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 
 interface BatchRestartDialogProps {
   pipelineStatusName?: PipelineStatusName
@@ -49,6 +52,7 @@ export const BatchRestartDialog = ({
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const pipelineId = Number(_pipelineId)
   const { runWithRequestStatus } = usePipelineRequestStatus()
+  const restartRequestStatus = getRestartRequestStatus(pipelineStatusName)
   const affectedTables = useMemo(() => {
     if (mode === 'all') {
       return tables
@@ -76,7 +80,7 @@ export const BatchRestartDialog = ({
     if (!projectRef) return toast.error('Project ref is required')
     onResetStart?.(affectedTableIds)
     try {
-      await runWithRequestStatus(pipelineId, getRestartRequestStatus(pipelineStatusName), () =>
+      await runWithRequestStatus(pipelineId, restartRequestStatus, () =>
         rollbackTables({
           projectRef,
           pipelineId,
@@ -109,7 +113,10 @@ export const BatchRestartDialog = ({
     resetDescription = `This resets ${resetScope} and deletes ${destinationData}. Existing rows sync again for ${copiedTables.length} of ${count} ${tableWord}, while ${remainingTables} ${remainingAction} initial sync and resume with new changes only.`
   }
 
-  const description = `${resetDescription} If the pipeline is running, it restarts automatically to apply the reset.`
+  const shouldRestartPipeline = restartRequestStatus !== PipelineStatusRequestStatus.None
+  const description = shouldRestartPipeline
+    ? `${resetDescription} The pipeline restarts automatically to apply the reset.`
+    : resetDescription
 
   const dialogContent =
     mode === 'all'

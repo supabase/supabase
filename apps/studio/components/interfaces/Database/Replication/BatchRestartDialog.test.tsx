@@ -124,7 +124,7 @@ describe('BatchRestartDialog', () => {
 
     expect(
       screen.getByText(
-        'This resets the table, deletes its destination data, and syncs existing rows again. If the pipeline is running, it restarts automatically to apply the reset.'
+        'This resets the table, deletes its destination data, and syncs existing rows again.'
       )
     ).toBeInTheDocument()
   })
@@ -204,6 +204,13 @@ describe('BatchRestartDialog', () => {
         { queryClient }
       )
       await screen.findByText(initialStatus === 'started' ? 'Running' : 'Stopped')
+      expect(
+        screen.getByText(
+          initialStatus === 'started'
+            ? 'This resets the table, deletes its destination data, and syncs existing rows again. The pipeline restarts automatically to apply the reset.'
+            : 'This resets the table, deletes its destination data, and syncs existing rows again.'
+        )
+      ).toBeInTheDocument()
       fireEvent.click(
         screen.getByRole('button', {
           name: target === 'all' ? 'Reset all tables' : 'Reset table',
