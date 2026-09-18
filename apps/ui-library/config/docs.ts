@@ -24,40 +24,6 @@ export const gettingStarted: SidebarNavGroup = {
   ],
 }
 
-export const starterApps: SidebarNavGroup = {
-  title: 'Starter Apps',
-  items: [
-    {
-      title: 'Next.js Starter',
-      href: '/docs/starters/nextjs-starter',
-      items: [],
-      new: true,
-      commandItemLabel: 'Next.js Starter',
-    },
-    {
-      title: 'SaaS Starter',
-      href: '/docs/starters/saas-starter',
-      items: [],
-      new: true,
-      commandItemLabel: 'SaaS Starter',
-    },
-    {
-      title: 'AI Chat App',
-      href: '/docs/starters/ai-chat-app',
-      items: [],
-      new: true,
-      commandItemLabel: 'AI Chat App',
-    },
-    {
-      title: 'Flutter Starter',
-      href: '/docs/starters/flutter-starter',
-      items: [],
-      new: true,
-      commandItemLabel: 'Flutter Starter',
-    },
-  ],
-}
-
 export const platformBlocks: SidebarNavGroup = {
   title: 'Platform',
   items: [
@@ -192,29 +158,6 @@ export const componentPages: SidebarNavGroup = {
     },
   ],
 }
-
-export const COMMAND_ITEMS = [
-  ...gettingStarted.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...starterApps.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...componentPages.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...oauthBlocks.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...mcpBlocks.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-]
 
 // Framework titles for display
 export const frameworkTitles: Record<string, string> = {
