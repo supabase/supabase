@@ -8,7 +8,6 @@ sidebar_label: 'ClickHouse'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-
 The ClickHouse destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
 Replicate Postgres changes to [ClickHouse](https://clickhouse.com/) as current-state tables or an append-only history. [Choose a table engine](#choose-a-table-engine), [prepare resources](#prepare-clickhouse-resources), then [configure the destination](#configure-clickhouse-as-a-destination).
@@ -32,7 +31,6 @@ Choose the engine before creating the pipeline. Changing **Table engine** later 
 
 Updating a source primary-key value removes the old key from the current-state view and writes the row under its new key. Changing the primary-key definition is a separate [schema change](#schema-change-support).
 
-
 ## Prepare ClickHouse resources
 
 Before creating the destination:
@@ -49,7 +47,6 @@ Before creating the destination:
 Keep the database otherwise empty. Pipelines manages the replicated tables and current-state views. Don't pre-create or manually alter those objects.
 
 The default `ReplacingMergeTree` engine requires ClickHouse 23.5 or later. The `MergeTree` event-log engine does not have this minimum-version requirement.
-
 
 ## Configure ClickHouse as a destination
 

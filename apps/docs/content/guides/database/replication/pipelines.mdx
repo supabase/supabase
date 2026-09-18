@@ -39,7 +39,6 @@ Follow your destination guide to prepare its resources and credentials, and chec
 - [DuckLake](/docs/guides/database/replication/ducklake)
 - [Snowflake](/docs/guides/database/replication/snowflake)
 
-
 ### Step 2: Enable Pipelines
 
 <Admonition type="note">
@@ -173,7 +172,6 @@ You can delete the destination tables yourself after the restart. **Don't modify
 A pipeline restart does not request a fresh copy of every table. Tables that completed initial sync resume from saved progress. An interrupted initial sync can start again from scratch: Pipelines deletes the partial destination data and copies the table again according to the **Initial sync** selection. This can also happen to an unfinished table when another table's restart temporarily stops the pipeline.
 
 If the main replication slot is lost and **Recreate slot** is enabled, startup rebuilds all replicated tables. Review [lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) for its data-loss and billing effects. To deliberately rebuild specific tables, use [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
-
 
 ### Disabling Pipelines
 

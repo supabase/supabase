@@ -224,7 +224,6 @@ $$ language plpgsql security definer;
 
 Some results:
 
-
 | Policy                           | Index | Main Rs | Team Rs | on 10 teams | 100   | 500   | note               |
 | -------------------------------- | ----- | ------- | ------- | ----------- | ----- | ----- | ------------------ |
 | =ANY(user_teams())               | no    | 1M      | 1000    | >2Min       | >2Min | >2Min | TO or killed       |
@@ -233,4 +232,3 @@ Some results:
 | =ANY(ARRAY(select user_teams())) | yes   | 1M      | 1000    | 2ms         | 3     | 3     |                    |
 | in(1,2,3...100)                  | no    | 1M      | NA      | 130ms       | 142   | x     | baseline check     |
 | =ANY(ARRAY(select user_teams())) | yes   | 1M      | 10K     | x           | x     | x     | 24ms (on 1K teams) |
-

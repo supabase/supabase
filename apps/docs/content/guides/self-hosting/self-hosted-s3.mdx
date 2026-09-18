@@ -40,7 +40,6 @@ aws s3 ls \
 s3://your-storage-bucket )
 ```
 
-
 ### Test with rclone
 
 ```sh
@@ -78,7 +77,6 @@ storage:
 
 Depending on your setup, you may need to adjust these values - for example, to use a local S3-compatible service like RustFS, MinIO or a cloud provider like AWS.
 
-
 ### Using RustFS
 
 An override `docker-compose.rustfs.yml` can be added to enable RustFS container and provide an S3-compatible API for Storage backend:
@@ -89,7 +87,6 @@ sh run.sh start
 ```
 
 Make sure to review the Storage section in your `.env` file for related configuration options.
-
 
 ### Using MinIO
 
@@ -143,7 +140,6 @@ storage:
 ```
 
 ## Verify the setup
-
 
 - Open Studio and upload a file to a bucket. List the file using the AWS CLI or `rclone` to confirm the S3 endpoint works.
 - If using an S3 backend: confirm the file appears in your S3 provider's console.

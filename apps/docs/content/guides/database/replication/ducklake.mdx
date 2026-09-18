@@ -8,7 +8,6 @@ sidebar_label: 'DuckLake'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-
 The DuckLake destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
 Replicate Postgres tables to [DuckLake](https://ducklake.select/) for current-state lakehouse queries. [Prepare resources](#understand-the-ducklake-components), [configure the destination](#choose-a-configuration-mode), then [query replicated data](#query-the-destination).
@@ -16,7 +15,6 @@ Replicate Postgres tables to [DuckLake](https://ducklake.select/) for current-st
 ## Source table requirements
 
 Insert-only tables don't require a primary key or replica identity. Updates and deletes require a published Postgres row identity. See [supported replica identities](#replica-identity).
-
 
 ## Prepare DuckLake resources [#understand-the-ducklake-components]
 
@@ -29,7 +27,6 @@ Prepare a Postgres catalog, object storage, and a compatible query engine:
 | Query engine     | Reads the catalog and object storage. Pipelines doesn't include a DuckLake query endpoint; use DuckDB or another compatible engine. |
 
 You can query replicated tables, but treat them and their underlying catalog and object-storage state as read-only. Writes outside Pipelines can conflict with replication and background maintenance.
-
 
 ## Configure DuckLake as a destination [#choose-a-configuration-mode]
 

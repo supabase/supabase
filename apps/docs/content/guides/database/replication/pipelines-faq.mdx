@@ -8,7 +8,6 @@ sidebar_label: 'FAQ'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-
 ## Which plans support Pipelines?
 
 Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Replication** or contact your account manager.
@@ -20,7 +19,6 @@ BigQuery is in public alpha. ClickHouse, DuckLake, and Snowflake are in private 
 ## Does the destination's region affect performance?
 
 Yes. Distance between the source, pipeline, and destination adds network latency and can reduce throughput. Choose resources near the [managed pipeline region](/docs/guides/database/replication/pipelines#region), prioritizing the destination if you can optimize only one side.
-
 
 ## What does Pipelines install in the database?
 
@@ -39,7 +37,6 @@ The `etl` schema is reserved for Pipelines. If your application already uses a s
 </Admonition>
 
 To remove the installed objects, delete all pipelines, then [disable Pipelines](#what-happens-when-you-disable-pipelines).
-
 
 ## What does Pipelines check before creating a pipeline?
 
@@ -91,7 +88,6 @@ Deleting or modifying managed objects can stop replication and require a new ini
 ## What happens when a project becomes inactive or moves to the Free Plan?
 
 Project inactivity stops its pipelines. Start them manually after restarting the project. Downgrading to the Free Plan deletes its pipelines.
-
 
 ## What happens when you disable Pipelines?
 
