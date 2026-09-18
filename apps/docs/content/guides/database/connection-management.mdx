@@ -19,6 +19,10 @@ The general rule is that if you are heavily using the PostgREST database API, yo
 
 These numbers are generalizations and depends on other Supabase products that you use and the extent of their usage. The actual values depend on your concurrent peak connection usage. For instance, if you were only using 80 connections in a week period and your database max connections is set to 500, then realistically you could allocate the difference of 420 (minus a reasonable buffer) to service more demand.
 
+This pool size applies per database user (role), not as a single total for the whole project. Each distinct role that connects through a pooler gets its own pool of up to this many direct Postgres connections, so the total connections poolers can open scale with the number of roles in use.
+
+The value defaults to a size based on your project's Compute add-on. Once you set it manually, it becomes fixed and no longer adjusts on its own, including when your Compute size changes. If you resize Compute later, revisit this setting and adjust it to your needs.
+
 ## Monitoring connections
 
 ### Capturing historical usage
