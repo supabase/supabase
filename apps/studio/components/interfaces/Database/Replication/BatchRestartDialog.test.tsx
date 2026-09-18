@@ -142,6 +142,8 @@ describe('BatchRestartDialog', () => {
     'resets $target tables while honoring a $initialStatus pipeline',
     async ({ target, initialStatus, optimisticLabel, nextStatus, nextLabel }) => {
       const onOpenChange = vi.fn()
+      const onResetStart = vi.fn()
+      const onResetComplete = vi.fn()
       const requests: unknown[] = []
       const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
       let backendStatus: ReplicationPipelineStatusResponse['status']['name'] = initialStatus
@@ -172,7 +174,12 @@ describe('BatchRestartDialog', () => {
       })
       customRender(
         <PipelineRequestStatusProvider>
-          <RestartDialogWithStatus target={target} onOpenChange={onOpenChange} />
+          <RestartDialogWithStatus
+            target={target}
+            onOpenChange={onOpenChange}
+            onResetStart={onResetStart}
+            onResetComplete={onResetComplete}
+          />
         </PipelineRequestStatusProvider>,
         { queryClient }
       )
@@ -182,6 +189,7 @@ describe('BatchRestartDialog', () => {
           name: target === 'all' ? 'Reset all tables' : 'Reset table',
         })
       )
+      expect(onResetStart).toHaveBeenCalledWith(target === 'all' ? [1] : 1)
       expect(screen.getByText(optimisticLabel)).toBeInTheDocument()
       backendStatus = nextStatus
       await act(async () => {
@@ -196,6 +204,7 @@ describe('BatchRestartDialog', () => {
         complete()
       })
       await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+      expect(onResetComplete).toHaveBeenCalledWith(target === 'all' ? [1] : 1)
       await waitFor(() => expect(screen.getByText(nextLabel)).toBeInTheDocument())
       expect(requests).toEqual([
         {
@@ -209,9 +218,13 @@ describe('BatchRestartDialog', () => {
 const RestartDialogWithStatus = ({
   target,
   onOpenChange,
+  onResetStart,
+  onResetComplete,
 }: {
   target: 'single' | 'all'
   onOpenChange: (open: boolean) => void
+  onResetStart: (tableIds: number[] | number) => void
+  onResetComplete: (tableIds: number[] | number) => void
 }) => {
   const { data, error, isPending, isError, isSuccess } = useReplicationPipelineStatusQuery({
     projectRef: 'default',
@@ -236,6 +249,8 @@ const RestartDialogWithStatus = ({
           tables={[table(1, { name: 'following_wal' })]}
           pipelineStatusName={pipelineStatusName}
           onOpenChange={onOpenChange}
+          onResetStart={onResetStart}
+          onResetComplete={onResetComplete}
         />
       ) : (
         <RestartTableDialog
@@ -243,6 +258,8 @@ const RestartDialogWithStatus = ({
           table={table(1, { name: 'following_wal' })}
           pipelineStatusName={pipelineStatusName}
           onOpenChange={onOpenChange}
+          onResetStart={onResetStart}
+          onResetComplete={onResetComplete}
         />
       )}
     </>

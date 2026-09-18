@@ -30,6 +30,8 @@ interface BatchRestartDialogProps {
   sourceId?: number
   publicationName?: string
   tableSyncCopy?: TableSyncCopyConfig | null
+  onResetStart?: (tableIds: number[]) => void
+  onResetComplete?: (tableIds: number[]) => void
 }
 
 export const BatchRestartDialog = ({
@@ -41,6 +43,8 @@ export const BatchRestartDialog = ({
   publicationName,
   tableSyncCopy,
   pipelineStatusName,
+  onResetStart,
+  onResetComplete,
 }: BatchRestartDialogProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const pipelineId = Number(_pipelineId)
@@ -52,6 +56,7 @@ export const BatchRestartDialog = ({
       return tables.filter((table) => table.state.name === 'error')
     }
   }, [mode, tables])
+  const affectedTableIds = affectedTables.map((table) => table.id)
   const copiedTables = useMemo(
     () => getTableCopyTargets(affectedTables, tableSyncCopy),
     [affectedTables, tableSyncCopy]
@@ -71,6 +76,7 @@ export const BatchRestartDialog = ({
 
   const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
+    onResetStart?.(affectedTableIds)
     try {
       await runWithRequestStatus(pipelineId, getRestartRequestStatus(pipelineStatusName), () =>
         rollbackTables({
@@ -79,7 +85,10 @@ export const BatchRestartDialog = ({
           target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
         })
       )
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      onResetComplete?.(affectedTableIds)
+    }
   }
 
   const count = affectedTables.length
@@ -97,12 +106,12 @@ export const BatchRestartDialog = ({
     mode === 'all'
       ? {
           title: 'Reset all tables',
-          description: `This resets all ${count} ${tableWord}. Destination data will be deleted. ${initialSyncDescription} Running pipelines restart automatically. Stopped pipelines remain stopped.`,
+          description: `This resets all ${count} ${tableWord}. Destination data will be deleted. ${initialSyncDescription} The pipeline restarts automatically if it is running. Otherwise, it remains stopped.`,
           action: 'Reset all tables',
         }
       : {
           title: 'Reset failed tables',
-          description: `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted. ${initialSyncDescription} Running pipelines restart automatically. Stopped pipelines remain stopped. Other tables stay as they are.`,
+          description: `This resets ${count} failed ${tableWord}. Destination data for those tables will be deleted. ${initialSyncDescription} The pipeline restarts automatically if it is running. Otherwise, it remains stopped.`,
           action: 'Reset failed tables',
         }
 

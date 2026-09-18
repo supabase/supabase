@@ -27,6 +27,8 @@ interface RestartTableDialogProps {
   tableSyncCopy?: TableSyncCopyConfig | null
   sourceId?: number
   publicationName?: string
+  onResetStart?: (tableId: number) => void
+  onResetComplete?: (tableId: number) => void
 }
 
 export const RestartTableDialog = ({
@@ -37,6 +39,8 @@ export const RestartTableDialog = ({
   sourceId,
   publicationName,
   pipelineStatusName,
+  onResetStart,
+  onResetComplete,
 }: RestartTableDialogProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const pipelineId = Number(_pipelineId)
@@ -58,6 +62,7 @@ export const RestartTableDialog = ({
   const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
     if (!pipelineId) return toast.error('Pipeline ID is required')
+    onResetStart?.(table.id)
 
     try {
       await runWithRequestStatus(pipelineId, getRestartRequestStatus(pipelineStatusName), () =>
@@ -67,12 +72,15 @@ export const RestartTableDialog = ({
           target: { type: 'single_table', table_id: table.id },
         })
       )
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      onResetComplete?.(table.id)
+    }
   }
 
   const consequence = willCopyTable
-    ? 'Destination data for this table will be deleted and existing rows will sync again. Running pipelines restart automatically. Stopped pipelines remain stopped.'
-    : 'Destination data for this table will be deleted. Initial sync is skipped for this table, so replication resumes with new changes only. Running pipelines restart automatically. Stopped pipelines remain stopped.'
+    ? 'Destination data for this table will be deleted and existing rows will sync again. The pipeline restarts automatically if it is running. Otherwise, it remains stopped.'
+    : 'Destination data for this table will be deleted. Initial sync is skipped for this table, so replication resumes with new changes only. The pipeline restarts automatically if it is running. Otherwise, it remains stopped.'
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

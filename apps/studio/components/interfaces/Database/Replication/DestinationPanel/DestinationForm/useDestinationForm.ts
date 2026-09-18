@@ -297,7 +297,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         await runWithRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, () =>
           startPipeline({ projectRef, pipelineId })
         )
-        toast.success('Pipeline created. Start requested.')
+        toast.success('Pipeline created. Starting…')
       }
     } catch (error) {
       let action = 'create and start pipeline'

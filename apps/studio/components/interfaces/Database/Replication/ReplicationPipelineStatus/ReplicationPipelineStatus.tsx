@@ -129,6 +129,7 @@ export const ReplicationPipelineStatus = () => {
   } | null>(null)
   const [showBatchRestartDialog, setShowBatchRestartDialog] = useState(false)
   const [batchRestartMode, setBatchRestartMode] = useState<'all' | 'errored' | null>(null)
+  const [resettingTableIds, setResettingTableIds] = useState<Set<number>>(new Set())
   const pipelineId = Number(_pipelineId)
   const { getRequestStatus, isRequestPending } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
@@ -212,6 +213,7 @@ export const ReplicationPipelineStatus = () => {
     statusName === PipelineStatusName.FAILED
   const hasOptimisticStatus = requestStatus !== PipelineStatusRequestStatus.None
   const isPipelineBusy = hasOptimisticStatus || isRequestPending(pipelineId)
+  const isAnyTableResetting = resettingTableIds.size > 0
   const showDisabledState = isPipelineBusy || !isPipelineActionable
   const canResetErroredTables = hasErroredTables && !showDisabledState
   const stateNotice = getPipelineStateNotice({ requestStatus, statusName, tableStatuses })
@@ -428,6 +430,7 @@ export const ReplicationPipelineStatus = () => {
                             />
                           )}
                           {filteredTableStatuses.map((table) => {
+                            const isResetting = resettingTableIds.has(table.id)
                             const isErrorState = table.state.name === 'error'
                             const errorReason =
                               isErrorState && 'reason' in table.state
@@ -441,10 +444,10 @@ export const ReplicationPipelineStatus = () => {
                               <TableReplicationRow
                                 key={table.id}
                                 table={table}
-                                isRestarting={false}
+                                isRestarting={isResetting}
                                 showDisabledState={showDisabledState}
                                 disabledStateMessage={config.message}
-                                isAnyRestartInProgress={isPipelineBusy}
+                                isAnyRestartInProgress={isPipelineBusy || isAnyTableResetting}
                                 isPipelineStopped={statusName === PipelineStatusName.STOPPED}
                                 onSelectRestart={() => {
                                   setSelectedTableForRestart({
@@ -498,6 +501,16 @@ export const ReplicationPipelineStatus = () => {
           sourceId={pipeline?.source_id}
           publicationName={pipeline?.config.publication_name}
           pipelineStatusName={statusName}
+          onResetStart={(tableId) => {
+            setResettingTableIds((current) => new Set(current).add(tableId))
+          }}
+          onResetComplete={(tableId) => {
+            setResettingTableIds((current) => {
+              const next = new Set(current)
+              next.delete(tableId)
+              return next
+            })
+          }}
         />
       )}
 
@@ -523,6 +536,16 @@ export const ReplicationPipelineStatus = () => {
           publicationName={pipeline?.config.publication_name}
           tableSyncCopy={pipeline?.config.table_sync_copy}
           pipelineStatusName={statusName}
+          onResetStart={(tableIds) => {
+            setResettingTableIds((current) => new Set([...current, ...tableIds]))
+          }}
+          onResetComplete={(tableIds) => {
+            setResettingTableIds((current) => {
+              const next = new Set(current)
+              tableIds.forEach((tableId) => next.delete(tableId))
+              return next
+            })
+          }}
         />
       )}
     </>
