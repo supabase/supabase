@@ -5,7 +5,7 @@ Link any relevant issues here.
 
 ## Solution
 
-Describe the key choices you made when architecting the solution.
+Provide a brief description of the change and the key choices you made when architecting the solution.
 Feel free to include screenshots if it includes visual changes.
 
 <!--
@@ -13,16 +13,16 @@ Feel free to include screenshots if it includes visual changes.
 
 If relevant, include links to changed pages for easy review access.
 
-Replace `BRANCH-NAME` with the Git branch name in lowercase, using `-` in place of `/`. Keep the rows that apply.
+Copy the preview base URL from the Vercel bot comment on this PR. Use the following table as an example template.
 
 | Site           | Live                                                                      | Preview                                                                                                      | Search for                    |
 | -------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------- |
-| WWW            | [/blog/your-post](https://supabase.com/blog/your-post)                    | [/blog/your-post](https://zone-www-dot-com-git-BRANCH-NAME-supabase.vercel.app/blog/your-post)                | unique phrase from the change |
-| Docs           | [/docs/guides/your-page](https://supabase.com/docs/guides/your-page)      | [/docs/guides/your-page](https://docs-git-BRANCH-NAME-supabase.vercel.app/docs/guides/your-page)              | unique phrase from the change |
-| Studio         | [/dashboard](https://supabase.com/dashboard)                              | [/dashboard](https://studio-git-BRANCH-NAME-supabase.vercel.app/dashboard)                                   | unique phrase from the change |
-| Design system  | [/design-system](https://supabase.com/design-system)                      | [/design-system](https://design-system-git-BRANCH-NAME-supabase.vercel.app/design-system)                    | unique phrase from the change |
-| UI library     | [/library](https://supabase.com/library)                                  | [/library](https://ui-library-git-BRANCH-NAME-supabase.vercel.app/library)                                   | unique phrase from the change |
-| Knowledge base | [/kb/guides/your-page](https://supabase.com/kb/guides/your-page)          | [/kb/guides/your-page](https://kb-git-BRANCH-NAME-supabase.vercel.app/kb/guides/your-page)                    | unique phrase from the change |
+| WWW            | [/blog/your-post](https://supabase.com/blog/your-post)                    | [/blog/your-post](https://zone-www-dot-com-git-branch-name-supabase.vercel.app/blog/your-post)                | unique phrase from the change |
+| Docs           | [/docs/guides/your-page](https://supabase.com/docs/guides/your-page)      | [/docs/guides/your-page](https://docs-git-branch-name-supabase.vercel.app/docs/guides/your-page)              | unique phrase from the change |
+| Studio         | [/dashboard](https://supabase.com/dashboard)                              | [/dashboard](https://studio-git-branch-name-supabase.vercel.app/dashboard)                                   | unique phrase from the change |
+| Design system  | [/design-system](https://supabase.com/design-system)                      | [/design-system](https://design-system-git-branch-name-supabase.vercel.app/design-system)                    | unique phrase from the change |
+| UI library     | [/library](https://supabase.com/library)                                  | [/library](https://ui-library-git-branch-name-supabase.vercel.app/library)                                   | unique phrase from the change |
+| Knowledge base | [/kb/guides/your-page](https://supabase.com/kb/guides/your-page)          | [/kb/guides/your-page](https://kb-git-branch-name-supabase.vercel.app/kb/guides/your-page)                    | unique phrase from the change |
 -->
 
 <!-- ## Additional context
