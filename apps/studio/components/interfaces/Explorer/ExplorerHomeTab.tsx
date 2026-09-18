@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2, NotebookText, Play, SquareCode } from 'lucide-react'
+import { Loader2, NotebookText, SquareCode } from 'lucide-react'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -76,13 +76,15 @@ const ExplorerHomeContent = () => {
             placeholder="Explore your data, check project health, create a notebook..."
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(message) =>
-              isSqlStatement(message)
-                ? createQuery({ sql: message, autoRun: true })
-                : createChat({ initialMessage: message })
+            onSubmit={(message) => createChat({ initialMessage: message })}
+            secondaryAction={
+              isSqlQuery
+                ? {
+                    label: 'Run SQL',
+                    onClick: () => createQuery({ sql: value, autoRun: true }),
+                  }
+                : undefined
             }
-            submitIcon={isSqlQuery ? <Play /> : undefined}
-            submitLabel={isSqlQuery ? 'Run SQL query' : undefined}
           />
           <AssistantAgentHarnessFooter />
 
