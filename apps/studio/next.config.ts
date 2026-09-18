@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-exports */
 
 import bundleAnalyzer from '@next/bundle-analyzer'
-import { withSentryConfig } from '@sentry/nextjs'
+import { withSentryConfig } from '@sentry/nextjs/config'
 import type { NextConfig } from 'next'
 
 import { getCSP } from './csp'
@@ -220,7 +220,6 @@ const platformConfig =
 export default process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
   ? withSentryConfig(platformConfig, {
       silent: false,
-      debug: true,
       sourcemaps: { disable: true },
 
       // For all available options, see:
@@ -229,24 +228,37 @@ export default process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VER
       // Upload a larger set of source maps for prettier stack traces (increases build time)
       widenClientFileUpload: true,
 
-      // Automatically annotate React components to show their full name in breadcrumbs and session replay
-      reactComponentAnnotation: {
-        enabled: true,
+      // Annotate first-party modules at build time so
+      // `thirdPartyErrorFilterIntegration` (instrumentation-client.ts) can tell
+      // our code apart from browser extensions and injected scripts at runtime.
+      //
+      // This MUST stay top-level. Next 16 builds with Turbopack by default, and
+      // the webpack-only route for this (`webpack.unstable_sentryWebpackPluginOptions
+      // .applicationKey`, forwarded to @sentry/webpack-plugin) never runs there.
+      // The top-level option is the only one the SDK honors under both bundlers —
+      // for Turbopack it injects `_sentryModuleMetadata` via a loader rule, which
+      // requires Next >= 16.
+      //
+      // Without the annotation no frame carries first-party metadata, so the
+      // integration tags EVERY event `third_party_code: true` and
+      // `filterSentryEvent` drops everything except globalErrorBoundary crashes.
+      applicationKey: 'supabase-studio',
+
+      _experimental: {
+        // Turbopack counterpart of `webpack.reactComponentAnnotation` — shows
+        // component names in breadcrumbs and traces. Requires Next >= 16.
+        turbopackReactComponentAnnotation: {
+          enabled: true,
+        },
       },
 
-      // Automatically tree-shake Sentry logger statements to reduce bundle size
-      disableLogger: true,
-
-      // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-      // See the following for more information:
-      // https://docs.sentry.io/product/crons/
-      // https://vercel.com/docs/cron-jobs
-      automaticVercelMonitors: true,
-
-      // Annotate bundles at build time so thirdPartyErrorFilterIntegration can
-      // distinguish our code from browser extensions / injected scripts at runtime.
-      unstable_sentryWebpackPluginOptions: {
-        applicationKey: 'supabase-studio',
+      // Webpack-only build options. Inert under Turbopack, but kept nested (not
+      // flat) so they neither warn nor get lost if a build ever runs `--webpack`.
+      webpack: {
+        // Tree-shake Sentry logger statements to reduce bundle size
+        treeshake: {
+          removeDebugLogging: true,
+        },
       },
     })
   : platformConfig

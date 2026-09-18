@@ -61,7 +61,7 @@
     "@number-flow/react": "^0.3.2",
     "@radix-ui/react-use-escape-keydown": "^1.1.1",
     "@sentry/nextjs": "catalog:",
-    "@sentry/react": "^10.27.0",
+    "@sentry/react": "^10.74.0",
     "@sentry/tanstackstart-react": "catalog:",
     "@smithy/property-provider": "^4.0.4",
     "@stripe/react-stripe-js": "6.1.0",
