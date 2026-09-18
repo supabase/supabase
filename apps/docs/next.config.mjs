@@ -233,7 +233,6 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'docs',
-  sourcemaps: { disable: true },
   unstable_sentryWebpackPluginOptions: {
     applicationKey: 'supabase-docs',
   },

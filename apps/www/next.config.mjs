@@ -247,7 +247,6 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'www',
-  sourcemaps: { disable: true },
   unstable_sentryWebpackPluginOptions: {
     applicationKey: 'supabase-www',
   },
