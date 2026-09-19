@@ -29,9 +29,18 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 type StorageTypeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
   disableInput: boolean
+  /** When true, only storage types that are no more expensive than what's already provisioned can be selected. */
+  downsizeOnly?: boolean
+  /** The currently persisted storage type */
+  provisionedStorageType?: DiskType
 }
 
-export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) {
+export function StorageTypeField({
+  form,
+  disableInput,
+  downsizeOnly,
+  provisionedStorageType,
+}: StorageTypeFieldProps) {
   const { control, trigger } = form
   const { data: project } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
@@ -52,26 +61,18 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
               field.onChange(e)
 
               /**
-               * Set default IOPS if not dirty
-               * This is to ensure that the IOPS is set to the minimum value if the user has not changed it
-               *
-               * Only set it if the current configured IOPS is smaller than the min IOPS, otherwise leave at same IOPS
+               * Clamp IOPS into the newly selected storage type's supported [min, max] range
+               * if the user hasn't manually edited it — otherwise leave their value in place
+               * and let validation surface any conflict.
                */
-              if (e === 'gp3') {
-                if (
-                  !form.getFieldState('provisionedIOPS').isDirty &&
-                  (!form.getValues('provisionedIOPS') ||
-                    form.getValues('provisionedIOPS') < DISK_LIMITS[DiskType.GP3].minIops)
-                ) {
-                  form.setValue('provisionedIOPS', DISK_LIMITS[DiskType.GP3].minIops)
-                }
-              } else {
-                if (
-                  !form.getFieldState('provisionedIOPS').isDirty &&
-                  (!form.getValues('provisionedIOPS') ||
-                    form.getValues('provisionedIOPS') < DISK_LIMITS[DiskType.IO2].minIops)
-                ) {
-                  form.setValue('provisionedIOPS', DISK_LIMITS[DiskType.IO2].minIops)
+              if (!form.getFieldState('provisionedIOPS').isDirty) {
+                const { minIops, maxIops } = DISK_LIMITS[e]
+                const currentIOPS = form.getValues('provisionedIOPS')
+
+                if (!currentIOPS || currentIOPS < minIops) {
+                  form.setValue('provisionedIOPS', minIops)
+                } else if (currentIOPS > maxIops) {
+                  form.setValue('provisionedIOPS', maxIops)
                 }
               }
 
@@ -99,7 +100,11 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
             <SelectContent>
               <>
                 {DISK_TYPE_OPTIONS.map((item) => {
-                  const disableIo2 = item.type === 'io2' && !isIo2Supported
+                  const isIo2Option = item.type === 'io2'
+                  const disableIo2ForRegion = isIo2Option && !isIo2Supported
+                  const disableIo2ForDownsize =
+                    isIo2Option && !!downsizeOnly && provisionedStorageType !== DiskType.IO2
+                  const disableIo2 = disableIo2ForRegion || disableIo2ForDownsize
                   return (
                     <Tooltip key={item.type}>
                       <TooltipTrigger asChild>
@@ -120,7 +125,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                           </div>
                         </SelectItem>
                       </TooltipTrigger>
-                      {disableIo2 && (
+                      {disableIo2ForRegion && (
                         <TooltipContent side="right" className="w-64">
                           IO2 Volume Type is not available in your project's region (
                           {project?.region}). More information available{' '}
@@ -128,6 +133,12 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                             here
                           </InlineLink>
                           .
+                        </TooltipContent>
+                      )}
+                      {disableIo2ForDownsize && (
+                        <TooltipContent side="right" className="w-64">
+                          An io2 disk is over-provisioned for your current compute. To use io2,
+                          upgrade to Large compute or greater.
                         </TooltipContent>
                       )}
                     </Tooltip>
