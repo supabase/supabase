@@ -1,0 +1,231 @@
+---
+title: 'Supabase Compute (Private Alpha) — Agent Guide'
+---
+
+This guide is for AI coding agents deploying and operating Supabase Compute, currently in private alpha. It combines the [`supabase-compute` Agent Skill](https://github.com/supabase/compute-agent-starter) — its `SKILL.md` and worked examples — into a single reference.
+
+<Admonition type="caution">
+
+Supabase Compute is in private alpha. If the CLI answers `Compute is not available for project <ref>.`, the project is not enrolled — request enrollment before continuing.
+
+</Admonition>
+
+A compute instance is one named service, packaged from a directory and run as one or more instances on the Supabase platform.
+
+- Runtimes: `node` / `deno` (default-exported `fetch` handler; deploys are build-free and serve in ~15s) or `dockerfile` (any language; ~1–2 min build).
+- Spec: `size` `2gb`|`4gb`, `exposure` `public`|`private` (private = no URL, outbound-only), `instances` (copies kept running).
+
+Exposure:
+
+- Public: the service listens on `$PORT` (default 8080) and is reachable at `https://<project-ref>.supabase.co/compute/v1/<name>`.
+- Private: not reachable over HTTP; the service starts from its `ENTRYPOINT` and runs its own loop — consuming a queue, or performing a single task.
+
+## Preconditions
+
+1. CLI: `npm install -g supabase@beta` (Compute ships in the beta channel and is opt-in — see below).
+2. Auth: `supabase login`, or `SUPABASE_ACCESS_TOKEN` set to an `sbp_...` personal access token (dashboard → Account → Access Tokens).
+3. Project ref: pass `--project-ref <20-char ref>` everywhere, or run `supabase link` once in the repo.
+
+## Core workflow (CLI)
+
+Compute is experimental and opt-in: enable it in `supabase/config.toml` (or set `SUPABASE_EXPERIMENTAL_COMPUTE=1` for one shell).
+
+```toml
+[experimental]
+compute = true
+```
+
+Then:
+
+```bash
+# 1. scaffold: creates supabase/compute/<name>/ + a [compute.<name>] section
+#    in supabase/config.toml (names are DNS labels: a-z, 0-9, hyphen)
+supabase compute new <name> --runtime node --size 2gb --exposure public
+
+# 2. deploy: packages the directory AS-IS (node needs node_modules vendored —
+#    there is no server-side install), uploads, deploys, waits, prints the URL
+supabase compute push <name> --project-ref <ref>
+
+# 3. invoke
+curl https://<ref>.supabase.co/compute/v1/<name>/
+
+# 4. observe
+supabase compute list --project-ref <ref>
+supabase compute status <name> --project-ref <ref>
+supabase compute logs <name> --project-ref <ref>          # 24h, all streams
+supabase compute logs <name> -f --kind app                # follow app logs
+
+# 5. delete (keeps local files and the config entry; push restores)
+supabase compute delete <name> --project-ref <ref> --yes
+```
+
+Teardown is asynchronous: right after a delete, `list` may briefly show the compute instance as `deleting`, then — because the local files remain — as `not deployed`. Both are expected.
+
+Every change is another `push`: edit code and push; scale with `push <name> --instances 3`; resize/exposure by editing the `[compute.<name>]` TOML keys and pushing. Secrets: compute instances read the project's secrets as environment variables (`supabase secrets set KEY=value --project-ref <ref>`); running instances pick changes up within about a minute.
+
+Machine-readable output: `status` and `list` take `-o json`; the other compute commands already emit JSON when not attached to a terminal.
+
+## Rules
+
+- Treat instances as stateless: they can be replaced at any time. Durable state belongs in the user's database or storage.
+- A request during boot answers `compute instance <name> is starting` — retry within a few seconds. A 503 with `Retry-After` means the instances are saturated — scale up.
+- A public instance must accept connections on `$PORT` within 50 seconds of starting. One that misses that window is stopped and relaunched with a growing backoff, and never becomes ready. Bind the port first; load heavy libraries and models afterwards (a startup thread, or lazily on the first request) — importing torch or opencv at module scope takes over a minute on a fresh instance. Download models at build time (`RUN python -c ...` in the Dockerfile), never on boot. A private instance runs its own loop and need not listen at all.
+- Memory: `2gb` gives about 1.9 GiB to the app, `4gb` about 3.8 GiB. A process that grows past that is killed, and the instance replaced.
+- Python: set `ENV PYTHONUNBUFFERED=1` in the Dockerfile so `print` output reaches `logs` even when the process is killed mid-way.
+- Never guess at failures: `status` carries `state_reason` for a failed build, and `logs --kind builds` its history.
+
+## Network restrictions
+
+If the project has [Postgres network restrictions](/docs/guides/platform/network-restrictions) enabled, a compute instance's direct connections to Postgres (or its pooler) are blocked unless the Compute egress ranges are on the allowlist. Network restrictions apply only to direct database connections — access through the Data API (PostgREST, Storage, Auth, etc.) is unaffected, so a compute instance calling the Data API keeps working either way.
+
+Add these CIDRs — Compute's production egress ranges — to the project's allowlist:
+
+- `44.246.156.159/32`
+- `52.27.88.146/32`
+- `44.237.218.47/32`
+- `2600:1f14:777:fa00::/56`
+
+Use [`network-restrictions update`](/docs/reference/cli/supabase-network-restrictions-update) with `--append` so the existing allowlist is kept:
+
+```bash
+supabase network-restrictions update --project-ref <ref> \
+  --db-allow-cidr 44.246.156.159/32 \
+  --db-allow-cidr 52.27.88.146/32 \
+  --db-allow-cidr 44.237.218.47/32 \
+  --db-allow-cidr 2600:1f14:777:fa00::/56 \
+  --append \
+  --experimental
+```
+
+Confirm with [`network-restrictions get`](/docs/reference/cli/supabase-network-restrictions-get):
+
+```bash
+supabase network-restrictions get --project-ref <ref> --experimental
+```
+
+<Admonition type="caution">
+
+Omitting `--append` replaces the whole allowlist with only the CIDRs passed in that command. Always pass `--append`, or re-list any existing CIDRs alongside the Compute ranges above.
+
+</Admonition>
+
+## Examples
+
+The workflow above used `node`. These two show what the other runtimes are for.
+
+### Deno: TypeScript, live streaming, no vendoring
+
+Deno resolves imports at startup from your `deno.json`, so — unlike `node` — there is nothing to vendor: ship two small files and dependencies come from the registry.
+
+```
+supabase/compute/ticker/
+├── main.ts
+└── deno.json
+```
+
+```json
+{ "imports": { "@std/ulid": "jsr:@std/ulid@1" } }
+```
+
+```ts
+// main.ts — JSON at /, a server-sent event stream at /stream
+import { ulid } from '@std/ulid'
+
+export default {
+  fetch(request: Request): Response {
+    const url = new URL(request.url)
+    if (url.pathname !== '/stream') {
+      return Response.json({ id: ulid(), at: new Date().toISOString() })
+    }
+    let timer: number
+    const body = new ReadableStream({
+      start(controller) {
+        const enc = new TextEncoder()
+        timer = setInterval(() => {
+          controller.enqueue(enc.encode(`data: ${JSON.stringify({ id: ulid() })}\n\n`))
+        }, 1000)
+      },
+      cancel() {
+        clearInterval(timer)
+      },
+    })
+    return new Response(body, { headers: { 'content-type': 'text/event-stream' } })
+  },
+}
+```
+
+```toml
+[experimental]
+compute = true
+
+[compute.ticker]
+runtime = "deno"
+size = "2gb"
+exposure = "public"
+```
+
+```bash
+supabase compute push ticker --project-ref <ref>
+curl -N https://<ref>.supabase.co/compute/v1/ticker/stream   # events tick in live
+```
+
+### Dockerfile: any language — Python + FastAPI
+
+A `dockerfile` compute instance runs whatever the image runs; the platform builds it for you (network is available at build time, so `pip install` works). The only contract: serve HTTP on `$PORT` (default 8080).
+
+```
+supabase/compute/pyapi/
+├── Dockerfile
+├── requirements.txt
+└── main.py
+```
+
+```dockerfile
+FROM public.ecr.aws/docker/library/python:3.12-slim
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY main.py .
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+```
+
+```
+fastapi==0.117.1
+uvicorn==0.37.0
+```
+
+```python
+# main.py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def home():
+    return {"language": "python", "framework": "fastapi"}
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int):
+    return {"item_id": item_id}
+```
+
+```toml
+[experimental]
+compute = true
+
+[compute.pyapi]
+runtime = "dockerfile"
+size = "2gb"
+exposure = "public"
+```
+
+```bash
+supabase compute push pyapi --project-ref <ref>   # builds ~1–2 min
+curl https://<ref>.supabase.co/compute/v1/pyapi/items/7        # {"item_id":7}
+```
+
+## Go deeper
+
+- Scripting without the CLI, upload/deploy wire format, log SQL: see [`references/management-api.md`](https://github.com/supabase/compute-agent-starter/blob/main/.claude/skills/supabase-compute/references/management-api.md) in the `compute-agent-starter` repo.
+- Error messages and their remedies: see [`references/troubleshooting.md`](https://github.com/supabase/compute-agent-starter/blob/main/.claude/skills/supabase-compute/references/troubleshooting.md) in the `compute-agent-starter` repo.
