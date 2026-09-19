@@ -251,12 +251,12 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
         'Learn how to build a user management app with Vue 3 and Supabase Database, Auth, and Storage functionality.',
     },
     {
-      title: 'Nuxt 3',
+      title: 'Nuxt',
       href: '/guides/getting-started/tutorials/with-nuxt',
       icon: '/docs/img/icons/nuxt-icon',
       hasLightIcon: false,
       description:
-        'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
+        'Learn how to build a user management app with Nuxt and Supabase Database, Auth, and Storage functionality.',
     },
     {
       title: 'Angular',
