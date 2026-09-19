@@ -468,7 +468,9 @@ services:
       [
         "start",
         "--main-service",
-        "/home/deno/functions/main"
+        "/home/deno/functions/main",
+        "--user-worker-request-idle-timeout",
+        "150000"
       ]
 
   # Comment out everything below this point if you are using an external Postgres database
