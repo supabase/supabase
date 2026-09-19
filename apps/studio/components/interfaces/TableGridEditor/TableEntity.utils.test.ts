@@ -89,6 +89,51 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     expect(result).toBe(expected)
   })
 
+  it('should escape json string values with embedded quotes and backslashes without corrupting them', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'metadata', dataType: 'jsonb', format: 'jsonb', position: 1 },
+      ],
+      name: 'demo',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    // Values as they arrive from Postgres (jsonb cast to text on export).
+    const rows = [
+      { idx: 1, id: 1, metadata: '{"note": "say \\"hi\\""}' },
+      { idx: 2, id: 2, metadata: '{"path": "C:\\\\Users\\\\me"}' },
+    ]
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "public"."demo" ("id", "metadata") VALUES (1, '{"note": "say \\"hi\\""}'), (2, '{"path": "C:\\\\Users\\\\me"}');`
+    expect(result).toBe(expected)
+  })
+
+  it('should stringify json object values instead of coercing them to [object Object]', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'metadata', dataType: 'jsonb', format: 'jsonb', position: 1 },
+      ],
+      name: 'demo',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [
+      { idx: 1, id: 1, metadata: { version: 1 } },
+      { idx: 2, id: 2, metadata: { note: 'say "hi"' } },
+    ]
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "public"."demo" ("id", "metadata") VALUES (1, '{"version":1}'), (2, '{"note":"say \\"hi\\""}');`
+    expect(result).toBe(expected)
+  })
+
   it('should emit valid Postgres literals for booleans, numbers and text arrays', () => {
     const table: SupaTable = {
       id: 1,
