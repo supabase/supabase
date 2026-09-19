@@ -3,21 +3,21 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  buildRetryTargets,
-  isWarehouseSettingUp,
-  type WarehouseSetupTarget,
-} from './Warehouse.utils'
+import { buildRetryTargets, isWarehouseSettingUp } from './Warehouse.utils'
 import { WarehouseConnectSection } from './WarehouseConnectSection'
 import { WarehouseDisableCard } from './WarehouseDisableCard'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
+import { WarehouseSetupForm } from './WarehouseSetupForm'
 import {
   WarehouseEnablingProgress,
   WarehouseReplicatedTablesSection,
 } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
-import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
+import {
+  useWarehouseSetupMutation,
+  type WarehouseSetupBody,
+} from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -37,19 +37,19 @@ export const WarehouseSetupPanel = () => {
   // has to act on, so it must not disappear.
   const setupMutation = useWarehouseSetupMutation({ onError: () => {} })
 
-  const handleSetup = (targets: WarehouseSetupTarget[]) => {
-    if (!projectRef || targets.length === 0) return
+  const handleSetup = (body: WarehouseSetupBody) => {
+    if (!projectRef || body.targets.length === 0) return
     const isInitialSetup = data?.setup_status !== 'complete'
 
     setupMutation.mutate(
-      { projectRef, body: { targets } },
+      { projectRef, body },
       {
         onSuccess: () => {
           if (isInitialSetup) {
             track('warehouse_enabled', {
               source: 'integrations_overview',
-              schemaTargetCount: targets.filter((target) => target.type === 'schema').length,
-              tableTargetCount: targets.filter((target) => target.type === 'table').length,
+              schemaTargetCount: body.targets.filter((target) => target.type === 'schema').length,
+              tableTargetCount: body.targets.filter((target) => target.type === 'table').length,
             })
           }
         },
@@ -89,7 +89,7 @@ export const WarehouseSetupPanel = () => {
 
   if (status === 'not_started') {
     return (
-      <WarehouseSchemaTablePicker
+      <WarehouseSetupForm
         onSubmit={handleSetup}
         isSubmitting={setupMutation.isPending}
         error={setupMutation.error}
@@ -120,7 +120,7 @@ export const WarehouseSetupPanel = () => {
             <Button
               variant="default"
               loading={setupMutation.isPending}
-              onClick={() => handleSetup(retryTargets)}
+              onClick={() => handleSetup({ targets: retryTargets })}
             >
               Retry
             </Button>
@@ -135,7 +135,7 @@ export const WarehouseSetupPanel = () => {
       <WarehouseReplicatedTablesSection tables={data.tables} />
       <WarehouseSchemaTablePicker
         isEditing
-        onSubmit={handleSetup}
+        onSubmit={(targets) => handleSetup({ targets })}
         isSubmitting={setupMutation.isPending}
         error={setupMutation.error}
       />

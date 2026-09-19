@@ -36,6 +36,7 @@ import type { ResponseError } from '@/types'
 export interface WarehouseSchemaTablePickerProps {
   onSubmit: (targets: WarehouseSetupTarget[]) => void
   isSubmitting: boolean
+  isSubmitDisabled?: boolean
   /** Set when editing an already-enabled Warehouse rather than setting one up for the first time. */
   isEditing?: boolean
   /** Failure from the submit itself, rendered inline rather than as a toast the user can lose. */
@@ -45,6 +46,7 @@ export interface WarehouseSchemaTablePickerProps {
 export const WarehouseSchemaTablePicker = ({
   onSubmit,
   isSubmitting,
+  isSubmitDisabled = false,
   isEditing = false,
   error,
 }: WarehouseSchemaTablePickerProps) => {
@@ -140,6 +142,7 @@ export const WarehouseSchemaTablePicker = ({
   }
 
   const handleSubmit = () => {
+    if (isSubmitDisabled || isSubmitting) return
     const targets = buildWarehouseSetupTargets(selection, schemasWithTables)
     if (targets.length === 0) return
     onSubmit(targets)
@@ -318,7 +321,7 @@ export const WarehouseSchemaTablePicker = ({
             */}
             <Button
               variant="primary"
-              disabled={selectedCount === 0 || !hasChanges}
+              disabled={selectedCount === 0 || !hasChanges || isSubmitDisabled}
               loading={isSubmitting}
               onClick={handleSubmit}
             >

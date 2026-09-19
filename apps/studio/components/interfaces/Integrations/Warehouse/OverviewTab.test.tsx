@@ -59,6 +59,31 @@ vi.mock('./WarehouseSchemaTablePicker', () => ({
 }))
 
 mockAnimationsApi()
+vi.mock('./WarehouseSetupForm', () => ({
+  WarehouseSetupForm: ({
+    onSubmit,
+  }: {
+    onSubmit: (body: {
+      targets: { type: 'table'; schema: string; name: string }[]
+      destination_project_ref?: string
+    }) => void
+  }) => (
+    <section>
+      Replicated tables picker
+      <button
+        tabIndex={0}
+        onClick={() =>
+          onSubmit({
+            targets: [{ type: 'table', schema: 'public', name: 'orders' }],
+            destination_project_ref: 'default',
+          })
+        }
+      >
+        Submit initial tables
+      </button>
+    </section>
+  ),
+}))
 dayjs.extend(duration)
 
 const FDW_STATUS: WarehouseSetupStatusResponse['fdw_status'] = {
