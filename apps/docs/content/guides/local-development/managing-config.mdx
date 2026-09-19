@@ -63,8 +63,9 @@ redirect_uri = "" # Overrides the default auth redirectUrl.
 
 ### What a push changes
 
-- Only properties that `config.toml` declares are written. A section or key that is missing from the file leaves the hosted value unchanged.
-- A declared value replaces the hosted value, including values set in the Dashboard. For example, `[auth.external.google]` with `enabled = false` disables Google sign-in on the hosted project, even if it is enabled in the Dashboard.
+- Only properties that `config.toml` declares are written. A property the file doesn't declare keeps its hosted value. `supabase config diff` lists such a property as `remote-only`, for information.
+- A declared value replaces the hosted value, including a value set in the Dashboard. For example, `[auth.external.google]` with `enabled = false` disables Google sign-in on the hosted project, even if it is enabled in the Dashboard.
+- Some endpoints require a group of properties together, such as the SMTP settings, captcha, and each OAuth provider. When one member of a group changes, the CLI sends the whole group, using the project's current value for the members you don't declare, so those keep their hosted value. If the platform doesn't report a member's current value, the CLI sends the schema default and marks it as `[group-write]` in the confirmation output.
 - Before each write, the CLI prints the change for the affected resource (`api`, `db.settings`, `db.network_restrictions`, `db.ssl_enforcement`, `auth`, `storage`) and asks for confirmation.
 
 <Admonition type="caution">
