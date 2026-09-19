@@ -2546,6 +2546,10 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/managing-config' as `/${string}`,
         },
         {
+          name: 'Managing remote config as code',
+          url: '/guides/local-development/config-as-code' as `/${string}`,
+        },
+        {
           name: 'Restoring downloaded backup',
           url: '/guides/local-development/restoring-downloaded-backup' as `/${string}`,
           enabled: localDevelopmentEnabled,
