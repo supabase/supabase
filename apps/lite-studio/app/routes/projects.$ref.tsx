@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import {
   Badge,
@@ -37,6 +37,13 @@ export default function ProjectPage() {
   const { ref } = useParams()
   const [loading, setLoading] = useState(false)
   const [enableRls, setEnableRls] = useState(true)
+
+  useEffect(() => {
+    if (!loading) return
+
+    const timer = setTimeout(() => setLoading(false), 2000)
+    return () => clearTimeout(timer)
+  }, [loading])
 
   return (
     <div className="py-8 space-y-8">
@@ -81,10 +88,7 @@ export default function ProjectPage() {
               <Button
                 variant="outline"
                 loading={loading}
-                onClick={() => {
-                  setLoading(true)
-                  setTimeout(() => setLoading(false), 2000)
-                }}
+                onClick={() => setLoading(true)}
               >
                 Refresh Status
               </Button>
@@ -137,12 +141,13 @@ export default function ProjectPage() {
             <div className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="project-name">Project Name</Label>
-                <Input id="project-name" placeholder="my-project" defaultValue={ref} />
+                <Input key={ref} id="project-name" placeholder="my-project" defaultValue={ref} />
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="project-url">Project URL</Label>
                 <Input
+                  key={ref}
                   id="project-url"
                   placeholder="https://xyz.supabase.co"
                   disabled
