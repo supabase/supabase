@@ -147,11 +147,15 @@ A supplied `confirm_cost_id` is ignored only for a tool call that uses form-base
 
 Your MCP client controls how the confirmation is collected. Some clients support hooks or rules that answer elicitations automatically, so treat cost confirmation as a guardrail rather than proof that a person approved each action.
 
+Troubleshooting: If you expect a dialog and don't see one, see [Cost confirmations do not appear in your MCP client](/docs/guides/troubleshooting/cost-confirmations-do-not-appear-in-your-mcp-client-mVq3Lp).
+
 ### Destructive SQL confirmations
 
 When SQL elicitation is available and your client supports forms, `execute_sql` and `apply_migration` ask for confirmation when they detect destructive SQL. The `execute_sql` confirmation applies only outside read-only mode. SQL not classified as destructive proceeds without this additional warning. Detection uses limited regular-expression checks, not a complete SQL parser: it does not catch every destructive operation and is not a security guarantee.
 
 If SQL elicitation is unavailable, unsupported by your client, or skipped with `skip_elicitations`, SQL follows the existing execution path without an additional MCP confirmation. Read-only restrictions and permissions still apply. Keep the [security recommendations](#recommendations) in place.
+
+Troubleshooting: If you expect a dialog and don't see one, see [SQL confirmations do not appear in your MCP client](/docs/guides/troubleshooting/sql-confirmations-do-not-appear-in-your-mcp-client-sQf7Kp).
 
 ### Edge Function secrets
 
@@ -165,6 +169,8 @@ Enter secret values only in the Supabase Dashboard, never in chat, model input, 
 4. Return to your MCP client and confirm that you saved it.
 
 Save the secret in the Dashboard before confirming in your MCP client. If you cancel the request, this does not undo a secret you already saved in the Dashboard.
+
+Troubleshooting: If the tool is unavailable or the Dashboard flow is incomplete, see [Edge Function secret collection is unavailable or incomplete](/docs/guides/troubleshooting/edge-function-secret-collection-is-unavailable-or-incomplete-eFs4Nx).
 
 ## Configuration options
 

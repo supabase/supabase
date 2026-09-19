@@ -1,0 +1,41 @@
+---
+title = "SQL confirmations do not appear in your MCP client"
+topics = [ "ai", "database" ]
+keywords = [
+"mcp",
+"elicitation",
+"confirmation",
+"destructive SQL",
+"execute_sql",
+"apply_migration",
+"skip_elicitations",
+]
+---
+
+The Supabase MCP server can ask for [confirmation before running detected destructive SQL](/docs/guides/ai-tools/mcp#destructive-sql-confirmations) through `execute_sql` or `apply_migration`. If you expect a confirmation dialog and don't see one, work through these checks.
+
+## Form-based SQL confirmation is unavailable or unsupported
+
+SQL confirmation dialogs require the server to offer form-based SQL confirmation and your client to support form elicitations for the request. Check your connection against [Client support](/docs/guides/ai-tools/mcp#client-support).
+
+If form-based SQL confirmation is unavailable or unsupported, the tools follow their existing SQL execution behavior without an additional MCP confirmation prompt. Permissions and read-only restrictions still apply. There is no legacy cost-style confirmation workflow for SQL.
+
+## The SQL does not trigger detection
+
+The tools only request confirmation for SQL detected as destructive. Detection uses regular expressions, not a full SQL parser, and does not catch every destructive statement. A missing prompt does not prove that SQL is safe.
+
+Review the SQL itself rather than relying on a confirmation dialog. Do not run destructive SQL to test whether a prompt appears.
+
+## Your connection is read-only
+
+`execute_sql` only requests destructive SQL confirmation outside read-only mode. Keep read-only mode enabled when you do not need write access; do not disable it to get a confirmation prompt.
+
+## SQL confirmations are skipped for the tool
+
+Check your MCP server URL for `skip_elicitations`. If it includes `execute_sql` or `apply_migration`, that tool follows its existing SQL execution behavior without the additional MCP confirmation prompt. Permissions and read-only restrictions still apply.
+
+To receive supported confirmations, remove the affected tool from `skip_elicitations`. See [Skip form confirmations](/docs/guides/ai-tools/mcp#skip-form-confirmations).
+
+## Your client answers elicitations automatically
+
+Some clients support hooks or rules that respond to elicitations without showing a dialog. If your client supports form elicitations but no dialog appears, check its elicitation or hook configuration.
