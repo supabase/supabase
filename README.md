@@ -41,7 +41,7 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 
 ## How it works
 
-Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
+Supabase is a combination of open-source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
 
 **Architecture**
 
@@ -54,8 +54,8 @@ You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and 
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API.
 - [GoTrue](https://github.com/supabase/gotrue) is a JWT-based authentication API that simplifies user sign-ups, logins, and session management in your applications.
-- [Storage](https://github.com/supabase/storage-api) a RESTful API for managing files in S3, with Postgres handling permissions.
-- [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API.
+- [Storage](https://github.com/supabase/storage-api) is a RESTful API for managing files in S3, with Postgres handling permissions.
+- [pg_graphql](http://github.com/supabase/pg_graphql/) is a PostgreSQL extension that exposes a GraphQL API.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [Envoy](https://github.com/envoyproxy/envoy) is a cloud-native, high-performance edge and service proxy.
 
