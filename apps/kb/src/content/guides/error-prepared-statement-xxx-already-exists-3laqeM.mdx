@@ -1,0 +1,14 @@
+---
+title: 'Error: prepared statement "XXX" already exists'
+description: 'Explains that this error occurs because PgBouncer does not support prepared statements, and how to avoid it with a direct connection or a Prisma parameter.'
+topics: ['Troubleshooting', 'Database']
+github_url: 'https://github.com/orgs/supabase/discussions/17751'
+---
+
+> [!CAUTION]
+> This predates the current pooler setup. Today it is the Shared Pooler (Supavisor) in transaction mode that lacks prepared statement support — the Dedicated Pooler (PgBouncer, available on paid plans) supports them. Check which pooler and mode you are connecting through before following the advice below.
+
+This error occurs when you are trying to connect to the database using PgBouncer. PgBouncer does not support prepared statements. If you have prepared statements in use, you will need to use direct connections - port 5432.
+
+There is a special parameter in the query string for Prisma to work with PgBouncer
+[Prisma's PgBouncer configuration guide](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management/configure-pg-bouncer)

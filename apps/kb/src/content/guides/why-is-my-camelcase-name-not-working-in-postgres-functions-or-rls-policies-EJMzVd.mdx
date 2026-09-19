@@ -1,0 +1,10 @@
+---
+title: 'Why is my camelCase name not working in Postgres functions or RLS policies?'
+description: 'Recommends using snake_case instead of camelCase for Postgres identifiers to avoid needing double-quoted names in functions and RLS policies.'
+topics: ['Troubleshooting', 'Database']
+github_url: 'https://github.com/orgs/supabase/discussions/12893'
+---
+
+Avoid camelCase (upper case letters) if possible when naming functions, tables, columns, and variables. You must enclose "camelCase" in double quotes when you define it or use it. YOU WILL FORGET. Use snake_case instead and make your life easier.
+
+Note to Prisma users, you will likely have to deal with it.

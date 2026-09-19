@@ -1,0 +1,10 @@
+---
+title: 'How to View Database Metrics'
+description: 'Explains how to set up a Grafana dashboard for real-time database metrics and how it compares to the Dashboard Reports page.'
+topics: ['Troubleshooting', 'Database', 'Supabase Platform']
+github_url: 'https://github.com/orgs/supabase/discussions/20938'
+---
+
+To monitor real-time metrics of your database, like CPU, EBS, active database connections, and memory usage, you can deploy a Grafana Dashboard. Check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local or free [Fly.io](http://fly.io/) deployments. Refer to our concise [documentation](/docs/guides/observability/metrics) to learn more about the metrics endpoint.
+
+While the [Dashboard's Reports Page](/dashboard/project/_/observability) displays some metric data, it provides hourly averages, not real-time by the second data. However, it offers query metrics, which the Grafana Dashboard does not include.

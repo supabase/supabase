@@ -1,0 +1,16 @@
+---
+title: 'NEW variable is null in a trigger function.'
+description: "Explains why the NEW variable is null in a trigger function and how the trigger's ROW vs STATEMENT setting controls whether it's available."
+topics: ['Troubleshooting', 'Database']
+github_url: 'https://github.com/orgs/supabase/discussions/15934'
+---
+
+When you create a function and call it from a trigger the NEW variable is only passed in if the trigger is on ROW operations
+
+The UI currently defaults to STATEMENT which will not provide NEW or OLD variables to the function.
+
+![Add a new Trigger panel with Orientation set to Statement](/kb/img/troubleshooting/49e11154-296b-42b9-8036-8a7288e49b8a.png)
+
+Also in SQL (reference: [CREATE TRIGGER](https://www.postgresql.org/docs/current/sql-createtrigger.html))
+
+![CREATE TRIGGER statement using FOR EACH ROW](/kb/img/troubleshooting/c7ac0f69-6fb9-4ff2-8aab-5cda6bada3f6.png)

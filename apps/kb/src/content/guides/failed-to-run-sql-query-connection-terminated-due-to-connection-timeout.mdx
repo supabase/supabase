@@ -1,0 +1,23 @@
+---
+title: 'Error: Failed to run sql query: Connection terminated due to connection timeout'
+description: 'Explains that this error typically means the database is overloaded and unresponsive, and lists steps to check health, add resources, or restart it.'
+topics: ['Troubleshooting', 'Database', 'Dashboard']
+---
+
+![Failed to run sql query: Connection terminated due to connection timeout](/kb/img/troubleshooting/failed-to-run-sql-query-connection-terminated-due-to-connection-timeout.jpg)
+
+This error typically happens when the database is overloaded and causing an outage. As the database does not respond in a timely manner there can be a variety of symptoms such as tables not loading, error messages related to retrieving data and the dashboard seems to be unresponsive.
+
+- Check your database health in [Database reports](/dashboard/project/_/observability/database).
+- If needed, increase resources in [Infrastructure](/dashboard/project/_/settings/infrastructure).
+- Alternatively, you can restart the database in [Project Settings](/dashboard/project/_/settings/general) but this may be only a temporary fix if the project is undersized / unoptimized.
+
+Review the appropriate guides based on your scenario:
+
+- [High CPU usage](/kb/guides/high-cpu-usage)
+- [High RAM usage](/kb/guides/exhaust-ram)
+- [High Swap usage](/kb/guides/exhaust-swap)
+- [High Disk I/O](/kb/guides/exhaust-disk-io)
+- [Query optimization](/docs/guides/database/query-optimization)
+
+You can also set up alerts using a [Prometheus endpoint / Grafana charts](/docs/guides/observability/metrics) to monitor vital resources.

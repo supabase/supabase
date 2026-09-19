@@ -1,0 +1,44 @@
+---
+title: "OAuth sign in isn't redirecting on the server side"
+description: "Explains why OAuth sign-in doesn't redirect automatically on the server side, and how to redirect using the returned URL in Next.js, SvelteKit, and Remix."
+topics: ['Troubleshooting', 'Auth']
+github_url: 'https://github.com/orgs/supabase/discussions/15862'
+---
+
+The reason behind this limitation is that the auth helpers library lacks a direct mechanism for performing server-side redirects, as each framework handles redirects differently. However, the library does offer a URL through the data property it returns, which should be used for the purpose of redirection.
+
+**Next.js:**
+
+```ts
+import { NextResponse } from "next/server";
+...
+const { data } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+
+return NextResponse.redirect(data.url)
+```
+
+**SvelteKit:**
+
+```ts
+import { redirect } from '@sveltejs/kit';
+...
+const { data } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+
+throw redirect(303, data.url)
+```
+
+**Remix:**
+
+```ts
+import { redirect } from "@remix-run/node"; // or cloudflare/deno
+...
+const { data } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+
+return redirect(data.url)
+```
