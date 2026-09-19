@@ -44,7 +44,7 @@ export const TOTPFactors = () => {
 
   return (
     <>
-      {enableAuthRecoveryCodes && (
+      {enableAuthRecoveryCodes && shouldVerifyRecoveryCodes && (
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
