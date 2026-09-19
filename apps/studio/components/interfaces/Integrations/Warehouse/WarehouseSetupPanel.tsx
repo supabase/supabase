@@ -17,6 +17,7 @@ import {
 } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { useWarehouseDisableMutation } from '@/data/warehouse/warehouse-disable-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -29,7 +30,10 @@ export const WarehouseSetupPanel = () => {
     { projectRef },
     {
       refetchInterval: (query) =>
-        isWarehouseSettingUp(query.state.data?.setup_status) ? 3000 : false,
+        isWarehouseSettingUp(query.state.data?.setup_status) ||
+        query.state.data?.setup_status === 'disabling'
+          ? 3000
+          : false,
     }
   )
 
@@ -37,8 +41,12 @@ export const WarehouseSetupPanel = () => {
   // has to act on, so it must not disappear.
   const setupMutation = useWarehouseSetupMutation({ onError: () => {} })
 
+  const disableMutation = useWarehouseDisableMutation()
+
   const handleSetup = (targets: WarehouseSetupTarget[]) => {
-    if (!projectRef || targets.length === 0) return
+    if (!projectRef || targets.length === 0) {
+      return
+    }
     const isInitialSetup = data?.setup_status !== 'complete'
 
     setupMutation.mutate(
@@ -57,7 +65,9 @@ export const WarehouseSetupPanel = () => {
     )
   }
 
-  if (isPending) return <GenericSkeletonLoader />
+  if (isPending) {
+    return <GenericSkeletonLoader />
+  }
 
   // Warehouse rides on the replication API, which isn't wired up in local development. Same
   // treatment Pipelines gives it, so a local dev doesn't read this as a broken build.
@@ -83,17 +93,72 @@ export const WarehouseSetupPanel = () => {
       />
     )
   }
-  if (!data) return <GenericSkeletonLoader />
+  if (!data) {
+    return <GenericSkeletonLoader />
+  }
 
   const status = data.setup_status
 
-  if (status === 'not_started') {
+  if (status === 'disabling') {
     return (
-      <WarehouseSchemaTablePicker
-        onSubmit={handleSetup}
-        isSubmitting={setupMutation.isPending}
-        error={setupMutation.error}
+      <Admonition
+        type="default"
+        title="Disabling Warehouse"
+        description={
+          data.delete_data
+            ? 'Stopping replication and deleting DuckLake data and catalog metadata. You can enable Warehouse again after cleanup finishes.'
+            : 'Stopping replication and disconnecting Warehouse. Copied data and catalog metadata will be retained.'
+        }
       />
+    )
+  }
+
+  if (status === 'deletion_failed') {
+    return (
+      <AlertError
+        subject="Warehouse cleanup failed"
+        showErrorPrefix={false}
+        error={{
+          message: data.error ?? 'Cleanup is incomplete. Retry to finish disabling Warehouse.',
+        }}
+        additionalActions={
+          <Button
+            variant="default"
+            loading={disableMutation.isPending}
+            disabled={!projectRef}
+            onClick={() => {
+              if (projectRef) {
+                disableMutation.mutate({ projectRef, deleteData: data.delete_data === true })
+              }
+            }}
+          >
+            Retry cleanup
+          </Button>
+        }
+      />
+    )
+  }
+
+  if (status === 'not_started' || status === 'disabled') {
+    return (
+      <>
+        {status === 'disabled' && (
+          <Admonition
+            type="default"
+            title="Warehouse disabled"
+            description={
+              data.delete_data
+                ? 'DuckLake data and catalog metadata have been deleted. You can set up Warehouse again.'
+                : 'Copied data and catalog metadata have been retained. You can enable Warehouse again.'
+            }
+          />
+        )}
+        <WarehouseSchemaTablePicker
+          onSubmit={handleSetup}
+          isSubmitting={setupMutation.isPending}
+          error={setupMutation.error}
+        />
+      </>
     )
   }
 
