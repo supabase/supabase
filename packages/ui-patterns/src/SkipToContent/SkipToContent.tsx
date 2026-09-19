@@ -19,8 +19,7 @@ function SkipToContent({ href, children = 'Skip to content', className }: SkipTo
   return (
     <div
       className={cn(
-        // w-fit: wrapper is a block div by default and would otherwise span the full content column.
-        'fixed top-0 left-[10px] z-[100] w-fit',
+        'fixed top-0 left-[10px] z-[100] inline-flex w-fit rounded-lg bg-background',
         '-translate-y-full focus-within:translate-y-[10px]',
         'transition-transform duration-200 ease-out',
         className

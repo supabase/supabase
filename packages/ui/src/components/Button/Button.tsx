@@ -10,44 +10,52 @@ import { cn } from '../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
+// Normalize the shared border curve at contrast 0.5: (0.05 + 0.95 * 0.5)² = 0.275625.
 const buttonVariants = cva(
   `relative
   inline-flex items-center justify-center
   cursor-pointer
   space-x-2
   text-center
-  font-regular
-  ease-out
+  font-medium
+  ease-[cubic-bezier(0.22,1,0.36,1)]
   duration-200
-  rounded-md
   transition-[background-color,border-color,color,scale]
   [&:not([aria-haspopup])]:motion-safe:active:scale-[0.97]
   focus-ring
   border
+  [--button-shadow-opacity:0.04] dark:[--button-shadow-opacity:0.2]
+  [--button-edge-strength:calc(var(--contrast-border,0.275625)/0.275625*0.6)]
+  dark:[--button-edge-strength:calc(var(--contrast-border,0.275625)/0.275625)]
+  [--button-edge-color:var(--colors-black)] dark:[--button-edge-color:var(--colors-white)]
   `,
   {
     variants: {
       variant: {
         primary: `
-          bg-brand-400 dark:bg-brand-500
-          hover:bg-brand/80 dark:hover:bg-brand/50
-          text-foreground
-          border-brand-500/75 dark:border-brand/30
-          hover:border-brand-600 dark:hover:border-brand
-          data-[state=open]:bg-brand-400/80 dark:data-[state=open]:bg-brand-500/80
+          border-0
+          bg-primary
+          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          text-primary-foreground
+          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          hover:bg-[var(--primary-hover)]
+          data-[state=open]:bg-[var(--primary-hover)]
           `,
         default: `
           text-foreground
-          bg-background dark:bg-card hover:bg-popover
-          border-strong hover:border-control-hover
-          data-[state=open]:bg-popover
-          data-[state=open]:border-control-hover
+          border-0
+          bg-card hover:bg-muted dark:bg-muted dark:hover:bg-accent
+          dark:bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_-1px_0_0_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          data-[state=open]:bg-muted dark:data-[state=open]:bg-accent
           `,
         secondary: `
           bg-foreground
-          text-background hover:text-background/80
-          border-foreground-light hover:border-foreground-lighter
-          data-[state=open]:border-foreground-lighter
+          text-background
+          border-0
+          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity))]
+          hover:bg-foreground/90
+          data-[state=open]:bg-foreground/90
         `,
         outline: `
           text-foreground
@@ -79,27 +87,34 @@ const buttonVariants = cva(
           border-transparent
         `,
         danger: `
-          text-foreground
-          bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
-          border-border-destructive hover:border-destructive
-          hover:text-hi-contrast
-          data-[state=open]:border-destructive
-          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive/50
+          border-0
+          bg-destructive
+          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          text-destructive-foreground
+          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          hover:bg-[var(--destructive-hover)]
+          data-[state=open]:bg-[var(--destructive-hover)]
         `,
         warning: `
-          text-foreground
-          bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
-          border-border-warning hover:border-warning
-          hover:text-hi-contrast
-          data-[state=open]:border-warning
-          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning/50
+          border-0
+          bg-warning
+          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          text-warning-foreground
+          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          hover:bg-[var(--warning-hover)]
+          data-[state=open]:bg-[var(--warning-hover)]
         `,
       },
       block: {
         true: 'w-full flex items-center justify-center',
       },
       size: {
-        ...SIZE_VARIANTS,
+        // Larger sizes use a softer curve so radius stays proportional to height.
+        tiny: `${SIZE_VARIANTS.tiny} rounded-md`,
+        small: `${SIZE_VARIANTS.small} rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]`,
+        medium: `${SIZE_VARIANTS.medium} rounded-[calc(var(--radius-md)*(1+(38/26-1)*0.35))]`,
+        large: `${SIZE_VARIANTS.large} rounded-[calc(var(--radius-md)*(1+(42/26-1)*0.35))]`,
+        xlarge: `${SIZE_VARIANTS.xlarge} rounded-[calc(var(--radius-md)*(1+(50/26-1)*0.35))]`,
       },
       overlay: {
         base: `absolute inset-0 bg-background opacity-50`,
@@ -137,7 +152,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
     },
     variant: {
-      primary: 'text-brand-600',
+      primary: 'text-primary-foreground/50',
       default: 'text-foreground-lighter',
       secondary: 'text-background',
       alternative: 'text-foreground-lighter',
@@ -145,8 +160,8 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-lighter',
-      danger: 'text-destructive',
-      warning: 'text-warning',
+      danger: 'text-destructive-foreground/50',
+      warning: 'text-warning-foreground/50',
     },
   },
 })
@@ -155,7 +170,7 @@ export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
   variants: {
     variant: {
-      primary: 'text-brand-600',
+      primary: 'text-primary-foreground/50',
       default: 'text-foreground-lighter',
       secondary: 'text-background',
       alternative: 'text-foreground-lighter',
@@ -163,8 +178,8 @@ const loadingVariants = cva('', {
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-muted',
-      danger: 'text-destructive',
-      warning: 'text-warning',
+      danger: 'text-destructive-foreground/50',
+      warning: 'text-warning-foreground/50',
     },
     loading: {
       default: '',

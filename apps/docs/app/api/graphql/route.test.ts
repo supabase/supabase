@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { GET, POST } from './route'
+
 vi.mock('~/lib/logger', async () => {
   const actual = await vi.importActual<typeof import('~/lib/logger')>('~/lib/logger')
   return {
@@ -7,8 +9,6 @@ vi.mock('~/lib/logger', async () => {
     sendToLogflare: vi.fn(),
   }
 })
-
-import { GET, POST } from './route'
 
 describe('/api/graphql POST basic error statuses', () => {
   beforeAll(() => {
