@@ -32,10 +32,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: 6b08233ff8bca855f6a38246b2a8049332219188
+          key: da6838d8d6898f28ec9ab432353b2707db9df8f5
       - name: install linter
         if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 6b08233ff8bca855f6a38246b2a8049332219188
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev da6838d8d6898f28ec9ab432353b2707db9df8f5
       - name: run linter
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

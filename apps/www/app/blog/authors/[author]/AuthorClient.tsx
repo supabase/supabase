@@ -52,11 +52,14 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
     <>
       <SectionContainerWithCn height="narrow" className="space-y-6">
         <div className="text-foreground-lighter flex space-x-1">
-          <h1 className="cursor-pointer">
+          <nav
+            aria-label="Breadcrumb"
+            className="cursor-pointer font-heading font-medium tracking-normal"
+          >
             <Link href="/blog">Blog</Link>
             <span className="px-2">/</span>
             <span className="text-foreground">{author?.author ?? authorId}</span>
-          </h1>
+          </nav>
         </div>
 
         {author && (

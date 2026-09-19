@@ -2,6 +2,8 @@ import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { StartYourProjectButton } from '@/components/StartYourProjectButton'
+
 export function Hero() {
   return (
     <SectionContainerWithCn>
@@ -17,10 +19,8 @@ export function Hero() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <StartYourProjectButton />
           <Button asChild size="medium">
-            <Link href="https://supabase.com/dashboard">Start your project</Link>
-          </Button>
-          <Button asChild size="medium" variant="default">
             <Link href="/docs/guides/realtime">Documentation</Link>
           </Button>
         </div>

@@ -49,13 +49,16 @@ export const pricingTooltips: PricingTooltips = {
     main: 'The maximum number of users your project can have',
   },
   'auth.maus': {
-    main: 'Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
+    main: 'Users who log in or refresh their token count toward MAU. This includes users who sign in through your OAuth 2.1 server.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
+  },
+  'auth.oauthServer': {
+    main: 'Use your project as an OAuth 2.1 and OpenID Connect identity provider. There is no separate charge. Users who sign in through your OAuth server count toward MAU.',
   },
   'auth.userDataOwnership': {
     main: 'Full ownership and access to the underlying user data including encrypted passwords.',
   },
   'auth.anonSignIns': {
-    main: 'Anonymous user requests count towards MAU, just like a permanent user.',
+    main: 'Anonymous user requests count toward MAU, just like a permanent user.',
   },
 
   'auth.basicMFA': {
@@ -85,13 +88,13 @@ export const pricingTooltips: PricingTooltips = {
     main: 'Billing is based on the sum of all invocations, independent of response status, throughout your billing period.',
   },
   'realtime.concurrentConnections': {
-    main: 'Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
+    main: 'Total number of successful connections. Connections attempts are not counted toward usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
   },
   'realtime.messagesPerMonth': {
     main: "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
   },
   'security.logDrain': {
-    main: 'Only events processed and sent to destinations are counted. Egress required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
+    main: 'Only events processed and sent to destinations are counted. Egress required to export logs count toward usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
   },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
@@ -166,8 +169,10 @@ export const PricingTableRowDesktop = (props: any) => {
         style={{ borderTop: 'none' }}
         id={`${props.sectionId}-desktop`}
       >
+        {/* 108px/84px are pre-hydration fallbacks only; after mount PricingComparisonTable
+            measures the sticky thead into --pricing-category-top and that value wins */}
         <th
-          className="bg-background text-foreground sticky top-[108px] xl:top-[84px] z-10 py-3 pl-6 text-left text-sm font-medium"
+          className="bg-background text-foreground sticky top-[var(--pricing-category-top,108px)] xl:top-[var(--pricing-category-top,84px)] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -193,7 +198,7 @@ export const PricingTableRowDesktop = (props: any) => {
               >
                 <span className="mr-1">{feat.title}</span>
                 {tooltips?.main && (
-                  <InfoTooltip side="top" className="max-w-[250px]">
+                  <InfoTooltip side="top" className="max-w-[250px]" label={`About ${feat.title}`}>
                     {tooltips.main}
                   </InfoTooltip>
                 )}
@@ -207,7 +212,7 @@ export const PricingTableRowDesktop = (props: any) => {
                   <td
                     key={i}
                     className={[
-                      `pl-6 pr-2 tier-${planName}`,
+                      `pl-6 pr-2 py-5 tier-${planName}`,
                       typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
@@ -218,10 +223,14 @@ export const PricingTableRowDesktop = (props: any) => {
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <div className="text-foreground text-xs flex flex-col justify-center">
+                      <div className="text-foreground text-xs flex flex-col justify-center gap-2">
                         <span className="flex items-center gap-2">
                           {tooltips?.[planName] && (
-                            <InfoTooltip side="top" className="max-w-[250px]">
+                            <InfoTooltip
+                              side="top"
+                              className="max-w-[250px]"
+                              label={`About ${feat.title} on the ${planName} plan`}
+                            >
                               {tooltips[planName]}
                             </InfoTooltip>
                           )}

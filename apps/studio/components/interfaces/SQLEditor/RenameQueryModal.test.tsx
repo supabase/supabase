@@ -34,6 +34,8 @@ const createSnippet = (id: string, name: string): SnippetWithContent => ({
 
 const SNIPPET_A = createSnippet('snippet-a', 'First query')
 const SNIPPET_B = createSnippet('snippet-b', 'Second query')
+const UNTITLED_A = createSnippet('untitled-a', 'Untitled query')
+const UNTITLED_B = createSnippet('untitled-b', 'Untitled query')
 
 /** The modal renders the AI title generator, which checks for an OpenAI key when self-hosted. */
 const mockOpenAIKeyCheck = () =>
@@ -106,6 +108,47 @@ describe('RenameQueryModal', () => {
     await waitFor(() => expect(getNameInput()).toHaveValue('Second query'))
     // Nothing has changed yet, so there is nothing to submit
     expect(screen.getByRole('button', { name: 'Rename query' })).toBeDisabled()
+  })
+
+  test('resets for the next snippet when both snippets share a name', async () => {
+    mockOpenAIKeyCheck()
+    const requests = mockUpsert()
+    const onComplete = vi.fn()
+
+    const { rerender } = customRender(
+      <RenameQueryModal snippet={UNTITLED_A} visible onCancel={vi.fn()} onComplete={onComplete} />
+    )
+
+    await userEvent.clear(getNameInput())
+    await userEvent.type(getNameInput(), 'Renamed query')
+    fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
+    await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
+
+    // The parent keeps the renamed snippet selected while closing the modal, then reopens it for
+    // a second snippet that still carries the same original name
+    rerender(
+      <RenameQueryModal
+        snippet={UNTITLED_A}
+        visible={false}
+        onCancel={vi.fn()}
+        onComplete={onComplete}
+      />
+    )
+    rerender(
+      <RenameQueryModal snippet={UNTITLED_B} visible onCancel={vi.fn()} onComplete={onComplete} />
+    )
+
+    await waitFor(() => expect(getNameInput()).toHaveValue('Untitled query'))
+
+    await userEvent.clear(getNameInput())
+    await userEvent.type(getNameInput(), 'Second renamed query')
+    fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
+
+    await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(2))
+    expect(requests).toEqual([
+      { id: 'untitled-a', name: 'Renamed query' },
+      { id: 'untitled-b', name: 'Second renamed query' },
+    ])
   })
 
   test('discards an abandoned edit when cancelled', async () => {

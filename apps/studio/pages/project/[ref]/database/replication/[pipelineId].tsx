@@ -2,13 +2,11 @@ import { FeatureFlagContext, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 
+import { ReplicationPipelineLayout } from '@/components/interfaces/Database/Replication/ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from '@/components/interfaces/Database/Replication/ReplicationPipelineStatus/ReplicationPipelineStatus'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { ReplicationLayout } from '@/components/layouts/DatabaseLayout/ReplicationLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import { FormHeader } from '@/components/ui/Forms/FormHeader'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
@@ -26,16 +24,9 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
     <>
       {enablePgReplicate && (
-        <PipelineRequestStatusProvider>
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <div className="col-span-12">
-                <FormHeader title="Replication" />
-                <ReplicationPipelineStatus />
-              </div>
-            </ScaffoldSection>
-          </ScaffoldContainer>
-        </PipelineRequestStatusProvider>
+        <ReplicationPipelineLayout>
+          <ReplicationPipelineStatus />
+        </ReplicationPipelineLayout>
       )}
     </>
   )
@@ -43,7 +34,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
+    <ReplicationLayout>{page}</ReplicationLayout>
   </DefaultLayout>
 )
 

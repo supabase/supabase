@@ -12,7 +12,7 @@ export const MoveCellDropdownContent = ({ cellId }: MoveCellDropdownContentProps
   const currentNotebook = useCurrentNotebook()
 
   const cells = currentNotebook?.notebook.content?.cells ?? []
-  const currentIndex = cells.findIndex((c) => c.id === cellId)
+  const currentIndex = cells.findIndex((c) => c._id === cellId)
   const isFirstCell = currentIndex <= 0
   const isLastCell = currentIndex === -1 || currentIndex === cells.length - 1
 

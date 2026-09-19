@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -9,7 +9,7 @@ import { Button } from 'ui'
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { SharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
@@ -64,7 +64,9 @@ const REPORT_TITLE = 'Auth'
 
 const AuthUsage = () => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelReports')
   const chartSyncId = `auth-report`
+  const queryGroup = useOtel ? 'auth-otel' : 'auth-bigquery'
 
   const {
     selectedDateRange,
@@ -143,6 +145,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: { provider: usageProviderFilter },
+    useOtel,
   })
 
   const errorsReportConfig = createErrorsReportConfig({
@@ -151,6 +154,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: { status_code: monitoringStatusCodeFilter },
+    useOtel,
   })
 
   const latencyReportConfig = createLatencyReportConfig({
@@ -159,6 +163,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: {},
+    useOtel,
   })
 
   const onRefreshReport = useRefreshHandler(
@@ -225,7 +230,6 @@ const AuthUsage = () => {
                 side="bottom"
               >
                 <Button
-                  variant="default"
                   disabled={isRefreshing}
                   icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"
@@ -293,6 +297,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{ provider: usageProviderFilter }}
                   highlightActions={highlightActions}
                 />
@@ -327,6 +332,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{ status_code: monitoringStatusCodeFilter }}
                   highlightActions={highlightActions}
                 />
@@ -351,6 +357,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{}}
                   highlightActions={highlightActions}
                 />

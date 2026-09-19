@@ -11,9 +11,8 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Badge } from 'ui'
+import { Badge, Heading } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { resolveContentListingIcon } from './iconChip'
 
@@ -30,6 +29,8 @@ function useContentListingClickHandler(group: ContentListingGroup) {
 
   const trackClick = useCallback(
     (item: ContentListingItem) => {
+      if (!item.href) return
+
       sendTelemetryEvent({
         action: 'docs_content_listing_clicked',
         properties: {
@@ -74,8 +75,45 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
         )}
         <ul className={listClassName}>
           {items.map((item) => {
+            const key = `${group.id}-${item.href ?? item.title}`
+            const panel = (
+              <GlassPanel
+                title={item.title}
+                icon={resolveContentListingIcon(item.icon)}
+                hasLightIcon={item.hasLightIcon ?? typeof item.icon === 'string'}
+                className={item.href ? undefined : 'cursor-default'}
+                badge={
+                  item.badge && item.badgePosition !== 'below' ? (
+                    <Badge variant="success">{item.badge}</Badge>
+                  ) : undefined
+                }
+              >
+                {item.badge && item.badgePosition === 'below' && (
+                  <Badge variant="success" className="mb-3 block w-fit">
+                    {item.badge}
+                  </Badge>
+                )}
+                {item.subtitle && (
+                  <span className="mb-2 block text-tertiary-foreground">{item.subtitle}</span>
+                )}
+                {item.description}
+              </GlassPanel>
+            )
+            const listContent = (
+              <>
+                <strong>{item.title}</strong>: {item.description}
+              </>
+            )
+
+            if (!item.href) {
+              return (
+                <li key={key} className={gridItemClassName}>
+                  {isGrid ? panel : listContent}
+                </li>
+              )
+            }
+
             const external = isExternalContentListingHref(item.href)
-            const key = `${group.id}-${item.href}`
 
             if (isGrid) {
               return (
@@ -88,23 +126,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                     target={external ? '_blank' : undefined}
                     rel={external ? 'noopener noreferrer' : undefined}
                   >
-                    <GlassPanel
-                      title={item.title}
-                      icon={resolveContentListingIcon(item.icon)}
-                      hasLightIcon={item.hasLightIcon ?? typeof item.icon === 'string'}
-                      badge={
-                        item.badge && item.badgePosition !== 'below' ? (
-                          <Badge variant="success">{item.badge}</Badge>
-                        ) : undefined
-                      }
-                    >
-                      {item.badge && item.badgePosition === 'below' && (
-                        <Badge variant="success" className="mb-3 block w-fit">
-                          {item.badge}
-                        </Badge>
-                      )}
-                      {item.description}
-                    </GlassPanel>
+                    {panel}
                   </Link>
                 </li>
               )
@@ -118,7 +140,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                   target={external ? '_blank' : undefined}
                   rel={external ? 'noopener noreferrer' : undefined}
                 >
-                  <strong>{item.title}</strong>: {item.description}
+                  {listContent}
                 </Link>
               </li>
             )

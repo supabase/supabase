@@ -1,110 +1,142 @@
-import { MessageCirclePlus, NotebookText, SquareCode } from 'lucide-react'
-import { useState } from 'react'
+import { useParams } from 'common'
+import { Loader2, NotebookText, SquareCode } from 'lucide-react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { cn } from 'ui'
 
+import { isSqlStatement } from './ExplorerHomeTab.utils'
+import { ExplorerOnboarding } from './ExplorerOnboarding'
 import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
+import { NOTEBOOK_TEMPLATES } from './templates'
+import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
+import { CHAT_TEMPLATES } from '@/components/ui/AIAssistantPanel/AIAssistant.prompts'
+import { AssistantAgentHarnessFooter } from '@/components/ui/AIAssistantPanel/AssistantAgentHarnessFooter'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
-import type { AssistantModel } from '@/state/ai-assistant-state'
 
 export const ExplorerHomeTab = () => {
+  const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
+
+  if (!isReady) return <ExplorerHomeLoading />
+  if (!hasCompletedOnboarding) return <ExplorerOnboarding />
+  if (home === 'query') return <ExplorerHomeQuery />
+
+  return <ExplorerHomeContent />
+}
+
+const ExplorerHomeLoading = () => (
+  <div
+    role="status"
+    aria-label="Opening Explorer"
+    className="flex h-full items-center justify-center bg-surface-100"
+  >
+    <Loader2 size={18} className="animate-spin motion-reduce:animate-none text-foreground-muted" />
+  </div>
+)
+
+const ExplorerHomeQuery = () => {
+  const { ref } = useParams()
+  const { createQuery, projectRef } = useCreateQuery()
+  const openedProjectRef = useRef<string | undefined>(undefined)
+
+  const openQuery = useEffectEvent(() => {
+    if (!ref || ref !== projectRef || openedProjectRef.current === ref) return
+    openedProjectRef.current = ref
+    createQuery({ replace: true })
+  })
+
+  useEffect(() => openQuery(), [ref, projectRef])
+
+  return <ExplorerHomeLoading />
+}
+
+const ExplorerHomeContent = () => {
   const { createNotebook } = useCreateNotebook()
   const { createQuery } = useCreateQuery()
   const { createChat } = useCreateChat()
 
   const [value, setValue] = useState<string>('')
-  const [selectedModel, setSelectedModal] = useState<AssistantModel>('gpt-5.4-nano')
-
-  const onCreateNotebook = () => {}
-  const onCreateChat = () => {}
+  const isSqlQuery = isSqlStatement(value)
 
   return (
-    <div className="bg-surface-100 h-full flex flex-col items-center justify-center">
-      <div className="w-full max-w-2xl">
-        <div className="flex items-center justify-center flex-col gap-y-1 mb-12">
-          <h1 className="heading-section">Explore your project</h1>
-          <p className="text-foreground-lighter text-sm">
-            Ask the Assistant about your data, or begin with a new resource.
-          </p>
+    <div className="flex flex-col h-full">
+      <div
+        className={cn(
+          'flex-grow min-h-0 overflow-y-auto bg-surface-100 h-full',
+          'flex flex-col items-center px-10'
+        )}
+      >
+        <div className="w-full max-w-2xl my-auto py-10">
+          <div className="text-center mb-6">
+            <h1 className="heading-section">Run SQL. Chat with your project. Create a Notebook</h1>
+          </div>
+
+          <AssistantChatForm
+            loading={false}
+            className="bg"
+            placeholder="Explore your data, check project health, create a notebook..."
+            value={value}
+            onValueChange={(e) => setValue(e.target.value)}
+            onSubmit={(message) => createChat({ initialMessage: message })}
+            secondaryAction={
+              isSqlQuery
+                ? {
+                    label: 'Run SQL',
+                    onClick: () => createQuery({ sql: value, autoRun: true }),
+                  }
+                : undefined
+            }
+          />
+          <AssistantAgentHarnessFooter />
+
+          <section className="mt-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <ActionCard
+                icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Run SQL"
+                description="Write and run an ad-hoc query"
+                bgColor="bg-blue-500"
+                onClick={() => createQuery()}
+              />
+              <ActionCard
+                icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Create a notebook"
+                description="Combine notes, queries, and results"
+                bgColor="bg-blue-500"
+                onClick={() => createNotebook()}
+              />
+            </div>
+          </section>
+
+          <section className="mt-8 flex flex-col gap-y-3">
+            <h2 className="text-sm font-medium text-foreground">Start with a template</h2>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {NOTEBOOK_TEMPLATES.map((template) => (
+                <ActionCard
+                  key={template.title}
+                  icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                  title={template.title}
+                  description={template.description}
+                  bgColor="bg-blue-500"
+                  onClick={() =>
+                    createNotebook({ name: template.title, cells: template.buildCells() })
+                  }
+                />
+              ))}
+              {CHAT_TEMPLATES.map((template) => (
+                <ActionCard
+                  key={template.title}
+                  icon={<template.icon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                  title={template.title}
+                  bgColor="bg-blue-500"
+                  onClick={() =>
+                    createChat({ name: template.title, initialMessage: template.initialMessage })
+                  }
+                />
+              ))}
+            </div>
+          </section>
         </div>
-
-        <AssistantChatForm
-          loading={false}
-          className="bg"
-          placeholder="Ask anything about your project"
-          value={value}
-          onValueChange={(e) => setValue(e.target.value)}
-          selectedModel={selectedModel}
-          onSelectModel={setSelectedModal}
-          onSubmit={(message) => createChat({ initialMessage: message, model: selectedModel })}
-        />
-
-        <section className="mt-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <ActionCard
-              icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Create a notebook"
-              description="Combine notes, queries, and results"
-              bgColor="bg-blue-500"
-              onClick={() => createNotebook()}
-            />
-            <ActionCard
-              icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Run SQL"
-              description="Write and run an ad-hoc query"
-              bgColor="bg-blue-500"
-              onClick={createQuery}
-            />
-          </div>
-        </section>
-
-        <section className="mt-8 flex flex-col gap-y-3">
-          <h2 className="text-sm font-medium text-foreground">Start with a template</h2>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <ActionCard
-              icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Authentication health"
-              description="Notebook template"
-              bgColor="bg-blue-500"
-              onClick={onCreateNotebook}
-            />
-            <ActionCard
-              icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Signup funnel"
-              description="Notebook template"
-              bgColor="bg-blue-500"
-              onClick={onCreateNotebook}
-            />
-            <ActionCard
-              icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Incident review"
-              description="Notebook template"
-              bgColor="bg-blue-500"
-              onClick={onCreateNotebook}
-            />
-            <ActionCard
-              icon={<MessageCirclePlus className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Investigate errors"
-              description="Chat template"
-              bgColor="bg-blue-500"
-              onClick={onCreateChat}
-            />
-            <ActionCard
-              icon={<MessageCirclePlus className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Explore your schema"
-              description="Chat template"
-              bgColor="bg-blue-500"
-              onClick={onCreateChat}
-            />
-            <ActionCard
-              icon={<MessageCirclePlus className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-              title="Optimize a query"
-              description="Chat template"
-              bgColor="bg-blue-500"
-              onClick={onCreateChat}
-            />
-          </div>
-        </section>
       </div>
     </div>
   )

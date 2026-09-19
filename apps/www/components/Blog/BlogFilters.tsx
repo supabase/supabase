@@ -193,7 +193,6 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
           <Button
             className="px-2 h-full"
             size="medium"
-            variant="default"
             aria-label="Search posts"
             onClick={() => setShowSearchInput(true)}
           >

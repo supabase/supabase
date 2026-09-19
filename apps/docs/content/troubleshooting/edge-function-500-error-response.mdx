@@ -21,35 +21,34 @@ If you received back the below message, then go to the [JavaScript failure](#jav
 Internal Server Error
 ```
 
-If the body contained a custom message, or nothing at all, run the below query in [Log Explorer](</dashboard/project/_/logs/explorer?q=SELECT%0A++fl.event_message,%0A++content.timestamp,%0A++fel.function_name,%0AFROM+function_logs+fl%0ALEFT+JOIN+UNNEST(fl.metadata)+AS+content+ON+TRUE%0ALEFT+JOIN+(%0A++SELECT%0A++++em.execution_id,%0A++++res.status_code,%0A++++req.pathname+AS+function_name%0A++FROM+function_edge_logs%0A++LEFT+JOIN+UNNEST(metadata)+AS+em+ON+TRUE%0A++LEFT+JOIN+UNNEST(em.request)+AS+req+ON+TRUE%0A++LEFT+JOIN+UNNEST(em.response)+AS+res+ON+TRUE%0A)+fel+ON+content.execution_id+=+fel.execution_id%0AWHERE+%0A++fel.status_code+=+500%0A++++AND+%0A++content.level+=+%27error%27%0A++++AND%0A++++(%0A++++++content.event_type+=+%27Log%27%0A++++++++OR%0A++++++content.event_type+=+%27UncaughtException%27%0A++++)%0A++++AND%0A++fl.event_message+LIKE+%27%25Error:%25file:///%25%27%0AORDER+BY+function_name,+timestamp%0ALIMIT+50;&its=&ite=>) after setting the time range:
+If the body contained a custom message, or nothing at all, run the below query in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20console_logs.event_message%2C%0A%20%20console_logs.timestamp%2C%0A%20%20invocation_events.function_name%0Afrom%0A%20%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20timestamp%2C%0A%20%20%20%20%20%20event_message%2C%0A%20%20%20%20%20%20log_attributes%5B%27execution_id%27%5D%20as%20execution_id%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_logs%27%0A%20%20%20%20%20%20and%20log_attributes%5B%27level%27%5D%20%3D%20%27error%27%0A%20%20%20%20%20%20and%20log_attributes%5B%27event_type%27%5D%20in%20%28%27Log%27%2C%20%27UncaughtException%27%29%0A%20%20%20%20%20%20and%20event_message%20like%20%27%25Error%3A%25file%3A///%25%27%0A%20%20%29%20as%20console_logs%0A%20%20inner%20join%20%28%0A%20%20%20%20select%0A%20%20%20%20%20%20log_attributes%5B%27execution_id%27%5D%20as%20execution_id%2C%0A%20%20%20%20%20%20log_attributes%5B%27request.pathname%27%5D%20as%20function_name%0A%20%20%20%20from%20logs%0A%20%20%20%20where%20source%20%3D%20%27function_edge_logs%27%0A%20%20%20%20%20%20and%20toInt32OrZero%28log_attributes%5B%27response.status_code%27%5D%29%20%3D%20500%0A%20%20%29%20as%20invocation_events%20on%20console_logs.execution_id%20%3D%20invocation_events.execution_id%0Aorder%20by%20invocation_events.function_name%2C%20console_logs.timestamp%0Alimit%2050%3B) after setting the time range:
 
 ```sql
 select
   console_logs.event_message,
-  cast(invocation_events.timestamp as datetime) as timestamp,
+  console_logs.timestamp,
   invocation_events.function_name
 from
-  function_logs as console_logs
-  left join UNNEST(console_logs.metadata) as metadata on true
-  left join (
+  (
     select
       timestamp,
-      em.execution_id,
-      res.status_code,
-      req.pathname as function_name
-    from
-      function_edge_logs
-      left join UNNEST(metadata) as em on true
-      left join UNNEST(em.request) as req on true
-      left join UNNEST(em.response) as res on true
-  ) as invocation_events
-    on metadata.execution_id = invocation_events.execution_id
-where
-  invocation_events.status_code = 500
-  and metadata.level = 'error'
-  and metadata.event_type in ('Log', 'UncaughtException')
-  and console_logs.event_message like '%Error:%file:///%'
-order by invocation_events.function_name, invocation_events.timestamp
+      event_message,
+      log_attributes['execution_id'] as execution_id
+    from logs
+    where source = 'function_logs'
+      and log_attributes['level'] = 'error'
+      and log_attributes['event_type'] in ('Log', 'UncaughtException')
+      and event_message like '%Error:%file:///%'
+  ) as console_logs
+  inner join (
+    select
+      log_attributes['execution_id'] as execution_id,
+      log_attributes['request.pathname'] as function_name
+    from logs
+    where source = 'function_edge_logs'
+      and toInt32OrZero(log_attributes['response.status_code']) = 500
+  ) as invocation_events on console_logs.execution_id = invocation_events.execution_id
+order by invocation_events.function_name, console_logs.timestamp
 limit 50;
 ```
 

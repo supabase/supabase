@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import { Highlights } from './Highlights'
+import { StartYourProjectButton } from '@/components/StartYourProjectButton'
 
 export function Hero() {
   return (
@@ -19,10 +20,8 @@ export function Hero() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <StartYourProjectButton />
           <Button asChild size="medium">
-            <Link href="https://supabase.com/dashboard">Start your project</Link>
-          </Button>
-          <Button asChild size="medium" variant="default">
             <Link href="/docs/guides/functions">Documentation</Link>
           </Button>
         </div>

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import {
+  cn,
   FormField,
   Select,
   SelectContent,
@@ -85,17 +86,29 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
 
                           <div className="text-sm">
                             <span className="text-foreground">
-                              {instanceSizeSpecs[option].ram} RAM / {instanceSizeSpecs[option].cpu}{' '}
-                              CPU
+                              {instanceSizeSpecs[option].ram} RAM / {instanceSizeSpecs[option].cpu}
                             </span>
                             <p
                               translate="no"
-                              className="text-xs text-foreground-light"
+                              className={cn(
+                                'text-xs',
+                                highAvailability
+                                  ? 'line-through text-foreground-lighter'
+                                  : 'text-foreground-light'
+                              )}
                               data-field="instance-details"
                             >
                               ${instanceSizeSpecs[option].priceHourly}/hour (~$
                               {instanceSizeSpecs[option].priceMonthly}/month)
                             </p>
+                            {highAvailability && (
+                              <p
+                                className="text-xs text-foreground-light"
+                                data-field="instance-details"
+                              >
+                                Free during Alpha
+                              </p>
+                            )}
                           </div>
                         </div>
                       </SelectItem>
@@ -104,7 +117,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                   {!highAvailability && (
                     <SelectItem key={'disabled'} value={'disabled'} disabled>
                       <div className="flex items-center justify-center w-full">
-                        <span>Larger instance sizes available after creation</span>
+                        <span>Larger, dedicated compute available after creation</span>
                       </div>
                     </SelectItem>
                   )}

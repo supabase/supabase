@@ -1,0 +1,46 @@
+{
+  "name": "kb",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev --port 3008",
+    "prebuild": "pnpm run generate:markdown",
+    "build": "astro build",
+    "generate:markdown": "node --experimental-strip-types ./scripts/generate-markdown.mjs",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.2.4",
+    "@astrojs/mdx": "^7.0.7",
+    "@astrojs/react": "^6.0.4",
+    "astro": "^7.2.6",
+    "lucide-react": "*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.2.4",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "config": "workspace:*",
+    "lodash-es": "catalog:",
+    "tailwindcss": "catalog:",
+    "vitest": "catalog:"
+  },
+  "allowScripts": {
+    "esbuild": true
+  }
+}

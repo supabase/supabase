@@ -1,10 +1,14 @@
 'use client'
 
+import {
+  NavSectionCaret,
+  NavSectionContent,
+  NavSectionList,
+} from '~/components/Navigation/NavSection'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { isElementInViewport } from '~/features/ui/helpers.dom'
 import { BASE_PATH } from '~/lib/constants'
 import { debounce } from 'lodash-es'
-import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Collapsible } from 'radix-ui'
@@ -350,28 +354,26 @@ function CompoundRefLink({
           )}
         >
           <span className={getLinkStyles(false)}>{section.title}</span>
-          <ChevronUp
-            width={16}
-            className={cn(
-              'group-disabled:cursor-not-allowed group-disabled:opacity-10',
-              'data-open-parent:rotate-0 data-closed-parent:rotate-90',
-              'transition'
-            )}
-          />
+          <NavSectionCaret className="group-disabled:cursor-not-allowed group-disabled:opacity-10" />
         </button>
       </Collapsible.Trigger>
-      <Collapsible.Content
-        className={cn('border-l border-control pl-3 ml-1 data-open:mt-2 grid gap-2.5')}
-      >
-        <ul className="space-y-2">
-          {(section.items || []).map((item, idx) => {
-            return (
-              <li key={`${section.id}-${idx}`}>
-                <RefLink basePath={basePath} section={item} realNavigation={realNavigation} />
-              </li>
-            )
-          })}
-        </ul>
+      <Collapsible.Content asChild>
+        <NavSectionContent>
+          <NavSectionList>
+            {(section.items || []).map((item, idx) => {
+              return (
+                <li key={`${section.id}-${idx}`}>
+                  <RefLink
+                    basePath={basePath}
+                    section={item}
+                    className="block py-1.25"
+                    realNavigation={realNavigation}
+                  />
+                </li>
+              )
+            })}
+          </NavSectionList>
+        </NavSectionContent>
       </Collapsible.Content>
     </Collapsible.Root>
   )

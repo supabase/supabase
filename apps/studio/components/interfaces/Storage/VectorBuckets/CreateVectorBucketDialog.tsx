@@ -220,10 +220,10 @@ export const CreateVectorBucketDialog = ({
         </Form>
 
         <DialogFooter>
-          <Button variant="default" disabled={isLoading} onClick={() => setVisible(false)}>
+          <Button disabled={isLoading} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button form={formId} type="submit" loading={isLoading}>
+          <Button variant="primary" form={formId} type="submit" loading={isLoading}>
             Create
           </Button>
         </DialogFooter>

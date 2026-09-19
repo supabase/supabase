@@ -117,7 +117,7 @@ const TableSelector = ({
                   <AlertDescription className="text-xs mb-2">
                     Error: {(error as any)?.message}
                   </AlertDescription>
-                  <Button variant="default" size="tiny" onClick={() => refetch()}>
+                  <Button size="tiny" onClick={() => refetch()}>
                     Reload tables
                   </Button>
                 </Alert>

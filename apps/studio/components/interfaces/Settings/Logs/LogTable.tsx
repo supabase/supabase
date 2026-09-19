@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { IS_PLATFORM, useParams } from 'common'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -10,6 +9,7 @@ import {
   Checkbox,
   cn,
   ContextMenu,
+  ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
   copyToClipboard,
@@ -30,6 +30,7 @@ import {
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  getShiftClickSelection,
   isDefaultLogPreviewFormat,
 } from './Logs.utils'
 import LogSelection from './LogSelection'
@@ -69,6 +70,7 @@ interface Props {
   selectedLogError?: LogQueryError | ResponseError
   onSelectedLogChange?: (log: LogData | null) => void
   sqlQuery?: string
+  columnRenderers?: Column<LogData>[]
 }
 type LogMap = { [id: string]: LogData }
 
@@ -98,12 +100,15 @@ export const LogTable = ({
   selectedLogError,
   onSelectedLogChange,
   sqlQuery,
+  columnRenderers,
 }: Props) => {
   const { ref } = useParams()
   const { profile } = useProfile()
   const [selectedLogId] = useSelectedLog()
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+  // Last row key the user toggled, used as the start of a shift-click range
+  const selectionAnchorRef = useRef<string | null>(null)
   const [copiedFormat, setCopiedFormat] = useState<LogCopyFormat | null>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
   const [activeRow, setActiveRow] = useState<LogData | null>(null)
@@ -194,13 +199,24 @@ export const LogTable = ({
     minWidth: 32,
     renderCell: ({ row }) => {
       const key = getRowKey(row)
-      const toggle = () => {
-        const next = new Set(selectedRows)
-        if (next.has(key)) {
-          next.delete(key)
+      const toggle = (isShiftClick: boolean) => {
+        let next: Set<string>
+        if (isShiftClick) {
+          next = getShiftClickSelection({
+            orderedKeys: logDataRows.map(getRowKey),
+            selectedKeys: selectedRows,
+            anchorKey: selectionAnchorRef.current,
+            targetKey: key,
+          })
         } else {
-          next.add(key)
+          next = new Set(selectedRows)
+          if (next.has(key)) {
+            next.delete(key)
+          } else {
+            next.add(key)
+          }
         }
+        selectionAnchorRef.current = next.size > 0 ? key : null
         setSelectedRows(next)
         if (next.size > 0) {
           setSelectedRow(null)
@@ -210,16 +226,23 @@ export const LogTable = ({
       return (
         <div
           className="absolute group inset-0 flex justify-center px-2 items-center cursor-pointer"
+          // Prevent a shift-click from starting a browser text selection across rows
+          onMouseDown={(e) => {
+            if (e.shiftKey) e.preventDefault()
+          }}
           onClick={(e) => {
             e.stopPropagation()
-            toggle()
+            toggle(e.shiftKey)
           }}
         >
           <Checkbox
             className="group-hover:border-foreground-muted"
             checked={selectedRows.has(key)}
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            onCheckedChange={toggle}
+            // use onClick instead of onCheckedChange so the shift key is available for range selection
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation()
+              toggle(e.shiftKey)
+            }}
           />
         </div>
       )
@@ -245,7 +268,9 @@ export const LogTable = ({
 
   let columns = DEFAULT_COLUMNS
 
-  if (!queryType) {
+  if (columnRenderers) {
+    columns = columnRenderers
+  } else if (!queryType) {
     columns
   } else {
     switch (queryType) {
@@ -288,6 +313,7 @@ export const LogTable = ({
     (row: LogData) => {
       // Regular single click — clear multi-select, open side panel
       setSelectedRows(new Set())
+      selectionAnchorRef.current = null
       setSelectedRow(row)
       onSelectedLogChange?.(row)
     },
@@ -363,6 +389,7 @@ export const LogTable = ({
     () => {
       if (selectedRows.size === logDataRows.length) {
         setSelectedRows(new Set())
+        selectionAnchorRef.current = null
       } else {
         setSelectedRows(new Set(logDataRows.map((row) => getRowKey(row))))
         setSelectedRow(null)
@@ -383,6 +410,7 @@ export const LogTable = ({
       } else {
         next.add(key)
       }
+      selectionAnchorRef.current = next.size > 0 ? key : null
       setSelectedRows(next)
     },
     { enabled: selectedRow !== null }
@@ -401,6 +429,7 @@ export const LogTable = ({
     SHORTCUT_IDS.LOGS_PREVIEW_EXIT_SELECTION,
     () => {
       setSelectedRows(new Set())
+      selectionAnchorRef.current = null
       ;(document.activeElement as HTMLElement | null)?.blur()
     },
     { enabled: !selectionOpen && selectedRows.size > 0 }
@@ -423,6 +452,7 @@ export const LogTable = ({
   useEffect(() => {
     if (isLoading) {
       setSelectedRows(new Set())
+      selectionAnchorRef.current = null
     }
   }, [isLoading])
 
@@ -482,11 +512,7 @@ export const LogTable = ({
 
       {showHistogramToggle && (
         <div className="flex items-center gap-2">
-          <Button
-            variant="default"
-            icon={isHistogramShowing ? <Eye /> : <EyeOff />}
-            onClick={onHistogramToggle}
-          >
+          <Button icon={isHistogramShowing ? <Eye /> : <EyeOff />} onClick={onHistogramToggle}>
             Histogram
           </Button>
         </div>
@@ -495,7 +521,6 @@ export const LogTable = ({
       <div className="gap-x-2 flex items-center">
         {IS_PLATFORM && (
           <ButtonTooltip
-            variant="default"
             onClick={onSave}
             loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}
@@ -584,6 +609,7 @@ export const LogTable = ({
                 sqlQuery={sqlQuery}
                 onClear={() => {
                   setSelectedRows(new Set())
+                  selectionAnchorRef.current = null
                 }}
               />
             </div>
@@ -616,7 +642,7 @@ export const LogTable = ({
                 'data-grid--logs-explorer': !queryType,
               })}
               rowHeight={40}
-              headerRowHeight={queryType ? 0 : 28}
+              headerRowHeight={queryType || columnRenderers ? 0 : 28}
               columns={columns}
               rowClass={(row: LogData) => {
                 const key = getRowKey(row)

@@ -1,4 +1,5 @@
 import { Check, PointerIcon, TrendingUp, ZapIcon } from 'lucide-react'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { cn } from 'ui'
@@ -54,7 +55,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({

@@ -3,14 +3,14 @@
 import { useCallback, useState } from 'react'
 
 export type CopyMarkdownFromUrlOptions = {
-  /** When the markdown URL is missing or not OK, use this HTML string instead (e.g. rendered article). */
-  fallbackHtml?: () => string
+  /** When the markdown URL is missing or not OK, use this string instead (e.g. rendered article HTML). */
+  fallback?: () => string
 }
 
 const COPIED_FEEDBACK_MS = 2000
 
 /**
- * Fetches markdown from `mdUrl`, falls back to optional HTML when the response is not OK,
+ * Fetches markdown from `mdUrl`, falls back to the optional fallback string when the response is not OK,
  * then writes the result to the clipboard.
  */
 export async function copyMarkdownFromUrl(
@@ -23,7 +23,7 @@ export async function copyMarkdownFromUrl(
     if (res.ok) {
       text = await res.text()
     } else {
-      text = options?.fallbackHtml?.() ?? ''
+      text = options?.fallback?.() ?? ''
       if (!text) return false
     }
     await navigator.clipboard.writeText(text)

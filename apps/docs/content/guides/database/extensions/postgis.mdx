@@ -45,6 +45,12 @@ drop extension if exists postgis;
 </TabPanel>
 </Tabs>
 
+<Admonition type="caution">
+
+Always install PostGIS into a dedicated schema (`extensions` in the examples above), never `public`. PostGIS creates the `spatial_ref_sys` reference table in whichever schema you install into, and if that's `public`, the table is exposed through the Data API — see [Troubleshooting](#troubleshooting) if this has already happened to your project.
+
+</Admonition>
+
 ## Examples
 
 To get started with PostGIS, create a table and see to use PostGIS for some typical use cases. Imagine creating a basic restaurant-searching app.
@@ -503,6 +509,14 @@ await supabase.Rpc("restaurants_in_view", new Dictionary<string, object>
 </Tabs>
 
 ## Troubleshooting
+
+### Security advisor flags `public.spatial_ref_sys`
+
+If `PostGIS` was installed in the `public` schema, the [Security Advisor](/dashboard/project/_/advisors/security) may report that `public.spatial_ref_sys` grants write access to the Data API roles (`anon`, `authenticated`), and that it can't be fixed by enabling RLS because your project's `postgres` role doesn't own the table.
+
+This is expected, not a data exposure risk: `spatial_ref_sys` is `PostGIS`'s built-in lookup table of coordinate system definitions, and it never holds your data. The actual problem is that `PostGIS` is installed in `public`, a schema the Data API exposes by default. Enabling RLS on the table isn't possible for your `postgres` role, and it isn't the fix. Follow the steps below to move `PostGIS` out of `public` yourself. They include a backup, since the default path drops and recreates the extension. To avoid the rebuild, contact Supabase Support instead.
+
+### Moving `PostGIS` to a different schema
 
 As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from one schema to another. If you need to move it from one schema to another for any reason (e.g. from the public schema to the extensions schema for security reasons), you would normally run a ALTER EXTENSION to relocate the schema. However, you will now to do the following steps:
 

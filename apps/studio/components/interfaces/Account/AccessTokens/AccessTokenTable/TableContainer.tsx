@@ -1,12 +1,14 @@
-import { Card, CardContent, cn } from 'ui'
 import {
+  Card,
+  CardContent,
+  cn,
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableHeadSort,
   TableRow,
-} from 'ui/src/components/shadcn/ui/table'
+} from 'ui'
 
 import { AccessTokenSort, AccessTokenSortColumn } from '../AccessToken.types'
 

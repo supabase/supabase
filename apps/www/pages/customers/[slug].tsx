@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
+import { MarkdownActions } from '@/components/MarkdownActions'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -209,10 +210,16 @@ function CaseStudyPage(props: any) {
                           )
                         })}
 
+                        <MarkdownActions
+                          pagePath={`/customers/${slug}`}
+                          pageType="customers"
+                          className="not-prose"
+                        />
+
                         <div>
                           <p>Ready to get started?</p>
                           <div>
-                            <Button asChild variant="default" iconRight={<ChevronRight />}>
+                            <Button asChild iconRight={<ChevronRight />}>
                               <Link
                                 href="https://supabase.com/contact/enterprise"
                                 className="no-underline"

@@ -80,7 +80,7 @@ export const ClientSideExceptionHandler = ({
       </Admonition>
 
       <div className={cn('w-full mx-auto grid gap-2', 'grid-cols-2 sm:w-1/2')}>
-        <Button asChild variant="default" icon={<ExternalLink />}>
+        <Button asChild icon={<ExternalLink />}>
           <SupportLink
             queryParams={{
               category: SupportCategories.DASHBOARD_BUG,

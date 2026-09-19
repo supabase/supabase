@@ -85,7 +85,7 @@ export const ProjectClaimConfirm = ({
               }}
             >
               {!requester.icon && (
-                <p className="text-foreground-light text-lg">{requester.name[0]}</p>
+                <p className="text-foreground-light text-lg">{requester.name?.[0] ?? '?'}</p>
               )}
             </div>
 
@@ -255,7 +255,13 @@ export const ProjectClaimConfirm = ({
         </div>
       </div>
       <div className="flex justify-center sticky bottom-0">
-        <Button size="medium" loading={isLoading} disabled={isLoading} onClick={onClaimProject}>
+        <Button
+          variant="primary"
+          size="medium"
+          loading={isLoading}
+          disabled={isLoading}
+          onClick={onClaimProject}
+        >
           Claim project {projectClaim?.project?.name}
         </Button>
       </div>

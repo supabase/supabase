@@ -1,5 +1,3 @@
-import { Label } from '@ui/components/shadcn/ui/label'
-import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import dayjs from 'dayjs'
 import { Clock, HistoryIcon, Lock } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
@@ -11,9 +9,12 @@ import {
   cn,
   copyToClipboard,
   Input,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
+  RadioGroup,
+  RadioGroupItem,
 } from 'ui'
 
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
@@ -283,7 +284,7 @@ export const LogsDatePicker = ({
 
   const triggerButton = (
     <PopoverTrigger asChild>
-      <Button variant="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
+      <Button icon={<Clock size={12} />} {...buttonTriggerProps}>
         {value.isHelper
           ? value.text
           : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
@@ -342,6 +343,11 @@ export const LogsDatePicker = ({
                 ) : null}
               </Label>
             ))}
+            {displayedHelpers.length === 0 && (
+              <p className="px-2 py-1.5 text-xs text-foreground-light w-full">
+                Invalid format. Try 2h, 30m, or 7d.
+              </p>
+            )}
           </RadioGroup>
         </div>
 
@@ -420,7 +426,6 @@ export const LogsDatePicker = ({
             ) : null}
 
             <Button
-              variant="default"
               onClick={() => {
                 const today = new Date()
                 setCurrentMonth(today)
@@ -430,7 +435,9 @@ export const LogsDatePicker = ({
             >
               Today
             </Button>
-            <Button onClick={handleApply}>Apply</Button>
+            <Button variant="primary" onClick={handleApply}>
+              Apply
+            </Button>
           </div>
         </div>
       </PopoverContent>

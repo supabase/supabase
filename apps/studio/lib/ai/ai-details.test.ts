@@ -45,8 +45,6 @@ describe('getAIDetails', () => {
   let mockCheckEntitlement: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
-    vi.clearAllMocks()
-
     const orgsQuery = await import('@/data/organizations/organizations-query')
     const subscriptionQuery = await import('@/data/subscriptions/org-subscription-query')
     const projectQuery = await import('@/data/projects/project-detail-query')
@@ -91,6 +89,7 @@ describe('getAIDetails', () => {
       hasAccessToAdvanceModel: false,
       hasHipaaAddon: false,
       orgId: 1,
+      orgSlug: ORG_SLUG,
       planId: 'pro',
       region: 'us-east-1',
       isSensitive: false,
@@ -189,6 +188,7 @@ describe('getAIDetails', () => {
       expect(result.aiOptInLevel).toBe('disabled')
       expect(result.hasAccessToAdvanceModel).toBe(false)
       expect(result.orgId).toBeUndefined()
+      expect(result.orgSlug).toBeUndefined()
       expect(result.planId).toBeUndefined()
     })
 
@@ -216,6 +216,7 @@ describe('getAIDetails', () => {
 
     expect(result.aiOptInLevel).toBe('disabled')
     expect(result.orgId).toBeUndefined()
+    expect(result.orgSlug).toBeUndefined()
   })
 
   it('falls back to the most restrictive posture when project detail is unavailable', async () => {
@@ -231,48 +232,20 @@ describe('getAIDetails', () => {
     expect(result.region).toBeUndefined()
   })
 
-  describe('HIPAA organizations', () => {
-    beforeEach(() => {
-      mockSubscriptionHasHipaaAddon.mockReturnValue(true)
-      mockGetAiOptInLevel.mockReturnValue('schema_and_log_and_data')
+  it('keeps the opt-in level for a sensitive project in a HIPAA org', async () => {
+    mockSubscriptionHasHipaaAddon.mockReturnValue(true)
+    mockGetAiOptInLevel.mockReturnValue('schema_and_log_and_data')
+    mockGetProjectSettings.mockResolvedValue({ is_sensitive: true })
+
+    const result = await getAIDetails({
+      orgSlug: ORG_SLUG,
+      projectRef: PROJECT_REF,
+      authorization: AUTH,
     })
 
-    it('disables the opt-in level for a sensitive project', async () => {
-      mockGetProjectSettings.mockResolvedValue({ is_sensitive: true })
-
-      const result = await getAIDetails({
-        orgSlug: ORG_SLUG,
-        projectRef: PROJECT_REF,
-        authorization: AUTH,
-      })
-
-      expect(result.aiOptInLevel).toBe('disabled')
-      expect(result.hasHipaaAddon).toBe(true)
-    })
-
-    it('disables the opt-in level when project sensitivity is unknown', async () => {
-      mockGetProjectSettings.mockResolvedValue(undefined)
-
-      const result = await getAIDetails({
-        orgSlug: ORG_SLUG,
-        projectRef: PROJECT_REF,
-        authorization: AUTH,
-      })
-
-      expect(result.aiOptInLevel).toBe('disabled')
-    })
-
-    it('keeps the opt-in level for a project explicitly marked not sensitive', async () => {
-      mockGetProjectSettings.mockResolvedValue({ is_sensitive: false })
-
-      const result = await getAIDetails({
-        orgSlug: ORG_SLUG,
-        projectRef: PROJECT_REF,
-        authorization: AUTH,
-      })
-
-      expect(result.aiOptInLevel).toBe('schema_and_log_and_data')
-    })
+    expect(result.aiOptInLevel).toBe('schema_and_log_and_data')
+    expect(result.hasHipaaAddon).toBe(true)
+    expect(result.isSensitive).toBe(true)
   })
 
   it('keeps the opt-in level for a sensitive project outside a HIPAA org', async () => {

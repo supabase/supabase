@@ -4,8 +4,8 @@ import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
 import ReactMarkdown from 'react-markdown'
+import { Heading } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 const meta = {
   title: 'Supabase CLI config',

@@ -128,9 +128,8 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
             </Badge>
           )}
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
               <Button
-                variant="default"
                 className="px-1"
                 icon={<MoreVertical />}
                 aria-label={`Open actions for ${hook.title}`}

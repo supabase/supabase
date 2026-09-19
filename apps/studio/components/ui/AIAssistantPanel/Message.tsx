@@ -71,7 +71,7 @@ function UserMessage({ message }: { message: VercelMessage }) {
         )}
         onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
       >
-        <MessageDisplay.MainArea>
+        <MessageDisplay.MainArea className="w-full max-w-3xl mx-auto">
           <MessageDisplay.ProfileImage />
           <MessageDisplay.Content message={message} />
         </MessageDisplay.MainArea>

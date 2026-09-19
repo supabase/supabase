@@ -26,6 +26,7 @@ export interface SingleValueFieldArrayProps<
   addLabel: string
   removeLabel?: string
   disabled?: boolean
+  pasteSeparator?: RegExp
   minimumRows?: number
   inputSize?: React.ComponentProps<typeof Input>['size']
   inputAutoComplete?: string
@@ -61,6 +62,7 @@ export const SingleValueFieldArray = <
   addLabel,
   removeLabel = 'Remove row',
   disabled = false,
+  pasteSeparator,
   minimumRows = 0,
   inputSize = 'small',
   inputAutoComplete,
@@ -75,7 +77,11 @@ export const SingleValueFieldArray = <
   removeButtonType = 'default',
   removeButtonSize = 'tiny',
 }: SingleValueFieldArrayProps<TFieldValues, TFieldArrayName, TItem>) => {
-  const { fields, append, remove } = useFieldArray<TFieldValues, TFieldArrayName, 'fieldId'>({
+  const { fields, append, insert, remove } = useFieldArray<
+    TFieldValues,
+    TFieldArrayName,
+    'fieldId'
+  >({
     control,
     name,
     keyName: 'fieldId',
@@ -83,6 +89,28 @@ export const SingleValueFieldArray = <
 
   const typedFields = fields as FieldArrayWithId<TFieldValues, TFieldArrayName, 'fieldId'>[]
   const disableRemove = disabled || typedFields.length <= minimumRows
+
+  const createRow = (value: string) =>
+    ({ ...(createEmptyRow() as object), [valueFieldName]: value }) as TItem
+
+  const handlePaste = (
+    event: React.ClipboardEvent<HTMLInputElement>,
+    index: number,
+    onChange: (value: string) => void
+  ) => {
+    if (!pasteSeparator) return
+
+    const values = event.clipboardData
+      .getData('text')
+      .split(pasteSeparator)
+      .map((value) => value.trim())
+      .filter(Boolean)
+    if (values.length <= 1) return
+
+    event.preventDefault()
+    onChange(values[0])
+    insert(index + 1, values.slice(1).map(createRow))
+  }
 
   return (
     <div className={cn('space-y-3', className)}>
@@ -102,6 +130,7 @@ export const SingleValueFieldArray = <
                       className={cn('w-full', inputClassName)}
                       placeholder={placeholder}
                       disabled={disabled}
+                      onPaste={(event) => handlePaste(event, index, field.onChange)}
                     />
                   </FormControl>
                   <FormMessage />

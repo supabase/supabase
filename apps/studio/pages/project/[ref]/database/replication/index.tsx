@@ -1,6 +1,9 @@
+import { MessageSquare } from 'lucide-react'
+import { Button } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
+  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
@@ -9,16 +12,19 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
+import { PIPELINES_FEEDBACK_URL } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
+import { ReplicationLayout } from '@/components/layouts/DatabaseLayout/ReplicationLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
@@ -32,23 +38,46 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   if (isHighAvailability) {
     return (
-      <div className="flex h-full w-full items-center justify-center p-6">
-        <HighAvailabilityDisabledEmptyState
-          title="Replication unavailable on High Availability projects"
-          description="We're working to bring replication to High Availability projects. Contact support if this is blocking your work."
-        />
-      </div>
+      <>
+        <PageHeader size="large">
+          <PageHeaderMeta>
+            <PageHeaderSummary>
+              <PageHeaderTitle>Replication</PageHeaderTitle>
+              <PageHeaderDescription>High Availability cluster topology</PageHeaderDescription>
+            </PageHeaderSummary>
+          </PageHeaderMeta>
+        </PageHeader>
+
+        <PageContainer size="large">
+          <PageSection>
+            <PageSectionContent>
+              <div className="relative h-[500px] w-full overflow-hidden rounded-md border border-muted">
+                <InstanceConfiguration />
+              </div>
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      </>
     )
   }
 
   return (
-    <PipelineRequestStatusProvider>
+    <>
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Replication</PageHeaderTitle>
-            <PageHeaderDescription>Read replicas and analytics pipelines</PageHeaderDescription>
+            <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
           </PageHeaderSummary>
+
+          <PageHeaderAside>
+            <Button asChild variant="default" icon={<MessageSquare />}>
+              <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
+                Leave feedback
+              </a>
+            </Button>
+            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+          </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
 
@@ -58,19 +87,20 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         ) : (
           <PageSection>
             <PageSectionContent className="flex flex-col gap-12">
+              <ReadReplicasMovedCallout />
               <ReplicationDiagram />
               <Destinations />
             </PageSectionContent>
           </PageSection>
         )}
       </PageContainer>
-    </PipelineRequestStatusProvider>
+    </>
   )
 }
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
+    <ReplicationLayout>{page}</ReplicationLayout>
   </DefaultLayout>
 )
 

@@ -15,17 +15,26 @@ interface SSLEnforcementConfirmDialogProps {
   isTargetEnforced: boolean
   isSubmitting: boolean
   onConfirm: () => Promise<void>
+  /**
+   * Controlled mode for callers whose control can't act as the dialog trigger
+   * (e.g. a switch, where a disabled control must never open the dialog).
+   * Omit both, and pass `children`, to render the children as the trigger.
+   */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export const SSLEnforcementConfirmDialog = ({
   isTargetEnforced,
   isSubmitting,
   onConfirm,
+  open,
+  onOpenChange,
   children,
 }: PropsWithChildren<SSLEnforcementConfirmDialogProps>) => {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {children !== undefined && <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>}
       <AlertDialogContent size="medium">
         <AlertDialogHeader>
           <AlertDialogTitle>Updating SSL enforcement involves a brief downtime</AlertDialogTitle>

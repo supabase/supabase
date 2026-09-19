@@ -4,8 +4,9 @@ import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pric
 import Solutions from '~/data/MainProducts'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useIsomorphicLayoutEffect } from 'common'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
 import {
@@ -119,6 +120,23 @@ const PricingComparisonTable = ({
 
   const sendTelemetryEvent = useSendTelemetryEvent()
   const orgSlug = organizations?.[0]?.slug
+
+  const tableRef = useRef<HTMLTableElement>(null)
+  const theadRef = useRef<HTMLTableSectionElement>(null)
+
+  useIsomorphicLayoutEffect(() => {
+    const table = tableRef.current
+    const thead = theadRef.current
+    if (!table || !thead) return
+
+    const observer = new ResizeObserver(() => {
+      const theadTop = parseFloat(getComputedStyle(thead).top) || 0
+      const categoryTop = Math.floor(theadTop + thead.getBoundingClientRect().height)
+      table.style.setProperty('--pricing-category-top', `${categoryTop}px`)
+    })
+    observer.observe(thead)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <div
@@ -372,9 +390,9 @@ const PricingComparisonTable = ({
 
       {/* <!-- lg+ --> */}
       <div className="hidden lg:block">
-        <table className="h-px w-full table-fixed">
+        <table ref={tableRef} className="h-px w-full table-fixed">
           <caption className="sr-only">Pricing plan comparison</caption>
-          <thead className="bg-background sticky top-[62px] z-10">
+          <thead ref={theadRef} className="bg-background sticky top-[62px] z-10">
             <tr>
               <th
                 className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"

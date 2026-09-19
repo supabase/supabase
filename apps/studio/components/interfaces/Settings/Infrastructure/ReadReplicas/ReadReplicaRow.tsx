@@ -24,6 +24,7 @@ import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
 import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
 import { type Database } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
@@ -106,24 +107,13 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
         </TableCell>
 
         <TableCell>
-          <Minus size={18} className="text-foreground-lighter" />
-        </TableCell>
-
-        <TableCell>
           <div className="flex items-center justify-end gap-x-2">
-            <Button
-              asChild
-              variant="default"
-              className="relative"
-              disabled={status === 'GOING_DOWN'}
-            >
-              <Link href={`/project/${ref}/database/replication/replica/${replica.identifier}`}>
-                View replica
-              </Link>
+            <Button asChild className="relative" disabled={status === 'GOING_DOWN'}>
+              <Link href={getReadReplicaPath(ref, replica.identifier)}>View replica</Link>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" icon={<MoreVertical />} className="w-7" />
+                <Button icon={<MoreVertical />} className="w-7" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem

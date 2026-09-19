@@ -148,9 +148,19 @@ check_logs_if_running analytics \
     'Executing startup tasks' \
     'Ensuring single tenant user is seeded'
 
-check_logs supavisor \
-    'Connected to Postgres database' \
-    'HEAD /api/health$'
+# Database pooler: Supavisor by default, or PgBouncer when the pgbouncer
+# override is enabled (which disables Supavisor). Check whichever is running.
+if is_service_running supavisor; then
+    check_logs supavisor \
+        'Connected to Postgres database' \
+        'HEAD /api/health$'
+elif is_service_running pgbouncer; then
+    check_logs pgbouncer \
+        'process up: PgBouncer' \
+        'listening on .*6432'
+else
+    fail_msg "pooler (neither supavisor nor pgbouncer is running)"
+fi
 
 check_logs_if_running vector \
     'Vector has started'

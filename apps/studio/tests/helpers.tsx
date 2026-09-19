@@ -9,7 +9,7 @@ import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
 import type { Organization } from '@/types'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
 interface SelectorOptions {
   container?: HTMLElement
@@ -65,6 +65,7 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     organization_requires_mfa: false,
     opt_in_tags: [],
     restriction_status: null,
+    requires_indirect_tax_declaration: false,
     restriction_data: null,
     organization_missing_address: false,
     organization_missing_tax_id: false,
@@ -99,6 +100,7 @@ export const createMockOrganizationResponse = (
     organization_requires_mfa: false,
     opt_in_tags: [],
     restriction_status: null,
+    requires_indirect_tax_declaration: false,
     restriction_data: null,
     organization_missing_address: false,
     organization_missing_tax_id: false,

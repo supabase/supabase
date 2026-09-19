@@ -56,9 +56,7 @@ export const AddPasswordRow = ({ email }: { email: string }) => {
             <p className="text-sm text-foreground-lighter">{email}</p>
           </div>
         </div>
-        <Button variant="default" onClick={() => setIsDialogOpen(true)}>
-          Add password
-        </Button>
+        <Button onClick={() => setIsDialogOpen(true)}>Add password</Button>
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -120,7 +118,7 @@ const AddPasswordForm = ({ email, onClose }: { email: string; onClose: () => voi
                     actions={
                       <Button
                         icon={passwordHidden ? <Eye /> : <EyeOff />}
-                        variant="default"
+                        aria-label={passwordHidden ? 'Show password' : 'Hide Password'}
                         className="w-7"
                         onClick={() => setPasswordHidden((prev) => !prev)}
                       />
@@ -136,10 +134,10 @@ const AddPasswordForm = ({ email, onClose }: { email: string; onClose: () => voi
         </DialogSection>
 
         <DialogFooter>
-          <Button variant="default" disabled={isPending} onClick={onClose}>
+          <Button disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" loading={isPending} disabled={isPending}>
+          <Button variant="primary" type="submit" loading={isPending} disabled={isPending}>
             Add password
           </Button>
         </DialogFooter>

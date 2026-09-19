@@ -30,14 +30,16 @@ import {
   getAvailableRegions,
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
+import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
-import { BASE_PATH } from '@/lib/constants'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -85,6 +87,8 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
+  const { getRegionRestriction } = useRegionRestriction()
+
   const { data: statusData } = useIncidentStatusQuery()
   const { incidents = [] } = statusData ?? {}
 
@@ -131,6 +135,10 @@ export const RegionSelector = ({
     [...unfilteredRegionOptions],
     highAvailability
   )
+  const regionOptionsWithRestriction = regionOptions.map((region) => ({
+    ...region,
+    restriction: getRegionRestriction(region),
+  }))
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
 
   const isLocalEnvironment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
@@ -181,6 +189,13 @@ export const RegionSelector = ({
           const selectedRegionLabel = selectedRegion?.name
             ? getDisplayNameForSmartRegion(selectedRegion.name)
             : dbRegion
+          const selectedRestriction = regionOptionsWithRestriction.find(
+            (region) => region.name === dbRegion
+          )?.restriction
+          const selectedRestrictionCopy =
+            selectedRestriction !== undefined
+              ? getRegionRestrictionCopy(selectedRestriction)
+              : undefined
           const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
 
           const affectingIncidents = incidents.filter((incident) => {
@@ -237,6 +252,7 @@ export const RegionSelector = ({
                     disabled={isLoading}
                   >
                     <SelectTrigger
+                      ref={field.ref}
                       id="region"
                       className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
                     >
@@ -251,14 +267,7 @@ export const RegionSelector = ({
                           <div className="flex items-center gap-x-3">
                             {isLoading && <Loader2 size={14} className="animate-spin" />}
                             {selectedRegion?.code && (
-                              // For some reason, Safari considered the empty string alt text on this icon as misspelled (with VoiceOver)
-                              // Only way to fix it is to set the role. Not needed for the combobox options
-                              // eslint-disable-next-line jsx-a11y/alt-text
-                              <img
-                                role="presentation"
-                                className="w-5 rounded-xs"
-                                src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
-                              />
+                              <RegionFlag className="w-5" region={selectedRegion.code} />
                             )}
                             <span className="text-foreground">{triggerLabel}</span>
                           </div>
@@ -279,11 +288,7 @@ export const RegionSelector = ({
                                 >
                                   <div className="flex flex-row items-center justify-between w-full">
                                     <div className="flex items-center gap-x-3">
-                                      <img
-                                        alt=""
-                                        className="w-5 rounded-xs"
-                                        src={`${BASE_PATH}/img/regions/${value.code}.svg`}
-                                      />
+                                      <RegionFlag className="w-5" region={value.code} />
                                       <span className="text-foreground">
                                         {getDisplayNameForSmartRegion(value.name)}
                                       </span>
@@ -309,24 +314,23 @@ export const RegionSelector = ({
                         <SelectLabel>
                           {highAvailability ? 'High Availability Regions' : 'Specific regions'}
                         </SelectLabel>
-                        {regionOptions.map((value) => {
+                        {regionOptionsWithRestriction.map((value) => {
+                          const restrictionCopy =
+                            value.restriction !== undefined
+                              ? getRegionRestrictionCopy(value.restriction)
+                              : undefined
                           return (
                             <SelectItem
                               key={value.code}
                               value={value.name}
                               className={cn(
                                 'w-full [&>:nth-child(2)]:w-full',
-                                value.status !== undefined && 'pointer-events-auto!'
+                                restrictionCopy !== undefined && 'pointer-events-auto!'
                               )}
-                              disabled={value.status !== undefined}
                             >
                               <div className="flex flex-row items-center justify-between w-full gap-x-2">
                                 <div className="flex items-center gap-x-3">
-                                  <img
-                                    alt=""
-                                    className="w-5 rounded-xs"
-                                    src={`${BASE_PATH}/img/regions/${value.code}.svg`}
-                                  />
+                                  <RegionFlag className="w-5" region={value.code} />
                                   <div className="flex items-center gap-x-2">
                                     <span className="text-foreground">{value.name}</span>
                                     <span className="text-xs text-foreground-lighter font-mono">
@@ -340,16 +344,14 @@ export const RegionSelector = ({
                                     Recommended
                                   </Badge>
                                 )}
-                                {value.status !== undefined && value.status === 'capacity' && (
+                                {restrictionCopy !== undefined && (
                                   <Tooltip>
                                     <TooltipTrigger>
                                       <Badge variant="warning" className="mr-1">
-                                        Unavailable
+                                        {restrictionCopy.badge}
                                       </Badge>
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                      Temporarily unavailable due to this region being at capacity.
-                                    </TooltipContent>
+                                    <TooltipContent>{restrictionCopy.tooltip}</TooltipContent>
                                   </Tooltip>
                                 )}
                               </div>
@@ -377,6 +379,17 @@ export const RegionSelector = ({
                         .
                       </>
                     }
+                    className="mt-3"
+                  />
+                </FormItemLayout>
+              )}
+
+              {selectedRestrictionCopy !== undefined && (
+                <FormItemLayout layout="horizontal" isReactForm={false}>
+                  <Admonition
+                    type="warning"
+                    title={selectedRestrictionCopy.title}
+                    description={`${selectedRestrictionCopy.notice} ${SELECT_DIFFERENT_REGION}`}
                     className="mt-3"
                   />
                 </FormItemLayout>

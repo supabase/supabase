@@ -4,33 +4,6 @@
  */
 
 export interface paths {
-  '/v1/webhooks/events': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Publish event
-     * @description Ingests and schedules a new webhook event to be published out to all subscribed endpoints.
-     *
-     *     In case of non-successful response status codes, early termination, networking issues,
-     *     requests to this endpoint should be retried until it succeeds, otherwise there is a risk of
-     *     loosing events.
-     *
-     *     `meta.idempotency_key` is used to ensure idempotency when retrying the requests and so it
-     *     must always be provided.
-     */
-    post: operations['postV1WebhooksEvents']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/v2/organizations/{slug}/integrations/github/connections': {
     parameters: {
       query?: never
@@ -174,7 +147,7 @@ export interface paths {
      * Get delivery
      * @description Get details of a specific delivery attempt.
      */
-    get: operations['allV2OrganizationsBySlugWebhooks']
+    get: operations['v2-organizations-slug-webhooks-deliveries-id-get']
     put?: never
     post?: never
     delete?: never
@@ -200,7 +173,7 @@ export interface paths {
      *
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
-    post: operations['allV2OrganizationsBySlugWebhooks']
+    post: operations['v2-organizations-slug-webhooks-deliveries-id-retry-post']
     delete?: never
     options?: never
     head?: never
@@ -218,20 +191,20 @@ export interface paths {
      * List endpoints
      * @description List all Webhook endpoints based on a project's ref or an organization's slug.
      */
-    get: operations['allV2OrganizationsBySlugWebhooks']
+    get: operations['v2-organizations-slug-webhooks-endpoints-get']
     put?: never
     /**
      * Create endpoint
      * @description Create new endpoint configuration to subscribe to specific webhook events.
      */
-    post: operations['allV2OrganizationsBySlugWebhooks']
+    post: operations['v2-organizations-slug-webhooks-endpoints-post']
     /**
      * Delete all endpoints
      * @description Delete all endpoints including all events and deliveries.
      *
      *     Any in-flight webhooks will result in a no-op.
      */
-    delete: operations['allV2OrganizationsBySlugWebhooks']
+    delete: operations['v2-organizations-slug-webhooks-endpoints-delete']
     options?: never
     head?: never
     patch?: never
@@ -248,7 +221,7 @@ export interface paths {
      * Get endpoint
      * @description Get details of a specific endpoint.
      */
-    get: operations['allV2OrganizationsBySlugWebhooks']
+    get: operations['v2-organizations-slug-webhooks-endpoints-id-get']
     put?: never
     post?: never
     /**
@@ -257,14 +230,14 @@ export interface paths {
      *
      *     Any in-flight webhooks will result in a no-op.
      */
-    delete: operations['allV2OrganizationsBySlugWebhooks']
+    delete: operations['v2-organizations-slug-webhooks-endpoints-id-delete']
     options?: never
     head?: never
     /**
      * Update endpoint
      * @description Update endpoint's configuration.
      */
-    patch: operations['allV2OrganizationsBySlugWebhooks']
+    patch: operations['v2-organizations-slug-webhooks-endpoints-id-patch']
     trace?: never
   }
   '/v2/organizations/{slug}/webhooks/endpoints/{id}/deliveries': {
@@ -280,7 +253,7 @@ export interface paths {
      *
      *     Deliveries which has expired are no longer available and will not be listed.
      */
-    get: operations['allV2OrganizationsBySlugWebhooks']
+    get: operations['v2-organizations-slug-webhooks-endpoints-id-deliveries-get']
     put?: never
     post?: never
     delete?: never
@@ -309,7 +282,24 @@ export interface paths {
      *
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
-    post: operations['allV2OrganizationsBySlugWebhooks']
+    post: operations['v2-organizations-slug-webhooks-endpoints-id-test-post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/advisors/run': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Runs the project advisors with the given names */
+    post: operations['v2-run-project-advisors']
     delete?: never
     options?: never
     head?: never
@@ -352,6 +342,120 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/projects/{ref}/branches': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Create a database branch
+     * @description Creates a database branch from the specified project. Compute and disk size can be set here so the branch is provisioned at the requested size, instead of being resized after creation.
+     */
+    post: operations['v2-create-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all compute instances
+     * @description Returns all compute instances you've previously deployed to the specified project.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-list-all-compute-instances']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Retrieve a compute instance
+     * @description Returns a compute instance along with the counts of its running instances. Poll this after a deploy until `build_state` leaves `building`.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-a-compute-instance']
+    put?: never
+    post?: never
+    /**
+     * Delete a compute instance
+     * @description Tombstones the compute instance. Its running instances and image are torn down asynchronously.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    delete: operations['v2-delete-a-compute-instance']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}/deploy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Deploy a compute instance
+     * @description Creates the compute instance if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the compute instance reaches `build_state` `active` or `failed` later.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-deploy-a-compute-instance']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}/uploads': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mint a presigned slot for a build-context upload
+     * @description PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-create-compute-instance-upload']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/projects/{ref}/config': {
     parameters: {
       query?: never
@@ -360,8 +464,10 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Alpha] Get a project's service configuration
+     * Get a project's service configuration
      * @description Returns the project's database, pooler, Auth, Data API, Realtime and Storage configuration — the same configuration a branch inherits from its base project. Each is the effective config, so a setting the project has never overridden is reported at its platform default rather than as null. Auth secrets are returned as an HMAC of their value. `storage` is read live from the storage service; the rest come from this platform's own records.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
      */
     get: operations['v2-get-project-config']
     put?: never
@@ -478,7 +584,7 @@ export interface paths {
      * Get delivery
      * @description Get details of a specific delivery attempt.
      */
-    get: operations['allV2ProjectsByRefWebhooks']
+    get: operations['v2-projects-ref-webhooks-deliveries-id-get']
     put?: never
     post?: never
     delete?: never
@@ -504,7 +610,7 @@ export interface paths {
      *
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
-    post: operations['allV2ProjectsByRefWebhooks']
+    post: operations['v2-projects-ref-webhooks-deliveries-id-retry-post']
     delete?: never
     options?: never
     head?: never
@@ -522,20 +628,20 @@ export interface paths {
      * List endpoints
      * @description List all Webhook endpoints based on a project's ref or an organization's slug.
      */
-    get: operations['allV2ProjectsByRefWebhooks']
+    get: operations['v2-projects-ref-webhooks-endpoints-get']
     put?: never
     /**
      * Create endpoint
      * @description Create new endpoint configuration to subscribe to specific webhook events.
      */
-    post: operations['allV2ProjectsByRefWebhooks']
+    post: operations['v2-projects-ref-webhooks-endpoints-post']
     /**
      * Delete all endpoints
      * @description Delete all endpoints including all events and deliveries.
      *
      *     Any in-flight webhooks will result in a no-op.
      */
-    delete: operations['allV2ProjectsByRefWebhooks']
+    delete: operations['v2-projects-ref-webhooks-endpoints-delete']
     options?: never
     head?: never
     patch?: never
@@ -552,7 +658,7 @@ export interface paths {
      * Get endpoint
      * @description Get details of a specific endpoint.
      */
-    get: operations['allV2ProjectsByRefWebhooks']
+    get: operations['v2-projects-ref-webhooks-endpoints-id-get']
     put?: never
     post?: never
     /**
@@ -561,14 +667,14 @@ export interface paths {
      *
      *     Any in-flight webhooks will result in a no-op.
      */
-    delete: operations['allV2ProjectsByRefWebhooks']
+    delete: operations['v2-projects-ref-webhooks-endpoints-id-delete']
     options?: never
     head?: never
     /**
      * Update endpoint
      * @description Update endpoint's configuration.
      */
-    patch: operations['allV2ProjectsByRefWebhooks']
+    patch: operations['v2-projects-ref-webhooks-endpoints-id-patch']
     trace?: never
   }
   '/v2/projects/{ref}/webhooks/endpoints/{id}/deliveries': {
@@ -584,7 +690,7 @@ export interface paths {
      *
      *     Deliveries which has expired are no longer available and will not be listed.
      */
-    get: operations['allV2ProjectsByRefWebhooks']
+    get: operations['v2-projects-ref-webhooks-endpoints-id-deliveries-get']
     put?: never
     post?: never
     delete?: never
@@ -613,91 +719,7 @@ export interface paths {
      *
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
-    post: operations['allV2ProjectsByRefWebhooks']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * [Alpha] List all workers
-     * @description Returns all workers you've previously deployed to the specified project.
-     */
-    get: operations['v2-list-all-workers']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * [Alpha] Retrieve a worker
-     * @description Returns a worker along with its instance tally. Poll this after a deploy until `build_state` leaves `building`.
-     */
-    get: operations['v2-get-a-worker']
-    put?: never
-    post?: never
-    /**
-     * [Alpha] Delete a worker
-     * @description Tombstones the worker. Its instances and image are torn down asynchronously.
-     */
-    delete: operations['v2-delete-a-worker']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}/deploy': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * [Alpha] Deploy a worker
-     * @description Creates the worker if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the worker reaches `build_state` `active` or `failed` later.
-     */
-    post: operations['v2-deploy-a-worker']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}/uploads': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * [Alpha] Mint a presigned slot for a build-context upload
-     * @description PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.
-     */
-    post: operations['v2-create-worker-upload']
+    post: operations['v2-projects-ref-webhooks-endpoints-id-test-post']
     delete?: never
     options?: never
     head?: never
@@ -749,14 +771,6 @@ export interface components {
             | 'syslog'
           config:
             | {
-                hostname?: string
-                password?: string | null
-                port?: number | null
-                schema?: string
-                url?: string | null
-                username?: string | null
-              }
-            | {
                 gzip?: boolean
                 headers?: {
                   [key: string]: string
@@ -764,10 +778,6 @@ export interface components {
                 /** @enum {string} */
                 http?: 'http1' | 'http2'
                 url?: string
-              }
-            | {
-                dataset_id?: string
-                project_id?: string
               }
             | {
                 api_key?: string
@@ -800,8 +810,33 @@ export interface components {
                 /** @default false */
                 tls?: boolean
               }
+            | {
+                access_key_id?: string
+                batch_timeout?: number
+                s3_bucket?: string
+                secret_access_key?: string
+                storage_region?: string
+              }
+            | {
+                password?: string
+                region?: string
+                username?: string
+              }
+            | {
+                endpoint?: string
+                /** @default true */
+                gzip?: boolean
+                /** @default {} */
+                headers?: {
+                  [key: string]: string
+                }
+                /** @default http/protobuf */
+                protocol?: string
+              }
           description?: string
           name: string
+        } & {
+          [key: string]: unknown
         }
         /**
          * @description Resource type.
@@ -835,7 +870,7 @@ export interface components {
         [key: string]: unknown
       }
     }
-    ListLogDrainsResponse: {
+    ListLogDrainsResponse_Output: {
       data: {
         attributes: {
           /** @enum {string} */
@@ -854,14 +889,6 @@ export interface components {
             | 'syslog'
           config:
             | {
-                hostname?: string
-                password?: string | null
-                port?: number | null
-                schema?: string
-                url?: string | null
-                username?: string | null
-              }
-            | {
                 gzip?: boolean
                 headers?: {
                   [key: string]: string
@@ -869,10 +896,6 @@ export interface components {
                 /** @enum {string} */
                 http?: 'http1' | 'http2'
                 url?: string
-              }
-            | {
-                dataset_id?: string
-                project_id?: string
               }
             | {
                 api_key?: string
@@ -904,6 +927,29 @@ export interface components {
                 structured_data?: string
                 /** @default false */
                 tls?: boolean
+              }
+            | {
+                access_key_id?: string
+                batch_timeout?: number
+                s3_bucket?: string
+                secret_access_key?: string
+                storage_region?: string
+              }
+            | {
+                password?: string
+                region?: string
+                username?: string
+              }
+            | {
+                endpoint?: string
+                /** @default true */
+                gzip?: boolean
+                /** @default {} */
+                headers?: {
+                  [key: string]: string
+                }
+                /** @default http/protobuf */
+                protocol?: string
               }
           description?: string
           name: string
@@ -916,7 +962,7 @@ export interface components {
         type: 'log_drain'
       }[]
     }
-    LogDrainResponse: {
+    LogDrainResponse_Output: {
       data: {
         attributes: {
           /** @enum {string} */
@@ -935,14 +981,6 @@ export interface components {
             | 'syslog'
           config:
             | {
-                hostname?: string
-                password?: string | null
-                port?: number | null
-                schema?: string
-                url?: string | null
-                username?: string | null
-              }
-            | {
                 gzip?: boolean
                 headers?: {
                   [key: string]: string
@@ -950,10 +988,6 @@ export interface components {
                 /** @enum {string} */
                 http?: 'http1' | 'http2'
                 url?: string
-              }
-            | {
-                dataset_id?: string
-                project_id?: string
               }
             | {
                 api_key?: string
@@ -986,6 +1020,29 @@ export interface components {
                 /** @default false */
                 tls?: boolean
               }
+            | {
+                access_key_id?: string
+                batch_timeout?: number
+                s3_bucket?: string
+                secret_access_key?: string
+                storage_region?: string
+              }
+            | {
+                password?: string
+                region?: string
+                username?: string
+              }
+            | {
+                endpoint?: string
+                /** @default true */
+                gzip?: boolean
+                /** @default {} */
+                headers?: {
+                  [key: string]: string
+                }
+                /** @default http/protobuf */
+                protocol?: string
+              }
           description?: string
           name: string
         }
@@ -997,7 +1054,7 @@ export interface components {
         type: 'log_drain'
       }
     }
-    OrganizationMemberRoleResponse: {
+    OrganizationMemberRoleResponse_Output: {
       data: {
         attributes: {
           /**
@@ -1042,14 +1099,6 @@ export interface components {
             | 'syslog'
           config?:
             | {
-                hostname?: string
-                password?: string | null
-                port?: number | null
-                schema?: string
-                url?: string | null
-                username?: string | null
-              }
-            | {
                 gzip?: boolean
                 headers?: {
                   [key: string]: string
@@ -1057,10 +1106,6 @@ export interface components {
                 /** @enum {string} */
                 http?: 'http1' | 'http2'
                 url?: string
-              }
-            | {
-                dataset_id?: string
-                project_id?: string
               }
             | {
                 api_key?: string
@@ -1093,8 +1138,33 @@ export interface components {
                 /** @default false */
                 tls?: boolean
               }
+            | {
+                access_key_id?: string
+                batch_timeout?: number
+                s3_bucket?: string
+                secret_access_key?: string
+                storage_region?: string
+              }
+            | {
+                password?: string
+                region?: string
+                username?: string
+              }
+            | {
+                endpoint?: string
+                /** @default true */
+                gzip?: boolean
+                /** @default {} */
+                headers?: {
+                  [key: string]: string
+                }
+                /** @default http/protobuf */
+                protocol?: string
+              }
           description?: string
           name?: string
+        } & {
+          [key: string]: unknown
         }
         /**
          * @description Resource type.
@@ -1128,10 +1198,179 @@ export interface components {
         type: 'organization_member_role'
       }
     }
+    V2BranchResponse_Output: {
+      data: {
+        attributes: {
+          /**
+           * Format: date-time
+           * @description Creation timestamp.
+           */
+          created_at: string
+          /** @description Git branch being tracked. */
+          git_branch?: string
+          /** @description Whether this is the default branch of the project. */
+          is_default: boolean
+          /** @description Name of the branch. */
+          name: string
+          /**
+           * Format: uri
+           * @description HTTP endpoint receiving branch status updates.
+           */
+          notify_url?: string
+          /** @description Ref of the project it branches from. */
+          parent_project_ref: string
+          /** @description Whether the branch is kept when its git branch is deleted or its PR is merged. */
+          persistent: boolean
+          /** @description Ref of the project backing this branch. */
+          project_ref: string
+          /**
+           * Format: date-time
+           * @description Last update timestamp.
+           */
+          updated_at: string
+          /** @description Whether the branch is seeded from the project's data. */
+          with_data: boolean
+        }
+        /**
+         * Format: uuid
+         * @description ID of the branch.
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'branch'
+      }
+    }
+    V2ComputeInstanceResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          build_state: 'building' | 'active' | 'failed'
+          deleting?: boolean
+          image_version?: string
+          instances?: {
+            declared: number
+            live: number
+            ready: number
+            stale: number
+          }
+          instances_error?: string
+          secret_generation: string
+          spec: {
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+          state_reason?: string
+        }
+        /**
+         * @description Compute instance name.
+         * @example hello-world
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance'
+      }
+    }
+    V2ComputeInstanceUploadResponse_Output: {
+      data: {
+        attributes: {
+          /** @description When the slot stops accepting the upload. */
+          expires_at: string
+          /** @example PUT */
+          method: string
+          /** @description Presigned destination for the `.tar.gz` build context. */
+          url: string
+        }
+        /**
+         * @description Upload id to pass to the deploy endpoint as `context_upload_id`.
+         * @example cafe0000000000000000000000000000
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance_upload'
+      }
+    }
+    V2CreateBranchRequest: {
+      data: {
+        attributes: {
+          /** @description Desired disk size in GB. Omit this field to default to the smallest disk size available on the plan. */
+          desired_disk_size_gb?: number
+          /**
+           * @description Desired instance size. Omit this field to always default to the smallest possible size.
+           * @enum {string}
+           */
+          desired_instance_size?:
+            | 'nano'
+            | 'micro'
+            | 'small'
+            | 'medium'
+            | 'large'
+            | 'xlarge'
+            | '2xlarge'
+            | '4xlarge'
+            | '8xlarge'
+            | '12xlarge'
+            | '16xlarge'
+            | '24xlarge'
+            | '24xlarge_optimized_memory'
+            | '24xlarge_optimized_cpu'
+            | '24xlarge_high_memory'
+            | '48xlarge'
+            | '48xlarge_optimized_memory'
+            | '48xlarge_optimized_cpu'
+            | '48xlarge_high_memory'
+          /**
+           * @description Git branch to track. Must exist on the connected GitHub repository when the project has one.
+           * @example feature/login-page
+           */
+          git_branch?: string
+          /**
+           * @description Name of the branch.
+           * @example preview-login-page
+           */
+          name: string
+          /**
+           * Format: uri
+           * @description HTTP endpoint to receive branch status updates.
+           * @example https://example.com/webhooks/branches
+           */
+          notify_url?: string
+          /** @description Whether the branch is kept when its git branch is deleted or its PR is merged. */
+          persistent?: boolean
+          /** @description Region to create the branch in. Omit to inherit the region of the project it branches from. */
+          region?: string
+          /** @description Whether to seed the branch from the project's latest physical backup. */
+          with_data?: boolean
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'branch'
+      }
+    }
     V2CreateInvitationsRequest: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
           /** @description The projects to limit a user to. If omitted, user will have org-wide access with the provided role. */
           projects?: {
@@ -1156,10 +1395,14 @@ export interface components {
         type: 'organization_invitation'
       }[]
     }
-    V2CreateInvitationsResponse: {
+    V2CreateInvitationsResponse_Output: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1190,7 +1433,11 @@ export interface components {
           }
           message: string
           meta: {
-            /** Format: email */
+            /**
+             * Format: email
+             * @description Email address of the invitation receipient.
+             * @example hello@example.com
+             */
             email: string
           }
         }[]
@@ -1232,7 +1479,11 @@ export interface components {
     V2DeleteInvitationsRequest: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1242,10 +1493,14 @@ export interface components {
         type: 'organization_invitation'
       }[]
     }
-    V2DeleteInvitationsResponse: {
+    V2DeleteInvitationsResponse_Output: {
       data: {
         attributes: {
-          /** Format: email */
+          /**
+           * Format: email
+           * @description Email address of the invitation receipient.
+           * @example hello@example.com
+           */
           email: string
         }
         /**
@@ -1255,13 +1510,12 @@ export interface components {
         type: 'organization_invitation'
       }[]
     }
-    V2DeployWorkerRequest: {
+    V2DeployComputeInstanceRequest: {
       data: {
         attributes: {
           /** @description Id of a build context staged through the uploads endpoint. Required unless `runtime` is set. */
           context_upload_id?: string
           spec: {
-            backend?: string
             /** @example public */
             exposure: string
             /** @example 1 */
@@ -1276,10 +1530,49 @@ export interface components {
          * @description Resource type.
          * @enum {string}
          */
-        type: 'project_worker'
+        type: 'project_compute_instance'
       }
     }
-    V2ListGitHubConnectionsResponse: {
+    V2ListComputeInstancesResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          build_state: 'building' | 'active' | 'failed'
+          deleting?: boolean
+          image_version?: string
+          instances?: {
+            declared: number
+            live: number
+            ready: number
+            stale: number
+          }
+          instances_error?: string
+          secret_generation: string
+          spec: {
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+          state_reason?: string
+        }
+        /**
+         * @description Compute instance name.
+         * @example hello-world
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance'
+      }[]
+    }
+    V2ListGitHubConnectionsResponse_Output: {
       data: {
         attributes: {
           /** @description Maximum number of preview branches */
@@ -1352,7 +1645,7 @@ export interface components {
         prev: string | null
       }
     }
-    V2ListMembersResponse: {
+    V2ListMembersResponse_Output: {
       data: {
         attributes: {
           /** @description Member's avatar URL */
@@ -1415,7 +1708,7 @@ export interface components {
         prev: string | null
       }
     }
-    V2ListPrivateLinkAssociationsResponse: {
+    V2ListPrivateLinkAssociationsResponse_Output: {
       data: {
         attributes: {
           /** @description Human-readable name for the AWS account. */
@@ -1467,7 +1760,7 @@ export interface components {
         type: 'private_link_association'
       }[]
     }
-    V2ListProjectsResponse: {
+    V2ListProjectsResponse_Output: {
       data: {
         attributes: {
           /** @description Cloud provider hosting the project */
@@ -1582,7 +1875,7 @@ export interface components {
         prev: string | null
       }
     }
-    V2ListRolesResponse: {
+    V2ListRolesResponse_Output: {
       data: {
         attributes: {
           /**
@@ -1598,47 +1891,7 @@ export interface components {
         type: 'organization_role'
       }[]
     }
-    V2ListWorkersResponse: {
-      data: {
-        attributes: {
-          /** @enum {string} */
-          build_state: 'building' | 'active' | 'failed'
-          deleting?: boolean
-          image_version?: string
-          instances?: {
-            declared: number
-            live: number
-            ready: number
-            stale: number
-          }
-          instances_error?: string
-          secret_generation: string
-          spec: {
-            backend?: string
-            /** @example public */
-            exposure: string
-            /** @example 1 */
-            instances: number
-            /** @example node */
-            runtime?: string
-            /** @example 2gb-1vcpu */
-            size: string
-          }
-          state_reason?: string
-        }
-        /**
-         * @description Worker name.
-         * @example hello-world
-         */
-        id: string
-        /**
-         * @description Resource type.
-         * @enum {string}
-         */
-        type: 'project_worker'
-      }[]
-    }
-    V2PreviewProjectTransferResponse: {
+    V2PreviewProjectTransferResponse_Output: {
       data: {
         attributes: {
           errors: {
@@ -1662,7 +1915,7 @@ export interface components {
         type: 'project_transfer_result'
       }
     }
-    V2PrivateLinkAssociationResponse: {
+    V2PrivateLinkAssociationResponse_Output: {
       data: {
         attributes: {
           /** @description Human-readable name for the AWS account. */
@@ -1714,7 +1967,94 @@ export interface components {
         type: 'private_link_association'
       }
     }
-    V2ProjectConfigResponse: {
+    V2ProjectAdvisorsResponse_Output: {
+      data: {
+        attributes: {
+          lints: {
+            cache_key: string
+            categories: ('PERFORMANCE' | 'SECURITY' | 'HEALTH')[]
+            description: string
+            detail: string
+            /** @enum {string} */
+            facing: 'EXTERNAL'
+            /** @enum {string} */
+            level: 'ERROR' | 'WARN' | 'INFO'
+            metadata?: {
+              entity?: string
+              fkey_columns?: number[]
+              fkey_name?: string
+              name?: string
+              schema?: string
+              /** @enum {string} */
+              type?:
+                | 'table'
+                | 'view'
+                | 'materialized view'
+                | 'foreign table'
+                | 'auth'
+                | 'function'
+                | 'extension'
+                | 'compliance'
+                | 'health'
+            }
+            /** @enum {string} */
+            name:
+              | 'unindexed_foreign_keys'
+              | 'auth_users_exposed'
+              | 'auth_rls_initplan'
+              | 'no_primary_key'
+              | 'unused_index'
+              | 'multiple_permissive_policies'
+              | 'policy_exists_rls_disabled'
+              | 'rls_enabled_no_policy'
+              | 'duplicate_index'
+              | 'security_definer_view'
+              | 'function_search_path_mutable'
+              | 'rls_disabled_in_public'
+              | 'extension_in_public'
+              | 'rls_references_user_metadata'
+              | 'materialized_view_in_api'
+              | 'foreign_table_in_api'
+              | 'unsupported_reg_types'
+              | 'auth_otp_long_expiry'
+              | 'auth_otp_short_length'
+              | 'ssl_not_enforced'
+              | 'log_connections_not_enabled'
+              | 'network_restrictions_not_set'
+              | 'password_requirements_min_length'
+              | 'pitr_not_enabled'
+              | 'auth_leaked_password_protection'
+              | 'auth_insufficient_mfa_options'
+              | 'auth_password_policy_missing'
+              | 'leaked_service_key'
+              | 'no_backup_admin'
+              | 'vulnerable_postgres_version'
+              | 'db_not_reachable'
+              | 'db_connection_failing'
+              | 'db_connection_limit_reached'
+              | 'instance_telemetry_lost'
+              | 'instance_db_down'
+              | 'instance_alert_firing'
+              | 'log_data_api_error_rate_high'
+              | 'log_auth_error_rate_high'
+              | 'log_storage_error_rate_high'
+              | 'log_edge_function_error_rate_high'
+              | 'project_not_active'
+              | 'advisor_check_unavailable'
+            /** Format: date-time */
+            observed_at?: string
+            remediation: string
+            title: string
+          }[]
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_advisors'
+      }
+    }
+    V2ProjectConfigResponse_Output: {
       data: {
         attributes: {
           api: {
@@ -1731,6 +2071,8 @@ export interface components {
             [key: string]: unknown
           }
           database: {
+            /** @description The major Postgres version the database runs. `17` covers both Postgres 17 and Oriole on 17, since Oriole is a storage engine rather than a version. */
+            major_version: number
             network_restrictions: {
               allowed_cidrs: {
                 address: string
@@ -1831,8 +2173,8 @@ export interface components {
             capabilities: {
               iceberg_catalog: boolean
               list_v2: boolean
+              object_versioning: boolean
             }
-            database_pool_mode: string
             features: {
               iceberg_catalog: {
                 enabled: boolean
@@ -1857,7 +2199,7 @@ export interface components {
             }
             /** Format: int64 */
             file_size_limit: number
-            migration_version: string
+            migration_version: string | null
             /** @enum {string} */
             upstream_target: 'main' | 'canary'
           }
@@ -1869,6 +2211,63 @@ export interface components {
          * @enum {string}
          */
         type: 'project_config'
+      }
+    }
+    V2RunProjectAdvisorsBody: {
+      data: {
+        attributes: {
+          lints: {
+            /** @enum {string} */
+            name:
+              | 'unindexed_foreign_keys'
+              | 'auth_users_exposed'
+              | 'auth_rls_initplan'
+              | 'no_primary_key'
+              | 'unused_index'
+              | 'multiple_permissive_policies'
+              | 'policy_exists_rls_disabled'
+              | 'rls_enabled_no_policy'
+              | 'duplicate_index'
+              | 'security_definer_view'
+              | 'function_search_path_mutable'
+              | 'rls_disabled_in_public'
+              | 'extension_in_public'
+              | 'rls_references_user_metadata'
+              | 'materialized_view_in_api'
+              | 'foreign_table_in_api'
+              | 'unsupported_reg_types'
+              | 'auth_otp_long_expiry'
+              | 'auth_otp_short_length'
+              | 'ssl_not_enforced'
+              | 'log_connections_not_enabled'
+              | 'network_restrictions_not_set'
+              | 'password_requirements_min_length'
+              | 'pitr_not_enabled'
+              | 'auth_leaked_password_protection'
+              | 'auth_insufficient_mfa_options'
+              | 'auth_password_policy_missing'
+              | 'leaked_service_key'
+              | 'no_backup_admin'
+              | 'vulnerable_postgres_version'
+              | 'db_not_reachable'
+              | 'db_connection_failing'
+              | 'db_connection_limit_reached'
+              | 'instance_telemetry_lost'
+              | 'instance_db_down'
+              | 'instance_alert_firing'
+              | 'log_data_api_error_rate_high'
+              | 'log_auth_error_rate_high'
+              | 'log_storage_error_rate_high'
+              | 'log_edge_function_error_rate_high'
+          }[]
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_advisors'
+      } & {
+        [key: string]: unknown
       }
     }
     V2TransferProjectBody: {
@@ -1883,68 +2282,6 @@ export interface components {
         type: 'project_transfer_input'
       }
     }
-    V2WorkerResponse: {
-      data: {
-        attributes: {
-          /** @enum {string} */
-          build_state: 'building' | 'active' | 'failed'
-          deleting?: boolean
-          image_version?: string
-          instances?: {
-            declared: number
-            live: number
-            ready: number
-            stale: number
-          }
-          instances_error?: string
-          secret_generation: string
-          spec: {
-            backend?: string
-            /** @example public */
-            exposure: string
-            /** @example 1 */
-            instances: number
-            /** @example node */
-            runtime?: string
-            /** @example 2gb-1vcpu */
-            size: string
-          }
-          state_reason?: string
-        }
-        /**
-         * @description Worker name.
-         * @example hello-world
-         */
-        id: string
-        /**
-         * @description Resource type.
-         * @enum {string}
-         */
-        type: 'project_worker'
-      }
-    }
-    V2WorkerUploadResponse: {
-      data: {
-        attributes: {
-          /** @description When the slot stops accepting the upload. */
-          expires_at: string
-          /** @example PUT */
-          method: string
-          /** @description Presigned destination for the `.tar.gz` build context. */
-          url: string
-        }
-        /**
-         * @description Upload id to pass to the deploy endpoint as `context_upload_id`.
-         * @example cafe0000000000000000000000000000
-         */
-        id: string
-        /**
-         * @description Resource type.
-         * @enum {string}
-         */
-        type: 'project_worker_upload'
-      }
-    }
   }
   responses: never
   parameters: never
@@ -1954,325 +2291,6 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  postV1WebhooksEvents: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': {
-          data: {
-            attributes: {
-              /**
-               * @description Organization slug
-               * @example tsrqponmlkjihgfedcba
-               */
-              organization_slug: string
-              /** @description Extra data to pass to consumers. `organization_slug` and `project_ref` (if applicable) are always provided by default. */
-              payload?: {
-                [key: string]: unknown
-              }
-              /** @description Project's ref. If left unspecified or `null`, the event will published as organization-wide, only to organization-wide endpoints. */
-              project_ref?: string | null
-              /**
-               * Format: date-time
-               * @description Optional timestamp of event publication.
-               */
-              timestamp?: string
-              /**
-               * @description Webhook event type.
-               * @enum {string}
-               */
-              type:
-                | 'v1.project.paused'
-                | 'v1.project.created'
-                | 'v1.project.restored'
-                | 'v1.project.transferred'
-                | 'v1.project.removed'
-                | 'v1.project.restarted'
-                | 'v1.project.status.changed'
-                | 'v1.project.backup.started'
-                | 'v1.project.branch.created'
-                | 'v1.project.branch.updated'
-                | 'v1.project.branch.removed'
-                | 'v1.organization.member.invitation.created'
-                | 'v1.organization.member.invitation.canceled'
-                | 'v1.organization.member.added'
-                | 'v1.organization.member.removed'
-                | 'v1.organization.member.role.assigned'
-                | 'v1.organization.member.role.removed'
-                | 'v1.organization.member.role.updated'
-                | 'v1.organization.billing.plan.upgraded'
-                | 'v1.organization.billing.plan.downgraded'
-                | 'project.v1.paused'
-                | 'project.v1.created'
-                | 'project.v1.restored'
-                | 'project.v1.transferred'
-                | 'project.v1.removed'
-                | 'project.v1.restarted'
-                | 'project.v1.status.changed'
-                | 'project.v1.backup.started'
-                | 'project.v1.branch.created'
-                | 'project.v1.branch.updated'
-                | 'project.v1.branch.removed'
-                | 'organization.v1.member.invitation.created'
-                | 'organization.v1.member.invitation.canceled'
-                | 'organization.v1.member.added'
-                | 'organization.v1.member.removed'
-                | 'organization.v1.member.role.assigned'
-                | 'organization.v1.member.role.removed'
-                | 'organization.v1.member.role.updated'
-                | 'organization.v1.billing.plan.upgraded'
-                | 'organization.v1.billing.plan.downgraded'
-                | 'project.v1.branch.deleted'
-            }
-            /**
-             * @description Resource type.
-             * @constant
-             */
-            type: 'event'
-          }
-          meta: {
-            /** @description Idempotency key. */
-            idempotency_key: string
-          }
-        }
-      }
-    }
-    responses: {
-      /** @description Events published */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            data: {
-              id: string
-              /**
-               * @description Resource type.
-               * @constant
-               */
-              type: 'ingress'
-            }
-          }
-        }
-      }
-      /** @description PermissionDenied */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error: {
-              /** @constant */
-              code: 'forbidden.permission_denied'
-              description?: string
-              id?: string
-              issues?: components['schemas']['APIErrorObject'][]
-              links?: {
-                [key: string]: {
-                  describedby?: string
-                  href: string
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                  rel?: string
-                  title?: string
-                  type?: string
-                }
-              }
-              /** @constant */
-              message: 'Forbidden: Permission denied'
-              meta?: {
-                [key: string]: unknown
-              }
-            }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-      /** @description GenericRequestTimeout */
-      408: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error: {
-              /** @constant */
-              code: 'request_timeout'
-              description?: string
-              id?: string
-              issues?: components['schemas']['APIErrorObject'][]
-              links?: {
-                [key: string]: {
-                  describedby?: string
-                  href: string
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                  rel?: string
-                  title?: string
-                  type?: string
-                }
-              }
-              /** @constant */
-              message: 'Request Timeout'
-              meta?: {
-                [key: string]: unknown
-              }
-            }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-      /** @description GenericTooManyRequests */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error: {
-              /** @constant */
-              code: 'too_many_requests'
-              description?: string
-              id?: string
-              issues?: components['schemas']['APIErrorObject'][]
-              links?: {
-                [key: string]: {
-                  describedby?: string
-                  href: string
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                  rel?: string
-                  title?: string
-                  type?: string
-                }
-              }
-              /** @constant */
-              message: 'Too Many Requests'
-              meta?: {
-                [key: string]: unknown
-              }
-            }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'internal_server_error'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Internal Server Error'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'internal_server_error.event.ingress_failed'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Internal Server Error: Failed to ingress the event'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-      /** @description TemporarilyDisabled */
-      503: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error: {
-              /** @constant */
-              code: 'service_unavailable.temporarily_disabled'
-              description?: string
-              id?: string
-              issues?: components['schemas']['APIErrorObject'][]
-              links?: {
-                [key: string]: {
-                  describedby?: string
-                  href: string
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                  rel?: string
-                  title?: string
-                  type?: string
-                }
-              }
-              /** @constant */
-              message: 'Service Unavailable: Temporarily disabled'
-              meta?: {
-                [key: string]: unknown
-              }
-            }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-    }
-  }
   'v2-list-organization-github-connections': {
     parameters: {
       query?: {
@@ -2311,7 +2329,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListGitHubConnectionsResponse']
+          'application/json': components['schemas']['V2ListGitHubConnectionsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2373,7 +2391,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListMembersResponse']
+          'application/json': components['schemas']['V2ListMembersResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2427,7 +2445,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationMemberRoleResponse']
+          'application/json': components['schemas']['OrganizationMemberRoleResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2498,7 +2516,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2CreateInvitationsResponse']
+          'application/json': components['schemas']['V2CreateInvitationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2560,7 +2578,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2DeleteInvitationsResponse']
+          'application/json': components['schemas']['V2DeleteInvitationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2628,7 +2646,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListProjectsResponse']
+          'application/json': components['schemas']['V2ListProjectsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2677,7 +2695,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListRolesResponse']
+          'application/json': components['schemas']['V2ListRolesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -2709,7 +2727,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-deliveries-id-get': {
     parameters: {
       query?: never
       header?: never
@@ -2746,8 +2764,6 @@ export interface operations {
                      */
                     organization_slug: string
                     project_ref: string | null
-                  } & {
-                    [key: string]: unknown
                   }
                   /**
                    * Format: date-time
@@ -3156,7 +3172,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-deliveries-id-retry-post': {
     parameters: {
       query?: never
       header?: never
@@ -3499,7 +3515,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-get': {
     parameters: {
       query?: {
         /** @description Up to how many records to return. */
@@ -3908,7 +3924,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-post': {
     parameters: {
       query?: never
       header?: never
@@ -4362,7 +4378,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-delete': {
     parameters: {
       query?: never
       header?: never
@@ -4742,7 +4758,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-get': {
     parameters: {
       query?: never
       header?: never
@@ -5161,7 +5177,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-delete': {
     parameters: {
       query?: never
       header?: never
@@ -5580,7 +5596,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-patch': {
     parameters: {
       query?: never
       header?: never
@@ -6070,7 +6086,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-deliveries-get': {
     parameters: {
       query?: {
         /** @description Cursor in cursor-based pagination to return up to `page[size]` records after (exclusive) the entry specified by this query param. */
@@ -6482,7 +6498,7 @@ export interface operations {
       }
     }
   }
-  allV2OrganizationsBySlugWebhooks: {
+  'v2-organizations-slug-webhooks-endpoints-id-test-post': {
     parameters: {
       query?: never
       header?: never
@@ -6933,6 +6949,59 @@ export interface operations {
       }
     }
   }
+  'v2-run-project-advisors': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2RunProjectAdvisorsBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ProjectAdvisorsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
   'v2-list-log-drains': {
     parameters: {
       query?: never
@@ -6950,7 +7019,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListLogDrainsResponse']
+          'application/json': components['schemas']['ListLogDrainsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7012,7 +7081,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['LogDrainResponse']
+          'application/json': components['schemas']['LogDrainResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7085,7 +7154,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['LogDrainResponse']
+          'application/json': components['schemas']['LogDrainResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7184,6 +7253,337 @@ export interface operations {
       }
     }
   }
+  'v2-create-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2CreateBranchRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2BranchResponse_Output']
+        }
+      }
+      /** @description Invalid branch configuration for this project */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Organization plan does not cover the requested branch */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to create database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-list-all-compute-instances': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ListComputeInstancesResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-delete-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-deploy-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2DeployComputeInstanceRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-create-compute-instance-upload': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceUploadResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
   'v2-get-project-config': {
     parameters: {
       query?: never
@@ -7201,7 +7601,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ProjectConfigResponse']
+          'application/json': components['schemas']['V2ProjectConfigResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7250,7 +7650,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2ListPrivateLinkAssociationsResponse']
+          'application/json': components['schemas']['V2ListPrivateLinkAssociationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7312,7 +7712,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2PrivateLinkAssociationResponse']
+          'application/json': components['schemas']['V2PrivateLinkAssociationResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7552,7 +7952,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V2PreviewProjectTransferResponse']
+          'application/json': components['schemas']['V2PreviewProjectTransferResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -7584,7 +7984,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-deliveries-id-get': {
     parameters: {
       query?: never
       header?: never
@@ -7621,8 +8021,6 @@ export interface operations {
                      */
                     organization_slug: string
                     project_ref: string | null
-                  } & {
-                    [key: string]: unknown
                   }
                   /**
                    * Format: date-time
@@ -8031,7 +8429,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-deliveries-id-retry-post': {
     parameters: {
       query?: never
       header?: never
@@ -8374,7 +8772,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-get': {
     parameters: {
       query?: {
         /** @description Up to how many records to return. */
@@ -8783,7 +9181,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-post': {
     parameters: {
       query?: never
       header?: never
@@ -9237,7 +9635,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-delete': {
     parameters: {
       query?: never
       header?: never
@@ -9617,7 +10015,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-get': {
     parameters: {
       query?: never
       header?: never
@@ -10036,7 +10434,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-delete': {
     parameters: {
       query?: never
       header?: never
@@ -10455,7 +10853,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-patch': {
     parameters: {
       query?: never
       header?: never
@@ -10945,7 +11343,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-deliveries-get': {
     parameters: {
       query?: {
         /** @description Cursor in cursor-based pagination to return up to `page[size]` records after (exclusive) the entry specified by this query param. */
@@ -11357,7 +11755,7 @@ export interface operations {
       }
     }
   }
-  allV2ProjectsByRefWebhooks: {
+  'v2-projects-ref-webhooks-endpoints-id-test-post': {
     parameters: {
       query?: never
       header?: never
@@ -11804,257 +12202,6 @@ export interface operations {
               APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
-        }
-      }
-    }
-  }
-  'v2-list-all-workers': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2ListWorkersResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-get-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-delete-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-deploy-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V2DeployWorkerRequest']
-      }
-    }
-    responses: {
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-create-worker-upload': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerUploadResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
         }
       }
     }

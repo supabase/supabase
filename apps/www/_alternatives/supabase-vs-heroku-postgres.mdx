@@ -21,7 +21,7 @@ Supabase also offers managed Postgres, the main difference is that with each dep
 - Auth - [users can log in and out of your application](https://supabase.com/auth)
 - Functions - [deploy custom logic to the edge](https://supabase.com/edge-functions)
 - Storage - [serve large files and folders](https://supabase.com/storage)
-- Supavisor - [connection pooling useful for serverless computing](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler)
+- Supavisor - [connection pooling useful for serverless computing](https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works)
 
 ## How are they similar?
 
@@ -42,7 +42,7 @@ Heroku Postgres and Supabase both offer:
 These are some of the key differences between Heroku Postgres and Supabase in terms of features:
 
 - Supabase is more than just the raw database, it also comes with:
-  - [Connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool) so that you won’t run out of connections in a serverless environment.
+  - [Connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works) so that you won’t run out of connections in a serverless environment.
   - [Auto-generated APIs](https://supabase.com/docs/guides/api#rest-api-overview) based on your schema, so you can communicate with your database directly from the client.
   - [Realtime API](https://supabase.com/docs/reference/dart/subscribe) is useful for when you want to subscribe to changes to your database over websockets.
   - [Auth API](https://supabase.com/auth) can be used to leverage Postgres’s Row Level Security model, and control access to sensitive data on a per user, or per group level.
