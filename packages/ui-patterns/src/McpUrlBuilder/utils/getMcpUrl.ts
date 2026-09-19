@@ -14,10 +14,17 @@ export function buildClientConfig(
   return client?.transformConfig ? client.transformConfig(base) : base
 }
 
+export type McpSkipElicitation =
+  | 'execute_sql'
+  | 'apply_migration'
+  | 'create_project'
+  | 'create_branch'
+
 interface GetMcpUrlOptions {
   projectRef?: string
   readonly?: boolean
   features?: string[]
+  skipElicitations?: McpSkipElicitation[]
   selectedClient?: McpClient
   isPlatform: boolean
   apiUrl?: string
@@ -40,6 +47,7 @@ export function getMcpUrl({
   nonPlatformUrl,
   readonly = false,
   features = [],
+  skipElicitations = [],
   selectedClient,
 }: GetMcpUrlOptions): GetMcpUrlReturn {
   // Generate the MCP URL based on current configuration
@@ -52,6 +60,9 @@ export function getMcpUrl({
   }
   if (features.length > 0) {
     url.searchParams.set('features', features.join(','))
+  }
+  if (isPlatform && skipElicitations.length > 0) {
+    url.searchParams.set('skip_elicitations', skipElicitations.join(','))
   }
   const mcpUrl = url.toString()
 

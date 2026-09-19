@@ -13,17 +13,23 @@ keywords = [
 ]
 ---
 
-The Supabase MCP server asks for [confirmation through your MCP client](/docs/guides/ai-tools/mcp#cost-confirmation) before `create_project` or `create_branch` creates a resource that incurs charges. If you expect a confirmation dialog and don't see one, work through these checks.
+When your connection uses form-based cost confirmation, the Supabase MCP server asks for [confirmation through your MCP client](/docs/guides/ai-tools/mcp#cost-confirmation) before `create_project` or `create_branch` creates a resource that incurs charges. If you expect a confirmation dialog and don't see one, work through these checks.
 
 ## Your client uses the `get_cost` and `confirm_cost` flow
 
-Cost confirmation dialogs appear in clients that connect using MCP specification revision 2026-07-28 or later and support form elicitations. Clients on older revisions of the specification use the `get_cost` and `confirm_cost` tools instead. On that flow, the agent quotes the cost in chat and asks you before creating the resource. No dialog appears, and this is the expected behavior for these clients.
+Cost confirmation dialogs appear when the server offers form-based cost confirmation for the tool and your client supports form elicitations for the request. The specification revision alone does not determine which flow your connection uses. If form-based cost confirmation is unavailable or unsupported, the tool uses the legacy cost confirmation workflow instead. In that workflow, the agent quotes the cost in chat and asks you before creating the resource. No dialog appears, and this is the expected behavior.
 
-To check which flow your connection uses, ask your client to list the available Supabase tools. If `get_cost` and `confirm_cost` are in the list, your connection uses that flow.
+The bundled version 0.13 CLI stdio server does not offer elicitation and uses the legacy cost confirmation workflow.
 
-## The creation has no cost
+To check which flow a creation tool uses, ask your client to list the available Supabase tools and the resource types accepted by `get_cost` and `confirm_cost`. The resource types accepted by these helpers use the legacy cost confirmation workflow; another resource type can use form-based cost confirmation on the same connection. Their absence does not prove that form-based cost confirmation is active: project scoping, account feature settings, or server availability can also hide them.
 
-When a creation is free, for example a project that is covered by your plan, no confirmation is requested and the resource is created directly.
+## Cost confirmations are skipped for the tool
+
+Check your MCP server URL for `skip_elicitations`. If it includes `create_project` or `create_branch`, that tool uses the legacy cost confirmation workflow instead of a confirmation dialog. Skipping the form does not approve the cost or avoid charges. See [Skip form confirmations](/docs/guides/ai-tools/mcp#skip-form-confirmations).
+
+## The project creation is quoted at zero cost
+
+When a new project creation request uses form-based cost confirmation and is quoted at zero cost, no confirmation is requested and the project is created directly. This exception does not apply to branch creation: when it uses form-based cost confirmation, it asks you to confirm the standard rate before any allowances or exemptions are applied.
 
 ## Your client answers elicitations automatically
 
