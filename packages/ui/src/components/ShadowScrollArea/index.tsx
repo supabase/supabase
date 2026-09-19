@@ -57,10 +57,9 @@ const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>
             'w-full overflow-auto',
             stickyLastColumn && [
               '[&_tr>*:last-child]:sticky [&_tr>*:last-child]:z-38 [&_tr>*:last-child]:right-0',
-              '[&_tr:hover>*:last-child]:bg-transparent',
-              '[&_th>*:last-child]:bg-surface-100',
+              '[&_tr:hover>td:last-child]:bg-card',
+              '[&_th>*:last-child]:bg-card',
               stickyColumnShadow,
-              hasHorizontalScroll && '[&_tr:hover>td:last-child]:!bg-surface-200',
             ],
             canScrollRight &&
               '[&_td]:before:opacity-100 [&_tr>*:last-child]:before:opacity-100 [&_th:last-child]:before:opacity-100',
