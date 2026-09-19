@@ -27,6 +27,12 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
     .mockReturnValue({ data: { ref: 'project-ref', connectionString: 'postgres://' } }),
 }))
 
+// Defaults the `UserActivity` ConfigCat flag to off; individual tests override this.
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useFlag: vi.fn().mockReturnValue(false),
+}))
+
 // Heavy tab bodies — the sanctioned use of vi.mock. This spec only asserts tab
 // visibility, not what the tabs render.
 vi.mock('./UserOverview', () => ({
@@ -34,6 +40,9 @@ vi.mock('./UserOverview', () => ({
 }))
 vi.mock('./UserLogs', () => ({
   UserLogs: () => <div data-testid="user-logs" />,
+}))
+vi.mock('./UserActivityTab', () => ({
+  UserActivityTab: () => <div data-testid="user-activity" />,
 }))
 
 const renderPanel = (disabledFeatures: string[] = []) => {
