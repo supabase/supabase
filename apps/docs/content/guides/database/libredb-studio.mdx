@@ -54,7 +54,9 @@ hideToc: true
 
     <StepHikeCompact.Details title="Create the connection">
 
-        In LibreDB Studio, choose **New connection**, pick PostgreSQL, and paste the connection string into the paste box. Host, port, database and user are filled in from the string, and the `sslmode` it carries is applied to the SSL panel, so a Supabase URL arrives already set to verify the server certificate. Enter the database password, then save.
+        In LibreDB Studio, choose **New connection**, pick PostgreSQL, and paste the connection string into the paste box. Host, port, database and user are filled in from the string, and the `sslmode` it carries is applied to the SSL panel. Enter the database password, then save.
+
+        A string carrying `sslmode=require` arrives on **Require**, which encrypts the connection but does not verify the server, so it does not stop a man-in-the-middle attack. To verify as well as encrypt, download your server root certificate from [Database settings](/dashboard/project/_/database/settings), set **SSL Mode** to `verify-full`, and paste the certificate into **CA Certificate (PEM)**.
 
         You can also fill the form by hand with the host, port, database, user and password from the Connect panel.
 
