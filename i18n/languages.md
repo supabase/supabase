@@ -27,6 +27,7 @@
 - [Lithuanian / lietuvių](/i18n/README.lt.md)
 - [Latvian / latviski](/i18n/README.lv.md)
 - [Malay / Bahasa Malaysia](/i18n/README.ms.md)
+- [Marathi / मराठी](/i18n/README.mr.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb.md)
 - [Persian / فارسی](/i18n/README.fa.md)
