@@ -1,0 +1,75 @@
+---
+id: 'libredb-studio'
+title: 'Connecting with LibreDB Studio'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+[`LibreDB Studio`](https://libredb.org) is an open source SQL IDE that runs in the browser. You deploy it next to your infrastructure, so the connection details stay on your own server rather than on each developer's laptop.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Deploy LibreDB Studio">
+
+        Run it with [Docker](https://www.docker.com/products/docker-desktop/), or install it from npm, Homebrew, Snap or a Helm chart.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+        ```sh
+        docker run -d -p 3000:3000 -v libredb-data:/app/data ghcr.io/libredb/libredb-studio:latest
+        ```
+
+        The workspace is served at [`http://localhost:3000`](http://localhost:3000). On the first run it generates an admin password and prints it once to the container log:
+
+        ```sh
+        docker logs <container> | grep Password
+        ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Get your connection credentials">
+
+    - On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true)
+    - View parameters under "Session pooler"
+
+    <Admonition type="note" title="Connection notice">
+
+        If you're in an [IPv6 environment](/docs/guides/platform/ipv4-address#checking-your-network-ipv6-support) or have the [IPv4 Add-On](/docs/guides/platform/ipv4-address#understanding-ip-addresses), you can use the direct connection string instead of Supavisor in Session mode.
+
+    </Admonition>
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Create the connection">
+
+        In LibreDB Studio, choose **New connection**, pick PostgreSQL, and paste the connection string into the paste box. Host, port, database and user are filled in from the string, and the `sslmode` it carries is applied to the SSL panel, so a Supabase URL arrives already set to verify the server certificate. Enter the database password, then save.
+
+        You can also fill the form by hand with the host, port, database, user and password from the Connect panel.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Explore your project">
+
+        Open the connection. The object browser lists your schemas, including the `auth`, `storage`, `graphql` and `extensions` schemas that Supabase manages, alongside `public`. From there you can run SQL, read the query plan, generate an ER diagram, and profile a table's columns.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
