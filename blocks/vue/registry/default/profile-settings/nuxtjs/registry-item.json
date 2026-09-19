@@ -1,0 +1,21 @@
+{
+  "name": "profile-settings-nuxtjs",
+  "type": "registry:block",
+  "title": "Profile Settings Editor for Nuxt.js and Supabase",
+  "description": "A comprehensive component block allowing users to update their profile metadata and upload custom avatars to Supabase Storage in Nuxt.js.",
+  "registryDependencies": ["button", "card", "input", "label", "avatar"],
+  "docs": "Make sure you have created a public Supabase Storage bucket named `avatars` with public read access enabled to store user avatars.",
+  "files": [
+    {
+      "path": "registry/default/profile-settings/nuxtjs/app/components/profile-form.vue",
+      "type": "registry:component",
+      "target": "app/components/profile-form.vue"
+    },
+    {
+      "path": "registry/default/profile-settings/nuxtjs/app/composables/useUserProfile.ts",
+      "type": "registry:component",
+      "target": "app/composables/useUserProfile.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest", "lucide-vue-next"]
+}

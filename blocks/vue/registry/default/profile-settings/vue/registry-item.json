@@ -1,0 +1,21 @@
+{
+  "name": "profile-settings-vue",
+  "type": "registry:block",
+  "title": "Profile Settings Editor for Vue and Supabase",
+  "description": "A comprehensive component block allowing users to update their profile metadata and upload custom avatars to Supabase Storage.",
+  "registryDependencies": ["button", "card", "input", "label", "avatar"],
+  "docs": "Make sure you have created a public Supabase Storage bucket named `avatars` with public read access enabled to store user avatars.",
+  "files": [
+    {
+      "path": "registry/default/profile-settings/vue/components/profile-form.vue",
+      "type": "registry:component",
+      "target": "components/profile-form.vue"
+    },
+    {
+      "path": "registry/default/profile-settings/vue/composables/useUserProfile.ts",
+      "type": "registry:component",
+      "target": "composables/useUserProfile.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest", "lucide-vue-next"]
+}
