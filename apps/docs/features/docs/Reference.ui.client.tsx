@@ -2,13 +2,23 @@
 
 import { ReferenceContentInitiallyScrolledContext } from '~/features/docs/Reference.navigation.client'
 import { safeHistoryReplaceState } from '~/lib/historyUtils'
-import { XCircle } from 'lucide-react'
-import type { HTMLAttributes, PropsWithChildren } from 'react'
+import { Check, XCircle } from 'lucide-react'
+import type { HTMLAttributes, PropsWithChildren, ReactNode } from 'react'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import {
   cn,
   CollapsibleTrigger,
+  ComboboxTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select,
   SelectContent,
   SelectGroup,
@@ -123,5 +133,71 @@ export function DetailsTrigger({ label, className }: { label: string; className?
       <XCircle size={14} aria-hidden="true" className="reference-details-trigger-icon" />
       {label}
     </CollapsibleTrigger>
+  )
+}
+
+export function ExamplesCombobox({
+  examples,
+  className,
+}: {
+  examples: Array<{ id: string; name: string; content: ReactNode }>
+  className?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState(examples[0])
+
+  const handleSelect = (id: string) => {
+    setSelected(examples.find((example) => example.id === id) ?? examples[0])
+    setOpen(false)
+  }
+
+  if (examples.length === 1) {
+    return <div className={className}>{selected.content}</div>
+  }
+
+  return (
+    <div
+      className={cn(
+        '[&_.shiki:first-child]:rounded-t-none [&_.shiki:first-child]:border-t-0',
+        className
+      )}
+    >
+      <Popover open={open} onOpenChange={setOpen}>
+        <div className="rounded-t-lg border border-default bg-200">
+          <PopoverTrigger asChild>
+            <ComboboxTrigger className="rounded-lg border-0 bg-transparent focus-visible:ring-inset focus-visible:ring-offset-0">
+              {selected.name}
+            </ComboboxTrigger>
+          </PopoverTrigger>
+        </div>
+        <PopoverContent align="start" className="z-40 w-(--radix-popover-trigger-width) p-0">
+          <Command>
+            <CommandInput placeholder="Search examples…" />
+            <CommandList>
+              <CommandEmpty>No example found</CommandEmpty>
+              <CommandGroup>
+                {examples.map((example) => (
+                  <CommandItem
+                    key={example.id}
+                    value={example.id}
+                    keywords={[example.name]}
+                    onSelect={handleSelect}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 size-4',
+                        selected.id === example.id ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                    {example.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      {selected.content}
+    </div>
   )
 }

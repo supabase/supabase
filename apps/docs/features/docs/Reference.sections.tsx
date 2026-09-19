@@ -26,11 +26,11 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { isFeatureEnabled } from 'common'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Badge, cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { Badge, cn } from 'ui'
 
 import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
-import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
+import { ApiOperationBodySchemeSelector, ExamplesCombobox } from './Reference.ui.client'
 
 type RefSectionsProps = {
   libraryId: string
@@ -223,40 +223,25 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
           </>
         )}
       </div>
-      <div className="overflow-auto">
+      <div className="min-w-0">
         {'examples' in command &&
           Array.isArray(command.examples) &&
           command.examples.length > 0 && (
-            <Tabs defaultValue={command.examples[0].id}>
-              <TabsList className="flex-wrap gap-2 border-0">
-                {command.examples.map((example) => (
-                  <TabsTrigger
-                    key={example.id}
-                    value={example.id}
-                    className={cn(
-                      'px-2.5 py-1 rounded-full',
-                      'border-0 bg-surface-200 hover:bg-surface-300',
-                      'text-xs text-foreground-lighter',
-                      // Undoing styles from primitive component
-                      'data-[state=active]:border-0 data-[state=active]:shadow-0',
-                      'data-[state=active]:bg-foreground data-[state=active]:text-background',
-                      'transition'
-                    )}
-                  >
-                    {example.name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {command.examples.map((example) => (
-                <TabsContent key={example.id} value={example.id}>
-                  <CodeBlock lang="bash" className="mb-6">
-                    {example.code}
-                  </CodeBlock>
-                  <h3 className="text-foreground-lighter text-sm mb-2">Response</h3>
-                  <CodeBlock lang="txt">{example.response}</CodeBlock>
-                </TabsContent>
-              ))}
-            </Tabs>
+            <ExamplesCombobox
+              examples={command.examples.map((example) => ({
+                id: example.id,
+                name: example.name,
+                content: (
+                  <>
+                    <CodeBlock lang="bash" className="mb-6">
+                      {example.code}
+                    </CodeBlock>
+                    <h3 className="text-foreground-lighter text-sm mb-2">Response</h3>
+                    <CodeBlock lang="txt">{example.response}</CodeBlock>
+                  </>
+                ),
+              }))}
+            />
           )}
       </div>
     </RefSubLayout.Section>
@@ -514,7 +499,7 @@ async function FunctionSection({
         />
         {types && 'ret' in types && !!types.ret && <ReturnTypeDetails returnType={types.ret} />}
       </div>
-      <div className="overflow-auto">
+      <div className="min-w-0">
         {(() => {
           // Prefer YAML examples, fallback to TypeDoc examples
           const yamlExamples =
@@ -526,54 +511,39 @@ async function FunctionSection({
           if (examples.length === 0) return null
 
           return (
-            <Tabs defaultValue={examples[0].id}>
-              <TabsList className="flex-wrap gap-2 border-0">
-                {examples.map((example) => (
-                  <TabsTrigger
-                    key={example.id}
-                    value={example.id}
-                    className={cn(
-                      'px-2.5 py-1 rounded-full',
-                      'border-0 bg-surface-200 hover:bg-surface-300',
-                      'text-xs text-foreground-lighter',
-                      // Undoing styles from primitive component
-                      'data-[state=active]:border-0 data-[state=active]:shadow-0',
-                      'data-[state=active]:bg-foreground data-[state=active]:text-background',
-                      'transition'
-                    )}
-                  >
-                    {example.name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {examples.map((example) => (
-                <TabsContent key={example.id} value={example.id}>
-                  <div
-                    className={cn(
-                      'prose wrap-break-word max-w-none',
-                      '[&_.shiki]:!my-0 [&_.shiki:not(:last-child)]:!mb-4',
-                      '[&_p]:!whitespace-normal'
-                    )}
-                  >
-                    <MDXRemoteRefs source={example.code} />
-                  </div>
-                  <div className="flex flex-col gap-2 mt-2">
-                    {'data' in example && !!example.data?.sql && (
-                      <CollapsibleDetails title="Data source" content={example.data.sql} />
-                    )}
-                    {'response' in example && !!example.response && (
-                      <CollapsibleDetails title="Response" content={example.response} />
-                    )}
-                    {'description' in example && !!example.description && (
-                      <CollapsibleDetails
-                        title="Notes"
-                        content={normalizeMarkdown(example.description)}
-                      />
-                    )}
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
+            <ExamplesCombobox
+              examples={examples.map((example) => ({
+                id: example.id,
+                name: example.name,
+                content: (
+                  <>
+                    <div
+                      className={cn(
+                        'prose wrap-break-word max-w-none',
+                        '[&_.shiki]:!my-0 [&_.shiki:not(:last-child)]:!mb-4',
+                        '[&_p]:!whitespace-normal'
+                      )}
+                    >
+                      <MDXRemoteRefs source={example.code} />
+                    </div>
+                    <div className="flex flex-col gap-2 mt-2">
+                      {'data' in example && !!example.data?.sql && (
+                        <CollapsibleDetails title="Data source" content={example.data.sql} />
+                      )}
+                      {'response' in example && !!example.response && (
+                        <CollapsibleDetails title="Response" content={example.response} />
+                      )}
+                      {'description' in example && !!example.description && (
+                        <CollapsibleDetails
+                          title="Notes"
+                          content={normalizeMarkdown(example.description)}
+                        />
+                      )}
+                    </div>
+                  </>
+                ),
+              }))}
+            />
           )
         })()}
       </div>
