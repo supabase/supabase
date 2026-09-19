@@ -2,6 +2,8 @@ import * as jose from 'jsr:@panva/jose@6'
 
 console.log('main function started')
 
+const MAX_WORKER_RETRIES = 3
+
 const JWT_SECRET = Deno.env.get('JWT_SECRET')
 const SUPABASE_JWKS = parseJwks(Deno.env.get('SUPABASE_JWKS'))
 const LOCAL_JWKS = SUPABASE_JWKS ? jose.createLocalJWKSet(SUPABASE_JWKS) : null
@@ -335,19 +337,34 @@ Deno.serve(async (req: Request) => {
   const envVarsObj = { ...Deno.env.toObject(), SUPABASE_FUNCTION_SLUG: service_name }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
-  try {
-    const worker = await EdgeRuntime.userWorkers.create({
-      servicePath,
-      memoryLimitMb,
-      workerTimeoutMs,
-      context: { supervisor: { requestAbsentTimeoutMs } },
-      noModuleCache,
-      importMapPath,
-      envVars,
-    })
-    return handleWorkerResponse(await worker.fetch(req))
-  } catch (e) {
-    console.error(e)
-    return getFunctionErrorResponse(resolveRuntimeError(e))
+  const callWorker = async (req: Request, retriesLeft = MAX_WORKER_RETRIES): Promise<Response> => {
+    // Preserve the body before fetch() can consume it, even on a failed attempt.
+    const retryReq = retriesLeft > 0 ? req.clone() : null
+
+    try {
+      const worker = await EdgeRuntime.userWorkers.create({
+        servicePath,
+        memoryLimitMb,
+        workerTimeoutMs,
+        context: { supervisor: { requestAbsentTimeoutMs } },
+        noModuleCache,
+        importMapPath,
+        envVars,
+      })
+      return handleWorkerResponse(await worker.fetch(req))
+    } catch (e) {
+      // Retirement rejects before dispatch, so user code has not run yet.
+      if (e instanceof Deno.errors.WorkerAlreadyRetired && retryReq) {
+        console.warn(`${service_name}: worker retired before dispatch; retrying (${retriesLeft} left)`)
+        // Request.clone() does not copy the tag that connects streaming to the client.
+        EdgeRuntime.applySupabaseTag(req, retryReq)
+        return await callWorker(retryReq, retriesLeft - 1)
+      }
+
+      console.error(e)
+      return getFunctionErrorResponse(resolveRuntimeError(e))
+    }
   }
+
+  return await callWorker(req)
 })
