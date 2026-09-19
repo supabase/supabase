@@ -131,7 +131,10 @@ export function McpConfigPanel() {
         Find your client below and add the configuration shown. You can scope the server by
         appending URL query parameters: <inlineCode value="?project_ref=<id>" /> to limit it to a
         single project, <inlineCode value="?read_only=true" /> to allow only read queries, and{' '}
-        <inlineCode value="?features=database,docs" /> to enable specific tool groups.
+        <inlineCode value="?features=database,docs" /> to enable specific tool groups. For hosted
+        connections, the optional <inlineCode value="skip_elicitations" /> parameter selects which{' '}
+        <link url="/docs/guides/ai-tools/mcp#skip-form-confirmations">form confirmations</link> to
+        skip when elicitation is available.
       </paragraph>
 
       {MCP_CLIENT_GROUPS.map((group) => (
