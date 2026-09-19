@@ -264,7 +264,7 @@ resources:
                         route:
                           cluster: functions
                           prefix_rewrite: /
-                          timeout: 150s
+                          timeout: 160s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
