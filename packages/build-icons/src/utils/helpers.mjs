@@ -44,7 +44,7 @@ export const resetFile = (fileName, outputDirectory) =>
 /**
  * Reads the file contents.
  *
- * @param {string} path
+ * @param {string} entry
  * @returns {string} The contents of a file
  */
 const readFile = (entry) => fs.readFileSync(path.resolve(__dirname, '../', entry), 'utf-8')
@@ -111,7 +111,7 @@ const hash = (string, seed = 5381) => {
  *
  * @param {object} seed
  * @param {string} seed.name A name, for example an icon name
- * @param {object} seed.attributes An object of SVGElement Attrbutes
+ * @param {object} seed.attributes An object of SVGElement Attributes
  * @returns {string} A hashed string of 6 characters
  */
 export const generateHashedKey = ({ name, attributes }) => hash(JSON.stringify([name, attributes]))
