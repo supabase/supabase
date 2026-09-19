@@ -44,6 +44,12 @@ const METRICS: MetricConfig[] = [
     unit: 'gigabytes',
     anchor: 'logIngestion',
   },
+  {
+    key: PricingMetric.LOG_QUERYING,
+    label: 'Log Query',
+    unit: 'gigabytes',
+    anchor: 'logQuery',
+  },
 ]
 
 const formatCount = (value: number) => value.toLocaleString()

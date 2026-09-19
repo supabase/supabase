@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChartArea, Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
@@ -54,6 +54,8 @@ export const Usage = () => {
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
+
+  const isLogUsageInsightsEnabled = useFlag('logIngestionBillingEnabled')
 
   const {
     data: subscription,
@@ -355,7 +357,7 @@ export const Usage = () => {
         isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
 
-      {subscription?.plan.id === 'platform' && (
+      {(subscription?.plan.id === 'platform' || isLogUsageInsightsEnabled) && (
         <OrgLogUsage
           orgSlug={slug as string}
           projectRef={selectedProjectRef}
@@ -364,7 +366,7 @@ export const Usage = () => {
           endDate={endDate}
           currentBillingCycleSelected={currentBillingCycleSelected}
           orgDailyStats={orgDailyStats}
-          isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+          isLoadingOrgDailyStats={isLoadingOrgDailyStats || isLoadingSubscription}
         />
       )}
 
