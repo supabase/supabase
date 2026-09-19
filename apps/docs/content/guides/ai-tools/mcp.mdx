@@ -107,7 +107,7 @@ Requires a paid plan.
 
 ## Elicitations
 
-[Elicitation](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation) lets an MCP server pause a tool call to ask you for input or confirmation. These flows require both server availability and an MCP client that supports the appropriate elicitation mode: forms for [cost confirmation](#cost-confirmation) and SQL confirmations, or URLs for secret entry.
+[Elicitation](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation) lets an MCP server pause a tool call to ask you for input or confirmation. These flows require both server availability and an MCP client that supports the appropriate elicitation mode: forms for [cost confirmation](#cost-confirmation) and [SQL confirmations](#destructive-sql-confirmations), or URLs for [secret entry](#edge-function-secrets).
 
 Server elicitation is separate from your MCP client's own approval of tool calls. It does not replace manual approval or the [security recommendations](#recommendations).
 
