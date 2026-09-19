@@ -184,7 +184,7 @@ export function McpConfigPanel({
               {projectRef ? (
                 <p className="text-xs text-foreground-light">
                   Skipping cost confirmations is unavailable for project-scoped connections because
-                  the existing cost approval flow requires account-level tools.
+                  the legacy cost confirmation workflow requires account-level tools.
                 </p>
               ) : !selectedFeaturesSupported.includes('account') ? (
                 <p className="text-xs text-foreground-light">
