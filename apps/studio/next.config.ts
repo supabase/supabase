@@ -56,6 +56,7 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     clientRouterFilter: false,
+    turbopackFileSystemCacheForBuild: false,
   },
   async rewrites() {
     return [
