@@ -25,6 +25,7 @@ describe('updating filesystem snippets', () => {
   })
 
   afterEach(async () => {
+    vi.restoreAllMocks()
     await fs.rm(directory.path, { recursive: true, force: true })
   })
 
@@ -54,6 +55,22 @@ describe('updating filesystem snippets', () => {
     await expect(updateSnippet(originalId, { name: 'blocked' })).rejects.toThrow()
 
     expect(await fs.readFile(originalPath(), 'utf8')).toBe(originalSql)
+    expect((await fs.readdir(directory.path)).sort()).toEqual(['blocked.sql', 'original.sql'])
+  })
+
+  it('preserves the saved SQL and removes partial temporary files when a write fails', async () => {
+    const writeFile = fs.writeFile.bind(fs)
+    vi.spyOn(fs, 'writeFile').mockImplementationOnce(async (filePath) => {
+      await writeFile(filePath, 'partial SQL')
+      throw new Error('Disk full')
+    })
+
+    await expect(updateSnippet(originalId, { content: { sql: 'select 43;' } })).rejects.toThrow(
+      'Disk full'
+    )
+
+    expect(await fs.readFile(originalPath(), 'utf8')).toBe(originalSql)
+    expect(await fs.readdir(directory.path)).toEqual(['original.sql'])
   })
 
   it('preserves both snippets when the destination is already occupied', async () => {

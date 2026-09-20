@@ -434,11 +434,18 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
   const targetPath = path.join(SNIPPETS_DIR, targetFolder?.name ?? '', `${name}.sql`)
   const content = updates.content?.sql ?? foundSnippet.content
 
-  await fs.writeFile(targetPath, content, 'utf-8')
+  const temporaryPath = path.join(path.dirname(targetPath), `.snippet-${uuidv4()}.tmp`)
+  try {
+    await fs.writeFile(temporaryPath, content, 'utf-8')
+    await fs.rename(temporaryPath, targetPath)
+  } catch (error) {
+    await fs.rm(temporaryPath, { force: true })
+    throw error
+  }
   const stats = await fs.stat(targetPath)
 
   // Keep the original until the destination is saved. Content-only updates
-  // write to the same file, so there is nothing to delete.
+  // replace the same path, so there is nothing to delete.
   if (newId !== id) {
     try {
       const [sourceRealPath, targetRealPath] = await Promise.all([

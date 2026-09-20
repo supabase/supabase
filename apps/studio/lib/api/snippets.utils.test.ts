@@ -1172,8 +1172,12 @@ describe('snippets.utils', () => {
       expect(mockedFS.unlink).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')
       )
+      expect(mockedFS.rename).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'updated-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'updated-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         'SELECT * FROM new;',
         'utf-8'
       )
@@ -1249,8 +1253,12 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates)
 
       // Should write to the folder path
+      expect(mockedFS.rename).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'existing-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'existing-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         'SELECT * FROM old;',
         'utf-8'
       )
@@ -1294,8 +1302,12 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates)
 
       // Should write to the root path
+      expect(mockedFS.rename).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         'SELECT * FROM folder;',
         'utf-8'
       )
@@ -1361,8 +1373,12 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates as any)
 
       // Should write to the folder path with new name
+      expect(mockedFS.rename).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'renamed-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'renamed-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         'SELECT * FROM new;',
         'utf-8'
       )
@@ -1392,8 +1408,12 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates as any)
 
       expect(result.content.sql).toBe('')
+      expect(mockedFS.rename).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         '',
         'utf-8'
       )
