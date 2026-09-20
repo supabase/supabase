@@ -3692,6 +3692,23 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 }
 
 /**
+ * User clicked a metrics or documentation link on a resource exhaustion warning banner (Troubleshoot menu item or single-action button).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerTroubleshootClickedEvent {
+  action: 'resource_exhaustion_banner_troubleshoot_clicked'
+  groups: TelemetryGroups
+  properties: {
+    troubleshootAction: 'metrics' | 'docs'
+    warningType: string
+    warningTypes: string[]
+    destination: string
+  }
+}
+
+/**
  * User clicked a row in the Unified Logs interface.
  *
  * @group Events
@@ -3890,6 +3907,39 @@ export interface HeaderLocalDropdownOpenedEvent {
 export interface HeaderLocalVersionPopoverOpenedEvent {
   action: 'header_local_version_popover_opened'
   groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User enabled Warehouse by submitting a schema and table selection.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseEnabledEvent {
+  action: 'warehouse_enabled'
+  properties: {
+    /** Where the user initiated Warehouse setup. */
+    source: 'integrations_overview'
+    /** Number of schemas replicated in full. */
+    schemaTargetCount: number
+    /** Number of tables replicated individually. */
+    tableTargetCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User disabled Warehouse for a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseDisabledEvent {
+  action: 'warehouse_disabled'
+  properties: {}
+  groups: TelemetryGroups
 }
 
 /**
@@ -4095,6 +4145,7 @@ export type TelemetryEvent =
   | AccessTokenDoneButtonClickedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
+  | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
@@ -4111,3 +4162,5 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | WarehouseEnabledEvent
+  | WarehouseDisabledEvent

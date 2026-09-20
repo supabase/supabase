@@ -110,6 +110,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
   return (
     <SortableSection
       id={cell._id}
+      sectionWidth="48rem"
       actions={<AddCellDropdown cellId={cell._id} />}
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-2 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"

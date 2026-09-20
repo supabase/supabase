@@ -12,6 +12,7 @@ import ReactMarkdown from 'react-markdown'
 import { ConnectionIcon } from 'ui-patterns/McpUrlBuilder'
 
 import { AiPrompt } from './AiPrompt'
+import { PromptCode } from './PromptPanel'
 import { TabPanel, Tabs } from './Tabs'
 
 type AgentSetupProps = {
@@ -33,11 +34,7 @@ const markdownComponents = {
       </a>
     )
   },
-  code: ({ children }: { children?: ReactNode }) => (
-    <code className="rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
-      {children}
-    </code>
-  ),
+  code: PromptCode,
 }
 
 function HarnessBody({ harness }: { harness: MonitoringAgentHarnessSetup }) {

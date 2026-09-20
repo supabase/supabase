@@ -39,7 +39,6 @@ interface AIAssistantHeaderProps {
   onCloseAssistant: () => void
   showMetadataWarning: boolean
   updatedOptInSinceMCP: boolean
-  isHipaaProjectDisallowed: boolean
   aiOptInLevel: 'disabled' | 'schema' | 'full' | string | undefined
 }
 
@@ -50,7 +49,6 @@ export const AIAssistantHeader = ({
   onCloseAssistant,
   showMetadataWarning,
   updatedOptInSinceMCP,
-  isHipaaProjectDisallowed,
   aiOptInLevel,
 }: AIAssistantHeaderProps) => {
   const { openChat } = useCreateChat()
@@ -244,7 +242,6 @@ export const AIAssistantHeader = ({
         onVisibleChange={setIsOptInModalOpen}
         showMetadataWarning={showMetadataWarning}
         updatedOptInSinceMCP={updatedOptInSinceMCP}
-        isHipaaProjectDisallowed={isHipaaProjectDisallowed}
         aiOptInLevel={aiOptInLevel}
       />
     </div>

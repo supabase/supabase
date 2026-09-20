@@ -1,12 +1,12 @@
 'use client'
 
 import { aiPrompts, type AiPromptId } from '~/data/ai-prompts.data'
-import { Sparkles } from 'lucide-react'
 
 import {
   Prompt,
   PromptContent,
   PromptCopy,
+  PromptMarkdown,
   PromptPanel,
   PromptTitle,
   type PromptPanelTelemetry,
@@ -39,9 +39,11 @@ function AiPrompt({ id, telemetry }: AiPromptProps) {
   return (
     <PromptPanel telemetry={{ ...telemetry, promptId: id }}>
       <Prompt value="prompt" expandable>
-        <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
+        <PromptTitle>Agent Prompt</PromptTitle>
         <PromptCopy>{prompt}</PromptCopy>
-        <PromptContent>{prompt}</PromptContent>
+        <PromptContent>
+          <PromptMarkdown>{prompt}</PromptMarkdown>
+        </PromptContent>
       </Prompt>
     </PromptPanel>
   )
