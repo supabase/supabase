@@ -64,6 +64,20 @@
         text-align: right;
         word-break: break-all;
       }
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 2px;
+      }
+      .dot.on {
+        background: #3ecf8e;
+        box-shadow: 0 0 6px #3ecf8e;
+      }
+      .dot.off {
+        background: rgba(128, 128, 128, 0.5);
+      }
       #status {
         margin-top: 12px;
         padding: 8px;
@@ -86,7 +100,10 @@
     <h1>Sync auth → local Studio</h1>
 
     <div class="row"><span>Source (hosted)</span><span id="source-tab">—</span></div>
-    <div class="row"><span>Target (local)</span><span id="target-tab">—</span></div>
+    <div class="row">
+      <span><span id="conn-dot" class="dot off"></span> Target (local)</span>
+      <span id="target-tab">—</span>
+    </div>
 
     <label for="target-origin">Local Studio origin</label>
     <input id="target-origin" type="text" placeholder="http://localhost:8082" />

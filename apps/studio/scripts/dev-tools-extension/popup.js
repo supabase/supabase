@@ -1,21 +1,8 @@
-// Popup logic for the remote-dev auth sync tool.
-//
-// Reads the Supabase dashboard session from a hosted-dashboard tab's
-// localStorage and writes it into a local Studio tab's localStorage, then
-// reloads the local tab. This is what lets a locally-running Studio (in
-// REMOTE_DEV mode) authenticate as you against real projects without the OAuth
-// sign-in flow — the dashboard token is a plain (non-HttpOnly) localStorage
-// value, so no cookie copying is involved.
-//
-// See ../../REMOTE_DEV.md for the whole workflow.
+// Copy the Supabase dashboard session from a hosted-dashboard tab into a local
+// Studio tab (localStorage) and reload it. See ./README.md.
 
-// localStorage keys auth-js uses for the dashboard session. The main token key
-// is required; the `-user` cache is copied opportunistically to avoid a refetch.
-// Override the base key via NEXT_PUBLIC_STORAGE_KEY (rare) — update here to match.
 const STORAGE_KEYS = ['supabase.dashboard.auth.token', 'supabase.dashboard.auth.token-user']
-
-// A tab is a valid *source* if it's the hosted dashboard.
-const SOURCE_HOST_PATTERN = /^https:\/\/(supabase\.com|.*\.supabase\.com|supabase\.green)$/
+const SOURCE_HOST_PATTERN = /^https:\/\/(supabase\.com|supabase\.green)$/
 const DEFAULT_TARGET_ORIGIN = 'http://localhost:8082'
 
 const els = {
@@ -24,6 +11,7 @@ const els = {
   targetOrigin: document.getElementById('target-origin'),
   sync: document.getElementById('sync'),
   status: document.getElementById('status'),
+  connDot: document.getElementById('conn-dot'),
 }
 
 let sourceTabId = null
@@ -42,7 +30,7 @@ function originOf(url) {
   }
 }
 
-// Executed in the source page context: pull the session keys out of localStorage.
+// Runs in the source page: read the session keys from localStorage.
 function readKeys(keys) {
   const out = {}
   for (const key of keys) {
@@ -52,7 +40,7 @@ function readKeys(keys) {
   return out
 }
 
-// Executed in the target page context: write the session keys and reload.
+// Runs in the target page: write the session keys and reload.
 function writeKeysAndReload(entries) {
   for (const [key, value] of Object.entries(entries)) {
     window.localStorage.setItem(key, value)
@@ -73,6 +61,26 @@ async function findTabs() {
   els.sourceTab.textContent = source ? originOf(source.url) : 'no tab open'
   els.targetTab.textContent = target ? targetOrigin : `open ${targetOrigin}`
   els.sync.disabled = !(sourceTabId && targetTabId)
+
+  await refreshConnected()
+}
+
+// Green dot when the local Studio tab already holds a dashboard session.
+async function refreshConnected() {
+  let connected = false
+  if (targetTabId) {
+    try {
+      const [{ result }] = await chrome.scripting.executeScript({
+        target: { tabId: targetTabId },
+        func: (key) => Boolean(window.localStorage.getItem(key)),
+        args: [STORAGE_KEYS[0]],
+      })
+      connected = Boolean(result)
+    } catch {
+      connected = false
+    }
+  }
+  els.connDot.className = `dot ${connected ? 'on' : 'off'}`
 }
 
 async function sync() {
@@ -101,6 +109,7 @@ async function sync() {
     })
 
     setStatus(`Synced ${Object.keys(entries).length} key(s) and reloaded local Studio.`, 'ok')
+    els.connDot.className = 'dot on'
   } catch (error) {
     setStatus(`Sync failed: ${error?.message ?? error}`, 'err')
     els.sync.disabled = false
