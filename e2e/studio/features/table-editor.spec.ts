@@ -815,8 +815,8 @@ testRunner('table editor', () => {
     await using _ = await withSetupCleanup(
       async () => {
         await query(`
-          create table public.${tableName} (id integer primary key, label text, metadata jsonb, tags text[]);
-          insert into public.${tableName} values (1, 'copy_csv_json_row', '{"active":true}', array['first', 'second']);
+          create table public.${tableName} (id integer primary key, label text, metadata jsonb[], tags text[]);
+          insert into public.${tableName} values (1, 'copy_csv_json_row', array['{"active":true}'::jsonb], array['first', 'second']);
         `)
       },
       async () => {
@@ -847,11 +847,11 @@ testRunner('table editor', () => {
         {
           id: 1,
           label: 'copy_csv_json_row',
-          metadata: { active: true },
+          metadata: [{ active: true }],
           tags: ['first', 'second'],
         },
       ])
-    }).toPass()
+    }).toPass({ timeout: 2000 })
   })
 
   test('copying cell values from first and second row works', async ({ page, ref }) => {
