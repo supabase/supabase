@@ -474,13 +474,8 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
       await fs.link(temporaryPath, targetPath)
       hasPublishedTarget = true
       await fs.unlink(temporaryPath)
-      try {
-        await fs.unlink(sourcePath)
-      } catch (error) {
-        if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
-          throw error
-        }
-      }
+      // A missing source means another move won; let rollback remove this destination.
+      await fs.unlink(sourcePath)
     }
 
     return updatedSnippet

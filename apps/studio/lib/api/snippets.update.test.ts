@@ -169,6 +169,25 @@ describe('updating filesystem snippets', () => {
     expect(await fs.readdir(directory.path)).toEqual(['original.sql'])
   })
 
+  it('rejects the losing operation when the same snippet moves to different destinations', async () => {
+    const finishFirst = synchronizeWrites('select 2;')
+
+    const first = updateSnippet(originalId, {
+      name: 'first',
+      content: { sql: 'select 1;' },
+    }).finally(finishFirst)
+    const second = updateSnippet(originalId, {
+      name: 'second',
+      content: { sql: 'select 2;' },
+    })
+    const results = await Promise.allSettled([first, second])
+
+    expect(results[0].status).toBe('fulfilled')
+    expect(results[1]).toMatchObject({ status: 'rejected', reason: { code: 'ENOENT' } })
+    expect(await fs.readFile(path.join(directory.path, 'first.sql'), 'utf8')).toBe('select 1;')
+    expect(await fs.readdir(directory.path)).toEqual(['first.sql'])
+  })
+
   it('removes the new destination when the source cannot be removed', async () => {
     const unlink = fs.unlink.bind(fs)
     vi.spyOn(fs, 'unlink').mockImplementation(async (filePath) => {

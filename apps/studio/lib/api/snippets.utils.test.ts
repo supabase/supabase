@@ -1441,7 +1441,7 @@ describe('snippets.utils', () => {
       await expect(updateSnippet(id, updates)).rejects.toThrow('Permission denied')
     })
 
-    it('should continue when old file deletion fails with ENOENT', async () => {
+    it('should roll back the destination when the source disappears', async () => {
       const id = generateDeterministicUuid(['existing-snippet.sql'])
 
       mockedFS.access.mockResolvedValue(undefined)
@@ -1460,10 +1460,8 @@ describe('snippets.utils', () => {
 
       const updates = { name: 'new-name' }
 
-      const result = await updateSnippet(id, updates)
-
-      expect(result.name).toBe('new-name')
-      expect(result.content.sql).toBe('SELECT * FROM old;')
+      await expect(updateSnippet(id, updates)).rejects.toThrow('File not found')
+      expect(mockedFS.unlink).toHaveBeenCalledWith(path.join(MOCK_SNIPPETS_DIR, 'new-name.sql'))
     })
 
     it('should throw error when moving snippet to folder that already contains snippet with same name', async () => {
