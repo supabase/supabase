@@ -14,6 +14,22 @@ vi.mock('./snippets.constants', () => ({
   },
 }))
 
+const synchronizeWrites = (secondSql: string) => {
+  const writeFile = fs.writeFile.bind(fs)
+  let writes = 0
+  const bothStarted = Promise.withResolvers<void>()
+  const firstFinished = Promise.withResolvers<void>()
+
+  vi.spyOn(fs, 'writeFile').mockImplementation(async (...args) => {
+    if (++writes === 2) bothStarted.resolve()
+    await bothStarted.promise
+    if (args[1] === secondSql) await firstFinished.promise
+    return writeFile(...args)
+  })
+
+  return firstFinished.resolve
+}
+
 describe('updating filesystem snippets', () => {
   const originalSql = 'select 42;'
   const originalId = generateDeterministicUuid(['original.sql'])
@@ -120,4 +136,84 @@ describe('updating filesystem snippets', () => {
     expect(await fs.readdir(directory.path)).toEqual(['Original.sql'])
     expect((await getSnippet(updated.id)).content.sql).toBe(originalSql)
   })
+
+  it('does not overwrite another snippet when concurrent renames choose the same destination', async () => {
+    const secondSql = 'select 7;'
+    await fs.writeFile(path.join(directory.path, 'second.sql'), secondSql)
+    const secondId = generateDeterministicUuid(['second.sql'])
+    const finishFirst = synchronizeWrites(secondSql)
+
+    const first = updateSnippet(originalId, { name: 'target' }).finally(finishFirst)
+    const second = updateSnippet(secondId, { name: 'target' })
+    const results = await Promise.allSettled([first, second])
+
+    expect(results[0].status).toBe('fulfilled')
+    expect(results[1]).toMatchObject({
+      status: 'rejected',
+      reason: new Error('Snippet named "target" already exists in the specified folder'),
+    })
+    expect(await fs.readFile(path.join(directory.path, 'target.sql'), 'utf8')).toBe(originalSql)
+    expect(await fs.readFile(path.join(directory.path, 'second.sql'), 'utf8')).toBe(secondSql)
+    expect((await fs.readdir(directory.path)).sort()).toEqual(['second.sql', 'target.sql'])
+  })
+
+  it('allows concurrent content updates to the same snippet', async () => {
+    const secondSql = 'select 2;'
+    const finishFirst = synchronizeWrites(secondSql)
+
+    const first = updateSnippet(originalId, { content: { sql: 'select 1;' } }).finally(finishFirst)
+    const second = updateSnippet(originalId, { content: { sql: secondSql } })
+    await Promise.all([first, second])
+
+    expect(await fs.readFile(originalPath(), 'utf8')).toBe(secondSql)
+    expect(await fs.readdir(directory.path)).toEqual(['original.sql'])
+  })
+
+  it('removes the new destination when the source cannot be removed', async () => {
+    const unlink = fs.unlink.bind(fs)
+    vi.spyOn(fs, 'unlink').mockImplementation(async (filePath) => {
+      if (filePath === originalPath()) {
+        throw Object.assign(new Error('Permission denied'), { code: 'EACCES' })
+      }
+      return unlink(filePath)
+    })
+
+    await expect(
+      updateSnippet(originalId, { name: 'renamed', content: { sql: 'select 43;' } })
+    ).rejects.toThrow('Permission denied')
+
+    expect(await fs.readFile(originalPath(), 'utf8')).toBe(originalSql)
+    expect(await fs.readdir(directory.path)).toEqual(['original.sql'])
+  })
+
+  it.each(['case rename', 'content replacement'])(
+    'preserves the original filename and SQL when a case-only %s fails',
+    async (failure) => {
+      const targetPath = path.join(directory.path, 'Original.sql')
+      const sourceRealPath = await fs.realpath(originalPath())
+      const realpath = fs.realpath.bind(fs)
+      const rename = fs.rename.bind(fs)
+      // Exercise case-insensitive path resolution on every test platform.
+      vi.spyOn(fs, 'realpath').mockImplementation(async (filePath) => {
+        return filePath === targetPath ? sourceRealPath : realpath(filePath)
+      })
+      vi.spyOn(fs, 'rename').mockImplementation(async (source, target) => {
+        const isContentReplacement = String(source).includes('.snippet-')
+        if (
+          (failure === 'content replacement' && isContentReplacement) ||
+          (failure === 'case rename' && source === originalPath() && target === targetPath)
+        ) {
+          throw Object.assign(new Error('Permission denied'), { code: 'EACCES' })
+        }
+        return rename(source, target)
+      })
+
+      await expect(
+        updateSnippet(originalId, { name: 'Original', content: { sql: 'select 43;' } })
+      ).rejects.toThrow('Permission denied')
+
+      expect(await fs.readFile(originalPath(), 'utf8')).toBe(originalSql)
+      expect(await fs.readdir(directory.path)).toEqual(['original.sql'])
+    }
+  )
 })

@@ -435,37 +435,63 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
   const content = updates.content?.sql ?? foundSnippet.content
 
   const temporaryPath = path.join(path.dirname(targetPath), `.snippet-${uuidv4()}.tmp`)
+  let hasPublishedTarget = false
   try {
     await fs.writeFile(temporaryPath, content, 'utf-8')
-    await fs.rename(temporaryPath, targetPath)
-  } catch (error) {
-    await fs.rm(temporaryPath, { force: true })
-    throw error
-  }
-  const stats = await fs.stat(targetPath)
+    const stats = await fs.stat(temporaryPath)
+    const updatedSnippet = buildSnippet(name, content, folderId, stats.birthtime)
 
-  // Keep the original until the destination is saved. Content-only updates
-  // replace the same path, so there is nothing to delete.
-  if (newId !== id) {
-    try {
-      const [sourceRealPath, targetRealPath] = await Promise.all([
-        fs.realpath(sourcePath),
-        fs.realpath(targetPath),
-      ])
-      if (sourceRealPath === targetRealPath) {
-        // A case-only rename can refer to the same file on a case-insensitive filesystem.
-        await fs.rename(sourcePath, targetPath)
-      } else {
-        await fs.unlink(sourcePath)
-      }
-    } catch (error) {
-      if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
-        throw error
+    let isSameFile = sourcePath === targetPath
+    if (!isSameFile) {
+      try {
+        const [sourceRealPath, targetRealPath] = await Promise.all([
+          fs.realpath(sourcePath),
+          fs.realpath(targetPath),
+        ])
+        isSameFile = sourceRealPath === targetRealPath
+      } catch (error) {
+        if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
+          throw error
+        }
       }
     }
-  }
 
-  return buildSnippet(name, content, folderId, stats.birthtime)
+    if (isSameFile) {
+      if (sourcePath === targetPath) {
+        await fs.rename(temporaryPath, targetPath)
+      } else {
+        // Change the casing before replacing the SQL, so a failed rename keeps the original.
+        await fs.rename(sourcePath, targetPath)
+        try {
+          await fs.rename(temporaryPath, targetPath)
+        } catch (error) {
+          await fs.rename(targetPath, sourcePath)
+          throw error
+        }
+      }
+    } else {
+      // Linking publishes the complete file without replacing a concurrently created destination.
+      await fs.link(temporaryPath, targetPath)
+      hasPublishedTarget = true
+      await fs.unlink(temporaryPath)
+      try {
+        await fs.unlink(sourcePath)
+      } catch (error) {
+        if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
+          throw error
+        }
+      }
+    }
+
+    return updatedSnippet
+  } catch (error) {
+    if (hasPublishedTarget) await fs.unlink(targetPath)
+    await fs.rm(temporaryPath, { force: true })
+    if (error instanceof Error && 'code' in error && error.code === 'EEXIST') {
+      throw new Error(`Snippet named "${name}" already exists in the specified folder`)
+    }
+    throw error
+  }
 }
 
 export const getFolders = async (folderId: string | null = null): Promise<Folder[]> => {

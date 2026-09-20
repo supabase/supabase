@@ -30,6 +30,7 @@ vi.mock('fs/promises', () => ({
     stat: vi.fn(),
     realpath: vi.fn(),
     rename: vi.fn(),
+    link: vi.fn(),
   },
 }))
 const mockedFS = vi.mocked(fs)
@@ -1172,7 +1173,7 @@ describe('snippets.utils', () => {
       expect(mockedFS.unlink).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')
       )
-      expect(mockedFS.rename).toHaveBeenCalledWith(
+      expect(mockedFS.link).toHaveBeenCalledWith(
         expect.any(String),
         path.join(MOCK_SNIPPETS_DIR, 'updated-snippet.sql')
       )
@@ -1253,7 +1254,7 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates)
 
       // Should write to the folder path
-      expect(mockedFS.rename).toHaveBeenCalledWith(
+      expect(mockedFS.link).toHaveBeenCalledWith(
         expect.any(String),
         path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'existing-snippet.sql')
       )
@@ -1302,7 +1303,7 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates)
 
       // Should write to the root path
-      expect(mockedFS.rename).toHaveBeenCalledWith(
+      expect(mockedFS.link).toHaveBeenCalledWith(
         expect.any(String),
         path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')
       )
@@ -1373,7 +1374,7 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates as any)
 
       // Should write to the folder path with new name
-      expect(mockedFS.rename).toHaveBeenCalledWith(
+      expect(mockedFS.link).toHaveBeenCalledWith(
         expect.any(String),
         path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'renamed-snippet.sql')
       )
@@ -1431,7 +1432,9 @@ describe('snippets.utils', () => {
 
       const error = new Error('Permission denied') as NodeJS.ErrnoException
       error.code = 'EACCES'
-      mockedFS.unlink.mockRejectedValue(error)
+      mockedFS.unlink.mockImplementation(async (filePath) => {
+        if (filePath === path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')) throw error
+      })
 
       const updates = { name: 'new-name' }
 
@@ -1451,7 +1454,9 @@ describe('snippets.utils', () => {
 
       const error = new Error('File not found') as NodeJS.ErrnoException
       error.code = 'ENOENT'
-      mockedFS.unlink.mockRejectedValue(error)
+      mockedFS.unlink.mockImplementation(async (filePath) => {
+        if (filePath === path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')) throw error
+      })
 
       const updates = { name: 'new-name' }
 
