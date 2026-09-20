@@ -807,6 +807,53 @@ testRunner('table editor', () => {
     await expect(page.getByRole('gridcell', { name: 'value 101' })).not.toBeVisible()
   })
 
+  test('copying rows as CSV preserves JSON and array values for subsequent copies', async ({
+    page,
+    ref,
+  }) => {
+    const tableName = 'pw_table_copy_csv_json'
+    await using _ = await withSetupCleanup(
+      async () => {
+        await query(`
+          create table public.${tableName} (id integer primary key, label text, metadata jsonb, tags text[]);
+          insert into public.${tableName} values (1, 'copy_csv_json_row', '{"active":true}', array['first', 'second']);
+        `)
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    const tablesLoaded = waitForTableToLoad(page, ref)
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await tablesLoaded
+    const rowsLoaded = waitForGridDataToLoad(page, ref)
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await rowsLoaded
+    await page
+      .getByRole('row', { name: /copy_csv_json_row/ })
+      .getByRole('checkbox')
+      .click()
+
+    await page.getByRole('button', { name: 'Copy', exact: true }).click()
+    await page.getByRole('menuitem', { name: 'Copy as CSV', exact: true }).click()
+    await expectClipboardValue({ page, value: 'id,label,metadata,tags' })
+
+    await page.getByRole('button', { name: 'Copy', exact: true }).press('Enter')
+    await page.getByRole('menuitem', { name: 'Copy as JSON', exact: true }).press('Enter')
+    await expect(async () => {
+      const copied = await page.evaluate(() => navigator.clipboard.readText())
+      expect(JSON.parse(copied)).toMatchObject([
+        {
+          id: 1,
+          label: 'copy_csv_json_row',
+          metadata: { active: true },
+          tags: ['first', 'second'],
+        },
+      ])
+    }).toPass()
+  })
+
   test('copying cell values from first and second row works', async ({ page, ref }) => {
     const tableName = 'pw_table_copy_rows'
     const colName = 'pw_column'
