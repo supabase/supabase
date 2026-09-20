@@ -11,14 +11,10 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
   Form,
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -542,11 +538,8 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone verification message"
                         description="To format the OTP code use `{{ .Code }}`. Newlines are supported for WebOTP API compatibility."
                       >
-                        <FormControl_Shadcn_>
-                          <Textarea
                         <FormControl>
-                          <Input
-                            type="text"
+                          <Textarea
                             {...field}
                             rows={4}
                             placeholder="Your code is {{ .Code }}"
