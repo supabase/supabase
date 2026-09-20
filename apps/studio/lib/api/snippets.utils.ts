@@ -408,10 +408,14 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
     throw new Error(`Snippet with id ${id} not found`)
   }
 
-  const newId = generateDeterministicUuid([
-    updates.folder_id !== undefined ? updates.folder_id : foundSnippet.folderId,
-    `${updates.name ?? foundSnippet.name}.sql`,
-  ])
+  const name = sanitizeName(updates.name ?? foundSnippet.name)
+  const folderId = updates.folder_id !== undefined ? updates.folder_id : foundSnippet.folderId
+  const targetFolder = entries.find((entry) => entry.type === 'folder' && entry.id === folderId)
+  if (folderId !== null && !targetFolder) {
+    throw new Error(`Folder with id ${folderId} not found`)
+  }
+
+  const newId = generateDeterministicUuid([folderId, `${name}.sql`])
 
   const snippetAtTargetLocation = entries.find(
     (entry) => entry.id === newId && entry.type === 'file'
@@ -423,24 +427,38 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
     )
   }
 
-  const snippet = buildSnippet(
-    foundSnippet.name,
-    foundSnippet.content || '',
-    foundSnippet.folderId,
-    foundSnippet.createdAt
+  const sourceFolder = entries.find(
+    (entry) => entry.type === 'folder' && entry.id === foundSnippet.folderId
   )
+  const sourcePath = path.join(SNIPPETS_DIR, sourceFolder?.name ?? '', `${foundSnippet.name}.sql`)
+  const targetPath = path.join(SNIPPETS_DIR, targetFolder?.name ?? '', `${name}.sql`)
+  const content = updates.content?.sql ?? foundSnippet.content
 
-  // it's easier to delete the old file first and then recreate a new one
-  await deleteSnippet(snippet.id)
+  await fs.writeFile(targetPath, content, 'utf-8')
+  const stats = await fs.stat(targetPath)
 
-  const updatedSnippet = await saveSnippet({
-    name: updates.name ?? snippet.name,
-    content: updates.content ?? snippet.content,
-    // folder_id can be null
-    folder_id: updates.folder_id !== undefined ? updates.folder_id : snippet.folder_id,
-  } as Snippet)
+  // Keep the original until the destination is saved. Content-only updates
+  // write to the same file, so there is nothing to delete.
+  if (newId !== id) {
+    try {
+      const [sourceRealPath, targetRealPath] = await Promise.all([
+        fs.realpath(sourcePath),
+        fs.realpath(targetPath),
+      ])
+      if (sourceRealPath === targetRealPath) {
+        // A case-only rename can refer to the same file on a case-insensitive filesystem.
+        await fs.rename(sourcePath, targetPath)
+      } else {
+        await fs.unlink(sourcePath)
+      }
+    } catch (error) {
+      if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
+        throw error
+      }
+    }
+  }
 
-  return updatedSnippet
+  return buildSnippet(name, content, folderId, stats.birthtime)
 }
 
 export const getFolders = async (folderId: string | null = null): Promise<Folder[]> => {

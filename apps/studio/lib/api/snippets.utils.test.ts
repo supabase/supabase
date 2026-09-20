@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { generateDeterministicUuid } from './snippets.browser'
 import {
@@ -28,6 +28,8 @@ vi.mock('fs/promises', () => ({
     unlink: vi.fn(),
     rm: vi.fn(),
     stat: vi.fn(),
+    realpath: vi.fn(),
+    rename: vi.fn(),
   },
 }))
 const mockedFS = vi.mocked(fs)
@@ -1145,6 +1147,10 @@ describe('snippets.utils', () => {
   })
 
   describe('updateSnippet', () => {
+    beforeEach(() => {
+      mockedFS.realpath.mockImplementation(async (filePath) => String(filePath))
+    })
+
     it('should update an existing snippet', async () => {
       const id = generateDeterministicUuid(['existing-snippet.sql'])
 
