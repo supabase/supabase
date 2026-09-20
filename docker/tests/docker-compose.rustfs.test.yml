@@ -1,4 +1,4 @@
-# Test overlay: exposes the S3 backend port for direct testing.
+# Test override: exposes the S3 backend port for direct testing.
 #
 # Usage:
 #   docker compose -f docker-compose.yml -f docker-compose.rustfs.yml \

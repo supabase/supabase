@@ -33,6 +33,11 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
+        // Project-level Vercel settings Nitro's vercel preset reads at build
+        // time; they change the emitted routes and asset paths.
+        "VERCEL_SKEW_PROTECTION_ENABLED",
+        "VERCEL_IMMUTABLE_STATIC_FILES_ENABLED",
+        "VERCEL_HASH_SALT",
         "MAINTENANCE_MODE",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
@@ -63,6 +68,8 @@
         "READ_ONLY_API_KEY",
         "SUPABASE_SERVICE_KEY",
         "SUPABASE_ANON_KEY",
+        "SUPABASE_PUBLISHABLE_KEY",
+        "SUPABASE_SECRET_KEY",
         "SUPABASE_PUBLIC_URL",
         "DEFAULT_PROJECT_NAME",
         "DEFAULT_ORGANIZATION_NAME",
@@ -77,6 +84,7 @@
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
+        "SKIP_ASSET_UPLOAD",
         "NEXT_PUBLIC_SENTRY_DSN",
         "AWS_BEDROCK_PROFILE",
         "AWS_BEDROCK_ROLE_ARN",
@@ -98,15 +106,45 @@
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
         "LIVE_SUPABASE_SECRET_KEY",
+        // Selects the build mode for the studio's `build`/`start` scripts
+        // (e.g. e2e sets `MODE=test`). Listed so turbo invalidates the
+        // cache when it changes — without this, switching between test and
+        // production builds reuses a stale cached output.
+        "MODE",
+        // Read by the Nitro server behind `pnpm start`. Declared so the turbo
+        // env lint rule passes even though turbo doesn't drive `start`.
+        "PORT",
+        // Gates the TanStack vs Next path in vercel.ts and
+        // scripts/dispatch.js (the dev/build/start dispatcher).
+        "STUDIO_FRAMEWORK",
+        // Vite's built-in `import.meta.env.SSR` flag (used in ConnectStepsSection
+        // to gate Vite-only `import.meta.glob`). Not a real process env var
+        // but turbo's `no-undeclared-env-vars` lint flags any `env.SSR` access.
+        "SSR",
       ],
       "passThroughEnv": [
+        // Vite bakes this into TanStack's server-function request header. Passed
+        // through rather than hashed so Next's same-commit redeploys keep
+        // hitting the turbo cache as before; a TanStack cache hit reuses the
+        // earlier deployment's id, which is the same code and falls back to
+        // latest if that deployment is gone.
+        "VERCEL_DEPLOYMENT_ID",
         "CURRENT_CLI_VERSION",
         "VERCEL_GIT_COMMIT_REF",
         "VERCEL_GIT_COMMIT_SHA",
         "SNIPPETS_MANAGEMENT_FOLDER",
         "EDGE_FUNCTIONS_MANAGEMENT_FOLDER",
+        "S3_PROTOCOL_ACCESS_KEY_ID",
+        "S3_PROTOCOL_ACCESS_KEY_SECRET",
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**/*",
+        // TanStack Start via Nitro: node server and Vercel Build Output.
+        ".output/**",
+        ".vercel/output/**",
+      ],
     },
   },
 }

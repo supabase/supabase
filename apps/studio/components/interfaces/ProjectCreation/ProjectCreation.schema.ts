@@ -17,6 +17,13 @@ export const FormSchema = z
     postgresVersion: z.string({
       required_error: 'Please enter a Postgres version.',
     }),
+    instanceType: z.string().optional(),
+    kubernetesClusterId: z
+      .string()
+      .trim()
+      .transform((value) => (value === '' ? undefined : value))
+      .optional(),
+    kubernetesClusterForce: z.boolean().optional(),
     dbRegion: z.string({
       required_error: 'Please select a region.',
     }),
@@ -33,14 +40,29 @@ export const FormSchema = z
     dbPassStrengthMessage: z.string().default(''),
     dbPassStrengthWarning: z.string().default(''),
     instanceSize: z.string().optional(),
+    githubRepositoryId: z.string().optional().default(''),
+    githubInstallationId: z.number().optional(),
+    githubRepositoryName: z.string().optional().default(''),
     dataApi: z.boolean(),
     dataApiDefaultPrivileges: z.boolean(),
     enableRlsEventTrigger: z.boolean(),
     postgresVersionSelection: z.string(),
     useOrioleDb: z.boolean(),
+    shouldRunMigrations: z.boolean(),
   })
   .superRefine(
-    ({ dbPassStrength, dbPassStrengthWarning, highAvailability, cloudProvider }, ctx) => {
+    (
+      {
+        dbPassStrength,
+        dbPassStrengthWarning,
+        highAvailability,
+        cloudProvider,
+        useOrioleDb,
+        kubernetesClusterId,
+        kubernetesClusterForce,
+      },
+      ctx
+    ) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -53,6 +75,36 @@ export const FormSchema = z
           code: z.ZodIssueCode.custom,
           path: ['cloudProvider'],
           message: 'High availability is only supported on AWS (Revamped)',
+        })
+      }
+
+      if (highAvailability && useOrioleDb) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['highAvailability'],
+          message: 'High availability is not supported with OrioleDB images',
+        })
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['useOrioleDb'],
+          message: 'High availability is not supported with OrioleDB images',
+        })
+      }
+
+      if (kubernetesClusterId && cloudProvider !== 'AWS_K8S' && cloudProvider !== 'AWS_NIMBUS') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['kubernetesClusterId'],
+          message:
+            'Kubernetes cluster ID is only supported for Kubernetes-architecture cloud providers',
+        })
+      }
+
+      if (kubernetesClusterForce && !kubernetesClusterId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['kubernetesClusterForce'],
+          message: 'Force-deploy has no effect without a Kubernetes cluster ID',
         })
       }
     }

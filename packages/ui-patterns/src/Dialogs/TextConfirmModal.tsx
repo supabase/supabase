@@ -8,12 +8,13 @@ import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   cn,
   copyToClipboard,
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
@@ -24,12 +25,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
-import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
-import { Admonition } from './../admonition'
+import { Admonition } from '../Admonition'
 
 export interface TextConfirmModalProps {
   loading: boolean
@@ -43,13 +43,13 @@ export interface TextConfirmModalProps {
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
-  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
-    base?: React.ComponentProps<typeof Alert_Shadcn_>
+    base?: React.ComponentProps<typeof Alert>
     title?: string
     description?: string | ReactNode
   }
-  input?: React.ComponentProps<typeof Input_Shadcn_>
+  input?: React.ComponentProps<typeof Input>
   label?: React.ComponentProps<typeof FormLabel>
   formMessage?: React.ComponentProps<typeof FormMessage>
   description?: React.ComponentProps<typeof FormDescription>
@@ -109,8 +109,6 @@ export const TextConfirmModal = forwardRef<
       },
     })
 
-    const isFormValid = form.formState.isValid
-
     // 2. Define a submit handler.
     function onSubmit(_values: z.infer<typeof formSchema>) {
       // Do something with the form values.
@@ -123,10 +121,17 @@ export const TextConfirmModal = forwardRef<
     }, [confirmString])
 
     useEffect(() => {
+      if (visible) form.reset()
+    }, [visible])
+
+    useEffect(() => {
       if (!showCopied) return
       const timer = setTimeout(() => setShowCopied(false), 2000)
       return () => clearTimeout(timer)
     }, [showCopied])
+
+    const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
+    const alertTitleProps = alert?.title ? { title: alert.title } : {}
 
     return (
       <Dialog
@@ -134,21 +139,22 @@ export const TextConfirmModal = forwardRef<
         {...props}
         onOpenChange={() => {
           if (visible) {
+            form.reset()
             onCancel()
           }
         }}
       >
-        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5 block!" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
-              label={alert.title}
               description={alert.description}
+              {...alertTitleProps}
               className="border-x-0 rounded-none -mt-px"
-              {...alert?.base}
+              {...alertBase}
             />
           )}
           {children && (
@@ -180,19 +186,27 @@ export const TextConfirmModal = forwardRef<
                     <FormLabel {...label} enableSelection={!enableCopy}>
                       Type{' '}
                       {enableCopy ? (
-                        <Button
-                          type="default"
-                          className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
-                          iconRight={
-                            showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
-                          }
-                          onClick={() => {
-                            setShowCopied(true)
-                            copyToClipboard(confirmString)
-                          }}
-                        >
-                          {confirmString}
-                        </Button>
+                        <>
+                          <Button
+                            className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
+                            iconRight={
+                              showCopied ? (
+                                <Check strokeWidth={2} className="text-brand" />
+                              ) : (
+                                <Copy />
+                              )
+                            }
+                            onClick={() => {
+                              setShowCopied(true)
+                              copyToClipboard(confirmString)
+                            }}
+                          >
+                            {confirmString}
+                          </Button>
+                          <span className="sr-only" role="status">
+                            {showCopied ? `${confirmString} copied to clipboard` : ''}
+                          </span>
+                        </>
                       ) : (
                         <span className="text-foreground break-all whitespace-pre">
                           {confirmString}
@@ -201,7 +215,7 @@ export const TextConfirmModal = forwardRef<
                       to confirm.
                     </FormLabel>
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         autoComplete="off"
                         placeholder={confirmPlaceholder}
                         {...input}
@@ -215,23 +229,23 @@ export const TextConfirmModal = forwardRef<
               />
               <div className="flex gap-2">
                 {!blockDeleteButton && (
-                  <Button size="medium" block type="default" disabled={loading} onClick={onCancel}>
+                  <Button size="medium" block disabled={loading} onClick={onCancel}>
                     {cancelLabel}
                   </Button>
                 )}
                 <Button
                   block
                   size="medium"
-                  type={
+                  variant={
                     variant === 'destructive'
                       ? 'danger'
                       : variant === 'warning'
                         ? 'warning'
                         : 'primary'
                   }
-                  htmlType="submit"
+                  type="submit"
                   loading={loading}
-                  disabled={!isFormValid || loading}
+                  disabled={loading}
                   className="truncate"
                 >
                   {confirmLabel}

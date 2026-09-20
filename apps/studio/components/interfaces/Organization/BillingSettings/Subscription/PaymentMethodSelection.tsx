@@ -14,14 +14,7 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
-import {
-  Checkbox,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Button, Checkbox, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -39,6 +32,7 @@ import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -51,6 +45,7 @@ export interface PaymentMethodSelectionProps {
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
   useAsDefaultBillingAddress: boolean
   onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
+  onClose?: () => void
 }
 
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
@@ -63,10 +58,12 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     onTaxIdChange,
     useAsDefaultBillingAddress,
     onUseAsDefaultBillingAddressChange,
+    onClose,
   }: PaymentMethodSelectionProps,
   ref
 ) {
   const { slug } = useParams()
+  const snap = useOrgSettingsPageStateSnapshot()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -230,7 +227,30 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         dry_run: true,
       })
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to validate billing profile')
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to validate billing profile'
+      if (errorMessage.includes('The tax ID type does not match the billing address country')) {
+        toast.error(
+          <div>
+            <p>{errorMessage} Update your billing address or tax ID before upgrading your plan.</p>
+            <Button
+              className="mt-2"
+              onClick={() => {
+                if (onClose) {
+                  onClose()
+                  snap.setPanelKey(undefined)
+                  const el = document.getElementById('address')
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }
+              }}
+            >
+              Update tax ID
+            </Button>
+          </div>
+        )
+      } else {
+        toast.error(errorMessage)
+      }
       return false
     }
 
@@ -275,15 +295,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         size="invisible"
         onOpen={() => {
           // [Joshen] This is to ensure that hCaptcha popup remains clickable
-          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.add('pointer-events-auto!')
         }}
         onClose={() => {
           setSetupIntent(undefined)
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onVerify={(token) => {
           setCaptchaToken(token)
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onExpire={() => {
           setCaptchaToken(null)
@@ -305,7 +325,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             className="gap-[2px]"
             size="tiny"
           >
-            <Select_Shadcn_
+            <Select
               value={selectedPaymentMethod}
               onValueChange={(value) => {
                 if (value === 'new') {
@@ -315,14 +335,14 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 onSelectPaymentMethod(value)
               }}
             >
-              <SelectTrigger_Shadcn_ id="payment-method">
-                <SelectValue_Shadcn_ className="flex gap-2" />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+              <SelectTrigger id="payment-method">
+                <SelectValue className="flex gap-2" />
+              </SelectTrigger>
+              <SelectContent>
                 {paymentMethods?.data.map((method) => {
                   const label = `•••• •••• •••• ${method.card?.last4}`
                   return (
-                    <SelectItem_Shadcn_ key={method.id} value={method.id}>
+                    <SelectItem key={method.id} value={method.id}>
                       <div className="flex gap-2">
                         <img
                           alt="Credit Card Brand"
@@ -333,19 +353,19 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                         />
                         {label}
                       </div>
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   )
                 })}
-                <SelectItem_Shadcn_ value="new">
+                <SelectItem value="new">
                   <div className="flex gap-2">
                     <Plus size={16} />
                     <p className="transition text-foreground-light group-hover:text-foreground">
                       Add new payment method
                     </p>
                   </div>
-                </SelectItem_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         ) : null}
 

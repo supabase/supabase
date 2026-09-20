@@ -1,14 +1,14 @@
 import { useEffect } from 'react'
-import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
+import { ControllerRenderProps, UseFormReturn, useWatch } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -26,9 +26,16 @@ interface PostgresVersionDetails {
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
   dbRegion: string
+  disabled?: boolean
   organizationSlug?: string
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
+  /**
+   * Owned by the form owner (not this component) so the last valid selection
+   * survives this selector unmounting, e.g. when its collapsible section
+   * closes. Create it with useRef('') alongside the form.
+   */
+  lastValidSelectionRef: { current: string }
   type?: 'create' | 'unpause'
   layout?: 'vertical' | 'horizontal'
   label?: string
@@ -56,9 +63,11 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 export const PostgresVersionSelector = ({
   cloudProvider,
   dbRegion,
+  disabled = false,
   organizationSlug,
   field,
   form,
+  lastValidSelectionRef,
   type = 'create',
   layout = 'horizontal',
   label = 'Postgres version',
@@ -91,38 +100,64 @@ export const PostgresVersionSelector = ({
       ? (createVersions?.available_versions ?? [])
       : (unpauseVersions?.available_versions ?? [])
   const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
-  const { postgresVersionSelection } = form.watch()
+  const postgresVersionSelection = useWatch({
+    control: form.control,
+    name: 'postgresVersionSelection',
+  })
 
+  // react-hook-form intermittently drops this field's value when its Controller
+  // remounts, so a one-shot "set the default once versions load" effect leaves
+  // the select stuck empty. Instead this effect re-asserts off the watched value:
+  // a selection present in the current list is kept (and remembered in the
+  // owner-held lastValidSelectionRef), and when the value is missing or cleared
+  // out from under us it restores the last valid selection, falling back to the
+  // GA default.
   useEffect(() => {
-    if (availableVersions.length > 0) {
-      const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
-      const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
-      form.setValue('postgresVersionSelection', defaultValue)
+    if (availableVersions.length === 0) return
+    const isSelectionAvailable = (selection: string) =>
+      availableVersions.some((version) => formatValue(version) === selection)
+
+    if (postgresVersionSelection && isSelectionAvailable(postgresVersionSelection)) {
+      lastValidSelectionRef.current = postgresVersionSelection
+      return
     }
-  }, [isSuccess, availableVersions, form])
+
+    if (isSelectionAvailable(lastValidSelectionRef.current)) {
+      form.setValue('postgresVersionSelection', lastValidSelectionRef.current)
+      return
+    }
+
+    const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
+    const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
+    form.setValue('postgresVersionSelection', defaultValue)
+  }, [isSuccess, availableVersions, postgresVersionSelection, lastValidSelectionRef, form])
 
   return (
-    <FormItemLayout label={label} layout={layout}>
-      <Select_Shadcn_
+    <FormItemLayout id={field.name} label={label} layout={layout}>
+      <Select
         value={postgresVersionSelection}
         onValueChange={field.onChange}
         disabled={
+          disabled ||
           availableVersions.length === 0 ||
           (type === 'create' && isLoadingProjectCreateVersions) ||
           (type === 'unpause' && isLoadingProjectUnpauseVersions)
         }
       >
-        <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-          <SelectValue_Shadcn_ placeholder="Select a Postgres version for your project" />
-        </SelectTrigger_Shadcn_>
-        <SelectContent_Shadcn_>
-          <SelectGroup_Shadcn_>
+        <SelectTrigger
+          id={field.name}
+          className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
+        >
+          <SelectValue placeholder="Select a Postgres version for your project" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
             {availableVersions.map((value) => {
               const postgresVersion = value.version
                 .split('supabase-postgres-')[1]
                 .replace('-orioledb', '')
               return (
-                <SelectItem_Shadcn_
+                <SelectItem
                   key={formatValue(value)}
                   value={formatValue(value)}
                   className="w-full [&>:nth-child(2)]:w-full"
@@ -138,12 +173,12 @@ export const PostgresVersionSelector = ({
                       )}
                     </div>
                   </div>
-                </SelectItem_Shadcn_>
+                </SelectItem>
               )
             })}
-          </SelectGroup_Shadcn_>
-        </SelectContent_Shadcn_>
-      </Select_Shadcn_>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </FormItemLayout>
   )
 }

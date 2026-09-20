@@ -56,6 +56,18 @@ export function findConditionByPath(group: FilterGroup, path: number[]): FilterC
   return null
 }
 
+export function collectConditions(
+  group: FilterGroup,
+  path: number[] = []
+): { condition: FilterCondition; path: number[] }[] {
+  return group.conditions.flatMap((condition, index) => {
+    const currentPath = [...path, index]
+    return isGroup(condition)
+      ? collectConditions(condition, currentPath)
+      : [{ condition, path: currentPath }]
+  })
+}
+
 export function isCustomOptionObject(option: any): option is CustomOptionObject {
   return typeof option === 'object' && option !== null && 'component' in option
 }
@@ -326,14 +338,9 @@ export function groupMenuItemsByOperator(items: MenuItem[]): MenuItemGroup[] {
   }))
 }
 
-export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + '...'
-}
-
 export function getActionItemLabel(item: MenuItem): string {
   if (item.isAction && item.actionInputValue) {
-    return `Ask AI: "${truncateText(item.actionInputValue, 30)}"`
+    return `Ask AI: "${item.actionInputValue}"`
   }
   return item.label
 }

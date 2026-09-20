@@ -83,7 +83,7 @@ export function JitDbAccessRulesTable({
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="inline-flex">
-                <Button type="default" icon={<Plus />} onClick={onAddRule} disabled={addDisabled}>
+                <Button icon={<Plus />} onClick={onAddRule} disabled={addDisabled}>
                   Add rule
                 </Button>
               </span>
@@ -122,7 +122,7 @@ export function JitDbAccessRulesTable({
                 return (
                   <TableRow
                     key={user.id}
-                    className={rowIsInteractive ? 'relative inset-focus cursor-pointer' : undefined}
+                    className={rowIsInteractive ? 'relative focus-inset cursor-pointer' : undefined}
                     onClick={
                       rowIsInteractive
                         ? (event) => {
@@ -168,9 +168,8 @@ export function JitDbAccessRulesTable({
                           <Button
                             icon={<EllipsisVertical />}
                             aria-label="More actions"
-                            type="default"
                             size="tiny"
-                            className="w-7"
+                            className="w-7 hit-area-2"
                             disabled={!canUpdate || disableActions}
                           />
                         </DropdownMenuTrigger>

@@ -1,15 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import {
-  AlertDescription_Shadcn_ as AlertDescription,
-  AlertTitle_Shadcn_ as AlertTitle,
-  buttonVariants,
-  cn,
-} from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { AlertDescription, AlertTitle, buttonVariants, cn } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface SpendCapDisabledSectionProps {
   currentDiskSizeGb?: number
@@ -17,14 +11,8 @@ interface SpendCapDisabledSectionProps {
 
 export function SpendCapDisabledSection({ currentDiskSizeGb }: SpendCapDisabledSectionProps) {
   const { data: org, isPending: isOrgPending } = useSelectedOrganizationQuery()
-  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
 
-  const isSpendCapEnabled =
-    !isOrgPending &&
-    !isProjectPending &&
-    org?.plan.id !== 'free' &&
-    !org?.usage_billing_enabled &&
-    project?.cloud_provider !== 'FLY'
+  const isSpendCapEnabled = !isOrgPending && org?.plan.id !== 'free' && !org?.usage_billing_enabled
 
   const showAutoExpandNotice =
     isSpendCapEnabled &&
@@ -61,7 +49,7 @@ export function SpendCapDisabledSection({ currentDiskSizeGb }: SpendCapDisabledS
             <div className="mt-3">
               <Link
                 href={`/org/${org?.slug}/billing?panel=costControl`}
-                className={cn(buttonVariants({ type: 'default', size: 'tiny' }))}
+                className={cn(buttonVariants({ variant: 'default', size: 'tiny' }))}
               >
                 Disable spend cap
               </Link>

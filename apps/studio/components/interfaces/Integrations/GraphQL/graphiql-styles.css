@@ -1,0 +1,19 @@
+/*
+ * GraphiQL v5 bundles a full copy of Monaco's CSS into its stylesheet. Studio's
+ * SQL editor (and every other Monaco instance) shares the same global Monaco
+ * instance, and those `.monaco-*` rules are unscoped, so importing GraphiQL's
+ * stylesheet directly leaks its Monaco theme onto the SQL editor — whichever
+ * stylesheet happens to load last wins the cascade.
+ *
+ * Importing it into a low-priority cascade layer fixes this without touching the
+ * vendored bundle: Studio's own Monaco styles (the runtime-injected monaco-editor
+ * CSS and styles/monaco.css) are unlayered, and unlayered rules always beat any
+ * layered rule. So Studio's Monaco styling wins everywhere — including inside
+ * GraphiQL's editor, which is the consistent behavior we want.
+ *
+ * GraphiQL's own UI (the `.graphiql-container` selectors) still applies: the
+ * `graphiql` layer is registered after Tailwind's layers (this file loads after
+ * globals.css), so it outranks Tailwind's base/component resets just as the
+ * unlayered import did before.
+ */
+@import 'graphiql/style.css' layer(graphiql);

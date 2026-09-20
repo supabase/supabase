@@ -1,15 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+
 import './index.css'
+
 import App from './App'
-import { Auth } from '@supabase/auth-ui-react'
-import { supabase } from './utils/supabaseClient'
+import { UserProvider } from './utils/userContext'
 
 ReactDOM.render(
   <React.StrictMode>
-    <Auth.UserContextProvider supabaseClient={supabase}>
+    <UserProvider>
       <App />
-    </Auth.UserContextProvider>
+    </UserProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )

@@ -1,6 +1,27 @@
 import { describe, expect, it } from 'vitest'
 
-import { passwordStrength } from './password-strength'
+import { passwordNeedsPercentEncoding, passwordStrength } from './password-strength'
+
+describe('passwordNeedsPercentEncoding', () => {
+  it('returns false for passwords that are safe to use in a connection string', () => {
+    expect(passwordNeedsPercentEncoding('')).toBe(false)
+    expect(passwordNeedsPercentEncoding('teststring')).toBe(false)
+    expect(passwordNeedsPercentEncoding('Str0ngPassword123')).toBe(false)
+    expect(passwordNeedsPercentEncoding('with-safe_chars.~!')).toBe(false)
+  })
+
+  it('returns true for passwords with characters that need percent-encoding', () => {
+    expect(passwordNeedsPercentEncoding('test@string')).toBe(true)
+    expect(passwordNeedsPercentEncoding('te:ststring')).toBe(true)
+    expect(passwordNeedsPercentEncoding('tests/tring')).toBe(true)
+    expect(passwordNeedsPercentEncoding('test#string')).toBe(true)
+    expect(passwordNeedsPercentEncoding('test%string')).toBe(true)
+    expect(passwordNeedsPercentEncoding('test+string')).toBe(true)
+    expect(passwordNeedsPercentEncoding('test?string')).toBe(true)
+    expect(passwordNeedsPercentEncoding('test&string')).toBe(true)
+    expect(passwordNeedsPercentEncoding('test string')).toBe(true)
+  })
+})
 
 describe('passwordStrength', () => {
   it('returns empty values for message, warning and strength for empty input', async () => {

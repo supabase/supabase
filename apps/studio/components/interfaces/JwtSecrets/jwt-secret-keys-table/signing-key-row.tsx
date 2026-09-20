@@ -22,7 +22,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
@@ -30,7 +30,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 interface SigningKeyRowProps {
-  signingKey: components['schemas']['SigningKeyResponse']
+  signingKey: components['schemas']['SigningKeyResponse_Output']
   setSelectedKey: (key?: JWTSigningKey) => void
   setShownDialog: (dialog?: 'key-details' | 'revoke' | 'delete') => void
   handlePreviouslyUsedKey: (keyId: string) => void
@@ -123,7 +123,7 @@ export const SigningKeyRow = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               className="px-1.5"
               loading={isLoading}
               icon={<MoreVertical className="size-4" />}

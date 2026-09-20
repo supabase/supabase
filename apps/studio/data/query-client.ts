@@ -20,6 +20,16 @@ const SKIP_RETRY_PATHNAME_MATCHERS = [
 
 export const MAX_RETRY_FAILURE_COUNT = 3
 
+function isQueryEndpointStatementTimeout(error: unknown) {
+  const PG_META_QUERY_PATHNAME_MATCHER = match('/platform/pg-meta/:ref/query')
+  return (
+    error instanceof ResponseError &&
+    !!error.requestPathname &&
+    !!PG_META_QUERY_PATHNAME_MATCHER(error.requestPathname) &&
+    !!error.message?.includes('canceling statement due to statement timeout')
+  )
+}
+
 let queryClient: QueryClient | undefined
 
 export function getQueryClient() {
@@ -70,6 +80,17 @@ export function getQueryClient() {
 
             // react-query default: doubles, starting at 1000ms, with each attempt, but will not exceed 30 seconds
             return Math.min(1000 * 2 ** failureCount, 30000)
+          },
+          refetchOnWindowFocus(query) {
+            // [Joshen] Opting to not refetch a /query request that failed due to a statement
+            // timeout, presumably that it'll just run into the same issue. Can however be overriden
+            // on a per case basis on each individual query hook
+            if (isQueryEndpointStatementTimeout(query.state.error)) return false
+            return true
+          },
+          refetchOnReconnect(query) {
+            if (isQueryEndpointStatementTimeout(query.state.error)) return false
+            return true
           },
         },
       },

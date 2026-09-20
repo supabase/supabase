@@ -1,3 +1,5 @@
+import { validateGoPageInvariants } from 'marketing'
+
 import rawPages from '@/_go'
 import { goPageSchema, type GoPage } from '@/types/go'
 
@@ -11,6 +13,13 @@ export function getAllGoPages(): GoPage[] {
     if (!result.success) {
       throw new Error(
         `Invalid go page definition (slug: "${(raw as any).slug ?? 'unknown'}"):\n${result.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`).join('\n')}`
+      )
+    }
+
+    const invariantErrors = validateGoPageInvariants(result.data)
+    if (invariantErrors.length > 0) {
+      throw new Error(
+        `Invalid go page definition (slug: "${result.data.slug}"):\n${invariantErrors.map((m) => `  - ${m}`).join('\n')}`
       )
     }
 

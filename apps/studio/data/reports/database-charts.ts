@@ -1,10 +1,25 @@
+import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
+
+import {
+  hasBurstableIO,
+  mapComputeSizeNameToAddonVariantId,
+} from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
 import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
 import { DiskAttributesData } from '@/data/config/disk-attributes-query'
 import { MaxConnectionsData } from '@/data/database/max-connections-query'
 import { Project } from '@/data/projects/project-detail-query'
+import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability.constants'
 import { DOCS_URL } from '@/lib/constants'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
+
+// High Availability projects run on volumes without a burst credit pool, so the
+// Disk IO Burst Balance chart has no data to show for them.
+export const shouldShowDiskIOBurstBalanceChart = (
+  project: Project | undefined,
+  isFlagEnabled: boolean
+): boolean =>
+  isFlagEnabled && hasBurstableIO(project?.infra_compute_size) && !resolveHighAvailability(project)
 
 export const getReportAttributesV2: (
   entitledFeatures: string[],
@@ -12,15 +27,37 @@ export const getReportAttributesV2: (
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
   pgBouncerMaxConnections?: number,
-  isSpendCapEnabled?: boolean
+  isSpendCapEnabled?: boolean,
+  showDiskIOBurstBalanceChart?: boolean,
+  showMemoryCommitmentChart?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
-  _project,
+  project,
   diskConfig,
   maxConnections,
   pgBouncerMaxConnections,
-  isSpendCapEnabled
+  isSpendCapEnabled,
+  showDiskIOBurstBalanceChart,
+  showMemoryCommitmentChart
 ) => {
+  const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+  // High Availability projects run Multigres, whose dedicated pooler is multipooler rather
+  // than PgBouncer. Multipooler docs aren't published yet, so the docs link is dropped for now.
+  const isHighAvailability = resolveHighAvailability(project)
+  const provisionedDiskIops = diskConfig?.attributes?.iops
+  const computeIopsLimit = COMPUTE_MAX_IOPS[computeVariantId]
+  const effectiveMaxIops =
+    typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
+      ? Math.min(provisionedDiskIops, computeIopsLimit)
+      : provisionedDiskIops
+  const showBurstBalanceChart = shouldShowDiskIOBurstBalanceChart(
+    project,
+    !!showDiskIOBurstBalanceChart
+  )
+  const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
+  const baselineThroughputLabel =
+    typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
+
   return [
     {
       id: 'ram-usage',
@@ -37,13 +74,15 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: any) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
       attributes: [
         {
           attribute: 'ram_usage_used',
           provider: 'infra-monitoring',
           label: 'Used',
+          color: 'var(--chart-1)',
+          fill: 'var(--chart-1-fill)',
           tooltip:
             'RAM in use by Postgres and the operating system. Sustained high usage may indicate memory pressure',
         },
@@ -51,6 +90,8 @@ export const getReportAttributesV2: (
           attribute: 'ram_usage_cache_and_buffers',
           provider: 'infra-monitoring',
           label: 'Cache + Buffers',
+          color: 'var(--chart-2)',
+          fill: 'var(--chart-2-fill)',
           tooltip:
             'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
         },
@@ -58,8 +99,95 @@ export const getReportAttributesV2: (
           attribute: 'ram_usage_free',
           provider: 'infra-monitoring',
           label: 'Free',
+          color: 'var(--chart-muted)',
+          fill: 'var(--chart-muted-fill)',
           tooltip:
             'Unallocated memory available for use. A small portion is always reserved by the operating system',
+        },
+        {
+          attribute: 'ram_usage_total',
+          provider: 'infra-monitoring',
+          label: 'Total RAM',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip: 'Total RAM available on this instance',
+        },
+        {
+          attribute: 'ram_usage_swap',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          omitFromTotal: true,
+          color: 'var(--chart-3)',
+          tooltip:
+            'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
+      ],
+    },
+    {
+      id: 'memory-commitment',
+      label: 'Memory commitment',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-commitment`,
+      hide: !showMemoryCommitmentChart,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: true,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+      },
+      attributes: [
+        {
+          attribute: 'ram_commit_used',
+          provider: 'infra-monitoring',
+          label: 'Committed',
+          color: 'var(--chart-1)',
+          fill: 'var(--chart-1-fill)',
+          tooltip:
+            'Total memory the kernel has promised to processes (RAM plus swap). Sustained values near or above the commit limit indicate overcommitment and a high risk of out-of-memory failures',
+        },
+        {
+          attribute: 'ram_commit_limit',
+          provider: 'infra-monitoring',
+          label: 'Commit limit',
+          color: 'var(--chart-reference)',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip:
+            'Maximum memory the kernel will commit (RAM plus swap, adjusted by the overcommit ratio). Committed memory approaching this limit puts the database at risk of being killed when the system runs out of memory',
+        },
+      ],
+    },
+    {
+      id: 'swap-usage',
+      label: 'Swap usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      hide: true,
+      showTooltip: true,
+      showLegend: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: false,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        domain: [0, (dataMax: number) => Math.max(dataMax, 1024 * 1024 * 1024)] as any,
+      },
+      attributes: [
+        {
+          attribute: 'swap_usage',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          tooltip:
+            'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
         },
       ],
     },
@@ -75,7 +203,6 @@ export const getReportAttributesV2: (
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
-      normalizeVisibleStackToPercent: true,
       YAxisProps: {
         width: 55,
         domain: [0, 100] as [number, number],
@@ -90,8 +217,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'System',
           format: '%',
-          color: { light: '#EDC35E', dark: '#EDD35E' },
-          fill: { light: '#F6D99F', dark: '#5C5230' },
+          color: 'var(--chart-2)',
+          fill: 'var(--chart-2-fill)',
           tooltip:
             'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead',
         },
@@ -100,8 +227,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'User',
           format: '%',
-          color: { light: '#0063E8', dark: '#65BCD9' },
-          fill: { light: '#80B1F4', dark: '#2A3D45' },
+          color: 'var(--chart-1)',
+          fill: 'var(--chart-1-fill)',
           tooltip:
             'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries',
         },
@@ -110,8 +237,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IOwait',
           format: '%',
-          color: { light: '#DB3A34', dark: '#FF6B6B' },
-          fill: { light: '#F2A7A3', dark: '#5C2A2A' },
+          color: 'var(--chart-3)',
+          fill: 'var(--chart-3-fill)',
           tooltip:
             'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks',
         },
@@ -120,8 +247,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IRQs',
           format: '%',
-          color: { light: '#DA760B', dark: '#DA760B' },
-          fill: { light: '#FFB885', dark: '#5C3D0A' },
+          color: 'var(--chart-4)',
+          fill: 'var(--chart-4-fill)',
           tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
         },
         {
@@ -129,8 +256,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'Other',
           format: '%',
-          color: { light: '#B616A6', dark: '#DB8DF9' },
-          fill: { light: '#DB8BD3', dark: '#4A3D5C' },
+          color: 'var(--chart-5)',
+          fill: 'var(--chart-5-fill)',
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
         },
@@ -140,8 +267,8 @@ export const getReportAttributesV2: (
           label: 'Idle',
           format: '%',
           omitFromTotal: true,
-          color: { light: '#6EA85F', dark: '#A3FFC2' },
-          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
+          color: 'var(--chart-muted)',
+          fill: 'var(--chart-muted-fill)',
           tooltip: 'CPU time spent idle and available for new work',
         },
         {
@@ -149,8 +276,45 @@ export const getReportAttributesV2: (
           provider: 'reference-line',
           label: 'Max',
           value: 100,
+          color: 'var(--chart-reference)',
           tooltip: 'Max CPU usage',
           isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'network-throughput',
+      label: 'Network throughput',
+      syncId: 'database-reports',
+      hide: false,
+      showTooltip: true,
+      format: 'bytes-per-second',
+      valuePrecision: 1,
+      showLegend: true,
+      showMaxValue: false,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 70,
+        tickFormatter: (value: number) => `${formatBytes(value, 1)}/s`,
+      },
+      defaultChartStyle: 'stackedAreaLine',
+      attributes: [
+        {
+          attribute: 'network_receive_bytes',
+          provider: 'infra-monitoring',
+          label: 'Network in',
+          color: 'var(--chart-in)',
+          fill: 'var(--chart-in-fill)',
+          tooltip: 'Inbound network throughput (bytes per second)',
+        },
+        {
+          attribute: 'network_transmit_bytes',
+          provider: 'infra-monitoring',
+          label: 'Network out',
+          color: 'var(--chart-out)',
+          fill: 'var(--chart-out-fill)',
+          tooltip: 'Outbound network throughput (bytes per second)',
         },
       ],
     },
@@ -168,7 +332,7 @@ export const getReportAttributesV2: (
       showMaxValue: true,
       YAxisProps: {
         width: 55,
-        tickFormatter: (value: any) => compactNumberFormatter(value),
+        tickFormatter: (value: number) => compactNumberFormatter(value),
       },
       defaultChartStyle: 'bar',
       attributes: [
@@ -176,6 +340,8 @@ export const getReportAttributesV2: (
           attribute: 'disk_iops_write',
           provider: 'infra-monitoring',
           label: 'Write IOPS',
+          color: 'var(--chart-out)',
+          fill: 'var(--chart-out-fill)',
           tooltip:
             'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
         },
@@ -183,6 +349,8 @@ export const getReportAttributesV2: (
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
           label: 'Read IOPS',
+          color: 'var(--chart-in)',
+          fill: 'var(--chart-in-fill)',
           tooltip:
             'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
         },
@@ -190,9 +358,10 @@ export const getReportAttributesV2: (
           attribute: 'disk_iops_max',
           provider: 'reference-line',
           label: 'Max IOPS',
-          value: diskConfig?.attributes?.iops,
+          color: 'var(--chart-reference)',
+          value: effectiveMaxIops,
           tooltip:
-            'Maximum IOPS (Input/Output Operations Per Second) for your current compute size',
+            'Effective maximum IOPS for your current compute and disk configuration. Equal to the lower of the compute IOPS limit and the provisioned disk IOPS',
           isMaxValue: true,
         },
       ],
@@ -212,7 +381,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 70,
-        tickFormatter: (value: any) => `${formatBytes(value, 1)}/s`,
+        tickFormatter: (value: number) => `${formatBytes(value, 1)}/s`,
       },
       defaultChartStyle: 'stackedAreaLine',
       attributes: [
@@ -220,18 +389,23 @@ export const getReportAttributesV2: (
           attribute: 'disk_bytes_read',
           provider: 'infra-monitoring',
           label: 'Read throughput',
+          color: 'var(--chart-in)',
+          fill: 'var(--chart-in-fill)',
           tooltip: 'Disk read throughput (bytes per second)',
         },
         {
           attribute: 'disk_bytes_written',
           provider: 'infra-monitoring',
           label: 'Write throughput',
+          color: 'var(--chart-out)',
+          fill: 'var(--chart-out-fill)',
           tooltip: 'Disk write throughput (bytes per second)',
         },
         {
           attribute: 'disk_throughput_max',
           provider: 'reference-line',
           label: 'Max throughput',
+          color: 'var(--chart-reference)',
           value:
             diskConfig?.attributes?.type === 'gp3' &&
             typeof diskConfig.attributes.throughput_mbps === 'number'
@@ -239,6 +413,37 @@ export const getReportAttributesV2: (
               : undefined,
           tooltip: 'Maximum disk throughput for your current compute size',
           isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'disk-io-burst-balance',
+      label: 'Disk IO Burst Balance',
+      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
+      syncId: 'database-reports',
+      hide: !showBurstBalanceChart,
+      format: '%',
+      valuePrecision: 0,
+      showTooltip: true,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
+      },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'disk_io_budget',
+          provider: 'infra-monitoring',
+          label: 'Burst credits remaining',
+          format: '%',
+          tooltip: `Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. At 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
         },
       ],
     },
@@ -262,12 +467,15 @@ export const getReportAttributesV2: (
           attribute: 'pg_stat_database_num_backends',
           provider: 'infra-monitoring',
           label: 'Total connections',
+          color: 'var(--chart-1)',
+          fill: 'var(--chart-1-fill)',
           tooltip: 'Total number of active database connections',
         },
         {
           attribute: 'max_db_connections',
           provider: 'reference-line',
           label: 'Max connections',
+          color: 'var(--chart-reference)',
           value: maxConnections?.maxConnections,
           tooltip: 'Max available connections for your current compute size',
           isMaxValue: true,
@@ -296,6 +504,8 @@ export const getReportAttributesV2: (
           attribute: 'client_connections_postgres',
           provider: 'infra-monitoring',
           label: 'Postgres',
+          color: 'var(--chart-1)',
+          fill: 'var(--chart-1-fill)',
           tooltip:
             'Direct connections to the Postgres database from your application and external clients',
         },
@@ -303,12 +513,16 @@ export const getReportAttributesV2: (
           attribute: 'client_connections_authenticator',
           provider: 'infra-monitoring',
           label: 'PostgREST',
+          color: 'var(--chart-2)',
+          fill: 'var(--chart-2-fill)',
           tooltip: 'Connection pool managed by PostgREST',
         },
         {
           attribute: 'client_connections_supabase_admin',
           provider: 'infra-monitoring',
           label: 'Reserved',
+          color: 'var(--chart-3)',
+          fill: 'var(--chart-3-fill)',
           tooltip:
             'Administrative connections used by various Supabase services for internal operations and maintenance tasks',
         },
@@ -316,24 +530,31 @@ export const getReportAttributesV2: (
           attribute: 'client_connections_supabase_auth_admin',
           provider: 'infra-monitoring',
           label: 'Auth',
+          color: 'var(--chart-4)',
+          fill: 'var(--chart-4-fill)',
           tooltip: 'Connection pool managed by Supabase Auth',
         },
         {
           attribute: 'client_connections_supabase_storage_admin',
           provider: 'infra-monitoring',
           label: 'Storage',
+          color: 'var(--chart-5)',
+          fill: 'var(--chart-5-fill)',
           tooltip: 'Connection pool managed by Supabase Storage',
         },
         {
           attribute: 'client_connections_other',
           provider: 'infra-monitoring',
           label: 'Other roles',
+          color: 'var(--chart-6)',
+          fill: 'var(--chart-6-fill)',
           tooltip: "Miscellaneous database connections that don't fall into other categories.",
         },
         {
           attribute: 'max_db_connections',
           provider: 'reference-line',
           label: 'Max connections',
+          color: 'var(--chart-reference)',
           value: maxConnections?.maxConnections,
           tooltip: 'Max available connections for your current compute size',
           isMaxValue: true,
@@ -355,18 +576,26 @@ export const getReportAttributesV2: (
       YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'bar',
-      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
+      titleTooltip: isHighAvailability
+        ? 'Client connections to multipooler, the dedicated pooler for High Availability projects (docs coming soon)'
+        : undefined,
+      docsUrl: isHighAvailability
+        ? undefined
+        : `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
           attribute: 'client_connections_pgbouncer',
           provider: 'infra-monitoring',
-          label: 'pgbouncer',
-          tooltip: 'PgBouncer connections',
+          label: isHighAvailability ? 'multipooler' : 'pgbouncer',
+          color: 'var(--chart-1)',
+          fill: 'var(--chart-1-fill)',
+          tooltip: isHighAvailability ? 'Multipooler connections' : 'PgBouncer connections',
         },
         {
           attribute: 'pg_pooler_max_connections',
           provider: 'reference-line',
           label: 'Max pooler connections',
+          color: 'var(--chart-reference)',
           value: pgBouncerMaxConnections,
           tooltip: 'Maximum allowed pooler connections for your current compute size',
           isMaxValue: true,
@@ -380,8 +609,9 @@ export const getReportAttributesV2: (
       valuePrecision: 0,
       entitlement: 'database',
       requiredPlan: 'Pro',
-      hide: !entitledFeatures.includes('database'),
-      showTooltip: false,
+      // High Availability projects don't run Supavisor, so there's no data to show.
+      hide: !entitledFeatures.includes('database') || isHighAvailability,
+      showTooltip: true,
       showLegend: false,
       showMaxValue: false,
       showGrid: true,
@@ -393,6 +623,8 @@ export const getReportAttributesV2: (
           attribute: 'supavisor_connections_active',
           provider: 'infra-monitoring',
           label: 'supavisor',
+          color: 'var(--chart-1)',
+          fill: 'var(--chart-1-fill)',
           tooltip: 'Supavisor connections',
         },
       ],
@@ -409,7 +641,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 65,
-        tickFormatter: (value: any) => formatBytes(value, 1),
+        tickFormatter: (value: number) => formatBytes(value, 1),
       },
       hideChartType: false,
       defaultChartStyle: 'bar',
@@ -420,6 +652,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'System',
+          color: 'var(--chart-3)',
+          fill: 'var(--chart-3-fill)',
           tooltip: 'Reserved space for the system to ensure your database runs smoothly',
         },
         {
@@ -427,6 +661,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'WAL',
+          color: 'var(--chart-2)',
+          fill: 'var(--chart-2-fill)',
           tooltip:
             'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
         },
@@ -435,6 +671,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'Database',
+          color: 'var(--chart-1)',
+          fill: 'var(--chart-1-fill)',
           tooltip: 'Disk usage by your database (tables, indexes, data, ...)',
         },
         {
@@ -443,6 +681,7 @@ export const getReportAttributesV2: (
           isMaxValue: true,
           format: 'bytes',
           label: 'Disk Size',
+          color: 'var(--chart-reference)',
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
         entitledFeatures.includes('database') &&
@@ -454,7 +693,7 @@ export const getReportAttributesV2: (
                 strokeDasharray: '4 2',
                 label: 'Spend cap enabled',
                 value: diskConfig?.attributes?.size_gb! * 1024 * 1024 * 1024,
-                className: '[&_line]:!stroke-yellow-800 [&_line]:!opacity-100',
+                className: '[&_line]:stroke-yellow-800! [&_line]:opacity-100!',
                 opacity: 1,
               }
             : {
@@ -462,7 +701,7 @@ export const getReportAttributesV2: (
                 provider: 'reference-line',
                 isReferenceLine: true,
                 label: '90% - Disk resize threshold',
-                className: '[&_line]:!stroke-yellow-800',
+                className: '[&_line]:stroke-yellow-800!',
                 value: diskConfig?.attributes?.size_gb! * 1024 * 1024 * 1024 * 0.9,
               }),
       ],

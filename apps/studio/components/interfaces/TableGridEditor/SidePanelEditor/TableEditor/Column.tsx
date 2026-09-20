@@ -1,28 +1,29 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Link, Plus, Settings, X } from 'lucide-react'
+import { Eye, EyeOff, GripVertical, Link, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
 import {
   Badge,
   Button,
   Checkbox,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Input,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
-import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
+import { ColumnDefaultValue } from '../ColumnEditor/ColumnDefaultValue'
 import ColumnType from '../ColumnEditor/ColumnType'
-import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { checkIfRelationChanged } from './ForeignKeysManagement/ForeignKeysManagement.utils'
@@ -56,6 +57,7 @@ interface ColumnProps {
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
+  shouldAutoFocusName?: boolean
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
   onEditForeignKey: (relation?: ForeignKey) => void
@@ -68,13 +70,13 @@ export const Column = ({
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
+  shouldAutoFocusName = false,
   onUpdateColumn,
   onRemoveColumn,
   onEditForeignKey,
 }: ColumnProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
-  const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
   const settingsCount = [
     column.isNullable ? 1 : 0,
@@ -123,15 +125,18 @@ export const Column = ({
           ref={setActivatorNodeRef}
           {...attributes}
           {...listeners}
+          tabIndex={0}
           className="opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
           type="button"
         >
           <GripVertical size={16} strokeWidth={1.5} />
         </button>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[30%]">
         <div className="flex w-[95%] items-center justify-between">
+          <div className="h-4 w-px bg-border" />
           <Input
+            autoFocus={shouldAutoFocusName}
             aria-label="Column name"
             size="small"
             value={column.name}
@@ -144,22 +149,74 @@ export const Column = ({
             )}
             onChange={(event) => onUpdateColumn({ name: event.target.value })}
           />
+
           {relations.filter((r) => !r.toRemove).length === 0 ? (
-            <Button
-              type="dashed"
-              className="rounded-l-none h-[30px] py-0 px-2"
-              onClick={() => onEditForeignKey()}
-            >
-              <Link size={12} />
-            </Button>
+            <div className="flex items-center gap-x-1">
+              <Button
+                variant="dashed"
+                className="rounded-l-none h-[30px] py-0 px-2"
+                onClick={() => onEditForeignKey()}
+              >
+                <Link size={12} />
+              </Button>
+              <div className="h-4 w-px bg-border" />
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    tabIndex={0}
+                    onClick={() => {
+                      const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+
+                      const isSensitive = !column.isSensitiveData
+
+                      let updatedComment = column.comment || ''
+
+                      if (isSensitive && !updatedComment.includes(SENSITIVE_DATA_MARKER)) {
+                        updatedComment = updatedComment
+                          ? `${updatedComment} ${SENSITIVE_DATA_MARKER}`
+                          : SENSITIVE_DATA_MARKER
+                      } else if (!isSensitive) {
+                        updatedComment = updatedComment.replace(SENSITIVE_DATA_MARKER, '').trim()
+                      }
+
+                      onUpdateColumn({ isSensitiveData: isSensitive, comment: updatedComment })
+                    }}
+                    className={cn(
+                      'transition cursor-pointer p-1 hover:bg-surface-100 rounded',
+
+                      column.isSensitiveData
+                        ? 'opacity-100 text-foreground'
+                        : 'opacity-50 hover:opacity-100 text-foreground-light'
+                    )}
+                    type="button"
+                    aria-label={
+                      column.isSensitiveData ? 'Marked as sensitive' : 'Not marked as sensitive'
+                    }
+                  >
+                    {column.isSensitiveData ? (
+                      <EyeOff size={14} strokeWidth={1.5} />
+                    ) : (
+                      <Eye size={14} strokeWidth={1.5} />
+                    )}
+                  </button>
+                </TooltipTrigger>
+
+                <TooltipContent side="bottom">
+                  {column.isSensitiveData
+                    ? 'Data is masked in grid display. Actual data unchanged in database.'
+                    : 'Mark as sensitive to mask in grid display'}
+                </TooltipContent>
+              </Tooltip>
+            </div>
           ) : (
-            <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="default" className="rounded-l-none h-[30px] py-0 px-2">
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
+              <PopoverTrigger asChild>
+                <Button className="rounded-l-none h-[30px] py-0 px-2">
                   <Link size={12} />
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
                 side="bottom"
                 align="center"
@@ -167,16 +224,16 @@ export const Column = ({
                 <div className="text-xs px-2 pt-2">
                   Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
                 </div>
-                <Command_Shadcn_>
-                  <CommandList_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                <Command>
+                  <CommandList>
+                    <CommandGroup>
                       {relations.map((relation, idx) => {
                         const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
                         const status = getRelationStatus(relation)
                         if (status === 'REMOVE') return null
 
                         return (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={key}
                             value={key}
                             className="cursor-pointer w-full"
@@ -216,32 +273,32 @@ export const Column = ({
                                 </p>
                               </div>
                             )}
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         )
                       })}
-                    </CommandGroup_Shadcn_>
-                    <CommandSeparator_Shadcn_ />
-                    <CommandGroup_Shadcn_>
-                      <CommandItem_Shadcn_
+                    </CommandGroup>
+                    <CommandSeparator />
+                    <CommandGroup>
+                      <CommandItem
                         className="cursor-pointer w-full gap-x-2"
                         onSelect={() => onEditForeignKey()}
                         onClick={() => onEditForeignKey()}
                       >
                         <Plus size={14} strokeWidth={1.5} />
                         <p>Add foreign key relation</p>
-                      </CommandItem_Shadcn_>
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+                      </CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
           <ColumnType
-            value={column.format}
+            value={{ format: column.format, formatSchema: column.formatSchema }}
             enumTypes={enumTypes}
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
@@ -249,36 +306,26 @@ export const Column = ({
             description={
               hasForeignKeys ? 'Column type cannot be changed as it has a foreign key relation' : ''
             }
-            onOptionSelect={(format: string) => {
+            onOptionSelect={({ format, formatSchema }) => {
               const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
-              onUpdateColumn({ format, defaultValue })
+              onUpdateColumn({ format, formatSchema, defaultValue })
             }}
           />
         </div>
       </div>
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[95%]">
-          <InputWithSuggestions
-            aria-label="Column default value"
-            data-testid={`${column.name}-default-value`}
-            placeholder={
-              typeof column.defaultValue === 'string' && column.defaultValue.length === 0
-                ? 'EMPTY'
-                : 'NULL'
-            }
+          <ColumnDefaultValue
+            columnFields={column}
+            enumTypes={enumTypes}
+            showLabel={false}
             size="small"
-            value={column.defaultValue ?? ''}
-            disabled={column.format.includes('int') && column.isIdentity}
-            className={`rounded bg-surface-100 lg:gap-0 ${
+            className={`rounded-sm lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
-            suggestions={suggestions}
-            suggestionsHeader="Suggested expressions"
-            suggestionsTooltip="Suggested expressions"
-            onChange={(event) => onUpdateColumn({ defaultValue: event.target.value })}
-            onSelectSuggestion={(suggestion: Suggestion) =>
-              onUpdateColumn({ defaultValue: suggestion.value })
-            }
+            data-testid={`${column.name}-default-value`}
+            aria-label="Column default value"
+            onUpdateField={onUpdateColumn}
           />
         </div>
       </div>
@@ -298,8 +345,8 @@ export const Column = ({
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
       <div className="flex w-[5%] justify-end">
         {(!column.isPrimaryKey || column.format.includes('int')) && (
-          <Popover_Shadcn_>
-            <PopoverTrigger_Shadcn_
+          <Popover>
+            <PopoverTrigger
               data-testid={`${column.name}-extra-options`}
               className="group flex items-center -space-x-1"
             >
@@ -311,8 +358,8 @@ export const Column = ({
               <div className="text-foreground-light transition-colors group-hover:text-foreground">
                 <Settings size={16} strokeWidth={1} />
               </div>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ align="end" className="w-80 p-0">
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
               <div className="flex items-center justify-center bg-surface-200 gap-y-1 py-1.5 px-3 border-b border-overlay">
                 <h5 className="text-foreground">Extra options</h5>
               </div>
@@ -387,13 +434,19 @@ export const Column = ({
                   </FormItemLayout>
                 )}
               </div>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
         )}
       </div>
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
-          <button className="cursor-pointer" onClick={() => onRemoveColumn()}>
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label="Remove column"
+            className="cursor-pointer"
+            onClick={() => onRemoveColumn()}
+          >
             <X size={16} strokeWidth={1} />
           </button>
         </div>

@@ -59,7 +59,7 @@ const levelsData = {
   },
   telemetry: {
     icon: 'telemetry',
-    name: 'Telemetry',
+    name: 'Observability',
   },
   realtime: {
     icon: 'realtime',
@@ -105,6 +105,14 @@ const levelsData = {
     icon: 'integrations',
     name: 'Integrations',
   },
+  reference_server_v1: {
+    icon: 'reference-javascript',
+    name: 'Server Reference v1.0',
+  },
+  reference_middleware_v1: {
+    icon: 'reference-javascript',
+    name: 'Middleware Reference v1.0',
+  },
   reference_javascript_v1: {
     icon: 'reference-javascript',
     name: 'JavaScript Reference v1.0',
@@ -128,6 +136,10 @@ const levelsData = {
   reference_csharp_v1: {
     icon: 'reference-csharp',
     name: 'C# Reference v1.0',
+  },
+  reference_csharp_v8: {
+    icon: 'reference-csharp',
+    name: 'C# Reference v8.0',
   },
   reference_python_v2: {
     icon: 'reference-python',
@@ -200,11 +212,14 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
       )}
     >
       <button
+        tabIndex={0}
         className={cn(
           'h-8 w-8 flex group items-center justify-center mr-1',
           mobileMenuOpen && 'mt-0.5'
         )}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
+        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={mobileMenuOpen}
       >
         <div
           className={cn(
@@ -265,7 +280,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'left-0',
         'right-0',
         'z-10',
-        'backdrop-blur-sm backdrop-filter bg-alternative/90',
+        'backdrop-blur-xs backdrop-filter bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
         'lg:hidden'
@@ -283,8 +298,9 @@ const Container = memo(function Container({
     <main
       // used by layout to scroll to top
       id={DOCS_CONTENT_CONTAINER_ID}
+      tabIndex={-1}
       className={cn(
-        'w-full transition-all ease-out relative',
+        'w-full transition-all ease-out relative scroll-mt-(--header-height) outline-hidden',
         // desktop override any margin styles
         'lg:ml-0',
         className
@@ -305,7 +321,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
         'fixed lg:relative z-40 lg:z-auto',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
         'lg:w-[420px] !lg:left-0',
-        'lg:top-[var(--header-height)] lg:sticky',
+        'lg:top-(--header-height) lg:sticky',
         'h-screen lg:h-[calc(100vh-var(--header-height))]',
         // desktop override any left styles
         'lg:left-0',
@@ -318,13 +334,13 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
     >
       <div
         className={cn(
-          'top-0 lg:top-[var(--header-height)]',
+          'top-0',
           'h-full',
-          'relative lg:sticky',
+          'relative',
           'w-full lg:w-auto',
-          'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
-          '[overscroll-behavior:contain]',
-          'backdrop-blur backdrop-filter bg-background',
+          'h-fit lg:h-full overflow-y-scroll lg:overflow-auto',
+          'overscroll-contain',
+          'backdrop-blur-sm backdrop-filter bg-background',
           'flex flex-col grow'
         )}
       >
@@ -332,7 +348,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           Main menu
         </span>
         <div className="top-0 sticky h-0 z-10">
-          <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
+          <div className="bg-linear-to-b from-background to-transparent h-4 w-full"></div>
         </div>
         <div
           className={cn(
@@ -411,7 +427,7 @@ function SidebarSkeleton({
           className={cn(
             'sticky',
             'transition-all top-0 z-10',
-            'backdrop-blur backdrop-filter bg-background'
+            'backdrop-blur-sm backdrop-filter bg-background'
           )}
         >
           {hideSideNav ? null : menuName ? (

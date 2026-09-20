@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { IS_PROD } from '../constants'
+import { safeLocalStorage } from '../safe-storage'
 
 const defaultDark: { [name: string]: string } = {
   '--brand-accent': '160deg 100% 50%',
@@ -51,7 +52,7 @@ export const useThemeSandbox = (): any => {
   const hash = window.location.hash
   const defaultConfig = defaultDark // use dark default tokens
   // const defaultConfig = defaultLight // use light default tokens
-  const localPreset = localStorage.getItem('theme-sandbox')
+  const localPreset = safeLocalStorage.getItem('theme-sandbox')
   const isSandbox = hash.includes('#theme-sandbox') || localPreset !== null
   const [themeConfig, setThemeConfig] = useState(
     localPreset ? JSON.parse(localPreset) : defaultConfig
@@ -65,7 +66,7 @@ export const useThemeSandbox = (): any => {
 
   const updateCSSVariables = () => {
     Object.entries(themeConfig).map(([key, value]) => styles.style.setProperty(key, value))
-    localStorage.setItem('theme-sandbox', JSON.stringify(themeConfig))
+    safeLocalStorage.setItem('theme-sandbox', JSON.stringify(themeConfig))
   }
 
   const init = async () => {
@@ -76,7 +77,7 @@ export const useThemeSandbox = (): any => {
     gui.width = 500
 
     Object.entries(defaultConfig).map(([key, _value]) => {
-      if (!themeConfig[key]) return localStorage.removeItem('theme-sandbox')
+      if (!themeConfig[key]) return safeLocalStorage.removeItem('theme-sandbox')
       const folderName = key.split('-')[2]
       const folder = gui.__folders[folderName] ?? gui.addFolder(folderName)
 
@@ -96,7 +97,7 @@ export const useThemeSandbox = (): any => {
         gui.destroy()
       },
       'Reset localStorage': function () {
-        localStorage.removeItem('theme-sandbox')
+        safeLocalStorage.removeItem('theme-sandbox')
         setThemeConfig(defaultConfig)
       },
     }

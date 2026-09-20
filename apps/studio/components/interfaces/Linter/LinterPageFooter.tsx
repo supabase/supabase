@@ -3,8 +3,10 @@ import { X } from 'lucide-react'
 import { Button, cn } from 'ui'
 
 import { Markdown } from '../Markdown'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface LinterPageFooterProps {
   isLoading: boolean
@@ -32,7 +34,7 @@ export const LinterPageFooter = ({
     <div className="px-6 py-6 flex gap-x-4 border-t relative">
       <Button
         className="absolute top-1.5 right-3 px-1.5"
-        type="text"
+        variant="text"
         size="tiny"
         onClick={() => setShowBottomSection(false)}
       >
@@ -46,15 +48,21 @@ export const LinterPageFooter = ({
           Consider resetting the analysis after making any changes
         </p>
 
-        <Button
-          type="default"
-          className="!mt-3 w-min"
-          disabled={isLoading || isRefetching}
-          loading={isLoading || isRefetching}
-          onClick={() => refetch()}
+        <ShortcutTooltip
+          shortcutId={SHORTCUT_IDS.ADVISORS_REFRESH}
+          label="Rerun linter"
+          side="bottom"
+          align="start"
         >
-          Rerun linter
-        </Button>
+          <Button
+            className="mt-3! w-min"
+            disabled={isLoading || isRefetching}
+            loading={isLoading || isRefetching}
+            onClick={() => refetch()}
+          >
+            Rerun linter
+          </Button>
+        </ShortcutTooltip>
       </div>
 
       <div
@@ -78,7 +86,7 @@ export const LinterPageFooter = ({
           <Markdown
             className="text-xs"
             content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](${DOCS_URL}/guides/database/inspect).`}
+            potential issues. [Learn more here](${DOCS_URL}/guides/observability/inspect).`}
           />
         </div>
       )}

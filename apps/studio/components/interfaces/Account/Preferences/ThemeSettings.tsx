@@ -1,21 +1,19 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import {
   Card,
   CardContent,
-  Label_Shadcn_,
+  Label,
   RadioGroup,
   RadioGroupLargeItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Separator,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   singleThemes,
-  Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -27,9 +25,49 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { ThemeColorSettings } from './ThemeColorSettings'
 import { DEFAULT_SIDEBAR_BEHAVIOR } from '@/components/interfaces/Sidebar'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { BASE_PATH } from '@/lib/constants'
+
+/**
+ * Declared at module scope and memoized deliberately. While this lived inside
+ * `ThemeSettings` React saw a brand new component type on every parent render
+ * and remounted the whole radio group, so the four `react-inlinesvg` previews
+ * restarted their fetch and rendered nothing until it resolved — collapsing
+ * the cards for a frame. That was invisible while the parent only re-rendered
+ * on a theme change, but it became a continuous flicker once dragging a
+ * customize-theme slider started re-rendering the parent every frame.
+ */
+const SingleThemeSelection = memo(function SingleThemeSelection({
+  theme,
+  setTheme,
+}: {
+  theme: string | undefined
+  setTheme: (theme: string) => void
+}) {
+  return (
+    <RadioGroup
+      name="theme"
+      onValueChange={setTheme}
+      aria-label="Choose a theme"
+      defaultValue={theme}
+      value={theme}
+      className="grid grid-cols-2 gap-4"
+    >
+      {singleThemes.map((themeMode) => (
+        <RadioGroupLargeItem
+          className="p-3 w-full"
+          key={themeMode.value}
+          value={themeMode.value}
+          label={themeMode.name}
+        >
+          <SVG src={`${BASE_PATH}/img/themes/${themeMode.value}.svg?v=2`} />
+        </RadioGroupLargeItem>
+      ))}
+    </RadioGroup>
+  )
+})
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -48,30 +86,6 @@ export const ThemeSettings = () => {
 
   if (!mounted) return null
 
-  function SingleThemeSelection() {
-    return (
-      <RadioGroup
-        name="theme"
-        onValueChange={setTheme}
-        aria-label="Choose a theme"
-        defaultValue={theme}
-        value={theme}
-        className="grid grid-cols-2 gap-4"
-      >
-        {singleThemes.map((theme: Theme) => (
-          <RadioGroupLargeItem
-            className="p-3 w-full"
-            key={theme.value}
-            value={theme.value}
-            label={theme.name}
-          >
-            <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
-          </RadioGroupLargeItem>
-        ))}
-      </RadioGroup>
-    )
-  }
-
   return (
     <PageSection>
       <PageSectionMeta>
@@ -86,19 +100,19 @@ export const ThemeSettings = () => {
         <Card>
           <CardContent className="grid grid-cols-12 gap-6">
             <div className="col-span-full md:col-span-4 flex flex-col gap-2">
-              <Label_Shadcn_ htmlFor="theme" className="text-foreground">
+              <Label htmlFor="theme" className="text-foreground">
                 Theme mode
-              </Label_Shadcn_>
-              <p className="text-sm text-foreground-light">
+              </Label>
+              <p className="text-sm text-foreground-lighter">
                 Choose how Supabase looks to you. Select a single theme, or sync with your system.
               </p>
             </div>
 
             <div className="col-span-full md:col-span-8 flex flex-col gap-4">
-              <SingleThemeSelection />
+              <SingleThemeSelection theme={theme} setTheme={setTheme} />
             </div>
           </CardContent>
-          <Separator />
+          <ThemeColorSettings isVisible={theme !== 'classic-dark'} />
           <CardContent>
             <FormItemLayout
               isReactForm={false}
@@ -106,20 +120,20 @@ export const ThemeSettings = () => {
               layout="flex-row-reverse"
               description="Choose your preferred sidebar behavior: open, closed, or expand on hover."
             >
-              <Select_Shadcn_
+              <Select
                 value={sidebarBehaviour}
                 onValueChange={setSidebarBehaviour}
                 aria-label="Select an option"
               >
-                <SelectTrigger_Shadcn_>
-                  <SelectValue_Shadcn_ placeholder="Choose an option" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="open">Expanded</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="closed">Collapsed</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="expandable">Expand on hover</SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose an option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Expanded</SelectItem>
+                  <SelectItem value="closed">Collapsed</SelectItem>
+                  <SelectItem value="expandable">Expand on hover</SelectItem>
+                </SelectContent>
+              </Select>
             </FormItemLayout>
           </CardContent>
         </Card>

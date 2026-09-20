@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
@@ -39,12 +38,15 @@ import {
   calculateTotalChartAggregate,
   CustomLabel,
   CustomTooltip,
+  getStackId,
   MultiAttribute,
+  resolveChartColor,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
-import { formatBytes } from '@/lib/helpers'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
@@ -155,7 +157,13 @@ export function ComposedChart({
 
   const { Container } = useChartSize(size)
 
-  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
+  const formatChartDate = (value: number | string) =>
+    displayDateInUtc
+      ? formatDateTime(value, { tz: 'UTC', format: customDateFormat })
+      : formatPickerDate(value, customDateFormat)
 
   const formatTimestamp = (ts: unknown) => {
     if (typeof ts !== 'number' && typeof ts !== 'string') {
@@ -163,10 +171,11 @@ export function ComposedChart({
     }
 
     if (typeof ts === 'number' && ts > 1e14) {
-      return day(ts / 1000).format(customDateFormat)
+      // Microsecond timestamp; convert to milliseconds before formatting.
+      return formatChartDate(ts / 1000)
     }
 
-    return day(ts).format(customDateFormat)
+    return formatChartDate(ts)
   }
 
   const _XAxisProps = XAxisProps || {
@@ -212,9 +221,15 @@ export function ComposedChart({
       return value
     }
 
+    if (typeof format === 'function') {
+      return format(value)
+    }
+
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      const formatted = formatBytes(bytesValue, valuePrecision)
+      const formatted = isMemoryChart
+        ? formatBytesMinMB(bytesValue, valuePrecision)
+        : formatBytes(bytesValue, valuePrecision)
       return format === 'bytes-per-second' ? `${formatted}/s` : formatted
     }
 
@@ -226,7 +241,11 @@ export function ComposedChart({
       return '<1'
     }
 
-    return numberFormatter(value, valuePrecision)
+    const formatted = numberFormatter(value, valuePrecision)
+    if (typeof format === 'string' && format) {
+      return `${formatted}${format}`
+    }
+    return formatted
   }
 
   function computeHighlightedValue() {
@@ -289,7 +308,7 @@ export function ComposedChart({
   const maxAttribute = attributes.find((a) => a.isMaxValue)
   const maxAttributeData = {
     name: maxAttribute?.attribute,
-    color: CHART_COLORS.REFERENCE_LINE,
+    color: resolveChartColor(maxAttribute?.color, isDarkMode) ?? CHART_COLORS.REFERENCE_LINE,
   }
 
   const referenceLines = attributes.filter((attribute) => {
@@ -324,16 +343,12 @@ export function ComposedChart({
             const attribute = attributes.find((attr) => attr.attribute === att.name)
             return {
               ...att,
-              color: attribute?.color
-                ? isDarkMode
-                  ? attribute.color.dark
-                  : attribute.color.light
-                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
-              fill: attribute?.fill
-                ? isDarkMode
-                  ? attribute.fill.dark
-                  : attribute.fill.light
-                : STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length],
+              color:
+                resolveChartColor(attribute?.color, isDarkMode) ??
+                STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+              fill:
+                resolveChartColor(attribute?.fill, isDarkMode) ??
+                STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length],
             }
           })
       : []
@@ -362,6 +377,8 @@ export function ComposedChart({
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
     chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
+  const isSwapChart = chartData?.some((att: any) => att.name.toLowerCase().includes('swap_'))
+  const isMemoryChart = isRamChart || isSwapChart
   const isDiskSpaceChart = chartData?.some((att: any) =>
     att.name.toLowerCase().includes('disk_space_')
   )
@@ -371,7 +388,7 @@ export function ComposedChart({
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
   const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
   const shouldFormatBytes =
-    isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+    isBytesFormat || isMemoryChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   const yMaxFromVisible = Math.max(
     0,
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
@@ -409,6 +426,7 @@ export function ComposedChart({
         className={className}
         attribute={title}
         format={format}
+        docsUrl={docsUrl}
         titleTooltip={titleTooltip}
       />
     )
@@ -443,6 +461,7 @@ export function ComposedChart({
         valuePrecision={valuePrecision}
         shouldFormatBytes={shouldFormatBytes}
         isNetworkChart={isNetworkChart}
+        isMemoryChart={isMemoryChart}
         attributes={attributes}
         sql={sql}
       />
@@ -473,9 +492,22 @@ export function ComposedChart({
 
             const activeTimestamp =
               data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
+
+            const next = data[activeTooltipIndex + 1]
+            const prev = data[activeTooltipIndex - 1]
+            const prevTimestamp = prev?.[xAxisKey] ?? prev?.timestamp
+            const nextTimestamp =
+              next?.[xAxisKey] ??
+              next?.timestamp ??
+              (prevTimestamp != null && activeTimestamp != null
+                ? Number(activeTimestamp) + (Number(activeTimestamp) - Number(prevTimestamp))
+                : undefined)
+
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
               coordinates: activeLabel,
+              nextLabel: nextTimestamp?.toString(),
+              nextCoordinate: nextTimestamp,
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
@@ -530,7 +562,7 @@ export function ComposedChart({
                 <Bar
                   key={attribute.name}
                   dataKey={attribute.name}
-                  stackId={attributes?.find((a) => a.attribute === attribute?.name)?.stackId ?? '1'}
+                  stackId={getStackId(attributes, attribute?.name, '1')}
                   fill={attribute.color}
                   radius={0.75}
                   opacity={1}
@@ -546,7 +578,7 @@ export function ComposedChart({
                   key={attribute.name}
                   type="linear"
                   dataKey={attribute.name}
-                  stackId="1"
+                  stackId={getStackId(attributes, attribute.name, attribute.name)}
                   fill={`url(#gradient-${attribute.name})`}
                   fillOpacity={1}
                   stroke={attribute.color}
@@ -565,7 +597,9 @@ export function ComposedChart({
               key={maxAttribute.attribute}
               type="linear"
               dataKey={maxAttribute.attribute}
-              stroke={CHART_COLORS.REFERENCE_LINE}
+              stroke={
+                resolveChartColor(maxAttribute.color, isDarkMode) ?? CHART_COLORS.REFERENCE_LINE
+              }
               strokeWidth={2}
               strokeDasharray={maxAttribute.strokeDasharray ?? '3 3'}
               dot={false}
@@ -581,7 +615,7 @@ export function ComposedChart({
                 key={line.attribute}
                 y={line.value}
                 strokeWidth={1}
-                stroke={isDarkMode ? line.color?.dark : line.color?.light}
+                stroke={resolveChartColor(line.color, isDarkMode)}
                 strokeDasharray={line.strokeDasharray ?? '3 3'}
                 label={undefined}
               >

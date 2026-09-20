@@ -1,3 +1,5 @@
+'use client'
+
 import React, { TableHTMLAttributes, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -29,7 +31,7 @@ const Table = ({ children, ...props }: TableProps) => {
     <div className="relative">
       <span
         className={cn(
-          'block md:hidden absolute inset-0 left-auto w-5 bg-gradient-to-r from-transparent to-background transition-opacity opacity-100',
+          'block md:hidden absolute inset-0 left-auto w-5 bg-linear-to-r from-transparent to-background transition-opacity opacity-100',
           !showShadow && 'opacity-0 duration-300'
         )}
       />

@@ -1,11 +1,16 @@
 import {
+  Activity,
+  AlertTriangle,
   Box,
   Clock,
+  Database,
   Eye,
+  Gauge,
   Lock,
   LockIcon,
   Ruler,
   Scaling,
+  Server,
   Table2,
   TextSearch,
   Unlock,
@@ -14,7 +19,9 @@ import {
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
+import { asGraphqlExposureLint, GraphqlExposureLintCTA } from './GraphqlExposureLintCTA'
 import { LINTER_LEVELS, LintInfo } from '@/components/interfaces/Linter/Linter.constants'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { Lint, LINT_TYPES } from '@/data/lint/lint-query'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -24,9 +31,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Unindexed foreign keys',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/database/indexes?schema=${metadata?.schema}`,
+      `/project/${projectRef}/database/indexes?schema=${encodeURIComponent(metadata?.schema ?? '')}`,
     linkText: 'Create an index',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0001_unindexed_foreign_keys`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0001_unindexed_foreign_keys`,
     category: 'performance',
   },
   {
@@ -35,16 +42,16 @@ export const lintInfoMap: LintInfo[] = [
     icon: <Lock className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/editor`,
     linkText: 'View table',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0002_auth_users_exposed`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0002_auth_users_exposed`,
     category: 'security',
   },
   {
     name: 'auth_rls_initplan',
     title: 'Auth RLS Initialization Plan',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/auth/policies`,
+    link: ({ projectRef }) => `/project/${projectRef}/database/policies`,
     linkText: 'View policies',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0003_auth_rls_initplan`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0003_auth_rls_initplan`,
     category: 'performance',
   },
   {
@@ -53,7 +60,7 @@ export const lintInfoMap: LintInfo[] = [
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/editor`,
     linkText: 'View table',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0004_no_primary_key`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0004_no_primary_key`,
     category: 'performance',
   },
   {
@@ -61,9 +68,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Unused Index',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`,
+      `/project/${projectRef}/database/indexes?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View index',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0005_unused_index`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0005_unused_index`,
     category: 'performance',
   },
   {
@@ -71,9 +78,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Multiple Permissive Policies',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0006_multiple_permissive_policies`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0006_multiple_permissive_policies`,
     category: 'performance',
   },
   {
@@ -81,9 +88,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Policy Exists RLS Disabled',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0007_policy_exists_rls_disabled`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0007_policy_exists_rls_disabled`,
     category: 'security',
   },
   {
@@ -91,9 +98,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'RLS Enabled No Policy',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View table',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0008_rls_enabled_no_policy`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0008_rls_enabled_no_policy`,
     category: 'security',
   },
   {
@@ -101,9 +108,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Duplicate Index',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`,
+      `/project/${projectRef}/database/indexes?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View index',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0009_duplicate_index`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0009_duplicate_index`,
     category: 'performance',
   },
   {
@@ -111,9 +118,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Security Definer View',
     icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: () =>
-      `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0010_security_definer_view`,
+      `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0010_security_definer_view`,
     linkText: 'View docs',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0010_security_definer_view`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0010_security_definer_view`,
     category: 'security',
   },
   {
@@ -121,9 +128,18 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Function Search Path Mutable',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`,
+      `/project/${projectRef}/database/functions?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View functions',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0011_function_search_path_mutable`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0011_function_search_path_mutable`,
+    category: 'security',
+  },
+  {
+    name: 'auth_allow_anonymous_sign_ins',
+    title: 'Anonymous Sign-Ins Allowed',
+    icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
+    linkText: 'View settings',
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins`,
     category: 'security',
   },
   {
@@ -131,9 +147,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'RLS Disabled in Public',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0013_rls_disabled_in_public`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0013_rls_disabled_in_public`,
     category: 'security',
   },
   {
@@ -141,9 +157,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Extension in Public',
     icon: <Unlock className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/database/extensions?filter=${metadata?.name}`,
+      `/project/${projectRef}/database/extensions?filter=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View extension',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0014_extension_in_public`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0014_extension_in_public`,
     category: 'security',
   },
   {
@@ -177,27 +193,27 @@ export const lintInfoMap: LintInfo[] = [
     name: 'rls_references_user_metadata',
     title: 'RLS references user metadata',
     icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/auth/policies`,
+    link: ({ projectRef }) => `/project/${projectRef}/database/policies`,
     linkText: 'View policies',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0015_rls_references_user_metadata`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0015_rls_references_user_metadata`,
     category: 'security',
   },
   {
     name: 'materialized_view_in_api',
     title: 'Materialized View in API',
     icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: () => `${DOCS_URL}/guides/database/database-advisors?lint=0016_materialized_view_in_api`,
+    link: () => `${DOCS_URL}/guides/observability/advisors?lint=0016_materialized_view_in_api`,
     linkText: 'View docs',
-    docsLink: `${DOCS_URL}/guides/database/database-advisors?lint=0016_materialized_view_in_api`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0016_materialized_view_in_api`,
     category: 'security',
   },
   {
     name: 'foreign_table_in_api',
     title: 'Foreign Table in API',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: () => `${DOCS_URL}/guides/database/database-linter?lint=0017_foreign_table_in_api`,
+    link: () => `${DOCS_URL}/guides/observability/advisors?lint=0017_foreign_table_in_api`,
     linkText: 'View docs',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0017_foreign_table_in_api`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0017_foreign_table_in_api`,
     category: 'security',
   },
   {
@@ -205,9 +221,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Unsupported reg types',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: () =>
-      `${DOCS_URL}/guides/database/database-advisors?lint=0018_unsupported_reg_types&queryGroups=lint`,
+      `${DOCS_URL}/guides/observability/advisors?lint=0018_unsupported_reg_types&queryGroups=lint`,
     linkText: 'View docs',
-    docsLink: `${DOCS_URL}/guides/database/database-advisors?lint=0018_unsupported_reg_types&queryGroups=lint`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0018_unsupported_reg_types&queryGroups=lint`,
     category: 'security',
   },
   {
@@ -243,6 +259,16 @@ export const lintInfoMap: LintInfo[] = [
     icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/database/backups/pitr`,
     linkText: 'View settings',
+    docsLink: `${DOCS_URL}/guides/platform/backups#point-in-time-recovery`,
+    category: 'security',
+  },
+  {
+    name: 'pitr_archiving_stale',
+    title: 'PITR archiving may be broken',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/database/backups/pitr`,
+    linkText: 'View settings',
+    // anchor explains what PITR is, not how to fix a stale archive; PITR-archiving-specific docs tracked in TODO: INDATA-1149
     docsLink: `${DOCS_URL}/guides/platform/backups#point-in-time-recovery`,
     category: 'security',
   },
@@ -295,7 +321,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'vulnerable_postgres_version',
     title: 'Postgres version has security patches available',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/settings/infrastructure`,
+    link: ({ projectRef }) => getServiceVersionsPath(projectRef),
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/upgrading`,
     category: 'security',
@@ -305,9 +331,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Sensitive Columns Exposed',
     icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/editor?schema=${metadata?.schema}&table=${metadata?.name}`,
+      `/project/${projectRef}/editor?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View table',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0023_sensitive_columns_exposed`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0023_sensitive_columns_exposed`,
     category: 'security',
   },
   {
@@ -315,9 +341,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'RLS Policy Always True',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0024_permissive_rls_policy`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0024_permissive_rls_policy`,
     category: 'security',
   },
   {
@@ -329,7 +355,7 @@ export const lintInfoMap: LintInfo[] = [
       return `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId ?? metadata?.name ?? '')}`
     },
     linkText: 'View bucket',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0025_public_bucket_allows_listing`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0025_public_bucket_allows_listing`,
     category: 'security',
   },
   {
@@ -337,9 +363,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Public Can See Object in GraphQL Schema',
     icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/editor?schema=${metadata?.schema}&table=${metadata?.name}`,
+      `/project/${projectRef}/editor?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View object',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0026_pg_graphql_anon_table_exposed`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0026_pg_graphql_anon_table_exposed`,
     category: 'security',
   },
   {
@@ -347,9 +373,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Signed-In Users Can See Object in GraphQL Schema',
     icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/editor?schema=${metadata?.schema}&table=${metadata?.name}`,
+      `/project/${projectRef}/editor?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View object',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0027_pg_graphql_authenticated_table_exposed`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0027_pg_graphql_authenticated_table_exposed`,
     category: 'security',
   },
   {
@@ -357,9 +383,9 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Public Can Execute SECURITY DEFINER Function',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`,
+      `/project/${projectRef}/database/functions?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View function',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0028_anon_security_definer_function_executable`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0028_anon_security_definer_function_executable`,
     category: 'security',
   },
   {
@@ -367,10 +393,84 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Signed-In Users Can Execute SECURITY DEFINER Function',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`,
+      `/project/${projectRef}/database/functions?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View function',
-    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable`,
+    docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0029_authenticated_security_definer_function_executable`,
     category: 'security',
+  },
+  // Health lints report on the running project rather than on schema, so they link to the
+  // page that shows what is happening rather than to an object to edit.
+  {
+    name: 'instance_db_down',
+    title: 'Database process is down',
+    icon: <Database className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/logs/postgres-logs`,
+    linkText: 'View database logs',
+    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
+    category: 'health',
+  },
+  {
+    name: 'db_not_reachable',
+    title: 'Database not usable',
+    icon: <Server className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/database/settings`,
+    linkText: 'View connection settings',
+    docsLink: `${DOCS_URL}/guides/database/connecting-to-postgres`,
+    category: 'health',
+  },
+  {
+    name: 'db_connection_limit_reached',
+    title: 'Database connection limit reached',
+    icon: <Gauge className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/observability/connections`,
+    linkText: 'View connections',
+    docsLink: `${DOCS_URL}/guides/database/connection-management`,
+    category: 'health',
+  },
+  {
+    name: 'log_data_api_error_rate_high',
+    title: 'Data API error rate is persistently high',
+    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
+    linkText: 'View logs',
+    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
+    category: 'health',
+  },
+  {
+    name: 'log_auth_error_rate_high',
+    title: 'Auth error rate is persistently high',
+    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
+    linkText: 'View logs',
+    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
+    category: 'health',
+  },
+  {
+    name: 'log_storage_error_rate_high',
+    title: 'Storage error rate is persistently high',
+    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
+    linkText: 'View logs',
+    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
+    category: 'health',
+  },
+  {
+    name: 'log_edge_function_error_rate_high',
+    title: 'Edge Function error rate is persistently high',
+    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
+    linkText: 'View logs',
+    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
+    category: 'health',
+  },
+  {
+    name: 'instance_alert_firing',
+    title: 'Infrastructure alerts firing',
+    icon: <AlertTriangle className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/infrastructure`,
+    linkText: 'View infrastructure',
+    docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
+    category: 'health',
   },
 ]
 
@@ -378,10 +478,12 @@ export const LintCTA = ({
   title,
   projectRef,
   metadata,
+  onAfterAction,
 }: {
   title: LINT_TYPES
   projectRef: string
   metadata: Lint['metadata']
+  onAfterAction?: () => void
 }) => {
   const lintInfo = lintInfoMap.find((item) => item.name === title)
 
@@ -389,11 +491,23 @@ export const LintCTA = ({
     return null
   }
 
+  const graphqlExposureLintName = asGraphqlExposureLint(title)
+  if (graphqlExposureLintName) {
+    return (
+      <GraphqlExposureLintCTA
+        lintName={graphqlExposureLintName}
+        projectRef={projectRef}
+        metadata={metadata}
+        onAfterAction={onAfterAction}
+      />
+    )
+  }
+
   const link = lintInfo.link({ projectRef, metadata })
   const linkText = lintInfo.linkText
 
   return (
-    <Button asChild type="default">
+    <Button asChild>
       <Link href={link} rel="noreferrer" className="no-underline">
         {linkText}
       </Link>
@@ -409,6 +523,8 @@ export const EntityTypeIcon = ({ type }: { type: string | undefined }) => {
       return <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
     case 'auth':
       return <Lock className="text-foreground-muted" size={15} strokeWidth={1.5} />
+    case 'health':
+      return <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />
     default:
       return <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />
   }
@@ -454,6 +570,15 @@ Schema: ${schema}
 Issue Details: ${issue}
 Description: ${description}`
 }
+
+const LINTER_LEVEL_VALUES = Object.values(LINTER_LEVELS)
+
+/**
+ * The `preset` query param is user controlled, so match it against the known levels
+ * instead of trusting it to be one.
+ */
+export const parseLinterLevel = (value?: string) =>
+  LINTER_LEVEL_VALUES.find((level) => level === value)
 
 export const getLintEntityString = (metadata: Lint['metadata']) => {
   if (!metadata) {

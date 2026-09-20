@@ -43,7 +43,7 @@ _Optionally_ if you are using custom configuration with `createClient` then foll
 <TabPanel id="1.0x" label="Before">
 
 ```ts src/supabaseClient.ts
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   schema: 'custom',
   persistSession: false,
 })
@@ -53,7 +53,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 <TabPanel id="2.0x" label="After">
 
 ```ts src/supabaseClient.ts
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   db: {
     schema: 'custom',
   },

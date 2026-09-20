@@ -1,25 +1,14 @@
 'use client'
 
+import {
+  ComboBox,
+  ComboBoxOption,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.ComboBox'
 import type {
   Branch,
   Org,
   Variable,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
-
-import { Check, Copy } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import CopyToClipboard from 'react-copy-to-clipboard'
-import { withErrorBoundary } from 'react-error-boundary'
-import { proxy, useSnapshot } from 'valtio'
-
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
-import { Button_Shadcn_ as Button, cn, Input_Shadcn_ as Input } from 'ui'
-
-import {
-  ComboBox,
-  ComboBoxOption,
-} from '~/components/ProjectConfigVariables/ProjectConfigVariables.ComboBox'
 import {
   fromBranchValue,
   fromOrgProjectValue,
@@ -40,7 +29,16 @@ import {
   useProjectsInfiniteQuery,
 } from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useOnLogout } from '~/lib/userAuth'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
+import { Check, Copy } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useId, useMemo, useState } from 'react'
+import CopyToClipboard from 'react-copy-to-clipboard'
+import { withErrorBoundary } from 'react-error-boundary'
+import { Button_Shadcn_ as Button, cn, Input } from 'ui'
+import { proxy, useSnapshot } from 'valtio'
 
 type ProjectOrgDataState =
   | 'userLoading'
@@ -141,10 +139,14 @@ function OrgProjectSelector() {
         : (projects!
             .map((project) => {
               const organization = organizations!.find((org) => org.id === project.organization_id)!
+              const paused = isProjectPaused(project)
               return {
                 id: project.ref,
                 value: toOrgProjectValue(organization, project),
-                displayName: toDisplayNameOrgProject(organization, project),
+                displayName: paused
+                  ? `${toDisplayNameOrgProject(organization, project)} (paused)`
+                  : toDisplayNameOrgProject(organization, project),
+                disabled: paused,
               }
             })
             .filter(Boolean) as ComboBoxOption[]),
@@ -165,10 +167,14 @@ function OrgProjectSelector() {
 
       if (storedOrg && storedProject && storedProject.organization_id === storedOrg.id) {
         setSelectedOrgProject(storedOrg, storedProject)
-      } else if (projects!.length > 0) {
-        const firstProject = projects![0]
-        const matchingOrg = organizations!.find((org) => org.id === firstProject.organization_id)
-        if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject)
+      } else {
+        const firstActiveProject = projects!.find((project) => !isProjectPaused(project))
+        if (firstActiveProject) {
+          const matchingOrg = organizations!.find(
+            (org) => org.id === firstActiveProject.organization_id
+          )
+          if (matchingOrg) setSelectedOrgProject(matchingOrg, firstActiveProject)
+        }
       }
     }
   }, [organizations, projects, selectedOrg, selectedProject, setSelectedOrgProject, stateSummary])
@@ -297,7 +303,15 @@ function BranchSelector() {
   ) : null
 }
 
-function VariableView({ variable, className }: { variable: Variable; className?: string }) {
+function VariableView({
+  variable,
+  inputId,
+  className,
+}: {
+  variable: Variable
+  inputId: string
+  className?: string
+}) {
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
 
@@ -384,12 +398,14 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   }
 
   const { copied, handleCopy } = useCopy()
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <>
       <div className={cn('flex items-center gap-2', className)}>
         <Input
-          disabled
+          readOnly
+          id={inputId}
           type="text"
           className="font-mono"
           value={
@@ -408,12 +424,21 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             disabled={!variableValue}
             variant="ghost"
             className="px-0"
-            onClick={handleCopy}
-            aria-label="Copy"
+            onClick={() => {
+              handleCopy()
+              sendTelemetryEvent({
+                action: 'docs_project_config_variables_copy_button_clicked',
+                properties: { variable },
+              })
+            }}
+            aria-label={`Copy ${prettyFormatVariable[variable]}`}
           >
-            {copied ? <Check /> : <Copy />}
+            {copied ? <Check size="18" aria-hidden /> : <Copy size="18" aria-hidden />}
           </Button>
         </CopyToClipboard>
+        <span className="sr-only" role="status">
+          {copied ? `${prettyFormatVariable[variable]} copied` : ''}
+        </span>
       </div>
       {stateSummary === 'loggedIn.selectedProject.dataError' && (
         <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
@@ -440,7 +465,7 @@ function LoginHint({ variable }: { variable: Variable }) {
   if (isUserLoading || isLoggedIn) return null
 
   return (
-    <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
+    <p className="not-prose text-foreground-muted text-sm mt-2 mb-0 ml-1">
       To get your {prettyFormatVariable[variable]},{' '}
       <Link
         className="text-foreground-muted"
@@ -459,14 +484,21 @@ function ProjectConfigVariablesInternal({ variable }: { variable: Variable }) {
   const { clear: clearSharedStoreData } = useSnapshot(projectsStore)
   useOnLogout(clearSharedStoreData)
 
+  const inputId = useId()
+
   return (
     <div className="max-w-[min(100%, 500px)] my-6">
-      <h6 className={cn('mt-0 mb-1', 'text-foreground')}>{prettyFormatVariable[variable]}</h6>
+      <label
+        htmlFor={inputId}
+        className={cn('block mt-0 mb-1 font-heading font-semibold', 'text-foreground')}
+      >
+        {prettyFormatVariable[variable]}
+      </label>
       <div className="flex flex-wrap gap-x-6">
         <OrgProjectSelector />
         <BranchSelector />
       </div>
-      <VariableView variable={variable} className="mt-1" />
+      <VariableView variable={variable} inputId={inputId} className="mt-1" />
       <LoginHint variable={variable} />
     </div>
   )

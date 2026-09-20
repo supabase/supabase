@@ -1,4 +1,5 @@
 import { Check, PointerIcon, TrendingUp, ZapIcon } from 'lucide-react'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { cn } from 'ui'
@@ -54,7 +55,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -163,12 +164,12 @@ const data: () => {
         'Supabase includes everything you need to create the perfect app for your brand, business, or just for fun.',
       className: cn(
         '[&_div.grid]:sm:divide-x [&_div.grid]:divide-y',
-        '[&_div.grid>div:nth-child(2n+1)]:sm:!border-l-0',
-        '[&_div.grid>div:nth-child(2n+2)]:sm:!border-l',
-        '[&_div.grid>div:nth-child(2n+2)]:lg:!border-l',
-        '[&_div.grid>div:nth-child(3n+3)]:lg:!border-l-0',
-        '[&_div.grid>div:nth-child(2n+3)]:lg:!border-l',
-        '[&_div.grid>div:nth-child(2)]:lg:!border-t-0'
+        '[&_div.grid>div:nth-child(2n+1)]:sm:border-l-0!',
+        '[&_div.grid>div:nth-child(2n+2)]:sm:border-l!',
+        '[&_div.grid>div:nth-child(2n+2)]:lg:border-l!',
+        '[&_div.grid>div:nth-child(3n+3)]:lg:border-l-0!',
+        '[&_div.grid>div:nth-child(2n+3)]:lg:border-l!',
+        '[&_div.grid>div:nth-child(2)]:lg:border-t-0!'
       ),
       features: [
         {
@@ -222,7 +223,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                  bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
                 "
               />
             </div>
@@ -254,8 +255,8 @@ const data: () => {
               . Secure and trusted.
             </>
           ),
-          className: '!border-l-0 sm:!border-l sm:!border-t-0',
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          className: 'border-l-0! sm:border-l! sm:border-t-0!',
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'realtime',
@@ -267,9 +268,9 @@ const data: () => {
               <span className="text-foreground">multi-player, collaborative experiences</span>.
             </>
           ),
-          className: '!border-l-0 sm:!border-l',
+          className: 'border-l-0! sm:border-l!',
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {
@@ -277,7 +278,7 @@ const data: () => {
           title: 'Edge Functions',
           icon: MainProducts[PRODUCT_SHORTNAMES.FUNCTIONS].icon,
           subheading: <>Custom backend logic when you want to dive into code.</>,
-          className: '!border-l-0 sm:!border-l lg:!border-l-0',
+          className: 'border-l-0! sm:border-l! lg:border-l-0!',
           image: <FunctionsVisual className="" />,
         },
         {
@@ -290,7 +291,7 @@ const data: () => {
               images you need in your app.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -321,7 +322,7 @@ const data: () => {
               industry-standard tools to guide you.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}

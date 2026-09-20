@@ -100,19 +100,19 @@ export function WhatWillILearn() {
           </div>
           <div className="col-span-6">
             <ul className="grid gap-6 text-foreground-light ">
-              <li className="grid grid-cols-[auto,1fr] gap-3 border-b border-border/40 pb-3">
+              <li className="grid grid-cols-[auto_1fr] gap-3 border-b border-border/40 pb-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-md bg-brand-500/10 text-brand-500">
                   <Timer className="h-5 w-5" />
                 </span>
                 <span>Real-time room monitoring that tracks live occupancy, sensor readings</span>
               </li>
-              <li className="grid grid-cols-[auto,1fr] gap-3 border-b border-border/40 pb-3">
+              <li className="grid grid-cols-[auto_1fr] gap-3 border-b border-border/40 pb-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-md bg-brand-500/10 text-brand-500">
                   <CalendarRange className="h-5 w-5" />
                 </span>
                 <span>Booking management with live status filters, calendar integrations.</span>
               </li>
-              <li className="grid grid-cols-[auto,1fr] gap-3 border-b border-border/40 pb-3">
+              <li className="grid grid-cols-[auto_1fr] gap-3 border-b border-border/40 pb-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-md bg-brand-500/10 text-brand-500">
                   <History className="h-5 w-5" />
                 </span>
@@ -120,7 +120,7 @@ export function WhatWillILearn() {
                   Advanced analytics that surface 30+ days of utilization trends and patterns.
                 </span>
               </li>
-              <li className="grid grid-cols-[auto,1fr] gap-3">
+              <li className="grid grid-cols-[auto_1fr] gap-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-md bg-brand-500/10 text-brand-500">
                   <BarChart3 className="h-5 w-5" />
                 </span>

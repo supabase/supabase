@@ -1,43 +1,35 @@
 'use client'
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import ScrollProgress from 'components/ScrollProgress'
 import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
 import { useSendTelemetryEvent } from 'lib/telemetry'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
-import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns'
+import {
+  Button,
+  buttonVariants,
+  cn,
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from 'ui'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
+import MenuItem from './MenuItem'
+import { MobileMenu } from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
-
-const MenuItem = dynamic(() => import('./MenuItem'))
-const MobileMenu = dynamic(() => import('./MobileMenu'))
-const NavigationMenu = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenu)
-)
-const NavigationMenuContent = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuContent)
-)
-const NavigationMenuItem = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuItem)
-)
-const NavigationMenuLink = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuLink)
-)
-const NavigationMenuList = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuList)
-)
-const NavigationMenuTrigger = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuTrigger)
-)
-const ScrollProgress = dynamic(() => import('components/ScrollProgress'))
 
 interface Props {
   hideNavbar: boolean
@@ -48,26 +40,36 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const pathname = usePathname()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState('')
+  const [visibleDropdown, setVisibleDropdown] = useState('')
+  const [isSwitchingDropdown, setIsSwitchingDropdown] = useState(false)
+  const [openedDropdowns, setOpenedDropdowns] = useState<string[]>([])
+  const handleDropdownChange = (value: string) => {
+    // animate card height between two open menus only
+    setIsSwitchingDropdown(value !== '' && activeDropdown !== '')
+    setActiveDropdown(value)
+    if (value === '') return
+    setVisibleDropdown(value)
+    if (!openedDropdowns.includes(value)) setOpenedDropdowns([...openedDropdowns, value])
+  }
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const user = useUser()
   const menu = getMenu()
+  const dropdownTitles: string[] = menu.primaryNav
+    .filter((menuItem) => menuItem.hasDropdown)
+    .map((menuItem) => menuItem.title)
+  const getDropdownSide = (title: string) => {
+    if (title === visibleDropdown) return 'active'
+    return dropdownTitles.indexOf(title) < dropdownTitles.indexOf(visibleDropdown) ? 'start' : 'end'
+  }
   const sendTelemetryEvent = useSendTelemetryEvent()
   const userMenu = useDropdownMenu(user)
 
-  const isLaunchWeekXPage = pathname === '/launch-week/x'
-  const isLaunchWeek12Page = pathname === '/launch-week/12'
-  const isLaunchWeek13Page = pathname === '/launch-week/13'
   const isGAWeekSection = pathname?.startsWith('/ga-week')
   const isStateOfStartupsPage = pathname?.startsWith('/state-of-startups')
-  const disableStickyNav =
-    isLaunchWeekXPage ||
-    isGAWeekSection ||
-    isLaunchWeekXPage ||
-    isLaunchWeek12Page ||
-    isLaunchWeek13Page ||
-    !stickyNavbar
-  const showLaunchWeekNavMode = (isGAWeekSection || isLaunchWeekXPage) && !open
+  const disableStickyNav = isGAWeekSection || !stickyNavbar
+  const showLaunchWeekNavMode = isGAWeekSection && !open
 
   const [scrolled, setScrolled] = React.useState(false)
   React.useEffect(() => {
@@ -99,6 +101,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      {!isStateOfStartupsPage && <AnnouncementBanner />}
       <div
         className={cn(
           'sticky top-0 z-40 transform',
@@ -108,46 +111,68 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         style={{ transform: 'translate3d(0,0,999px)' }}
         data-nav-transparent={isTransparent ? '' : undefined}
       >
+        {isStateOfStartupsPage && <AnnouncementBanner />}
         <div
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',
-            !showLaunchWeekNavMode && !isTransparent && '!opacity-100',
-            showLaunchWeekNavMode && '!bg-transparent dark:!bg-black',
-            isGAWeekSection && 'dark:!bg-alternative',
-            isTransparent && '!bg-transparent dark:!bg-transparent !opacity-100'
+            !showLaunchWeekNavMode && !isTransparent && 'opacity-100!',
+            showLaunchWeekNavMode && 'bg-transparent! dark:bg-black!',
+            isGAWeekSection && 'dark:bg-alternative!',
+            isTransparent && 'bg-transparent! dark:bg-transparent! opacity-100!'
           )}
         />
         <nav
           className={cn(
-            `relative z-40 border-default border-b backdrop-blur-sm transition-all duration-300`,
+            `relative z-40 border-default border-b backdrop-blur-xs transition-all duration-300`,
             showLaunchWeekNavMode && 'border-muted border-b bg-transparent',
             isTransparent && 'border-transparent backdrop-blur-none'
           )}
         >
-          <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
-            <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
+          <div className="section-container relative flex justify-between h-16">
+            <div className="flex items-center flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center shrink-0">
                   <RightClickBrandLogo />
                 </div>
                 <NavigationMenu
                   delayDuration={0}
-                  className="hidden pl-8 sm:space-x-4 lg:flex h-16"
-                  viewportClassName="rounded-xl bg-background"
+                  value={activeDropdown}
+                  onValueChange={handleDropdownChange}
+                  renderViewport={false}
+                  className="static hidden pl-8 lg:flex h-16 items-stretch"
                 >
-                  <NavigationMenuList>
+                  <NavigationMenuList className="h-full space-x-0 items-stretch">
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
-                        <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
+                        <NavigationMenuItem
+                          className="text-sm font-medium"
+                          key={menuItem.title}
+                          value={menuItem.title}
+                        >
                           <NavigationMenuTrigger
                             className={cn(
-                              buttonVariants({ type: 'text', size: 'small' }),
-                              '!bg-transparent hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground px-2 h-auto'
+                              buttonVariants({ variant: 'text', size: 'small' }),
+                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2.5 h-full'
                             )}
                           >
                             {menuItem.title}
                           </NavigationMenuTrigger>
-                          <NavigationMenuContent>{menuItem.dropdown}</NavigationMenuContent>
+                          <NavigationMenuContent
+                            forceMount
+                            inert={visibleDropdown !== menuItem.title}
+                            data-active={visibleDropdown === menuItem.title}
+                            data-side={getDropdownSide(menuItem.title)}
+                            className={cn(
+                              'md:w-full data-[motion^=from-]:animate-none! data-[motion^=to-]:animate-none!',
+                              'data-[active=false]:pointer-events-none data-[active=false]:opacity-0',
+                              'data-[side=start]:-translate-x-4 data-[side=end]:translate-x-4',
+                              'motion-safe:group-data-[switching=true]/viewport:transition-[opacity,translate]',
+                              'motion-safe:group-data-[switching=true]/viewport:duration-250',
+                              'motion-safe:group-data-[switching=true]/viewport:ease-in-out'
+                            )}
+                          >
+                            {openedDropdowns.includes(menuItem.title) ? menuItem.dropdown : null}
+                          </NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
@@ -155,7 +180,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                             <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
-                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link"
+                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link px-2.5 h-full"
                               hoverColor="brand"
                             />
                           </NavigationMenuLink>
@@ -163,9 +188,25 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       )
                     )}
                   </NavigationMenuList>
+                  <NavigationMenuViewport
+                    forceMount
+                    data-open={activeDropdown !== ''}
+                    data-switching={isSwitchingDropdown}
+                    containerProps={{ className: 'inset-x-0' }}
+                    className={cn(
+                      'group/viewport origin-top scale-100 rounded-xl bg-surface-75 md:w-[960px]',
+                      'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
+                      'data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200',
+                      'data-[open=false]:invisible data-[open=false]:scale-[0.97] data-[open=false]:opacity-0',
+                      'data-[open=false]:pointer-events-none',
+                      'motion-safe:transition-[opacity,scale,visibility]',
+                      'motion-safe:data-[switching=true]:transition-[height,opacity,scale,visibility]',
+                      'motion-reduce:transition-none'
+                    )}
+                  />
                 </NavigationMenu>
               </div>
-              <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
+              <div className="flex items-center gap-2 opacity-0 animate-fade-in scale-100! delay-300">
                 <div
                   className={cn(
                     'flex items-center gap-2 transition-opacity',
@@ -183,7 +224,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     </>
                   ) : (
                     <>
-                      <Button type="default" className="hidden lg:block" asChild>
+                      <Button className="hidden lg:block" asChild>
                         <Link
                           href="https://supabase.com/dashboard"
                           onClick={() =>
@@ -196,7 +237,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           Sign in
                         </Link>
                       </Button>
-                      <Button className="hidden lg:block" asChild>
+                      <Button variant="primary" className="hidden lg:block" asChild>
                         <Link
                           href="https://supabase.com/dashboard/sign-up"
                           onClick={() =>

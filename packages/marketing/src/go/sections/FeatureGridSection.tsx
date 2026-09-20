@@ -7,7 +7,7 @@ export default function FeatureGridSection({ section }: { section: GoFeatureGrid
   const hasSecondRow = items.length > columns
 
   return (
-    <div className="max-w-[80rem] mx-auto px-8">
+    <div className="max-w-7xl mx-auto px-8">
       {(section.title || section.description) && (
         <div className="mb-12">
           {section.title && (

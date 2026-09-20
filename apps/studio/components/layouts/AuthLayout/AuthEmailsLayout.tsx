@@ -23,7 +23,7 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   ]
 
   return (
-    <AuthLayout title="Email">
+    <AuthLayout title="Emails">
       {showEmails ? (
         <PageLayout
           title="Emails"

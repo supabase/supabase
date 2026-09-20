@@ -24,7 +24,7 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <DevToolbarProvider apiUrl={API_URL}>
             <PageTelemetry />
             <ScrollRestoration />
-            <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+            <ThemeProvider>
               <TooltipProvider delayDuration={0}>
                 <DocsCommandProvider>
                   <div className="flex flex-col">

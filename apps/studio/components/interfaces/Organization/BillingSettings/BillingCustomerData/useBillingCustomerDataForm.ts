@@ -166,6 +166,7 @@ export function useBillingCustomerDataForm({
 
     const taxIdValues = form.getValues()
     const selectedTaxId = TAX_IDS.find((option) => option.name === taxIdValues.tax_id_name)
+    const taxIdValue = taxIdValues.tax_id_value?.trim() ?? ''
 
     const payload = {
       address: {
@@ -178,11 +179,11 @@ export function useBillingCustomerDataForm({
       },
       billing_name: address.name.trim(),
       tax_id:
-        selectedTaxId && taxIdValues.tax_id_type?.length && taxIdValues.tax_id_value?.length
+        selectedTaxId && taxIdValues.tax_id_type?.length && taxIdValue.length
           ? {
               type: taxIdValues.tax_id_type,
               value: sanitizeTaxIdValue({
-                value: taxIdValues.tax_id_value,
+                value: taxIdValue,
                 name: taxIdValues.tax_id_name,
               }),
               country: getEffectiveTaxCountry(selectedTaxId),

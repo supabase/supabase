@@ -1,21 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { useFlag } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input, Input_Shadcn_ } from 'ui'
+import { Form, FormControl, FormField, Input } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import { RecoveryCodesModal } from './RecoveryCodesModal'
 import InformationBox from '@/components/ui/InformationBox'
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useRecoveryCodesGenerateMutation } from '@/data/recovery-codes/recovery-codes-generate-mutation'
+import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 
 type TOTP = { qr_code: string; secret: string; uri: string }
 
@@ -26,6 +30,15 @@ interface AddNewFactorModalProps {
 
 export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   const { data, mutate: enroll, isPending: isEnrolling, reset } = useMfaEnrollMutation()
+  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
+  const { isPending: isRecoveryCodesStatusPending, refetch: refetchRecoveryCodesStatus } =
+    useRecoveryCodesStatusQuery({
+      enabled: enableAuthRecoveryCodes,
+    })
+
+  const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation()
+
+  const [isRecoveryCodesModalOpen, setIsRecoveryCodesModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     if (!visible) reset()
@@ -35,7 +48,7 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
     <>
       <FirstStep
         visible={visible && !Boolean(data)}
-        isEnrolling={isEnrolling}
+        isEnrolling={isEnrolling || (enableAuthRecoveryCodes && isRecoveryCodesStatusPending)}
         enroll={enroll}
         reset={reset}
         onClose={onClose}
@@ -44,8 +57,24 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
         visible={visible && Boolean(data)}
         factorName={data?.friendly_name ?? ''}
         factor={data as Extract<typeof data, { type: 'totp' }>}
-        isLoading={isEnrolling}
-        onClose={onClose}
+        isLoading={isEnrolling || (enableAuthRecoveryCodes && isRecoveryCodesStatusPending)}
+        onClose={async () => {
+          if (enableAuthRecoveryCodes) {
+            const { data: currentRecoveryCodesStatus } = await refetchRecoveryCodesStatus()
+            const shouldGenerateRecoveryCodes = currentRecoveryCodesStatus?.status === 'unenrolled'
+
+            if (shouldGenerateRecoveryCodes) {
+              recoveryCodesGenerateMutation.mutate({})
+              setIsRecoveryCodesModalOpen(true)
+            }
+          }
+          onClose()
+        }}
+      />
+      <RecoveryCodesModal
+        open={isRecoveryCodesModalOpen}
+        onOpenChange={(open) => setIsRecoveryCodesModalOpen(open)}
+        mutation={recoveryCodesGenerateMutation}
       />
     </>
   )
@@ -59,25 +88,28 @@ interface FirstStepProps {
   onClose: () => void
 }
 
+const ENROLL_FORM_ID = 'add-totp-factor-form'
+
+const EnrollFormSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required'),
+})
+type EnrollFormValues = z.infer<typeof EnrollFormSchema>
+
+const enrollFormDefaultValues: EnrollFormValues = { name: '' }
+
 const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) => {
-  const FormSchema = z.object({
-    name: z.string().min(1, 'Please provide a name to identify this app'),
-  })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: { name: '' },
+  const form = useForm<EnrollFormValues>({
+    resolver: zodResolver(EnrollFormSchema),
+    defaultValues: enrollFormDefaultValues,
     mode: 'onChange',
   })
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<EnrollFormValues> = async (values) => {
     enroll({ factorType: 'totp', friendlyName: values.name })
   }
 
   useEffect(() => {
-    if (!visible) {
-      // Generate a name with a number between 0 and 1000
-      form.reset({ name: `App ${Math.floor(Math.random() * 1000)}` })
-    }
+    if (visible) form.reset(enrollFormDefaultValues)
   }, [form, visible])
 
   return (
@@ -93,7 +125,7 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
     >
       <Form {...form}>
         <form
-          id="verify-otp-form"
+          id={ENROLL_FORM_ID}
           className="flex flex-col gap-4"
           onSubmit={form.handleSubmit(onSubmit)}
         >
@@ -104,11 +136,11 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
             render={({ field }) => (
               <FormItemLayout
                 name="name"
-                label="Provide a name to identify this app"
-                description="A string will be randomly generated if a name is not provided"
+                label="Authenticator app name"
+                description="Used to identify the app in your account settings and during sign-in."
               >
                 <FormControl>
-                  <Input_Shadcn_ id="name" {...field} />
+                  <Input placeholder="e.g.: Google Authenticator" autoFocus {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -139,10 +171,7 @@ const SecondStep = ({
   onClose,
 }: SecondStepProps) => {
   const queryClient = useQueryClient()
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const FormSchema = z.object({
     code: z.string().min(1, 'Please provide a code from your authenticator app'),
@@ -217,7 +246,7 @@ const SecondStep = ({
       {factor && (
         <div className="flex flex-col gap-y-4">
           <div className="flex justify-center py-6">
-            <div className="h-48 w-48 bg-white rounded">
+            <div className="h-48 w-48 bg-white rounded-sm">
               <img width={190} height={190} src={factor.totp.qr_code} alt={factor.totp.uri} />
             </div>
           </div>
@@ -225,14 +254,12 @@ const SecondStep = ({
           <InformationBox
             title="Unable to scan?"
             description={
-              <Input
-                copy
-                disabled
-                id="ref"
-                size="small"
+              <FormItemLayout
+                isReactForm={false}
                 label="You can also enter this secret key into your authenticator app"
-                value={factor.totp.secret}
-              />
+              >
+                <PasswordInput copy disabled id="ref" size="small" value={factor.totp.secret} />
+              </FormItemLayout>
             }
           />
 
@@ -247,15 +274,9 @@ const SecondStep = ({
                 name="code"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout name="code" label="Authentication code">
+                  <FormItemLayout label="Authentication code">
                     <FormControl>
-                      <Input_Shadcn_
-                        id="code"
-                        autoFocus
-                        {...field}
-                        placeholder="XXXXXX"
-                        className="font-mono"
-                      />
+                      <Input autoFocus {...field} placeholder="XXXXXX" className="font-mono" />
                     </FormControl>
                   </FormItemLayout>
                 )}

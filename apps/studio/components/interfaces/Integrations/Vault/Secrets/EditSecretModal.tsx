@@ -16,7 +16,8 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
+  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -143,9 +144,9 @@ export const EditSecretModal = () => {
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name">
+                      <FormItemLayout label="Name">
                         <FormControl>
-                          <Input_Shadcn_ id="name" {...field} />
+                          <Input {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -155,13 +156,9 @@ export const EditSecretModal = () => {
                     name="description"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout
-                        name="description"
-                        label="Description"
-                        labelOptional="Optional"
-                      >
+                      <FormItemLayout label="Description" labelOptional="Optional">
                         <FormControl>
-                          <Input_Shadcn_ id="description" {...field} data-lpignore="true" />
+                          <Input {...field} data-lpignore="true" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -171,27 +168,42 @@ export const EditSecretModal = () => {
                     name="secret"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="secret" label="Secret value">
-                        <FormControl>
-                          <div className="relative">
-                            <Input_Shadcn_
-                              id="secret"
-                              type={showSecretValue ? 'text' : 'password'}
+                      <FormItemLayout label="Secret value">
+                        <div className="relative">
+                          <FormControl>
+                            <Textarea
                               {...field}
+                              rows={1}
+                              ref={(el) => {
+                                field.ref(el)
+                                if (el) {
+                                  el.style.height = 'auto'
+                                  el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                                }
+                              }}
                               data-lpignore="true"
-                            />
-                            <Button
-                              type="default"
-                              title={showSecretValue ? `Hide secret value` : `Show secret value`}
-                              aria-label={
-                                showSecretValue ? `Hide secret value` : `Show secret value`
+                              className="min-h-0 resize-none"
+                              style={
+                                {
+                                  WebkitTextSecurity: showSecretValue ? undefined : 'disc',
+                                } as React.CSSProperties
                               }
-                              className="absolute right-1 top-1 w-7"
-                              icon={showSecretValue ? <EyeOff /> : <Eye />}
-                              onClick={() => setShowSecretValue(!showSecretValue)}
+                              onChange={(e) => {
+                                field.onChange(e)
+                                e.currentTarget.style.height = 'auto'
+                                e.currentTarget.style.height =
+                                  Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                              }}
                             />
-                          </div>
-                        </FormControl>
+                          </FormControl>
+                          <Button
+                            title={showSecretValue ? `Hide secret value` : `Show secret value`}
+                            aria-label={showSecretValue ? `Hide secret value` : `Show secret value`}
+                            className="absolute right-1 top-1 w-7"
+                            icon={showSecretValue ? <EyeOff /> : <Eye />}
+                            onClick={() => setShowSecretValue(!showSecretValue)}
+                          />
+                        </div>
                       </FormItemLayout>
                     )}
                   />
@@ -200,7 +212,6 @@ export const EditSecretModal = () => {
             </DialogSection>
             <DialogFooter>
               <Button
-                type="default"
                 disabled={isSubmitting}
                 onClick={() => {
                   form.reset()
@@ -209,7 +220,7 @@ export const EditSecretModal = () => {
               >
                 Cancel
               </Button>
-              <Button form={formId} htmlType="submit" loading={isSubmitting}>
+              <Button variant="primary" form={formId} type="submit" loading={isSubmitting}>
                 Update secret
               </Button>
             </DialogFooter>

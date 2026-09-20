@@ -92,7 +92,7 @@ supabase db reset
 
 This command recreates your local database from scratch and applies all migration scripts under `supabase/migrations` directory. Now your local database is up to date.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 The new migration command also supports stdin as input. This allows you to pipe in an existing script from another file or stdout:
 
@@ -146,7 +146,7 @@ This is because the default schema diff tool does not account for default privil
 
 Commit the new migration script to git and you are ready to deploy.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Alternatively, you may pass in the `--use-migra` experimental flag to generate a more concise migration using [`migra`](https://github.com/djrobstep/migra).
 

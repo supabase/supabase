@@ -10,6 +10,7 @@ type JitDbAccessGrantVariables = {
   userId: string
   roles: Array<{
     role: string
+    branches_only?: boolean
     expires_at?: number // Unix timestamp in seconds per role
     allowed_networks?: {
       allowed_cidrs?: Array<{ cidr: string }>
@@ -57,7 +58,7 @@ export const useJitDbAccessGrantMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to grant JIT database access: ${data.message}`)
+        toast.error(`Failed to grant temporary access: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

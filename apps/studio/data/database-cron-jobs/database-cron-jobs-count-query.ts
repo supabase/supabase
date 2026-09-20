@@ -1,7 +1,8 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseCronJobsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type DatabaseCronJobsCountVariables = {
@@ -9,7 +10,7 @@ type DatabaseCronJobsCountVariables = {
   connectionString?: string | null
 }
 
-const cronJobCountSql = `select count(jobid) from cron.job;`.trim()
+const cronJobCountSql = safeSql`select count(jobid) from cron.job;`
 
 export async function getDatabaseCronJobsCount({
   projectRef,

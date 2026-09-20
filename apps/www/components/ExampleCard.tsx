@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
-import { useBreakpoint } from 'common'
-
-import { Button } from 'ui'
-import Panel from './Panel'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useBreakpoint } from 'common'
+import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Button } from 'ui'
+
+import Panel from './Panel'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
@@ -34,7 +34,7 @@ function ExampleCard(props: any) {
       <Panel outerClassName="h-full" innerClassName="bg-surface-75 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           {props.tags && (
-            <div className="relative w-full aspect-[3/1] bg flex items-center justify-center gap-4 overflow-hidden">
+            <div className="relative w-full aspect-3/1 bg flex items-center justify-center gap-4 overflow-hidden">
               {props.tags.map((tag: string) => {
                 const framework = frameworks.find((f) => f.name === tag)
                 if (!framework) return null
@@ -54,7 +54,7 @@ function ExampleCard(props: any) {
                         fillRule="evenodd"
                         clipRule="evenodd"
                         d={framework.icon}
-                        fill="hsl(var(--foreground-lighter))"
+                        fill="var(--foreground-lighter)"
                       />
                     </svg>
                   </div>
@@ -111,12 +111,12 @@ function ExampleCard(props: any) {
               {props.repo_url && (
                 <Button
                   size="tiny"
-                  type="text"
-                  className="group overflow-hidden text-foreground-lighter group-hover/panel:text-foreground !bg-transparent !p-0"
+                  variant="text"
+                  className="group overflow-hidden text-foreground-lighter group-hover/panel:text-foreground bg-transparent! p-0!"
                   iconRight={
                     <div className="relative w-3.5 h-3.5 flex items-center justify-center">
                       <ArrowUpRight className="absolute w-3.5 h-3.5 inset-0 transition-transform duration-200 translate-x-0 translate-y-0 group-hover/panel:translate-x-6 group-hover/panel:-translate-y-6" />
-                      <ArrowUpRight className="absolute w-3.5 h-3.5 inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover/panel:translate-x-0 group-hover/panel:-translate-y-0" />
+                      <ArrowUpRight className="absolute w-3.5 h-3.5 inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover/panel:translate-x-0 group-hover/panel:translate-y-0" />
                     </div>
                   }
                 >

@@ -2,9 +2,9 @@ import { useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -103,14 +103,14 @@ export function ProjectBranchSelector() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger asChild>
             <ProjectBranchSelectorTrigger {...triggerProps} />
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-[780px]" side="bottom" align="start">
+          </PopoverTrigger>
+          <PopoverContent className="p-0 w-[780px]" side="bottom" align="start">
             <ProjectBranchSelectorPopover onClose={() => setOpen(false)} />
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       </SidebarMenuItem>
     </SidebarMenu>
   )

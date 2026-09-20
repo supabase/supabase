@@ -1,0 +1,26 @@
+---
+id: 'ai-tools'
+title: 'AI Tools'
+subtitle: 'Connect your AI coding agent to Supabase.'
+---
+
+Supabase provides everything you need to connect an AI coding agent to your project: a live connection to your database and platform (MCP), portable instructions your agent can reuse (Agent Skills), a one-step bundle of both (Plugin), and copy-paste prompts for tools that don't support any of the above.
+
+<Admonition type="note">
+
+See how these tools perform on real Supabase tasks in [Supabase Evals](/evals), our open-source benchmark for AI coding agents.
+
+</Admonition>
+
+## Pick your agent
+
+<ContentListings id="ai-tools-supported-agents" />
+
+## Key concepts
+
+- **MCP (Model Context Protocol)**: a live connection between your agent and your actual Supabase project. Once connected, your agent can call tools to query data, run migrations, deploy Edge Functions, and more.
+- **Agent Skills**: portable, on-demand instructions your agent loads when it needs Supabase- or Postgres-specific procedural knowledge. Skills don't require a live connection, and work across different agents.
+- **Plugin**: a single install that bundles the MCP server and Agent Skills together for a specific agent.
+- **Prompts**: static prompt files you copy into your project for agents that don't support MCP, plugins, or skills natively.
+
+<ContentListings id="ai-tools-building-into-app" />

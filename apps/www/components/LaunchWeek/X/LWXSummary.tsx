@@ -30,14 +30,14 @@ const LWXSummary = () => {
           {mainDays.map(
             (day, i: number) =>
               day.shipped && (
-                <ol key={day.id}>
+                <li key={day.id}>
                   <Link href={day.blog} className="group flex py-1 gap-2 hover:text-foreground">
                     <span className="shrink-0 text-sm font-mono uppercase leading-6">
                       Day {i + 1} -
                     </span>
                     <span className="leading-6">{day.description}</span>
                   </Link>
-                </ol>
+                </li>
               )
           )}
         </ul>
@@ -51,7 +51,7 @@ const LWXSummary = () => {
             {buildDays.map(
               (day, i: number) =>
                 day.is_shipped && (
-                  <ol key={day.id}>
+                  <li key={day.id}>
                     <Link
                       href={day.links[0].url}
                       className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
@@ -64,25 +64,25 @@ const LWXSummary = () => {
                         {day.title}
                       </span>
                     </Link>
-                  </ol>
+                  </li>
                 )
             )}
-            <ol className="border-t pt-4 mt-2">
+            <li className="border-t pt-4 mt-2">
               <Link
                 href="/blog/supabase-hackathon-lwx"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
                 Supabase Launch Week X Hackathon
               </Link>
-            </ol>
-            <ol>
+            </li>
+            <li>
               <Link
                 href="/blog/community-meetups-lwx"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
                 Supabase Launch Week X Community Meetups
               </Link>
-            </ol>
+            </li>
           </ul>
         </div>
       </div>

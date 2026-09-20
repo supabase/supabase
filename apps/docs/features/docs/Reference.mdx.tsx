@@ -1,13 +1,14 @@
-import matter from 'gray-matter'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { type ComponentProps } from 'react'
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { components } from '~/features/docs/MdxBase.shared'
 import { RefSubLayout } from '~/features/docs/Reference.ui'
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import { REF_DOCS_DIRECTORY } from '~/lib/docs'
+import matter from 'gray-matter'
+import { type ComponentProps } from 'react'
+
 import { CodeBlock } from '../ui/CodeBlock/CodeBlock'
 
 async function getRefMarkdownInternal(relPath: string) {
@@ -40,18 +41,22 @@ const getRefMarkdown = cache_fullProcess_withDevCacheBust(
 
 interface MDXRemoteRefsProps {
   source: string
+  codeBlockProps?: Partial<ComponentProps<typeof CodeBlock>>
 }
 
-function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
+function MDXRemoteRefs({ source, codeBlockProps }: MDXRemoteRefsProps) {
   const refComponents = {
     ...components,
     // Override the CodeBlock used for normal guides to skip type generation
     // because it is too resource-intensive
-    pre: (props: ComponentProps<typeof CodeBlock>) => <CodeBlock {...props} skipTypeGeneration />,
+    pre: (props: ComponentProps<typeof CodeBlock>) => (
+      <CodeBlock {...props} {...codeBlockProps} skipTypeGeneration />
+    ),
     RefSubLayout,
     CliGlobalFlagsHandler,
   }
 
+  // @ts-expect-error: Gildas - This is because RefSubLayout is a namespace containing multiple components. It works but the MDXClient types are stricter
   return <MDXRemoteBase source={source} components={refComponents} />
 }
 

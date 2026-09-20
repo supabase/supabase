@@ -8,7 +8,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   SidePanel,
   Switch,
 } from 'ui'
@@ -51,6 +51,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: initialValues,
   })
 
   const { mutate: createDatabaseRole, isPending: isCreating } = useDatabaseRoleCreateMutation({
@@ -108,7 +109,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                   Name
                 </FormLabel>
                 <FormControl className="col-span-8">
-                  <Input_Shadcn_ {...field} className="w-full" />
+                  <Input {...field} className="w-full" />
                 </FormControl>
                 <FormMessage className="col-start-5 col-span-8" />
               </FormItem>

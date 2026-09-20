@@ -2,7 +2,18 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Trash } from 'lucide-react'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { Button, FormControl, FormField, FormItem, FormLabel, FormMessage, Input_Shadcn_ } from 'ui'
+import {
+  Button,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 interface EnumeratedTypeValueRowProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -49,22 +60,30 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
                 {...attributes}
                 {...listeners}
                 className={`opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab ${
-                  isDisabled ? 'text-foreground-lighter !cursor-default' : 'text-foreground'
+                  isDisabled ? 'text-foreground-lighter cursor-default!' : 'text-foreground'
                 }`}
                 type="button"
+                tabIndex={isDisabled ? -1 : 0}
                 disabled={isDisabled}
               >
                 <GripVertical size={16} strokeWidth={1.5} />
               </button>
-              <Input_Shadcn_ {...inputField} className="w-full" />
-              <Button
-                type="default"
-                size="small"
-                disabled={isDisabled}
-                icon={<Trash strokeWidth={1.5} size={16} />}
-                className="px-2"
-                onClick={() => onRemoveValue()}
-              />
+              <Input {...inputField} className="w-full" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="small"
+                    disabled={isDisabled}
+                    icon={<Trash strokeWidth={1.5} size={16} />}
+                    className="px-2"
+                    onClick={() => onRemoveValue()}
+                    aria-label="Remove value"
+                    // Tooltip repeats the label; the description would read the name twice
+                    aria-describedby={undefined}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Remove value</TooltipContent>
+              </Tooltip>
             </div>
           </FormControl>
           <FormMessage className="ml-6" />

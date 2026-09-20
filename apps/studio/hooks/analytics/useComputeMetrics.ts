@@ -13,7 +13,7 @@ export type ComputeMetrics = {
   cpu: number
   disk: number
   memory: number
-  connections: { current: number; max: number }
+  connections: { peak: number; max: number }
   isLoading: boolean
   isError: boolean
 }
@@ -23,7 +23,6 @@ export function useComputeMetrics({ projectRef }: { projectRef?: string }): Comp
 
   // Intentionally anchored to mount time so the query key stays stable across re-renders.
   // React Query's staleTime handles background refresh without shifting the window.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { startDate, endDate } = useMemo(() => {
     const now = dayjs()
     return {

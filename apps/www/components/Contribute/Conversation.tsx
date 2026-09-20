@@ -26,7 +26,7 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
     <div className="flex flex-col gap-10">
       {/* Title, Question, and First Reply Section */}
       {question && question.content && (
-        <div className="bg-surface-200 p-[var(--card-padding-x)] rounded-lg flex flex-col gap-6">
+        <div className="bg-surface-200 p-(--card-padding-x) rounded-lg flex flex-col gap-6">
           {/* Platform, Date, Author, Title */}
           <header className="flex flex-col gap-3">
             {/* Platform, Date, Author - logo spans both rows; platform/date and author link out */}
@@ -87,7 +87,7 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
           </header>
 
           {/* Question */}
-          <div className="border border-border rounded-lg p-6 bg-surface-100 min-w-0 shadow-sm">
+          <div className="border border-border rounded-lg p-6 bg-surface-100 min-w-0 shadow-xs">
             <div className="text-foreground min-w-0">
               <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                 {question.content}

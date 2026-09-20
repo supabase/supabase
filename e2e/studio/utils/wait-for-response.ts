@@ -109,6 +109,16 @@ export async function waitForDatabaseToLoad(page: Page, ref: string, schema?: st
     page,
     'pg-meta',
     ref,
-    `tables?include_columns=true&included_schemas=${databaseSchema}`
+    `query?key=project:default-schema:${databaseSchema}-infinite_tables`
+  )
+}
+
+export async function waitForSchemaVisualizerToLoad(page: Page, ref: string, schema?: string) {
+  const databaseSchema = schema || 'public'
+  return await waitForApiResponse(
+    page,
+    'pg-meta',
+    ref,
+    `query?key=project:default-schema:${schema ?? 'public'}-infinite_tables`
   )
 }

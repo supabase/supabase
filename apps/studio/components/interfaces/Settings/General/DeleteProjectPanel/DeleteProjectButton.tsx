@@ -7,10 +7,10 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface DeleteProjectButtonProps {
-  type?: 'danger' | 'default'
+  variant?: 'danger' | 'default'
 }
 
-export const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
+export const DeleteProjectButton = ({ variant = 'danger' }: DeleteProjectButtonProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -21,7 +21,7 @@ export const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProp
   return (
     <>
       <ButtonTooltip
-        type={type}
+        variant={variant}
         disabled={!canDeleteProject}
         onClick={() => setIsOpen(true)}
         tooltip={{

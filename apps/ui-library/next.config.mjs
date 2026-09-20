@@ -1,5 +1,3 @@
-import { withContentlayer } from 'next-contentlayer2'
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
@@ -11,6 +9,9 @@ const nextConfig = {
         as: '*.js',
       },
     },
+  },
+  outputFileTracingIncludes: {
+    '/api/docs-md/**/*': ['./public/markdown/docs/**/*'],
   },
   async redirects() {
     return [
@@ -32,10 +33,6 @@ const nextConfig = {
       },
     ]
   },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
-  },
 }
 
-export default withContentlayer(nextConfig)
+export default nextConfig

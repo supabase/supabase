@@ -60,7 +60,6 @@ export const ForeignKeyRow = ({
             </p>
             <Button
               asChild
-              type="default"
               title={`${foreignKey.schema}.${foreignKey.table}`}
               className="py-0.5 px-1.5 font-mono"
               icon={
@@ -71,7 +70,7 @@ export const ForeignKeyRow = ({
                   preProcessor={(code: any) =>
                     code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
                   }
-                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-sm" />}
+                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-xs" />}
                   cacheRequests={true}
                 />
               }
@@ -105,17 +104,11 @@ export const ForeignKeyRow = ({
       </div>
       {!disabled && (
         <div className="flex items-center gap-x-2">
-          <Button type="default" onClick={onSelectEdit}>
-            Edit
-          </Button>
+          <Button onClick={onSelectEdit}>Edit</Button>
           {foreignKey.toRemove ? (
-            <Button type="default" onClick={onSelectUndoRemove}>
-              Cancel remove
-            </Button>
+            <Button onClick={onSelectUndoRemove}>Cancel remove</Button>
           ) : (
-            <Button type="default" onClick={onSelectRemove}>
-              Remove
-            </Button>
+            <Button onClick={onSelectRemove}>Remove</Button>
           )}
         </div>
       )}

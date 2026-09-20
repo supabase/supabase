@@ -24,15 +24,36 @@ export const gettingStarted: SidebarNavGroup = {
   ],
 }
 
-export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Skills',
+export const starterApps: SidebarNavGroup = {
+  title: 'Starter Apps',
   items: [
     {
-      title: 'Skills',
-      href: '/docs/ai-editors-rules/skills',
+      title: 'Next.js Starter',
+      href: '/docs/starters/nextjs-starter',
       items: [],
       new: true,
-      commandItemLabel: 'AI Skills',
+      commandItemLabel: 'Next.js Starter',
+    },
+    {
+      title: 'SaaS Starter',
+      href: '/docs/starters/saas-starter',
+      items: [],
+      new: true,
+      commandItemLabel: 'SaaS Starter',
+    },
+    {
+      title: 'AI Chat App',
+      href: '/docs/starters/ai-chat-app',
+      items: [],
+      new: true,
+      commandItemLabel: 'AI Chat App',
+    },
+    {
+      title: 'Flutter Starter',
+      href: '/docs/starters/flutter-starter',
+      items: [],
+      new: true,
+      commandItemLabel: 'Flutter Starter',
     },
   ],
 }
@@ -45,6 +66,41 @@ export const platformBlocks: SidebarNavGroup = {
       href: '/docs/platform/platform-kit',
       items: [],
       commandItemLabel: 'Platform Kit',
+    },
+  ],
+}
+
+export const oauthBlocks: SidebarNavGroup = {
+  title: 'OAuth',
+  items: [
+    {
+      title: 'OAuth Consent',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/oauth-consent',
+      items: [],
+      new: true,
+      commandItemLabel: 'OAuth Consent',
+    },
+  ],
+}
+
+export const mcpBlocks: SidebarNavGroup = {
+  title: 'MCP',
+  items: [
+    {
+      title: 'MCP Server',
+      href: '/docs/headless/mcp-server',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Server',
+    },
+    {
+      title: 'Headless App',
+      supportedFrameworks: ['tanstack'],
+      href: '/docs/tanstack/headless-app',
+      items: [],
+      new: true,
+      commandItemLabel: 'Headless App',
     },
   ],
 }
@@ -94,7 +150,16 @@ export const componentPages: SidebarNavGroup = {
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/realtime-monaco',
       items: [],
+      new: true,
       commandItemLabel: 'Realtime Monaco',
+    },
+    {
+      title: 'Realtime Flow',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-flow',
+      items: [],
+      new: true,
+      commandItemLabel: 'Realtime Flow',
     },
     {
       title: 'Current User Avatar',
@@ -112,18 +177,18 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Realtime Chat',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-chat',
       items: [],
       commandItemLabel: 'Realtime Chat',
     },
     {
-      title: 'Infinite Query Hook',
-      supportedFrameworks: [],
-      href: '/docs/infinite-query-hook',
+      title: 'Infinite Query',
+      supportedFrameworks: ['react', 'vue'],
+      href: '/docs/react/infinite-query',
       new: true,
       items: [],
-      commandItemLabel: 'Infinite Query Hook',
+      commandItemLabel: 'Infinite Query',
     },
   ],
 }
@@ -133,11 +198,19 @@ export const COMMAND_ITEMS = [
     label: item.commandItemLabel,
     href: item.href,
   })),
-  ...aiEditorsRules.items.map((item) => ({
+  ...starterApps.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),
   ...componentPages.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
+  })),
+  ...oauthBlocks.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
+  })),
+  ...mcpBlocks.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),

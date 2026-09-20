@@ -9,7 +9,7 @@ This feature is only available on the [Team and Enterprise Plans](/pricing). If 
 
 </Admonition>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
@@ -64,7 +64,7 @@ First you need to download Supabase's SAML metadata file. Click the button below
 
 Alternatively, visit this page to initiate a download: `https://alt.supabase.io/auth/v1/sso/saml/metadata?download=true`
 
-Click on the _Upload metadata file_ option in the toolbar and select the file you just downloaded.
+Click on the _Upload metadata file_ option in the toolbar and select the file you downloaded.
 
 ![Azure AD console: Supabase application, SAML-based Sign-on screen, selected Upload metadata file button](/docs/img/sso-azure-step-06-1.png)
 
@@ -128,13 +128,13 @@ Fill out the Attribute Mapping section using the **Azure** preset.
 
 ![Attribute mapping configuration](/docs/img/sso-dashboard-configure-attributes-azure.png)
 
-## Step 12: Join organization on signup (optional) [#dashboard-configure-autojoin]
+## Step 12: Join organization on sign-up (optional) [#dashboard-configure-autojoin]
 
-By default this setting is disabled, users logging in via SSO will not be added to your organization automatically.
+By default this setting is disabled, users signing in via SSO will not be added to your organization automatically.
 
 ![Auto-join disabled](/docs/img/sso-dashboard-configure-autojoin-disabled.png)
 
-Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO. Auto-join applies on **every login**, not just first signup - this makes it safe to test SSO before enabling this feature.
+Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they sign in via SSO. Auto-join applies on **every sign-in**, not only on first sign-up - this makes it safe to test SSO before enabling this feature.
 
 ![Auto-join enable](/docs/img/sso-dashboard-configure-autojoin-enabled.png)
 
@@ -164,7 +164,7 @@ Before rolling out SSO to your organization, we strongly recommend thorough test
 - Security best practices
 - Pre-launch checklist
 
-<Admonition type="note" label="Testing in Azure sandbox">
+<Admonition type="note" title="Testing in Azure sandbox">
 
 If your organization has an Azure sandbox or test tenant, consider testing your SSO configuration there first before applying to production.
 

@@ -23,7 +23,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
     <div
       className={cn(
         'bg-surface-100',
-        'rounded-md border shadow-sm',
+        'rounded-md border shadow-xs',
         props.noHideOverflow ? '' : 'overflow-hidden',
         props.noMargin ? '' : 'mb-4 md:mb-8',
         props.className
@@ -95,17 +95,17 @@ const PanelNotice = forwardRef<
         {...props}
         className={cn(
           'relative px-card py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
-          layout === 'vertical' && '!flex-col !items-start gap-y-2',
+          layout === 'vertical' && 'flex-col! items-start! gap-y-2',
           className
         )}
       >
         <div
-          className="absolute inset-0 -mt-[5px]"
+          className="absolute inset-0 mt-[-5px]"
           style={{
             backgroundImage: `
-                linear-gradient(to right, hsl(var(--background-200)/1) 0%, hsl(var(--background-200)/1) 30%, hsl(var(--background-200)/0) 100%),
-                linear-gradient(to right, hsl(var(--border-default)/0.33) 1px, transparent 1px),
-                linear-gradient(to bottom, hsl(var(--border-default)/0.33) 1px, transparent 1px)
+                linear-gradient(to right, oklch(from var(--background-200) l c h / 1) 0%, oklch(from var(--background-200) l c h / 1) 30%, oklch(from var(--background-200) l c h / 0) 100%),
+                linear-gradient(to right, oklch(from var(--border-default) l c h / 0.33) 1px, transparent 1px),
+                linear-gradient(to bottom, oklch(from var(--border-default) l c h / 0.33) 1px, transparent 1px)
               `,
             backgroundSize: '100% 100%, 15px 15px, 15px 15px',
             backgroundPosition: '0 0, 0 0, 0 0',
@@ -134,7 +134,7 @@ const PanelNotice = forwardRef<
           )}
         </div>
         {href && (
-          <Button size="tiny" type="default" className="text-xs" asChild>
+          <Button size="tiny" className="text-xs" asChild>
             <a href={href} target="_blank" rel="noreferrer noopener">
               {buttonText ?? 'Read the accouncement'}
             </a>

@@ -13,7 +13,7 @@ Edge Function Invocations are billed using Package pricing, with each package re
 
 ### Example
 
-For simplicity, let's assume a package size of 1 million and a charge of <Price price="2" /> per package without a free quota.
+For simplicity, assume a package size of 1 million and a charge of <Price price="2" /> per package without a free quota.
 
 | Invocations | Packages Billed | Costs               |
 | ----------- | --------------- | ------------------- |
@@ -39,11 +39,11 @@ The organization's function invocations are within the quota, so no charges appl
 | Line Item            | Units                 | Costs                    |
 | -------------------- | --------------------- | ------------------------ |
 | Pro Plan             | 1                     | <Price price="25" />     |
-| Compute Hours Micro  | 744 hours             | <Price price="10" />     |
+| Compute Hours Small  | 730 hours             | <Price price="15" />     |
 | Function Invocations | 1,800,000 invocations | <Price price="0" />      |
-| **Subtotal**         |                       | **<Price price="35" />** |
+| **Subtotal**         |                       | **<Price price="40" />** |
 | Compute Credits      |                       | -<Price price="10" />    |
-| **Total**            |                       | **<Price price="25" />** |
+| **Total**            |                       | **<Price price="30" />** |
 
 ### Exceeding quota
 
@@ -52,11 +52,11 @@ The organization's function invocations exceed the quota by 1.4 million, incurri
 | Line Item            | Units                 | Costs                    |
 | -------------------- | --------------------- | ------------------------ |
 | Pro Plan             | 1                     | <Price price="25" />     |
-| Compute Hours Micro  | 744 hours             | <Price price="10" />     |
+| Compute Hours Small  | 730 hours             | <Price price="15" />     |
 | Function Invocations | 3,400,000 invocations | <Price price="4" />      |
-| **Subtotal**         |                       | **<Price price="39" />** |
+| **Subtotal**         |                       | **<Price price="44" />** |
 | Compute Credits      |                       | -<Price price="10" />    |
-| **Total**            |                       | **<Price price="29" />** |
+| **Total**            |                       | **<Price price="34" />** |
 
 ## View usage
 

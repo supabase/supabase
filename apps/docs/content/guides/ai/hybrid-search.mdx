@@ -16,7 +16,7 @@ Hybrid search combines the strengths of both these methods. It would ensure that
 
 ## When to consider hybrid search
 
-The decision to use hybrid search depends on what your users are looking for in your app. For a code repository where developers need to find exact lines of code or error messages, keyword search is likely ideal because it matches specific terms. In a mental health forum where users search for advice or experiences related to their feelings, semantic search may be better because it finds results based on the meaning of a query, not just specific words. For a shopping app where customers might search for specific product names yet also be open to related suggestions, hybrid search combines the best of both worlds - finding exact matches while also uncovering similar products based on the shopping context.
+The decision to use hybrid search depends on what your users are looking for in your app. For a code repository where developers need to find exact lines of code or error messages, keyword search is likely ideal because it matches specific terms. In a mental health forum where users search for advice or experiences related to their feelings, semantic search may be better because it finds results based on the meaning of a query, not only specific words. For a shopping app where customers might search for specific product names yet also be open to related suggestions, hybrid search combines the best of both worlds - finding exact matches while also uncovering similar products based on the shopping context.
 
 ## How to combine search methods
 
@@ -44,9 +44,9 @@ This constant can be any positive number, but is typically small. A constant of 
 
 ## Hybrid search in Postgres
 
-Let's implement hybrid search in Postgres using `tsvector` (keyword search) and `pgvector` (semantic search).
+Implement hybrid search in Postgres using `tsvector` (keyword search) and `pgvector` (semantic search).
 
-First we'll create a `documents` table to store the documents that we will search over. This is just an example - adjust this to match the structure of your application.
+First, you can create a `documents` table to store the documents that you can search over. This is an example. Adjust this to match the structure of your application.
 
 ```sql
 create table documents (
@@ -131,7 +131,7 @@ limit
 $$;
 ```
 
-Let's break this down:
+Where:
 
 - **Parameters:** The function accepts quite a few parameters, but the main (required) ones are `query_text`, `query_embedding`, and `match_count`.
   - `query_text` is the user's query text (more on this shortly)

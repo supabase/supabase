@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-flow",
+  "type": "registry:component",
+  "title": "Realtime Flow",
+  "description": "Real-time flow diagram editor for collaborative applications.",
+  "registryDependencies": [],
+  "dependencies": [
+    "@xyflow/react@latest",
+    "@supabase-labs/y-supabase@latest",
+    "y-protocols@latest",
+    "yjs@latest"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+      "type": "registry:component"
+    }
+  ]
+}

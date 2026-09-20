@@ -271,4 +271,29 @@ let response = try await supabase
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+[Table("leaderboard")]
+class Leaderboard : BaseModel
+{
+    [PrimaryKey("id", false)]
+    public int Id { get; set; }
+
+    [Column("player")]
+    public string Player { get; set; }
+
+    [Column("score")]
+    public int Score { get; set; }
+}
+
+var result = await supabase
+  .From<Leaderboard>()
+  .Order(x => x.Score, Ordering.Descending)
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>

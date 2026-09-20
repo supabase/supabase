@@ -75,14 +75,13 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
       restriction_status: null,
       restriction_data: null,
       organization_missing_address: false,
+      requires_indirect_tax_declaration: false,
     },
   }),
 }))
 
-vi.mock('@/data/telemetry/send-event-mutation', () => ({
-  useSendEventMutation: () => ({
-    mutate: vi.fn(),
-  }),
+vi.mock('@/lib/telemetry/track', () => ({
+  useTrack: () => vi.fn(),
 }))
 
 const resetSidebarManagerState = () => {
@@ -100,7 +99,6 @@ describe('LayoutSidebar', () => {
   afterEach(() => {
     resetSidebarManagerState()
     localStorage.clear()
-    vi.clearAllMocks()
   })
 
   const renderSidebar = () =>

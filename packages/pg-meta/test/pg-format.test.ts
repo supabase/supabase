@@ -147,9 +147,14 @@ describe('pg-format', () => {
       expect(keyword('ROW')).toBe('ROW')
     })
 
-    test('accepts lowercase and mixed case', () => {
+    test('accepts allow-listed multi-word keywords', () => {
+      expect(keyword('INSTEAD OF')).toBe('INSTEAD OF')
+      expect(keyword('BY DEFAULT')).toBe('BY DEFAULT')
+    })
+
+    test('multi-word allow-list is case-insensitive', () => {
       expect(keyword('instead of')).toBe('instead of')
-      expect(keyword('Each Row')).toBe('Each Row')
+      expect(keyword('By Default')).toBe('By Default')
     })
 
     test('accepts words with underscores and digits', () => {
@@ -179,6 +184,12 @@ describe('pg-format', () => {
 
     test('rejects strings with parentheses', () => {
       expect(() => keyword('fn()')).toThrow('Not a valid keyword')
+    })
+
+    test('rejects arbitrary multi-word phrases not on the allow-list', () => {
+      expect(() => keyword('DROP TABLE')).toThrow('Not a valid keyword')
+      expect(() => keyword('DELETE FROM users')).toThrow('Not a valid keyword')
+      expect(() => keyword('Each Row')).toThrow('Not a valid keyword')
     })
   })
 

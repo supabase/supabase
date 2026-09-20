@@ -6,6 +6,7 @@ import withYaml from 'next-plugin-yaml'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import { parse as parseToml } from 'smol-toml'
+
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -60,7 +61,7 @@ const nextConfig = {
   ],
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-    '/api/guides-md/**/*': ['./public/docs/guides/**/*'],
+    '/api/guides-md/**/*': ['./public/markdown/guides/**/*'],
     '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
@@ -131,6 +132,16 @@ const nextConfig = {
    */
   async redirects() {
     return [
+      {
+        source: '/guides/observability/access-data',
+        destination: '/guides/observability',
+        permanent: true,
+      },
+      {
+        source: '/guides/observability/access-data.md',
+        destination: '/guides/observability.md',
+        permanent: true,
+      },
       // Redirect root to docs base path in dev/preview envs
       {
         source: '/',
@@ -153,6 +164,48 @@ const nextConfig = {
         destination: 'https://supabase.com/blog/:path*',
         basePath: false,
         permanent: false,
+      },
+
+      // Redirect old managed pipeline slugs in dev/preview envs
+      {
+        source: '/guides/database/replication/external-replication-setup',
+        destination: '/guides/database/replication/pipelines',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/external-replication-monitoring',
+        destination: '/guides/database/replication/pipelines-monitoring',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/external-replication-faq',
+        destination: '/guides/database/replication/pipelines-faq',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/replication-setup',
+        destination: '/guides/database/replication/pipelines',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/replication-monitoring',
+        destination: '/guides/database/replication/pipelines-monitoring',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/replication-faq',
+        destination: '/guides/database/replication/pipelines-faq',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/inspect',
+        destination: '/guides/monitoring-and-debugging/inspect',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/database-advisors',
+        destination: '/guides/observability/advisors',
+        permanent: true,
       },
     ]
   },
@@ -180,6 +233,9 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'docs',
+  unstable_sentryWebpackPluginOptions: {
+    applicationKey: 'supabase-docs',
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

@@ -5,18 +5,19 @@
 import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, MouseEventHandler, useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   cn,
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
-import { DialogDescription, DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 
-import { Admonition } from './../admonition'
+import { Admonition } from '../Admonition'
 
 export interface ConfirmationModalProps {
   loading?: boolean
@@ -27,12 +28,16 @@ export interface ConfirmationModalProps {
   confirmLabel?: string
   confirmLabelLoading?: string
   cancelLabel?: string
+  /** Overrides the first footer action label when `onAdditionalAction` is provided. */
+  additionalActionLabel?: string
   onConfirm: () => void
   onCancel: () => void
+  /** Overrides the first footer action while `onCancel` continues to handle dismissal. */
+  onAdditionalAction?: () => void
   disabled?: boolean
-  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
-    base?: React.ComponentProps<typeof Alert_Shadcn_>
+    base?: React.ComponentProps<typeof Alert>
     title?: string
     description?: string | React.ReactNode
   }
@@ -51,8 +56,10 @@ export const ConfirmationModal = forwardRef<
       visible,
       onCancel,
       onConfirm,
+      onAdditionalAction,
       loading: loading_,
       cancelLabel = 'Cancel',
+      additionalActionLabel,
       confirmLabel = 'Submit',
       confirmLabelLoading,
       alert = undefined,
@@ -75,6 +82,10 @@ export const ConfirmationModal = forwardRef<
       if (loading_ === undefined) setLoading(true)
     }
 
+    const preventDismissWhileLoading = (event: Event) => {
+      if (loading) event.preventDefault()
+    }
+
     useEffect(() => {
       if (visible && loading_ === undefined) {
         setLoading(false)
@@ -85,21 +96,24 @@ export const ConfirmationModal = forwardRef<
       if (loading_ !== undefined) setLoading(loading_)
     }, [loading_])
 
+    const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
+    const alertTitleProps = alert?.title ? { title: alert.title } : {}
+
     return (
       <Dialog
         open={visible}
         {...props}
-        onOpenChange={() => {
-          if (visible) {
-            onCancel()
-          }
+        onOpenChange={(open) => {
+          if (!open && visible && !loading) onCancel()
         }}
       >
         <DialogContent
           aria-describedby={undefined}
           ref={ref}
-          className="p-0 gap-0 pb-5 !block"
+          className="p-0 gap-0 pb-5 block!"
           size={size}
+          onPointerDownOutside={preventDismissWhileLoading}
+          onEscapeKeyDown={preventDismissWhileLoading}
         >
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle>{title}</DialogTitle>
@@ -108,10 +122,10 @@ export const ConfirmationModal = forwardRef<
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
-              label={alert.title}
               description={alert.description}
+              {...alertTitleProps}
               className="border-x-0 rounded-none -mt-px"
-              {...alert?.base}
+              {...alertBase}
             />
           )}
           {children && (
@@ -126,20 +140,19 @@ export const ConfirmationModal = forwardRef<
             <Button
               size="medium"
               block
-              type="default"
               disabled={loading}
-              onClick={() => onCancel()}
+              onClick={() => (onAdditionalAction ?? onCancel)()}
             >
-              {cancelLabel}
+              {additionalActionLabel ?? cancelLabel}
             </Button>
 
             <Button
               block
               size="medium"
-              type={
+              variant={
                 variant === 'destructive' ? 'danger' : variant === 'warning' ? 'warning' : 'primary'
               }
-              htmlType="submit"
+              type="submit"
               loading={loading}
               disabled={loading || disabled}
               onClick={onSubmit}

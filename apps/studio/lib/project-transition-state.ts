@@ -1,4 +1,6 @@
-export const FALLBACK_LONG_RUNNING_STATE_THRESHOLD_MINUTES = 10
+import { safeLocalStorage } from 'common'
+
+export const FALLBACK_LONG_RUNNING_STATE_THRESHOLD_MINUTES = 20
 // Persist long enough for same-browser reloads, but not so long that a later transition reuses stale state.
 export const MAX_PERSISTED_TRANSITION_AGE_HOURS = 24
 
@@ -15,7 +17,7 @@ export const getPersistedTransitionStartTime = (
 ) => {
   if (typeof window === 'undefined') return now
 
-  const existingValue = window.localStorage.getItem(storageKey)
+  const existingValue = safeLocalStorage.getItem(storageKey)
 
   if (existingValue !== null) {
     const parsedStartTime = Number(existingValue)
@@ -31,14 +33,12 @@ export const getPersistedTransitionStartTime = (
     }
   }
 
-  window.localStorage.setItem(storageKey, String(now))
+  safeLocalStorage.setItem(storageKey, String(now))
   return now
 }
 
 export const clearPersistedTransitionStartTime = (storageKey: string) => {
-  if (typeof window === 'undefined') return
-
-  window.localStorage.removeItem(storageKey)
+  safeLocalStorage.removeItem(storageKey)
 }
 
 export const getRemainingTransitionTimeMs = ({

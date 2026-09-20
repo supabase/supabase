@@ -4,6 +4,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
+import { useWatch } from 'react-hook-form'
 import { DialogSectionSeparator, Form } from 'ui'
 
 import {
@@ -24,10 +25,11 @@ import { OrganizationSelector } from './OrganizationSelector'
 import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
-import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
+import { SupportAccessToggle } from './SupportAccessToggle'
 import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
+  canAllowSupportAccess,
   formatMessage,
   formatStudioVersion,
   getOrgSubscriptionPlan,
@@ -70,7 +72,10 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
-  const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
+  const [organizationSlug, projectRef, category, severity, subject, library] = useWatch({
+    control: form.control,
+    name: ['organizationSlug', 'projectRef', 'category', 'severity', 'subject', 'library'],
+  })
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
@@ -96,12 +101,25 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         sentProjectRef: variables.projectRef,
         sentOrgSlug: variables.organizationSlug,
         sentCategory: variables.category,
+        submittedRequest: {
+          organizationSlug: variables.organizationSlug,
+          projectRef: variables.projectRef,
+          category: variables.category,
+          severity: variables.severity,
+          subject: variables.subject,
+          message: variables.message,
+          affectedServices: variables.affectedServices ?? '',
+          library: variables.library,
+          allowSupportAccess: variables.allowSupportAccess,
+          dashboardLogs: variables.dashboardLogs,
+        },
       })
     },
     onError: (error) => {
       dispatch({
         type: 'ERROR',
         message: error.message,
+        code: error.code,
       })
     },
   })
@@ -147,10 +165,9 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       ...values,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
-      allowSupportAccess:
-        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-          ? values.allowSupportAccess
-          : false,
+      allowSupportAccess: canAllowSupportAccess(values.category, values.projectRef)
+        ? values.allowSupportAccess
+        : false,
       library:
         values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
           ? selectedLibrary.key
@@ -236,14 +253,14 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         {DASHBOARD_LOG_CATEGORIES.includes(category) && (
           <>
-            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}
 
-        {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+        {canAllowSupportAccess(category, projectRef) && (
           <>
-            <SupportAccessToggle form={form} />
+            <SupportAccessToggle form={form} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}

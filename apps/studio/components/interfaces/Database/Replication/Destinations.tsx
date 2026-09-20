@@ -1,93 +1,142 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
+import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
   CardContent,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
-import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
-import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
-import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from './useIsETLPrivateAlpha'
+import { DisablePipelinesDialog } from './DisablePipelinesDialog'
+import { EnablePipelinesModal } from './EnablePipelinesCallout'
+import { getStatusName } from './Pipeline.utils'
+import { PipelineStatusName } from './Replication.constants'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
+} from './useIsETLPrivateAlpha'
+import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { AlertError } from '@/components/ui/AlertError'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
+import {
+  replicationPipelineStatusQueryOptions,
+  type ReplicationPipelineStatusData,
+} from '@/data/replication/pipeline-status-query'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from '@/lib/constants'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+type DestinationSortColumn = 'name' | 'status'
+type DestinationSort = `${DestinationSortColumn}:${'asc' | 'desc'}`
+
+// Worst first, so sorting ascending by status surfaces the pipelines that need attention.
+const STATUS_SORT_ORDER: PipelineStatusName[] = [
+  PipelineStatusName.FAILED,
+  PipelineStatusName.STOPPED,
+  PipelineStatusName.STOPPING,
+  PipelineStatusName.STARTING,
+  PipelineStatusName.STARTED,
+  PipelineStatusName.UNKNOWN,
+]
+
+// Keyed by pipeline id from the responses themselves, so this never closes over component state.
+const combinePipelineStatuses = (
+  results: { data?: ReplicationPipelineStatusData }[]
+): Map<number, PipelineStatusName | undefined> =>
+  new Map(
+    results
+      .map((result) => result.data)
+      .filter((data): data is ReplicationPipelineStatusData => data !== undefined)
+      .map((data) => [data.pipeline_id, getStatusName(data.status)])
+  )
+
+const compareStatusNames = (
+  a: PipelineStatusName | undefined,
+  b: PipelineStatusName | undefined,
+  direction: 'asc' | 'desc'
+) => {
+  if (a === undefined) return b === undefined ? 0 : 1
+  if (b === undefined) return -1
+
+  const comparison = STATUS_SORT_ORDER.indexOf(a) - STATUS_SORT_ORDER.indexOf(b)
+  return direction === 'asc' ? comparison : -comparison
+}
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
+
+  useRedirectLegacyReadReplicaDestination()
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
 
-  const newDestinationDefaultType = infrastructureReadReplicas
-    ? 'Read Replica'
-    : etlEnableBigQuery
-      ? 'BigQuery'
-      : etlEnableIceberg
-        ? 'Analytics Bucket'
-        : null
+  const newDestinationDefaultType: DestinationType | null = etlEnableBigQuery
+    ? 'BigQuery'
+    : etlEnableIceberg
+      ? 'Analytics Bucket'
+      : etlEnableDucklake
+        ? 'DuckLake'
+        : etlEnableSnowflake
+          ? 'Snowflake'
+          : etlEnableClickHouse
+            ? 'ClickHouse'
+            : null
 
   const prefetchedRef = useRef(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
-  const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
-  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
-    useState(false)
+  const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
+  const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
-  const [_, setDestinationType] = useQueryState(
+  const [, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
-      'Read Replica',
       'BigQuery',
       'Analytics Bucket',
+      'DuckLake',
+      'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
     })
   )
-
-  const {
-    data: databases = [],
-    error: databasesError,
-    isPending: isDatabasesLoading,
-    isError: isDatabasesError,
-    isSuccess: isDatabasesSuccess,
-  } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
-  const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
-  const filteredReplicas =
-    filterString.length === 0
-      ? readReplicas
-      : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
 
   const {
     data: destinationsData,
@@ -98,19 +147,68 @@ export const Destinations = () => {
   } = useReplicationDestinationsQuery({
     projectRef,
   })
-  const destinations = destinationsData?.destinations ?? []
+  const destinations = useMemo(
+    () => destinationsData?.destinations ?? [],
+    [destinationsData?.destinations]
+  )
   const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
-  const filteredDestinations =
-    filterString.length === 0
-      ? (destinations ?? [])
-      : (destinations ?? []).filter((destination) =>
-          destination.name.toLowerCase().includes(filterString.toLowerCase())
-        )
+  const filteredDestinations = useMemo(
+    () =>
+      filterString.length === 0
+        ? destinations
+        : destinations.filter((destination) =>
+            destination.name.toLowerCase().includes(filterString.toLowerCase())
+          ),
+    [destinations, filterString]
+  )
 
   const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
     projectRef,
   })
-  const pipelines = pipelinesData?.pipelines ?? []
+  const pipelines = useMemo(() => pipelinesData?.pipelines ?? [], [pipelinesData?.pipelines])
+
+  // Sorting by status needs every pipeline's status up here, not just inside each row. These share
+  // the rows' query keys, so each status is still only fetched once.
+  const statusByPipelineId = useQueries({
+    queries: pipelines.map((pipeline) =>
+      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id })
+    ),
+    combine: combinePipelineStatuses,
+  })
+
+  const getDestinationStatus = (destinationId: number) => {
+    const pipeline = pipelines.find((p) => p.destination_id === destinationId)
+    return pipeline === undefined ? undefined : statusByPipelineId.get(pipeline.id)
+  }
+
+  const [sort, setSort] = useState<DestinationSort>('name:asc')
+  const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
+
+  const getAriaSort = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return 'none'
+    return sortDirection === 'asc' ? 'ascending' : 'descending'
+  }
+
+  const handleSortChange = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return setSort(`${column}:asc`)
+    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
+  }
+
+  // Not memoized: the status map is rebuilt whenever a pipeline status refetches, so a useMemo
+  // here would never hit. Sorting a handful of destinations per render costs nothing.
+  const sortedDestinations = [...filteredDestinations].sort((a, b) => {
+    if (sortColumn === 'status') {
+      const nameComparison = a.name.localeCompare(b.name)
+
+      return (
+        compareStatusNames(getDestinationStatus(a.id), getDestinationStatus(b.id), sortDirection) ||
+        (sortDirection === 'asc' ? nameComparison : -nameComparison)
+      )
+    }
+
+    const comparison = a.name.localeCompare(b.name)
+    return sortDirection === 'asc' ? comparison : -comparison
+  })
 
   const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
     projectRef,
@@ -119,7 +217,9 @@ export const Destinations = () => {
     () => sourcesData?.sources.find((source) => source.name === projectRef),
     [projectRef, sourcesData?.sources]
   )
-  const canDisableExternalReplication =
+  const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
+
+  const canDisablePipelines =
     isSourcesSuccess &&
     isDestinationsSuccess &&
     isPipelinesSuccess &&
@@ -127,13 +227,24 @@ export const Destinations = () => {
     destinations.length === 0 &&
     pipelines.length === 0
 
-  const isLoading = isDestinationsLoading || isDatabasesLoading
-  const hasErrorsFetchingData = isDestinationsError || isDatabasesError
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
   const openDestinationPanel = () => {
     if (!newDestinationDefaultType) return
     setDestinationType(newDestinationDefaultType)
   }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search pipelines' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
 
   useEffect(() => {
     if (
@@ -156,100 +267,130 @@ export const Destinations = () => {
     }
   }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
-  useEffect(() => {
-    if (!isDatabasesSuccess) return
-
-    const pollReplicas = async () => {
-      const fixedStatuses = [
-        REPLICA_STATUS.ACTIVE_HEALTHY,
-        REPLICA_STATUS.ACTIVE_UNHEALTHY,
-        REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
-      ]
-
-      const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
-      const hasTransientStatus = replicasInTransition.length > 0
-
-      // If all replicas are active healthy, stop fetching statuses
-      if (!hasTransientStatus) setStatusRefetchInterval(false)
-    }
-
-    pollReplicas()
-  }, [isDatabasesSuccess, readReplicas])
-
   return (
-    <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Input
-              placeholder="Filter destinations"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-              actions={
-                filterString.length > 0 && (
-                  <Button
-                    type="text"
-                    icon={<X />}
-                    className="p-0 h-5 w-5"
-                    onClick={() => setFilterString('')}
-                  />
-                )
-              }
-            />
-          </div>
-          <div className="flex items-center gap-x-2">
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            ref={searchInputRef}
+            placeholder="Search pipelines"
+            size="tiny"
+            icon={<Search />}
+            value={filterString}
+            className="w-full lg:w-52"
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+            actions={
+              filterString.length > 0 && (
+                <Button
+                  aria-label="Clear search"
+                  variant="text"
+                  icon={<X />}
+                  className="p-0 h-5 w-5"
+                  onClick={() => setFilterString('')}
+                />
+              )
+            }
+          />
+        </div>
+        <div className="flex items-center gap-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label="More actions"
+                variant="default"
+                icon={<MoreVertical />}
+                className="px-1.25"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuItem asChild>
+                <Link href={`/org/${organization?.slug}/usage#pipeline-initial-sync-data`}>
+                  View Pipelines usage
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {replicationNotEnabled ? (
+                <DropdownMenuItem onClick={() => setShowEnablePipelinesDialog(true)}>
+                  Enable Pipelines
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  className="data-disabled:pointer-events-auto data-disabled:cursor-not-allowed"
+                  disabled={!canDisablePipelines}
+                  onClick={() => {
+                    if (!canDisablePipelines) return
+                    setShowDisablePipelinesDialog(true)
+                  }}
+                >
+                  <div className="flex flex-col gap-y-0.5">
+                    <p>Disable Pipelines</p>
+                    {!canDisablePipelines && (
+                      <p className="text-foreground-lighter">Delete all pipelines first</p>
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+            label="Add pipeline"
+            onTrigger={openDestinationPanel}
+            options={{ enabled: !!newDestinationDefaultType }}
+            side="bottom"
+          >
             <Button
-              type="default"
+              variant="primary"
               icon={<Plus />}
               disabled={!newDestinationDefaultType}
               onClick={openDestinationPanel}
             >
-              Add destination
+              Add pipeline
             </Button>
-            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-            {canDisableExternalReplication && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<MoreVertical />} className="w-7" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
-                    Disable external replication
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
+          </Shortcut>
         </div>
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
+        {/* Mounted whether or not it has anything to say, so the update is announced */}
+        <p role="status" aria-live="polite" className="sr-only">
+          {isDestinationsLoading ? 'Loading pipelines' : ''}
+        </p>
+
         {hasErrorsFetchingData && (
-          <AlertError
-            error={destinationsError || databasesError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
-          />
+          <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
         )}
 
-        {isLoading ? (
-          <GenericSkeletonLoader />
-        ) : hasReplicas || hasDestinations ? (
+        {isDestinationsLoading && <GenericSkeletonLoader />}
+
+        {!isDestinationsLoading && hasDestinations && (
           <Card>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead key="type" className="w-[20px]" />
-                    <TableHead key="name" className="w-[250px]">
-                      Name
+                    <TableHead key="type" className="w-[40px]" />
+                    <TableHead key="name" className="w-[250px]" aria-sort={getAriaSort('name')}>
+                      <TableHeadSort
+                        column="name"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Name
+                      </TableHeadSort>
                     </TableHead>
-                    <TableHead key="status" className="w-[150px]">
-                      Status
+                    <TableHead key="status" className="w-[150px]" aria-sort={getAriaSort('status')}>
+                      <TableHeadSort
+                        column="status"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Status
+                      </TableHeadSort>
                     </TableHead>
-                    <TableHead key="lag" className="w-[80px]">
+                    <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
                     <TableHead key="publication">Publication</TableHead>
@@ -257,71 +398,48 @@ export const Destinations = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredReplicas.map((replica) => {
-                    return (
-                      <ReadReplicaRow
-                        key={replica.identifier}
-                        replica={replica}
-                        onUpdateReplica={() => setStatusRefetchInterval(5000)}
-                      />
-                    )
-                  })}
-
-                  {filteredDestinations.map((destination) => (
+                  {sortedDestinations.map((destination) => (
                     <DestinationRow key={destination.id} destinationId={destination.id} />
                   ))}
 
-                  {!isLoading &&
+                  {!isDestinationsLoading &&
                     filteredDestinations.length === 0 &&
-                    filteredReplicas.length === 0 &&
-                    (hasReplicas || hasDestinations) && (
-                      <TableRow>
-                        <TableCell colSpan={5}>
-                          <p>No results found</p>
-                          <p className="text-foreground-light">
-                            Your search for "{filterString}" did not return any results
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
+                    hasDestinations && <TableRowNoResults colSpan={6} search={filterString} />}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
-        ) : (
-          !isLoading &&
-          !hasErrorsFetchingData && (
-            <div
-              className={cn(
-                'w-full',
-                'border border-dashed bg-surface-100 border-overlay',
-                'flex flex-col px-16 rounded-lg justify-center items-center py-8 mt-4'
-              )}
+        )}
+
+        {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
+          <EmptyStatePresentational
+            icon={Workflow}
+            title="Add a pipeline"
+            description="Send tables to an external destination for analytics workloads."
+          >
+            <Button
+              variant="default"
+              icon={<Plus />}
+              disabled={!newDestinationDefaultType}
+              onClick={openDestinationPanel}
             >
-              <h4>Replication keeps your data in sync across systems</h4>
-              <p className="text-foreground-light text-sm text-balance text-center mt-1">
-                Deploy read replicas for lower latency and better resource management, or capture
-                database changes to external platforms for real-time data pipelines.
-              </p>
-              <Button
-                icon={<Plus />}
-                disabled={!newDestinationDefaultType}
-                onClick={openDestinationPanel}
-                className="mt-4"
-              >
-                Add destination
-              </Button>
-            </div>
-          )
+              Add pipeline
+            </Button>
+          </EmptyStatePresentational>
         )}
       </div>
 
-      <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
+      <DestinationPanel />
 
-      <DisableExternalReplicationDialog
-        open={showDisableExternalReplicationDialog}
-        setOpen={setShowDisableExternalReplicationDialog}
+      <EnablePipelinesModal
+        open={showEnablePipelinesDialog}
+        onOpenChange={setShowEnablePipelinesDialog}
       />
-    </>
+
+      <DisablePipelinesDialog
+        open={showDisablePipelinesDialog}
+        setOpen={setShowDisablePipelinesDialog}
+      />
+    </div>
   )
 }

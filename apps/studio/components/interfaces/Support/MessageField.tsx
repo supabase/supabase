@@ -1,8 +1,8 @@
 import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
-import { FormControl, FormField, TextArea_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { FormControl, FormField, TextArea } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
@@ -31,7 +31,7 @@ export function MessageField({ form, originalError }: MessageFieldProps) {
           }
         >
           <FormControl>
-            <TextArea_Shadcn_
+            <TextArea
               {...field}
               rows={4}
               maxLength={5000}

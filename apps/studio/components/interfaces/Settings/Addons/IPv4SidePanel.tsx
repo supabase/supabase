@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { cn, RadioGroup, RadioGroupLargeItem, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -75,7 +75,7 @@ const IPv4SidePanel = () => {
       priceContent: (
         <>
           <p className="text-foreground text-sm">$0</p>
-          <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
+          <p className="text-foreground-light translate-y-px text-sm">/ month</p>
         </>
       ),
       priceRowClassName: 'mt-2',
@@ -161,12 +161,12 @@ const IPv4SidePanel = () => {
           {!isAws && (
             <Admonition
               type="default"
-              title="Dedicated IPv4 address is only available for AWS projects"
+              description="Dedicated IPv4 address is only available for AWS projects."
             />
           )}
 
           {isAws && (
-            <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
+            <div className={cn('mt-8! pb-4', !hasAccessToIPv4 && 'opacity-75')}>
               <RadioGroup
                 name="ipv4"
                 value={selectedOption}

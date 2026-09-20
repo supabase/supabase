@@ -1,7 +1,7 @@
-import { Doc } from 'contentlayer/generated'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
+import { Doc } from '@/.velite'
 import { docsConfig } from '@/config/docs'
 import { cn } from '@/lib/utils'
 import { NavItem, NavItemWithChildren } from '@/types/nav'

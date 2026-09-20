@@ -4,7 +4,7 @@ import { cn } from 'ui'
 
 interface ComputeBadgeProps extends HTMLAttributes<HTMLDivElement> {
   infraComputeSize:
-    | components['schemas']['ProjectDetailResponse']['infra_compute_size']
+    | components['schemas']['ProjectDetailResponse_Output']['infra_compute_size']
     | '>16XL'
     | undefined
   icon?: ReactNode
@@ -21,7 +21,7 @@ export function ComputeBadge({ infraComputeSize, className, icon, ...props }: Co
     <div
       className={cn(
         // Base styles
-        'inline-flex items-center justify-center rounded text-center font-mono uppercase',
+        'inline-flex items-center justify-center rounded-sm text-center font-mono uppercase',
         'whitespace-nowrap font-medium tracking-[0.06em] text-[11px] leading-[1.1] px-[5.5px] py-[3px]',
         'transition-all',
         // Variant styles

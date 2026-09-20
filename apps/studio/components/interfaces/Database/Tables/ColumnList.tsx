@@ -1,4 +1,3 @@
-import { PostgresColumn } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -25,6 +24,7 @@ import {
   cn,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -48,17 +48,18 @@ import {
   getUniqueIndexColumnNames,
 } from './ColumnList.utils'
 import { ConstraintToken } from './ConstraintToken'
-import AlertError from '@/components/ui/AlertError'
+import { displayColumnType } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
 
-const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
+const getColumnTypeAffordancePresentation = (column: SafePostgresColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
   const iconClassName = 'text-foreground-muted'
 
@@ -98,8 +99,8 @@ const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
 
 interface ColumnListProps {
   onAddColumn: () => void
-  onEditColumn: (column: PostgresColumn) => void
-  onDeleteColumn: (column: PostgresColumn) => void
+  onEditColumn: (column: SafePostgresColumn) => void
+  onDeleteColumn: (column: SafePostgresColumn) => void
 }
 
 export const ColumnList = ({
@@ -142,9 +143,6 @@ export const ColumnList = ({
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'columns'
   )
-  const deleteColumnTooltipText = !canUpdateColumns
-    ? 'Additional permissions required to delete column'
-    : undefined
 
   return (
     <div className="space-y-4">
@@ -190,7 +188,7 @@ export const ColumnList = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-0 !px-0" />
+                <TableHead className="w-0 px-0!" />
 
                 <TableHead
                   className={cn(columns.length === 0 ? 'text-foreground-muted' : undefined)}
@@ -312,7 +310,7 @@ export const ColumnList = ({
 
                   return (
                     <TableRow key={column.name}>
-                      <TableCell className="w-0 !pl-5 !pr-1">
+                      <TableCell className="w-0 pl-5! pr-1!">
                         <Tooltip>
                           <TooltipTrigger asChild className="cursor-default" aria-label={typeLabel}>
                             <div className="flex w-4 justify-center">{TypeIcon}</div>
@@ -322,7 +320,11 @@ export const ColumnList = ({
                               <span>{column.data_type}</span>
                               {column.format !== column.data_type && (
                                 <span className="text-xs text-foreground-light">
-                                  {column.format}
+                                  {displayColumnType(
+                                    column.format,
+                                    column.format_schema,
+                                    column.data_type === 'ARRAY'
+                                  )}
                                 </span>
                               )}
                             </div>
@@ -343,7 +345,13 @@ export const ColumnList = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p className="text-foreground-lighter">{column.format}</p>
+                        <p className="text-foreground-lighter">
+                          {displayColumnType(
+                            column.format,
+                            column.format_schema,
+                            column.data_type === 'ARRAY'
+                          )}
+                        </p>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1.5">{constraintTokens}</div>
@@ -352,7 +360,6 @@ export const ColumnList = ({
                         {!isSchemaLocked && isTableEntity && (
                           <div className="flex justify-end gap-2">
                             <ButtonTooltip
-                              type="default"
                               disabled={!canUpdateColumns}
                               onClick={() => onEditColumn(column)}
                               tooltip={{
@@ -367,24 +374,33 @@ export const ColumnList = ({
                               Edit
                             </ButtonTooltip>
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
-                              </DropdownMenuTrigger>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      aria-label={`Delete ${column.name} column`}
+                                      // Tooltip repeats the label; the description would read the name twice
+                                      aria-describedby={undefined}
+                                      className="px-1"
+                                      icon={<MoreVertical />}
+                                    />
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  {!canUpdateColumns
+                                    ? 'Additional permissions required to delete column'
+                                    : `Delete ${column.name} column`}
+                                </TooltipContent>
+                              </Tooltip>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
-                                <DropdownMenuItemTooltip
+                                <DropdownMenuItem
                                   disabled={!canUpdateColumns}
                                   onClick={() => onDeleteColumn(column)}
                                   className="gap-x-2"
-                                  tooltip={{
-                                    content: {
-                                      side: 'left',
-                                      text: deleteColumnTooltipText,
-                                    },
-                                  }}
                                 >
                                   <Trash size={12} />
                                   <p>Delete column</p>
-                                </DropdownMenuItemTooltip>
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>

@@ -4,9 +4,9 @@ import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { TimestampInfo } from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
@@ -17,7 +17,7 @@ import { useBackupRestoreMutation } from '@/data/database/backup-restore-mutatio
 import { DatabaseBackup, useBackupsQuery } from '@/data/database/backups-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
 export const BackupsList = () => {
@@ -29,6 +29,7 @@ export const BackupsList = () => {
   const { setProjectStatus } = useSetProjectStatus()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+  const isHighAvailability = useIsHighAvailability()
 
   const { data: backups } = useBackupsQuery({ projectRef })
   const {
@@ -88,6 +89,7 @@ export const BackupsList = () => {
                     backup={x}
                     index={i}
                     isHealthy={isHealthy}
+                    isHighAvailability={isHighAvailability}
                     onSelectBackup={() => setSelectedBackup(x)}
                   />
                 )
@@ -119,7 +121,7 @@ export const BackupsList = () => {
                 displayAs="utc"
                 utcTimestamp={selectedBackup.inserted_at}
                 labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-                className="!text-sm"
+                className="text-sm!"
               />
             </p>
           )}

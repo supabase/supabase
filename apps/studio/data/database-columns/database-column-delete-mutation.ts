@@ -3,11 +3,8 @@ import { PGColumn } from '@supabase/pg-meta/src/pg-meta-columns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { databaseKeys } from '@/data/database/keys'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import { tableEditorKeys } from '@/data/table-editor/keys'
-import { tableRowKeys } from '@/data/table-rows/keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { viewKeys } from '@/data/views/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -53,28 +50,20 @@ export const useDatabaseColumnDeleteMutation = ({
       const { projectRef, column } = variables
       await Promise.all([
         // refetch all entities in the sidebar because deleting a column may regenerate a view (and change its id)
-        queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
-        queryClient.invalidateQueries({
-          queryKey: databaseKeys.foreignKeyConstraints(projectRef, column.schema),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: tableEditorKeys.tableEditor(projectRef, column.table_id),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: databaseKeys.tableDefinition(projectRef, column.table_id),
+        invalidateTableMetadata(queryClient, {
+          projectRef,
+          schema: column.schema,
+          tableId: column.table_id,
+          tableName: column.table,
+          includeRows: true,
+          includeLint: true,
         }),
         // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
         // which has a view dependent on it
         queryClient.invalidateQueries({
-          queryKey: viewKeys.listBySchema(projectRef, column.schema),
+          queryKey: viewKeys.listBySchema(projectRef, [column.schema]),
         }),
       ])
-
-      // We need to invalidate tableRowsAndCount after tableEditor
-      // to ensure the query sent is correct
-      await queryClient.invalidateQueries({
-        queryKey: tableRowKeys.tableRowsAndCount(projectRef, column.table_id),
-      })
 
       await onSuccess?.(data, variables, context)
     },

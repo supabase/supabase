@@ -1,9 +1,8 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
-import { useParams } from 'common'
+import type { PGTable } from '@supabase/pg-meta'
 import { noop } from 'lodash'
 import { useCallback, type ChangeEvent, type DragEvent } from 'react'
 import { toast } from 'sonner'
-import { SidePanel, Tabs } from 'ui'
+import { SidePanel, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
@@ -20,12 +19,11 @@ import {
   isParsingState,
   useSpreadsheetImport,
 } from './useSpreadsheetImport'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface SpreadsheetImportProps {
   visible: boolean
-  selectedTable?: PostgresTable
+  selectedTable?: PGTable
   saveContent: (prefillData: ImportContent) => void
   closePanel: () => void
   updateEditorDirty?: (value: boolean) => void
@@ -38,8 +36,7 @@ export const SpreadsheetImport = ({
   closePanel,
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const {
     state,
     handleSwitchTab,
@@ -59,7 +56,6 @@ export const SpreadsheetImport = ({
   )
   const isCompatible = !selectedTable || incompatibleHeaders.length === 0
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const onConfirm = (resolve: () => void) => {
     if (state._tag === 'no_selected_file') {
       toast.error('Please upload a file to import your data with')
@@ -86,10 +82,7 @@ export const SpreadsheetImport = ({
         emptyStringAsNullHeaders: state.emptyStringAsNullHeaders,
         resolve,
       })
-      sendEvent({
-        action: 'import_data_added',
-        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('import_data_added')
     }
   }
 
@@ -119,8 +112,12 @@ export const SpreadsheetImport = ({
     >
       <SidePanel.Content>
         <div className="pt-6">
-          <Tabs block type="pills" activeId={tab} onChange={handleSwitchTab}>
-            <Tabs.Panel id="fileUpload" label="Upload CSV">
+          <Tabs value={tab} onValueChange={handleSwitchTab}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="fileUpload">Upload CSV</TabsTrigger>
+              <TabsTrigger value="pasteText">Paste text</TabsTrigger>
+            </TabsList>
+            <TabsContent value="fileUpload">
               <SpreadsheetFileDropZone
                 file={hasAttachedFile(state) ? state.file : undefined}
                 parseProgress={
@@ -129,13 +126,13 @@ export const SpreadsheetImport = ({
                 onUploadFile={handleUploadFile}
                 onRemoveFile={handleRemoveFile}
               />
-            </Tabs.Panel>
-            <Tabs.Panel id="pasteText" label="Paste text">
+            </TabsContent>
+            <TabsContent value="pasteText">
               <SpreadsheetInputZone
                 text={hasAttachedText(state) ? state.text : ''}
                 onInputChange={handleInputText}
               />
-            </Tabs.Panel>
+            </TabsContent>
           </Tabs>
         </div>
       </SidePanel.Content>

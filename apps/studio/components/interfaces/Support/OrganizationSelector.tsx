@@ -3,12 +3,12 @@ import {
   Badge,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -36,7 +36,7 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
         return (
           <FormItemLayout hideMessage layout="vertical" label="Which organization is affected?">
             <FormControl>
-              <Select_Shadcn_
+              <Select
                 {...fieldWithoutRef}
                 disabled={!isSuccessOrganizations}
                 defaultValue={field.value}
@@ -48,8 +48,8 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                   }
                 }}
               >
-                <SelectTrigger_Shadcn_ className="w-full" aria-label="Select an organization">
-                  <SelectValue_Shadcn_ asChild placeholder="Select an organization">
+                <SelectTrigger className="w-full" aria-label="Select an organization">
+                  <SelectValue asChild placeholder="Select an organization">
                     <div className="flex items-center gap-x-2">
                       {orgSlug === NO_ORG_MARKER ? (
                         <span>No specific organization</span>
@@ -58,23 +58,21 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                       )}
                       {subscriptionPlanId && <Badge variant="default">{subscriptionPlanId}</Badge>}
                     </div>
-                  </SelectValue_Shadcn_>
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {organizations?.map((org) => (
-                      <SelectItem_Shadcn_ key={org.slug} value={org.slug}>
+                      <SelectItem key={org.slug} value={org.slug}>
                         {org.name}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
                     {isSuccessOrganizations && (organizations ?? []).length === 0 && (
-                      <SelectItem_Shadcn_ value={NO_ORG_MARKER}>
-                        No specific organization
-                      </SelectItem_Shadcn_>
+                      <SelectItem value={NO_ORG_MARKER}>No specific organization</SelectItem>
                     )}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
           </FormItemLayout>
         )

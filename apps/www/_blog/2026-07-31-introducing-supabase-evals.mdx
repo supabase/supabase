@@ -1,0 +1,79 @@
+---
+title: 'Introducing Supabase Evals'
+description: 'Our open-source benchmark for how well AI coding agents build with Supabase.'
+author: matt_rossman
+date: '2026-07-31'
+categories:
+  - product
+tags:
+  - ai
+  - evals
+  - developer-tools
+imgSocial: 'introducing-supabase-evals/og.png'
+imgThumb: 'introducing-supabase-evals/thumb.png'
+toc_depth: 2
+---
+
+Today we're open sourcing [`supabase/evals`](https://github.com/supabase/evals), our benchmark and framework for testing how well AI agents build using Supabase. It runs coding agents including Claude Code, Codex, and OpenCode against real Supabase tasks, for example, building a schema, debugging a failed Edge Function, or fixing a broken RLS policy, and then scores how well they performed. It powers both our [published benchmark](https://supabase.com/evals) and an internal regression suite we monitor daily. As more people ship Supabase projects through an agent instead of by hand, we wanted a way to measure that experience instead of guessing.
+
+![Supabase Evals benchmark results](/images/blog/introducing-supabase-evals/benchmark-results.png)
+
+> The results cited here reflect a snapshot at the time of writing. AI tooling changes rapidly, so check the [live page](https://supabase.com/evals) for current results.
+
+## Why we built this
+
+Agents are becoming a primary way people build with Supabase, interacting through our CLI, MCP server, agent skills, and docs. We needed a way to understand how agents perform across all of these Supabase surfaces, not just one tool in isolation. By tracking where agents stumble, we can make intentional fixes and verify they hold instead of regressing, and test new features confidently before shipping.
+
+## How we approached it
+
+We started by defining the dimensions we wanted to cover, including:
+
+- **Product** areas like Database and Auth
+- **Topics** agents need to handle well across any product, like the SDK and observability
+- **Stages** of a Supabase builder's journey, such as building an app or resolving issues
+
+Then we picked the smallest set of scenarios that touched each dimension at least once, grounded in real problems like support tickets, bug reports, or GitHub issues.
+
+We split scenarios into two suites, benchmark and regression:
+
+**Benchmark scenarios** aim for breadth, acting as a small but diverse set of scenarios that cover the real Supabase user journey. We run these against several harness configurations, including a mixture of more capable and smaller models, and [publish results on our site](https://supabase.com/evals).
+
+**Regression scenarios** aim for depth, covering specific known failure modes that we monitor more frequently without influencing benchmark scores. This gives us a space to triage bug reports or experiment with new features without skewing our published results.
+
+Every scenario runs against a real Supabase environment to measure what an agent would actually do in the wild. We built a framework that spins up both a hosted-like Supabase stack and a local CLI project in containers, so agents invoke our actual MCP server and CLI. We score their behavior with a combination of deterministic checks (whether a user can access certain data, or an Edge Function returns an expected result) and LLM-as-a-judge for anything that needs semantic judgment. To reduce false negatives while keeping runs sustainable, we let agents retry once after a failure before grading them. We run benchmark scenarios when assessing new changes or harnesses, and refresh regression results daily.
+
+Benchmark results are visualized in a web app, so anyone can browse and filter the scores or see details of each run.
+
+## What we've found so far
+
+Below are some areas we saw agents tripping up during benchmark development, and how we're addressing them:
+
+### Key findings
+
+#### Skills vs no-skills isn't as big a delta as we expected, and that's a good sign
+
+Across our benchmark, agents already pass most scenarios with no skill loaded at all. In the Build stage, for example, Opus 5 and Kimi K3 both scored 100% with no skill loaded. Skills closed the gap for the rest: Sonnet 5 went from 78% to 100%, GPT-5.6 Sol from 89% to 100%, and GPT-5.4 mini from 78% to 89%. That means agents are reasonably capable at broad Supabase tasks out of the box. The biggest impact we saw is that agents with our skills loaded checked Supabase docs more consistently and thoroughly, which helped skills earn their keep in the edge cases where models need to unlearn outdated pre-training knowledge. We still recommend using our skill to ensure your agents have the most up-to-date information on Supabase best practices and breaking changes, examples of which follow below.
+
+### Where agents struggle
+
+#### Agents don't reach for declarative schema workflows
+
+[Declarative schemas](https://supabase.com/docs/guides/local-development/declarative-database-schemas) are a developer-friendly way of describing the shape of your database in one place instead of reasoning across several migration files. We expect agents to prefer managing schemas from that single source of truth instead of piecing it together from a chain of migrations. But even in a project that already uses declarative schemas, we noticed agents try to hand-write migrations instead. As a result, we [updated our skill guidance](https://github.com/supabase/agent-skills/pull/120) to make it clearer when to pick each workflow and [verified the behavior correction](https://github.com/supabase/evals/pull/80) with our evals.
+
+#### Our newer libraries aren't sufficiently discoverable
+
+We [recently released](https://supabase.com/blog/introducing-supabase-server) `@supabase/server` to simplify boilerplate of writing secure Edge Functions. When tasked with writing edge functions though, agents still choose to verify auth by hand with `supabase-js`. We've since published a ["Which package to choose"](https://supabase.com/docs/guides/auth/choosing-a-server-package) guide to clarify when to use each package, as a reference for agents.
+
+#### Skill activation is uneven
+
+We track which skills agents loaded during a session compared to what was available. Our main `supabase` skill loads in every scenario where it's available. Our earlier skill, covering [Postgres best practices](https://supabase.com/blog/postgres-best-practices-for-ai-agents), originally loaded in only about one in ten of those same sessions. We rewrote our description of that skill to lead with clearer triggers, increasing activation to 60% across our benchmarks, though we still find OpenAI models more reliable at activating the skill.
+
+#### Docs usage is inconsistent across harnesses
+
+During runs we track when agents read our docs, either via the Supabase MCP `search_docs` tool or their native web tools. Codex-based agents check docs more than Claude Code agents do. The more capable OpenAI model checks docs most consistently, and Codex / GPT-5.6 reads the most pages, around 8 per scenario versus about 2 for Claude Code. Claude Code checks our docs in under 40% of scenarios even with skills loaded. We're working to make sure agents are checking docs in the situations they need to, and that they find all the information they need to make good decisions.
+
+## Check it out
+
+Browse the benchmark results at [supabase.com/evals](https://supabase.com/evals) and group by product, stage, or agent to see where agents are strong and where they're not. Or see the [GitHub repo](https://github.com/supabase/evals) for details on the benchmark and regression scenarios.
+
+This is a starting point. We'll expand coverage of edge cases within this problem space, and add new scenarios as agents and our product change. We're also working to make our scoring more rigorous and stable. As we build confidence in specific regression scenarios, we may graduate them into the published benchmark. Lastly, we're working on a new CLI command and MCP tool that will allow agents to submit feedback when they struggle, which will help us prioritize what's next.

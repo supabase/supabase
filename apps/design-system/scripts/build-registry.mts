@@ -1,5 +1,5 @@
 // @sts-nocheck
-import { existsSync, promises as fs } from 'fs'
+import { promises as fs } from 'fs'
 import { tmpdir } from 'os'
 import path from 'path'
 import { cwd } from 'process'
@@ -191,13 +191,10 @@ export const Index: Record<string, any> = {
           })
         )
 
-        // // Write the source file for blocks only.
+        // Write the source file for blocks only.
         sourceFilename = `__registry__/${style.name}/${type}/${item.name}.tsx`
         const sourcePath = path.join(process.cwd(), sourceFilename)
-        if (!existsSync(sourcePath)) {
-          await fs.mkdir(sourcePath, { recursive: true })
-        }
-
+        await fs.mkdir(path.dirname(sourcePath), { recursive: true })
         rimraf.sync(sourcePath)
         await fs.writeFile(sourcePath, sourceFile.getText())
       }
@@ -273,8 +270,10 @@ export const Index: Record<string, any> = {
   // await fs.writeFile(path.join(REGISTRY_PATH, 'index.json'), registryJson, 'utf8')
 
   // Write style index.
-  rimraf.sync(path.join(process.cwd(), '__registry__/index.tsx'))
-  await fs.writeFile(path.join(process.cwd(), '__registry__/index.tsx'), index)
+  const indexPath = path.join(process.cwd(), '__registry__/index.tsx')
+  await fs.mkdir(path.dirname(indexPath), { recursive: true })
+  rimraf.sync(indexPath)
+  await fs.writeFile(indexPath, index)
 }
 
 // ----------------------------------------------------------------------------

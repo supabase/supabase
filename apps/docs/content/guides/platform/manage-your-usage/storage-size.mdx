@@ -12,6 +12,8 @@ You are charged for the total size of all assets in your buckets.
 Storage size is charged by Gigabyte-Hours (GB-Hrs). 1 GB-Hr represents the use of 1 GB of storage for 1 hour.
 For example, storing 10 GB of data for 5 hours results in 50 GB-Hrs (10 GB × 5 hours).
 
+Because usage is measured in GB-Hrs, your Storage size for quota and billing is effectively the average across the billing period, not the live size. For example, storing 20 GB for the first half of the month and 0 GB for the second half averages to 10 GB. This means reducing storage late in the cycle lowers the average only gradually, so it may not immediately clear a restriction until the next billing cycle begins.
+
 ### Usage on your invoice
 
 Usage is shown as "Storage Size GB-Hrs" on your invoice.
@@ -29,24 +31,24 @@ The organization's Storage size usage is within the quota, so no charges for Sto
 | Line Item           | Units     | Costs                    |
 | ------------------- | --------- | ------------------------ |
 | Pro Plan            | 1         | <Price price="25" />     |
-| Compute Hours Micro | 744 hours | <Price price="10" />     |
+| Compute Hours Small | 730 hours | <Price price="15" />     |
 | Storage Size        | 85 GB     | <Price price="0" />      |
-| **Subtotal**        |           | **<Price price="35" />** |
+| **Subtotal**        |           | **<Price price="40" />** |
 | Compute Credits     |           | -<Price price="10" />    |
-| **Total**           |           | **<Price price="25" />** |
+| **Total**           |           | **<Price price="30" />** |
 
 ### Exceeding quota
 
-The organization's Storage size usage exceeds the quota by 257 GB, incurring charges for this additional usage.
+The organization's Storage size usage exceeds the quota by 188 GB, incurring charges for this additional usage.
 
-| Line Item           | Units     | Costs                      |
-| ------------------- | --------- | -------------------------- |
-| Pro Plan            | 1         | <Price price="25" />       |
-| Compute Hours Micro | 744 hours | <Price price="10" />       |
-| Storage Size        | 357 GB    | <Price price="5.4" />      |
-| **Subtotal**        |           | **<Price price="40.4" />** |
-| Compute Credits     |           | -<Price price="10" />      |
-| **Total**           |           | **<Price price="30.4" />** |
+| Line Item           | Units     | Costs                    |
+| ------------------- | --------- | ------------------------ |
+| Pro Plan            | 1         | <Price price="25" />     |
+| Compute Hours Small | 730 hours | <Price price="15" />     |
+| Storage Size        | 288 GB    | <Price price="4" />      |
+| **Subtotal**        |           | **<Price price="44" />** |
+| Compute Credits     |           | -<Price price="10" />    |
+| **Total**           |           | **<Price price="34" />** |
 
 ## View usage
 

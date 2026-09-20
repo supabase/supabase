@@ -24,7 +24,7 @@ This typically indicates an authentication failure where the database connection
     ```
 
 3.  **Skip the Pooler and connect directly to the database with the Supabase CLI (Requires IPv6):**
-    - If your network supports IPv6, you can use the beta CLI version with the `--skip-pooler` flag to bypass the connection pooler to avoid this particular issue.
+    - If your network supports IPv6, you can use the beta CLI version with the `--skip-pooler` flag to bypass the connection pooler to avoid this particular issue. Install options are documented under [Beta channel](/docs/guides/local-development/cli/getting-started#beta-channel) in the CLI getting started guide.
 
     ```bash
     npx supabase@beta link --skip-pooler

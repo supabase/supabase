@@ -4,7 +4,7 @@ import type { GoStepsSection } from '../schemas'
 
 export default function StepsSection({ section }: { section: GoStepsSection }) {
   return (
-    <div className="max-w-[80rem] w-full min-w-0 mx-auto px-8">
+    <div className="max-w-7xl w-full min-w-0 mx-auto px-8">
       {(section.title || section.description) && (
         <div className="mb-12">
           {section.title && (

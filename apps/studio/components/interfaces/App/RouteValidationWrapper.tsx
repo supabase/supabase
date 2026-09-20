@@ -1,13 +1,14 @@
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
+import { useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
+import { MCP_SECRETS_ROUTE } from '@/components/interfaces/MCP/Secrets/McpSecrets.constants'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
-import useLatest from '@/hooks/misc/useLatest'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -21,10 +22,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const isUserMFAEnabled = useIsMFAEnabled()
 
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
-  const [lastVisitedOrganization, setLastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization, setLastVisitedOrganization } = useLastVisitedOrganization()
 
   const DEFAULT_HOME = IS_PLATFORM
     ? !!lastVisitedOrganization
@@ -41,6 +39,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     // this is used by database.dev, usually as /new/new-project
     '/new/[slug]',
     '/join',
+    MCP_SECRETS_ROUTE,
   ]
 
   /**
@@ -71,7 +70,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidOrg) {
         toast.error('You do not have access to this organization')
-        router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
+        router.push(DEFAULT_HOME)
         return
       }
     }

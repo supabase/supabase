@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { describe, expect, it, vi } from 'vitest'
 
 import { hasIndexRecommendations } from '../../QueryPerformance/IndexAdvisor/index-advisor.utils'
@@ -9,7 +10,7 @@ vi.mock('../../QueryPerformance/IndexAdvisor/index-advisor.utils', () => ({
 }))
 
 const baseRow: QueryPerformanceRow = {
-  query: 'SELECT * FROM users',
+  query: safeSql`SELECT * FROM users`,
   calls: 10,
   mean_time: 50,
   min_time: 10,
@@ -49,7 +50,7 @@ describe('classifyQuery', () => {
       ...baseRow,
       index_advisor_result: {
         errors: [],
-        index_statements: ['CREATE INDEX ...'],
+        index_statements: [safeSql`CREATE INDEX ...`],
         startup_cost_before: 0,
         startup_cost_after: 0,
         total_cost_before: 0,
@@ -86,7 +87,7 @@ describe('classifyQuery', () => {
       ...baseRow,
       index_advisor_result: {
         errors: ['critical error'],
-        index_statements: ['CREATE INDEX ...'],
+        index_statements: [safeSql`CREATE INDEX ...`],
         startup_cost_before: 0,
         startup_cost_after: 0,
         total_cost_before: 0,

@@ -57,6 +57,10 @@ vi.mock('@/components/interfaces/Account/Preferences/ThemeSettings', () => ({
   ThemeSettings: () => <div>ThemeSettings</div>,
 }))
 
+vi.mock('@/components/interfaces/Account/Preferences/TimezoneSettings', () => ({
+  TimezoneSettings: () => <div>TimezoneSettings</div>,
+}))
+
 vi.mock('@/components/interfaces/Account/Preferences/HotkeySettings', () => ({
   HotkeySettings: () => <div>HotkeySettings</div>,
 }))
@@ -103,6 +107,7 @@ describe('/account/me', () => {
     expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
     expect(screen.getByText('AccountConnections')).toBeInTheDocument()
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
+    expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
     expect(screen.getByText('HotkeySettings')).toBeInTheDocument()
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.getByText('AnalyticsSettings')).toBeInTheDocument()
@@ -115,6 +120,7 @@ describe('/account/me', () => {
     render(<PreferencesPage dehydratedState={{}} />)
 
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
+    expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
     expect(screen.getByText('HotkeySettings')).toBeInTheDocument()
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.queryByText('ProfileInformation')).not.toBeInTheDocument()

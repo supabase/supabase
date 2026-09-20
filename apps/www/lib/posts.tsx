@@ -1,6 +1,7 @@
 import fs from 'fs'
-import matter from 'gray-matter'
 import path from 'path'
+import matter from 'gray-matter'
+
 import { validateBlogFrontmatterImages } from './blog-images'
 import { generateReadingTime } from './helpers'
 
@@ -171,6 +172,10 @@ export const getPostdata = async (slug: string, directory: string) => {
    * even if the mdx file is date namednamed like '2022-01-01-blog-post.mdx'
    */
   const found = folderfiles.filter((x) => x.includes(slug))[0]
+
+  if (!found) {
+    throw Object.assign(new Error(`Post not found: ${slug}`), { code: 'POST_NOT_FOUND' })
+  }
 
   const fullPath = path.join(postDirectory, found)
   const postContent = fs.readFileSync(fullPath, 'utf8')

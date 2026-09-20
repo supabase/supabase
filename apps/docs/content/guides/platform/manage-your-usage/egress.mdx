@@ -47,7 +47,7 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 
 Data sent to the client when using the shared connection pooler (Supavisor) to access your database. When using the shared connection pooler, we do not count database egress, as this would otherwise count double (Database -> Shared Pooler + Shared Pooler -> Client).
 
-**Example:** You are using our [shared connection pooler](/docs/guides/database/connecting-to-postgres#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
+**Example:** You are using our [shared connection pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
 
 ### Log Drain Egress
 
@@ -62,6 +62,12 @@ Cached and uncached egress have independent quotas and independent pricing. Cach
 ## How charges are calculated
 
 Egress is charged by gigabyte. Charges apply only for usage exceeding your subscription plan's quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Auth, Storage etc.).
+
+<Admonition type="note">
+
+Egress accumulates over the billing cycle and resets at the start of the next cycle. Usage that has already been served cannot be reduced retroactively, so the optimizations below lower future egress only. If your organization is restricted for egress, the restriction clears at the start of the next billing cycle, or immediately if you upgrade your plan or disable your Spend Cap.
+
+</Admonition>
 
 ### Usage on your invoice
 
@@ -88,26 +94,26 @@ The organization's Egress usage is within the quota, so no charges for Egress ap
 | Line Item           | Units     | Costs                    |
 | ------------------- | --------- | ------------------------ |
 | Pro Plan            | 1         | <Price price="25" />     |
-| Compute Hours Micro | 744 hours | <Price price="10" />     |
+| Compute Hours Small | 730 hours | <Price price="15" />     |
 | Egress              | 200 GB    | <Price price="0" />      |
 | Cached Egress       | 230 GB    | <Price price="0" />      |
-| **Subtotal**        |           | **<Price price="35" />** |
+| **Subtotal**        |           | **<Price price="40" />** |
 | Compute Credits     |           | -<Price price="10" />    |
-| **Total**           |           | **<Price price="25" />** |
+| **Total**           |           | **<Price price="30" />** |
 
 ### Exceeding quota
 
 The organization's Egress usage exceeds the uncached egress quota by 50 GB and the cached egress quota by 550 GB, incurring charges for this additional usage.
 
-| Line Item           | Units     | Costs                      |
-| ------------------- | --------- | -------------------------- |
-| Pro Plan            | 1         | <Price price="25" />       |
-| Compute Hours Micro | 744 hours | <Price price="10" />       |
-| Egress              | 300 GB    | <Price price="4.5" />      |
-| Cached Egress       | 800 GB    | <Price price="16.5" />     |
-| **Subtotal**        |           | **<Price price="47.5" />** |
-| Compute Credits     |           | -<Price price="10" />      |
-| **Total**           |           | **<Price price="37.5" />** |
+| Line Item           | Units     | Costs                    |
+| ------------------- | --------- | ------------------------ |
+| Pro Plan            | 1         | <Price price="25" />     |
+| Compute Hours Small | 730 hours | <Price price="15" />     |
+| Egress              | 300 GB    | <Price price="4.5" />    |
+| Cached Egress       | 800 GB    | <Price price="16.5" />   |
+| **Subtotal**        |           | **<Price price="61" />** |
+| Compute Credits     |           | -<Price price="10" />    |
+| **Total**           |           | **<Price price="51" />** |
 
 ## View usage
 
@@ -189,7 +195,7 @@ height={510}
 
 ### Most requested API endpoints
 
-In the [Logs Explorer](/dashboard/project/_/logs/explorer) you can access Edge Logs, and review the top paths to identify heavily queried endpoints. These logs currently do not include response byte data. That data will be available in the future too.
+In [Explorer](/dashboard/project/_/explorer), select query source **Logs** and [query API Gateway events](/docs/guides/observability/advanced-log-filtering) to identify heavily queried paths. These logs currently do not include response byte data. That data will be available in the future too.
 
 <Image
   alt="Top paths"

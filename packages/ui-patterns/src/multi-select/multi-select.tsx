@@ -1,31 +1,42 @@
 'use client'
 
 import { cva, VariantProps } from 'class-variance-authority'
-import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
-import { Badge, cn, useOnClickOutside } from 'ui'
+import { Check, ChevronDown, X as RemoveIcon } from 'lucide-react'
+// @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
+import type { Popover as PopoverPrimitive } from 'radix-ui'
+import React, { Children, useEffect } from 'react'
 import {
+  Badge,
+  cn,
   Command,
   CommandEmpty,
   CommandInput,
   CommandItem,
   CommandList,
-} from 'ui/src/components/shadcn/ui/command'
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverContentProps,
+  SIZE,
+  SIZE_VARIANTS,
+  SIZE_VARIANTS_DEFAULT,
+} from 'ui'
+
+import { SelectionListState } from '../SelectionListState'
 
 interface MultiSelectContextProps {
+  id: string
   values: string[]
   onValuesChange: (value: string[]) => void
   toggleValue: (values: string) => void
   open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setOpen: (open: boolean) => void
   inputValue: string
   setInputValue: React.Dispatch<React.SetStateAction<string>>
   activeIndex: number
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>
   size: MultiSelectorProps['size']
   disabled?: boolean
-  dropdownPlacement: 'top' | 'bottom'
   dropdownMaxHeight: number
 }
 
@@ -33,11 +44,12 @@ const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(n
 
 const DROPDOWN_MAX_HEIGHT = 300
 const DROPDOWN_GAP = 8
+const DROPDOWN_BORDER_HEIGHT = 2
 
 const commandItemClass = cn(
-  'relative text-foreground-lighter text-left px-2 py-1.5 rounded',
+  'relative text-foreground-light text-left px-2 py-1.5 rounded-xs',
   'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
-  'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong'
+  'peer-data-[value=true]:bg-overlay-hover'
 )
 
 function useMultiSelect() {
@@ -65,6 +77,7 @@ type MultiSelectorProps = {
   mode?: MultiSelectorMode
   values: string[]
   onValuesChange: (value: string[]) => void
+  onOpenChange?: (open: boolean) => void
   disabled?: boolean
 } & React.ComponentPropsWithoutRef<typeof Command> &
   VariantProps<typeof MultiSelectorVariants>
@@ -72,20 +85,33 @@ type MultiSelectorProps = {
 function MultiSelector({
   values = [],
   onValuesChange,
+  onOpenChange,
   disabled,
   dir,
   size,
   className,
   children,
+  id: idProp,
   ...props
 }: MultiSelectorProps) {
   const ref = React.useRef(null)
-  const [open, setOpen] = React.useState<boolean>(false)
+  const [open, setOpenState] = React.useState<boolean>(false)
   const [inputValue, setInputValue] = React.useState<string>('')
   const [activeIndex, setActiveIndex] = React.useState<number>(-1)
-
-  const [dropdownPlacement, setDropdownPlacement] = React.useState<'top' | 'bottom'>('bottom')
   const [dropdownMaxHeight, setDropdownMaxHeight] = React.useState<number>(DROPDOWN_MAX_HEIGHT)
+  const openRef = React.useRef(false)
+  const generatedId = React.useId()
+  const id = idProp ?? generatedId
+
+  const handleOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (openRef.current === nextOpen) return
+      openRef.current = nextOpen
+      setOpenState(nextOpen)
+      onOpenChange?.(nextOpen)
+    },
+    [onOpenChange]
+  )
 
   const toggleValue = React.useCallback(
     (toggledValue: string) => {
@@ -95,32 +121,31 @@ function MultiSelector({
         onValuesChange([...values, toggledValue])
       }
     },
-    [values]
+    [onValuesChange, values]
   )
-
-  const updateDropdownMetrics = React.useCallback(() => {
-    if (typeof window === 'undefined') return
-    const triggerEl = ref.current as HTMLDivElement | null
-    if (!triggerEl) return
-
-    const rect = triggerEl.getBoundingClientRect()
-    const viewportHeight = window.innerHeight
-    const spaceBelow = viewportHeight - rect.bottom - DROPDOWN_GAP
-    const spaceAbove = rect.top - DROPDOWN_GAP
-    const shouldDropUp = spaceBelow < DROPDOWN_MAX_HEIGHT && spaceAbove > spaceBelow
-    const placement = shouldDropUp ? 'top' : 'bottom'
-    const availableSpace = Math.max(placement === 'top' ? spaceAbove : spaceBelow, 0)
-    const nextHeight =
-      availableSpace > 0 ? Math.min(DROPDOWN_MAX_HEIGHT, availableSpace) : DROPDOWN_MAX_HEIGHT
-
-    setDropdownPlacement(placement)
-    setDropdownMaxHeight(nextHeight)
-  }, [])
 
   useEffect(() => {
     if (!open) return
     const controller = new AbortController()
     const { signal } = controller
+
+    const updateDropdownMetrics = () => {
+      if (typeof window === 'undefined') return
+      const triggerEl = ref.current as HTMLDivElement | null
+      if (!triggerEl) return
+
+      const rect = triggerEl.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const spaceBelow = viewportHeight - rect.bottom - DROPDOWN_GAP
+      const spaceAbove = rect.top - DROPDOWN_GAP
+      const shouldDropUp = spaceBelow < DROPDOWN_MAX_HEIGHT && spaceAbove > spaceBelow
+      const placement = shouldDropUp ? 'top' : 'bottom'
+      const availableSpace = Math.max(placement === 'top' ? spaceAbove : spaceBelow, 0)
+      const nextHeight =
+        availableSpace > 0 ? Math.min(DROPDOWN_MAX_HEIGHT, availableSpace) : DROPDOWN_MAX_HEIGHT
+
+      setDropdownMaxHeight(nextHeight)
+    }
 
     const handleUpdate = updateDropdownMetrics
     handleUpdate()
@@ -128,14 +153,7 @@ function MultiSelector({
     window.addEventListener('scroll', handleUpdate, { capture: true, passive: true, signal })
 
     return () => controller.abort()
-  }, [open, updateDropdownMetrics])
-
-  // detect clicks from outside
-  useOnClickOutside(ref, () => {
-    if (open) {
-      setOpen(false)
-    }
-  })
+  }, [open])
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -153,47 +171,50 @@ function MultiSelector({
           }
           break
         case 'Escape':
-          activeIndex !== -1 ? setActiveIndex(-1) : setOpen(false)
+          activeIndex !== -1 ? setActiveIndex(-1) : handleOpenChange(false)
           if (ref.current) {
             const button = (ref.current as HTMLDivElement).querySelector('button[role="combobox"]')
             button && (button as HTMLButtonElement).focus()
           }
           break
         case 'Enter':
-          setOpen(true)
+          handleOpenChange(true)
           break
       }
     },
-    [values, inputValue, activeIndex]
+    [values, inputValue, activeIndex, handleOpenChange]
   )
 
   return (
     <MultiSelectContext.Provider
       value={{
+        id,
         values,
         toggleValue,
         onValuesChange,
         open,
-        setOpen,
+        setOpen: handleOpenChange,
         inputValue,
         setInputValue,
         activeIndex,
         setActiveIndex,
         size: size || 'small',
         disabled,
-        dropdownPlacement,
         dropdownMaxHeight,
       }}
     >
-      <Command
-        ref={ref}
-        onKeyDown={handleKeyDown}
-        className={cn('relative w-auto overflow-visible bg-transparent flex flex-col', className)}
-        dir={dir}
-        {...props}
-      >
-        {children}
-      </Command>
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <Command
+          id={id}
+          ref={ref}
+          onKeyDown={handleKeyDown}
+          className={cn('relative w-auto overflow-visible bg-transparent flex flex-col', className)}
+          dir={dir}
+          {...props}
+        >
+          {children}
+        </Command>
+      </Popover>
     </MultiSelectContext.Provider>
   )
 }
@@ -203,10 +224,102 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
   persistLabel?: boolean
   className?: string
   badgeLimit?: number | 'wrap'
+  wrapBadges?: boolean
   deletableBadge?: boolean
   showIcon?: boolean
   mode?: MultiSelectorMode
+  renderValue?: (value: string) => React.ReactNode
 }
+
+// The tiny control has no vertical padding to spare, so its children stretch to the
+// control height and drop their line-height; the larger sizes center normally.
+const asMinHeight = (height: string) => height.replace('h-', 'min-h-')
+
+const MultiSelectorTriggerVariants = cva('', {
+  variants: {
+    size: {
+      tiny: `${SIZE.text.tiny} ${SIZE.height.tiny} p-0.5 items-stretch`,
+      small: `${SIZE.text.small} ${asMinHeight(SIZE.height.small)} p-1.5 items-center`,
+      medium: `${SIZE.text.medium} ${asMinHeight(SIZE.height.medium)} ${SIZE.padding.medium} items-center`,
+      large: `${SIZE.text.large} ${asMinHeight(SIZE.height.large)} ${SIZE.padding.large} items-center`,
+      xlarge: `${SIZE.text.xlarge} ${asMinHeight(SIZE.height.xlarge)} ${SIZE.padding.xlarge} items-center`,
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
+const MultiSelectorBadgesVariants = cva('flex overflow-hidden flex-1 min-w-0', {
+  variants: {
+    size: {
+      tiny: 'h-full min-h-0 items-center gap-0.5',
+      small: 'gap-1',
+      medium: 'gap-1',
+      large: 'gap-1',
+      xlarge: 'gap-1',
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
+const MultiSelectorBadgeVariants = cva(
+  'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5 normal-case tracking-normal text-xs/none',
+  {
+    variants: {
+      size: {
+        tiny: 'h-full py-0',
+        small: '',
+        medium: '',
+        large: '',
+        xlarge: '',
+      },
+    },
+    defaultVariants: {
+      size: SIZE_VARIANTS_DEFAULT,
+    },
+  }
+)
+
+const MultiSelectorLabelVariants = cva(
+  'text-foreground-muted whitespace-nowrap opacity-0 transition-opacity hidden',
+  {
+    variants: {
+      size: {
+        tiny: 'leading-none',
+        small: 'leading-5',
+        medium: 'leading-5',
+        large: 'leading-5',
+        xlarge: 'leading-5',
+      },
+    },
+    defaultVariants: {
+      size: SIZE_VARIANTS_DEFAULT,
+    },
+  }
+)
+
+const MultiSelectorInlineInputWrapperVariants = cva(
+  '-ml-1 px-0 flex-1 border-none truncate min-w-0',
+  {
+    variants: {
+      size: {
+        tiny: 'h-full',
+        small: '',
+        medium: '',
+        large: '',
+        xlarge: '',
+      },
+    },
+    defaultVariants: {
+      size: SIZE_VARIANTS_DEFAULT,
+    },
+  }
+)
+
+const INLINE_INPUT_CLASSES = 'py-0 px-1 truncate'
 
 const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTriggerProps>(
   (
@@ -216,14 +329,16 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       className,
       deletableBadge = true,
       badgeLimit = 9999,
+      wrapBadges = false,
       showIcon = true,
       mode = 'combobox',
+      renderValue,
       children,
       ...props
     },
     ref
   ) => {
-    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen } =
+    const { activeIndex, values, setInputValue, toggleValue, disabled, open, setOpen, size } =
       useMultiSelect()
 
     const inputRef = React.useRef<HTMLButtonElement>(null)
@@ -237,34 +352,34 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const [extraBadgesCount, setExtraBadgesCount] = React.useState(0)
     const [isDeleteHovered, setIsDeleteHovered] = React.useState(false)
 
-    const IS_BADGE_LIMIT_WRAP = badgeLimit === 'wrap'
+    const SHOULD_WRAP_BADGES = wrapBadges || badgeLimit === 'wrap'
     const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
+    const HAS_TINY_PLACEHOLDER = size === 'tiny' && values.length === 0
 
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
 
-      if (IS_BADGE_LIMIT_WRAP) {
-        setVisibleBadges(values)
-        setExtraBadgesCount(0)
-      } else {
+      if (IS_NUMERIC_LIMIT) {
         setVisibleBadges(values.slice(0, badgeLimit))
         setExtraBadgesCount(Math.max(0, values.length - badgeLimit))
+      } else {
+        setVisibleBadges(values)
+        setExtraBadgesCount(0)
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded shrink-0 px-1.5'
+    const badgeClasses = MultiSelectorBadgeVariants({ size })
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
         if (IS_INLINE_MODE) {
-          if (!open) {
-            setOpen(true)
-            setInputValue('')
-          }
-
           event.stopPropagation()
           event.preventDefault()
+
+          if (!open) {
+            setInputValue('')
+          }
 
           setTimeout(() => {
             inlineInputRef.current?.focus()
@@ -281,92 +396,106 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     )
 
     return (
-      <button
-        ref={inputRef}
-        onClick={(e) => !isDeleteHovered && handleTriggerClick(e)}
-        disabled={disabled}
-        type="button"
-        role="combobox"
-        className={cn(
-          'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
-          'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
-          'ring-offset-background placeholder:text-muted-foreground',
-          'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          'hover:border-primary transition-colors duration-200',
-          className
-        )}
-        {...props}
-      >
-        <div
-          ref={badgesRef}
+      <PopoverAnchor asChild>
+        <button
+          ref={inputRef}
+          onClick={(e) => !isDeleteHovered && handleTriggerClick(e)}
+          disabled={disabled}
+          type="button"
+          role="combobox"
           className={cn(
-            'flex gap-1 -ml-1 overflow-hidden flex-1',
-            IS_BADGE_LIMIT_WRAP && 'flex-wrap',
-            !IS_BADGE_LIMIT_WRAP &&
-              'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
+            'flex w-full min-w-50 justify-between rounded-md border',
+            'border-strong',
+            // Empty: raised plate. Filled: sunk well for chips.
+            values.length > 0 ? 'bg-field' : 'bg-control-raised',
+            'placeholder:text-muted-foreground',
+            'ring-border-control focus-ring',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            'hover:border-control-hover transition-colors duration-200',
+            open && 'border-control-hover',
+            MultiSelectorTriggerVariants({ size }),
+            className
           )}
+          {...props}
         >
-          {visibleBadges.map((value) => (
-            <Badge key={value} className={badgeClasses}>
-              {value}
-              {deletableBadge && (
-                <div
-                  onMouseEnter={() => setIsDeleteHovered(true)}
-                  onMouseLeave={() => setIsDeleteHovered(false)}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    toggleValue(value)
-                    setIsDeleteHovered(false)
-                  }}
-                  className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors pointer-events-auto"
-                >
-                  <RemoveIcon size={12} />
-                </div>
-              )}
-            </Badge>
-          ))}
-          {extraBadgesCount > 0 && (
-            <Badge className={badgeClasses}>
-              {IS_NUMERIC_LIMIT && badgeLimit < 1
-                ? `${extraBadgesCount} item${extraBadgesCount > 1 ? 's' : ''} selected`
-                : `+${extraBadgesCount}`}
-            </Badge>
-          )}
-          <span
+          <div
+            ref={badgesRef}
             className={cn(
-              'text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1 opacity-0 transition-opacity hidden',
-              !IS_INLINE_MODE &&
-                (persistLabel || values.length === 0) &&
-                'opacity-100 visible inline'
+              MultiSelectorBadgesVariants({ size }),
+              SHOULD_WRAP_BADGES && 'flex-wrap',
+              !SHOULD_WRAP_BADGES &&
+                'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
             )}
           >
-            {label}
-          </span>
-          {IS_INLINE_MODE && (
-            <MultiSelectorInput
-              ref={inlineInputRef}
-              showSearchIcon={false}
-              onValueChange={activeIndex === -1 ? setInputValue : undefined}
-              placeholder={label}
-              autoFocus={false}
-              wrapperClassName={cn(
-                'px-0 flex-1 border-none truncate',
-                IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
+            {visibleBadges.map((value) => (
+              <Badge
+                key={value}
+                className={cn(
+                  badgeClasses,
+                  deletableBadge && (size === 'tiny' ? 'pr-px' : 'pr-0.5')
+                )}
+              >
+                {renderValue?.(value) ?? value}
+                {deletableBadge && (
+                  <div
+                    onMouseEnter={() => setIsDeleteHovered(true)}
+                    onMouseLeave={() => setIsDeleteHovered(false)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      toggleValue(value)
+                      setIsDeleteHovered(false)
+                    }}
+                    className="ml-1 p-0.5 rounded-xs cursor-pointer text-foreground-lighter hover:text-foreground-light hover:bg-surface-400 transition-colors pointer-events-auto"
+                  >
+                    <RemoveIcon size={12} />
+                  </div>
+                )}
+              </Badge>
+            ))}
+            {extraBadgesCount > 0 && (
+              <Badge className={badgeClasses}>
+                {IS_NUMERIC_LIMIT && badgeLimit < 1
+                  ? `${extraBadgesCount} item${extraBadgesCount > 1 ? 's' : ''} selected`
+                  : `+${extraBadgesCount}`}
+              </Badge>
+            )}
+            <span
+              className={cn(
+                MultiSelectorLabelVariants({ size }),
+                HAS_TINY_PLACEHOLDER && 'ml-2',
+                !IS_INLINE_MODE &&
+                  (persistLabel || values.length === 0) &&
+                  'opacity-100 visible inline'
               )}
-              className="py-0 px-1 truncate"
+            >
+              {label}
+            </span>
+            {IS_INLINE_MODE && (
+              <MultiSelectorInput
+                ref={inlineInputRef}
+                showSearchIcon={false}
+                onValueChange={activeIndex === -1 ? setInputValue : undefined}
+                placeholder={values.length === 0 ? label : undefined}
+                autoFocus={false}
+                wrapperClassName={cn(
+                  MultiSelectorInlineInputWrapperVariants({ size }),
+                  SHOULD_WRAP_BADGES && 'min-w-21.25'
+                )}
+                className={cn(INLINE_INPUT_CLASSES, HAS_TINY_PLACEHOLDER && 'pl-3')}
+              />
+            )}
+          </div>
+
+          {showIcon && (
+            <ChevronDown
+              aria-hidden="true"
+              size={16}
+              strokeWidth={1.5}
+              className="text-foreground-lighter shrink-0 ml-1.5 self-center"
             />
           )}
-        </div>
-
-        {showIcon && (
-          <ChevronsUpDown
-            size={16}
-            strokeWidth={2}
-            className="text-foreground-lighter shrink-0 ml-1.5"
-          />
-        )}
-      </button>
+        </button>
+      </PopoverAnchor>
     )
   }
 )
@@ -374,7 +503,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
 MultiSelectorTrigger.displayName = 'MultiSelectorTrigger'
 MultiSelector.Trigger = MultiSelectorTrigger
 
-const MultiSelectorInputVariants = cva('bg-control border', {
+const MultiSelectorInputVariants = cva('', {
   variants: {
     size: {
       ...SIZE_VARIANTS,
@@ -385,6 +514,8 @@ const MultiSelectorInputVariants = cva('bg-control border', {
   },
 })
 
+const getInputId = (id: string) => `${id}-input`
+
 const MultiSelectorInput = React.forwardRef<
   React.ElementRef<typeof CommandInput>,
   React.ComponentPropsWithoutRef<typeof CommandInput> & {
@@ -393,14 +524,23 @@ const MultiSelectorInput = React.forwardRef<
     wrapperClassName?: string
   }
 >(({ className, wrapperClassName, showResetIcon, showSearchIcon, ...props }, ref) => {
-  const { open, setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size, disabled } =
-    useMultiSelect()
+  const {
+    id,
+    open,
+    setOpen,
+    inputValue,
+    setInputValue,
+    activeIndex,
+    setActiveIndex,
+    size,
+    disabled,
+  } = useMultiSelect()
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   // Use the provided ref if available, otherwise use the local ref
   React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
 
-  const handleFocus = () => setOpen(true)
+  const handleFocus = () => !open && setOpen(true)
   const handleClick = () => setActiveIndex(-1)
   const handleReset = () => {
     setInputValue('')
@@ -439,10 +579,12 @@ const MultiSelectorInput = React.forwardRef<
       wrapperClassName={wrapperClassName}
       className={cn(
         MultiSelectorInputVariants({ size }),
-        'text-sm bg-transparent h-full grow border-none outline-none placeholder:text-foreground-muted flex-1',
+        'bg-transparent h-full grow border-none outline-hidden placeholder:text-foreground-muted flex-1',
         activeIndex !== -1 && 'caret-transparent',
         className
       )}
+      // Can't use id as CommandInput overrides it
+      data-id={getInputId(id)}
       {...props}
     />
   )
@@ -451,28 +593,31 @@ const MultiSelectorInput = React.forwardRef<
 MultiSelectorInput.displayName = 'MultiSelectorInput'
 MultiSelector.Input = MultiSelectorInput
 
-const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children }, ref) => {
-    const { open, dropdownPlacement } = useMultiSelect()
-
-    const closedTranslationClass = dropdownPlacement === 'top' ? 'translate-y-3' : '-translate-y-3'
-
+const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+  ({ className, children, ...props }, ref) => {
+    const { id } = useMultiSelect()
     return (
-      <div
+      <PopoverContent
+        align="start"
+        collisionPadding={DROPDOWN_GAP}
         ref={ref}
+        sideOffset={DROPDOWN_GAP}
         className={cn(
-          'absolute w-full bg-overlay shadow-md z-10 border border-overlay rounded-md transition-all',
-          dropdownPlacement === 'top'
-            ? 'bottom-[calc(100%+0.25rem)] origin-bottom'
-            : 'top-[calc(100%+0.25rem)] origin-top',
-          open
-            ? 'opacity-100 translate-y-0 visible duration-150 ease-in-out'
-            : cn('opacity-0 invisible duration-0', closedTranslationClass),
+          'bg-overlay shadow-md z-50 border rounded-md p-0',
+          'w-(--radix-popper-anchor-width)',
           className
         )}
+        onFocusOutside={(event) => {
+          if (event.target instanceof HTMLElement && event.target.dataset.id === getInputId(id)) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+        }}
+        sameWidthAsTrigger
+        {...props}
       >
-        {open && children}
-      </div>
+        {children}
+      </PopoverContent>
     )
   }
 )
@@ -484,57 +629,84 @@ const MultiSelectorList = React.forwardRef<
   React.ElementRef<typeof CommandList>,
   React.ComponentPropsWithoutRef<typeof CommandList> & {
     creatable?: boolean
+    emptyLabel?: string
+    error?: boolean
+    errorLabel?: string
+    loading?: boolean
   }
->(({ className, children, creatable = false }, ref) => {
-  const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
+>(
+  (
+    {
+      className,
+      children,
+      creatable = false,
+      emptyLabel = 'No results found',
+      error = false,
+      errorLabel,
+      loading = false,
+      ...props
+    },
+    ref
+  ) => {
+    const { open, inputValue, setInputValue, toggleValue, dropdownMaxHeight } = useMultiSelect()
 
-  const options = !!children
-    ? Array.isArray(children)
-      ? (children as React.ReactNode[])
-      : typeof children === 'object' && 'props' in children
-        ? children.props.children
-        : []
-    : []
-  const availableOptions = options
-    .filter((x: any) => !!x.props.value)
-    .map((x: any) => x.props.value.toLowerCase())
-  const isOptionExists = availableOptions.some((x: string) => x === inputValue.toLowerCase())
+    const options = Children.toArray(children)
+    const availableOptions = options
+      .filter((x: any) => !!x.props.value)
+      .map((x: any) => x.props.value.toLowerCase())
+    const isOptionExists = availableOptions.some((x: string) => x === inputValue.toLowerCase())
 
-  return (
-    <CommandList
-      ref={ref}
-      className={cn(
-        'p-2 flex flex-col gap-2 scrollbar-thin scrollbar-track-transparent transition-colors',
-        'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
-        'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
-        className
-      )}
-      style={{ maxHeight: dropdownMaxHeight }}
-    >
-      {children}
-      {creatable && inputValue.length > 0 && !isOptionExists ? (
-        <CommandItem
-          role="option"
-          onSelect={() => {
-            open && toggleValue(inputValue)
-            setInputValue('')
-          }}
-          className={commandItemClass}
-        >
-          Create "{inputValue}"
-        </CommandItem>
-      ) : creatable && options.length === 0 ? (
-        <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
-          Type to add a value
-        </div>
-      ) : (
-        <CommandEmpty>
-          <span className="text-foreground-muted">No results found</span>
-        </CommandEmpty>
-      )}
-    </CommandList>
-  )
-})
+    return (
+      <CommandList
+        ref={ref}
+        className={cn(
+          'p-1 flex flex-col scrollbar-thin scrollbar-track-transparent transition-colors',
+          'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
+          'scrollbar-thumb-rounded-lg w-full overflow-y-auto',
+          className
+        )}
+        style={{
+          maxHeight: `min(${dropdownMaxHeight}px, calc(var(--radix-popover-content-available-height) - ${DROPDOWN_BORDER_HEIGHT}px))`,
+        }}
+        {...props}
+      >
+        <SelectionListState
+          isLoading={loading}
+          isError={error}
+          isEmpty={!loading && !error && options.length === 0 && !creatable}
+          emptyLabel={emptyLabel}
+          errorLabel={errorLabel}
+          skeletonVariant="multi-select"
+        />
+        {!loading && !error && (options.length > 0 || creatable) && (
+          <>
+            {children}
+            {creatable && inputValue.length > 0 && !isOptionExists ? (
+              <CommandItem
+                role="option"
+                onSelect={() => {
+                  open && toggleValue(inputValue)
+                  setInputValue('')
+                }}
+                className={commandItemClass}
+              >
+                Create "{inputValue}"
+              </CommandItem>
+            ) : creatable && options.length === 0 ? (
+              <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
+                Type to add a value
+              </div>
+            ) : (
+              <CommandEmpty>
+                <span className="text-foreground-muted">{emptyLabel}</span>
+              </CommandEmpty>
+            )}
+          </>
+        )}
+      </CommandList>
+    )
+  }
+)
 
 MultiSelectorList.displayName = 'MultiSelectorList'
 MultiSelector.List = MultiSelectorList
@@ -561,17 +733,17 @@ const MultiSelectorItem = React.forwardRef<
       <div
         className={cn(
           'flex items-center justify-center',
-          'peer h-4 w-4 shrink-0 rounded border border-control bg-control/25 ring-offset-background',
+          'peer h-4 w-4 shrink-0 rounded-sm border border-control bg-control/25 ring-offset-background',
           'transition-colors duration-150 ease-in-out',
           'hover:border-strong',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background',
-          isSelected ? 'bg-foreground text-background' : '[&_svg]:invisible'
+          'focus-ring',
+          'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background-overlay',
+          isSelected ? 'bg-foreground text-background-overlay' : '[&_svg]:invisible'
         )}
       >
         <Check className="h-3 w-3" strokeWidth={4} />
       </div>
-      <div className="text-xs grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
+      <div className="text-sm grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
         {children}
       </div>
     </CommandItem>

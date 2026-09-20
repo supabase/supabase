@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
+import { useMemo } from 'react'
 
 import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
@@ -8,7 +10,13 @@ import type {
   QueryType,
 } from '@/components/interfaces/Settings/Logs/Logs.types'
 import { genSingleLogQuery } from '@/components/interfaces/Settings/Logs/Logs.utils'
-import { get } from '@/data/fetchers'
+import {
+  genSingleLogQueryOtel,
+  mapOtelSingleLogToLegacy,
+} from '@/components/interfaces/Settings/Logs/Logs.utils.otel'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
+import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface SingleLogHook {
@@ -31,9 +39,23 @@ function useSingleLog({
   paramsToMerge,
 }: SingleLogParams): SingleLogHook {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
-  const sql = id && table ? genSingleLogQuery(table, id) : ''
 
-  const params: LogsEndpointParams = { ...paramsToMerge, sql }
+  // When on, fetch the log from the OTEL endpoint instead of BigQuery.
+  const useOtel = useFlag('otelLegacyLogs')
+  const endpoint = logsAllEndpointUrl(useOtel)
+
+  const sql = useMemo(() => {
+    if (!id || !table) return safeSql``
+    if (useOtel) {
+      try {
+        return genSingleLogQueryOtel(id)
+      } catch {
+        // Malformed (non-uuid) id — emit nothing rather than throwing in render.
+        return safeSql``
+      }
+    }
+    return genSingleLogQuery(table, id)
+  }, [id, table, useOtel])
 
   const enabled = Boolean(id && table)
 
@@ -46,19 +68,29 @@ function useSingleLog({
     isRefetching,
     refetch,
   } = useQuery({
-    queryKey: ['projects', projectRef, 'single-log', id, queryType],
+    // id and queryType uniquely identify sql without having to stick the
+    // entire sql in the query key.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [
+      'projects',
+      projectRef,
+      'single-log',
+      id,
+      queryType,
+      paramsToMerge?.iso_timestamp_start,
+      paramsToMerge?.iso_timestamp_end,
+      { otel: useOtel },
+    ],
     queryFn: async ({ signal }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-        params: {
-          path: { ref: projectRef },
-          query: params,
-        },
+      const data = await executeAnalyticsSql({
+        projectRef,
+        endpoint,
+        sql,
+        iso_timestamp_start: paramsToMerge?.iso_timestamp_start ?? '',
+        iso_timestamp_end: paramsToMerge?.iso_timestamp_end ?? '',
+        method: 'get',
         signal,
       })
-      if (error) {
-        throw error
-      }
-
       return data as unknown as Logs
     },
     enabled,
@@ -68,7 +100,8 @@ function useSingleLog({
   })
 
   let error: null | string | object = rcError ? (rcError as any).message : null
-  const result = data?.result ? data.result[0] : undefined
+  const rawResult = data?.result ? data.result[0] : undefined
+  const result = rawResult && useOtel ? mapOtelSingleLogToLegacy(rawResult, queryType) : rawResult
 
   return {
     data: !!result

@@ -140,9 +140,9 @@ export class GuideModelLoader {
       },
       (error) => {
         if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-          return new FileNotFoundError('', error)
+          throw new FileNotFoundError('', error)
         }
-        return new Error(
+        throw new Error(
           `Failed to load guide from ${relPath}: ${extractMessageFromAnyError(error)}`,
           {
             cause: error,

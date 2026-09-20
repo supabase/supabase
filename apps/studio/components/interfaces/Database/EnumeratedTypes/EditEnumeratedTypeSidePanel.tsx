@@ -19,9 +19,9 @@ import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   Form,
@@ -31,7 +31,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   SidePanel,
 } from 'ui'
 import * as z from 'zod'
@@ -188,7 +188,7 @@ const EditEnumeratedTypeSidePanel = ({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input_Shadcn_ {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -201,7 +201,7 @@ const EditEnumeratedTypeSidePanel = ({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input_Shadcn_ {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormDescription>Optional</FormDescription>
                 </FormItem>
@@ -218,20 +218,15 @@ const EditEnumeratedTypeSidePanel = ({
               >
                 Values
               </span>
-              <Alert_Shadcn_>
+              <Alert>
                 <AlertCircle strokeWidth={1.5} />
-                <AlertTitle_Shadcn_>Existing values cannot be deleted or sorted</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p className="!leading-normal track">
+                <AlertTitle>Existing values cannot be deleted or sorted</AlertTitle>
+                <AlertDescription>
+                  <p className="leading-normal! track">
                     You will need to delete and recreate the enumerated type with the updated values
                     instead.
                   </p>
-                  <Button
-                    asChild
-                    type="default"
-                    icon={<ExternalLink strokeWidth={1.5} />}
-                    className="mt-2"
-                  >
+                  <Button asChild icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
                     <Link
                       href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
                       target="_blank"
@@ -240,8 +235,8 @@ const EditEnumeratedTypeSidePanel = ({
                       Learn more
                     </Link>
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -264,14 +259,13 @@ const EditEnumeratedTypeSidePanel = ({
             </div>
 
             <Button
-              type="default"
               icon={<Plus strokeWidth={1.5} />}
               onClick={() => append({ isNew: true, originalValue: '', updatedValue: '' })}
             >
               Add value
             </Button>
 
-            <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+            <Button ref={submitRef} type="submit" className="hidden">
               Update
             </Button>
           </form>

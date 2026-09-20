@@ -1,5 +1,13 @@
 [
   {
+    "author_id": "alex_hall",
+    "author": "Alex Hall",
+    "username": "alexhall",
+    "position": "Engineering",
+    "author_url": "https://github.com/alexhall",
+    "author_image_url": "https://github.com/alexhall.png"
+  },
+  {
     "author_id": "angelico_de_los_reyes",
     "author": "Angelico de los Reyes",
     "position": "Engineering",
@@ -28,6 +36,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/darora",
     "author_image_url": "https://github.com/darora.png"
+  },
+  {
+    "author_id": "elsa_heffernan",
+    "author": "Elsa Heffernan",
+    "position": "Partnerships",
+    "author_url": "https://www.linkedin.com/in/elsaheffernan/",
+    "author_image_url": "/images/blog/avatars/elsa-heffernan.png"
   },
   {
     "author_id": "fracek",
@@ -89,6 +104,14 @@
     "position": "Head of Growth",
     "author_url": "https://github.com/roryw10",
     "author_image_url": "https://github.com/roryw10.png"
+  },
+  {
+    "author_id": "shaziya_bandukia",
+    "author": "Shaziya Bandukia",
+    "username": "shaziyabandukia",
+    "position": "Product + Partnerships",
+    "author_url": "https://github.com/shaziyabandukia",
+    "author_image_url": "https://github.com/shaziyabandukia.png"
   },
   {
     "author_id": "steve_chavez",
@@ -697,7 +720,7 @@
   {
     "author_id": "bilharmer",
     "author": "Bil Harmer",
-    "position": "CSO",
+    "position": "CISO",
     "author_url": "#",
     "author_image_url": "/images/blog/avatars/bilharmer.jpg"
   },
@@ -820,6 +843,14 @@
     "author_image_url": "https://github.com/smeubank.png"
   },
   {
+    "author_id": "kemal_y",
+    "author": "Kemal Y",
+    "username": "kemaldotearth",
+    "position": "Design",
+    "author_url": "https://github.com/kemaldotearth",
+    "author_image_url": "https://github.com/kemaldotearth.png"
+  },
+  {
     "author_id": "katerina_skroumpelou",
     "author": "Katerina Skroumpelou",
     "position": "Engineering",
@@ -856,7 +887,7 @@
     "username": "deepthi",
     "position": "Head of Databases",
     "author_url": "https://github.com/deepthi",
-    "author_image_url": "https://github.com/deepthi.png"
+    "author_image_url": "/images/avatars/deepthi-sigireddi.jpg"
   },
   {
     "author_id": "joe_sciarrino",
@@ -918,7 +949,7 @@
     "author_id": "gregor_vand",
     "author": "Gregor Vand",
     "username": "gregorvand",
-    "position": "Technical Program Manager",
+    "position": "Product",
     "author_url": "https://www.linkedin.com/in/gregorvand/",
     "author_image_url": "https://github.com/gregorvand.png"
   },
@@ -945,5 +976,76 @@
     "company": "Figma",
     "author_url": "https://www.linkedin.com/in/samanthadotdesign/",
     "author_image_url": "/images/blog/avatars/samantha-lee.jpeg"
+  },
+  {
+    "author_id": "tomas_pozo",
+    "author": "Tomás Pozo",
+    "username": "tomaspozo",
+    "position": "Community",
+    "author_url": "https://github.com/tomaspozo",
+    "author_image_url": "https://github.com/tomaspozo.png"
+  },
+  {
+    "author_id": "kalleby_santos",
+    "author": "Kalleby Santos",
+    "username": "kallebysantos",
+    "position": "Engineering",
+    "author_url": "https://github.com/kallebysantos",
+    "author_image_url": "https://github.com/kallebysantos.png"
+  },
+  {
+    "author_id": "matt_johnston",
+    "author": "Matt Johnston",
+    "username": "johnstonmatt",
+    "position": "Engineering",
+    "author_url": "https://github.com/johnstonmatt",
+    "author_image_url": "https://github.com/johnstonmatt.png"
+  },
+  {
+    "author_id": "natalie_roberge",
+    "author": "Natalie Roberge",
+    "position": "Customer Solutions Architect",
+    "author_url": "https://www.linkedin.com/in/natalieroberge/",
+    "author_image_url": "/images/blog/avatars/natalie-roberge.png"
+  },
+  {
+    "author_id": "david_dalmaso",
+    "author": "David Dalmaso",
+    "position": "Member of Technical Staff",
+    "company": "Perplexity",
+    "author_url": "https://www.linkedin.com/in/david-dalmaso-359791101/",
+    "author_image_url": "/images/blog/avatars/david-dalmaso.png"
+  },
+  {
+    "author_id": "gary_qi",
+    "author": "Gary Qi",
+    "position": "Developer Operations Manager",
+    "company": "TRAE",
+    "author_url": "https://www.linkedin.com/",
+    "author_image_url": "/images/blog/avatars/gary-qi.png"
+  },
+  {
+    "author_id": "ekhar",
+    "author": "Eric Kharitonashvili",
+    "username": "ekhar",
+    "position": "Growth",
+    "author_url": "https://github.com/ekhar",
+    "author_image_url": "/images/blog/avatars/eric-kharitonashvili.png"
+  },
+  {
+    "author_id": "miranda_limonczenko",
+    "author": "Miranda Limonczenko",
+    "username": "czenko",
+    "position": "Docs Engineer",
+    "author_url": "https://github.com/czenko",
+    "author_image_url": "https://github.com/czenko.png"
+  },
+  {
+    "author_id": "nik_richers",
+    "author": "Nik Richers",
+    "username": "nrichers",
+    "position": "Product Manager",
+    "author_url": "https://github.com/nrichers",
+    "author_image_url": "https://github.com/nrichers.png"
   }
 ]

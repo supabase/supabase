@@ -6,6 +6,7 @@ import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 
 import { BannerCard } from '../BannerCard'
 import { BANNER_ID, useBannerStack } from '../BannerStackProvider'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { ChevronsUpAnimated } from '@/components/ui/ComputeBadgeWrapper'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
@@ -30,13 +31,13 @@ export const BannerFreeMicroUpgrade = () => {
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-2 items-start">
           <div className="animate-badge-pulse">
-            <div className="relative inline-flex overflow-hidden rounded">
+            <div className="relative inline-flex overflow-hidden rounded-sm">
               <ComputeBadge
                 infraComputeSize="nano"
                 icon={<ChevronsUpAnimated />}
                 className="text-brand-600 border-brand-500 bg-brand/10 gap-1"
               />
-              <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-brand/20 to-transparent blur-md" />
+              <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand/20 to-transparent blur-md" />
             </div>
           </div>
         </div>
@@ -49,7 +50,7 @@ export const BannerFreeMicroUpgrade = () => {
         </div>
         <div className="flex gap-2">
           <Button
-            type="primary"
+            variant="primary"
             size="tiny"
             asChild
             onClick={() => {
@@ -58,9 +59,7 @@ export const BannerFreeMicroUpgrade = () => {
               track('free_micro_upgrade_banner_cta_clicked')
             }}
           >
-            <Link href={`/project/${ref}/settings/compute-and-disk?upgrade=micro`}>
-              Upgrade for free
-            </Link>
+            <Link href={`${getInfrastructurePath(ref)}?upgrade=micro`}>Upgrade for free</Link>
           </Button>
         </div>
       </div>

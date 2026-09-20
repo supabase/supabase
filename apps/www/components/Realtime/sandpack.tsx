@@ -41,12 +41,12 @@ export default function SandpackWrapper({ files, dependencies = {} }: SandpackPr
           externalResources: ['https://cdn.tailwindcss.com'],
         }}
       >
-        <SandpackLayout className="!h-full !min-h-full !border-none !bg-surface-50 !rounded-none !flex !flex-col">
+        <SandpackLayout className="h-full! min-h-full! border-none! !bg-surface-50 rounded-none! flex! flex-col!">
           <SandpackPreview
             showNavigator={false}
             showRefreshButton={false}
             showOpenInCodeSandbox={false}
-            className="!h-full !flex-1 !border-none"
+            className="h-full! flex-1! border-none!"
           />
         </SandpackLayout>
       </SandpackProvider>

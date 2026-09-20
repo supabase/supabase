@@ -108,7 +108,7 @@ const LW15Heading = () => {
 
   return (
     <header className="border-b">
-      <SectionContainer className="flex flex-col justify-between gap-12 !py-8 lg:!py-10 h-full !max-w-none lg:!container">
+      <SectionContainer className="flex flex-col justify-between gap-12 py-8! lg:py-10! h-full max-w-none! lg:container!">
         <div className="grid md:grid-cols-5 gap-4 delay-100">
           <div
             data-animate

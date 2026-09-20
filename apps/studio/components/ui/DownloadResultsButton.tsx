@@ -15,6 +15,7 @@ import {
   KeyboardShortcut,
 } from 'ui'
 
+import { ButtonTooltip } from './ButtonTooltip'
 import {
   convertResultsToCSV,
   convertResultsToJSON,
@@ -25,11 +26,12 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DownloadResultsButtonProps {
   iconOnly?: boolean
-  type?: 'text' | 'default'
+  variant?: 'text' | 'default'
   text?: string
   align?: 'start' | 'center' | 'end'
-  results: any[]
+  results: readonly any[]
   fileName: string
+  enableCopyShortcuts?: boolean
   onDownloadAsCSV?: () => void
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
@@ -38,11 +40,12 @@ interface DownloadResultsButtonProps {
 
 export const DownloadResultsButton = ({
   iconOnly = false,
-  type = 'default',
+  variant = 'default',
   text = 'Export',
   align = 'start',
   results,
   fileName,
+  enableCopyShortcuts = true,
   onDownloadAsCSV,
   onCopyAsMarkdown,
   onCopyAsJSON,
@@ -73,7 +76,7 @@ export const DownloadResultsButton = ({
       return
     }
     copyToClipboard(markdownData, () => {
-      toast.success('Copied markdown to clipboard')
+      toast.success('Copied Markdown to clipboard')
       onCopyAsMarkdown?.()
     })
   }
@@ -103,15 +106,18 @@ export const DownloadResultsButton = ({
   }
 
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, copyAsMarkdown, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, copyAsJSON, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_CSV, copyAsCSV, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV, downloadAsCSV, {
@@ -122,17 +128,23 @@ export const DownloadResultsButton = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          type={type}
-          icon={iconOnly ? <Download /> : undefined}
-          iconRight={iconOnly ? undefined : <ChevronDown />}
-          disabled={results.length === 0}
-          className={iconOnly ? 'w-7' : ''}
-        >
-          {!iconOnly && text}
-        </Button>
+        {iconOnly ? (
+          <ButtonTooltip
+            variant={variant}
+            aria-label="Download results"
+            aria-describedby={undefined}
+            icon={<Download />}
+            disabled={results.length === 0}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Download results' } }}
+          />
+        ) : (
+          <Button variant={variant} iconRight={<ChevronDown />} disabled={results.length === 0}>
+            {text}
+          </Button>
+        )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} className="w-60">
+      <DropdownMenuContent align={align} className={enableCopyShortcuts ? 'w-60' : 'w-44'}>
         {isLogs && IS_PLATFORM && (
           <DropdownMenuItem asChild className="gap-x-2">
             <Link href={`/project/${ref}/settings/log-drains`}>
@@ -144,30 +156,38 @@ export const DownloadResultsButton = ({
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
           <Copy size={14} />
           <p>Copy as Markdown</p>
-          <span className="ml-auto">
-            <KeyboardShortcut keys={['Shift', 'Meta', 'm']} />
-          </span>
+          {enableCopyShortcuts && (
+            <span className="ml-auto">
+              <KeyboardShortcut keys={['Shift', 'Meta', 'm']} />
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsJSON} className="gap-x-2">
           <Copy size={14} />
           <p>Copy as JSON</p>
-          <span className="ml-auto">
-            <KeyboardShortcut keys={['Shift', 'Meta', 'j']} />
-          </span>
+          {enableCopyShortcuts && (
+            <span className="ml-auto">
+              <KeyboardShortcut keys={['Shift', 'Meta', 'j']} />
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsCSV} className="gap-x-2">
           <Copy size={14} />
           <p>Copy as CSV</p>
-          <span className="ml-auto">
-            <KeyboardShortcut keys={['Shift', 'Meta', 'c']} />
-          </span>
+          {enableCopyShortcuts && (
+            <span className="ml-auto">
+              <KeyboardShortcut keys={['Shift', 'Meta', 'c']} />
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>
           <Download size={14} />
           <p>Download CSV</p>
-          <span className="ml-auto">
-            <KeyboardShortcut keys={['Shift', 'Meta', 'd']} />
-          </span>
+          {enableCopyShortcuts && (
+            <span className="ml-auto">
+              <KeyboardShortcut keys={['Shift', 'Meta', 'd']} />
+            </span>
+          )}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

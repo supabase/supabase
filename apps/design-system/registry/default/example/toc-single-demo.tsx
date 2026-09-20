@@ -1,7 +1,13 @@
 'use client'
 
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { AnchorProvider, Toc, TOCItems, TOCScrollArea, type AnchorProviderProps } from 'ui-patterns'
+import {
+  AnchorProvider,
+  Toc,
+  TOCItems,
+  TOCScrollArea,
+  type AnchorProviderProps,
+} from 'ui-patterns/Toc'
 
 export default function MultiSelectDemo() {
   return (
@@ -149,7 +155,7 @@ const TocComponent = () => {
       <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
         On this page
       </h3>
-      <TOCScrollArea className="-ml-[2px]">
+      <TOCScrollArea className="ml-[-2px]">
         <TOCItems items={toc} />
       </TOCScrollArea>
     </Toc>

@@ -39,7 +39,7 @@ const CutomsersSliderDesktop: React.FC<Props> = ({ columns, className }) => (
           <CompositionCol
             key={`customers-col-${idx1}-${idx2}`}
             className={cn(
-              'flex flex-col !h-full',
+              'flex flex-col h-full!',
               compositionGap,
               column.type === 'expanded' ? 'w-[450px]' : 'w-[250px]'
             )}

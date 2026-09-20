@@ -47,8 +47,8 @@ const GridItem = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
                     transition 
                     group-hover:border 
                     group-hover:border-foreground-muted 
-                    group-data-[state=open]:border 
-                    group-data-[state=open]:border-foreground-muted 
+                    group-data-open:border 
+                    group-data-open:border-foreground-muted 
                 "
         ></div>
         {children}

@@ -68,6 +68,7 @@ export const useStripeSyncInstallMutation = ({
 
       track('integration_install_submitted', {
         integrationName: 'stripe_sync_engine',
+        method: 'template',
       })
 
       // Invalidate schemas query to refresh installation status

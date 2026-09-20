@@ -78,7 +78,7 @@ const FunctionLink = memo(function FunctionLink({
         {active && !isSubItem && (
           <div
             aria-hidden="true"
-            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-600"
+            className="absolute left-[-13px] top-0 bottom-0 w-px bg-brand-600"
           ></div>
         )}
         {isParent && (

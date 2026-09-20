@@ -23,7 +23,7 @@ export const AlgorithmHoverCard = ({ algorithm, legacy }: AlgorithmHoverCardProp
         <HoverCardTrigger className="min-w-0">
           <HelpCircle size={14} className="text-foreground-lighter" />
         </HoverCardTrigger>
-        <HoverCardContent className="w-[22rem] flex items-start gap-3" side="right" align="center">
+        <HoverCardContent className="w-88 flex items-start gap-3" side="right" align="center">
           <div className="flex-1">
             <h4 className="font-semibold truncate">{details.name}</h4>
             <div className="flex flex-col gap-2 text-sm text-foreground-light">

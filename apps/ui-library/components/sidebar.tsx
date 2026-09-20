@@ -11,7 +11,7 @@ export function Sidebar() {
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background justify-between flex items-center px-8 py-3 border-b">
         <MobileMenuSheet>
           <SheetTrigger asChild>
-            <Button type="outline" icon={<Menu />} />
+            <Button variant="outline" icon={<Menu />} />
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-80" showClose={false}>
             <ScrollArea className="h-full">

@@ -10,7 +10,7 @@ interface BranchBadgeProps {
 export function BranchBadge({ branch, isBranchingEnabled }: BranchBadgeProps) {
   if (!isBranchingEnabled) {
     return (
-      <Badge variant="warning" className="mt-[1px]">
+      <Badge variant="warning" className="mt-px">
         Production
       </Badge>
     )
@@ -18,7 +18,7 @@ export function BranchBadge({ branch, isBranchingEnabled }: BranchBadgeProps) {
 
   if (branch?.is_default) {
     return (
-      <Badge variant="warning" className="mt-[1px]">
+      <Badge variant="warning" className="mt-px">
         Production
       </Badge>
     )
@@ -26,14 +26,14 @@ export function BranchBadge({ branch, isBranchingEnabled }: BranchBadgeProps) {
 
   if (branch?.persistent) {
     return (
-      <Badge variant="success" className="mt-[1px]">
+      <Badge variant="success" className="mt-px">
         Persistent
       </Badge>
     )
   }
 
   return (
-    <Badge variant="success" className="mt-[1px]">
+    <Badge variant="success" className="mt-px">
       Preview
     </Badge>
   )

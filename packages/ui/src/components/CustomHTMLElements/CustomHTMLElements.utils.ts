@@ -1,3 +1,20 @@
+/**
+ * Flatten React node trees to plain text for heading anchor ids.
+ * MDX headings often mix strings with inline nodes (`code`, links, icons);
+ * older code assumed every non-string had `props.children` and crashed when
+ * that was missing (e.g. lucide icons inside docs MDX links).
+ */
+const flattenNodeText = (node: unknown): string => {
+  if (node == null || typeof node === 'boolean') return ''
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(flattenNodeText).join('')
+  if (typeof node === 'object' && node !== null && 'props' in node) {
+    const props = (node as { props?: { children?: unknown } }).props
+    return flattenNodeText(props?.children)
+  }
+  return ''
+}
+
 // Check if heading has custom anchor first, before forming the anchor based on the title
 export const getAnchor = (text: any, { id }: { id?: string } = {}): string | undefined => {
   if (id) {
@@ -15,27 +32,22 @@ export const getAnchor = (text: any, { id }: { id?: string } = {}): string | und
 
       const formattedText = text
         .map((x) => {
-          if (typeof x !== 'string') {
-            return x.props.children
+          if (typeof x === 'string') {
+            return x.trim()
           }
-
-          return x.trim()
+          return flattenNodeText(x)
         })
         .map((x) => {
           if (typeof x !== 'string') {
             return x
           }
-
           return slugify(x)
         })
 
       return formattedText.join('-').toLowerCase()
     } else {
-      const anchor = text.props.children
-      if (typeof anchor === 'string') {
-        return slugify(anchor)
-      }
-      return anchor
+      const flattened = flattenNodeText(text).trim()
+      return flattened ? slugify(flattened) : undefined
     }
   } else if (typeof text === 'string') {
     if (hasCustomAnchor(text)) {

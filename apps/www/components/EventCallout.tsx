@@ -55,7 +55,7 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
             outerClassName="w-full"
             innerClassName="relative p-4 lg:p-8 h-full flex flex-col md:flex-row gap-4 md:gap-8"
           >
-            <div className="relative h-52 lg:h-44 xl:h-52 aspect-[2/1] md:!aspect-[3/2] rounded-lg border">
+            <div className="relative h-52 lg:h-44 xl:h-52 aspect-2/1 md:aspect-3/2! rounded-lg border">
               {/* <Image
               src=""
               fill

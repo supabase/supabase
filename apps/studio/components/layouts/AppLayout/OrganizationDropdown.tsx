@@ -3,15 +3,20 @@ import { Boxes } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Badge, cn } from 'ui'
-import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
+import {
+  AppLayoutDropdownError,
+  AppLayoutDropdownTriggerButton,
+  AppLayoutDropdownWithPopover,
+} from './AppLayoutDropdown'
 import { OrganizationDropdownCommandContent } from './OrganizationDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface OrganizationDropdownProps {
   embedded?: boolean
@@ -40,6 +45,12 @@ export const OrganizationDropdown = ({
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
+  const track = useTrack()
+
+  const handleOpenChange = (next: boolean) => {
+    if (next) track('header_organization_dropdown_opened')
+    setOpen(next)
+  }
 
   if (isLoadingOrganizations && !embedded)
     return <ShimmeringLoader className="p-2 md:mr-2 w-[90px]" />
@@ -84,7 +95,8 @@ export const OrganizationDropdown = ({
       }
       commandContent={commandContent}
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={handleOpenChange}
+      triggerButton={<AppLayoutDropdownTriggerButton aria-label="Show organizations" />}
     />
   )
 }

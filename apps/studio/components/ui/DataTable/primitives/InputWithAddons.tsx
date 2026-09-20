@@ -12,8 +12,8 @@ export const InputWithAddons = forwardRef<HTMLInputElement, InputWithAddonsProps
     return (
       <div
         className={cn(
-          'group border-input ring-offset-background flex h-10 w-full rounded border bg-transparent text-sm overflow-hidden',
-          'focus-within:ring-ring focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2',
+          'group border-input ring-offset-background flex h-10 w-full rounded-sm border bg-transparent text-sm overflow-hidden',
+          'focus-within:ring-ring focus-within:outline-hidden focus-within:ring-2 focus-within:ring-offset-2',
           containerClassName
         )}
       >
@@ -22,7 +22,7 @@ export const InputWithAddons = forwardRef<HTMLInputElement, InputWithAddonsProps
         ) : null}
         <input
           className={cn(
-            'bg-transparent w-full px-0 py-2 focus:outline-none border-0 placeholder:text-foreground-lighter ',
+            'bg-transparent w-full px-0 py-2 focus:outline-hidden border-0 placeholder:text-foreground-lighter ',
             'disabled:cursor-not-allowed disabled:opacity-50 text-[0.75rem]',
             className
           )}

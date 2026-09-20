@@ -13,7 +13,12 @@ export default function LeadGenTemplate({
     <div className="flex flex-col gap-16 sm:gap-24">
       <HeroSection section={page.hero} />
       {page.sections?.map((section, i) => (
-        <SectionRenderer key={i} section={section} customRenderers={customRenderers} />
+        <SectionRenderer
+          key={i}
+          section={section}
+          slug={page.slug}
+          customRenderers={customRenderers}
+        />
       ))}
     </div>
   )

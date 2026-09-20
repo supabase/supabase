@@ -3,11 +3,11 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
 } from 'ui'
 import {
   PageHeader,
@@ -34,7 +34,10 @@ export const QueuePage = () => {
     connectionString: project?.connectionString,
   })
 
-  const currentQueue = queues?.find((queue) => queue.queue_name === childId)
+  // pgmq is case-insensitive when storing queue names — compare lowercased to be safe
+  const currentQueue = queues?.find(
+    (queue) => queue.queue_name.toLowerCase() === childId?.toLowerCase()
+  )
 
   const pageTitle = childLabel || childId || 'Queue'
 

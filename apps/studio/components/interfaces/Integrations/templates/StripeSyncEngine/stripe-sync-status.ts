@@ -1,4 +1,4 @@
-import { SchemaInstallationStatus, StripeSchemaComment } from 'stripe-experiment-sync/supabase'
+import { SchemaInstallationStatus, StripeSchemaComment } from '@stripe/sync-engine/supabase'
 
 import type {
   StripeSyncState,

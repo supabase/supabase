@@ -15,7 +15,7 @@ interface GetProjectsInfiniteVariables {
   page?: number
 }
 
-export type ProjectInfiniteResponse = components['schemas']['ListProjectsPaginatedResponse']
+export type ProjectInfiniteResponse = components['schemas']['ListProjectsPaginatedResponse_Output']
 export type ProjectInfoInfinite = ProjectInfiniteResponse['projects'][number]
 
 async function getProjects(
@@ -39,7 +39,7 @@ async function getProjects(
   })
 
   if (error) handleError(error)
-  return data as unknown as components['schemas']['ListProjectsPaginatedResponse']
+  return data as unknown as components['schemas']['ListProjectsPaginatedResponse_Output']
 }
 
 export type ProjectsInfiniteData = Awaited<ReturnType<typeof getProjects>>
@@ -70,9 +70,9 @@ export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
       const page = pages.length
       const currentTotalCount = page * limit
       // @ts-ignore [Joshen] API type issue for Version 2 endpoints
-      const totalCount = lastPage.pagination.count
+      const totalCount = lastPage?.pagination?.count
 
-      if (currentTotalCount >= totalCount) return undefined
+      if (totalCount === undefined || currentTotalCount >= totalCount) return undefined
       return page
     },
     ...options,

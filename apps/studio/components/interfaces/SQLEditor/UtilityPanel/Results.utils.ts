@@ -3,22 +3,8 @@ import Papa from 'papaparse'
 
 type ResultRow = Record<string, unknown>
 
-export function formatClipboardValue(value: unknown) {
-  if (value === null) return ''
-  if (typeof value == 'object' || Array.isArray(value)) {
-    return JSON.stringify(value)
-  }
-  return String(value)
-}
-
-export function formatCellValue(value: unknown) {
-  if (value === null) return 'NULL'
-  if (typeof value === 'string') return value
-  return JSON.stringify(value)
-}
-
 export function formatResults(
-  results: ResultRow[]
+  results: readonly ResultRow[]
 ): Record<string, string | number | boolean | null | undefined>[] {
   return results.map((row) => {
     const formatted: Record<string, string | number | boolean> = {}
@@ -31,28 +17,33 @@ export function formatResults(
   })
 }
 
-export function convertResultsToMarkdown(results: ResultRow[]): string | undefined {
+export function convertResultsToMarkdown(results: readonly ResultRow[]): string | undefined {
   const formatted = formatResults(results)
   if (formatted.length === 0) return undefined
 
   const columns = Object.keys(formatted[0])
-  const rows = formatted.map((row) => columns.map((col) => String(row[col] ?? '')))
-  const table = [columns, ...rows]
+  const escapeCell = (value: string) =>
+    value
+      .replace(/\\/g, '\\\\')
+      .replace(/\|/g, '\\|')
+      .replace(/\r\n|\r|\n/g, '<br>')
+  const rows = formatted.map((row) => columns.map((col) => escapeCell(String(row[col] ?? ''))))
+  const table = [columns.map(escapeCell), ...rows]
   return markdownTable(table)
 }
 
-export function convertResultsToJSON(results: ResultRow[]): string | undefined {
+export function convertResultsToJSON(results: readonly ResultRow[]): string | undefined {
   if (results.length === 0) return undefined
   return JSON.stringify(results, null, 2)
 }
 
-export function getResultsHeaders(results: ResultRow[]): string[] | undefined {
+export function getResultsHeaders(results: readonly ResultRow[]): string[] | undefined {
   const firstRow = Array.from(results)[0]
   if (firstRow) return Object.keys(firstRow)
   return undefined
 }
 
-export function convertResultsToCSV(results: ResultRow[]): string | undefined {
+export function convertResultsToCSV(results: readonly ResultRow[]): string | undefined {
   if (results.length === 0) return undefined
 
   const headers = getResultsHeaders(results)

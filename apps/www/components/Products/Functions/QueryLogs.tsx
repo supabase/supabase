@@ -55,6 +55,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
 
   const isPlaying = isActive && isInView
   const INTERVAL = 550 // in milliseconds
+  const MAX_LOGS = 120
 
   const logs = [
     createLog(),
@@ -72,10 +73,9 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
   const [activeLogs, setActiveLogs] = useState(logs)
 
   function createLog(offset?: number) {
-    const t = new Date()
-    t.setSeconds(t.getSeconds() - (offset ?? 0))
+    const t = new Date(Date.now() - (offset ?? 0))
     const randomStatus = Math.random()
-    const s = randomStatus > 0.99 ? STATUS.ERROR : randomStatus > 0.5 ? STATUS.INFO : STATUS.LOG
+    const s = randomStatus > 0.92 ? STATUS.ERROR : randomStatus > 0.5 ? STATUS.INFO : STATUS.LOG
 
     const randomMessage = messages[s][getRandomNumber(0, messages[s].length - 1)]
 
@@ -87,13 +87,20 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
     }
   }
 
+  useEffect(() => {
+    if (isPlaying) {
+      const newLog = createLog()
+      setActiveLogs((prev) => [newLog, ...prev].slice(0, MAX_LOGS))
+    }
+  }, [isPlaying])
+
   useInterval(
     () => {
       const skip = Math.random() > 0.6
       if (skip) return
 
       const newLog = createLog()
-      setActiveLogs([newLog, ...activeLogs])
+      setActiveLogs((prev) => [newLog, ...prev].slice(0, MAX_LOGS))
     },
     isPlaying ? INTERVAL : null
   )
@@ -105,12 +112,24 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
   if (!mounted) return null
 
   return (
-    <div className="absolute inset-0 bottom-8 overflow-hidden">
+    <div className="absolute inset-0 overflow-hidden">
       <div
-        className="absolute z-20 pointer-events-none inset-0 top-auto h-32"
+        className={cn(
+          'absolute z-20 pointer-events-none inset-0 bottom-auto h-32 transition-opacity duration-300',
+          isPlaying ? 'opacity-100' : 'opacity-0'
+        )}
         style={{
           background:
-            'linear-gradient(to top, hsl(var(--background-surface-75)) 0%, transparent 100%)',
+            'linear-gradient(to bottom, hsl(var(--background-surface-75)) 0%, transparent 100%)',
+        }}
+      />
+      <div
+        className={cn(
+          'absolute z-20 pointer-events-none inset-0 top-auto h-32 transition-opacity duration-300',
+          isPlaying ? 'opacity-100' : 'opacity-0'
+        )}
+        style={{
+          background: 'linear-gradient(to top, var(--background-surface-75) 0%, transparent 100%)',
         }}
       />
       <motion.ul
@@ -120,7 +139,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
           duration: 0.1,
           staggerChildren: 0.1,
         }}
-        className="relative z-10 w-full h-auto flex flex-col px-4 overflow-y-auto"
+        className="relative z-10 w-full h-auto flex flex-col overflow-y-auto"
       >
         <AnimatePresence>
           {activeLogs.map((log, i) => (
@@ -133,13 +152,17 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
                 y: 0,
                 transition: { delay: 0.2 + i * 0.03, duration: 0.15 },
               }}
-              className="py-2 md:px-4 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 lg:gap-5 items-center"
+              className="h-9 px-4 md:px-6 pointer-events-auto border-b hover:bg-selection/20 w-full font-mono text-xs flex gap-4 lg:gap-5 items-center"
             >
               <span className="shrink-0">{dayjs(log.timestamp).format('D MMM HH:mm:ss')}</span>
               <span
                 className={cn(
                   'w-[50px] flex items-center gap-1',
-                  log.status === 'ERROR' ? '!text-red-900' : '!text-blue-900'
+                  log.status === 'ERROR'
+                    ? 'text-destructive'
+                    : log.status === 'INFO'
+                      ? 'text-foreground-muted'
+                      : 'text-blue-900'
                 )}
               >
                 <span>

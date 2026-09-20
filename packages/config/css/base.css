@@ -1,0 +1,17 @@
+/*
+ * Base layer rules migrated from packages/config/ui.config.js addBase calls.
+ *
+ * Hides the spinner buttons on number inputs across browsers (WebKit + Firefox).
+ */
+
+@layer base {
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}

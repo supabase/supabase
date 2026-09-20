@@ -1,7 +1,8 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DiskBreakdownVariables = {
@@ -25,7 +26,7 @@ export async function getDiskBreakdown(
     {
       projectRef,
       connectionString,
-      sql: `
+      sql: safeSql`
     SELECT
   (
     SELECT

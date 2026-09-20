@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import { COMPUTE_BASELINE_IOPS, COMPUTE_MAX_IOPS } from 'shared-data'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import {
@@ -21,9 +21,10 @@ export function ComputeSizeRecommendationSection({
   actions,
   form,
 }: ComputeSizeRecommendationSectionProps) {
-  const { watch } = form
-  const computeSize = watch('computeSize')
-  const iops = watch('provisionedIOPS')
+  const [computeSize, iops] = useWatch({
+    control: form.control,
+    name: ['computeSize', 'provisionedIOPS'],
+  })
 
   const computeSizeRecommendedForIops = calculateComputeSizeRequiredForIops(iops)
   const maxIopsForComputeSize = calculateMaxIopsForComputeSize(computeSize ?? 'ci_micro')

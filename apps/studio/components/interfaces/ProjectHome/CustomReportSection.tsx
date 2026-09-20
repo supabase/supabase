@@ -16,8 +16,10 @@ import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Row } from 'ui-patterns'
+import { Row } from 'ui-patterns/Row'
 
+import { resolveSnippetSelection } from '@/components/interfaces/ProjectHome/CustomReportSection.utils'
+import { MakeReportSnippetPublicModal } from '@/components/interfaces/ProjectHome/MakeReportSnippetPublicModal'
 import { SnippetDropdown } from '@/components/interfaces/ProjectHome/SnippetDropdown'
 import { ReportBlock } from '@/components/interfaces/Reports/ReportBlock/ReportBlock'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
@@ -27,7 +29,7 @@ import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useInvalidateAnalyticsQuery } from '@/data/analytics/utils'
 import { useContentInfiniteQuery } from '@/data/content/content-infinite-query'
-import { Content } from '@/data/content/content-query'
+import { Content, ContentOfType } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
@@ -44,21 +46,25 @@ export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
   const endDate = dayjs().toISOString()
 
+  const track = useTrack()
   const { ref } = useParams()
   const { profile } = useProfile()
   const state = useDatabaseSelectorStateSnapshot()
-  const track = useTrack()
+
   const { invalidateInfraMonitoringQuery } = useInvalidateAnalyticsQuery()
   const { data: project } = useSelectedProjectQuery()
-
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
     { placeholderData: keepPreviousData }
   )
-  const homeReport = reportsData?.pages?.[0]?.content?.[0] as Content | undefined
+  const homeReport = reportsData?.pages?.[0]?.content?.[0] as ContentOfType<'report'> | undefined
   const reportContent = homeReport?.content as Dashboards.Content | undefined
+
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
+  const [snippetToMakePublic, setSnippetToMakePublic] = useState<
+    { id: string; name: string } | undefined
+  >(undefined)
   const [editableReport, setEditableReport] = useState<Dashboards.Content | undefined>(
     reportContent
   )
@@ -88,7 +94,14 @@ export function CustomReportSection() {
   const persistReport = useCallback(
     (updated: Dashboards.Content) => {
       if (!ref || !homeReport) return
-      upsertContent({ projectRef: ref, payload: { ...homeReport, content: updated } })
+      upsertContent({
+        projectRef: ref,
+        payload: {
+          ...homeReport,
+          description: homeReport.description ?? undefined,
+          content: updated,
+        },
+      })
     },
     [homeReport, ref, upsertContent]
   )
@@ -161,14 +174,17 @@ export function CustomReportSection() {
     []
   )
 
+  const isSnippetInReport = useCallback(
+    (id: string) =>
+      !!editableReport?.layout?.some(
+        (x) => String(x.id) === String(id) || String(x.attribute) === `snippet_${id}`
+      ),
+    [editableReport]
+  )
+
   const addSnippetToReport = useCallback(
     (snippet: { id: string; name: string }) => {
-      if (
-        editableReport?.layout?.some(
-          (x) =>
-            String(x.id) === String(snippet.id) || String(x.attribute) === `snippet_${snippet.id}`
-        )
-      ) {
+      if (isSnippetInReport(snippet.id)) {
         toast('This block is already in your report')
         return
       }
@@ -193,8 +209,8 @@ export function CustomReportSection() {
           payload: {
             id: uuidv4(),
             type: 'report',
-            name: 'Home',
-            description: '',
+            name: 'Homepage Report',
+            description: "Report displayed on the project's home page",
             visibility: 'project',
             owner_id: profile.id,
             content: newReport,
@@ -226,7 +242,25 @@ export function CustomReportSection() {
       findNextPlacement,
       createSnippetChartBlock,
       persistReport,
+      isSnippetInReport,
     ]
+  )
+
+  const handleSelectSnippet = useCallback(
+    (snippet: { id: string; name: string; visibility: Content['visibility'] }) => {
+      const action = resolveSnippetSelection(snippet, isSnippetInReport(snippet.id))
+      switch (action) {
+        case 'already-added':
+          toast('This block is already in your report')
+          return
+        case 'confirm-share':
+          setSnippetToMakePublic({ id: snippet.id, name: snippet.name })
+          return
+        case 'add':
+          addSnippetToReport(snippet)
+      }
+    },
+    [isSnippetInReport, addSnippetToReport]
   )
 
   const handleRemoveChart = ({ metric }: { metric: { key: string } }) => {
@@ -280,12 +314,15 @@ export function CustomReportSection() {
 
       const toastId = toast.loading(`Creating new query: ${label}`)
 
-      const payload = createSqlSnippetSkeletonV2({
-        name: label,
-        sql,
-        owner_id: profile.id,
-        project_id: project.id,
-      }) as UpsertContentPayload
+      const payload = {
+        ...createSqlSnippetSkeletonV2({
+          name: label,
+          sql,
+          owner_id: profile.id,
+          project_id: project.id,
+        }),
+        visibility: 'project',
+      } as UpsertContentPayload
 
       upsertContent({ projectRef: ref, payload })
 
@@ -338,7 +375,6 @@ export function CustomReportSection() {
         <div className="flex items-center gap-x-2">
           {layout.length > 0 && (
             <ButtonTooltip
-              type="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
@@ -349,12 +385,8 @@ export function CustomReportSection() {
           {canUpdateReport || canCreateReport ? (
             <SnippetDropdown
               projectRef={ref}
-              onSelect={addSnippetToReport}
-              trigger={
-                <Button type="default" icon={<Plus />}>
-                  Add block
-                </Button>
-              }
+              onSelect={handleSelectSnippet}
+              trigger={<Button icon={<Plus />}>Add block</Button>}
               side="bottom"
               align="end"
               autoFocus
@@ -364,11 +396,11 @@ export function CustomReportSection() {
       </div>
       <div className="relative">
         {isDraggingOver && (
-          <div className="absolute inset-0 rounded bg-brand/10 pointer-events-none z-10" />
+          <div className="absolute inset-0 rounded-sm bg-brand/10 pointer-events-none z-10" />
         )}
         {layout.length === 0 ? (
           <div
-            className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 transition-colors"
+            className="h-64 flex flex-col items-center justify-center rounded-sm border-2 border-dashed p-16 transition-colors"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -380,12 +412,8 @@ export function CustomReportSection() {
             {canUpdateReport || canCreateReport ? (
               <SnippetDropdown
                 projectRef={ref}
-                onSelect={addSnippetToReport}
-                trigger={
-                  <Button type="default" iconRight={<Plus size={14} />}>
-                    Add your first block
-                  </Button>
-                }
+                onSelect={handleSelectSnippet}
+                trigger={<Button iconRight={<Plus size={14} />}>Add your first block</Button>}
                 side="bottom"
                 align="center"
                 autoFocus
@@ -437,6 +465,16 @@ export function CustomReportSection() {
           </DndContext>
         )}
       </div>
+
+      <MakeReportSnippetPublicModal
+        projectRef={ref}
+        snippet={snippetToMakePublic}
+        onCancel={() => setSnippetToMakePublic(undefined)}
+        onConfirm={(snippet) => {
+          setSnippetToMakePublic(undefined)
+          addSnippetToReport(snippet)
+        }}
+      />
     </div>
   )
 }

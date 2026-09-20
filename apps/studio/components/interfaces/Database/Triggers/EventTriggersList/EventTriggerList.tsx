@@ -15,19 +15,21 @@ import {
   TableRow,
 } from 'ui'
 
+import type { EventTrigger } from './EventTriggerList.utils'
 import { SUPABASE_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
+import { getDatabaseFunctionsHref } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 
 interface EventTriggerListProps {
   filterString: string
-  eventTriggers: DatabaseEventTrigger[]
+  eventTriggers: EventTrigger[]
   ownerFilter: string[]
   canEdit: boolean
-  onEditTrigger: (trigger: DatabaseEventTrigger) => void
-  onEditTriggerWithAssistant: (trigger: DatabaseEventTrigger) => void
-  onDuplicateTrigger: (trigger: DatabaseEventTrigger) => void
-  onDeleteTrigger: (trigger: DatabaseEventTrigger) => void
+  onEditTrigger: (trigger: EventTrigger) => void
+  onEditTriggerWithAssistant: (trigger: EventTrigger) => void
+  onDuplicateTrigger: (trigger: EventTrigger) => void
+  onDeleteTrigger: (trigger: EventTrigger) => void
 }
 
 const SYSTEM_OWNERS = new Set<string>(SUPABASE_ROLES)
@@ -63,32 +65,8 @@ export const EventTriggerList = ({
     return sortBy(filteredEventTriggers, (trigger) => trigger.name.toLocaleLowerCase())
   }, [eventTriggers, ownerFilter, filterString])
 
-  if (orderedTriggers.length === 0 && filterString.length === 0 && ownerFilter.length === 0) {
-    return (
-      <TableRow>
-        <TableCell colSpan={6}>
-          <p className="text-sm text-foreground">No event triggers created yet</p>
-          <p className="text-sm text-foreground-light">
-            There are no event triggers configured for this database
-          </p>
-        </TableCell>
-      </TableRow>
-    )
-  }
-
   if (orderedTriggers.length === 0 && (filterString.length > 0 || ownerFilter.length > 0)) {
-    return (
-      <TableRow>
-        <TableCell colSpan={6}>
-          <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-foreground-light">
-            {filterString.length > 0
-              ? `Your search for "${filterString}" did not return any results`
-              : 'No event triggers match the current filters'}
-          </p>
-        </TableCell>
-      </TableRow>
-    )
+    return <TableRowNoResults colSpan={6} search={filterString} />
   }
 
   return (
@@ -105,7 +83,7 @@ export const EventTriggerList = ({
             <TableCell className="space-x-2">
               {canEditTrigger ? (
                 <Button
-                  type="text"
+                  variant="text"
                   onClick={() => onEditTrigger(trigger)}
                   title={trigger.name}
                   className="text-link-table-cell text-left text-sm disabled:opacity-90 disabled:no-underline min-w-0 p-0 hover:bg-transparent font-medium max-w-48 title"
@@ -126,7 +104,11 @@ export const EventTriggerList = ({
             <TableCell className="space-x-2">
               {trigger.function_name ? (
                 <Link
-                  href={`/project/${projectRef}/database/functions?search=${trigger.function_name}&schema=${trigger.function_schema}`}
+                  href={getDatabaseFunctionsHref(
+                    projectRef,
+                    trigger.function_schema,
+                    trigger.function_name
+                  )}
                   className="text-link-table-cell block max-w-40 text-foreground-light"
                 >
                   {trigger.function_name}
@@ -161,12 +143,7 @@ export const EventTriggerList = ({
               {canEditTrigger ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      aria-label="More options"
-                      type="default"
-                      className="px-1"
-                      icon={<MoreVertical />}
-                    />
+                    <Button aria-label="More options" className="px-1" icon={<MoreVertical />} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-52">
                     <DropdownMenuItem className="space-x-2" onClick={() => onEditTrigger(trigger)}>
@@ -200,7 +177,6 @@ export const EventTriggerList = ({
               ) : (
                 <ButtonTooltip
                   disabled
-                  type="default"
                   className="px-1"
                   icon={<MoreVertical />}
                   tooltip={{

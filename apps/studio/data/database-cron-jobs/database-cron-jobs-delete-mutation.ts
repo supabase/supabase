@@ -1,8 +1,9 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseCronJobsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseCronJobDeleteVariables = {
@@ -20,7 +21,7 @@ export async function deleteDatabaseCronJob({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT cron.unschedule(${jobId});`,
+    sql: safeSql`SELECT cron.unschedule(${literal(jobId)});`,
     queryKey: databaseCronJobsKeys.delete(),
   })
 
@@ -47,9 +48,12 @@ export const useDatabaseCronJobDeleteMutation = ({
     mutationFn: (vars) => deleteDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, searchTerm } = variables
-      await queryClient.invalidateQueries({
-        queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseCronJobsKeys.jobs(projectRef) }),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.listInfiniteMinimal(projectRef, searchTerm),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

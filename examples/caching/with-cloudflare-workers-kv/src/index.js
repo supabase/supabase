@@ -17,7 +17,7 @@ router.get('/write-kv', async (request, { ARTICLES }) => {
   return json(articles)
 })
 
-router.get('/articles', async (request, { SUPABASE_URL, SUPABASE_ANON_KEY, ARTICLES }) => {
+router.get('/articles', async (request, { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, ARTICLES }) => {
   const cachedArticles = await readFrom(ARTICLES, '/articles')
 
   if (cachedArticles) {
@@ -27,40 +27,43 @@ router.get('/articles', async (request, { SUPABASE_URL, SUPABASE_ANON_KEY, ARTIC
 
   console.log('fetching fresh articles')
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
 
   const { data } = await supabase.from('articles').select('*')
   await writeTo(ARTICLES, '/articles', data)
   return json(data)
 })
 
-router.get('/articles/:id', async (request, { SUPABASE_URL, SUPABASE_ANON_KEY, ARTICLES }) => {
-  const { id } = request.params
-  const cachedArticle = await readFrom(ARTICLES, `/articles/${id}`)
+router.get(
+  '/articles/:id',
+  async (request, { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, ARTICLES }) => {
+    const { id } = request.params
+    const cachedArticle = await readFrom(ARTICLES, `/articles/${id}`)
 
-  if (cachedArticle) {
-    console.log('sending the cache')
-    return json(cachedArticle)
+    if (cachedArticle) {
+      console.log('sending the cache')
+      return json(cachedArticle)
+    }
+
+    console.log('fetching fresh article')
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+
+    const { data } = await supabase.from('articles').select('*').match({ id }).single()
+
+    await writeTo(ARTICLES, `/articles/${id}`, data)
+
+    return json(data)
   }
-
-  console.log('fetching fresh article')
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-  const { data } = await supabase.from('articles').select('*').match({ id }).single()
-
-  await writeTo(ARTICLES, `/articles/${id}`, data)
-
-  return json(data)
-})
+)
 
 router.post(
   '/revalidate',
   withContent,
-  async (request, { SUPABASE_URL, SUPABASE_ANON_KEY, ARTICLES }, context) => {
+  async (request, { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, ARTICLES }, context) => {
     const updateCache = async () => {
       const { type, record, old_record } = request.content
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
 
       if (type === 'INSERT' || type === 'UPDATE') {
         await writeTo(ARTICLES, `/articles/${record.id}`, record)

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState } from 'react'
 
-export const useMeasuredWidth = <T extends HTMLElement>(ref: React.RefObject<T>) => {
+export const useMeasuredWidth = <T extends HTMLElement>(ref: React.RefObject<T | null>) => {
   const [measuredWidth, setMeasuredWidth] = useState<number | null>(null)
 
   useLayoutEffect(() => {

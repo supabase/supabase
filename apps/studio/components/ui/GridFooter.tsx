@@ -6,7 +6,7 @@ export const GridFooter = ({ children, className }: PropsWithChildren<{ classNam
     <div
       aria-label="Table grid footer"
       className={cn(
-        'flex min-h-9 h-9 overflow-hidden overflow-x-auto items-center px-2 w-full border-t',
+        'flex min-h-10 h-10 overflow-hidden overflow-x-auto items-center justify-between px-2 w-full border-t gap-x-8',
         className
       )}
     >

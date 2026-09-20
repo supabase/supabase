@@ -1,4 +1,4 @@
-import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
+import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef, ReactNode } from 'react'
 import { cn, DropdownMenuItem, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export const DropdownMenuItemTooltip = forwardRef<
@@ -6,7 +6,7 @@ export const DropdownMenuItemTooltip = forwardRef<
   ComponentPropsWithoutRef<typeof DropdownMenuItem> & {
     tooltip: {
       content: ComponentProps<typeof TooltipContent> & {
-        text?: string
+        text?: string | ReactNode
       }
     }
   }
@@ -17,7 +17,7 @@ export const DropdownMenuItemTooltip = forwardRef<
         <DropdownMenuItem
           ref={ref}
           {...props}
-          className={cn(props.className, '!pointer-events-auto')}
+          className={cn(props.className, 'pointer-events-auto!')}
           onClick={(e) => {
             if (!props.disabled && props.onClick) props.onClick(e)
           }}
