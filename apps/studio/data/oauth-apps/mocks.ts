@@ -16,7 +16,7 @@ import type {
 import type { OrganizationRole } from '@/data/organization-members/organization-roles-query'
 
 const ENABLE_MOCKS = true
-export const USE_MOCKS = ENABLE_MOCKS && process.env.NODE_ENV !== 'production'
+export const USE_MOCKS = ENABLE_MOCKS && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
 export const OAUTH_APPS_MOCK_SCENARIOS = {
   vercelDeveloper: 'mock-vercel-developer',
