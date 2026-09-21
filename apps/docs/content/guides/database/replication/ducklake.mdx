@@ -10,19 +10,19 @@ sidebar_label: 'DuckLake'
 
 {/* supa-mdx-lint-disable Rule003Spelling */}
 
-<Admonition type="note" label="Early Access">
+The DuckLake destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
-The DuckLake destination is in Early Access and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
+Replicate Postgres tables to [DuckLake](https://ducklake.select/) for current-state lakehouse queries. [Prepare resources](#understand-the-ducklake-components), [configure the destination](#choose-a-configuration-mode), then [query replicated data](#query-the-destination).
 
-</Admonition>
+## Source table requirements
 
-[DuckLake](https://ducklake.select/) is an open lakehouse format that stores metadata in a SQL catalog and table data in object storage. Supabase Pipelines keeps current-state DuckLake tables synchronized with published Postgres tables.
+Insert-only tables don't require a primary key or replica identity. Updates and deletes require a published Postgres row identity. See [supported replica identities](#replica-identity).
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-## Understand the DuckLake components
+## Prepare DuckLake resources [#understand-the-ducklake-components]
 
-A DuckLake destination has three independent components:
+Prepare a Postgres catalog, object storage, and a compatible query engine:
 
 | Component        | Purpose                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -30,13 +30,15 @@ A DuckLake destination has three independent components:
 | Object storage   | Stores Parquet data and delete files under an `s3://` path.                                                                         |
 | Query engine     | Reads the catalog and object storage. Pipelines doesn't include a DuckLake query endpoint; use DuckDB or another compatible engine. |
 
-Always query through the DuckLake catalog. Reading the Parquet objects directly can miss inlined changes, delete files, and the current snapshot selected by the catalog.
-
 You can query replicated tables, but treat them and their underlying catalog and object-storage state as read-only. Writes outside Pipelines can conflict with replication and background maintenance.
 
-## Choose a configuration mode
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-The Dashboard offers two ways to provide the catalog and storage.
+## Configure DuckLake as a destination [#choose-a-configuration-mode]
+
+Choose a mode below for its resource requirements and configuration steps.
+
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview), select **DuckLake**, then choose **Use Supabase** or **Custom parameters** for the catalog and storage.
 
 ### Use Supabase
 
@@ -48,27 +50,16 @@ Before you begin:
 - Make sure your organization role can administer SQL in the catalog project and Storage in the storage project.
 - Create a private standard Storage bucket, or create one from the destination form.
 - Choose a metadata schema unique to this DuckLake. Use only letters, numbers, and underscores.
-- Keep the catalog project and storage project in the same region when possible. Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**, so resources near Frankfurt reduce network latency.
+- Keep catalog and storage in the same region when possible, near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
 To configure the destination:
 
-1. Open [**Database > Replication**](/dashboard/project/_/database/replication)
-2. Click **Add destination**
-3. Select **DuckLake**. If it isn't available, [request Early Access](/go/supabase-pipelines-new-destinations).
-4. Select a Postgres publication and enter a destination name
-5. Select **Use Supabase**
-6. Configure the catalog:
-   - **Catalog project**: The project whose Postgres database stores DuckLake metadata
-   - **Pool size**: The number of concurrent DuckDB connections to the catalog, from `1` to `6`. The default is `4`.
-   - **Metadata schema**: A unique Postgres schema for this DuckLake's metadata
-7. Configure object storage:
-   - **Storage project**: The project whose Storage service holds DuckLake files
-   - **Bucket**: A dedicated private bucket for the DuckLake
-8. Click **Create and start pipeline**
+1. Select **Use Supabase**.
+2. Choose the **Catalog project**, **Pool size**, and **Metadata schema**. Pool size allows `1` to `6` concurrent DuckDB connections; the default is `4`.
+3. Choose the **Storage project** and private **Bucket**.
+4. Click **Create and start pipeline** and complete the validation and cost confirmations.
 
-Validation can show warnings that Supabase catalog and Storage credentials are provisioned only when the destination is saved. This is expected for **Use Supabase** mode. Review the selected projects and proceed to create the destination.
-
-Pipelines-generated credentials remain hidden and are only for the managed writer. Create separate read credentials when connecting an external query engine.
+Credential-provisioning warnings are expected before creation: catalog and Storage credentials are provisioned when you save the destination. Review the selected resources before proceeding.
 
 ### Custom parameters
 
@@ -94,11 +85,21 @@ Configure these fields in the destination form:
 - **Use SSL**: Keep enabled for production endpoints
 - **Metadata schema**: A unique Postgres schema for DuckLake metadata, using only letters, numbers, and underscores
 
+Click **Create and start pipeline** and complete the validation and cost confirmations.
+
 The catalog URL and storage credentials are stored as secrets and aren't returned after creation. When editing the destination, leave a secret field empty to keep its stored value, or enter a new value to replace it.
 
-## Query the destination
+## How replication works
 
-Pipelines manages replication but doesn't provide query compute for DuckLake during Early Access. Connect a DuckLake-compatible engine, such as DuckDB with its `ducklake` extension, to the same Postgres catalog and object-storage path.
+Pipelines creates current-state tables, copies rows according to the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy), then applies published changes and supported schema changes.
+
+Source schema and table names are preserved, while ASCII uppercase letters in column names are converted to lowercase. DuckDB compares schema, table, and column identifiers without ASCII case distinctions, so don't publish names that differ only by ASCII case. Use distinct lowercase column names. Source column names matching the generated `supabase_etl_ducklake_dropped_<ordinal>_<hash>` shape are reserved for schema-change recovery.
+
+A source `TRUNCATE` truncates the DuckLake table. A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops and recreates it. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination data in place.
+
+## Query replicated data [#query-the-destination]
+
+Connect DuckDB with its `ducklake` extension, or another compatible engine, to the same catalog and storage path. Query through the catalog; reading raw Parquet files can miss inlined changes, delete files, and the current snapshot.
 
 For **Use Supabase** mode, create separate read credentials for the selected catalog and Storage projects. The writer credentials generated for Pipelines aren't exposed. For **Custom parameters**, use separate read-only credentials when your catalog and storage provider support them.
 
@@ -109,34 +110,19 @@ select *
 from my_ducklake.public.orders;
 ```
 
-See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usage/connecting) for the current `ducklake` extension and `ATTACH` syntax. If your query client can't read a Supabase-backed catalog during Early Access, [contact support](/dashboard/support/new).
+See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usage/connecting) for the current `ducklake` extension and `ATTACH` syntax. If your query client can't read a Supabase-backed catalog during private alpha, [contact support](/dashboard/support/new).
 
-## How replication works
+## Replica identity
 
-For each published Postgres table, Pipelines:
+| Source table setting                             | Guidance                                                                                                               |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `REPLICA IDENTITY DEFAULT` with a primary key    | Include every primary-key column in the publication.                                                                   |
+| `REPLICA IDENTITY USING INDEX`                   | Include every column from the replica-identity index in the publication.                                               |
+| `REPLICA IDENTITY FULL`                          | Use when the table has no suitable key or the full old row is required. This increases source WAL volume.              |
+| `REPLICA IDENTITY NOTHING`                       | Insert-only. Inserts replicate, but updates and deletes don't contain an identity that DuckLake can match safely.      |
+| `REPLICA IDENTITY DEFAULT` without a primary key | Insert-only. Add a key, configure a replica-identity index, or use full identity before publishing updates or deletes. |
 
-1. Creates the corresponding schema and table in DuckLake
-2. Copies existing rows during the initial sync
-3. Applies subsequent inserts, updates, deletes, and truncates to the current-state table
-4. Applies supported source schema changes
-
-Source schema and table names are preserved, while ASCII uppercase letters in column names are converted to lowercase. DuckDB compares schema, table, and column identifiers without ASCII case distinctions, so don't publish names that differ only by ASCII case. Use distinct lowercase column names. Source column names matching the generated `supabase_etl_ducklake_dropped_<ordinal>_<hash>` shape are reserved for schema-change recovery.
-
-A source `TRUNCATE` truncates the DuckLake table. Resetting a table drops and recreates the DuckLake table before running a new initial sync. Removing a source table from the publication stops new changes after the pipeline restarts but leaves the destination table in place.
-
-## Source table requirements
-
-Insert-only tables don't require a primary key or replica identity. Updates and deletes require a published Postgres row identity.
-
-| Source table setting                             | DuckLake support | Guidance                                                                                                  |
-| ------------------------------------------------ | ---------------- | --------------------------------------------------------------------------------------------------------- |
-| `REPLICA IDENTITY DEFAULT` with a primary key    | Supported        | Include every primary-key column in the publication.                                                      |
-| `REPLICA IDENTITY USING INDEX`                   | Supported        | Include every column from the replica-identity index in the publication.                                  |
-| `REPLICA IDENTITY FULL`                          | Supported        | Use when the table has no suitable key or the full old row is required. This increases source WAL volume. |
-| `REPLICA IDENTITY NOTHING`                       | Insert-only      | Inserts replicate, but updates and deletes don't contain an identity that DuckLake can match safely.      |
-| `REPLICA IDENTITY DEFAULT` without a primary key | Insert-only      | Add a key, configure a replica-identity index, or use full identity before publishing updates or deletes. |
-
-Changing replica identity only affects new WAL records. A retained update or delete written before the change can continue to fail after restart and may require recreating the pipeline or restarting the affected table's initial sync.
+Replica-identity changes affect only new WAL. If retained updates or deletes still fail after a pipeline restart, [restart replication for the affected table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 ## Type mapping
 
@@ -164,39 +150,35 @@ Pipelines creates DuckLake columns with these mappings:
 
 DuckDB decimals support precision from `1` to `38` and a scale between `0` and the precision. Postgres `numeric` values declared outside that range, unconstrained `numeric`, and numeric types with unsupported modifiers are stored as `varchar` to preserve their serialized value.
 
+Numeric arrays use `varchar[]`, even when their declared precision and scale would fit a scalar DuckLake decimal.
+
 ## Schema change support
 
-DuckLake schema change support is limited during Early Access.
+Pipelines supports:
 
-Supported changes include:
-
-- Adding columns
-- Renaming columns
-- Dropping columns
+- Adding, renaming, or dropping columns
 - Dropping `NOT NULL` from an existing column
 - Adding, changing, or removing supported column defaults
+- Adding or removing published columns on tracked tables
 
-The following changes are not applied automatically:
+New columns are created as nullable so existing destination rows remain valid. Adding `NOT NULL` keeps an existing destination column nullable. Supported defaults are stored in DuckLake metadata; other defaults are skipped. Postgres still supplies the source values through replication.
 
-- Changing a column's data type
-- Adding `NOT NULL` to an existing nullable column
-- Renaming a source table or schema
+Previously excluded columns are added without a default, leaving historical rows `NULL`. Removing a published column drops its destination values; adding it again does not restore them.
 
-New columns are created as nullable so existing destination rows remain valid. If a source default can be represented safely, it is stored as DuckLake metadata; unsupported defaults are skipped with a warning. DuckLake applies each planned multi-column schema change in a transaction.
+For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 
 ## Troubleshooting
 
-| Issue                                                  | Resolution                                                                                                                                                                                          |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DuckLake isn't available in the destination list       | The destination is organization-gated during Early Access. [Request access](/go/supabase-pipelines-new-destinations).                                                                               |
-| Supabase mode shows credential-provisioning warnings   | This is expected before creation. Confirm your selected projects, bucket, and metadata schema, then proceed. Credentials are provisioned when the destination is saved.                             |
-| Catalog URL validation fails                           | Use a valid `postgres://` or `postgresql://` URL with credentials and an `sslmode` appropriate for your provider. Confirm the catalog is reachable from managed Pipelines.                          |
-| Data path validation fails                             | Use an `s3://<bucket>/<prefix>` URL. Local `file://` paths aren't supported.                                                                                                                        |
-| S3 validation fails                                    | Provide both non-empty keys, the correct region, an endpoint without a protocol scheme, the correct URL style, and the provider's SSL setting. Confirm the credentials cover the configured prefix. |
-| Metadata schema already exists                         | For a new DuckLake, choose another schema. Proceed with an existing schema only when you intentionally want to reuse that DuckLake and its corresponding data path.                                 |
-| Inserts work but updates or deletes fail               | Configure a primary-key identity, replica-identity index, or `REPLICA IDENTITY FULL`, and include every identity column in the publication.                                                         |
-| An external query omits recent changes or deleted rows | Attach and query the DuckLake catalog instead of scanning raw Parquet files. Confirm that the query engine has access to both the Postgres catalog and the object-storage path.                     |
-| A schema change fails                                  | Check the supported changes above. Don't modify managed catalog tables or files manually. [Contact support](/dashboard/support/new) with the pipeline ID and error details.                         |
+| Issue                                    | Resolution                                                                                                                                                  |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Credential-provisioning warnings         | Expected in [Use Supabase](#use-supabase) mode before saving. Review the selected resources.                                                                |
+| Catalog or storage validation fails      | Check [custom parameters](#custom-parameters), credentials, connectivity, and permissions for the configured prefix. Local `file://` paths are unsupported. |
+| Metadata schema exists                   | Choose a new schema, unless intentionally reusing the same DuckLake and its corresponding data path.                                                        |
+| Inserts work but updates or deletes fail | Check [replica identity and published columns](#source-table-requirements).                                                                                 |
+| Queries omit changes or deleted rows     | [Query through the catalog](#query-the-destination) with credentials for both catalog and storage.                                                          |
+| A schema change fails                    | Review [supported changes](#schema-change-support). Don't modify catalog tables or files manually.                                                          |
+
+Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors. For unresolved failures, [contact support](/dashboard/support/new) with the pipeline ID and error details.
 
 ## Additional resources
 
