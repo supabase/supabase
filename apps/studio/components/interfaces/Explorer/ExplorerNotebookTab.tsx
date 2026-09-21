@@ -450,16 +450,20 @@ export const ExplorerNotebookTab = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
-          <ExplorerToolbarAction
+          <ButtonTooltip
+            type="button"
+            variant="default"
+            size="tiny"
+            className="ml-1"
             aria-label="Run notebook"
             icon={<Play size={16} strokeWidth={2} />}
-            tooltip="Run notebook"
+            tooltip={{ content: { side: 'bottom', text: 'Run notebook' } }}
             loading={isRunningNotebook}
             disabled={queryCellIds.length === 0}
             onClick={handleRunNotebook}
           >
             Run
-          </ExplorerToolbarAction>
+          </ButtonTooltip>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
@@ -473,12 +477,8 @@ export const ExplorerNotebookTab = () => {
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
             >
               <div className="flex items-center gap-x-2">
-                <Button variant="default" onClick={() => onSelectAddCell('query')}>
-                  Add query cell
-                </Button>
-                <Button variant="default" onClick={() => onSelectAddCell('markdown')}>
-                  Add markdown cell
-                </Button>
+                <Button onClick={() => onSelectAddCell('query')}>Add query</Button>
+                <Button onClick={() => onSelectAddCell('markdown')}>Add markdown</Button>
               </div>
             </EmptyStatePresentational>
           )}
@@ -513,17 +513,19 @@ export const ExplorerNotebookTab = () => {
               <div className="flex items-center justify-center gap-x-2 mt-4">
                 <ButtonTooltip
                   variant="outline"
+                  size="small"
                   icon={<SquareCode />}
-                  className="w-7"
+                  className="w-[34px]"
                   onClick={() => onSelectAddCell('query')}
-                  tooltip={{ content: { side: 'bottom', text: 'Add query cell' } }}
+                  tooltip={{ content: { side: 'bottom', text: 'Add query' } }}
                 />
                 <ButtonTooltip
                   variant="outline"
+                  size="small"
                   icon={<FileText />}
-                  className="w-7"
+                  className="w-[34px]"
                   onClick={() => onSelectAddCell('markdown')}
-                  tooltip={{ content: { side: 'bottom', text: 'Add markdown cell' } }}
+                  tooltip={{ content: { side: 'bottom', text: 'Add markdown' } }}
                 />
               </div>
             </>

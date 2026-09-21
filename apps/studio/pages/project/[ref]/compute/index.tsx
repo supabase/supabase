@@ -92,7 +92,6 @@ const ComputePage: NextPageWithLayout = () => {
                 subject="Failed to retrieve compute instances"
                 additionalActions={
                   <Button
-                    variant="default"
                     icon={<RefreshCw />}
                     loading={isManuallyRefreshing}
                     onClick={handleManualRefresh}

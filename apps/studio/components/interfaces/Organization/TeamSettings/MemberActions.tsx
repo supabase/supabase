@@ -14,42 +14,34 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useTeamSettingsData } from './TeamSettingsDataContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationDeleteInvitationMutation } from '@/data/organization-members/organization-invitation-delete-mutation'
-import type { OrganizationRolesResponse } from '@/data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from '@/data/organizations/organization-member-delete-mutation'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
-import type { OrganizationBase } from '@/data/organizations/organizations-query'
 import { doPermissionsCheck } from '@/hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
-import type { Permission } from '@/types'
 
 interface MemberActionsProps {
   member: OrganizationMember
-  members: OrganizationMember[]
-  allRoles: OrganizationRolesResponse | undefined
-  permissions: Permission[] | undefined
-  selectedOrganization: OrganizationBase | undefined
-  organizationMembersDeletionEnabled: boolean
-  onManageAccess: (member: OrganizationMember) => void
 }
 
-export const MemberActions = ({
-  member,
-  members,
-  allRoles,
-  permissions,
-  selectedOrganization,
-  organizationMembersDeletionEnabled,
-  onManageAccess,
-}: MemberActionsProps) => {
+export const MemberActions = ({ member }: MemberActionsProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const isLoggedIn = useIsLoggedIn()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const {
+    members,
+    roles: allRoles,
+    permissions,
+    selectedOrganization,
+    organizationMembersDeletionEnabled,
+    onManageAccess,
+  } = useTeamSettingsData()
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -181,7 +173,6 @@ export const MemberActions = ({
     <>
       <div className="flex items-center justify-end gap-x-2">
         <ButtonTooltip
-          variant="default"
           disabled={isPendingInviteAcceptance || !canRemoveMember}
           onClick={() => onManageAccess(member)}
           tooltip={{
@@ -201,6 +192,7 @@ export const MemberActions = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              aria-label="More options"
               variant="text"
               className="px-1.5"
               disabled={isLoading}

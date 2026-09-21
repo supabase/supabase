@@ -20,6 +20,7 @@ import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
 import {
@@ -45,6 +46,8 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
+  const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
+  const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
   const [section, setSection] = useState<ExplorerResourceType>()
 
@@ -94,7 +97,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
         <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
           <EditorTabs
             isCollapseButtonHidden
-            customTabs={<HomeTabButton />}
+            customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}
             newTabButton={<NewTabButton />}
           />
         </div>

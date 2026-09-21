@@ -78,7 +78,7 @@ export const ComputeInstanceDetail = () => {
         <p className="text-sm text-foreground-light">
           Instance "{instanceName}" does not exist in this project
         </p>
-        <Button asChild variant="default">
+        <Button asChild>
           <Link href={`/project/${projectRef}/compute`}>Back to {PRODUCT_NAME}</Link>
         </Button>
       </div>

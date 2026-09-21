@@ -20,6 +20,7 @@ import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
+import Table from '~/components/Table'
 import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
 import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
@@ -29,6 +30,7 @@ import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { YouTube } from '~/features/ui/YouTube'
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
@@ -40,7 +42,7 @@ import SqlToRest from 'ui-patterns/SqlToRest'
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { AgentSetup } from '../ui/AgentSetup'
 import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
-import { AiPrompt } from '../ui/AiPrompt'
+import { AiPrompt, type AiPromptProps } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
@@ -72,7 +74,9 @@ const components = {
   AgentPluginsPanel,
   AgentSetup,
   AgentWatchSchedule,
-  AiPrompt,
+  AiPrompt: (props: Omit<AiPromptProps, 'telemetry'>) => (
+    <AiPrompt {...props} telemetry={{ source: 'guide' }} />
+  ),
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,
@@ -109,10 +113,12 @@ const components = {
   ShowUntil,
   SqlToRest,
   StepHikeCompact,
+  Table,
   Tabs,
   TabPanel,
   TerraformProviderSchema,
   WrapperDashboardIntegration,
+  YouTube,
   a: MdxAnchor,
   h2: (props: ComponentPropsWithoutRef<'h2'>) => (
     <Heading tag="h2" {...props}>
@@ -130,6 +136,7 @@ const components = {
     </Heading>
   ),
   pre: Pre,
+  table: Table,
   /**
    * Force inline code tags to go sync, this prevents Heading anchor resolution fail due to
    * our CodeBlock component being async. We need to find a better solution for more future

@@ -59,9 +59,7 @@ export const PolicyReview = ({
         </div>
       </DialogSection>
       <DialogFooter>
-        <Button variant="default" onClick={onSelectBack}>
-          Back to edit
-        </Button>
+        <Button onClick={onSelectBack}>Back to edit</Button>
         <Button
           variant="primary"
           disabled={isEmpty(policy)}

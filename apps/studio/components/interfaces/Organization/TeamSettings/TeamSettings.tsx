@@ -6,7 +6,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { InviteMemberButton } from './InviteMemberButton'
-import MembersView from './MembersView'
+import { MembersView } from './MembersView'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,

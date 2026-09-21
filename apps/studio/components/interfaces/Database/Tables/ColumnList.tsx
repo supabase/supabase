@@ -159,7 +159,6 @@ export const ColumnList = ({
         {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
             icon={<Plus />}
-            variant="default"
             disabled={!canUpdateColumns}
             onClick={() => onAddColumn()}
             tooltip={{
@@ -361,7 +360,6 @@ export const ColumnList = ({
                         {!isSchemaLocked && isTableEntity && (
                           <div className="flex justify-end gap-2">
                             <ButtonTooltip
-                              variant="default"
                               disabled={!canUpdateColumns}
                               onClick={() => onEditColumn(column)}
                               tooltip={{
@@ -383,7 +381,6 @@ export const ColumnList = ({
                                       aria-label={`Delete ${column.name} column`}
                                       // Tooltip repeats the label; the description would read the name twice
                                       aria-describedby={undefined}
-                                      variant="default"
                                       className="px-1"
                                       icon={<MoreVertical />}
                                     />

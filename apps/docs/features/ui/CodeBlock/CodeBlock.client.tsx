@@ -2,21 +2,14 @@
 
 import { ArrowRightFromLine, Check, Copy, WrapText, type LucideIcon } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
-import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
 import { Button, cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-
-import { getFontStyle } from './CodeBlock.utils'
 
 type CodeAnnotation = Pick<NodeHover, 'text' | 'docs' | 'tags'>
 export type CodeToken = [
   content: string,
-  color: ThemedToken['color'],
-  fontStyle: number,
-  annotation?: {
-    annotations: Array<CodeAnnotation>
-    htmlStyle: ThemedToken['htmlStyle']
-  },
+  className: string | undefined,
+  annotations?: Array<CodeAnnotation>,
 ]
 
 export function CodeBlockTokens({
@@ -30,6 +23,7 @@ export function CodeBlockTokens({
     <pre>
       <code
         className={cn(
+          '[contain:content]',
           lineNumbers && 'grid grid-cols-[auto_1fr] w-fit min-w-full py-3',
           '[--row-rest:var(--background-200)]',
           '[--row-hover:color-mix(in_srgb,var(--foreground)_3%,var(--background-200))]'
@@ -61,11 +55,16 @@ export function CodeBlockTokens({
 function CodeLine({ tokens }: { tokens: Array<CodeToken> }) {
   return (
     <span className="block min-h-5 leading-5">
-      {tokens.map(([content, color, fontStyle, annotation], idx) =>
-        annotation ? (
-          <AnnotatedSpan key={idx} content={content} {...annotation} />
+      {tokens.map(([content, className, annotations], idx) =>
+        annotations ? (
+          <AnnotatedSpan
+            key={idx}
+            content={content}
+            className={className}
+            annotations={annotations}
+          />
         ) : (
-          <span key={idx} style={{ color, ...getFontStyle(fontStyle) }}>
+          <span key={idx} className={className}>
             {content}
           </span>
         )
@@ -76,11 +75,11 @@ function CodeLine({ tokens }: { tokens: Array<CodeToken> }) {
 
 export function AnnotatedSpan({
   content,
-  htmlStyle,
+  className,
   annotations,
 }: {
   content: string
-  htmlStyle: ThemedToken['htmlStyle']
+  className: string | undefined
   annotations: Array<CodeAnnotation>
 }) {
   const [open, setOpen] = useState(false)
@@ -115,8 +114,8 @@ export function AnnotatedSpan({
       <TooltipTrigger asChild onClick={handleClick}>
         <button
           tabIndex={0}
-          style={htmlStyle}
           className={cn(
+            className,
             isTouchDevice &&
               'underline underline-offset-4 decoration-dashed decoration-[rgba(from_currentColor_r_g_b/0.5)]'
           )}
@@ -181,7 +180,20 @@ function CrossfadeIcon({
   )
 }
 
-export function CodeCopyButton({ className, content }: { className?: string; content: string }) {
+export function CodeCopyButton({
+  className,
+  content,
+  label = 'Copy code',
+  copiedLabel = 'Code copied',
+  onCopied,
+}: {
+  className?: string
+  content: string
+  label?: string
+  copiedLabel?: string
+  /** Runs after a successful clipboard write. */
+  onCopied?: () => void
+}) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -194,6 +206,7 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   const handleCopy = async () => {
     copyToClipboard(content, () => {
       setCopied(true)
+      onCopied?.()
     })
   }
 
@@ -204,7 +217,7 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   return (
     <>
       <span className="sr-only" aria-live="polite">
-        {copied ? 'Code copied' : ''}
+        {copied ? copiedLabel : ''}
       </span>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -219,14 +232,14 @@ export function CodeCopyButton({ className, content }: { className?: string; con
               'hover:bg-[var(--btn-active)]',
               className
             )}
-            aria-label="Copy code"
+            aria-label={label}
             // Tooltip repeats the label; the description would read the name twice
             aria-describedby={undefined}
           >
             <CrossfadeIcon active={copied} activeIcon={Check} inactiveIcon={Copy} />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Copy code</TooltipContent>
+        <TooltipContent>{label}</TooltipContent>
       </Tooltip>
     </>
   )

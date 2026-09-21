@@ -240,7 +240,6 @@ export const General = () => {
                   <CardFooter className="justify-end space-x-2">
                     {form.formState.isDirty && (
                       <Button
-                        variant="default"
                         type="button"
                         disabled={isUpdating}
                         onClick={() => form.reset({ name: project?.name ?? '' })}

@@ -164,7 +164,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                     </Button>
                   ) : (
                     <>
-                      <Button block size="medium" variant="default" asChild>
+                      <Button block size="medium" asChild>
                         <Link href="https://supabase.com/dashboard/sign-in">Sign in</Link>
                       </Button>
                       <Button variant="primary" block size="medium" asChild>

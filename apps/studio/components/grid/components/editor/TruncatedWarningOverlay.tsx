@@ -22,7 +22,7 @@ export const TruncatedWarningOverlay = ({
           You may try to render the entire value, but your browser may run into performance issues
         </p>
       </div>
-      <Button variant="default" loading={isLoading} onClick={loadFullValue}>
+      <Button loading={isLoading} onClick={loadFullValue}>
         Load full value
       </Button>
     </div>

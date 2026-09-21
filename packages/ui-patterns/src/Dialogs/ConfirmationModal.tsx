@@ -140,7 +140,6 @@ export const ConfirmationModal = forwardRef<
             <Button
               size="medium"
               block
-              variant="default"
               disabled={loading}
               onClick={() => (onAdditionalAction ?? onCancel)()}
             >

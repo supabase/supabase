@@ -279,7 +279,6 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
               <DocsButton href={provider.link} />
               <div className="flex items-center gap-x-3">
                 <Button
-                  variant="default"
                   type="reset"
                   onClick={() => {
                     setOpen(false)
