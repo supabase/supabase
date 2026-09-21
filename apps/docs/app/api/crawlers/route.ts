@@ -8,6 +8,7 @@ import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { BASE_PATH } from '~/lib/constants'
+import { referenceMdAlternateLink } from '~/lib/md-alternates'
 import { toHtml } from 'hast-util-to-html'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
@@ -86,6 +87,7 @@ function htmlShell(
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
     (slug ? '/' + slug : '') +
     `">` +
+    referenceMdAlternateLink([lib, version, slug].filter(Boolean).join('/')) +
     '</head>' +
     '<body>' +
     body +

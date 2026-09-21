@@ -3,6 +3,7 @@ import { getFlattenedSections } from '~/features/docs/Reference.generated.single
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { referenceMdAlternate } from '~/lib/md-alternates'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -149,6 +150,8 @@ export async function generateReferenceMetadata(
   const { slug } = await props.params
   const { alternates: parentAlternates, openGraph: parentOg } = await resolvingParent
 
+  const mdTypes = { ...(parentAlternates?.types ?? {}), ...referenceMdAlternate(slug.join('/')) }
+
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
   const isCliReference = parsedPath.__type === 'cli'
@@ -175,13 +178,7 @@ export async function generateReferenceMetadata(
     return {
       title: `${displayName} API Reference | ${metadataTitle || 'Supabase'}`,
       description: `API reference for the ${displayName} Supabase SDK`,
-      ...(slug.length > 0
-        ? {
-            alternates: {
-              canonical: url,
-            },
-          }
-        : {}),
+      alternates: { ...(slug.length > 0 ? { canonical: url } : {}), types: mdTypes },
       openGraph: {
         ...parentOg,
         url,
@@ -192,6 +189,7 @@ export async function generateReferenceMetadata(
     return {
       title: 'CLI Reference | Supabase Docs',
       description: 'CLI reference for the Supabase CLI',
+      alternates: { types: mdTypes },
     }
   } else if (isApiReference) {
     const { path } = parsedPath
@@ -211,13 +209,7 @@ export async function generateReferenceMetadata(
     return {
       title: `${sectionTitle ? `${sectionTitle} | ` : ''}Management API Reference | Supabase Docs`,
       description: `Management API reference for the Supabase API${sectionTitle ? `: ${sectionTitle}` : ''}`,
-      ...(operationSlug
-        ? {
-            alternates: {
-              canonical: url,
-            },
-          }
-        : {}),
+      alternates: { ...(operationSlug ? { canonical: url } : {}), types: mdTypes },
       openGraph: {
         ...parentOg,
         url,
@@ -227,6 +219,7 @@ export async function generateReferenceMetadata(
   } else if (isSelfHostingReference) {
     return {
       title: 'Self-Hosting | Supabase Docs',
+      alternates: { types: mdTypes },
     }
   } else {
     return {}

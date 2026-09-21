@@ -3,7 +3,7 @@ import path from 'node:path'
 import { PROD_URL } from '~/lib/constants'
 import { describe, expect, it, vi } from 'vitest'
 
-import { mdAlternate } from './md-alternates'
+import { mdAlternate, referenceMdAlternate, referenceMdAlternateLink } from './md-alternates'
 
 vi.mock('~/public/markdown/manifest.json', () => ({
   default: [
@@ -11,6 +11,10 @@ vi.mock('~/public/markdown/manifest.json', () => ({
     'troubleshooting/all-about-supabase-egress-a_Sg_e',
     'troubleshooting',
   ],
+}))
+
+vi.mock('~/public/markdown/reference-manifest.json', () => ({
+  default: { 'javascript/select': 'javascript/v2/select' },
 }))
 
 describe('mdAlternate', () => {
@@ -91,6 +95,21 @@ async function collectSourceFiles(dir: string): Promise<string[]> {
   }
   return files
 }
+
+describe('referenceMdAlternate', () => {
+  it('returns the .md sibling for a path in the manifest', () => {
+    expect(referenceMdAlternate('javascript/select')).toEqual({
+      'text/markdown': `${PROD_URL}/reference/javascript/select.md`,
+    })
+  })
+
+  it('renders the alternate as a link tag, or nothing', () => {
+    expect(referenceMdAlternateLink('javascript/select')).toBe(
+      `<link rel="alternate" type="text/markdown" href="${PROD_URL}/reference/javascript/select.md">`
+    )
+    expect(referenceMdAlternateLink('javascript/database')).toBe('')
+  })
+})
 
 describe('no hardcoded text/markdown outside the helper', () => {
   it('every text/markdown occurrence lives in an allowed file', async () => {
