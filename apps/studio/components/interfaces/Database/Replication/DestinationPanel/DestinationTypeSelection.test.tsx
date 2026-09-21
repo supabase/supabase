@@ -30,14 +30,6 @@ vi.mock('../useIsETLPrivateAlpha', () => ({
   useIsETLClickHousePrivateAlpha: () => mockClickHouseEnabled(),
 }))
 
-const mockInfrastructureReadReplicas = vi.fn(() => true)
-
-vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
-  useIsFeatureEnabled: () => ({
-    infrastructureReadReplicas: mockInfrastructureReadReplicas(),
-  }),
-}))
-
 // Background queries from useDestinationInformation (sources + pipelines fire
 // even in create mode). Prevent retries so unmatched handlers fail fast.
 vi.mock('@/data/replication/utils', () => ({
@@ -59,7 +51,6 @@ const addBackgroundMocks = () => {
 
 describe('DestinationTypeSelection', () => {
   beforeEach(() => {
-    mockInfrastructureReadReplicas.mockReturnValue(true)
     window.localStorage.clear()
   })
 
