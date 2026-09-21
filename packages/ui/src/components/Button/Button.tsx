@@ -21,7 +21,7 @@ const buttonVariants = cva(
   ease-[cubic-bezier(0.22,1,0.36,1)]
   duration-200
   transition-[background-color,border-color,color,scale]
-  motion-safe:active:scale-[0.97]
+  [&:not([aria-haspopup])]:motion-safe:active:scale-[0.97]
   focus-ring
   border
   [--button-shadow-opacity:0.04] dark:[--button-shadow-opacity:0.2]

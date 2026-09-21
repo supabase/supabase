@@ -44,6 +44,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 import { pageChromeRowClassName } from './storageExplorerChrome'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
 import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -143,7 +144,6 @@ export const FileExplorerHeader = ({
   const track = useTrack()
 
   const [pathString, setPathString] = useState('')
-  const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isPathDialogOpen, setIsPathDialogOpen] = useState(false)
 
@@ -154,17 +154,13 @@ export const FileExplorerHeader = ({
   const {
     projectRef,
     columns,
-    popColumn,
-    popColumnAtIndex,
-    popOpenedFolders,
-    fetchFoldersByPath,
     refetchAllOpenedFolders,
     refreshAll,
     isRefreshing,
     addNewFolderPlaceholder,
-    clearOpenedFolders,
     setSelectedFilePreview,
   } = useStorageExplorerStateSnapshot()
+  const { goUpOneLevel, navigateToPath } = useStorageExplorerNavigation()
   const {
     view,
     setView,
@@ -216,9 +212,7 @@ export const FileExplorerHeader = ({
   }, [breadcrumbs])
 
   const onSelectBack = () => {
-    popColumn()
-    popOpenedFolders()
-    setSelectedFilePreview(undefined)
+    goUpOneLevel()
   }
 
   const onSelectUpload = () => {
@@ -238,7 +232,7 @@ export const FileExplorerHeader = ({
     setPathString(event.target.value)
   }
 
-  const navigateByPathString = async (event?: SyntheticEvent) => {
+  const navigateByPathString = (event?: SyntheticEvent) => {
     if (event) {
       event.preventDefault()
       event.stopPropagation()
@@ -246,23 +240,11 @@ export const FileExplorerHeader = ({
 
     const paths = compact(pathString.split('/'))
     setIsPathDialogOpen(false)
-    await onSetPathByString(paths)
+    // Writing the URL is enough — the navigation provider rebuilds the columns from it.
+    navigateToPath(paths)
 
     if (paths.length > 0) {
       track('storage_explorer_navigate_submitted')
-    }
-  }
-
-  const onSetPathByString = async (paths: string[]) => {
-    if (paths.length === 0) {
-      popColumnAtIndex(0)
-      clearOpenedFolders()
-      setSelectedFilePreview(undefined)
-    } else {
-      const pathString = paths.join('/')
-      setLoading({ isLoading: true, message: `Navigating to ${pathString}...` })
-      await fetchFoldersByPath({ paths })
-      setLoading({ isLoading: false, message: '' })
     }
   }
 
@@ -347,7 +329,7 @@ export const FileExplorerHeader = ({
                   variant="outline"
                   aria-label="Navigate"
                   className="w-7 px-1"
-                  disabled={isPathDialogOpen || loading.isLoading}
+                  disabled={isPathDialogOpen}
                   onClick={onOpenNavigate}
                 />
               )}
