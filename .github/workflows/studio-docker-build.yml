@@ -47,9 +47,10 @@ jobs:
       - name: Check sharp is not in the image
         if: steps.filter.outputs.studio == 'true'
         run: |
-          traced=$(docker run --rm --entrypoint find supabase-studio:local /app \( -path '*node_modules/sharp*' -o -path '*node_modules/@img*' \) -print -quit)
+          traced=$(docker run --rm --entrypoint find supabase-studio:local /app \( -path '*node_modules/sharp*' -o -path '*node_modules/@img*' \) -type f | head -n 40)
           if [ -n "$traced" ]; then
-            echo "::error::sharp was traced into the standalone output: $traced"
+            echo "::error::sharp was traced into the standalone output"
+            echo "$traced"
             exit 1
           fi
       # Reuses the shared stages (deps/dev) from the first build's layer

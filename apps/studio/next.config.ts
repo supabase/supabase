@@ -195,9 +195,18 @@ const nextConfig = {
   // standalone output for self-hosted builds (it only skips it on Vercel).
   // With the image optimizer disabled above it is never loaded, so keep the
   // native binaries out of the self-hosted image.
-  outputFileTracingExcludes: {
-    '*': isPlatform ? [] : ['**/node_modules/sharp/**/*', '**/node_modules/@img/**/*'],
-  },
+  //
+  // Turbopack resolves these globs relative to `apps/studio`, but pnpm hoists
+  // the store to the monorepo root (`node_modules/.pnpm/...`). Each leading
+  // `../` moves the glob root up one directory, so `../../` anchors the
+  // pattern at the repo root where the packages actually live.
+  ...(isPlatform
+    ? {}
+    : {
+        outputFileTracingExcludes: {
+          '*': ['../../**/node_modules/sharp/**/*', '../../**/node_modules/@img/**/*'],
+        },
+      }),
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
   serverExternalPackages: ['libpg-query'],
   turbopack: {
