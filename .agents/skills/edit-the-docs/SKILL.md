@@ -13,7 +13,7 @@ description: >-
 
 Improves **existing** Supabase docs pages: structure, order, connective text, and clarity.
 
-**Not this skill:** [`write-the-docs`](../write-the-docs/SKILL.md) drafts net-new content or product-grounded rewrites from intent and code. [`review-the-docs`](../review-the-docs/SKILL.md) covers lint, build, and PR triage.
+**Not this skill:** [`write-the-docs`](../write-the-docs/SKILL.md) drafts net-new content or product-grounded rewrites from intent and code. [`review-the-docs`](../review-the-docs/SKILL.md) covers build and PR triage.
 
 **Output is one pull request, with one change type per commit.** A reviewer reads the style diff apart from the structure diff without holding several PRs in their head. Split into a stack of PRs only when the requester asks for one, or approves the split you offer because the diff turned out large. Phase 0 covers when to raise it, and [reference/stacked-prs.md](reference/stacked-prs.md) covers the mechanics.
 
