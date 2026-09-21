@@ -43,15 +43,18 @@ flowchart TB
     GZ["build:gz-archive"]
     GM --> outGuides["public/markdown/guides/"]
     RM --> outRef["public/markdown/reference/"]
+    RM --> outSections["public/markdown/reference-sections/"]
     GZ --> tarball["public/docs.tar.gz"]
   end
 
   subgraph docsServe ["apps/docs runtime"]
     mw["middleware.ts"]
     guidesMd["api/guides-md"]
+    referenceMd["api/reference-md"]
     crawlers["api/crawlers"]
     gql["api/graphql searchDocs"]
     mw --> guidesMd
+    mw --> referenceMd
   end
 
   subgraph wwwApp ["apps/www"]
@@ -60,6 +63,7 @@ flowchart TB
   end
 
   outGuides --> guidesMd
+  outSections --> referenceMd
   outGuides --> llmsFull
   outRef --> llmsFull
   outGuides --> llmsTxt
@@ -68,15 +72,16 @@ flowchart TB
 
 ## Entry points
 
-| URL                                      | Owner       | Source                                                                                        |
-| ---------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `/llms.txt`                              | `apps/www`  | `app/llms.txt/route.ts` — index of guide sections + reference links                           |
-| `/llms-full.txt`                         | `apps/www`  | `app/llms-full.txt/route.ts` — concatenated guides + reference + product overviews            |
-| `/docs/guides/<path>.md`                 | `apps/docs` | Middleware → `app/api/guides-md/[...slug]/route.ts` reads `public/markdown/guides/`           |
-| `/docs/markdown/reference/<lib>.md`      | `apps/docs` | Static file from `public/markdown/reference/` (build output)                                  |
-| `/docs/docs.tar.gz`                      | `apps/docs` | `internals/generate-gz-archive.ts` tarballs all of `public/markdown/`                         |
-| `/docs/api/graphql` (`searchDocs`)       | `apps/docs` | Vector search over embedded doc sections — see [`llm-agent-parity.md`](./llm-agent-parity.md) |
-| `/docs/reference/<sdk>/<section>` (bots) | `apps/docs` | `isbot()` → `app/api/crawlers/route.ts` (simplified HTML, not markdown)                       |
+| URL                                                 | Owner       | Source                                                                                                                           |
+| --------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `/llms.txt`                                         | `apps/www`  | `app/llms.txt/route.ts` — index of guide sections + reference links                                                              |
+| `/llms-full.txt`                                    | `apps/www`  | `app/llms-full.txt/route.ts` — concatenated guides + reference + product overviews                                               |
+| `/docs/guides/<path>.md`                            | `apps/docs` | Middleware → `app/api/guides-md/[...slug]/route.ts` reads `public/markdown/guides/`                                              |
+| `/docs/markdown/reference/<lib>.md`                 | `apps/docs` | Static file from `public/markdown/reference/` (build output)                                                                     |
+| `/docs/reference/<family>[/<version>]/<section>.md` | `apps/docs` | Middleware → `app/api/reference-md/[...slug]/route.ts` reads `public/markdown/reference-sections/` via `reference-manifest.json` |
+| `/docs/docs.tar.gz`                                 | `apps/docs` | `internals/generate-gz-archive.ts` tarballs all of `public/markdown/`                                                            |
+| `/docs/api/graphql` (`searchDocs`)                  | `apps/docs` | Vector search over embedded doc sections — see [`llm-agent-parity.md`](./llm-agent-parity.md)                                    |
+| `/docs/reference/<sdk>/<section>` (bots)            | `apps/docs` | `isbot()` → `app/api/crawlers/route.ts` (simplified HTML, not markdown)                                                          |
 
 Homepage alternate link points agents at the full dump:
 `https://supabase.com/llms-full.txt` (`apps/docs/app/page.tsx`).
@@ -109,14 +114,14 @@ flowchart TD
 
 ### Who gets what
 
-| Audience                                 | Typical request                                                                  | Format   | Notes                                                                                |
-| ---------------------------------------- | -------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------ |
-| **Human (browser)**                      | `/docs/guides/.../nextjs`                                                        | HTML     | Default — no special headers                                                         |
-| **Live-fetch agent**                     | Same URL with `Claude-User`, `ChatGPT-User`, `PerplexityBot`, or `Claude-Web` UA | Markdown | Auto-negotiated even without `.md` suffix                                            |
-| **Live-fetch agent**                     | `/docs/guides/.../nextjs.md` or `Accept: text/markdown`                          | Markdown | Explicit request                                                                     |
-| **SEO bot** (Googlebot)                  | Guide URL                                                                        | HTML     | Same page humans see; `isbot()` markdown rewrite applies only to **reference** pages |
-| **Training crawler** (GPTBot, ClaudeBot) | Guide URL                                                                        | HTML     | Allowed by `robots.txt` but **not** given alternate markdown — avoids cloaking       |
-| **Bulk ingest**                          | `/llms-full.txt`, `/docs/docs.tar.gz`                                            | Markdown | Reads prebuilt `public/markdown/` files                                              |
+| Audience                                 | Typical request                                                                  | Format   | Notes                                                                                                                                         |
+| ---------------------------------------- | -------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Human (browser)**                      | `/docs/guides/.../nextjs`                                                        | HTML     | Default — no special headers                                                                                                                  |
+| **Live-fetch agent**                     | Same URL with `Claude-User`, `ChatGPT-User`, `PerplexityBot`, or `Claude-Web` UA | Markdown | Auto-negotiated even without `.md` suffix                                                                                                     |
+| **Live-fetch agent**                     | `/docs/guides/.../nextjs.md` or `Accept: text/markdown`                          | Markdown | Explicit request                                                                                                                              |
+| **SEO bot** (Googlebot)                  | Guide URL                                                                        | HTML     | Same page humans see; the `isbot()` rewrite applies only to **reference** pages, and serves simplified HTML from `api/crawlers`, not markdown |
+| **Training crawler** (GPTBot, ClaudeBot) | Guide URL                                                                        | HTML     | Allowed by `robots.txt` but **not** given alternate markdown — avoids cloaking                                                                |
+| **Bulk ingest**                          | `/llms-full.txt`, `/docs/docs.tar.gz`                                            | Markdown | Reads prebuilt `public/markdown/` files                                                                                                       |
 
 Humans see interactive UI (copy buttons, styled panels). Agents and bulk
 tools read the pre-generated `.md` transcript — not the live HTML DOM.
@@ -130,6 +135,33 @@ Agents that don't know a specific URL can start from:
 - `rel="alternate" type="text/markdown"` on each guide page
   (`GuidesMdx.utils.tsx` → `${BASE_PATH}${pathname}.md`)
 - Docs homepage alternate → `https://supabase.com/llms-full.txt`
+
+## Reference sections
+
+Every concrete reference section also has a standalone markdown file. That
+covers SDK functions, CLI commands, HTTP operations, and introductions.
+Append `.md` to the section's URL:
+
+```text
+/docs/reference/javascript/select.md
+/docs/reference/javascript/v1/start.md
+/docs/reference/cli/global-flags.md
+```
+
+Unlike guides, reference markdown is suffix-only. There is no `Accept`
+negotiation and no live-fetch-agent user-agent rule. A request without `.md`
+keeps its existing HTML or crawler routing. `start` resolves to the family's
+introduction where no real `start` section exists, and an unversioned URL
+selects the registry's current version.
+
+A bare family URL lists its sections as links rather than returning the whole
+library. `/docs/reference/javascript.md` links every JavaScript section, and
+`/docs/reference.md` links every family. The whole library stays at
+`/docs/markdown/reference/<lib>.md`.
+
+Unknown families, versions, sections, and category-only paths return a
+markdown 404 with `Cache-Control: no-store` rather than falling back to a
+whole reference page.
 
 ## Content negotiation
 
