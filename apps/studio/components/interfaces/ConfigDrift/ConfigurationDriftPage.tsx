@@ -277,13 +277,13 @@ export function ConfigurationDriftPage() {
     <main className="space-y-6">
       <Admonition
         type="warning"
-        title="Config.toml will overwrite these settings on the next deploy"
+        title="Config.toml will overwrite these settings on next deploy"
         description={
           <>
-            This project is connected to GitHub, so the next commit will redeploy config.toml and
-            overwrite any settings changed here. To persist these changes instead, run{' '}
-            <code className="text-code-inline text-xs">supabase config pull</code> to pull them into
-            config.toml.
+            This project is connected to GitHub. The next commit redeploys{' '}
+            <code className="text-code-inline text-xs">config.toml</code> and overwrite changes made
+            here. To keep these changes, run{' '}
+            <code className="text-code-inline text-xs">supabase config pull</code> locally.
           </>
         }
       />
