@@ -351,6 +351,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
 - [x] A `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
 - [x] A `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx` (page inlines SignInLayout)
+- [x] A `routes/_auth/sign-in-recovery-code.tsx` ← `pages/sign-in-recovery-code.tsx` (page inlines SignInLayout)
 - [x] A `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
 - [x] A `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx` (page inlines ForgotPasswordLayout)
 - [x] A `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx` (page default already withAuth-wrapped)
