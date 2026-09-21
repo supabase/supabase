@@ -35,6 +35,8 @@ function getAssetPrefix() {
   return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 12) ?? 'unknown'}`
 }
 
+const isPlatform = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+
 const marketplaceApiUrl = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL
   ? new URL(process.env.NEXT_PUBLIC_MARKETPLACE_API_URL)
   : null
@@ -72,7 +74,6 @@ const nextConfig = {
     // auto-prepends `basePath` to source and destination on its own,
     // except for the special `/` → basePath bounce below which opts out
     // via `basePath: false`.
-    const isPlatform = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     const maintenance = process.env.MAINTENANCE_MODE === 'true'
     return [
       ...(isPlatform ? PLATFORM_REDIRECTS : SELF_HOSTED_REDIRECTS),
@@ -145,6 +146,13 @@ const nextConfig = {
     ]
   },
   images: {
+    // Hosted Studio optimizes images on Vercel. Self-hosted Studio serves
+    // plain <img> tags instead, matching what the TanStack build already
+    // does (`compat/next/image.tsx`): running the optimizer in-process
+    // would need sharp and libvips, which Next otherwise traces into the
+    // standalone output as native binaries the self-hosted image never
+    // needs.
+    unoptimized: !isPlatform,
     dangerouslyAllowSVG: false,
     remotePatterns: [
       {
@@ -182,6 +190,13 @@ const nextConfig = {
           ]
         : []),
     ],
+  },
+  // Next ships sharp as an optional dependency and traces it into the
+  // standalone output for self-hosted builds (it only skips it on Vercel).
+  // With the image optimizer disabled above it is never loaded, so keep the
+  // native binaries out of the self-hosted image.
+  outputFileTracingExcludes: {
+    '*': isPlatform ? [] : ['**/node_modules/sharp/**/*', '**/node_modules/@img/**/*'],
   },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
   serverExternalPackages: ['libpg-query'],
