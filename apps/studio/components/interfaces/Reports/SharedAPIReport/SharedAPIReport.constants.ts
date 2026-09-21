@@ -331,7 +331,10 @@ export const useSharedAPIReport = ({
             method: 'get',
             signal,
           })
-          if (data?.error) throw data.error
+          if (data?.error !== undefined) {
+            const message = typeof data.error === 'string' ? data.error : data.error.message
+            throw new Error(message)
+          }
           return data
         } catch (err) {
           Sentry.captureException({ message: 'Shared API Report Error', data: { error: err } })

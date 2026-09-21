@@ -10,11 +10,7 @@ import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
 } from '@/components/interfaces/Settings/Logs/Logs.constants'
-import type {
-  LogData,
-  Logs,
-  LogsEndpointParams,
-} from '@/components/interfaces/Settings/Logs/Logs.types'
+import type { LogData, LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
@@ -62,7 +58,7 @@ const fetchApiReportMetric = async ({
 }): Promise<LogData[]> => {
   if (projectRef === undefined) throw new Error('projectRef is required')
 
-  const data = (await executeAnalyticsSql({
+  const data = await executeAnalyticsSql({
     projectRef,
     endpoint: logsAllEndpointUrl(useOtel),
     sql,
@@ -70,10 +66,13 @@ const fetchApiReportMetric = async ({
     iso_timestamp_end: params.iso_timestamp_end,
     method: 'get',
     signal,
-  })) as unknown as Logs | undefined
+  })
 
-  if (data?.error !== undefined) throw data.error
-  return data?.result ?? []
+  if (data?.error !== undefined) {
+    const message = typeof data.error === 'string' ? data.error : data.error.message
+    throw new Error(message)
+  }
+  return (data?.result ?? []) as LogData[]
 }
 
 export const useApiReport = () => {
