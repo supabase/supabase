@@ -70,7 +70,7 @@ export const ArchivedFilePreviewPane = () => {
   const handleRestore = (version?: ArchivedVersionRow) => {
     if (!projectRef || !selectedBucket?.id) return
     restoreObject(
-      { projectRef, bucketId: selectedBucket.id, archivedObjectId: object.id },
+      { projectRef, bucketId: selectedBucket.id, archivedObjectId: object.id, path: object.path },
       {
         onSuccess: () => {
           toast.success(
@@ -90,6 +90,7 @@ export const ArchivedFilePreviewPane = () => {
       projectRef,
       bucketId: selectedBucket.id,
       archivedObjectId: object.id,
+      path: object.path,
       versionId: versionToDelete.versionId,
       wasCurrentAtArchive: versionToDelete.wasCurrentAtArchive,
     })
@@ -258,7 +259,12 @@ export const ArchivedFilePreviewPane = () => {
         onCancel={() => setIsPurgeConfirmVisible(false)}
         onConfirm={() => {
           if (!projectRef || !selectedBucket?.id) return
-          purgeObject({ projectRef, bucketId: selectedBucket.id, archivedObjectId: object.id })
+          purgeObject({
+            projectRef,
+            bucketId: selectedBucket.id,
+            archivedObjectId: object.id,
+            path: object.path,
+          })
         }}
         alert={{
           base: { variant: 'destructive' },
