@@ -80,6 +80,9 @@ export const TotalUsage = ({
         (usageItem) =>
           // Filter out compute as compute has no quota and is always being charged for
           !usageItem.metric.startsWith('COMPUTE_') &&
+          // Log metrics should not trigger the exceeded limits alert for now (soft rollout)
+          usageItem.metric !== PricingMetric.LOG_INGESTION &&
+          usageItem.metric !== PricingMetric.LOG_QUERYING &&
           !usageItem.unlimited &&
           usageItem.usage > (usageItem?.pricing_free_units ?? 0)
       )
