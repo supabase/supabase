@@ -1,7 +1,6 @@
 import { type SafeSqlFragment } from '@supabase/pg-meta'
 
 import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
-import type { Logs } from '../../Settings/Logs/Logs.types'
 import {
   SCHEMA_INTROSPECTION_REGEX,
   SUPAMONITOR_EXCLUDED_APP_NAMES,
@@ -9,6 +8,7 @@ import {
   TRANSACTION_CONTROL_REGEX,
 } from '../QueryInsights.constants'
 import type { ChartDataPoint, ParsedLogEntry } from '../QueryInsights.types'
+import type { QueryInsightsData } from '@/data/query-insights/query-insights-query'
 
 export function filterSystemLogs(
   logs: ParsedLogEntry[],
@@ -42,7 +42,7 @@ function asNumber(unknown: unknown): number | undefined {
   return Number.isNaN(parsed) ? undefined : parsed
 }
 
-export function parseSupamonitorLogs(logData: Logs['result']): ParsedLogEntry[] {
+export function parseSupamonitorLogs(logData: QueryInsightsData): ParsedLogEntry[] {
   if (!logData || logData.length === 0) return []
 
   return logData.map((log) => ({
@@ -50,7 +50,7 @@ export function parseSupamonitorLogs(logData: Logs['result']): ParsedLogEntry[] 
     application_name: asString(log.application_name),
     calls: asNumber(log.calls),
     database_name: asString(log.database_name),
-    query: log.query,
+    query: asString(log.query),
     query_id: asNumber(log.query_id),
     total_exec_time: asNumber(log.total_exec_time),
     total_plan_time: asNumber(log.total_plan_time),

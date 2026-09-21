@@ -1,5 +1,3 @@
-import type { SafeSqlFragment } from '@supabase/pg-meta'
-
 export interface ChartDataPoint {
   period_start: number
   timestamp: string
@@ -21,7 +19,7 @@ export interface ParsedLogEntry {
   application_name?: string
   calls?: number
   database_name?: string
-  query?: SafeSqlFragment
+  query?: string
   query_id?: number
   total_exec_time?: number
   total_plan_time?: number
@@ -36,5 +34,5 @@ export interface ParsedLogEntry {
   p95_exec_time?: number
   p50_plan_time?: number
   p95_plan_time?: number
-  [key: string]: any
+  [key: string]: unknown
 }
