@@ -13,7 +13,7 @@ If you encounter a `permission denied for database postgres` error during migrat
 ## Why this happens
 Postgres 15 and later versions remove default `CREATE` privileges from the `PUBLIC` role. This means custom roles do not automatically have permission to create objects in the database, even if the session was initiated by the `postgres` user.
 
-**How to resolve the issue**
+## How to resolve the issue
 To resolve this, you must grant the `CREATE` privilege on the database to the specific role used in your migration script. Run the following command in the [SQL editor](/dashboard/project/_/sql/new):
 
 ```sql
