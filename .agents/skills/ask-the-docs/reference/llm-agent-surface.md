@@ -170,9 +170,10 @@ Each guide page advertises its markdown alternate in metadata via
 | `/docs/reference/<lib>/<slug>.md`   | Single reference section                          |
 | `/docs/markdown/reference/<lib>.md` | Single reference lib export                       |
 
-Reference pages do **not** use the same `Accept: text/markdown`
-negotiation as guides. Reference markdown comes from the static export
-and `llms-full.txt`, not from middleware negotiation.
+Reference pages support `Accept: text/markdown` negotiation for sections
+listed in `public/markdown/reference-manifest.json`. Requests for a section's
+`.md` URL go to `/api/reference-md/<slug>`. Bulk reference exports remain
+available as static files and through `llms-full.txt`.
 
 ## Related
 

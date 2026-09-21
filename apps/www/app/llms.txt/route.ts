@@ -64,7 +64,7 @@ async function getSources(): Promise<Source[]> {
   return [
     ...guideSources,
     {
-      title: 'Supabase Reference (index of sections)',
+      title: 'Supabase reference index',
       relPath: 'docs/reference.md',
       enabled: true,
     },
