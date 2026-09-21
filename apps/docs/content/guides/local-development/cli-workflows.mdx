@@ -111,7 +111,7 @@ On this initial pull, the whole migration comes from that diff, which captures y
 
 If a change crosses a transaction boundary, `db pull` may write more than one ordered migration file instead of a single file. Commit all of them. On the legacy `migra` engine, this initial pull seeds the migration with `pg_dump` and appends a diff of what the dump skips.
 
-When connecting with `--db-url`, the connection pooler in session mode is the safe default. Direct connections (`db.<project-ref>.supabase.co:5432`) require IPv6 (or the IPv4 add-on), so on IPv4-only networks they fail outright.
+When connecting with `--db-url` for `db pull` or `db diff`, prefer the direct connection (`db.<project-ref>.supabase.co:5432`) so `pg-delta` can read the full catalog. Direct connections require IPv6 or the IPv4 add-on, so on an IPv4-only network use the session pooler instead. Don't use the transaction pooler for these commands. For `db dump` and `psql`, the session pooler is the safe default.
 
 <Admonition type="caution" title="Review the generated migration">
 
@@ -123,7 +123,7 @@ The generated file can include statements you didn't expect. The engine excludes
 
 <$Partial path="managed_schemas_diff_capture.mdx" />
 
-Manage those objects with [hand-written migrations](/docs/guides/deployment/database-migrations). On later pulls, `--schema` limits the diff to the schemas you list, so leave it off (or include `auth` and `storage`) to keep capturing these customizations. On the legacy `migra` engine, the initial pull's `pg_dump` skips these schemas, but the diff pass that follows appends your triggers and RLS policies in them to the same migration. If an older CLI prints a message that `auth` and `storage` were excluded, run `supabase db pull --schema auth,storage` once.
+Manage those objects with [hand-written migrations](/docs/guides/deployment/database-migrations). On `pg-delta`, omit `--schema` on later pulls. The flag only narrows the diff further and can't add managed objects back, so listing `auth` alone would drop a trigger whose function lives in `public`. On the legacy `migra` engine, the initial pull's `pg_dump` skips these schemas, but the diff pass that follows appends your triggers and RLS policies in them to the same migration. If an older CLI prints a message that `auth` and `storage` were excluded, run `supabase db pull --schema auth,storage` once.
 
 </Admonition>
 
@@ -399,7 +399,7 @@ If a dev or staging remote drifts or gets into a messy state, you can wipe it an
 supabase db reset --linked
 ```
 
-Unlike the default `supabase db reset`, which targets your local database, the `--linked` flag runs against the remote project you connected with `supabase link`: it drops the remote schema, then replays every local migration in order. Add `--include-seed` to reload seed data as well.
+Unlike the default `supabase db reset`, which targets your local database, the `--linked` flag runs against the remote project you connected with `supabase link`: it drops the remote schema, replays every local migration in order, then runs your seed files. Pass `--no-seed` to skip seeding.
 
 <Admonition type="danger">
 
@@ -417,7 +417,7 @@ For multi-environment setups with CI/CD (feature branches, staging, production),
 | `supabase start`                          | Starts the local stack, applies migrations + seed                                                               |
 | `supabase stop`                           | Stops the local stack (data persists until `db reset`)                                                          |
 | `supabase db reset`                       | Destroys local DB, applies all migrations + seed from scratch                                                   |
-| `supabase db reset --linked`              | Destroys the **linked remote** DB and rebuilds it from local migrations (destructive, dev/staging only)         |
+| `supabase db reset --linked`              | Destroys the **linked remote** DB and rebuilds it from local migrations + seed (destructive, dev/staging only)  |
 | `supabase db diff -f <name>`              | Generates a migration by diffing a live database (local by default) against a shadow built from your migrations |
 | `supabase db schema declarative sync`     | Diffs `supabase/schemas/` against your migrations and writes the difference as new migration file(s)            |
 | `supabase db schema declarative generate` | Exports a live database into declarative schema files under `supabase/schemas/`                                 |
