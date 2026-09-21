@@ -185,11 +185,14 @@ export function CodeCopyButton({
   content,
   label = 'Copy code',
   copiedLabel = 'Code copied',
+  onCopied,
 }: {
   className?: string
   content: string
   label?: string
   copiedLabel?: string
+  /** Runs after a successful clipboard write. */
+  onCopied?: () => void
 }) {
   const [copied, setCopied] = useState(false)
 
@@ -203,6 +206,7 @@ export function CodeCopyButton({
   const handleCopy = async () => {
     copyToClipboard(content, () => {
       setCopied(true)
+      onCopied?.()
     })
   }
 
