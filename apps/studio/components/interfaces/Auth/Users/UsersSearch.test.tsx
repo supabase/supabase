@@ -4,8 +4,8 @@ import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { useState } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { UsersSearch } from './UsersSearch'
 import type { SpecificFilterColumn } from './Users.constants'
+import { UsersSearch } from './UsersSearch'
 import { customRender } from '@/tests/lib/custom-render'
 
 const { mockTrack } = vi.hoisted(() => ({
@@ -51,6 +51,7 @@ describe('UsersSearch', () => {
     expect(screen.getByRole('search')).toBeInTheDocument()
     expect(input).toHaveAttribute('type', 'search')
     expect(input).toHaveAttribute('enterkeyhint', 'search')
+    expect(input).toHaveAttribute('aria-invalid', 'false')
     expect(screen.getByRole('button', { name: 'Search users' })).toHaveAttribute('type', 'submit')
   })
 
@@ -112,6 +113,11 @@ describe('UsersSearch', () => {
 
     await user.type(screen.getByRole('searchbox', { name: 'Search by user ID' }), 'not-a-uuid')
     expect(screen.getByRole('button', { name: 'Search users' })).toBeDisabled()
+    expect(screen.getByRole('searchbox', { name: 'Search by user ID' })).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    )
+    expect(screen.getByRole('status')).toHaveTextContent('User ID must be a valid UUID prefix.')
     fireEvent.submit(screen.getByRole('search'))
 
     expect(onUrlUpdate).not.toHaveBeenCalled()
