@@ -1,9 +1,13 @@
 import { queryOptions } from '@tanstack/react-query'
+import { components } from 'api-types'
 
 import { storageKeys } from '../keys'
 import type { ObjectVersionAction } from './object-versions-query'
+import { handleError, post } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
+
+type StorageObjectV2 = components['schemas']['StorageListResponseV2_Output']['objects'][number]
 
 export interface ArchivedObjectVersion {
   versionId: string
@@ -34,15 +38,91 @@ export type ArchivedObjectsVariables = {
 
 export type ArchivedObjectsError = ResponseError
 
+const PAGE_SIZE = 1000
+// The overlay synthesizes folders from full paths, so it needs the whole bucket.
+// Bounded so a pathological bucket can't page forever.
+const MAX_PAGES = 20
+
+const toVersion = (object: StorageObjectV2, action: ObjectVersionAction) => ({
+  versionId: object.version as string,
+  size: Number(object.metadata?.size ?? 0),
+  createdAt: object.created_at ?? object.updated_at ?? '',
+  action,
+})
+
+/**
+ * An object is archived when the row currently at its path is a delete marker:
+ * the file is gone from the live listing, but its versions are still retained.
+ * Objects whose current row is a real version are simply live, and objects with
+ * no delete marker on top are skipped.
+ */
+export const toArchivedObjects = (objects: StorageObjectV2[]): ArchivedObject[] => {
+  const byPath = new Map<string, StorageObjectV2[]>()
+  for (const object of objects) {
+    if (!object.version) continue
+    const rows = byPath.get(object.name) ?? []
+    rows.push(object)
+    byPath.set(object.name, rows)
+  }
+
+  const archived: ArchivedObject[] = []
+
+  for (const [path, rows] of byPath) {
+    const sorted = [...rows].sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
+    const current = sorted.find((row) => !row.archived_at)
+    if (!current?.is_delete_marker) continue
+
+    const retained = sorted.filter((row) => row !== current && !row.is_delete_marker)
+    const [liveAtArchive, ...rest] = retained
+    if (liveAtArchive === undefined) continue
+
+    archived.push({
+      id: current.version as string,
+      path,
+      archivedAt: current.created_at ?? current.updated_at ?? '',
+      currentVersion: toVersion(liveAtArchive, rest.length === 0 ? 'initial upload' : 'overwrite'),
+      noncurrentVersions: rest.map((row, index) =>
+        toVersion(row, index === rest.length - 1 ? 'initial upload' : 'overwrite')
+      ),
+    })
+  }
+
+  return archived.sort((a, b) => b.archivedAt.localeCompare(a.archivedAt))
+}
+
 async function getArchivedObjects(
   { projectRef, bucketId }: ArchivedObjectsVariables,
-  _signal?: AbortSignal
-): Promise<ArchivedObject[]> {
+  signal?: AbortSignal
+) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!bucketId) throw new Error('bucketId is required')
 
-  // TODO(storage-versioning): real endpoint once Storage exposes it.
-  return []
+  const objects: StorageObjectV2[] = []
+  let cursor: string | undefined
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const { data, error } = await post('/platform/storage/{ref}/buckets/{id}/objects/list-v2', {
+      params: { path: { ref: projectRef, id: bucketId } },
+      body: {
+        limit: PAGE_SIZE,
+        cursor,
+        // Flat listing: the overlay needs every archived object in the bucket,
+        // not one folder level at a time.
+        with_delimiter: false,
+        noncurrentVersions: 'include',
+        deleteMarkers: 'include',
+      },
+      signal,
+    })
+
+    if (error) handleError(error)
+    objects.push(...(data?.objects ?? []))
+
+    if (!data?.hasNext || !data.nextCursor) break
+    cursor = data.nextCursor
+  }
+
+  return toArchivedObjects(objects)
 }
 
 export type ArchivedObjectsData = Awaited<ReturnType<typeof getArchivedObjects>>
