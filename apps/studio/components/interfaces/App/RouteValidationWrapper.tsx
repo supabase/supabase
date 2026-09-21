@@ -106,8 +106,14 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
         setLastVisitedExplorerTab({ type: 'chat', id })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref, id])
+  }, [
+    ref,
+    id,
+    router.pathname,
+    setLastVisitedSnippet,
+    setLastVisitedTable,
+    setLastVisitedExplorerTab,
+  ])
 
   useEffect(() => {
     if (organization) {
