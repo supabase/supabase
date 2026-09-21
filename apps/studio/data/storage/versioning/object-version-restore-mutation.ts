@@ -2,31 +2,40 @@ import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/
 import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
+import { handleError, post } from '@/data/fetchers'
 import type { ResponseError } from '@/types'
 
 export type ObjectVersionRestoreVariables = {
   projectRef: string
   bucketId: string
-  objectName: string
+  /** The object's full path within the bucket, not just its leaf name. */
+  path: string
   /** The noncurrent version to promote back to current. */
   versionId: string
 }
 
+/**
+ * A move onto the object's own path. Storage consumes the source version, so the
+ * restored one leaves the history rather than being duplicated within it, and
+ * whatever was current becomes the newest noncurrent version.
+ */
 async function restoreObjectVersion({
   projectRef,
   bucketId,
-  objectName,
+  path,
   versionId,
 }: ObjectVersionRestoreVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!bucketId) throw new Error('bucketId is required')
-  if (!objectName) throw new Error('objectName is required')
+  if (!path) throw new Error('path is required')
   if (!versionId) throw new Error('versionId is required')
 
-  // TODO(storage-versioning): call the real endpoint once Storage exposes it.
-  // Restoring copies the version back over the object, which itself produces a
-  // new noncurrent version of whatever was current.
-  throw new Error('Restoring a version is not available yet')
+  const { error } = await post('/platform/storage/{ref}/buckets/{id}/objects/move', {
+    params: { path: { ref: projectRef, id: bucketId } },
+    body: { from: path, to: path, sourceVersionId: versionId },
+  })
+
+  if (error) handleError(error)
 }
 
 export const useObjectVersionRestoreMutation = ({
@@ -46,7 +55,7 @@ export const useObjectVersionRestoreMutation = ({
         queryKey: storageKeys.objectVersions(
           variables.projectRef,
           variables.bucketId,
-          variables.objectName
+          variables.path
         ),
       })
       await onSuccess?.(data, variables, context)
