@@ -26,6 +26,7 @@
   "list_edge_functions": [["edge_functions_read"]],
   "get_edge_function": [["edge_functions_read"]],
   "deploy_edge_function": [["edge_functions_write"]],
+  "create_edge_function_secret": [["edge_functions_secrets_write", "edge_functions_secrets_read"]],
   "get_storage_config": [["storage_config_read"]],
   "update_storage_config": [["storage_config_write"]],
   "list_storage_buckets": [["storage_read"]],

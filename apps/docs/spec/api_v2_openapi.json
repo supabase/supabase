@@ -427,7 +427,7 @@
     },
     "/v2/projects/{ref}/config": {
       "get": {
-        "description": "Returns the project's database, pooler, Auth, Data API, Realtime and Storage configuration — the same configuration a branch inherits from its base project. Each is the effective config, so a setting the project has never overridden is reported at its platform default rather than as null. Auth secrets are returned as an HMAC of their value. `storage` is read live from the storage service; the rest come from this platform's own records.",
+        "description": "Returns the project's database, pooler, Auth, Data API, Realtime and Storage configuration — the same configuration a branch inherits from its base project. Each is the effective config, so a setting the project has never overridden is reported at its platform default rather than as null. Auth secrets are returned as an HMAC of their value. `storage` is read live from the storage service; the rest come from this platform's own records.\n\nThis endpoint is currently in its **Alpha** stage.",
         "operationId": "v2-get-project-config",
         "parameters": [
           {
@@ -473,8 +473,9 @@
           }
         },
         "security": [{ "bearer": [] }],
-        "summary": "[Alpha] Get a project's service configuration",
+        "summary": "Get a project's service configuration",
         "tags": ["Projects"],
+        "x-badges": [{ "name": "Alpha", "position": "before" }],
         "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [
           [
@@ -487,7 +488,8 @@
             "realtime_config_read",
             "storage_config_read"
           ]
-        ]
+        ],
+        "x-scalar-stability": "experimental"
       }
     },
     "/v2/projects/{ref}/transfers/previews": {
@@ -867,10 +869,10 @@
         "x-fga-permissions": [["project_admin_write"]]
       }
     },
-    "/v2/projects/{ref}/workers": {
+    "/v2/projects/{ref}/compute": {
       "get": {
-        "description": "Returns all workers you've previously deployed to the specified project.",
-        "operationId": "v2-list-all-workers",
+        "description": "Returns all compute instances you've previously deployed to the specified project.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-list-all-compute-instances",
         "parameters": [
           {
             "name": "ref",
@@ -891,7 +893,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V2ListWorkersResponse_Output" }
+                "schema": { "$ref": "#/components/schemas/V2ListComputeInstancesResponse_Output" }
               }
             }
           },
@@ -915,18 +917,22 @@
           }
         },
         "security": [{ "bearer": [] }],
-        "summary": "[Alpha] List all workers",
-        "tags": ["Workers"],
-        "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "summary": "List all compute instances",
+        "tags": ["Compute"],
+        "x-badges": [
+          { "name": "OAuth scope: edge_functions:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
         "x-endpoint-owners": ["functions"],
         "x-fga-permissions": [["workers_read"]],
-        "x-oauth-scope": "edge_functions:read"
+        "x-oauth-scope": "edge_functions:read",
+        "x-scalar-stability": "experimental"
       }
     },
-    "/v2/projects/{ref}/workers/{name}": {
+    "/v2/projects/{ref}/compute/{name}": {
       "get": {
-        "description": "Returns a worker along with its instance tally. Poll this after a deploy until `build_state` leaves `building`.",
-        "operationId": "v2-get-a-worker",
+        "description": "Returns a compute instance along with the counts of its running instances. Poll this after a deploy until `build_state` leaves `building`.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-a-compute-instance",
         "parameters": [
           {
             "name": "ref",
@@ -957,7 +963,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V2WorkerResponse_Output" }
+                "schema": { "$ref": "#/components/schemas/V2ComputeInstanceResponse_Output" }
               }
             }
           },
@@ -981,16 +987,20 @@
           }
         },
         "security": [{ "bearer": [] }],
-        "summary": "[Alpha] Retrieve a worker",
-        "tags": ["Workers"],
-        "x-badges": [{ "name": "OAuth scope: edge_functions:read", "position": "after" }],
+        "summary": "Retrieve a compute instance",
+        "tags": ["Compute"],
+        "x-badges": [
+          { "name": "OAuth scope: edge_functions:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
         "x-endpoint-owners": ["functions"],
         "x-fga-permissions": [["workers_read"]],
-        "x-oauth-scope": "edge_functions:read"
+        "x-oauth-scope": "edge_functions:read",
+        "x-scalar-stability": "experimental"
       },
       "delete": {
-        "description": "Tombstones the worker. Its instances and image are torn down asynchronously.",
-        "operationId": "v2-delete-a-worker",
+        "description": "Tombstones the compute instance. Its running instances and image are torn down asynchronously.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-delete-a-compute-instance",
         "parameters": [
           {
             "name": "ref",
@@ -1038,18 +1048,22 @@
           }
         },
         "security": [{ "bearer": [] }],
-        "summary": "[Alpha] Delete a worker",
-        "tags": ["Workers"],
-        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "summary": "Delete a compute instance",
+        "tags": ["Compute"],
+        "x-badges": [
+          { "name": "OAuth scope: edge_functions:write", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
         "x-endpoint-owners": ["functions"],
         "x-fga-permissions": [["workers_write"]],
-        "x-oauth-scope": "edge_functions:write"
+        "x-oauth-scope": "edge_functions:write",
+        "x-scalar-stability": "experimental"
       }
     },
-    "/v2/projects/{ref}/workers/{name}/uploads": {
+    "/v2/projects/{ref}/compute/{name}/uploads": {
       "post": {
-        "description": "PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.",
-        "operationId": "v2-create-worker-upload",
+        "description": "PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-create-compute-instance-upload",
         "parameters": [
           {
             "name": "ref",
@@ -1080,7 +1094,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V2WorkerUploadResponse_Output" }
+                "schema": { "$ref": "#/components/schemas/V2ComputeInstanceUploadResponse_Output" }
               }
             }
           },
@@ -1104,18 +1118,22 @@
           }
         },
         "security": [{ "bearer": [] }],
-        "summary": "[Alpha] Mint a presigned slot for a build-context upload",
-        "tags": ["Workers"],
-        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "summary": "Mint a presigned slot for a build-context upload",
+        "tags": ["Compute"],
+        "x-badges": [
+          { "name": "OAuth scope: edge_functions:write", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
         "x-endpoint-owners": ["functions"],
         "x-fga-permissions": [["workers_write"]],
-        "x-oauth-scope": "edge_functions:write"
+        "x-oauth-scope": "edge_functions:write",
+        "x-scalar-stability": "experimental"
       }
     },
-    "/v2/projects/{ref}/workers/{name}/deploy": {
+    "/v2/projects/{ref}/compute/{name}/deploy": {
       "post": {
-        "description": "Creates the worker if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the worker reaches `build_state` `active` or `failed` later.",
-        "operationId": "v2-deploy-a-worker",
+        "description": "Creates the compute instance if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the compute instance reaches `build_state` `active` or `failed` later.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-deploy-a-compute-instance",
         "parameters": [
           {
             "name": "ref",
@@ -1145,7 +1163,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/V2DeployWorkerRequest" }
+              "schema": { "$ref": "#/components/schemas/V2DeployComputeInstanceRequest" }
             }
           }
         },
@@ -1154,7 +1172,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V2WorkerResponse_Output" }
+                "schema": { "$ref": "#/components/schemas/V2ComputeInstanceResponse_Output" }
               }
             }
           },
@@ -1178,12 +1196,16 @@
           }
         },
         "security": [{ "bearer": [] }],
-        "summary": "[Alpha] Deploy a worker",
-        "tags": ["Workers"],
-        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "summary": "Deploy a compute instance",
+        "tags": ["Compute"],
+        "x-badges": [
+          { "name": "OAuth scope: edge_functions:write", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
         "x-endpoint-owners": ["functions"],
         "x-fga-permissions": [["workers_write"]],
-        "x-oauth-scope": "edge_functions:write"
+        "x-oauth-scope": "edge_functions:write",
+        "x-scalar-stability": "experimental"
       }
     },
     "/v2/organizations/{slug}/members": {
@@ -1940,128 +1962,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -2571,128 +2471,6 @@
                     }
                   },
                   "required": ["data"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -3318,128 +3096,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -3962,128 +3618,6 @@
                     }
                   },
                   "required": ["data"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -4671,128 +4205,6 @@
                     }
                   },
                   "required": ["data"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -5484,128 +4896,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -6223,128 +5513,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -6929,92 +6097,6 @@
                           },
                           "required": ["code", "message"],
                           "title": "EndpointTestWrongEventType"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
                         }
                       ]
                     }
@@ -7038,22 +6120,6 @@
                         "code": "bad_request.endpoint.test.wrong_event_type",
                         "message": "Bad Request: Provided event type is not subscribed to by the endpoint",
                         "description": "Only event types that the endpoint is subscribed to can be specified."
-                      }
-                    }
-                  },
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
                       }
                     }
                   }
@@ -7785,128 +6851,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -8387,128 +7331,6 @@
                     }
                   },
                   "required": ["data"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -9133,128 +7955,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -9762,128 +8462,6 @@
                     }
                   },
                   "required": ["data"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -10507,128 +9085,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -11149,128 +9605,6 @@
                     }
                   },
                   "required": ["data"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -11856,128 +10190,6 @@
                     }
                   },
                   "required": ["data"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -12667,128 +10879,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -13404,128 +11494,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -14108,92 +12076,6 @@
                           },
                           "required": ["code", "message"],
                           "title": "EndpointTestWrongEventType"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
                         }
                       ]
                     }
@@ -14217,22 +12099,6 @@
                         "code": "bad_request.endpoint.test.wrong_event_type",
                         "message": "Bad Request: Provided event type is not subscribed to by the endpoint",
                         "description": "Only event types that the endpoint is subscribed to can be specified."
-                      }
-                    }
-                  },
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
                       }
                     }
                   }
@@ -14962,128 +12828,6 @@
               }
             }
           },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
           "401": {
             "description": "GenericUnauthorized",
             "content": {
@@ -15562,128 +13306,6 @@
                     }
                   },
                   "required": ["data"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Multiple error responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_slug" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid organization slug"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidSlug"
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "id": { "type": "string" },
-                            "code": { "type": "string", "const": "bad_request.invalid_ref" },
-                            "message": {
-                              "type": "string",
-                              "const": "Bad Request: Invalid project ref"
-                            },
-                            "description": { "type": "string" },
-                            "links": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {
-                                "type": "object",
-                                "properties": {
-                                  "href": { "type": "string" },
-                                  "rel": { "type": "string" },
-                                  "title": { "type": "string" },
-                                  "type": { "type": "string" },
-                                  "describedby": { "type": "string" },
-                                  "meta": {
-                                    "type": "object",
-                                    "propertyNames": { "type": "string" },
-                                    "additionalProperties": {}
-                                  }
-                                },
-                                "required": ["href"]
-                              }
-                            },
-                            "meta": {
-                              "type": "object",
-                              "propertyNames": { "type": "string" },
-                              "additionalProperties": {}
-                            },
-                            "issues": {
-                              "type": "array",
-                              "items": { "$ref": "#/components/schemas/APIErrorObject" }
-                            }
-                          },
-                          "required": ["code", "message"],
-                          "title": "InvalidRef"
-                        }
-                      ]
-                    }
-                  },
-                  "required": ["error"],
-                  "$defs": { "APIErrorObject": { "$ref": "#/components/schemas/APIErrorObject" } }
-                },
-                "examples": {
-                  "InvalidSlug": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_slug",
-                        "message": "Bad Request: Invalid organization slug"
-                      }
-                    }
-                  },
-                  "InvalidRef": {
-                    "value": {
-                      "error": {
-                        "code": "bad_request.invalid_ref",
-                        "message": "Bad Request: Invalid project ref"
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -17685,7 +15307,7 @@
                     "shared_at": {
                       "type": "string",
                       "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
                       "description": "The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending.",
                       "nullable": true
                     },
@@ -17806,7 +15428,7 @@
                   "shared_at": {
                     "type": "string",
                     "format": "date-time",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
                     "description": "The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending.",
                     "nullable": true
                   },
@@ -17846,7 +15468,7 @@
         },
         "required": ["data"]
       },
-      "V2ListWorkersResponse_Output": {
+      "V2ListComputeInstancesResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -17857,9 +15479,13 @@
                 "type": {
                   "type": "string",
                   "description": "Resource type.",
-                  "enum": ["project_worker"]
+                  "enum": ["project_compute_instance"]
                 },
-                "id": { "type": "string", "description": "Worker name.", "example": "hello-world" },
+                "id": {
+                  "type": "string",
+                  "description": "Compute instance name.",
+                  "example": "hello-world"
+                },
                 "attributes": {
                   "type": "object",
                   "properties": {
@@ -17920,7 +15546,7 @@
         },
         "required": ["data"]
       },
-      "V2WorkerResponse_Output": {
+      "V2ComputeInstanceResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -17929,9 +15555,13 @@
               "type": {
                 "type": "string",
                 "description": "Resource type.",
-                "enum": ["project_worker"]
+                "enum": ["project_compute_instance"]
               },
-              "id": { "type": "string", "description": "Worker name.", "example": "hello-world" },
+              "id": {
+                "type": "string",
+                "description": "Compute instance name.",
+                "example": "hello-world"
+              },
               "attributes": {
                 "type": "object",
                 "properties": {
@@ -17991,7 +15621,7 @@
         },
         "required": ["data"]
       },
-      "V2WorkerUploadResponse_Output": {
+      "V2ComputeInstanceUploadResponse_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -18000,7 +15630,7 @@
               "type": {
                 "type": "string",
                 "description": "Resource type.",
-                "enum": ["project_worker_upload"]
+                "enum": ["project_compute_instance_upload"]
               },
               "id": {
                 "type": "string",
@@ -18028,7 +15658,7 @@
         },
         "required": ["data"]
       },
-      "V2DeployWorkerRequest": {
+      "V2DeployComputeInstanceRequest": {
         "type": "object",
         "properties": {
           "data": {
@@ -18037,7 +15667,7 @@
               "type": {
                 "type": "string",
                 "description": "Resource type.",
-                "enum": ["project_worker"]
+                "enum": ["project_compute_instance"]
               },
               "attributes": {
                 "type": "object",

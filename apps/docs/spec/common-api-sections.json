@@ -236,6 +236,42 @@
   },
   {
     "type": "category",
+    "title": "Compute",
+    "items": [
+      {
+        "id": "v2-create-compute-instance-upload",
+        "title": "Create compute instance upload",
+        "slug": "v2-create-compute-instance-upload",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-a-compute-instance",
+        "title": "Delete a compute instance",
+        "slug": "v2-delete-a-compute-instance",
+        "type": "operation"
+      },
+      {
+        "id": "v2-deploy-a-compute-instance",
+        "title": "Deploy a compute instance",
+        "slug": "v2-deploy-a-compute-instance",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-a-compute-instance",
+        "title": "Get a compute instance",
+        "slug": "v2-get-a-compute-instance",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-all-compute-instances",
+        "title": "List all compute instances",
+        "slug": "v2-list-all-compute-instances",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Database",
     "items": [
       {
@@ -1316,42 +1352,6 @@
         "id": "v1-update-storage-config",
         "title": "Update storage config",
         "slug": "v1-update-storage-config",
-        "type": "operation"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "Workers",
-    "items": [
-      {
-        "id": "v2-create-worker-upload",
-        "title": "Create worker upload",
-        "slug": "v2-create-worker-upload",
-        "type": "operation"
-      },
-      {
-        "id": "v2-delete-a-worker",
-        "title": "Delete a worker",
-        "slug": "v2-delete-a-worker",
-        "type": "operation"
-      },
-      {
-        "id": "v2-deploy-a-worker",
-        "title": "Deploy a worker",
-        "slug": "v2-deploy-a-worker",
-        "type": "operation"
-      },
-      {
-        "id": "v2-get-a-worker",
-        "title": "Get a worker",
-        "slug": "v2-get-a-worker",
-        "type": "operation"
-      },
-      {
-        "id": "v2-list-all-workers",
-        "title": "List all workers",
-        "slug": "v2-list-all-workers",
         "type": "operation"
       }
     ]
