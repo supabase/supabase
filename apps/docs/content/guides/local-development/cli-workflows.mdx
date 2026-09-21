@@ -18,7 +18,7 @@ You need the Supabase CLI installed and a Docker-compatible runtime running. If 
 
 Keep in mind that **the local stack is for development only**. It is not hardened for production use and must never be exposed to external traffic. It has no TLS, no rate limiting, and default credentials. Use it to develop and test, then deploy to the [Supabase Platform](https://supabase.com) or a proper self-hosted setup for anything beyond that.
 
-<Admonition type="note" label="`supabase` vs. `npx supabase`">
+<Admonition type="note" title="`supabase` vs. `npx supabase`">
 
 How you invoke the CLI depends on how you installed it:
 
@@ -29,13 +29,13 @@ Every example in this guide is written as `supabase <command>`. Translate it to 
 
 </Admonition>
 
-<Admonition type="note" label="Starting from a template">
+<Admonition type="note" title="Starting from a template">
 
 If you want a working project to explore rather than an empty one, `supabase bootstrap` scaffolds a starter application (Next.js, Flutter, and more) with schema, migrations, and config already wired up. It's an alternative entry point to `supabase init` when starting a new project from scratch.
 
 </Admonition>
 
-## The `./supabase` directory
+## The `./supabase` directory [#the-supabase-directory]
 
 After `supabase init`, your project contains a `./supabase` directory. Here's what goes in it and what to commit:
 
@@ -49,11 +49,19 @@ After `supabase init`, your project contains a `./supabase` directory. Here's wh
 
 The `config.toml` is safe to commit. It contains no secrets by default. If you add sensitive values (OAuth credentials, API keys), use the `env()` function to reference environment variables instead of hardcoding them. See [Managing config and secrets](/docs/guides/local-development/managing-config).
 
-<Admonition type="note" label="Local vs. remote targets">
+<Admonition type="note" title="Local vs. remote targets">
 
 Many database commands accept `--local` and `--linked` flags to choose what they act on. The defaults are not the same across commands: `db diff` and `db reset` default to `--local`, while `db pull`, `db push`, and `db dump` default to `--linked`. When in doubt, pass the flag explicitly.
 
 </Admonition>
+
+## Which diff engine you're on [#pg-delta]
+
+`db diff`, `db pull`, and the `db schema declarative` commands generate SQL with a diff engine. The CLI ships two. [`pg-delta`](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta) is the engine for projects created with a recent `supabase init`, and [`migra`](https://github.com/djrobstep/migra) is the legacy engine.
+
+<$Partial path="diff_engine_check.mdx" />
+
+This guide describes `pg-delta` behavior and calls out where `migra` behaves differently. The `db schema declarative` commands require `pg-delta` and won't run on `migra`. For a side-by-side comparison and a switching procedure, see [Diff engines](/docs/guides/local-development/diff-engines).
 
 ## Move an existing project to local development
 
@@ -93,30 +101,29 @@ This tells the CLI which remote project to connect to for `db pull`, `db push`, 
 supabase db pull
 ```
 
-This connects to your remote database, dumps the entire schema, and saves it as a migration file:
+This builds a shadow database from your local `supabase/migrations` directory (empty at this point), diffs your remote database against it, and saves the difference as a migration file:
 
 ```
 supabase/migrations/<timestamp>_remote_schema.sql
 ```
 
-This initial migration is your baseline. It represents the current state of your database, and all future changes build on top of it. `db pull` also records this migration as already applied in the remote migration history (the `supabase_migrations.schema_migrations` table), so a later `db push` won't try to reapply it.
+On this initial pull, the whole migration comes from that diff, which captures your remote schema as executable SQL. This migration is your baseline. All future changes build on top of it. `db pull` also offers to record this migration as already applied in the remote migration history (the `supabase_migrations.schema_migrations` table). Accept it (non-interactive runs accept automatically) so a later `db push` won't try to reapply it.
 
-<Admonition type="caution" label="Review the generated migration">
+If a change crosses a transaction boundary, `db pull` may write more than one ordered migration file instead of a single file. Commit all of them. On the legacy `migra` engine, this initial pull seeds the migration with `pg_dump` and appends a diff of what the dump skips.
 
-`db pull` diffs your remote database against the CLI's default local stack, so the generated file can include statements you didn't expect. A common example is `DROP EXTENSION pg_net;`, emitted when your remote project has an extension disabled that the local stack enables by default. These statements apply silently on `db reset` and change your local schema, so read the file before committing it. See [Cleaning up generated migrations](#cleaning-up-generated-migrations) for what to look for.
+When connecting with `--db-url` for `db pull` or `db diff`, prefer the direct connection (`db.<project-ref>.supabase.co:5432`) so `pg-delta` can read the full catalog. Direct connections require IPv6 or the IPv4 add-on, so on an IPv4-only network use the session pooler instead. Don't use the transaction pooler for these commands. For `db dump` and `psql`, the session pooler is the safe default.
+
+<Admonition type="caution" title="Review the generated migration">
+
+The generated file can include statements you didn't expect. The engine excludes Supabase platform-managed schemas, roles, and a small set of platform extensions, but extensions you enable yourself (`pg_net`, `pg_cron`, `pgcrypto`, and others) are diffed like any other object. A `DROP EXTENSION "pg_net";` appears when your local configuration or migrations enable the extension and the remote project doesn't have it. These statements apply silently on `db reset` and change your local schema, so read the file before committing it. See [Cleaning up generated migrations](#cleaning-up-generated-migrations) for what to look for.
 
 </Admonition>
 
-<Admonition type="note">
+<Admonition type="note" title="Customizations in the `auth` and `storage` schemas">
 
-If you also use Supabase Auth or Storage and have customized their schemas, pull them separately:
+<$Partial path="managed_schemas_diff_capture.mdx" />
 
-```bash
-supabase db pull --schema auth -f pull-auth-schema
-supabase db pull --schema storage -f pull-storage-schema
-```
-
-These schemas are managed by Supabase and typically don't need to be pulled unless you've made custom modifications.
+Manage those objects with [hand-written migrations](/docs/guides/deployment/database-migrations). On `pg-delta`, omit `--schema` on later pulls. The flag only narrows the diff further and can't add managed objects back, so listing `auth` alone would drop a trigger whose function lives in `public`. On the legacy `migra` engine, the initial pull's `pg_dump` skips these schemas, but the diff pass that follows appends your triggers and RLS policies in them to the same migration. If an older CLI prints a message that `auth` and `storage` were excluded, run `supabase db pull --schema auth,storage` once.
 
 </Admonition>
 
@@ -138,7 +145,7 @@ Review and clean up the dump before committing. Remove production user data, sec
 
 **Option B: Write seed data by hand** (recommended for most projects):
 
-Create `supabase/seed.sql` with INSERT statements that set up a useful local development state: a few test users, sample data, and so on. This is often better than dumping production data because you control exactly what's in it.
+Create `supabase/seed.sql` with INSERT statements that set up a useful local development state, such as a few test users and sample data. This is often better than dumping production data because you control exactly what's in it.
 
 For more on organizing seed files, glob patterns, and generating realistic data, see [Seeding your database](/docs/guides/local-development/seeding-your-database).
 
@@ -160,9 +167,9 @@ git commit -m "add supabase local development setup"
 
 Your project now has a fully reproducible local development environment.
 
-<Admonition type="note" label="What about declarative schemas?">
+<Admonition type="note" title="What about declarative schemas?">
 
-For an existing project, the pulled migration already serves as your schema baseline. You don't need to also create a `schemas/` directory, because that would mean maintaining two representations of the same schema. If you want to adopt declarative schemas later, see [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas). For day-to-day changes going forward, see [The daily workflow](#the-daily-workflow) below.
+For an existing project, the pulled migration is already your schema baseline. You don't need to also create a `schemas/` directory, because that would mean maintaining two representations of the same schema. If you want to adopt declarative schemas later, `supabase db schema declarative generate` bootstraps the `supabase/schemas/` directory (or the directory set by `experimental.pgdelta.declarative_schema_path`) from your live database. See [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas). For day-to-day changes, see [The daily workflow](#the-daily-workflow).
 
 </Admonition>
 
@@ -215,10 +222,12 @@ create policy "Users can create their own todos"
 Then generate a migration from it:
 
 ```bash
-supabase db diff -f initial-schema
+supabase db schema declarative sync -f initial-schema
 ```
 
-This compares your declared schema against the current (empty) database and generates a migration file in `supabase/migrations/`. For the full declarative workflow, including managing views and functions, ordering schema files, and known caveats, see [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
+This compares your declared schema files against your (currently empty) migration history and writes the difference as a migration file in `supabase/migrations/`. The command then offers to apply the migration to your local database. Pass `--apply` or `--no-apply` to skip the prompt in scripts. The global `--yes` flag also applies it. Without one of those flags, a non-interactive run (CI, or an agent without a terminal) writes the file and silently skips the apply step.
+
+The `db schema declarative` commands require [`pg-delta`](/docs/guides/local-development/diff-engines), which `supabase init` enabled for you (`[experimental.pgdelta] enabled = true` in `config.toml`). For the full declarative workflow, including managing views and functions and known caveats, see [Declarative database schemas](/docs/guides/local-development/declarative-database-schemas).
 
 **Option B: Write the migration directly**
 
@@ -283,15 +292,19 @@ Which approach you use is a project-level decision, set when you first created y
 >
 <TabPanel id="declarative" label="Declarative schemas">
 
+These steps assume the `pg-delta` engine. On the legacy `migra` engine, generate the migration with `supabase db diff` instead of `db schema declarative sync`, and follow [Declarative schemas on the legacy `migra` engine](/docs/guides/local-development/declarative-database-schemas#declarative-schemas-on-the-legacy-migra-engine).
+
 1. Edit your schema file(s) in `supabase/schemas/` (add a table, a column, a policy, etc.)
-2. Generate a migration: `supabase db diff -f add-due-date-to-todo`
-3. Review the generated migration file. See [Cleaning up generated migrations](#cleaning-up-generated-migrations)
+2. Generate a migration: `supabase db schema declarative sync -f add-due-date-to-todo`
+3. Review the generated migration file(s). See [Cleaning up generated migrations](#cleaning-up-generated-migrations)
 4. Verify the full chain: `supabase db reset`
-5. Commit the schema file **and** the migration together
+5. Commit the schema file and the migration(s) together
 
 <Admonition type="caution">
 
-`db diff` compares your `supabase/schemas/` files against your existing migrations; it does **not** read the live local database. Changes you make directly in Studio or via SQL are ignored, so `db diff` reports "No schema changes found" and silently drops them. Always edit the schema files, then diff.
+`db schema declarative sync` compares your `supabase/schemas/` files against your existing migrations. It does not read the live local database. Changes you make directly in Studio or via SQL are invisible to it, so it reports "No schema changes found" and silently drops them. Always edit the schema files, then sync.
+
+Don't use `db diff` to generate migrations from declarative files. Under `pg-delta`, `db diff` never uses `supabase/schemas/` as its baseline. The old `[db.migrations].schema_paths` setting no longer changes that, and the CLI warns when the setting lists any paths. Remove it from `config.toml`.
 
 </Admonition>
 
@@ -304,7 +317,7 @@ Which approach you use is a project-level decision, set when you first created y
 supabase db diff -f add-due-date-to-todo
 ```
 
-This captures your UI changes as a migration file. This works only when your project has **no** declarative files in `supabase/schemas/`: `db diff` then compares the live local database against your migrations. If you use declarative schemas, don't edit through Studio expecting `db diff` to catch it - see the **Declarative schemas** tab.
+This captures your UI changes as a migration file. `db diff` compares the live local database against a shadow database built from your migrations, so anything you changed through Studio (or any SQL you ran) shows up in the diff. If you use declarative schemas, this leaves your schema files stale. Make changes by editing the files instead, per the **Declarative schemas** tab.
 
 **If you prefer to write SQL directly:**
 
@@ -386,7 +399,7 @@ If a dev or staging remote drifts or gets into a messy state, you can wipe it an
 supabase db reset --linked
 ```
 
-Unlike the default `supabase db reset`, which targets your local database, the `--linked` flag runs against the remote project you connected with `supabase link`: it drops the remote schema, then replays every local migration in order. Add `--include-seed` to reload seed data as well.
+Unlike the default `supabase db reset`, which targets your local database, the `--linked` flag runs against the remote project you connected with `supabase link`: it drops the remote schema, replays every local migration in order, then runs your seed files. Pass `--no-seed` to skip seeding.
 
 <Admonition type="danger">
 
@@ -398,61 +411,69 @@ For multi-environment setups with CI/CD (feature branches, staging, production),
 
 ## Key commands at a glance
 
-| Command                                | What it does                                                                                            |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `supabase init`                        | Creates `./supabase/config.toml`                                                                        |
-| `supabase start`                       | Starts the local stack, applies migrations + seed                                                       |
-| `supabase stop`                        | Stops the local stack (data persists until `db reset`)                                                  |
-| `supabase db reset`                    | Destroys local DB, applies all migrations + seed from scratch                                           |
-| `supabase db reset --linked`           | Destroys the **linked remote** DB and rebuilds it from local migrations (destructive; dev/staging only) |
-| `supabase db diff -f <name>`           | Generates a migration by diffing current DB state against a shadow database                             |
-| `supabase db pull`                     | Pulls remote schema into a new local migration file                                                     |
-| `supabase db push`                     | Applies pending local migrations to the remote database                                                 |
-| `supabase db dump`                     | Exports remote DB schema (or `--data-only` for data) via `pg_dump`                                      |
-| `supabase migration new <name>`        | Creates an empty migration file                                                                         |
-| `supabase migration list`              | Compares local migrations against remote migration history                                              |
-| `supabase gen types --lang typescript` | Generates TypeScript types from your database schema                                                    |
-| `supabase link --project-ref`          | Connects local project to a remote Supabase project                                                     |
-| `supabase login`                       | Authenticates with the Supabase platform                                                                |
+| Command                                   | What it does                                                                                                    |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `supabase init`                           | Creates `./supabase/config.toml`                                                                                |
+| `supabase start`                          | Starts the local stack, applies migrations + seed                                                               |
+| `supabase stop`                           | Stops the local stack (data persists until `db reset`)                                                          |
+| `supabase db reset`                       | Destroys local DB, applies all migrations + seed from scratch                                                   |
+| `supabase db reset --linked`              | Destroys the **linked remote** DB and rebuilds it from local migrations + seed (destructive, dev/staging only)  |
+| `supabase db diff -f <name>`              | Generates a migration by diffing a live database (local by default) against a shadow built from your migrations |
+| `supabase db schema declarative sync`     | Diffs `supabase/schemas/` against your migrations and writes the difference as new migration file(s)            |
+| `supabase db schema declarative generate` | Exports a live database into declarative schema files under `supabase/schemas/`                                 |
+| `supabase db pull`                        | Pulls remote schema into a new local migration file                                                             |
+| `supabase db pull --declarative`          | Updates `supabase/schemas/` from the remote database instead of creating a migration. `pg-delta` projects only  |
+| `supabase db push`                        | Applies pending local migrations to the remote database                                                         |
+| `supabase db dump`                        | Exports remote DB schema (or `--data-only` for data) via `pg_dump`                                              |
+| `supabase migration new <name>`           | Creates an empty migration file                                                                                 |
+| `supabase migration list`                 | Compares local migrations against remote migration history                                                      |
+| `supabase gen types --lang typescript`    | Generates TypeScript types from your database schema                                                            |
+| `supabase link --project-ref`             | Connects local project to a remote Supabase project                                                             |
+| `supabase login`                          | Authenticates with the Supabase platform                                                                        |
 
 For the full command reference and every flag, see the [CLI reference](/docs/reference/cli).
 
 ## Cleaning up generated migrations
 
-When `supabase db diff` generates a migration, it may include statements that are technically correct but noisy. Review every generated migration before committing.
+When `supabase db diff` or `db schema declarative sync` generates a migration, review it before committing.
 
-### Grants
+### What `pg-delta` output looks like
 
-You may see lines like:
+Generated SQL uses uppercase keywords, wrapped at a maximum width of 180 characters. You can override this with `[experimental.pgdelta] format_options` in `config.toml`, or set `format_options = "null"` to emit raw statements with no formatting applied.
 
-```sql
-GRANT MAINTAIN, REFERENCES, TRIGGER, TRUNCATE ON public.todos TO anon;
-GRANT MAINTAIN, REFERENCES, TRIGGER, TRUNCATE ON public.todos TO authenticated;
-GRANT MAINTAIN, REFERENCES, TRIGGER, TRUNCATE ON public.todos TO service_role;
-```
+Most changes produce a single migration file. When a change crosses a transaction boundary (for example `alter type ... add value` followed by a check constraint that uses the new enum value, which can't run in the same transaction), the CLI may write one ordered migration file per unit instead. The extra files carry a numeric segment suffix, such as `<timestamp>_add-status_1.sql` and `<timestamp+1s>_add-status_2.sql`. Commit all of them.
 
-These appear because the diff tool treats permissions as part of the schema state. For tables in the `public` schema, these grants are applied by default and the lines are redundant. They're harmless, but if you want clean migrations, you can remove them. Be consistent across your team about whether you keep or remove them.
-
-### Revoke/re-grant patterns
-
-Sometimes a diff produces:
+A migration whose statements can't run inside a transaction starts with this directive on its first line:
 
 ```sql
-REVOKE ALL ON TABLE public.todos FROM anon;
-GRANT ALL ON TABLE public.todos TO anon;
+-- pg-delta: transaction=false
 ```
 
-This is the diff tool being overly cautious. If you haven't changed permissions, these lines can be safely removed.
+`db reset`, `db push`, and `migration up` honor it by running the file's statements without a wrapping transaction. Keep the line. The CLI detects `create index concurrently` on its own and runs it standalone even without the directive, but other statements that can't run in a transaction depend on it. The directive also changes what happens on failure. Without a wrapping transaction, a failed statement leaves the earlier statements in the file applied.
+
+Deploys through the [GitHub integration](/docs/guides/deployment/branching/github-integration) don't honor the directive and run every migration inside a transaction, so these migrations fail there. Not every split file carries it. `alter type ... add value` runs in its own transaction, so its file is separate but has no directive.
 
 ### Extension statements
 
-`CREATE EXTENSION IF NOT EXISTS ...` may appear. Keep these if the extension is required by your migration. Remove them if the extension is already created by a previous migration or is part of the default Supabase setup.
+`CREATE EXTENSION IF NOT EXISTS ...` or `DROP EXTENSION ...` might appear when your local and remote extension sets differ. Keep the statement if it reflects a change you want. Remove it if the extension is already handled by a previous migration or you don't want to change it. Decide deliberately, because a `DROP EXTENSION` applies silently on `db reset`.
+
+Objects that extensions create and manage themselves, such as partitions maintained by `pg_partman` and queue tables created by `pgmq`, are recognized as extension-managed. The diff never emits raw `create table` or `drop table` statements for them. Instead it expresses changes through the extension's own API, such as `select pgmq.drop_queue('q');` or a `delete from partman.part_config` row, and the CLI flags those statements as destructive. Review them as carefully as any other drop.
+
+### Coverage warnings
+
+`pg-delta` reports schema objects it doesn't track (such as casts, operators, and text search configurations) as warnings instead of silently dropping them. Add those objects through hand-written migrations. To turn these warnings into hard failures (useful in CI), pass `--strict-coverage`.
+
+### Grants and revoke patterns
+
+Both engines treat permissions as part of the schema state, so generated migrations can include grant statements you didn't write. New tables can come with explicit `GRANT` lines for the default roles, and a first diff against an existing database can emit long runs of `REVOKE ALL` followed by `GRANT` statements derived from default privileges. These statements can also come from default-privilege differences between the two databases, so before removing them, check that the roles already hold the intended privileges on the target database. If they do and you haven't changed permissions, the lines are safe to remove. Be consistent across your team about whether you keep or remove them.
 
 ### Known limitations of `db diff`
 
-The diff is generated by `pg-delta`, the default schema diff engine. (The older [`migra`](https://github.com/djrobstep/migra) engine is still available: set `enabled = false` under `[experimental.pgdelta]` in `config.toml`, or pass `--use-migra`.) No diff engine captures everything. Most notably, DML (INSERT, UPDATE, DELETE) is not tracked, so data changes must be added to the migration manually, and some entities like RLS policy renames and certain view properties don't diff cleanly. See the [full list of caveats](/docs/guides/local-development/declarative-database-schemas#known-caveats) in the declarative schemas guide.
+No diff engine captures everything. DML (INSERT, UPDATE, DELETE) is never tracked, so you must add data changes to the migration by hand. This includes storage buckets, which are rows in the `storage.buckets` table rather than schema objects. See the [full list of caveats](/docs/guides/local-development/declarative-database-schemas#known-caveats) in the declarative schemas guide.
 
-Treat `db diff` output as a draft, not a final migration. When in doubt, review the generated SQL and adjust it manually.
+If a diff looks wrong, you can fall back to the legacy engine for a single run (`db diff --use-migra`, or `db pull --diff-engine migra`) to compare, or opt out entirely with `enabled = false` under `[experimental.pgdelta]`. See [Diff engines](/docs/guides/local-development/diff-engines) for how engine selection works and what differs between the two.
+
+Treat generated output as a draft, not a final migration. When in doubt, review the generated SQL and adjust it manually.
 
 ## Troubleshooting
 
@@ -467,6 +488,22 @@ The remote database already has those migrations in its history. Run `supabase m
 **Schema drift: remote was changed outside of migrations**
 
 If someone modified the remote database directly (via Dashboard, SQL editor, etc.), run `supabase db pull` to capture those changes as a new migration file. Then `supabase db reset` locally to verify everything still works.
+
+**`db pull` prints "No schema changes found" and exits non-zero**
+
+Local and remote are already in sync, so there is nothing to pull. If you script `db pull` in CI, expect a non-zero exit code. An empty `db diff` exits 0 instead.
+
+**`db diff` warns that `schema_paths` is ignored**
+
+Under `pg-delta`, declarative files are never part of the `db diff` baseline, so `[db.migrations].schema_paths` has no effect on it. Generate migrations from declarative files with `supabase db schema declarative sync` instead.
+
+**The first pull after enabling `pg-delta` is unexpectedly large**
+
+This happens when your migration history was built from legacy `migra` diffs, which didn't track objects such as comments, domains, roles, and publication membership. The first `db pull` on `pg-delta` captures those objects in a one-time catch-up migration. Your database already has them, so accept the prompt to record the migration as applied and review the file like any other generated migration. If your baseline came from the legacy engine's `pg_dump` path instead, it already contains those objects, and the first pull reports "No schema changes found". See [Switch an existing project to `pg-delta`](/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta) for the full procedure.
+
+**A diff looks wrong or comes back empty unexpectedly**
+
+Set `PGDELTA_DEBUG=1` and rerun the command. The CLI writes a debug bundle with the extracted snapshots, plan, and diagnostics. Plan bundles land under `supabase/.temp/pgdelta/v2/debug/<id>/`, and bundles from failed runs land under `supabase/.temp/pgdelta/debug/<id>/`. The bundle shows what the engine saw. Attach it when filing a CLI bug report.
 
 **Docker issues on `supabase start`**
 
