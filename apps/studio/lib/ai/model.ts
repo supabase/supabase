@@ -15,6 +15,7 @@ import {
 type ProviderOptions = Record<string, any>
 type SystemProviderOptions = Record<string, any>
 
+/** Default fallback endpoint for the standard OpenAI API. */
 export const DEFAULT_OPENAI_BASE_URL = 'https://api.openai.com/v1'
 
 type ModelSuccess = {
@@ -51,10 +52,12 @@ export type GetModelParams =
     }
 
 /**
- * Retrieves a LanguageModel from a specific provider and model entry.
- * Callers are responsible for resolving the correct model entry (including throttling/entitlement
- * fallbacks) before calling this function.
- * Returns systemProviderOptions that callers can attach to the system message.
+ * Resolves the appropriate AI LanguageModel and options for the given provider configuration.
+ *
+ * For OpenAI, respects `OPENAI_BASE_URL` when provided, falling back to `DEFAULT_OPENAI_BASE_URL`.
+ *
+ * @param params - Provider selection, routing key, and model specifications.
+ * @returns An object containing the initialized model or an error.
  */
 export async function getModel(params: GetModelParams): Promise<ModelResponse> {
   const { provider } = params
