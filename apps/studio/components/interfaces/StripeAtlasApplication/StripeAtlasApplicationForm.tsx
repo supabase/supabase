@@ -68,9 +68,9 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
                 control={form.control}
                 name="firstname"
                 render={({ field }) => (
-                  <FormItemLayout layout="vertical" label="First name" id="firstname">
+                  <FormItemLayout layout="vertical" label="First name">
                     <FormControl>
-                      <Input {...field} id="firstname" autoComplete="given-name" />
+                      <Input {...field} autoComplete="given-name" />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -79,9 +79,9 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
                 control={form.control}
                 name="lastname"
                 render={({ field }) => (
-                  <FormItemLayout layout="vertical" label="Last name" id="lastname">
+                  <FormItemLayout layout="vertical" label="Last name">
                     <FormControl>
-                      <Input {...field} id="lastname" autoComplete="family-name" />
+                      <Input {...field} autoComplete="family-name" />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -92,9 +92,9 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
               control={form.control}
               name="companyName"
               render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Company name" id="companyName">
+                <FormItemLayout layout="vertical" label="Company name">
                   <FormControl>
-                    <Input {...field} id="companyName" autoComplete="organization" />
+                    <Input {...field} autoComplete="organization" />
                   </FormControl>
                 </FormItemLayout>
               )}
