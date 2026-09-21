@@ -14,6 +14,7 @@ import type { LogData, LogsEndpointParams } from '@/components/interfaces/Settin
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { reportKeys, type ApiReportRequestParams } from '@/data/reports/keys'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -27,21 +28,6 @@ const apiQueryNames = [
   'networkTraffic',
   'requestsByCountry',
 ] as const
-
-type ApiQueryName = (typeof apiQueryNames)[number]
-type ApiReportRequestParams = Required<
-  Pick<LogsEndpointParams, 'iso_timestamp_start' | 'iso_timestamp_end'>
->
-
-const apiReportKeys = {
-  metric: (
-    projectRef: string | undefined,
-    queryName: ApiQueryName,
-    params: ApiReportRequestParams,
-    sql: SafeLogSqlFragment,
-    useOtel: boolean
-  ) => ['projects', projectRef, 'api-report', queryName, params, sql, { otel: useOtel }] as const,
-}
 
 const fetchApiReportMetric = async ({
   projectRef,
@@ -117,7 +103,7 @@ export const useApiReport = () => {
 
   const activeQueries = useQueries({
     queries: apiQueryNames.map((queryName) => ({
-      queryKey: apiReportKeys.metric(
+      queryKey: reportKeys.apiMetric(
         resolvedProjectRef,
         queryName,
         requestParams,

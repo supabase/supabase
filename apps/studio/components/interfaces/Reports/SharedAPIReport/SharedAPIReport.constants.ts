@@ -10,6 +10,7 @@ import { getLogsSql } from '../Reports.utils'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { reportKeys } from '@/data/reports/keys'
 import { IS_PLATFORM } from '@/lib/constants'
 
 const SOURCE_TABLE: Record<string, SafeLogSqlFragment> = {
@@ -211,40 +212,6 @@ export type SharedAPIReportFilterBy =
   | 'functions'
   | 'postgrest'
 
-const sharedApiReportKeys = {
-  all: ['shared-api-report'] as const,
-  metric: ({
-    filterBy,
-    queryName,
-    source,
-    filters,
-    start,
-    end,
-    projectRef,
-    useOtel,
-  }: {
-    filterBy: SharedAPIReportFilterBy
-    queryName: SharedAPIReportKey
-    source: string
-    filters: ReportFilterItem[]
-    start: string
-    end: string
-    projectRef: string
-    useOtel: boolean
-  }) =>
-    [
-      ...sharedApiReportKeys.all,
-      filterBy,
-      queryName,
-      source,
-      filters,
-      start,
-      end,
-      projectRef,
-      { otel: useOtel },
-    ] as const,
-}
-
 type SharedAPIReportParams = {
   filterBy: SharedAPIReportFilterBy
   start: string
@@ -309,7 +276,7 @@ export const useSharedAPIReport = ({
 
   const queries = useQueries({
     queries: keys.map((queryName) => ({
-      queryKey: sharedApiReportKeys.metric({
+      queryKey: reportKeys.sharedApiMetric({
         filterBy,
         queryName,
         source,
@@ -354,10 +321,10 @@ export const useSharedAPIReport = ({
 
   const error = keys.reduce(
     (acc, key, i) => {
-      acc[key] = queries[i].error as unknown as string
+      acc[key] = queries[i].error
       return acc
     },
-    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: string }
+    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: Error | null }
   )
 
   const isLoading = keys.reduce(
@@ -396,8 +363,8 @@ export const useSharedAPIReport = ({
     error,
     isLoading,
     isLoadingData,
-    isRefetching: queryClient.isFetching({ queryKey: sharedApiReportKeys.all }) > 0 || false,
-    refetch: () => queryClient.invalidateQueries({ queryKey: sharedApiReportKeys.all }),
+    isRefetching: queryClient.isFetching({ queryKey: reportKeys.allSharedApi }) > 0 || false,
+    refetch: () => queryClient.invalidateQueries({ queryKey: reportKeys.allSharedApi }),
     filters,
     addFilter,
     removeFilters,
