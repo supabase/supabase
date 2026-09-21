@@ -3746,6 +3746,22 @@ export interface StorageExplorerNavigateSubmittedEvent {
 }
 
 /**
+ * User selected a result from a bucket-wide search in the storage explorer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerSearchResultClickedEvent {
+  action: 'storage_explorer_search_result_clicked'
+  properties: {
+    /** Whether the selected result was a file or a folder */
+    itemType: 'file' | 'folder'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Remove policy button on the public bucket SELECT policy warning.
  *
  * @group Events
@@ -4283,6 +4299,7 @@ export type TelemetryEvent =
   | LogExplorerQueryRunButtonClickedEvent
   | StorageExplorerNavigateClickedEvent
   | StorageExplorerNavigateSubmittedEvent
+  | StorageExplorerSearchResultClickedEvent
   | StoragePublicBucketSelectPolicyRemovedEvent
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent

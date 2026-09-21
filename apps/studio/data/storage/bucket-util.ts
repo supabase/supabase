@@ -1,5 +1,11 @@
 import { listBucketObjects } from './bucket-objects-list-mutation'
 
+/**
+ * Storage has no notion of an empty folder, so creating one uploads this placeholder file
+ * to keep the prefix alive. It is an implementation detail and never shown to the user.
+ */
+export const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
+
 const DEFAULT_INTERVAL_MS = 3000
 const DEFAULT_MAX_ATTEMPTS = 60
 

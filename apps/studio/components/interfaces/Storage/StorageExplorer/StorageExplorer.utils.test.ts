@@ -11,6 +11,7 @@ import {
   copyStorageExplorerUrl,
   copyStoragePath,
   describeUploadFailure,
+  getParentPathLabel,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
   getReplaceableFileNames,
@@ -144,6 +145,16 @@ describe('getPathAlongOpenedFolders', () => {
   it('returns the folder path without the bucket when includeBucket=false', () => {
     const openedFolders = [makeFolder('images'), makeFolder('2024')]
     expect(getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)).toBe('images/2024')
+  })
+})
+
+describe('getParentPathLabel', () => {
+  it('falls back to the bucket name for a top level item', () => {
+    expect(getParentPathLabel('photos', 'avatars')).toBe('avatars')
+  })
+
+  it('joins the parent segments for a nested item', () => {
+    expect(getParentPathLabel('archive/2024/photos', 'avatars')).toBe('archive/2024')
   })
 })
 
