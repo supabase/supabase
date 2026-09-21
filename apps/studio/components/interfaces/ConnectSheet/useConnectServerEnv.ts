@@ -159,6 +159,12 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     return () => clearTimeout(timer)
   }, [isRevealed, isLegacySecret, revealedSecret, clearReveal])
 
+  useEffect(() => {
+    setIsRevealed(false)
+    clearReveal()
+  }, [projectRef, secretKey?.id, clearReveal])
+
+
   return {
     isLoading: isLoadingUrl || isLoadingKeys || isLoadingPermission,
     canReadAPIKeys,
