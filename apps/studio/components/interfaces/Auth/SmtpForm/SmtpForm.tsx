@@ -18,6 +18,9 @@ import {
   InputGroupAddon,
   InputGroupText,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
@@ -39,6 +42,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 const smtpEnabledSchema = z.object({
@@ -147,6 +151,7 @@ export const SmtpForm = () => {
   })
 
   const { isDirty } = form.formState
+  const isSmtpRequiredWhenEnabled = !IS_PLATFORM
   const smtpHost = useWatch({ control: form.control, name: 'SMTP_HOST' })
   const enableSmtp = useWatch({ control: form.control, name: 'ENABLE_SMTP' })
 
@@ -277,30 +282,46 @@ export const SmtpForm = () => {
                 <FormField
                   control={form.control}
                   name="ENABLE_SMTP"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Enable custom SMTP"
-                      description={
-                        <p className="text-sm text-foreground-lighter">
-                          Send auth emails through your custom SMTP provider.{' '}
-                          <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
-                            Rate limits
-                          </InlineLink>{' '}
-                          apply.
-                        </p>
-                      }
-                    >
-                      <FormControl>
-                        <Switch
-                          aria-label="Toggle SMTP"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
+                  render={({ field }) => {
+                    const isSmtpLockedOn = isSmtpRequiredWhenEnabled && field.value
+                    return (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Enable custom SMTP"
+                        description={
+                          <p className="text-sm text-foreground-lighter">
+                            Send auth emails through your custom SMTP provider.{' '}
+                            <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
+                              Rate limits
+                            </InlineLink>{' '}
+                            apply.
+                          </p>
+                        }
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div tabIndex={isSmtpLockedOn ? 0 : undefined}>
+                              <FormControl>
+                                <Switch
+                                  aria-label="Toggle SMTP"
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  disabled={!canUpdateConfig || isSmtpLockedOn}
+                                />
+                              </FormControl>
+                            </div>
+                          </TooltipTrigger>
+                          {isSmtpLockedOn && (
+                            <TooltipContent side="bottom" className="max-w-xs">
+                              Self-hosted Supabase has no built-in email service, so custom SMTP
+                              cannot be turned off. Update the settings below to change your
+                              provider.
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </FormItemLayout>
+                    )
+                  }}
                 />
               </CardContent>
 
