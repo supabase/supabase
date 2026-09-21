@@ -141,7 +141,7 @@ export const QueryPerformanceGrid = ({
                         icon={<ChevronDown size={14} className="text-foreground-muted" />}
                         onClick={(e) => e.stopPropagation()}
                         aria-label="Sort options"
-                        // Tooltip repeats the label; the description would read the name twice
+                        // Tooltip repeats the label; screen readers would read it twice
                         aria-describedby={undefined}
                       />
                     </DropdownMenuTrigger>

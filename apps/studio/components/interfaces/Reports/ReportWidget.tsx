@@ -78,7 +78,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
                     router.push({ pathname, query })
                   }}
                   aria-label={props.queryType === 'db' ? 'Open in SQL Editor' : 'Open in Logs Explorer'}
-                  // Tooltip repeats the label; the description would read the name twice
+                  // Tooltip repeats the label; screen readers would read it twice
                   aria-describedby={undefined}
                 />
               </TooltipTrigger>

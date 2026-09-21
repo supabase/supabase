@@ -133,7 +133,7 @@ export const SigningKeyRow = ({
                   loading={isLoading}
                   icon={<MoreVertical className="size-4" />}
                   aria-label="Manage key"
-                  // Tooltip repeats the label; the description would read the name twice
+                  // Tooltip repeats the label; screen readers would read it twice
                   aria-describedby={undefined}
                 />
               </DropdownMenuTrigger>
