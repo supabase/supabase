@@ -43,6 +43,7 @@
     "@supabase/supa-mdx-lint": "0.3.1",
     "@types/react": "catalog:",
     "config": "workspace:^",
+    "eslint-config-supabase": "workspace:*",
     "mdast-util-toc": "^6.1.1",
     "npm-run-all": "^4.1.5",
     "shiki": "^1.1.7",
