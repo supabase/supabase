@@ -1,4 +1,10 @@
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, safeLocalStorage, useFlag } from 'common'
+import {
+  FeatureFlagContext,
+  LOCAL_STORAGE_KEYS,
+  safeLocalStorage,
+  useFlag,
+  useParams,
+} from 'common'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -13,6 +19,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useIsObjectVersioningAvailable } from '@/data/config/project-storage-config-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -154,10 +161,24 @@ export const useIsExplorerEnabled = () => {
   return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
 }
 
+/**
+ * Three gates, each answering a different question. The `storageVersioningPrivateAlpha`
+ * ConfigCat flag is our lever over the dashboard UI, so we can pull it without a
+ * deploy. The project capability says whether Storage has turned object versioning
+ * on for this project, which during the private alpha is granted per project by the
+ * Storage team. The feature preview is the user's own opt-in, so an enabled project
+ * doesn't change under people who never asked for it.
+ */
 export const useIsStorageVersioningEnabled = () => {
+  const { ref } = useParams()
   const { flags } = useFeaturePreviewContext()
   const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
-  return isStorageVersioningEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
+  const isObjectVersioningAvailable = useIsObjectVersioningAvailable({ projectRef: ref })
+  return (
+    isStorageVersioningEnabled &&
+    isObjectVersioningAvailable &&
+    flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
+  )
 }
 
 export const useFeaturePreviewModal = () => {

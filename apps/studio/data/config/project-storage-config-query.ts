@@ -59,6 +59,15 @@ export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: stri
   return isIcebergCatalogEnabled
 }
 
+/**
+ * Object versioning is enabled per project by the Storage team during the private
+ * alpha, so the project's own config is the source of truth for who has it.
+ */
+export const useIsObjectVersioningAvailable = ({ projectRef }: { projectRef?: string }) => {
+  const { data } = useProjectStorageConfigQuery({ projectRef })
+  return !!data?.capabilities?.object_versioning
+}
+
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
   const { data } = useProjectStorageConfigQuery({ projectRef })
   const { isCli, isPlatform } = useDeploymentMode()
