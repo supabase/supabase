@@ -87,6 +87,8 @@ The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
 
 The shortened link points to [setup.sh](https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/docker/setup.sh) - you can inspect it before running. Use `-y` to run non-interactively with default values.
 
+If the script installed Docker for you, it also adds the user to the `docker` group. Log out and back in before continuing, otherwise the `docker` commands below need `sudo`.
+
 After the script finishes, start the stack:
 
 ```sh
