@@ -12,6 +12,8 @@ type BucketUpdateVariables = {
   isPublic: boolean
   file_size_limit: number | null
   allowed_mime_types: string[] | null
+  /** Omitted when versioning isn't changing. There is no going back to DISABLED. */
+  versioning_status?: components['schemas']['UpdateStorageBucketBody']['versioning_status']
 }
 
 // [Alaister]: API accept null values for allowed_mime_types and file_size_limit to reset
@@ -29,6 +31,7 @@ async function updateBucket({
   isPublic,
   file_size_limit,
   allowed_mime_types,
+  versioning_status,
 }: BucketUpdateVariables): Promise<BucketUpdateResult> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!id) throw new Error('Bucket name is required')
@@ -36,6 +39,7 @@ async function updateBucket({
   const payload: Partial<UpdateStorageBucketBody> = { public: isPublic }
   if (file_size_limit !== undefined) payload.file_size_limit = file_size_limit
   if (allowed_mime_types !== undefined) payload.allowed_mime_types = allowed_mime_types
+  if (versioning_status !== undefined) payload.versioning_status = versioning_status
 
   const { data, error } = await patch('/platform/storage/{ref}/buckets/{id}', {
     params: { path: { id, ref: projectRef } },

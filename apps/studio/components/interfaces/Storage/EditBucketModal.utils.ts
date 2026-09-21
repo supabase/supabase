@@ -51,6 +51,19 @@ export const getNextVersioningState = (
   return currentState === 'disabled' ? 'disabled' : 'suspended'
 }
 
+/**
+ * `DISABLED` is not an accepted update — the API has no way back once a bucket has
+ * been versioned, and a bucket that never was simply stays that way. Both cases
+ * mean sending no versioning field at all.
+ */
+export const toVersioningStatusUpdate = (
+  nextState: BucketVersioningState
+): 'ENABLED' | 'SUSPENDED' | undefined => {
+  if (nextState === 'enabled') return 'ENABLED'
+  if (nextState === 'suspended') return 'SUSPENDED'
+  return undefined
+}
+
 export const isSuspendingVersioning = (
   currentState: BucketVersioningState,
   isVersioningEnabled: boolean
