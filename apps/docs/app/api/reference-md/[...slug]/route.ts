@@ -1,11 +1,9 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import REFERENCE_MANIFEST from '~/public/markdown/reference-manifest.json'
+import MANIFEST from '~/public/markdown/reference-manifest.json'
 import { NextResponse } from 'next/server'
 
 const SECTIONS_DIR = path.join(process.cwd(), 'public/markdown/reference-sections')
-
-const MANIFEST: Record<string, string> = REFERENCE_MANIFEST
 
 const markdownResponse = (body: string, init: ResponseInit & { cache: string }) =>
   new NextResponse(body, {
@@ -27,8 +25,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   const { slug } = await params
   const requestPath = slug.join('/')
 
+  if (!Object.hasOwn(MANIFEST, requestPath)) return notFound(requestPath)
   const artifact = MANIFEST[requestPath]
-  if (!artifact) return notFound(requestPath)
 
   const filePath = path.join(SECTIONS_DIR, `${artifact}.md`)
   if (!filePath.startsWith(SECTIONS_DIR + path.sep)) return notFound(requestPath)

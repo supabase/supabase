@@ -42,7 +42,11 @@ describe('GET /api/reference-md/[...slug]', () => {
   })
 
   it('returns an uncacheable markdown 404 for paths the manifest lacks, without touching disk', async () => {
-    for (const slug of [['javascript', 'unknown'], ['index'], ['..', '..', 'etc', 'passwd']]) {
+    for (const slug of [
+      ['javascript', 'unknown'],
+      ['..', '..', 'etc', 'passwd'],
+      ['constructor'],
+    ]) {
       const response = await request(slug)
 
       expect(response.status).toBe(404)
