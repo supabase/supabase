@@ -1,7 +1,7 @@
 import { AuthUsersSearchSubmittedEvent } from 'common/telemetry-constants'
 import { Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
-import { Dispatch, forwardRef, SetStateAction } from 'react'
+import { Dispatch, FormEvent, forwardRef, SetStateAction } from 'react'
 import {
   Button,
   cn,
@@ -26,6 +26,8 @@ import {
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { useTrack } from '@/lib/telemetry/track'
 
+const USERS_SEARCH_FORM_ID = 'auth-users-search'
+
 const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
   switch (column) {
     case 'id':
@@ -40,6 +42,17 @@ const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
       return 'Search by user ID, email, phone or name'
     default:
       return 'Search users...'
+  }
+}
+
+const getSearchInputMode = (column: SpecificFilterColumn) => {
+  switch (column) {
+    case 'email':
+      return 'email'
+    case 'phone':
+      return 'tel'
+    default:
+      return 'search'
   }
 }
 
@@ -94,17 +107,37 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
     })
   }
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (searchInvalid) return
+    onSubmitSearch()
+  }
+
   return (
-    <div className="flex items-center">
-      <div className="text-xs h-[26px] flex items-center px-1.5 border border-strong rounded-l-md bg-surface-300">
-        <Search size={14} />
-      </div>
+    // Mobile keyboards (especially Android Chrome) often do not fire keydown
+    // with code/key "Enter". They submit the nearest form instead.
+    <form
+      id={USERS_SEARCH_FORM_ID}
+      role="search"
+      className="flex items-center"
+      onSubmit={handleSubmit}
+    >
+      <button
+        type="submit"
+        aria-label="Search users"
+        disabled={searchInvalid}
+        tabIndex={searchInvalid ? -1 : 0}
+        className="text-xs h-[26px] flex items-center px-1.5 border border-strong rounded-l-md bg-surface-300 text-foreground-light hover:text-foreground focus-ring disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <Search size={14} aria-hidden />
+      </button>
 
       <Select
         value={specificFilterColumn}
         onValueChange={(v) => onSelectFilterColumn(v as typeof specificFilterColumn)}
       >
         <SelectTrigger
+          type="button"
           size="tiny"
           className={cn(
             'w-[130px] bg-transparent! rounded-none -ml-px',
@@ -152,31 +185,35 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
       <Input
         ref={ref}
         size="tiny"
+        type="search"
+        enterKeyHint="search"
+        inputMode={getSearchInputMode(specificFilterColumn)}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="none"
+        spellCheck={false}
         containerClassName="w-[245px] rounded-l-none -ml-px"
         className={cn(
-          'bg-transparent',
+          'bg-transparent [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none',
           searchInvalid ? 'text-red-900 dark:border-red-900' : '',
           search.length > 1 && 'pr-6'
         )}
         placeholder={getSearchPlaceholder(specificFilterColumn)}
+        aria-label={getSearchPlaceholder(specificFilterColumn)}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-            if (!searchInvalid) onSubmitSearch()
-            return
-          }
-          onSearchInputEscape(search, () => {
-            setSearch('')
-            setFilterKeywords('')
-          })(e)
-        }}
+        onKeyDown={onSearchInputEscape(search, () => {
+          setSearch('')
+          setFilterKeywords('')
+        })}
         actions={
           search ? (
             <Button
               size="tiny"
+              type="button"
               variant="text"
               className="p-0 h-5 w-5"
+              aria-label="Clear search"
               icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
               onClick={() => {
                 setSearch('')
@@ -186,6 +223,6 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
           ) : null
         }
       />
-    </div>
+    </form>
   )
 })
