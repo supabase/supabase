@@ -313,7 +313,7 @@ export const EditWrapperSheet = ({
                                 aria-describedby={undefined}
                               />
                             </TooltipTrigger>
-                            <TooltipContent side="bottom">{`Delete ${table.table_name} foreign table`}</TooltipContent>
+                            <TooltipContent side="bottom">{`Remove ${table.table_name} foreign table`}</TooltipContent>
                           </Tooltip>
                         </div>
                       </div>
