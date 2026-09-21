@@ -27,7 +27,7 @@ If you can only optimize one side, prioritize placing your **destination** close
 
 ## Which plans support Pipelines?
 
-Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, access is being rolled out gradually, so an eligible plan does not guarantee that Pipelines is enabled for every organization yet. If it is not available, request access from the **Database > Replication** page or contact your account manager.
+Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, access is being rolled out gradually, so an eligible plan does not guarantee that Pipelines is enabled for every organization yet. If it is not available, request access from the **Database > Pipelines** page or contact your account manager.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -143,7 +143,7 @@ To recover:
 1. Check whether the pipeline is **Stopped**, **Stopping**, or **Failed**
 2. If it failed, review the error details and [replication logs](/dashboard/project/_/logs/replication-logs)
 3. Fix the underlying issue, such as destination connectivity, schema mismatches, permissions, or rate limits
-4. Start or restart the pipeline from [**Database > Replication**](/dashboard/project/_/database/replication)
+4. Start or restart the pipeline from [**Database > Pipelines**](/dashboard/project/_/database/pipelines)
 
 If the same error continues after restart, the pipeline may stop again. Review [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring) for troubleshooting steps.
 
@@ -151,7 +151,7 @@ If the same error continues after restart, the pipeline may stop again. Review [
 
 Lag increases when Postgres produces WAL faster than the pipeline can confirm it has processed. Common causes include a slow or rate-limited destination, a pipeline issue, heavy source database activity, long transactions, network latency between the pipeline and source database, or a stopped/disconnected pipeline.
 
-Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View pipeline**, and check **Waiting to sync**, **WAL retention remaining**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/pipelines-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
+Open [**Database > Pipelines**](/dashboard/project/_/database/pipelines), click **View pipeline**, and check **Waiting to sync**, **WAL retention remaining**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/pipelines-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
 
 ## What does a `Lost` slot status mean?
 
@@ -167,7 +167,7 @@ Table errors occur during the initial sync. To recover, click **View pipeline**,
 
 ## How to verify replication is working
 
-Check the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard:
+Check the [**Database > Pipelines**](/dashboard/project/_/database/pipelines) section of the Dashboard:
 
 1. Verify your pipeline shows **Running** status
 2. Click **View pipeline** to check table states
@@ -192,7 +192,7 @@ Stopping requests a graceful shutdown, so the pipeline can remain **Stopping** f
 
 If your project becomes inactive, Pipelines stops any running pipelines and does not automatically resume them after the project is restarted.
 
-After restarting the project, restart each replication pipeline manually from the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard.
+After restarting the project, restart each replication pipeline manually from the [**Database > Pipelines**](/dashboard/project/_/database/pipelines) section of the Dashboard.
 
 ## What happens after a downgrade to the free plan?
 

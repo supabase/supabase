@@ -3,14 +3,14 @@ import { useParams } from 'common'
 
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 
-export const Route = createFileRoute('/project/$ref/database/replication')({
-  component: ReplicationShell,
+export const Route = createFileRoute('/project/$ref/database/pipelines')({
+  component: PipelinesShell,
   staticData: {
     databaseLayoutTitle: 'Pipelines',
   },
 })
 
-function ReplicationShell() {
+function PipelinesShell() {
   const { ref: projectRef } = useParams()
 
   return (
