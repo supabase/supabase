@@ -168,6 +168,7 @@ export function ExamplesCombobox({
       value={selected.id}
       onValueChange={handleSelect}
       className={cn(
+        'isolate',
         '[&_.shiki:first-child]:rounded-t-none [&_.shiki:first-child]:border-t-0',
         className
       )}
