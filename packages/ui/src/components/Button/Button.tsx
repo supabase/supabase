@@ -20,6 +20,7 @@ const buttonVariants = cva(
   font-medium
   ease-[cubic-bezier(0.22,1,0.36,1)]
   duration-200
+  rounded-md
   transition-[background-color,border-color,color,scale]
   [&:not([aria-haspopup])]:motion-safe:active:scale-[0.97]
   focus-ring
@@ -109,7 +110,8 @@ const buttonVariants = cva(
         true: 'w-full flex items-center justify-center',
       },
       size: {
-        // Larger sizes use a softer curve so radius stays proportional to height.
+        // Larger sizes soften the curve; cn() merges these over base rounded-md.
+        // Radius stays on Button (not SIZE_VARIANTS) because that map is shared with Input/Select.
         tiny: `${SIZE_VARIANTS.tiny} rounded-md`,
         small: `${SIZE_VARIANTS.small} rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]`,
         medium: `${SIZE_VARIANTS.medium} rounded-[calc(var(--radius-md)*(1+(38/26-1)*0.35))]`,
@@ -129,10 +131,6 @@ const buttonVariants = cva(
       rounded: {
         true: 'rounded-full',
       },
-    },
-    // Match <Button size="tiny"> so raw buttonVariants({ variant }) keeps radius.
-    defaultVariants: {
-      size: 'tiny',
     },
   }
 )
