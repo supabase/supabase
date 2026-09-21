@@ -1,6 +1,7 @@
 import { clientSdkIds } from '~/content/navigation.references'
 import { BASE_PATH } from '~/lib/constants'
 import MARKDOWN_SLUGS from '~/public/markdown/manifest.json'
+import REFERENCE_MARKDOWN_PATHS from '~/public/markdown/reference-manifest.json'
 import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { isbot } from 'isbot'
 import { NextResponse, type NextRequest } from 'next/server'
@@ -8,6 +9,12 @@ import { NextResponse, type NextRequest } from 'next/server'
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
 const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
+
+const notAcceptable = () =>
+  new NextResponse('Not Acceptable', {
+    status: 406,
+    headers: { 'Cache-Control': 'no-store', Vary: 'Accept' },
+  })
 
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
@@ -21,12 +28,7 @@ export function middleware(request: NextRequest) {
       { hasMarkdownVariant: GUIDES_MARKDOWN_SLUGS.has(slug), isMarkdownSuffix: isMdSuffix }
     )
 
-    if (decision === 'not-acceptable') {
-      return new NextResponse('Not Acceptable', {
-        status: 406,
-        headers: { 'Cache-Control': 'no-store', Vary: 'Accept' },
-      })
-    }
+    if (decision === 'not-acceptable') return notAcceptable()
 
     if (decision === 'markdown') {
       const rewriteUrl = new URL(url)
@@ -39,8 +41,19 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  if (pathname.endsWith('.md')) {
-    const sectionPath = pathname.slice(REFERENCE_PATH.length + 1, -'.md'.length) || 'index'
+  // A `.md` URL always goes to the handler, which owns the Markdown 404, so the
+  // suffix skips the manifest check that guides apply to it.
+  const sectionPath = pathname.replace(/\.md$/, '').slice(REFERENCE_PATH.length + 1) || 'index'
+  const decision = pathname.endsWith('.md')
+    ? 'markdown'
+    : negotiateMarkdown(
+        { acceptHeader: request.headers.get('accept') ?? '' },
+        { hasMarkdownVariant: Object.hasOwn(REFERENCE_MARKDOWN_PATHS, sectionPath) }
+      )
+
+  if (decision === 'not-acceptable') return notAcceptable()
+
+  if (decision === 'markdown') {
     const rewriteUrl = new URL(url)
     rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/reference-md/${sectionPath}`
     return NextResponse.rewrite(rewriteUrl)

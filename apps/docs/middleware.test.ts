@@ -9,6 +9,13 @@ vi.mock('~/public/markdown/manifest.json', () => ({
   default: ['auth'],
 }))
 
+vi.mock('~/public/markdown/reference-manifest.json', () => ({
+  default: {
+    index: '_index',
+    'javascript/select': 'javascript/v2/select',
+  },
+}))
+
 // BASE_PATH defaults to '/docs' when NEXT_PUBLIC_BASE_PATH is unset, so test
 // paths include the /docs prefix to match the middleware's GUIDES_PATH check.
 function makeRequest(
@@ -106,7 +113,7 @@ describe('docs middleware — /guides/* content negotiation', () => {
     expect(middleware(req).status).toBe(406)
   })
 
-  it('does not 406 on /reference/* (negotiation contract is /guides/* only)', () => {
+  it('does not 406 on a reference path that has no markdown version', () => {
     const req = makeRequest('/docs/reference/javascript/introduction', {
       accept: 'application/x-content-negotiation-probe',
     })
@@ -207,11 +214,38 @@ describe('docs middleware — /reference/*.md', () => {
     )
   })
 
-  it('leaves reference URLs without .md alone, even when Accept asks for markdown', () => {
-    const req = makeRequest('/docs/reference/javascript/select', { accept: 'text/markdown' })
+  it('serves markdown without the suffix when Accept prefers it and the path has a markdown version', () => {
+    for (const [path, expected] of [
+      ['/docs/reference/javascript/select', 'javascript/select'],
+      ['/docs/reference', 'index'],
+    ]) {
+      const req = makeRequest(path, { accept: 'text/markdown, text/html;q=0.9' })
+      expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(REFERENCE_MD_REWRITE(expected))
+    }
+  })
+
+  it('keeps the existing HTML routing for browsers and for paths with no markdown version', () => {
+    const LIBRARY_PAGE = 'https://supabase.com/docs/reference/javascript'
+    for (const [path, accept, expected] of [
+      [
+        '/docs/reference/javascript/select',
+        'text/html,application/xhtml+xml,*/*;q=0.8',
+        LIBRARY_PAGE,
+      ],
+      ['/docs/reference/javascript/database', 'text/markdown', LIBRARY_PAGE],
+      ['/docs/reference/constructor', 'text/markdown', null],
+    ] as const) {
+      const response = middleware(makeRequest(path, { accept }))
+      expect(response.headers.get(REWRITE_HEADER)).toBe(expected)
+    }
+  })
+
+  it('answers 406 like guides when Accept excludes both HTML and markdown', () => {
+    const req = makeRequest('/docs/reference/javascript/select', { accept: 'application/json' })
     const response = middleware(req)
 
-    expect(response.status).not.toBe(406)
-    expect(response.headers.get(REWRITE_HEADER)).not.toContain('/api/reference-md/')
+    expect(response.status).toBe(406)
+    expect(response.headers.get('Cache-Control')).toBe('no-store')
+    expect(response.headers.get('Vary')).toBe('Accept')
   })
 })
