@@ -3,6 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
+import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -16,7 +17,18 @@ vi.mock('ui', async (importOriginal) => ({
   copyToClipboard: mockCopyToClipboard,
 }))
 
-const codes = Array.from(Array(10).keys()).map((i) => `code_${i}`)
+const codes = [
+  'wto24t5xbeulvjmi',
+  'ade6in2sufndbbwd',
+  'oge3npsrhrr66k25',
+  'pxbkfvxlbi6ggvnf',
+  'kc3oaioqdjn4htc3',
+  '363gseoknplambiy',
+  '3urgae2p2jegem4m',
+  'tbxog2guayp6uvud',
+  'rpcvcf4owbclxrfp',
+  'kyyfsp3eqjydj53t',
+]
 
 describe('GenerateRecoveryCodesModal', () => {
   test('generate the recovery codes and allow users to copy them', async () => {
@@ -34,8 +46,8 @@ describe('GenerateRecoveryCodesModal', () => {
 
     // Codes are generated
     await screen.findByText('Save your recovery codes')
-    await screen.findByText('code_0')
-    await screen.findByText('code_9')
+    await screen.findByText('WTO2-4T5X-BEUL-VJMI')
+    await screen.findByText('KYYF-SP3E-QJYD-J53T')
 
     // Users have to copy the codes to close the modal, next click should fail if they managed to close it
     expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(1)
@@ -44,7 +56,10 @@ describe('GenerateRecoveryCodesModal', () => {
     await waitFor(() =>
       expect(screen.getByRole('checkbox', { name: 'I have copied the codes' })).toBeChecked()
     )
-    expect(mockCopyToClipboard).toHaveBeenCalledWith(codes.join('\n'), expect.any(Function))
+    expect(mockCopyToClipboard).toHaveBeenCalledWith(
+      codes.map((code) => formatRecoveryCode(code)).join('\n'),
+      expect.any(Function)
+    )
 
     // We should have 2 close buttons (header icon and a standard button)
     expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(2)
@@ -82,7 +97,7 @@ describe('GenerateRecoveryCodesModal', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Generate recovery codes' }))
     // Codes are generated
     await screen.findByText('Save your recovery codes')
-    await screen.findByText('code_0')
-    await screen.findByText('code_9')
+    await screen.findByText('WTO2-4T5X-BEUL-VJMI')
+    await screen.findByText('KYYF-SP3E-QJYD-J53T')
   })
 })

@@ -515,7 +515,7 @@ export const UnifiedLogs = () => {
                     hasNextPage={hasNextPage}
                     setColumnOrder={setColumnOrder}
                     setColumnVisibility={setColumnVisibility}
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                    errorSubject="Failed to retrieve logs"
                     emptyStateMessage={
                       isUserFilterUnreachable(searchParameters) ? (
                         <div className="text-sm flex flex-col gap-y-1">
