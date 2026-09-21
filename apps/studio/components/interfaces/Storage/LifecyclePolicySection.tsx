@@ -64,15 +64,10 @@ export const LifecyclePolicySection = ({
         name="version_expiry_days"
         control={control}
         render={({ field }) => (
-          <FormItemLayout
-            name="version_expiry_days"
-            label="Noncurrent version expiration"
-            layout="flex-row-reverse"
-          >
+          <FormItemLayout label="Noncurrent version expiration" layout="flex-row-reverse">
             <FormControl>
               <InputGroup>
                 <FormInputGroupInput
-                  id={field.name}
                   name={field.name}
                   ref={field.ref}
                   onBlur={field.onBlur}
@@ -96,7 +91,6 @@ export const LifecyclePolicySection = ({
         control={control}
         render={({ field }) => (
           <FormItemLayout
-            name="max_noncurrent_versions"
             label="Retained noncurrent versions"
             description={hasDays ? undefined : 'Requires an expiration age to be set.'}
             layout="flex-row-reverse"
@@ -105,7 +99,6 @@ export const LifecyclePolicySection = ({
             <FormControl>
               <InputGroup>
                 <FormInputGroupInput
-                  id={field.name}
                   name={field.name}
                   ref={field.ref}
                   onBlur={field.onBlur}
