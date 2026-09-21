@@ -5088,6 +5088,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/warehouse/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Disable Warehouse
+     * @description Asynchronously stop and delete Warehouse replication, remove its publication and FDW, and revoke external catalog access. Optionally delete the DuckLake catalog schema and managed Storage bucket with delete_data=true, requiring SQL and Storage admin write permissions on the configured destination. Poll setup-status for completion. Source tables are preserved.
+     */
+    delete: operations['WarehouseController_deleteWarehouse']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/warehouse/{ref}/catalog': {
     parameters: {
       query?: never
@@ -16005,7 +16025,11 @@ export interface components {
       }[]
     }
     WarehouseSetupStatusResponse_Output: {
-      /** @description Project database FDW setup markers used to derive the Warehouse FDW phase */
+      /** @description Whether the current disable request deletes DuckLake data. */
+      delete_data?: boolean
+      /** @description Warehouse cleanup failure, when present. */
+      error?: string
+      /** @description Project database FDW setup markers; null during or after teardown, when setup inspection is inapplicable. */
       fdw_status: {
         /**
          * @description Whether fdw_warehouse is available to install on the project database instance
@@ -16037,18 +16061,26 @@ export interface components {
          * @example true
          */
         wrapper_installed: boolean
-      }
+      } | null
       /**
        * @description Warehouse replication pipeline id when it exists
        * @example 101
        */
       pipeline_id?: number
       /**
-       * @description Overall Warehouse setup status derived from replication state
+       * @description Overall Warehouse lifecycle status, using persisted state during teardown and replication state during setup
        * @example copying
        * @enum {string}
        */
-      setup_status: 'not_started' | 'setting_up' | 'copying' | 'complete' | 'error'
+      setup_status:
+        | 'complete'
+        | 'copying'
+        | 'deletion_failed'
+        | 'disabled'
+        | 'disabling'
+        | 'error'
+        | 'not_started'
+        | 'setting_up'
       /** @description Warehouse setup phases in execution order */
       steps: {
         /**
@@ -16061,13 +16093,13 @@ export interface components {
          * @example warehouse_copy
          * @enum {string}
          */
-        name: 'warehouse_pipeline' | 'warehouse_copy' | 'warehouse_fdw'
+        name: 'warehouse_copy' | 'warehouse_fdw' | 'warehouse_pipeline'
         /**
          * @description Derived Warehouse setup step status
          * @example running
          * @enum {string}
          */
-        status: 'waiting' | 'running' | 'completed' | 'skipped' | 'error'
+        status: 'completed' | 'error' | 'running' | 'skipped' | 'waiting'
       }[]
       /** @description Warehouse linked tables and replication-derived sync state */
       tables: {
@@ -16102,7 +16134,7 @@ export interface components {
          * @example live
          * @enum {string}
          */
-        state: 'syncing' | 'live' | 'error'
+        state: 'error' | 'live' | 'syncing'
         /**
          * @description Warehouse table size in bytes, when available
          * @example 197912092672
@@ -34530,6 +34562,72 @@ export interface operations {
         }
       }
       /** @description Failed to get Vercel redirect url */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  WarehouseController_deleteWarehouse: {
+    parameters: {
+      query?: {
+        /** @description Permanently delete the managed DuckLake catalog schema and Storage bucket. Defaults to false. */
+        delete_data?: 'false' | 'true'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Warehouse disable accepted. Poll setup-status for completion. */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Invalid deletion option or unmanaged Warehouse destination. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Another Warehouse mutation is running or the cleanup policy cannot be changed. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to request Warehouse disable. */
       500: {
         headers: {
           [name: string]: unknown
