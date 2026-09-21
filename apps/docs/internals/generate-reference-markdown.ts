@@ -3,12 +3,9 @@ import path from 'node:path'
 import { isFeatureEnabled, type Feature } from 'common/enabled-features'
 import matter from 'gray-matter'
 import yaml from 'js-yaml'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
-import { toMarkdown } from 'mdast-util-to-markdown'
-import { gfm } from 'micromark-extension-gfm'
 
-import { addBaseUrlPrefix } from './internal-links'
+import { generateSections } from './generate-reference-sections'
+import { prefixMarkdownLinks } from './reference-markdown.utils'
 
 const GENERATED = path.join(process.cwd(), 'features/docs/generated')
 const OUT_DIR = path.join(process.cwd(), 'public/markdown/reference')
@@ -447,21 +444,17 @@ async function generate() {
           output = await renderCli(ref)
           break
       }
-      const tree = fromMarkdown(output, {
-        extensions: [gfm()],
-        mdastExtensions: [gfmFromMarkdown()],
-      })
-      addBaseUrlPrefix(tree)
-      const prefixed = toMarkdown(tree, {
-        extensions: [gfmToMarkdown()],
-        bullet: '-',
-        listItemIndent: 'one',
-      })
+      const prefixed = prefixMarkdownLinks(output)
       await fs.writeFile(path.join(OUT_DIR, ref.outFile), prefixed)
     })
   )
 
   console.log(`Generated ${references.length} markdown files under public/markdown/reference/`)
+
+  await generateSections()
 }
 
-generate()
+generate().catch((error) => {
+  console.error(error)
+  process.exit(1)
+})

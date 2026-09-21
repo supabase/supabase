@@ -27,11 +27,12 @@ yarn-error.log*
 
 # Sitemap
 public/sitemap.xml
-# Generated guide and reference markdown files. manifest.json is committed
-# with a placeholder empty array so middleware.ts's import always resolves,
+# Generated guide and reference markdown files. Both manifests are committed
+# with a placeholder empty array and object so middleware.ts's import always resolves,
 # even when build:markdown hasn't run (e.g. in local dev, which skips it).
 public/markdown/*
 !public/markdown/manifest.json
+!public/markdown/reference-manifest.json
 public/docs.tar.gz
 public/docs/
 
