@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
@@ -30,9 +31,16 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { BucketVersioningFields } from './BucketVersioningFields/BucketVersioningFields'
 import {
+  fromLifecycleRules,
+  hasLifecyclePolicyChanged,
+  toLifecycleRules,
+} from './BucketVersioningFields/BucketVersioningFields.lifecycle'
+import {
+  getNextVersioningState,
   getVersioningFormDefaults,
   isEnablingVersioning,
   isSuspendingVersioning,
+  toVersioningStatusUpdate,
   type BucketVersioningSettings,
 } from './EditBucketModal.utils'
 import { EditBucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
@@ -45,6 +53,8 @@ import {
 } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { bucketLifecycleQueryOptions } from '@/data/storage/bucket-lifecycle-query'
+import { useBucketLifecycleUpdateMutation } from '@/data/storage/bucket-lifecycle-update-mutation'
 import { useBucketUpdateMutation } from '@/data/storage/bucket-update-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
@@ -71,22 +81,30 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
+  const { data: lifecycle } = useQuery({
+    ...bucketLifecycleQueryOptions({ projectRef: ref, bucketId: bucket?.id }),
+    enabled: isStorageVersioningEnabled && visible && !!ref && !!bucket?.id,
+  })
+  const storedPolicy = fromLifecycleRules(lifecycle)
+
   const versioningSettings: BucketVersioningSettings = {
     versioning: getBucketVersioningState(bucket),
-    versionExpiryDays: null,
-    maxNoncurrentVersions: null,
-    expirationMode: 'and',
+    versionExpiryDays: storedPolicy.versionExpiryDays,
+    maxNoncurrentVersions: storedPolicy.maxNoncurrentVersions,
+    expirationMode: storedPolicy.expirationMode,
   }
 
   // Held while the suspend confirmation is open, so confirming completes the save.
   const [pendingSuspendValues, setPendingSuspendValues] = useState<BucketFormValues | null>(null)
 
   const track = useTrack()
-  // The versioning fields aren't part of the update payload yet, so the intent is
-  // stashed here and only reported once the save actually succeeds.
+  // Stashed at submit time and only reported once the save actually succeeds.
   const enabledVersioningRef = useRef<{ hasLifecyclePolicy: boolean } | null>(null)
 
-  const { mutate: updateBucket, isPending: isUpdating } = useBucketUpdateMutation({
+  const { mutateAsync: updateLifecycle, isPending: isUpdatingLifecycle } =
+    useBucketLifecycleUpdateMutation()
+
+  const { mutate: updateBucket, isPending: isUpdatingBucket } = useBucketUpdateMutation({
     onSuccess: () => {
       setPendingSuspendValues(null)
       if (enabledVersioningRef.current !== null) {
@@ -130,6 +148,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     },
   })
 
+  const isUpdating = isUpdatingBucket || isUpdatingLifecycle
+
   const defaultValues = {
     name: bucket?.name ?? '',
     public: bucket?.public,
@@ -163,7 +183,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     onClose()
   }
 
-  const persistChanges = (values: BucketFormValues) => {
+  const persistChanges = async (values: BucketFormValues) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
 
@@ -176,12 +196,39 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           }
         : null
 
-    // TODO(storage-versioning): pass the versioning fields through once the
-    // API accepts them. Until then the section is form state only.
+    const nextVersioningState = getNextVersioningState(
+      versioningSettings.versioning,
+      values.enable_versioning
+    )
+    const versioningStatus = isStorageVersioningEnabled
+      ? toVersioningStatusUpdate(nextVersioningState)
+      : undefined
+
+    // The retention policy is stored beside the bucket, so it saves separately.
+    // Writing it first means a rejected policy leaves the bucket untouched.
+    // Suspending keeps the policy: retained versions still expire under it.
+    if (
+      isStorageVersioningEnabled &&
+      nextVersioningState !== 'disabled' &&
+      hasLifecyclePolicyChanged(storedPolicy, values)
+    ) {
+      try {
+        await updateLifecycle({
+          projectRef: ref,
+          bucketId: bucket.id,
+          rules: toLifecycleRules(values),
+        })
+      } catch {
+        // The mutation raises its own toast; leave the modal open to retry.
+        return
+      }
+    }
+
     updateBucket({
       projectRef: ref,
       id: bucket.id,
       isPublic: values.public,
+      versioning_status: versioningStatus,
       file_size_limit:
         values.has_file_size_limit && values.formatted_size_limit
           ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
@@ -226,7 +273,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       return setPendingSuspendValues(values)
     }
 
-    persistChanges(values)
+    await persistChanges(values)
   }
 
   useEffect(() => {
@@ -348,7 +395,11 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       layout="flex"
                     >
                       <FormControl>
-                        <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
+                        <Switch
+                          size="large"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl>
                     </FormItemLayout>
                   )}

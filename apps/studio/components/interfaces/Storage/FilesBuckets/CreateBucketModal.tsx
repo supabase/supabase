@@ -28,6 +28,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { BucketVersioningFields } from './BucketVersioningFields/BucketVersioningFields'
+import { toLifecycleRules } from './BucketVersioningFields/BucketVersioningFields.lifecycle'
 import { BucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { PROJECT_VERSIONING_DEFAULTS } from '@/components/interfaces/Storage/StorageVersioning.constants'
@@ -39,6 +40,7 @@ import {
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
+import { useBucketLifecycleUpdateMutation } from '@/data/storage/bucket-lifecycle-update-mutation'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -77,6 +79,9 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
   })
+  const { mutateAsync: updateLifecycle, isPending: isUpdatingLifecycle } =
+    useBucketLifecycleUpdateMutation({ onError: () => {} })
+  const isSaving = isCreatingBucket || isUpdatingLifecycle
 
   const form = useForm<BucketFormValues>({
     resolver: zodResolver(BucketFormSchema),
@@ -110,9 +115,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         })
       }
 
-      // TODO(storage-versioning): pass `enable_versioning`, `version_expiry_days`,
-      // `max_noncurrent_versions` and `expiration_mode` through once the API accepts them.
-      // Until then the versioning section is form state only.
+      const isVersioningEnabled = isStorageVersioningEnabled && values.enable_versioning
+
       await createBucket({
         projectRef: ref,
         id: values.name,
@@ -120,10 +124,21 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         isPublic: values.public,
         file_size_limit: fileSizeLimit,
         allowed_mime_types: allowedMimeTypes,
+        // A bucket is only ever created DISABLED or ENABLED; suspending comes later.
+        versioning_status: isVersioningEnabled ? 'ENABLED' : 'DISABLED',
       })
+
+      // Storage keeps the lifecycle policy separately from the bucket, so it is a
+      // second call. The bucket exists either way; a failure here leaves it
+      // versioned with no retention policy rather than rolling the creation back.
+      const lifecycleRules = isVersioningEnabled ? toLifecycleRules(values) : []
+      if (lifecycleRules.length > 0) {
+        await updateLifecycle({ projectRef: ref, bucketId: values.name, rules: lifecycleRules })
+      }
+
       track('storage_bucket_created', {
         bucketType: 'STANDARD',
-        hasVersioningEnabled: values.enable_versioning,
+        hasVersioningEnabled: isVersioningEnabled,
       })
 
       toast.success(`Successfully created bucket ${values.name}`)
@@ -359,15 +374,15 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         </Form>
 
         <DialogFooter>
-          <Button disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
+          <Button disabled={isSaving} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
             variant="primary"
             form={formId}
             type="submit"
-            loading={isCreatingBucket}
-            disabled={isCreatingBucket}
+            loading={isSaving}
+            disabled={isSaving}
           >
             Create
           </Button>
