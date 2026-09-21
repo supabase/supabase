@@ -15,7 +15,6 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupInput,
   Popover,
   PopoverContent,
   PopoverTrigger,
