@@ -9,6 +9,8 @@ conflict, follow `CONTRIBUTING.md`. Match literal code, API names, UI labels, an
 third-party product names even when they differ from this guidance, and format them
 as code or UI text as appropriate.
 
+The `/write-the-docs` and `/edit-the-docs` agent skills apply this list as you draft.
+
 Many unambiguous rules in this list are checked by `supa-mdx-lint`. Run
 `pnpm lint:mdx` from `apps/docs` after editing MDX. A lint warning still requires
 judgment: rewrite the sentence instead of applying a replacement that changes its
