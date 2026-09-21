@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
 
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
@@ -14,6 +14,8 @@ import {
 
 type ProviderOptions = Record<string, any>
 type SystemProviderOptions = Record<string, any>
+
+export const DEFAULT_OPENAI_BASE_URL = 'https://api.openai.com/v1'
 
 type ModelSuccess = {
   /** Spread directly into AI SDK calls: `streamText({ ...modelParams, ... })` */
@@ -84,9 +86,15 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
   }
 
   if (provider === 'openai') {
-    if (!process.env.OPENAI_API_KEY) {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) {
       return { error: new Error('OPENAI_API_KEY not available') }
     }
+    const rawBaseURL = process.env.OPENAI_BASE_URL?.trim().replace(/\/+$/, '')
+    const openai = createOpenAI({
+      apiKey,
+      baseURL: rawBaseURL || DEFAULT_OPENAI_BASE_URL,
+    })
     const baseProviderOptions = providerRegistry.providerOptions?.openai ?? {}
     const openaiProviderOptions = modelEntry?.reasoningEffort
       ? { ...baseProviderOptions, reasoningEffort: modelEntry.reasoningEffort }

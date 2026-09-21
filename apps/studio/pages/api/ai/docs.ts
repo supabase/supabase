@@ -92,7 +92,11 @@ export default async function handler(req: NextRequest) {
 }
 
 async function handlePost(request: NextRequest) {
-  const openai = new OpenAI({ apiKey: openAiKey })
+  const rawBaseURL = process.env.OPENAI_BASE_URL?.trim().replace(/\/+$/, '')
+  const openai = new OpenAI({
+    apiKey: openAiKey,
+    ...(rawBaseURL ? { baseURL: rawBaseURL } : {}),
+  })
 
   const body = await (request.json() as Promise<{
     messages: { content: string; role: 'user' | 'assistant' }[]

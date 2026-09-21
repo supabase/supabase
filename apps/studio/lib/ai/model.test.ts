@@ -1,12 +1,16 @@
-import { openai } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as bedrockModule from './bedrock'
-import { getModel } from './model'
+import { DEFAULT_OPENAI_BASE_URL, getModel } from './model'
 import { DEFAULT_COMPLETION_MODEL, openaiModelEntry } from './model.utils'
 
+const { openaiProvider } = vi.hoisted(() => ({
+  openaiProvider: vi.fn(),
+}))
+
 vi.mock('@ai-sdk/openai', () => ({
-  openai: vi.fn(() => 'openai-model'),
+  createOpenAI: vi.fn(),
 }))
 
 vi.mock('./bedrock', async () => ({
@@ -20,9 +24,14 @@ describe('getModel', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
+    vi.mocked(createOpenAI).mockReturnValue(
+      openaiProvider as unknown as ReturnType<typeof createOpenAI>
+    )
+    openaiProvider.mockReturnValue('openai-model')
   })
 
   afterEach(() => {
+    vi.unstubAllEnvs()
     process.env = { ...originalEnv }
   })
 
@@ -56,7 +65,11 @@ describe('getModel', () => {
     })
 
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
+    expect(createOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: DEFAULT_OPENAI_BASE_URL,
+    })
+    expect(openaiProvider).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(systemProviderOptions).toBeUndefined()
   })
 
@@ -80,7 +93,11 @@ describe('getModel', () => {
 
     expect(error).toBeUndefined()
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5.3-codex')
+    expect(createOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: DEFAULT_OPENAI_BASE_URL,
+    })
+    expect(openaiProvider).toHaveBeenCalledWith('gpt-5.3-codex')
     expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('low')
   })
 
@@ -93,7 +110,75 @@ describe('getModel', () => {
     })
 
     expect(error).toBeUndefined()
-    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
+    expect(createOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: DEFAULT_OPENAI_BASE_URL,
+    })
+    expect(openaiProvider).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('none')
+  })
+
+  it('passes OPENAI_BASE_URL to createOpenAI when configured', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'test-key')
+    vi.stubEnv('OPENAI_BASE_URL', 'https://integrate.api.nvidia.com/v1')
+
+    const { modelParams } = await getModel({
+      provider: 'openai',
+      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
+    })
+
+    expect(modelParams?.model).toEqual('openai-model')
+    expect(createOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: 'https://integrate.api.nvidia.com/v1',
+    })
+    expect(openaiProvider).toHaveBeenCalledWith('gpt-5.4-nano')
+  })
+
+  it('normalizes OPENAI_BASE_URL by trimming whitespace and stripping trailing slashes', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'test-key')
+    vi.stubEnv('OPENAI_BASE_URL', '  https://integrate.api.nvidia.com/v1///  ')
+
+    await getModel({
+      provider: 'openai',
+      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
+    })
+
+    expect(createOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: 'https://integrate.api.nvidia.com/v1',
+    })
+  })
+
+  it('falls back to default OpenAI endpoint when OPENAI_BASE_URL is whitespace', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'test-key')
+    vi.stubEnv('OPENAI_BASE_URL', '   ')
+
+    await getModel({
+      provider: 'openai',
+      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
+    })
+
+    expect(createOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: DEFAULT_OPENAI_BASE_URL,
+    })
+    expect(openaiProvider).toHaveBeenCalledWith('gpt-5.4-nano')
+  })
+
+  it('falls back to default OpenAI endpoint when OPENAI_BASE_URL is empty string', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'test-key')
+    vi.stubEnv('OPENAI_BASE_URL', '')
+
+    await getModel({
+      provider: 'openai',
+      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
+    })
+
+    expect(createOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: DEFAULT_OPENAI_BASE_URL,
+    })
+    expect(openaiProvider).toHaveBeenCalledWith('gpt-5.4-nano')
   })
 })
