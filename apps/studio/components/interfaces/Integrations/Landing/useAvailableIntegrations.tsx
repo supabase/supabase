@@ -253,7 +253,6 @@ export const useAvailableIntegrations = () => {
         website_url: siteUrl,
         images,
         built_by: authorName,
-        listing_logo: listingLogo,
       } = marketplaceWrapper
 
       const overrides = {
@@ -267,7 +266,6 @@ export const useAvailableIntegrations = () => {
           src: fullImageUrl(image),
           alt: `${title} screenshot ${i + 1}`,
         })),
-        icon: listingLogo ? renderMarketplaceLogo(listingLogo) : undefined,
       }
 
       return {
