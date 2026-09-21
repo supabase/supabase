@@ -127,7 +127,10 @@ const VersionActionsMenu = ({
 interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
+  /** Leaf name, for copy. */
   objectName: string
+  /** Full path within the bucket, which is what the version endpoints address. */
+  path: string
   versioningState: BucketVersioningState
   lifecyclePolicy: LifecyclePolicy
   expirationMode: ExpirationMode
@@ -142,6 +145,7 @@ export const VersionHistory = ({
   projectRef,
   bucketId,
   objectName,
+  path,
   versioningState,
   lifecyclePolicy,
   expirationMode,
@@ -157,7 +161,7 @@ export const VersionHistory = ({
     isError,
     error,
     isSuccess,
-  } = useQuery(objectVersionsQueryOptions({ projectRef, bucketId, objectName, lifecyclePolicy }))
+  } = useQuery(objectVersionsQueryOptions({ projectRef, bucketId, path, lifecyclePolicy }))
 
   const [versionToDelete, setVersionToDelete] = useState<ObjectVersion>()
 
@@ -197,7 +201,7 @@ export const VersionHistory = ({
 
   const handleRestore = (version: ObjectVersion) => {
     if (!projectRef || !bucketId) return
-    restoreVersion({ projectRef, bucketId, objectName, versionId: version.versionId })
+    restoreVersion({ projectRef, bucketId, path, versionId: version.versionId })
   }
 
   if (isPending) return <GenericSkeletonLoader />
@@ -325,7 +329,7 @@ export const VersionHistory = ({
           deleteVersion({
             projectRef,
             bucketId,
-            objectName,
+            path,
             versionId: versionToDelete.versionId,
           })
         }}
