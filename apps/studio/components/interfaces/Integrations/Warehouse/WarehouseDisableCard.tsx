@@ -25,6 +25,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { useWarehouseReplicatedTargets } from './useWarehouseReplicatedTargets'
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useTrack } from '@/lib/telemetry/track'
@@ -35,9 +36,10 @@ export const WarehouseDisableCard = () => {
   const track = useTrack()
   const [isConfirming, setIsConfirming] = useState(false)
 
+  const replicatedTargets = useWarehouseReplicatedTargets({ projectRef })
+
   const setupMutation = useWarehouseSetupMutation({
     onSuccess: async () => {
-      track('warehouse_disabled', {})
       // Disabling also turns off catalog access server-side, which the setup mutation doesn't know
       // to invalidate on its own.
       await queryClient.invalidateQueries({ queryKey: warehouseKeys.catalog(projectRef) })
@@ -46,6 +48,26 @@ export const WarehouseDisableCard = () => {
     },
     onError: (error) => toast.error(`Failed to disable Warehouse: ${error.message}`),
   })
+
+  const handleDisable = () => {
+    if (!projectRef) return undefined
+    // Snapshotted before the mutation, whose own onSuccess awaits the post-disable refetches.
+    const targets = replicatedTargets
+
+    // Returned so the dialog stays open on failure and closes once the disable succeeds.
+    return setupMutation.mutateAsync(
+      { projectRef, body: { targets: [] } },
+      {
+        onSuccess: () =>
+          track('warehouse_disabled', {
+            ...(targets !== undefined && {
+              schemaTargetCount: targets.filter((target) => target.type === 'schema').length,
+              tableTargetCount: targets.filter((target) => target.type === 'table').length,
+            }),
+          }),
+      }
+    )
+  }
 
   return (
     <PageSection className="pt-5!">
@@ -92,11 +114,7 @@ export const WarehouseDisableCard = () => {
               variant="danger"
               loading={setupMutation.isPending}
               disabled={!projectRef}
-              onClick={() =>
-                projectRef
-                  ? setupMutation.mutateAsync({ projectRef, body: { targets: [] } })
-                  : undefined
-              }
+              onClick={handleDisable}
             >
               Disable Warehouse
             </AlertDialogAction>
