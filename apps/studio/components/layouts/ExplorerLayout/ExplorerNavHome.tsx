@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { motion } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Plus, SquareCode } from 'lucide-react'
 import Link from 'next/link'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -12,10 +12,11 @@ import {
   rowClassName,
 } from './ExplorerLayout.constants'
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
-import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
+import { useCreateChat, useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNavHome = ({
   onSelectSection,
@@ -24,6 +25,8 @@ export const ExplorerNavHome = ({
 }) => {
   const { ref } = useParams()
   const { openChat } = useCreateChat()
+  const tabs = useTabsStateSnapshot()
+  const { createQuery } = useCreateQuery()
 
   const { data: notebooksData } = useNotebooksInfiniteQuery({ projectRef: ref, limit: 100 })
   const notebooks = notebooksData?.pages.flatMap((page) => page.content) ?? []
@@ -50,6 +53,16 @@ export const ExplorerNavHome = ({
       className="absolute inset-0 flex flex-col gap-4 overflow-y-auto p-3"
     >
       <nav className="flex flex-col gap-px">
+        <button
+          type="button"
+          tabIndex={0}
+          className={rowClassName(false)}
+          onClick={() => createQuery()}
+        >
+          <SquareCode size={14} className="shrink-0" />
+          <span className="flex-1 text-left">Run SQL</span>
+          <Plus size={14} className="shrink-0 text-foreground-muted" />
+        </button>
         {EXPLORER_SECTIONS.map(({ type, label, icon: Icon }) => {
           return (
             <button
@@ -77,11 +90,11 @@ export const ExplorerNavHome = ({
       </nav>
 
       <section className="flex flex-col gap-px">
-        <h3 className="mb-2 px-3 font-mono text-sm font-normal uppercase text-foreground-lighter">
+        <h3 className="mb-2 px-2 font-mono text-sm font-normal uppercase text-foreground-lighter">
           Recently updated
         </h3>
         {recentItems.length === 0 ? (
-          <p className="px-3 text-xs text-foreground-lighter">Nothing edited yet</p>
+          <p className="px-2 text-xs text-foreground-lighter">Nothing edited yet</p>
         ) : (
           recentItems.map((item) => {
             const Icon = EXPLORER_SECTIONS.find((section) => section.type === item.type)?.icon
@@ -102,6 +115,7 @@ export const ExplorerNavHome = ({
                 tabIndex={0}
                 className={rowClassName(false)}
                 onClick={() => openChat(item.id)}
+                onDoubleClick={() => tabs.makeTabPermanent(createTabId('chat', { id: item.id }))}
               >
                 {content}
               </button>
@@ -110,6 +124,9 @@ export const ExplorerNavHome = ({
                 key={item.id}
                 href={`/project/${ref}/explorer/notebook/${item.id}`}
                 className={rowClassName(false)}
+                onDoubleClick={() =>
+                  tabs.makeTabPermanent(createTabId('notebook', { id: item.id }))
+                }
               >
                 {content}
               </Link>

@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "dropzone-nuxtjs",
-  "type": "registry:block",
   "title": "Dropzone (File Upload) for Nuxt and Supabase",
   "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
   "dependencies": [
@@ -37,5 +36,6 @@
       "type": "registry:component",
       "target": "app/composables/useSupabaseUpload.ts"
     }
-  ]
+  ],
+  "type": "registry:block"
 }

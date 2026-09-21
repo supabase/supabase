@@ -22,16 +22,16 @@ Prepare these Google Cloud Platform (GCP) resources:
 
 1. **GCP account**: [Sign up for GCP](https://cloud.google.com/gcp) if you don't have one. In the destination project, make sure the [BigQuery API and BigQuery Storage API](https://cloud.google.com/bigquery/docs/service-dependencies) are enabled.
 
-2. **BigQuery dataset**: Create a [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
+2. **BigQuery dataset**: Create a [BigQuery dataset](https://docs.cloud.google.com/bigquery/docs/datasets) in your GCP project
    - Use a dataset ID such as `supabase_replication`
    - Choose a [dataset location](https://cloud.google.com/bigquery/docs/locations) near the [pipeline region](/docs/guides/database/replication/pipelines#region). You cannot change it after creation; it is independent of your Supabase project region.
 
-3. **GCP service account key**: Create a [service account](https://cloud.google.com/iam/docs/keys-create-delete) with appropriate permissions
+3. **GCP service account key**: Create a [service account](https://docs.cloud.google.com/iam/docs/service-accounts-create) with appropriate permissions
    - Grant **BigQuery Data Editor** on the destination dataset
    - Grant **BigQuery Job User** on the GCP project
-   - Create and download the JSON key file
+   - [Create and download the JSON key file](https://cloud.google.com/iam/docs/keys-create-delete)
 
-   Treat the downloaded JSON as a secret. Don't commit or share it, and [rotate or revoke the key](https://cloud.google.com/iam/docs/key-rotation) if it is exposed.
+   Treat the downloaded JSON as a secret. Don't commit or share it, and [delete the key](https://cloud.google.com/iam/docs/keys-create-delete#deleting) if it is exposed.
 
 If you use a custom IAM role, see the [required permissions](#custom-iam-permissions).
 
@@ -49,7 +49,7 @@ Optionally adjust [destination settings](#destination-settings) and [table parti
 
 Click **Create and start pipeline** and complete the validation and cost confirmations.
 
-Supabase Pipelines charges and Google Cloud charges are separate. BigQuery can charge for Storage Write API ingestion, storage, and the compute used to apply CDC changes. See [BigQuery CDC pricing](https://cloud.google.com/bigquery/docs/change-data-capture#pricing).
+Supabase Pipelines charges and Google Cloud charges are separate. BigQuery can charge for Storage Write API ingestion, storage, and the compute used to apply CDC changes. See [BigQuery CDC pricing](https://cloud.google.com/bigquery/docs/change-data-capture#CDC_pricing).
 
 ## How it works
 
@@ -131,29 +131,19 @@ BigQuery supports [flexible column names](https://cloud.google.com/bigquery/docs
 
 ## Schema change support
 
-Schema change support is in beta. Pipelines applies supported changes before writing rows that use the new schema. Initial sync copies a consistent table snapshot and then applies changes made during the copy.
+Pipelines supports:
 
-### Supported changes
+- Adding columns: scalar columns are nullable, and arrays are repeated fields
+- Removing or renaming columns, provided the primary key stays unchanged
+- Dropping `NOT NULL` from an existing scalar column
+- Adding, replacing, or removing supported literal defaults
+- Adding or removing published columns on tracked tables, provided the primary key stays unchanged and no existing array column is newly included
 
-| Postgres change                   | BigQuery behavior                                                             |
-| --------------------------------- | ----------------------------------------------------------------------------- |
-| Add a scalar column               | Adds the column as `NULLABLE`.                                                |
-| Remove or rename a column         | Applies the change unless the column is part of the destination primary key.  |
-| Drop `NOT NULL`                   | Changes a `REQUIRED` column to `NULLABLE`.                                    |
-| Add, replace, or remove a default | Applies supported literal defaults for future writes.                         |
-| Change the published column list  | Adds or removes columns for a table that the running pipeline already tracks. |
+New scalar columns leave historical BigQuery rows `NULL`; new array columns expose an empty array. Later row changes supply the source value. Pipelines does not backfill existing rows when adding a column.
 
-Adding a scalar column in Postgres or to the publication leaves historical BigQuery rows `NULL`. Later row changes supply the source value; Pipelines does not backfill existing rows.
+Removing a column from the publication also removes its destination values. Adding it again does not restore those values. To include a previously excluded array column, select the table for initial sync and [restart its replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-Removing a column from the publication also removes the BigQuery column and its stored values. Adding it again doesn't restore those values.
-
-### Changes that require extra action
-
-- **Data type changes:** Require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
-- **Adding `NOT NULL`:** BigQuery doesn't support adding `NOT NULL` to an existing column, so BigQuery keeps the column nullable. Postgres still prevents new `NULL` values from being written.
-- **Primary-key changes:** Changing which columns make up the primary key, their names, or their order isn't supported. Pipelines rejects the schema change instead of applying it.
-- **Publishing an existing array column:** Adding a previously excluded array column to the publication requires a resynchronization. BigQuery arrays can't represent `NULL`, so adding the destination column would expose an empty array for historical rows whose values Pipelines doesn't know. This restriction applies even if the source table is empty. Include the table in **Initial sync**, then [restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to replace destination data and copy existing rows again. Adding a new array column in Postgres is allowed, but existing BigQuery rows expose an empty array until a later row change supplies the source value; Pipelines doesn't backfill them.
-- **Interrupted schema changes:** BigQuery DDL is not transactional. If an interruption leaves completion uncertain, Pipelines blocks further writes until you [restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Adding `NOT NULL` keeps an existing destination column nullable. For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 
 ### Column defaults
 
@@ -191,7 +181,7 @@ Pipelines needs permission to inspect and manage destination tables, write data 
 
 ## Troubleshooting
 
-Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors. For update failures, check [replica identity and TOAST](#complete-update-rows-and-toast). For schema failures, review [changes that require extra action](#changes-that-require-extra-action).
+Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors. For update failures, check [replica identity and TOAST](#complete-update-rows-and-toast). For schema failures, review [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 
 ## Additional resources
 

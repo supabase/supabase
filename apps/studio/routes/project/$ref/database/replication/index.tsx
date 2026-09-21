@@ -4,9 +4,6 @@ import DatabaseReplicationPage from '@/pages/project/[ref]/database/replication/
 
 export const Route = createFileRoute('/project/$ref/database/replication/')({
   component: DatabaseReplicationIndexRoute,
-  staticData: {
-    databaseLayoutTitle: 'Replication',
-  },
 })
 
 function DatabaseReplicationIndexRoute() {

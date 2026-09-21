@@ -161,6 +161,31 @@ describe('buildValueItems', () => {
     ])
   })
 
+  it('disables options already used by another condition on the same property', () => {
+    const filters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [
+        { propertyName: 'name', operator: '=', value: 'alice' },
+        { propertyName: 'name', operator: '=', value: '' },
+      ],
+    }
+
+    const items = buildValueItems(
+      { type: 'value', path: [1] },
+      filters,
+      filterProperties,
+      {},
+      {},
+      '',
+      false
+    )
+
+    expect(items).toEqual([
+      { value: 'alice', label: 'Alice', disabled: true },
+      { value: 'bob', label: 'Bob' },
+    ])
+  })
+
   it.each(['~~*', '!~~*'])(
     'suppresses value suggestions for pattern-group operator `%s`',
     (operator) => {

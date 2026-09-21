@@ -343,6 +343,11 @@ export const LogsDatePicker = ({
                 ) : null}
               </Label>
             ))}
+            {displayedHelpers.length === 0 && (
+              <p className="px-2 py-1.5 text-xs text-foreground-light w-full">
+                Invalid format. Try 2h, 30m, or 7d.
+              </p>
+            )}
           </RadioGroup>
         </div>
 

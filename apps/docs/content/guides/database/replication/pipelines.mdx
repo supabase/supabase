@@ -16,7 +16,7 @@ Supabase Pipelines replicates Postgres data to a destination you configure in th
 
 ## Before you start
 
-Check the [plan and access requirements](/docs/guides/database/replication/pipelines-faq#which-plans-support-pipelines) and [compare destination data models](/docs/guides/database/replication#supported-destinations).
+Check the [plan and access requirements](/docs/guides/database/replication/pipelines-faq#which-plans-support-pipelines) and [check supported destinations](/docs/guides/database/replication#supported-destinations).
 
 ### Region
 
@@ -335,9 +335,17 @@ Wait for initial sync to finish before changing its filter; changing a filter do
 
 ## Schema change support
 
-Changing a replicated column's type or type modifiers leaves the destination type unchanged and logs a warning. Later schema changes or writes can fail. [Restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) after a type change; restarting table replication replaces destination data.
+Pipelines applies supported changes to replicated columns as replication progresses. It does not mirror every Postgres DDL operation. Check the supported changes and destination behavior for [BigQuery](/docs/guides/database/replication/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/snowflake#schema-change-support) before altering replicated tables.
 
-Other schema-change support is destination-specific. See the [BigQuery](/docs/guides/database/replication/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/snowflake#schema-change-support) guide for the exact behavior.
+Unsupported changes have different outcomes:
+
+- **Data type changes are skipped with a warning** in every destination, including changes to precision or scale. The destination keeps its existing type. Compatible values may continue to replicate, but later writes or schema changes can fail.
+- **Unsupported defaults and tightening `NOT NULL` are skipped with a warning.** Replication can continue with a different default or a more permissive destination column. Each destination guide describes these differences; skipping a default does not skip the values Postgres supplies in row changes.
+- **Incompatible schema changes are rejected with an error**, such as changing the primary-key definition used by BigQuery or ClickHouse's `ReplacingMergeTree`. Failed or interrupted schema changes can require manual recovery.
+
+Check [replication logs](/docs/guides/database/replication/pipelines-monitoring#viewing-logs) for warnings and errors after changing a replicated table.
+
+After a type change, or when a schema error cannot resume safely, resolve any source incompatibility and [restart replication for the affected tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables). This rebuilds their destination schema and **deletes their existing destination data**. Select the tables for **Initial sync** to copy their current source rows again. Restarting the pipeline alone does not rebuild tables. Do not repair managed destination objects manually.
 
 ## Limitations
 

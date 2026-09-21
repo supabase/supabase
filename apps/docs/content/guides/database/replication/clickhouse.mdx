@@ -10,7 +10,7 @@ sidebar_label: 'ClickHouse'
 
 {/* supa-mdx-lint-disable Rule003Spelling */}
 
-The ClickHouse destination is in Early Access and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
+The ClickHouse destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
 Replicate Postgres changes to [ClickHouse](https://clickhouse.com/) as current-state tables or an append-only history. [Choose a table engine](#choose-a-table-engine), [prepare resources](#prepare-clickhouse-resources), then [configure the destination](#configure-clickhouse-as-a-destination).
 
@@ -31,7 +31,7 @@ Choose the engine before creating the pipeline. Changing **Table engine** later 
 | `ReplacingMergeTree` | Current-state tables. Requires a primary key. Query the generated `__current` view.              |
 | `MergeTree`          | Append-only CDC history. A primary key is optional for insert-only tables. Query the base table. |
 
-During Early Access, source primary-key values must remain immutable when using `ReplacingMergeTree`. Updating a primary-key value can leave the old key visible in the generated current-state view.
+Updating a source primary-key value removes the old key from the current-state view and writes the row under its new key. Changing the primary-key definition is a separate [schema change](#schema-change-support).
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -111,12 +111,13 @@ Pipelines does not run `OPTIMIZE ... FINAL CLEANUP`. ClickHouse operators remain
 
 - `cdc_operation`, containing `INSERT`, `UPDATE`, or `DELETE`
 - `cdc_lsn`, containing the Postgres commit LSN for the change
+- `cdc_tx_ordinal`, containing the change's position within that transaction
 
-The `cdc_operation` and `cdc_lsn` names are reserved and can't be used by source columns.
+The `cdc_operation`, `cdc_lsn`, and `cdc_tx_ordinal` names are reserved and can't be used by source columns.
 
-Inserts and updates append the complete new row. Deletes append the old row when the source uses `REPLICA IDENTITY FULL`. With primary-key identity, a delete contains the key values; other fields use `NULL` for nullable scalars or placeholders such as zero, empty strings, and empty arrays. Those placeholders are not the deleted row's original values.
+Inserts and updates append the complete new row. A primary-key value update also appends a `DELETE` for the old key. Deletes append the old row when the source uses `REPLICA IDENTITY FULL`. With primary-key identity, a delete contains the key values; other fields use `NULL` for nullable scalars or placeholders such as zero, empty strings, and empty arrays. Those placeholders are not the deleted row's original values.
 
-Read the base table to analyze the event history. Multiple changes committed in one Postgres transaction can share the same `cdc_lsn`, so it is not a unique event ID or a total ordering for reconstructing current state.
+Read the base table to analyze the event history. Order source changes by `cdc_lsn` and then `cdc_tx_ordinal`. The old-key delete and new-key update from one primary-key value change share both values, so this pair is not a unique destination-row ID.
 
 ### Truncates and table restarts
 
@@ -163,41 +164,30 @@ Nullable scalar columns are wrapped in `Nullable(...)`. Character, text, `numeri
 
 ## Schema change support
 
-ClickHouse schema change support is limited during Early Access.
-
-Supported changes include:
+Pipelines supports:
 
 - Adding columns
-- Renaming columns, except moving a nested subcolumn to a different parent
-- Dropping columns
+- Renaming or dropping columns; nested subcolumns must stay under the same parent when renamed
 - Dropping `NOT NULL` from an existing scalar column
 - Adding, changing, or removing supported column defaults
+- Adding or removing published columns on tracked tables, subject to the same restrictions
 
-The following changes are not applied automatically:
+With `ReplacingMergeTree`, renaming or dropping a primary-key column or changing the key's columns or their order is rejected.
 
-- Changing a column's data type
-- Adding `NOT NULL` to an existing nullable column
-- Changing, dropping, or renaming a source primary-key column when using `ReplacingMergeTree`
-- Renaming a source table or schema
+New scalar columns are made nullable when ClickHouse needs a value for historical rows and the source default cannot be represented safely. Adding `NOT NULL` keeps an existing destination column nullable. Defaults that cannot be translated are skipped; Postgres still supplies the source values through replication.
 
-New scalar columns are made nullable when ClickHouse needs a value for historical rows and the source default cannot be represented safely. Some Postgres defaults cannot be translated to ClickHouse and are skipped with a warning.
+A previously excluded scalar column is added without a default, leaving historical rows `NULL`. Removing a published column drops its destination values; adding it again does not restore them. To include a previously excluded array column, select the table for initial sync and [restart its replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-Changing the publication's column list for an already tracked table is supported while the pipeline runs. A previously excluded scalar column is added as nullable without a default, so historical rows remain `NULL`. Removing a published column drops its destination values; adding it again does not restore them.
-
-Publishing a previously excluded array column requires a new initial sync because ClickHouse cannot represent a nullable array. Include the table in **Initial sync**, then [restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to replace destination data and copy existing rows again.
-
-For type changes, follow the shared [schema-change recovery guidance](/docs/guides/database/replication/pipelines#schema-change-support).
-
-ClickHouse DDL is not transactional. An interrupted multi-column schema change can leave a partially applied destination schema. Don't repair managed tables or views manually. If the pipeline remains failed after a pipeline restart, [contact support](/dashboard/support/new).
+For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 
 ## Troubleshooting
 
-| Issue                                      | Resolution                                                                                                                                                         |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| URL or connection fails                    | Use a reachable public HTTPS endpoint with the correct port and credentials. Private endpoints are unsupported.                                                    |
-| Validation passes but setup or writes fail | Check [permissions and resource requirements](#prepare-clickhouse-resources), including table ownership and the server version.                                    |
-| Updates, deletes, or arrays fail           | Check the [source table requirements](#source-table-requirements).                                                                                                 |
-| A schema change fails                      | Check [supported changes](#schema-change-support). Don't repair managed objects manually; contact support if restarting the pipeline does not resolve the failure. |
+| Issue                                      | Resolution                                                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| URL or connection fails                    | Use a reachable public HTTPS endpoint with the correct port and credentials. Private endpoints are unsupported.                 |
+| Validation passes but setup or writes fail | Check [permissions and resource requirements](#prepare-clickhouse-resources), including table ownership and the server version. |
+| Updates, deletes, or arrays fail           | Check the [source table requirements](#source-table-requirements).                                                              |
+| A schema change fails                      | Follow the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).     |
 
 Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors and include the pipeline ID when [contacting support](/dashboard/support/new).
 

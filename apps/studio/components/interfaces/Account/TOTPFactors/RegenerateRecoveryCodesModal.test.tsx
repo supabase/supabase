@@ -103,7 +103,13 @@ describe('RegenerateRecoveryCodesModal', () => {
 
     // Retry
     fireEvent.click(await screen.findByRole('button', { name: 'Regenerate my recovery codes' }))
-
+    // Confirm regeneration
+    await userEvent.type(
+      await within(await screen.findByRole('dialog')).findByRole('textbox', {
+        name: /Type REGENERATE to confirm./,
+      }),
+      'REGENERATE'
+    )
     fireEvent.click(
       await within(await screen.findByRole('dialog')).findByRole('button', { name: 'Regenerate' })
     )

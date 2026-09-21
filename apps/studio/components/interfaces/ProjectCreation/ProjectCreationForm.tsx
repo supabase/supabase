@@ -30,6 +30,7 @@ import {
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getAvailableRegions,
   getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
@@ -39,7 +40,9 @@ import {
 import { ProjectCreationFooter } from './ProjectCreationFooter'
 import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
+import { getRegionRestrictionMessage } from './RegionSelector.utils'
 import { SecurityOptions } from './SecurityOptions'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import {
   GitHubRepositoryField,
@@ -136,6 +139,7 @@ export const ProjectCreationForm = ({
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
+  const { getRegionRestriction } = useRegionRestriction()
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -181,7 +185,7 @@ export const ProjectCreationForm = ({
       shouldRunMigrations: true,
     },
   })
-  const { getFieldState, resetField, setValue } = form
+  const { getFieldState, resetField, setError, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -469,6 +473,29 @@ export const ProjectCreationForm = ({
       return toast.error(
         `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
       )
+    }
+
+    const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
+    const selectedStaticRegion = smartRegionEnabled
+      ? undefined
+      : Object.values(getAvailableRegions(cloudProvider as CloudProvider)).find(
+          (region) => region.displayName === dbRegion
+        )
+    const selectedRegionRestriction = getRegionRestriction(
+      selectedSpecificRegion ?? selectedStaticRegion
+    )
+    if (selectedRegionRestriction !== undefined) {
+      setError(
+        'dbRegion',
+        { type: 'manual', message: getRegionRestrictionMessage(selectedRegionRestriction) },
+        { shouldFocus: true }
+      )
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'region_unavailable' },
+        'form'
+      )
+      return
     }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined

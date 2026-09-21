@@ -274,7 +274,7 @@ const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL')!, secretKeys['default'])
 ```
 
-`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist in the runtime, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment Variables](/docs/guides/functions/secrets) for the full list of injected variables.
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist in the runtime, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment variables](/docs/guides/functions/secrets) for the full list of injected variables.
 
 If you are replacing legacy keys in an existing application rather than starting fresh, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
 

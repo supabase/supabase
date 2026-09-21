@@ -18,7 +18,6 @@ import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
   ExplorerQuery,
   ExplorerQueryEditor,
-  ExplorerQueryFooter,
   ExplorerQueryResults,
   ExplorerQueryViewport,
 } from '../ExplorerQuery'
@@ -31,6 +30,7 @@ import {
 } from '../ExplorerToolbar'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { DisplaySettingsButton } from './DisplaySettingsButton'
+import { QueryResultFooter } from './QueryResultFooter'
 import { QueryResultRenderer } from './QueryResultRenderer'
 import { QueryRunButton } from './QueryRunButton'
 import { QuerySourceMenu } from './QuerySourceMenu'
@@ -190,6 +190,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const columns = Object.keys(result?.rows?.[0] ?? {})
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
+  const resultsRowCount = (result?.rows ?? []).length
 
   const [promptInput, setPromptInput] = useState('')
   const [pendingRun, setPendingRun] = useState<{ sql: string; issues: PotentialIssues }>()
@@ -534,7 +535,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   return (
     <>
-      <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
+      <Shell className={className}>
         <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
             <CodeSquare size={16} strokeWidth={2} />
@@ -614,15 +615,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           </>
         )}
 
-        <ExplorerQueryFooter className="flex items-center gap-x-2">
-          <p>{(result?.rows ?? []).length.toLocaleString()} rows</p>
-          {rowLimit && (
-            <>
-              <p>·</p>
-              <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
-            </>
-          )}
-        </ExplorerQueryFooter>
+        <QueryResultFooter
+          results={result?.rows}
+          count={resultsRowCount}
+          rowLimit={rowLimit}
+          fileName={title}
+        />
       </Shell>
 
       {query._tag === 'database' && (

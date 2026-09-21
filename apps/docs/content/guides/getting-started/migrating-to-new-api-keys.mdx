@@ -122,7 +122,7 @@ const secretKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const secretKey = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)['default']
 ```
 
-The publishable keys work the same way through `SUPABASE_PUBLISHABLE_KEYS`. Read [the Managing Secrets guide](/docs/guides/functions/secrets) for more on environment variables in Edge Functions.
+The publishable keys work the same way through `SUPABASE_PUBLISHABLE_KEYS`. Read [Environment variables](/docs/guides/functions/secrets) for more on environment variables in Edge Functions.
 
 If you created more than one secret key in [step 1](#step-1-create-the-new-api-keys), every key lives in the same `SUPABASE_SECRET_KEYS` object, each under its own name. Read a non-default key the same way:
 

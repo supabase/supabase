@@ -10,7 +10,7 @@ sidebar_label: 'DuckLake'
 
 {/* supa-mdx-lint-disable Rule003Spelling */}
 
-The DuckLake destination is in Early Access and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
+The DuckLake destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
 Replicate Postgres tables to [DuckLake](https://ducklake.select/) for current-state lakehouse queries. [Prepare resources](#understand-the-ducklake-components), [configure the destination](#choose-a-configuration-mode), then [query replicated data](#query-the-destination).
 
@@ -110,7 +110,7 @@ select *
 from my_ducklake.public.orders;
 ```
 
-See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usage/connecting) for the current `ducklake` extension and `ATTACH` syntax. If your query client can't read a Supabase-backed catalog during Early Access, [contact support](/dashboard/support/new).
+See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usage/connecting) for the current `ducklake` extension and `ATTACH` syntax. If your query client can't read a Supabase-backed catalog during private alpha, [contact support](/dashboard/support/new).
 
 ## Replica identity
 
@@ -154,27 +154,18 @@ Numeric arrays use `varchar[]`, even when their declared precision and scale wou
 
 ## Schema change support
 
-DuckLake schema change support is limited during Early Access.
+Pipelines supports:
 
-Supported changes include:
-
-- Adding columns
-- Renaming columns
-- Dropping columns
+- Adding, renaming, or dropping columns
 - Dropping `NOT NULL` from an existing column
 - Adding, changing, or removing supported column defaults
+- Adding or removing published columns on tracked tables
 
-The following changes are not applied automatically:
+New columns are created as nullable so existing destination rows remain valid. Adding `NOT NULL` keeps an existing destination column nullable. Supported defaults are stored in DuckLake metadata; other defaults are skipped. Postgres still supplies the source values through replication.
 
-- Changing a column's data type
-- Adding `NOT NULL` to an existing nullable column
-- Renaming a source table or schema
+Previously excluded columns are added without a default, leaving historical rows `NULL`. Removing a published column drops its destination values; adding it again does not restore them.
 
-New columns are created as nullable so existing destination rows remain valid. If a source default can be represented safely, it is stored as DuckLake metadata; unsupported defaults are skipped with a warning. DuckLake applies each planned multi-column schema change in a transaction.
-
-Changing the publication's column list for an already tracked table is supported while the pipeline runs. Previously excluded columns are added as nullable without a default, so historical rows remain `NULL`. Removing a published column drops its destination values; adding it again does not restore them.
-
-For type changes, follow the shared [schema-change recovery guidance](/docs/guides/database/replication/pipelines#schema-change-support).
+For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 
 ## Troubleshooting
 
