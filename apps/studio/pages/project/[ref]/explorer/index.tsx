@@ -38,7 +38,9 @@ const ProjectExplorerPage: NextPageWithLayout = () => {
   // drafts and chats are local and resolve synchronously, notebooks require the
   // server round trip in `useLoadNotebook` above to resolve first.
   const goToLastVisitedTab = useEffectEvent(() => {
-    if (!projectRef || !lastVisited) {
+    if (!projectRef) return
+
+    if (!lastVisited) {
       activateHomeTab()
       return
     }
@@ -81,6 +83,7 @@ const ProjectExplorerPage: NextPageWithLayout = () => {
     if (isHistoryLoaded) goToLastVisitedTab()
   }, [
     isHistoryLoaded,
+    projectRef,
     lastVisited?.type,
     lastVisited?.id,
     aiAssistant.isInitialized,
@@ -89,6 +92,7 @@ const ProjectExplorerPage: NextPageWithLayout = () => {
   ])
 
   const isCheckingLastTab =
+    !projectRef ||
     !isHistoryLoaded ||
     (lastVisited?.type === 'chat' && !aiAssistant.isInitialized) ||
     (lastVisited?.type === 'notebook' && isNotebookLoading)
