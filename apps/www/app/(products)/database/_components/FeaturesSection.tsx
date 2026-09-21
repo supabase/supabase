@@ -16,19 +16,22 @@ const FEATURES = [
   {
     title: 'Just Postgres',
     description: 'A dedicated Postgres database.',
-    detail: '100% portable. Bring your existing Postgres database, or migrate away at any time.',
+    detail:
+      'Connect with psql, Prisma, Drizzle, or any Postgres client. 100% portable: bring your existing database, or migrate away at any time.',
     visual: PostgresSkeleton,
   },
   {
     title: 'Secure by default',
-    description: "Built on Postgres' proven Row Level Security.",
-    detail: 'Integrated with JWT authentication which controls exactly what your users can access.',
+    description: 'Row Level Security, built into Postgres.',
+    detail:
+      'Write policies in SQL to control exactly what each user can access. Works with Supabase Auth or third-party auth providers like Clerk and Auth0.',
     visual: RLSSkeleton,
   },
   {
-    title: 'Realtime enabled',
-    description: 'Data-change listeners over websockets.',
-    detail: 'Subscribe and react to database changes, milliseconds after they happen.',
+    title: 'Realtime when you need it',
+    description: 'Realtime subscriptions, when you need them.',
+    detail:
+      'Subscribe to database changes over WebSockets, milliseconds after they happen. Off by default. Enable it per table.',
     visual: RealtimeSkeleton,
   },
 ]
@@ -574,8 +577,8 @@ export function FeaturesSection() {
           <span className="text-foreground">from your database</span>
         </h3>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          Every Supabase project is a full Postgres database with realtime functionality,
-          fine-grained access controls, and instant APIs — no extra configuration required.
+          Every Supabase project starts as a full Postgres database. Row Level Security, realtime
+          subscriptions, and auto-generated APIs are built in and optional. Use what you need.
         </p>
       </div>
 
