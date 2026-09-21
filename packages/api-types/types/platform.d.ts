@@ -4830,6 +4830,43 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/stripe/atlas/application': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Will return the user data for the matching stripe application. */
+    post: operations['StripeAtlasPerkApplicationController_fetchAtlasApplication']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/atlas/application/complete': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Will verify that the stripe atlas token exists and create a credit code.
+     * @description If an unused credit code already exists for the stripe company, we will resend that code.
+     */
+    post: operations['StripeAtlasPerkApplicationController_completeStripeAtlasFlow']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/stripe/invoices/overdue': {
     parameters: {
       query?: never
@@ -10599,6 +10636,16 @@ export interface components {
     PendingConfirmationResponse: {
       message: string
     }
+    PerkApplicationDataResponse_Output: {
+      companyName?: string
+      email?: string
+      firstname?: string
+      lastname?: string
+      stripeAtlasToken: string
+    }
+    PerkApplicationLookupBody: {
+      stripeAtlasToken: string
+    }
     PgbouncerConfigResponse_Output: {
       connection_string: string
       db_dns_name: string
@@ -12671,6 +12718,14 @@ export interface components {
       vectorBuckets: {
         vectorBucketName: string
       }[]
+    }
+    StripeAtlasCompleteApplicationRequestBody: {
+      companyName: string
+      /** Format: email */
+      email: string
+      firstname: string
+      lastname: string
+      stripeAtlasToken: string
     }
     SupavisorConfigResponse_Output: {
       connection_string: string
@@ -34153,6 +34208,71 @@ export interface operations {
       }
       /** @description Failed to delete bucket index */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StripeAtlasPerkApplicationController_fetchAtlasApplication: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PerkApplicationLookupBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PerkApplicationDataResponse_Output']
+        }
+      }
+      /** @description Will send a 400 when matching application is considered stale or when we have an invalid schema in our db. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Will send a 404 when no matching application was found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StripeAtlasPerkApplicationController_completeStripeAtlasFlow: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StripeAtlasCompleteApplicationRequestBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Will send a 400 when the matching stripe company id already has a redeemed credit code. */
+      400: {
         headers: {
           [name: string]: unknown
         }
