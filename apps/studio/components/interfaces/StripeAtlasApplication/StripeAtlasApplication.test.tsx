@@ -26,7 +26,6 @@ const APPLICATION: PerkApplication = {
   firstname: 'Alice',
   lastname: 'Founder',
   companyName: 'Example Inc',
-  email: 'alice@example.com',
 }
 
 const encodeCallbackData = (data: unknown) => Buffer.from(JSON.stringify(data)).toString('base64')
@@ -96,7 +95,6 @@ describe('StripeAtlasApplicationScreen', () => {
     expect(await screen.findByLabelText('First name')).toHaveValue('Alice')
     expect(screen.getByLabelText('Last name')).toHaveValue('Founder')
     expect(screen.getByLabelText('Company name')).toHaveValue('Example Inc')
-    expect(screen.getByLabelText('Email')).toHaveValue('alice@example.com')
 
     expect(lookups).toEqual([{ stripeAtlasToken: STRIPE_ATLAS_TOKEN }])
   })
@@ -109,7 +107,6 @@ describe('StripeAtlasApplicationScreen', () => {
     expect(await screen.findByLabelText('First name')).toHaveValue('Alice')
     expect(screen.getByLabelText('Last name')).toHaveValue('')
     expect(screen.getByLabelText('Company name')).toHaveValue('')
-    expect(screen.getByLabelText('Email')).toHaveValue('')
   })
 
   it('surfaces the error instead of the form when the lookup fails', async () => {
@@ -121,29 +118,30 @@ describe('StripeAtlasApplicationScreen', () => {
     expect(screen.queryByLabelText('First name')).not.toBeInTheDocument()
   })
 
-  it('submits the edited details with the token and confirms the address it sent to', async () => {
+  it('submits the edited details with the token and confirms the application', async () => {
     mockLookup(APPLICATION)
     const completions = mockComplete()
 
     customRender(<StripeAtlasApplicationScreen />)
 
-    const email = await screen.findByLabelText('Email')
-    await userEvent.clear(email)
-    await userEvent.type(email, 'founders@example.com')
+    const companyName = await screen.findByLabelText('Company name')
+    await userEvent.clear(companyName)
+    await userEvent.type(companyName, 'Renamed Inc')
 
     clickSubmit()
 
     expect(await screen.findByText('Application confirmed')).toBeInTheDocument()
-    expect(screen.getByText(/sent your credit code to founders@example.com/)).toBeInTheDocument()
-    expect(screen.queryByLabelText('Email')).not.toBeInTheDocument()
+    expect(
+      screen.getByText(/sent your credit code to your Stripe Atlas Merchant email/)
+    ).toBeInTheDocument()
+    expect(screen.queryByLabelText('Company name')).not.toBeInTheDocument()
 
     expect(completions).toEqual([
       {
         stripeAtlasToken: STRIPE_ATLAS_TOKEN,
         firstname: 'Alice',
         lastname: 'Founder',
-        companyName: 'Example Inc',
-        email: 'founders@example.com',
+        companyName: 'Renamed Inc',
       },
     ])
   })
@@ -154,7 +152,7 @@ describe('StripeAtlasApplicationScreen', () => {
 
     customRender(<StripeAtlasApplicationScreen />)
 
-    await screen.findByLabelText('Email')
+    await screen.findByLabelText('First name')
     clickSubmit()
 
     await vi.waitFor(() =>
@@ -164,7 +162,7 @@ describe('StripeAtlasApplicationScreen', () => {
     )
 
     expect(screen.queryByText('Application confirmed')).not.toBeInTheDocument()
-    expect(screen.getByLabelText('Email')).toHaveValue('alice@example.com')
+    expect(screen.getByLabelText('First name')).toHaveValue('Alice')
 
     clickSubmit()
     await vi.waitFor(() => expect(completions).toHaveLength(2))

@@ -18,12 +18,6 @@ const FormSchema = z.object({
     .trim()
     .min(1, 'Company name is required')
     .max(200, 'Maximum 200 characters'),
-  email: z
-    .string()
-    .trim()
-    .min(1, 'Email is required')
-    .max(254, 'Maximum 254 characters')
-    .email('Enter a valid email address'),
 })
 
 type FormValues = z.infer<typeof FormSchema>
@@ -39,7 +33,6 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
       firstname: application.firstname ?? '',
       lastname: application.lastname ?? '',
       companyName: application.companyName ?? '',
-      email: application.email ?? '',
     },
   })
 
@@ -47,7 +40,6 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
     mutate: completeApplication,
     isPending,
     isSuccess,
-    variables,
   } = useStripeAtlasApplicationCompleteMutation()
 
   if (isSuccess) {
@@ -55,7 +47,7 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
       <Admonition
         type="success"
         title="Application confirmed"
-        description={<p>We've sent your credit code to {variables.email}.</p>}
+        description={<p>We've sent your credit code to your Stripe Atlas Merchant email.</p>}
       />
     )
   }
@@ -101,23 +93,6 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
             <FormItemLayout layout="vertical" label="Company name" id="companyName">
               <FormControl>
                 <Input {...field} id="companyName" autoComplete="organization" />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="vertical"
-              label="Email"
-              id="email"
-              description="The credit code will be sent to this email."
-            >
-              <FormControl>
-                <Input {...field} id="email" type="email" autoComplete="email" />
               </FormControl>
             </FormItemLayout>
           )}

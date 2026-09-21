@@ -10638,7 +10638,6 @@ export interface components {
     }
     PerkApplicationDataResponse_Output: {
       companyName?: string
-      email?: string
       firstname?: string
       lastname?: string
       stripeAtlasToken: string
@@ -12721,8 +12720,6 @@ export interface components {
     }
     StripeAtlasCompleteApplicationRequestBody: {
       companyName: string
-      /** Format: email */
-      email: string
       firstname: string
       lastname: string
       stripeAtlasToken: string
