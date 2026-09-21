@@ -2,30 +2,39 @@ import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/
 import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
+import { del, handleError } from '@/data/fetchers'
 import type { ResponseError } from '@/types'
 
 export type ObjectVersionDeleteVariables = {
   projectRef: string
   bucketId: string
-  objectName: string
+  /** The object's full path within the bucket, not just its leaf name. */
+  path: string
   /** The single version to remove. Other versions of the object are untouched. */
   versionId: string
 }
 
+/**
+ * Addressing a version explicitly is a hard delete even on a versioned bucket —
+ * a bare path would only hide whatever is currently at it.
+ */
 async function deleteObjectVersion({
   projectRef,
   bucketId,
-  objectName,
+  path,
   versionId,
 }: ObjectVersionDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!bucketId) throw new Error('bucketId is required')
-  if (!objectName) throw new Error('objectName is required')
+  if (!path) throw new Error('path is required')
   if (!versionId) throw new Error('versionId is required')
 
-  // TODO(storage-versioning): call the real endpoint once Storage exposes it.
-  // Deleting a specific version is permanent even on a versioned bucket.
-  throw new Error('Deleting a version is not available yet')
+  const { error } = await del('/platform/storage/{ref}/buckets/{id}/objects', {
+    params: { path: { ref: projectRef, id: bucketId } },
+    body: { paths: [{ path, versionId }] },
+  })
+
+  if (error) handleError(error)
 }
 
 export const useObjectVersionDeleteMutation = ({
@@ -45,7 +54,7 @@ export const useObjectVersionDeleteMutation = ({
         queryKey: storageKeys.objectVersions(
           variables.projectRef,
           variables.bucketId,
-          variables.objectName
+          variables.path
         ),
       })
       await onSuccess?.(data, variables, context)
