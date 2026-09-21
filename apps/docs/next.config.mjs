@@ -62,6 +62,7 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     '/api/guides-md/**/*': ['./public/markdown/guides/**/*'],
+    '/api/reference-md/**/*': ['./public/markdown/reference-sections/**/*'],
     '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },

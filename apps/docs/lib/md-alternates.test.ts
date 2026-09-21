@@ -66,6 +66,7 @@ const SCAN_ROOTS = ['app', 'components', 'features', 'lib', 'internals']
 const ALLOWED_MD_LITERAL_FILES = new Set([
   'lib/md-alternates.ts',
   'app/api/guides-md/[...slug]/route.ts',
+  'app/api/reference-md/[...slug]/route.ts',
 ])
 
 function isScannableSource(fileName: string): boolean {

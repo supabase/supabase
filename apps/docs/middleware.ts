@@ -39,6 +39,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  if (pathname.endsWith('.md')) {
+    const sectionPath = pathname.slice(REFERENCE_PATH.length + 1, -'.md'.length) || 'index'
+    const rewriteUrl = new URL(url)
+    rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/reference-md/${sectionPath}`
+    return NextResponse.rewrite(rewriteUrl)
+  }
+
   if (isbot(request.headers.get('user-agent'))) {
     let [, lib, maybeVersion, ...slug] = pathname.replace(REFERENCE_PATH, '').split('/')
 
@@ -86,5 +93,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/reference/:path*', '/guides/:path*'],
+  matcher: ['/reference.md', '/reference/:path*', '/guides/:path*'],
 }

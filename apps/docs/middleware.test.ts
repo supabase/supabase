@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { describe, expect, it, vi } from 'vitest'
 
-import { middleware } from './middleware'
+import { config, middleware } from './middleware'
 
 // The real manifest is generated at build time by a content script; mocking
 // it here decouples this test from that build step.
@@ -161,5 +161,57 @@ describe('docs middleware — /guides/* content negotiation', () => {
     })
     const rewrite = middleware(req).headers.get(REWRITE_HEADER) ?? ''
     expect(rewrite).not.toContain('/api/guides-md/')
+  })
+})
+
+describe('docs middleware — /reference/*.md', () => {
+  const REFERENCE_MD_REWRITE = (slug: string) =>
+    `https://supabase.com/docs/api/reference-md/${slug}`
+
+  it('rewrites .md requests to the reference markdown handler for every family', () => {
+    for (const slug of [
+      'javascript/start',
+      'javascript/v1/start',
+      'cli/global-flags',
+      'api/v1-create-a-project',
+      'self-hosting-auth/generates-an-email-action-link',
+    ]) {
+      const req = makeRequest(`/docs/reference/${slug}.md`)
+      expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(REFERENCE_MD_REWRITE(slug))
+    }
+  })
+
+  it('rewrites before the crawler check, whatever the Accept header', () => {
+    for (const headers of [
+      { userAgent: 'Googlebot/2.1 (+http://www.google.com/bot.html)' },
+      { accept: 'text/html' },
+    ]) {
+      const req = makeRequest('/docs/reference/javascript/select.md', headers)
+      expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(
+        REFERENCE_MD_REWRITE('javascript/select')
+      )
+    }
+  })
+
+  it('sends a bare /reference.md to the handler as index', () => {
+    expect(config.matcher).toContain('/reference.md')
+
+    const req = makeRequest('/docs/reference.md')
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(REFERENCE_MD_REWRITE('index'))
+  })
+
+  it('keeps the query string', () => {
+    const req = makeRequest('/docs/reference/javascript/select.md?utm=1')
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(
+      REFERENCE_MD_REWRITE('javascript/select?utm=1')
+    )
+  })
+
+  it('leaves reference URLs without .md alone, even when Accept asks for markdown', () => {
+    const req = makeRequest('/docs/reference/javascript/select', { accept: 'text/markdown' })
+    const response = middleware(req)
+
+    expect(response.status).not.toBe(406)
+    expect(response.headers.get(REWRITE_HEADER)).not.toContain('/api/reference-md/')
   })
 })
