@@ -39,7 +39,6 @@ import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePrev
 import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
-import { Tool } from '@/components/ui/AIAssistantPanel/elements/Tool'
 import {
   FormSection,
   FormSectionContent,
