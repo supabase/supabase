@@ -96,155 +96,6 @@ and run one of the following:
 </TabPanel>
 </Tabs>
 
-## Beta channel
-
-Pre-release CLI builds ship from the development branch (`X.Y.Z-beta.N` versions). Use the npm `beta` dist-tag, or install `supabase-beta` via Homebrew / Scoop (separate packages from stable).
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="npm"
-  queryGroup="platform"
->
-<TabPanel id="npm" label="npm">
-
-Install as a dev dependency:
-
-```sh
-npm install supabase@beta --save-dev
-```
-
-Or run without installing:
-
-```sh
-npx supabase@beta --help
-```
-
-</TabPanel>
-<TabPanel id="macos" label="macOS">
-
-```sh
-brew install supabase/tap/supabase-beta
-brew link --overwrite supabase-beta
-```
-
-</TabPanel>
-<TabPanel id="windows" label="Windows">
-
-```powershell
-scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
-scoop install supabase-beta
-```
-
-</TabPanel>
-<TabPanel id="linux" label="Linux">
-
-#### Homebrew
-
-```sh
-brew install supabase/tap/supabase-beta
-brew link --overwrite supabase-beta
-```
-
-#### Linux packages
-
-Beta builds are attached to [GitHub pre-releases](https://github.com/supabase/cli/releases). Download the `.apk`, `.deb`, or `.rpm` for your platform and install with the same commands as [Linux packages](#linux-packages) above.
-
-</TabPanel>
-</Tabs>
-
-## Updating the Supabase CLI
-
-When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same channels.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="npm"
-  queryGroup="platform"
->
-<TabPanel id="npm" label="npm">
-
-Update the CLI with [npm](https://www.npmjs.com/package/supabase):
-
-```sh
-npm update supabase --save-dev
-```
-
-Update to the latest beta release or switch a stable install to the beta channel with:
-
-```sh
-npm install supabase@beta --save-dev
-```
-
-</TabPanel>
-<TabPanel id="macos" label="macOS">
-
-```sh
-brew upgrade supabase
-```
-
-Beta channel:
-
-```sh
-brew upgrade supabase-beta
-```
-
-</TabPanel>
-<TabPanel id="windows" label="Windows">
-
-```powershell
-scoop update supabase
-```
-
-Beta channel:
-
-```powershell
-scoop update supabase-beta
-```
-
-</TabPanel>
-<TabPanel id="linux" label="Linux">
-
-#### Homebrew
-
-```sh
-brew upgrade supabase
-```
-
-Beta channel:
-
-```sh
-brew upgrade supabase-beta
-```
-
-#### Linux packages
-
-1. Download the latest package from the [Supabase CLI releases page](https://github.com/supabase/cli/releases/latest)
-2. Install the package using the same commands as the [initial installation](#linux-packages):
-   - `sudo apk add --allow-untrusted <...>.apk`
-   - `sudo dpkg -i <...>.deb`
-   - `sudo rpm -i <...>.rpm`
-
-</TabPanel>
-</Tabs>
-
-If you have any Supabase containers running locally, stop them and delete their data volumes before upgrading. This ensures that Supabase managed services can apply new migrations on a clean state of the local database.
-
-<Admonition type="note" title="Backup and stop running containers">
-
-Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
-
-```sh
-supabase db diff -f my_schema
-supabase db dump --local --data-only > supabase/seed.sql
-supabase stop --no-backup
-```
-
-</Admonition>
-
 ## Running a local Supabase project
 
 The most common thing you'll do with the CLI is run the full Supabase stack (Postgres, Auth, Storage, and the rest) on your own machine. That stack runs in Docker containers, so you need a container runtime installed first. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
@@ -397,6 +248,155 @@ When you finish working, stop the stack. This doesn't reset your local database:
 ```bash
 supabase stop
 ```
+
+## Beta channel
+
+Pre-release CLI builds ship from the development branch (`X.Y.Z-beta.N` versions). Use the npm `beta` dist-tag, or install `supabase-beta` via Homebrew / Scoop (separate packages from stable).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+  queryGroup="platform"
+>
+<TabPanel id="npm" label="npm">
+
+Install as a dev dependency:
+
+```sh
+npm install supabase@beta --save-dev
+```
+
+Or run without installing:
+
+```sh
+npx supabase@beta --help
+```
+
+</TabPanel>
+<TabPanel id="macos" label="macOS">
+
+```sh
+brew install supabase/tap/supabase-beta
+brew link --overwrite supabase-beta
+```
+
+</TabPanel>
+<TabPanel id="windows" label="Windows">
+
+```powershell
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase-beta
+```
+
+</TabPanel>
+<TabPanel id="linux" label="Linux">
+
+#### Homebrew
+
+```sh
+brew install supabase/tap/supabase-beta
+brew link --overwrite supabase-beta
+```
+
+#### Linux packages
+
+Beta builds are attached to [GitHub pre-releases](https://github.com/supabase/cli/releases). Download the `.apk`, `.deb`, or `.rpm` for your platform and install with the same commands as [Linux packages](#linux-packages) above.
+
+</TabPanel>
+</Tabs>
+
+## Updating the Supabase CLI
+
+When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same package manager you installed it with.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+  queryGroup="platform"
+>
+<TabPanel id="npm" label="npm">
+
+Update the CLI with [npm](https://www.npmjs.com/package/supabase):
+
+```sh
+npm update supabase --save-dev
+```
+
+Update to the latest beta release or switch a stable install to the beta channel with:
+
+```sh
+npm install supabase@beta --save-dev
+```
+
+</TabPanel>
+<TabPanel id="macos" label="macOS">
+
+```sh
+brew upgrade supabase
+```
+
+Beta channel:
+
+```sh
+brew upgrade supabase-beta
+```
+
+</TabPanel>
+<TabPanel id="windows" label="Windows">
+
+```powershell
+scoop update supabase
+```
+
+Beta channel:
+
+```powershell
+scoop update supabase-beta
+```
+
+</TabPanel>
+<TabPanel id="linux" label="Linux">
+
+#### Homebrew
+
+```sh
+brew upgrade supabase
+```
+
+Beta channel:
+
+```sh
+brew upgrade supabase-beta
+```
+
+#### Linux packages
+
+1. Download the latest package from the [Supabase CLI releases page](https://github.com/supabase/cli/releases/latest)
+2. Install the package using the same commands as the [initial installation](#linux-packages):
+   - `sudo apk add --allow-untrusted <...>.apk`
+   - `sudo dpkg -i <...>.deb`
+   - `sudo rpm -i <...>.rpm`
+
+</TabPanel>
+</Tabs>
+
+If you have any Supabase containers running locally, stop them and delete their data volumes before upgrading. This ensures that Supabase managed services can apply new migrations on a clean state of the local database.
+
+<Admonition type="note" title="Backup and stop running containers">
+
+Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
+
+```sh
+supabase db diff -f my_schema
+supabase db dump --local --data-only > supabase/seed.sql
+supabase stop --no-backup
+```
+
+</Admonition>
 
 ## Telemetry
 
