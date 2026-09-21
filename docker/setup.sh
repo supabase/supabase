@@ -366,7 +366,9 @@ fi
 
 # A user added to the docker group above cannot use it until the next login.
 DOCKER="docker"
-docker info >/dev/null 2>&1 || DOCKER="$SUDO docker"
+if [ -n "$SUDO" ] && ! docker info >/dev/null 2>&1; then
+    DOCKER="$SUDO docker"
+fi
 export DOCKER
 
 # Idempotent re-run: if CWD is already a set-up project, skip bootstrap.
