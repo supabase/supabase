@@ -97,28 +97,40 @@ export const ExposedFunctionSelector = ({
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger asChild>
-        <Button
-          size="small"
-          disabled={disabled}
-          className="w-full [&>span]:w-full pr-1! space-x-1"
-          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
-        >
-          <div className="w-full flex gap-1">
-            <p className="text-foreground-lighter">
-              {isCountsPending
-                ? 'Loading functions...'
-                : totalCount === 0
-                  ? 'No functions available'
-                  : `${grantsCount} of ${totalCount} functions exposed${
-                      pendingCount > 0
-                        ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
-                        : ''
-                    }`}
-            </p>
-          </div>
-        </Button>
-      </PopoverTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              size="small"
+              disabled={disabled}
+              className="w-full [&>span]:w-full pr-1! space-x-1"
+              iconRight={
+                <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+              }
+              aria-label="Select functions"
+              // Tooltip repeats the label; the description would read the name twice
+              aria-describedby={undefined}
+            >
+              <div className="w-full flex gap-1">
+                <p className="text-foreground-lighter">
+                  {isCountsPending
+                    ? 'Loading functions...'
+                    : totalCount === 0
+                      ? 'No functions available'
+                      : `${grantsCount} of ${totalCount} functions exposed${
+                          pendingCount > 0
+                            ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
+                            : ''
+                        }`}
+                </p>
+              </div>
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="end">
+          Select functions
+        </TooltipContent>
+      </Tooltip>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
