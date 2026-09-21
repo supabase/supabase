@@ -49,9 +49,9 @@ import { QuerySearchParamsType } from './UnifiedLogs.types'
 import {
   gateLogTypeFilters,
   gateLogTypeOptions,
+  getComputeLogsAvailability,
   getFacetedUniqueValues,
   getLevelRowClassName,
-  getWorkersLogsAvailability,
 } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -77,11 +77,11 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const CHART_CONFIG = {
   success: {
     label: <TooltipLabel level="success" />,
-    color: 'var(--chart-success)',
+    color: 'var(--chart-muted)',
   },
   warning: {
     label: <TooltipLabel level="warning" />,
-    color: 'var(--chart-warning)',
+    color: 'var(--chart-status-warning)',
   },
   error: {
     label: <TooltipLabel level="error" />,
@@ -97,15 +97,15 @@ export const UnifiedLogs = () => {
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const workersEnabled = !!useFlag('workers')
-  const workersAvailability = getWorkersLogsAvailability({
+  const computeEnabled = !!useFlag('compute')
+  const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
-    workersEnabled,
+    computeEnabled,
   })
   const visibleSearchFilters = gateLogTypeFilters(search.filter, {
     multigres: showMultigresLogs,
-    workers: workersAvailability.preserveWorkersFilter,
+    compute: computeAvailability.preserveComputeFilter,
   })
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
@@ -165,11 +165,11 @@ export const UnifiedLogs = () => {
       parameters.filter =
         gateLogTypeFilters(parameters.filter, {
           multigres: showMultigresLogs,
-          workers: workersAvailability.canQueryWorkers,
+          compute: computeAvailability.canQueryCompute,
         }) ?? null
     }
     return parameters
-  }, [search, showMultigresLogs, workersAvailability.canQueryWorkers])
+  }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
 
   const {
     data: unifiedLogsData,
@@ -298,7 +298,7 @@ export const UnifiedLogs = () => {
   const filterFields = useMemo(() => {
     const gatedFields = gateLogTypeOptions(defaultFilterFields, {
       multigres: showMultigresLogs,
-      workers: workersAvailability.canQueryWorkers,
+      compute: computeAvailability.canQueryCompute,
     })
 
     return gatedFields.map((field) => {
@@ -327,14 +327,14 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs, workersAvailability.canQueryWorkers])
+  }, [facets, showMultigresLogs, computeAvailability.canQueryCompute])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)
     if (Array.isArray(update.filter)) {
       update.filter = gateLogTypeFilters(update.filter.map(String), {
         multigres: showMultigresLogs,
-        workers: workersAvailability.canQueryWorkers,
+        compute: computeAvailability.canQueryCompute,
       })
     }
     setSearch(update)
@@ -343,7 +343,7 @@ export const UnifiedLogs = () => {
   useFilterSearchSync({
     applyFilterSearch,
     columnFilters,
-    enabled: workersAvailability.readyToSyncFilters,
+    enabled: computeAvailability.readyToSyncFilters,
   })
 
   useEffect(() => {
@@ -515,13 +515,13 @@ export const UnifiedLogs = () => {
                     hasNextPage={hasNextPage}
                     setColumnOrder={setColumnOrder}
                     setColumnVisibility={setColumnVisibility}
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                    errorSubject="Failed to retrieve logs"
                     emptyStateMessage={
                       isUserFilterUnreachable(searchParameters) ? (
                         <div className="text-sm flex flex-col gap-y-1">
                           <p className="text-foreground-light">No results found</p>
                           <p className="text-foreground-lighter">
-                            Filtering by user is only supported for Auth and Postgres log types
+                            Filtering by user is only supported for Auth and API Gateway log types
                           </p>
                         </div>
                       ) : undefined

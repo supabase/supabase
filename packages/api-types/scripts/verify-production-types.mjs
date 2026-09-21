@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -66,6 +66,56 @@ export async function findMismatchedTypes(
   return mismatches.filter((filename) => filename !== undefined)
 }
 
+export async function reportTypeDifferences(
+  filenames,
+  {
+    generatedTypesDirectory,
+    typesDirectory,
+    summaryPath = process.env.GITHUB_STEP_SUMMARY,
+    log = console.log,
+  }
+) {
+  const summary = [
+    '## Production API type differences',
+    '',
+    'Committed types differ from production. `-` lines are committed; `+` lines are production.',
+    '',
+  ]
+
+  for (const filename of filenames) {
+    let diff
+    try {
+      const result = await run(
+        'diff',
+        [
+          '-u',
+          '--label',
+          `committed/${filename}`,
+          '--label',
+          `production/${filename}`,
+          join(typesDirectory, filename),
+          join(generatedTypesDirectory, filename),
+        ],
+        { maxBuffer: 32 * 1024 * 1024 }
+      )
+      diff = result.stdout
+    } catch (error) {
+      if (error.code !== 1) throw error
+      diff = error.stdout
+    }
+
+    log(`${filename}\n${diff}`)
+    const preview = diff.slice(0, 60_000)
+    const escaped = preview.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+    summary.push(`### ${filename}`, '', `<pre>${escaped}</pre>`, '')
+    if (preview.length < diff.length) {
+      summary.push('Diff preview truncated. See the verification step logs for the full diff.', '')
+    }
+  }
+
+  if (summaryPath) await appendFile(summaryPath, `${summary.join('\n')}\n`)
+}
+
 export async function verifyProductionTypes() {
   const temporaryDirectory = await mkdtemp(join(tmpdir(), 'api-types-'))
   const generatedTypesDirectory = join(temporaryDirectory, 'types')
@@ -92,11 +142,22 @@ export async function verifyProductionTypes() {
       { cwd: packageDirectory }
     )
 
+    // Prettier resolves its config from the formatted file's location. The generated files live
+    // in a temporary directory outside the repository, so pass the repository config explicitly
+    // or they are formatted with Prettier's defaults and never match the committed files.
+    const { stdout: prettierConfigPath } = await run(
+      'pnpm',
+      ['exec', 'prettier', '--find-config-path', join(packageDirectory, 'package.json')],
+      { cwd: packageDirectory }
+    )
+
     await run(
       'pnpm',
       [
         'exec',
         'prettier',
+        '--config',
+        prettierConfigPath.trim(),
         '--write',
         ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
       ],
@@ -109,6 +170,7 @@ export async function verifyProductionTypes() {
     })
 
     if (changedTypes.length > 0) {
+      await reportTypeDifferences(changedTypes, { generatedTypesDirectory, typesDirectory })
       throw new Error(`Committed API types do not match production: ${changedTypes.join(', ')}`)
     }
   } finally {

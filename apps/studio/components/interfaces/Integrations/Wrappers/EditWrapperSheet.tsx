@@ -286,7 +286,6 @@ export const EditWrapperSheet = ({
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
-                                variant="default"
                                 className="px-1"
                                 icon={<Edit />}
                                 onClick={() => {
@@ -302,7 +301,6 @@ export const EditWrapperSheet = ({
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
-                                variant="default"
                                 className="px-1"
                                 icon={<Trash />}
                                 onClick={() => {
@@ -321,7 +319,7 @@ export const EditWrapperSheet = ({
                   })}
 
                   <div className="flex justify-end">
-                    <Button variant="default" onClick={() => setSelectedTableToEdit(NewTable)}>
+                    <Button onClick={() => setSelectedTableToEdit(NewTable)}>
                       Add foreign table
                     </Button>
                   </div>
@@ -334,13 +332,7 @@ export const EditWrapperSheet = ({
               </FormSection>
             </div>
             <SheetFooter>
-              <Button
-                size="tiny"
-                variant="default"
-                type="button"
-                onClick={confirmOnClose}
-                disabled={isSubmitting}
-              >
+              <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isSubmitting}>
                 Cancel
               </Button>
               <Button

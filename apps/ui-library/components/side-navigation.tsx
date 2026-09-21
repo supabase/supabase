@@ -9,6 +9,7 @@ import {
   mcpBlocks,
   oauthBlocks,
   platformBlocks,
+  starterApps,
 } from '@/config/docs'
 
 function SideNavigation() {
@@ -77,6 +78,14 @@ function SideNavigation() {
           {gettingStarted.title}
         </div>
         {gettingStarted.items.map((item, i) => (
+          <NavigationItem item={item} key={`${item.href}-${i}`} />
+        ))}
+      </div>
+      <div className="pb-6 space-y-0.5">
+        <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
+          {starterApps.title}
+        </div>
+        {starterApps.items.map((item, i) => (
           <NavigationItem item={item} key={`${item.href}-${i}`} />
         ))}
       </div>

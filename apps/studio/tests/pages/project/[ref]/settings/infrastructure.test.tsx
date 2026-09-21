@@ -12,8 +12,8 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
-type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse']
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
 type PermissionResponse = components['schemas']['AccessControlPermission']
 
 const PROJECT_REF = 'project-ref'
@@ -328,6 +328,11 @@ describe('/project/[ref]/settings/infrastructure', () => {
     expect(screen.getByTestId('metric-CPU')).toHaveTextContent('40%')
     expect(screen.getByTestId('metric-Memory')).toHaveTextContent('50%')
     expect(screen.getByTestId('metric-Disk')).toHaveTextContent('50%')
+
+    // Compute options describe CPU by size: shared below Large, dedicated with vCPUs from Large up
+    expect(screen.getAllByText('Shared compute')).toHaveLength(3) // Nano, Micro, Small
+    expect(screen.getByText('Dedicated · 2 vCPUs')).toBeInTheDocument() // Large
+    expect(screen.queryByText(/-core/)).not.toBeInTheDocument()
 
     await user.click(screen.getByText('Small'))
     expect(screen.getByRole('button', { name: 'Review changes' })).toBeEnabled()

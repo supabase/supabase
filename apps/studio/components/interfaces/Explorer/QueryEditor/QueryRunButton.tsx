@@ -26,10 +26,9 @@ export const QueryRunButton = ({
   onRunSelected,
 }: QueryRunButtonProps) => {
   return (
-    <div className="flex w-fit">
+    <div className="ml-1 flex w-fit">
       <ButtonTooltip
         type="button"
-        variant="default"
         size="tiny"
         loading={isExecuting}
         disabled={disabled}
@@ -54,7 +53,6 @@ export const QueryRunButton = ({
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
-            variant="default"
             size="tiny"
             disabled={disabled}
             aria-label="More actions"

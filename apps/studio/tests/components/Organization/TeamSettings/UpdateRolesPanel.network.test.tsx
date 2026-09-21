@@ -12,10 +12,10 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
-type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
+type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
 type AccessControlPermission = components['schemas']['AccessControlPermission']
 
 const ORG_SLUG = 'test-org'
@@ -172,7 +172,7 @@ describe('UpdateRolesPanel (network)', () => {
     expect(screen.getByRole('option', { name: /Read-only/ })).toBeInTheDocument()
 
     // The key safety message from the ticket: Administrator can delete projects
-    expect(screen.getByText(/including deleting projects/i)).toBeInTheDocument()
+    expect(screen.getByText('deleting projects')).toBeInTheDocument()
   })
 
   test('renders a role description for every known role', async () => {

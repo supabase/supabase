@@ -109,10 +109,12 @@ function AiTools({ className }: { className?: string }) {
 const GuidesSidebar = ({
   className,
   video,
+  videoTitle,
   hideToc,
 }: {
   className?: string
   video?: string
+  videoTitle?: string
   hideToc?: boolean
 }) => {
   const pathname = usePathname()
@@ -125,7 +127,7 @@ const GuidesSidebar = ({
       <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit">
         {video && (
           <div className="relative pl-5">
-            <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
+            <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} videoTitle={videoTitle} />
           </div>
         )}
         {showFeedback && (

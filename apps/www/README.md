@@ -97,6 +97,10 @@ imgThumb: my-image.png
 ---
 ```
 
+#### Blog post dates
+
+Use quoted `YYYY-MM-DD` values. `date` is the publication date. Set optional `updated` for substantive content revisions, excluding typo, link, or image fixes. It must be on or after `date` and supplies the sitemap and structured-data modification date. When absent, `date` supplies both.
+
 #### Events
 
 Events use different image fields to avoid confusion with their display patterns:

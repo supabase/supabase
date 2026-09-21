@@ -57,9 +57,7 @@ const PromoToast = () => {
             Claim your ticket
           </Link>
         </Button>
-        <Button variant="default" onClick={handleHide}>
-          Dismiss
-        </Button>
+        <Button onClick={handleHide}>Dismiss</Button>
       </div>
     </div>
   )

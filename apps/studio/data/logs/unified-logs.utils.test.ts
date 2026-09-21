@@ -170,12 +170,12 @@ describe('extractLogMetadata', () => {
     })
   })
 
-  describe('workers logs', () => {
+  describe('compute logs', () => {
     it('does not synthesize unsupported request metadata', () => {
       const row = {
         event_message: 'Error: Dynamic require of "path" is not supported',
         id: '51a29911-9293-4616-8984-743cc548b629',
-        log_type: 'workers',
+        log_type: 'compute',
         metadata: {
           cw_event_id: '39883203917805946105278943454814281535421893832620638214',
           launch_id: '1788424715503435269',
@@ -191,7 +191,7 @@ describe('extractLogMetadata', () => {
       expect(extractLogMetadata(row)).toEqual({ status: null, method: null, pathname: null })
     })
 
-    it('preserves only Workers metadata while keeping unsupported fields null', () => {
+    it('preserves only Compute metadata while keeping unsupported fields null', () => {
       const metadata = {
         cw_event_id: '39883203917805946105278943454814281535421893832620638214',
         launch_id: '1788424715503435269',
@@ -203,7 +203,7 @@ describe('extractLogMetadata', () => {
       const mapped = mapUnifiedLogRow({
         event_message: 'Error: Dynamic require of "path" is not supported',
         id: '51a29911-9293-4616-8984-743cc548b629',
-        log_type: 'workers',
+        log_type: 'compute',
         metadata,
         timestamp: 1788424716876000,
         status: 200,
@@ -229,7 +229,7 @@ describe('extractLogMetadata', () => {
       expect(mapped).not.toHaveProperty('project')
     })
 
-    it('does not add metadata to non-Workers rows', () => {
+    it('does not add metadata to non-Compute rows', () => {
       const mapped = mapUnifiedLogRow({
         id: 'edge-log',
         timestamp: 1788424716876000,
@@ -251,7 +251,7 @@ describe('extractLogMetadata', () => {
 })
 
 describe('parseUnifiedLogsQueryRows', () => {
-  const workersRow = {
+  const computeRow = {
     event_message: 'Error: Dynamic require of "path" is not supported',
     id: '51a29911-9293-4616-8984-743cc548b629',
     metadata: {
@@ -264,7 +264,7 @@ describe('parseUnifiedLogsQueryRows', () => {
     },
     project: 'cxkpapyhaaywrtudnqpl',
     timestamp: 1788424716876000,
-    log_type: 'workers',
+    log_type: 'compute',
     status: null,
     level: null,
     pathname: null,
@@ -274,15 +274,15 @@ describe('parseUnifiedLogsQueryRows', () => {
     auth_user: null,
   }
 
-  it('parses the Workers projection and strips project', () => {
-    const [parsed] = parseUnifiedLogsQueryRows([workersRow])
+  it('parses the Compute projection and strips project', () => {
+    const [parsed] = parseUnifiedLogsQueryRows([computeRow])
 
     expect(parsed).toMatchObject({
-      id: workersRow.id,
-      timestamp: workersRow.timestamp,
-      event_message: workersRow.event_message,
-      metadata: workersRow.metadata,
-      log_type: 'workers',
+      id: computeRow.id,
+      timestamp: computeRow.timestamp,
+      event_message: computeRow.event_message,
+      metadata: computeRow.metadata,
+      log_type: 'compute',
       status: null,
       level: null,
       pathname: null,
@@ -296,14 +296,14 @@ describe('parseUnifiedLogsQueryRows', () => {
   })
 
   it('rejects invalid metadata', () => {
-    expect(() => parseUnifiedLogsQueryRows([{ ...workersRow, metadata: 'invalid' }])).toThrow()
+    expect(() => parseUnifiedLogsQueryRows([{ ...computeRow, metadata: 'invalid' }])).toThrow()
   })
 
   it.each([{ id: 42 }, { timestamp: true }])('rejects invalid identity fields', (invalidFields) => {
-    expect(() => parseUnifiedLogsQueryRows([{ ...workersRow, ...invalidFields }])).toThrow()
+    expect(() => parseUnifiedLogsQueryRows([{ ...computeRow, ...invalidFields }])).toThrow()
   })
 
   it('rejects invalid projected field types', () => {
-    expect(() => parseUnifiedLogsQueryRows([{ ...workersRow, level: 'info' }])).toThrow()
+    expect(() => parseUnifiedLogsQueryRows([{ ...computeRow, level: 'info' }])).toThrow()
   })
 })

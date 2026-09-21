@@ -5,12 +5,10 @@ import { BASE_PATH } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getDeploymentCommit() {
-  // Deliberately unpinned: API fetches never carry the `?dpl=` skew-protection
-  // pin — only built asset URLs do (TanStack, see skewProtectionDpl in
-  // vite.config.ts) — so Vercel's edge routes this to the LATEST deployment
-  // and the check can detect a newer version while the session's assets stay
-  // pinned. We keep the basePath URL so it still routes to studio in
-  // production (root `/api/*` there is the marketing site).
+  // Deliberately unpinned: TanStack only adds x-deployment-id to server-function
+  // calls (start.ts), and Nitro's session cookie is disabled. This API request
+  // sees the latest deployment while older assets stay in the immutable store.
+  // Keep the basePath so www routes this request to Studio in production.
   const response = await fetchHandler(`${BASE_PATH}/api/get-deployment-commit`)
   return (await response.json()) as { commitSha: string; commitTime: string }
 }

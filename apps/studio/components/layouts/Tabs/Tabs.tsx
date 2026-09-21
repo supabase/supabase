@@ -44,7 +44,7 @@ interface EditorTabsProps {
 }
 
 // [Joshen] Will be adjusting this component to support Explorer
-// Will require quite a bit of cleaning up once Explorer supercedes SQL Editor
+// Will require quite a bit of cleaning up once Explorer supersedes SQL Editor
 export const EditorTabs = ({
   customTabs,
   newTabButton,
@@ -52,7 +52,8 @@ export const EditorTabs = ({
 }: EditorTabsProps) => {
   const { ref } = useParams()
   const router = useRouter()
-  const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
+  const { setLastVisitedSnippet, setLastVisitedTable, setLastVisitedExplorerTab } =
+    useDashboardHistory()
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
@@ -96,6 +97,9 @@ export const EditorTabs = ({
     }
     if (editor === 'sql') {
       setLastVisitedSnippet(undefined)
+    }
+    if (editor === 'explorer') {
+      setLastVisitedExplorerTab(undefined)
     }
   }
 

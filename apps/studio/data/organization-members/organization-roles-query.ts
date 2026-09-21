@@ -7,9 +7,9 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only']
 export type OrganizationRolesVariables = { slug?: string }
-export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponse']
+export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponse_Output']
 export type OrganizationRole =
-  components['schemas']['OrganizationRoleResponse']['org_scoped_roles'][0]
+  components['schemas']['OrganizationRoleResponse_Output']['org_scoped_roles'][0]
 
 export async function getOrganizationRoles(
   { slug }: OrganizationRolesVariables,
@@ -46,10 +46,10 @@ export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
     select: (data) => {
       return {
         ...data,
-        org_scoped_roles: data.org_scoped_roles.sort((a, b) => {
+        org_scoped_roles: [...data.org_scoped_roles].sort((a, b) => {
           return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
         }),
-      } as any
+      } as TData
     },
     ...options,
   })
