@@ -519,10 +519,6 @@ Use _might_ for possibility or an uncertain outcome.
 
 Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation.
 
-### Multigres
-
-Use _Multigres_ for the product name. Don't write _multi-gres_ or _MultiGres_.
-
 ## N
 
 ### native
@@ -681,11 +677,6 @@ Use _setup_ as a noun or adjective and _set up_ as a verb.
 - **Recommended**: Complete the setup to set up authentication.
 - **Not recommended**: Setup authentication.
 
-### shard
-
-Use _shard_ as a noun and _sharding_ for the practice of splitting data across
-nodes.
-
 ### sign in and sign-in
 
 Use _sign in_, _sign out_, and _sign up_ as verbs. Use the hyphenated forms
@@ -833,10 +824,6 @@ self-hosting requirements or a migration VM, and in general CPU discussion.
 
 Write _versus_ in prose, not _vs._ Use `vs` only when it is part of a literal name
 or when space is constrained.
-
-### Vitess
-
-Use _Vitess_ for the product name.
 
 ## W
 
