@@ -875,6 +875,8 @@ the full term lists in one place, grouped by the problem they cause.
 
 Don't use _actually_, _easily_, _easy_, _just_, _let's_, _obviously_,
 _of course_, _please_, _quickly_, _simple_, _simply_, or _that's it_. Remove the term or state the intended meaning directly.
+_please_ is the exception: keep it when asking permission, apologizing for an
+inconvenience, or requesting an action that primarily benefits Supabase.
 
 ### Marketing language
 

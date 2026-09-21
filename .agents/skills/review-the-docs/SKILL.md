@@ -203,7 +203,9 @@ Verify both guides and reference output when `generate-reference-markdown.ts` or
 MDX prose, partials, navigation — no pipeline or example changes.
 
 Check the prose against [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) and
-[`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md) yourself. No tool checks terminology.
+[`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md) yourself. No CI or local
+check covers terminology. CodeRabbit flags it on `apps/docs/content/**/*.mdx`,
+but only once the PR is open.
 
 Checklist:
 

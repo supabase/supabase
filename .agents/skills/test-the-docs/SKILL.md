@@ -92,5 +92,5 @@ Write a verification report per [reference/verification-report.md](reference/ver
 ## Related skills
 
 - [`write-the-docs`](../write-the-docs/SKILL.md) — Draft; hands off here before PR
-- [`review-the-docs`](../review-the-docs/SKILL.md) — lint/build/classify; consumes verification report
+- [`review-the-docs`](../review-the-docs/SKILL.md) — build/classify; consumes verification report
 - [`pm-the-docs`](../pm-the-docs/SKILL.md) — Frame/Shape; universe for cross-repo product lookup
