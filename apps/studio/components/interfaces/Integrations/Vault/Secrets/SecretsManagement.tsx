@@ -127,7 +127,7 @@ export const SecretsManagement = () => {
                           onClick={() => setSearchValue('')}
                           className="p-0 h-5 w-5"
                           aria-label="Clear search"
-                          // Tooltip repeats the label; the description would read the name twice
+                          // Tooltip repeats the label; screen readers would read it twice
                           aria-describedby={undefined}
                         />
                       </TooltipTrigger>

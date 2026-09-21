@@ -66,7 +66,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
                   className="px-1"
                   icon={<MoreVertical />}
                   aria-label="Manage secret"
-                  // Tooltip repeats the label; the description would read the name twice
+                  // Tooltip repeats the label; screen readers would read it twice
                   aria-describedby={undefined}
                 />
               </DropdownMenuTrigger>
@@ -127,7 +127,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
               }
               onClick={() => setRevealSecret(!revealSecret)}
               aria-label={revealSecret ? 'Hide secret value' : 'Show secret value'}
-              // Tooltip repeats the label; the description would read the name twice
+              // Tooltip repeats the label; screen readers would read it twice
               aria-describedby={undefined}
             />
           </TooltipTrigger>

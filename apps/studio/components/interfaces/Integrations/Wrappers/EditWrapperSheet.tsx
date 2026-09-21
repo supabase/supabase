@@ -293,7 +293,7 @@ export const EditWrapperSheet = ({
                                   setSelectedTableToEdit(table)
                                 }}
                                 aria-label={`Edit ${table.table_name} foreign table`}
-                                // Tooltip repeats the label; the description would read the name twice
+                                // Tooltip repeats the label; screen readers would read it twice
                                 aria-describedby={undefined}
                               />
                             </TooltipTrigger>
@@ -309,7 +309,7 @@ export const EditWrapperSheet = ({
                                   removeTable(tableIndex)
                                 }}
                                 aria-label={`Remove ${table.table_name} foreign table`}
-                                // Tooltip repeats the label; the description would read the name twice
+                                // Tooltip repeats the label; screen readers would read it twice
                                 aria-describedby={undefined}
                               />
                             </TooltipTrigger>

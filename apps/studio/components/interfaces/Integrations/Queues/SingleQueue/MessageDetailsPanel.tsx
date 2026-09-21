@@ -99,7 +99,7 @@ export const MessageDetailsPanel = ({
             icon={<X />}
             onClick={() => setSelectedMessage(null)}
             aria-label="Close panel"
-            // Tooltip repeats the label; the description would read the name twice
+            // Tooltip repeats the label; screen readers would read it twice
             aria-describedby={undefined}
           />
         </TooltipTrigger>
