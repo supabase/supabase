@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 import { getMockOAuthAppsAuthorizeRedirect, USE_MOCKS } from './mocks'
 import type { OAuthAppsAuthorizeRedirect } from './types'
@@ -21,18 +22,26 @@ export async function denyOAuthAppsAuthorize({ slug, auth_id }: OAuthAppsAuthori
 
 type OAuthAppsAuthorizeDenyData = Awaited<ReturnType<typeof denyOAuthAppsAuthorize>>
 
-export const useOAuthAppsAuthorizeDenyMutation = (
-  options: Omit<
-    UseCustomMutationOptions<
-      OAuthAppsAuthorizeDenyData,
-      ResponseError,
-      OAuthAppsAuthorizeDenyVariables
-    >,
-    'mutationFn'
-  > = {}
-) => {
+export const useOAuthAppsAuthorizeDenyMutation = ({
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    OAuthAppsAuthorizeDenyData,
+    ResponseError,
+    OAuthAppsAuthorizeDenyVariables
+  >,
+  'mutationFn'
+> = {}) => {
   return useMutation<OAuthAppsAuthorizeDenyData, ResponseError, OAuthAppsAuthorizeDenyVariables>({
     mutationFn: (vars) => denyOAuthAppsAuthorize(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to deny access to OAuth app: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
     ...options,
   })
 }
