@@ -995,6 +995,41 @@ export interface AskAiClickedEvent {
 }
 
 /**
+ * Surface that rendered the prompt panel a user copied from.
+ */
+export type DocsAiPromptSource = 'homepage' | 'guide' | 'agent_setup'
+
+/**
+ * User copied the contents of a docs prompt panel - the homepage setup card or an
+ * `AiPrompt` block - and the clipboard write succeeded. Fires on success only;
+ * failed clipboard writes are not counted.
+ *
+ * Distinct from `ai_prompt_copied`, which belongs to Studio's AI assistant.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs, /docs/guides
+ */
+export interface DocsAiPromptCopiedEvent {
+  action: 'docs_ai_prompt_copied'
+  properties: {
+    /**
+     * Surface the panel was rendered on.
+     */
+    source: DocsAiPromptSource
+    /**
+     * `value` of the pane that was active when the copy happened. Known panes
+     * are `prompt` and `cli`; other strings remain allowed for future panes.
+     */
+    tab: 'prompt' | 'cli' | (string & {})
+    /**
+     * Prompt identifier, set when the panel comes from an `AiPrompt` block.
+     */
+    promptId?: string
+  }
+}
+
+/**
  * User clicked a curated orientation link from a content listings MDX component.
  *
  * @group Events
@@ -3964,6 +3999,7 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | AskAiClickedEvent
+  | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent

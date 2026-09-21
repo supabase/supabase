@@ -56,6 +56,7 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     clientRouterFilter: false,
+    turbopackFileSystemCacheForBuild: false,
   },
   async rewrites() {
     return [
@@ -219,7 +220,8 @@ const platformConfig =
 
 export default process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
   ? withSentryConfig(platformConfig, {
-      silent: true,
+      silent: false,
+      debug: true,
 
       // For all available options, see:
       // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
