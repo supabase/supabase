@@ -36,7 +36,6 @@ export const ExplorerChatToolbar = ({
   isChatLoading,
   showMetadataWarning,
   updatedOptInSinceMCP,
-  isHipaaProjectDisallowed,
   aiOptInLevel,
 }: ExplorerChatToolbarProps) => {
   const snap = useAiAssistantStateSnapshot()
@@ -120,7 +119,6 @@ export const ExplorerChatToolbar = ({
         onVisibleChange={setIsOptInModalOpen}
         showMetadataWarning={showMetadataWarning}
         updatedOptInSinceMCP={updatedOptInSinceMCP}
-        isHipaaProjectDisallowed={isHipaaProjectDisallowed}
         aiOptInLevel={aiOptInLevel}
       />
 
