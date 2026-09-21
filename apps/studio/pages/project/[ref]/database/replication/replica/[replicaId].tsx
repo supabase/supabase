@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { ReplicationLayout } from '@/components/layouts/DatabaseLayout/ReplicationLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from '@/types'
 
@@ -27,7 +27,7 @@ const DatabaseReadReplicaRedirectPage: NextPageWithLayout = () => {
 
 DatabaseReadReplicaRedirectPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
+    <ReplicationLayout>{page}</ReplicationLayout>
   </DefaultLayout>
 )
 

@@ -1,6 +1,5 @@
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
 import { NextRequest } from 'next/server'
+import { describe, expect, it } from 'vitest'
 
 import { middleware } from './middleware'
 
@@ -14,8 +13,7 @@ describe('middleware markdown negotiation', () => {
   it('rewrites to the markdown route when Accept prefers markdown', () => {
     const response = middleware(request(DOCS_URL, { accept: 'text/markdown' }))
 
-    assert.equal(
-      response.headers.get('x-middleware-rewrite'),
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
       'https://supabase.com/library/api/docs-md/nextjs/client'
     )
   })
@@ -23,7 +21,7 @@ describe('middleware markdown negotiation', () => {
   it('406s when Accept rejects both html and markdown', () => {
     const response = middleware(request(DOCS_URL, { accept: 'application/json' }))
 
-    assert.equal(response.status, 406)
+    expect(response.status).toBe(406)
   })
 
   it('passes Server Action requests through untouched', () => {
@@ -35,8 +33,8 @@ describe('middleware markdown negotiation', () => {
       })
     )
 
-    assert.equal(response.status, 200)
-    assert.equal(response.headers.get('x-middleware-rewrite'), null)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
   })
 
   it('serves html to browsers', () => {
@@ -44,7 +42,7 @@ describe('middleware markdown negotiation', () => {
       request(DOCS_URL, { accept: 'text/html,application/xhtml+xml,*/*;q=0.8' })
     )
 
-    assert.equal(response.status, 200)
-    assert.equal(response.headers.get('x-middleware-rewrite'), null)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
   })
 })

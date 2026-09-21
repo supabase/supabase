@@ -73,7 +73,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
   const { tableName, schema, columns = [], projectRef, connectionString, orgSlug, message } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let isRestrictedByHipaa = false
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -84,7 +83,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
       const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
 
       aiOptInLevel = aiDetails.aiOptInLevel
-      isRestrictedByHipaa = aiDetails.isRestrictedByHipaa
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -119,7 +117,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
         connectionString,
         authorization,
         aiOptInLevel,
-        isRestrictedByHipaa,
         accessToken,
         isExplorerEnabled: explorerEnabled,
         signal: toolsAbortController.signal,
