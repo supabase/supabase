@@ -166,7 +166,10 @@ export const ExplorerQueryTab = () => {
       }}
       toolbarActions={
         <>
-          <SaveQueryDropdown query={{ title: draft.name, sql: draft.uncheckedSql }} />
+          <SaveQueryDropdown
+            query={{ title: draft.name, sql: draft.uncheckedSql }}
+            source={toQuerySourceBinding(draft)}
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <ExplorerToolbarAction icon={<MoreVertical size={16} strokeWidth={2} />} />
