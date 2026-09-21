@@ -7,7 +7,9 @@ import { handleError, post } from '@/data/fetchers'
 import { replicationKeys } from '@/data/replication/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
+export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody'] & {
+  destination_project_ref?: string
+}
 
 export type WarehouseSetupVariables = {
   projectRef: string
@@ -33,6 +35,7 @@ export type WarehouseSetupData = Awaited<ReturnType<typeof setupWarehouse>>
 export const useWarehouseSetupMutation = ({
   onSuccess,
   onError,
+  onSettled,
   ...options
 }: Omit<
   UseCustomMutationOptions<WarehouseSetupData, ResponseError, WarehouseSetupVariables>,
@@ -59,6 +62,12 @@ export const useWarehouseSetupMutation = ({
       } else {
         onError(error, variables, context)
       }
+    },
+    async onSettled(data, error, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.destinations(variables.projectRef),
+      })
+      await onSettled?.(data, error, variables, context)
     },
     ...options,
   })
