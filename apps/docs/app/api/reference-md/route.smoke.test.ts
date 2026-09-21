@@ -83,6 +83,31 @@ describe('prod smoke test: reference section markdown', () => {
     }
   })
 
+  it('serves markdown without the suffix when Accept prefers it, and HTML to browsers', async () => {
+    const url = `${REFERENCE_URL}/javascript/select`
+    const [agent, browser] = await Promise.all([
+      fetch(url, { headers: { accept: 'text/markdown, text/html;q=0.9' } }),
+      fetch(url, { headers: { accept: 'text/html,application/xhtml+xml,*/*;q=0.8' } }),
+    ])
+
+    expectMarkdown(agent)
+    expect(browser.headers.get('content-type')).toContain('text/html')
+  })
+
+  it('advertises the markdown alternate on the crawler page and on the library page', async () => {
+    const [crawler, library] = await Promise.all([
+      fetch(`${REFERENCE_URL}/javascript/select`, { headers: { 'user-agent': 'Claude-User/1.0' } }),
+      fetch(`${REFERENCE_URL}/javascript`, { headers: { 'user-agent': 'Mozilla/5.0 Chrome/126' } }),
+    ])
+
+    expect(await crawler.text()).toContain(
+      'type="text/markdown" href="https://supabase.com/docs/reference/javascript/select.md"'
+    )
+    expect(await library.text()).toContain(
+      'type="text/markdown" href="https://supabase.com/docs/reference/javascript.md"'
+    )
+  })
+
   it('serves markdown to crawlers', async () => {
     const { response } = await fetchMarkdown('javascript/select', {
       headers: { 'user-agent': 'Googlebot/2.1 (+http://www.google.com/bot.html)' },
@@ -101,15 +126,17 @@ describe('prod smoke test: reference section markdown', () => {
     expect(guide.status).toBe(200)
   })
 
-  it('does not let the cache mix up the HTML and markdown representations', async () => {
+  it('does not let a cache serve one representation of a URL for the other', async () => {
+    const MARKDOWN = 'text/markdown, text/html;q=0.9'
+    const HTML = 'text/html,application/xhtml+xml,*/*;q=0.8'
     const contentTypes: Array<string | null> = []
-    for (const url of ['javascript/select', 'javascript/select.md', 'javascript/select']) {
-      const response = await fetch(`${REFERENCE_URL}/${url}`)
+    for (const accept of [MARKDOWN, HTML, MARKDOWN]) {
+      const response = await fetch(`${REFERENCE_URL}/javascript/select`, { headers: { accept } })
       contentTypes.push(response.headers.get('content-type'))
     }
 
-    expect(contentTypes[0]).toContain('text/html')
-    expect(contentTypes[1]).toContain('text/markdown')
-    expect(contentTypes[2]).toContain('text/html')
+    expect(contentTypes[0]).toContain('text/markdown')
+    expect(contentTypes[1]).toContain('text/html')
+    expect(contentTypes[2]).toContain('text/markdown')
   })
 })
