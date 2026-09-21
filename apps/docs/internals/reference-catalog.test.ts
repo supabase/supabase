@@ -79,12 +79,24 @@ describe('buildCatalog', () => {
     expect(entries[0]).toMatchObject({ slug: 'role-connections', sourceId: 'role-stats' })
   })
 
-  it('skips category entries', async () => {
-    const { manifest } = await catalog({
-      'javascript.v2': { database: { type: 'category', title: 'Database' } },
+  it('leaves out function sections that have no function entry', async () => {
+    const { entries } = await buildCatalog({
+      references: REGISTRY,
+      loadFunctionIds: async () => new Set(['select']),
+      loadSectionsBySlug: async (_libraryId, version) =>
+        version === 'v2'
+          ? new Map(
+              Object.entries({
+                database: { type: 'category', title: 'Database' },
+                select: section('select'),
+                'auth-mfa-recovery-codes': section('auth-mfa-recovery-codes'),
+                introduction: intro,
+              })
+            )
+          : undefined,
     })
 
-    expect(manifest).toEqual({})
+    expect(entries.map((entry) => entry.slug)).toEqual(['select', 'introduction'])
   })
 
   it('gives unversioned families no version segment and uses the hyphenated libPath', async () => {
@@ -119,6 +131,18 @@ describe('buildCatalog', () => {
 
     expect(manifest['javascript/select']).toBeDefined()
     expect(manifest['javascript/auth-signup']).toBeUndefined()
+  })
+
+  it("leaves out an old version's prose section that has no file of its own, and keeps the current one", async () => {
+    const { manifest } = await buildCatalog({
+      references: REGISTRY,
+      hasProse: async (entry) => entry.version === 'v2',
+      loadSectionsBySlug: async () =>
+        new Map(Object.entries({ installing: section('installing', { type: 'markdown' }) })),
+    })
+
+    expect(manifest['javascript/installing']).toBe('javascript/v2/installing')
+    expect(manifest['javascript/v1/installing']).toBeUndefined()
   })
 
   it('throws when two families claim the same public path', async () => {

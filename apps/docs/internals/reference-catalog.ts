@@ -76,12 +76,14 @@ type Catalog = {
 
 export const buildCatalog = async ({
   loadSectionsBySlug,
+  loadFunctionIds,
+  hasProse,
   references = REFERENCES as unknown as FamilyRegistry,
-  libraryIds = Object.keys(references),
 }: {
   loadSectionsBySlug: LoadSectionsBySlug
+  loadFunctionIds?: (libraryId: string, version: string) => Promise<Set<string>>
+  hasProse?: (entry: CatalogEntry) => Promise<boolean>
   references?: FamilyRegistry
-  libraryIds?: string[]
 }): Promise<Catalog> => {
   const entries: CatalogEntry[] = []
   const manifest: Record<string, string> = {}
@@ -98,9 +100,8 @@ export const buildCatalog = async ({
     manifest[publicPath] = artifact
   }
 
-  for (const libraryId of libraryIds) {
-    const family = references[libraryId]
-    if (!family || family.enabled === false) continue
+  for (const [libraryId, family] of Object.entries(references)) {
+    if (family.enabled === false) continue
     const { libPath } = family
     const versions = versionsFor(family)
 
@@ -110,11 +111,16 @@ export const buildCatalog = async ({
 
       const isLatestVersion = index === 0
       const eligible = new Map<string, CatalogEntry>()
+      let functionIds: Set<string> | undefined
 
       for (const [slug, section] of sections) {
         if (!section.slug || !section.type) continue
         if (!isConcreteType(section.type)) continue
         if (isAuthSectionHidden(family, section)) continue
+        if (section.type === 'function' && loadFunctionIds) {
+          functionIds ??= await loadFunctionIds(libraryId, version)
+          if (!functionIds.has(section.id ?? slug)) continue
+        }
 
         const entry: CatalogEntry = {
           libraryId,
@@ -128,6 +134,8 @@ export const buildCatalog = async ({
           shared: section.meta?.shared,
           artifact: `${libPath}/${version}/${slug}`,
         }
+        const needsOwnProse = section.type === 'markdown' && !isLatestVersion && !entry.shared
+        if (needsOwnProse && hasProse && !(await hasProse(entry))) continue
         eligible.set(slug, entry)
       }
 

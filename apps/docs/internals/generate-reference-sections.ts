@@ -52,15 +52,10 @@ const cached = <T>(key: string, load: () => Promise<T>): Promise<T> => {
 }
 
 const loadSectionsBySlug = async (libraryId: string, version: string) => {
-  try {
-    const data = await cached(`bySlug:${libraryId}:${version}`, () =>
-      readJson<Record<string, BySlugSection>>(generatedPath(libraryId, version, 'bySlug'))
-    )
-    return new Map(Object.entries(data))
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return undefined
-    throw err
-  }
+  const data = await cached(`bySlug:${libraryId}:${version}`, () =>
+    readJson<Record<string, BySlugSection>>(generatedPath(libraryId, version, 'bySlug'))
+  )
+  return new Map(Object.entries(data))
 }
 
 const loadFunctions = (libraryId: string, version: string) =>
@@ -88,55 +83,38 @@ const loadCliSpec = () =>
 
 const loadEndpoints = (libraryId: string) =>
   cached(`endpoints:${libraryId}`, async () => {
-    const name = libraryId === 'api' ? 'api' : toSdkId(libraryId)
+    const name = toSdkId(libraryId)
     const entries = await readJson<Array<[string, ApiEndpoint]>>(
       path.join(GENERATED, `${name}.latest.endpointsById.json`)
     )
     return new Map(entries)
   })
 
-class SectionError extends Error {
-  constructor(entry: CatalogEntry, detail: string) {
-    super(`[${entry.libPath}/${entry.version}/${entry.slug}] ${detail}`)
-    this.name = 'SectionError'
-  }
-}
-
-const proseCandidates = (entry: CatalogEntry): string[] => {
-  if (entry.shared) return [path.join(MDX_ROOT, 'shared', `${entry.sourceId}.mdx`)]
-  const versioned = path.join(MDX_ROOT, entry.libPath, entry.version, `${entry.sourceId}.mdx`)
-  const current = path.join(MDX_ROOT, entry.libPath, `${entry.sourceId}.mdx`)
-  return entry.isLatestVersion ? [current, versioned] : [versioned, current]
-}
+const prosePath = (entry: CatalogEntry): string =>
+  entry.shared
+    ? path.join(MDX_ROOT, 'shared', `${entry.sourceId}.mdx`)
+    : path.join(
+        MDX_ROOT,
+        entry.libPath,
+        entry.isLatestVersion ? '' : entry.version,
+        `${entry.sourceId}.mdx`
+      )
 
 const renderProse = async (entry: CatalogEntry): Promise<string> => {
-  for (const candidate of proseCandidates(entry)) {
-    let raw: string
-    try {
-      raw = await fs.readFile(candidate, 'utf8')
-    } catch (err) {
-      if ((err as NodeJS.ErrnoException).code === 'ENOENT') continue
-      throw err
-    }
+  const { content, data } = matter(await fs.readFile(prosePath(entry), 'utf8'))
+  const cliSpec = entry.libPath === 'cli' ? await loadCliSpec() : undefined
+  const body = await proseToMarkdown(content, { cliFlags: cliSpec?.flags })
+  if (!body.trim()) throw new Error('prose file is empty')
 
-    const { content, data } = matter(raw)
-    const cliSpec = entry.libPath === 'cli' ? await loadCliSpec() : undefined
-    const body = await proseToMarkdown(content, { cliFlags: cliSpec?.flags })
-    if (!body.trim()) throw new SectionError(entry, `prose file is empty: ${candidate}`)
-
-    // Introductions carry their real title in an <h1>; everything else needs one.
-    if (body.startsWith('# ')) return body
-    const title = (typeof data.title === 'string' && data.title) || entry.title || entry.slug
-    return `# ${title}\n\n${body}`
-  }
-
-  throw new SectionError(entry, `no MDX source found (tried ${proseCandidates(entry).join(', ')})`)
+  if (body.startsWith('# ')) return body
+  const title = (typeof data.title === 'string' && data.title) || entry.title || entry.slug
+  return `# ${title}\n\n${body}`
 }
 
 const renderFunction = async (entry: CatalogEntry): Promise<string> => {
   const functions = await loadFunctions(entry.libraryId, entry.version)
   const fn = functions.find((candidate) => candidate.id === entry.sourceId)
-  if (!fn) throw new SectionError(entry, `no function entry for id "${entry.sourceId}"`)
+  if (!fn) throw new Error(`no function entry for id "${entry.sourceId}"`)
 
   let types: TypeSpecEntry | undefined
   if (REFERENCES[entry.libraryId]?.typeSpec && fn.$ref) {
@@ -162,7 +140,7 @@ const renderCli = async (entry: CatalogEntry): Promise<string> => {
   const spec = await loadCliSpec()
   const commands = spec.commands ?? []
   const command = commands.find((candidate) => candidate.id === entry.sourceId)
-  if (!command) throw new SectionError(entry, `no CLI command for id "${entry.sourceId}"`)
+  if (!command) throw new Error(`no CLI command for id "${entry.sourceId}"`)
 
   const subcommandTitles = Object.fromEntries(
     commands.map((candidate) => [candidate.id, candidate.title ?? candidate.id])
@@ -173,7 +151,7 @@ const renderCli = async (entry: CatalogEntry): Promise<string> => {
 const renderOperation = async (entry: CatalogEntry): Promise<string> => {
   const endpoints = await loadEndpoints(entry.libraryId)
   const endpoint = endpoints.get(entry.sourceId)
-  if (!endpoint) throw new SectionError(entry, `no endpoint for id "${entry.sourceId}"`)
+  if (!endpoint) throw new Error(`no endpoint for id "${entry.sourceId}"`)
   return renderApiOperation({ endpoint, fallbackTitle: entry.title })
 }
 
@@ -192,7 +170,16 @@ const renderSection = async (entry: CatalogEntry): Promise<string> => {
 }
 
 export const generateSections = async (): Promise<void> => {
-  const { entries, manifest } = await buildCatalog({ loadSectionsBySlug })
+  const { entries, manifest } = await buildCatalog({
+    loadSectionsBySlug,
+    hasProse: (entry) =>
+      fs.access(prosePath(entry)).then(
+        () => true,
+        () => false
+      ),
+    loadFunctionIds: async (libraryId, version) =>
+      new Set((await loadFunctions(libraryId, version)).map((fn) => fn.id)),
+  })
 
   const failures: string[] = []
   const rendered = new Map<string, string>()
@@ -201,10 +188,10 @@ export const generateSections = async (): Promise<void> => {
     entries.map(async (entry) => {
       try {
         const body = await renderSection(entry)
-        if (!body.trim()) throw new SectionError(entry, 'rendered empty')
+        if (!body.trim()) throw new Error('rendered empty')
         rendered.set(entry.artifact, prefixMarkdownLinks(body))
       } catch (err) {
-        failures.push(err instanceof Error ? err.message : String(err))
+        failures.push(`[${entry.artifact}] ${err instanceof Error ? err.message : String(err)}`)
       }
     })
   )
