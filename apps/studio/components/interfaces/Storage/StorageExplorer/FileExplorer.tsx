@@ -5,6 +5,7 @@ import { cn } from 'ui'
 import { STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { FileExplorerColumn } from './FileExplorerColumn'
+import { FileExplorerKeyboardNavigationProvider } from './FileExplorerKeyboardNavigation'
 import { useStoragePreference } from './useStoragePreference'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -42,53 +43,57 @@ export const FileExplorer = ({
     container.scrollLeft = container.scrollWidth - container.clientWidth
   }, [columns.length, view, isPreviewOpen])
 
+  const isListView = view === STORAGE_VIEWS.LIST
+
   return (
-    <div
-      ref={fileExplorerRef}
-      className={cn(
-        'file-explorer flex grow overflow-x-auto justify-between h-full w-full relative',
-        view === STORAGE_VIEWS.LIST && 'flex-col'
-      )}
-    >
-      {isLoading ? (
-        <FileExplorerColumn
-          column={{ id: '', name: '', path: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
-        />
-      ) : view === STORAGE_VIEWS.COLUMNS ? (
-        <div className="flex">
-          {columns.map((column, index) => (
-            <FileExplorerColumn
-              key={`column-${index}`}
-              index={index}
-              column={column}
-              selectedItems={selectedItems}
-              itemSearchString={itemSearchString}
-              onFilesUpload={onFilesUpload}
-              onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-              onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-              onColumnLoadMore={onColumnLoadMore}
-            />
-          ))}
-        </div>
-      ) : view === STORAGE_VIEWS.LIST ? (
-        <>
-          {columns.length > 0 && (
-            <FileExplorerColumn
-              fullWidth
-              index={columns.length - 1}
-              column={columns[columns.length - 1]}
-              selectedItems={selectedItems}
-              itemSearchString={itemSearchString}
-              onFilesUpload={onFilesUpload}
-              onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-              onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-              onColumnLoadMore={onColumnLoadMore}
-            />
-          )}
-        </>
-      ) : (
-        <div>Unknown view: {view}</div>
-      )}
-    </div>
+    <FileExplorerKeyboardNavigationProvider isListView={isListView}>
+      <div
+        ref={fileExplorerRef}
+        className={cn(
+          'file-explorer flex grow overflow-x-auto justify-between h-full w-full relative',
+          isListView && 'flex-col'
+        )}
+      >
+        {isLoading ? (
+          <FileExplorerColumn
+            column={{ id: '', name: '', path: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
+          />
+        ) : view === STORAGE_VIEWS.COLUMNS ? (
+          <div className="flex">
+            {columns.map((column, index) => (
+              <FileExplorerColumn
+                key={`column-${index}`}
+                index={index}
+                column={column}
+                selectedItems={selectedItems}
+                itemSearchString={itemSearchString}
+                onFilesUpload={onFilesUpload}
+                onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+                onSelectColumnEmptySpace={onSelectColumnEmptySpace}
+                onColumnLoadMore={onColumnLoadMore}
+              />
+            ))}
+          </div>
+        ) : view === STORAGE_VIEWS.LIST ? (
+          <>
+            {columns.length > 0 && (
+              <FileExplorerColumn
+                fullWidth
+                index={columns.length - 1}
+                column={columns[columns.length - 1]}
+                selectedItems={selectedItems}
+                itemSearchString={itemSearchString}
+                onFilesUpload={onFilesUpload}
+                onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+                onSelectColumnEmptySpace={onSelectColumnEmptySpace}
+                onColumnLoadMore={onColumnLoadMore}
+              />
+            )}
+          </>
+        ) : (
+          <div>Unknown view: {view}</div>
+        )}
+      </div>
+    </FileExplorerKeyboardNavigationProvider>
   )
 }

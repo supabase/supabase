@@ -15,7 +15,11 @@ import { useStorageExplorerUrlState } from './useStorageExplorerUrlState'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface StorageExplorerNavigationContextValue {
-  openFolderAtIndex: (columnIndex: number, folder: StorageItem) => Promise<void>
+  openFolderAtIndex: (
+    columnIndex: number,
+    folder: StorageItem,
+    options?: { history?: 'push' | 'replace' }
+  ) => Promise<void>
   navigateToPath: (paths: string[]) => void
   goUpOneLevel: () => void
   truncateToColumn: (columnIndex: number) => void
@@ -64,8 +68,11 @@ export const StorageExplorerNavigationProvider = ({
 
   const previousStorePathRef = useRef(storePath)
   const previousSearchStringRef = useRef<string | null>(null)
-  /** Marks a store move as deliberate navigation (push), not a mutation side effect (replace). */
-  const navigationHistoryModeRef = useRef<'push' | null>(null)
+  /**
+   * Marks a store move as deliberate navigation (push), rather than a mutation side effect
+   * or arrow-key browsing (replace).
+   */
+  const navigationHistoryModeRef = useRef<'push' | 'replace' | null>(null)
   const previousPreviewRef = useRef(previewedFileName)
   /** The `?path` a restore is in flight for; `openedFolders` only catches up when it resolves. */
   const restoringPathRef = useRef<string | null>(null)
@@ -203,8 +210,15 @@ export const StorageExplorerNavigationProvider = ({
   ])
 
   const context = useMemo(() => {
-    const openFolderAtIndex = async (columnIndex: number, folder: StorageItem) => {
-      navigationHistoryModeRef.current = 'push'
+    const openFolderAtIndex = async (
+      columnIndex: number,
+      folder: StorageItem,
+      options?: { history?: 'push' | 'replace' }
+    ) => {
+      // Opening a folder is usually a navigation. Browsing the columns with the arrow keys
+      // opens whatever the cursor lands on, though, and a history entry per keystroke would
+      // make the Back button useless — those pass `replace`.
+      navigationHistoryModeRef.current = options?.history ?? 'push'
       await snap.openFolder(columnIndex, folder)
     }
 
