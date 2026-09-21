@@ -24,6 +24,7 @@ import {
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { fromLifecycleRules } from '../BucketVersioningFields.lifecycle'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { getBucketVersioningState } from '../StorageVersioning.constants'
@@ -36,6 +37,7 @@ import { VersionCompareWidget } from './VersionCompareWidget'
 import { VersionHistory } from './VersionHistory'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { bucketLifecycleQueryOptions } from '@/data/storage/bucket-lifecycle-query'
 import { useObjectPurgeMutation } from '@/data/storage/versioning/object-purge-mutation'
 import { useObjectVersionRestoreMutation } from '@/data/storage/versioning/object-version-restore-mutation'
 import {
@@ -51,12 +53,6 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 
 const PANEL_WIDTH = 450
-
-/**
- * TODO(storage-versioning): read the bucket's stored policy once the Storage API
- * returns it. No condition is set until then, so no row shows an expiry.
- */
-const EMPTY_LIFECYCLE_POLICY: LifecyclePolicy = { expiryDays: null, maxVersions: null }
 
 const PreviewFile = ({ item }: { item: StorageItem }) => {
   const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
@@ -338,6 +334,7 @@ export const PreviewPane = () => {
     projectRef,
     selectedBucket,
     selectedFilePreview: file,
+    openedFolders,
     setSelectedItemsToDelete,
     setSelectedFileCustomExpiry,
     downloadFile,
@@ -359,14 +356,29 @@ export const PreviewPane = () => {
 
   const versioningState = getBucketVersioningState(selectedBucket)
 
+  // The version endpoints address an object by its full path in the bucket, not
+  // by the leaf name the explorer renders.
+  const folderPath = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
+  const filePath = file ? [folderPath, file.name].filter(Boolean).join('/') : undefined
+
+  const { data: lifecycle } = useQuery({
+    ...bucketLifecycleQueryOptions({ projectRef, bucketId: selectedBucket?.id }),
+    enabled: isStorageVersioningEnabled && !!projectRef && !!selectedBucket?.id,
+  })
+  const storedPolicy = fromLifecycleRules(lifecycle)
+  const lifecyclePolicy: LifecyclePolicy = {
+    expiryDays: storedPolicy.versionExpiryDays,
+    maxVersions: storedPolicy.maxNoncurrentVersions,
+  }
+
   const { data: versions } = useQuery({
     ...objectVersionsQueryOptions({
       projectRef,
       bucketId: selectedBucket?.id,
-      objectName: file?.name,
-      lifecyclePolicy: EMPTY_LIFECYCLE_POLICY,
+      path: filePath,
+      lifecyclePolicy,
     }),
-    enabled: isStorageVersioningEnabled && !!projectRef && !!selectedBucket?.id && !!file?.name,
+    enabled: isStorageVersioningEnabled && !!projectRef && !!selectedBucket?.id && !!filePath,
   })
 
   const { mutate: restoreVersion, isPending: isRestoring } = useObjectVersionRestoreMutation({
@@ -395,18 +407,18 @@ export const PreviewPane = () => {
   const isComparing = previewedVersion !== undefined && !previewedVersion.isCurrent
 
   const handleRestore = () => {
-    if (!projectRef || !selectedBucket?.id || !previewedVersion) return
+    if (!projectRef || !selectedBucket?.id || !previewedVersion || !filePath) return
     restoreVersion({
       projectRef,
       bucketId: selectedBucket.id,
-      objectName: file.name,
+      path: filePath,
       versionId: previewedVersion.versionId,
     })
   }
 
   const handlePurge = () => {
-    if (!projectRef || !selectedBucket?.id) return
-    purgeObject({ projectRef, bucketId: selectedBucket.id, objectName: file.name })
+    if (!projectRef || !selectedBucket?.id || !filePath) return
+    purgeObject({ projectRef, bucketId: selectedBucket.id, path: filePath })
   }
 
   // The compare widget replaces the top of the panel, so scroll up to show it.
@@ -469,9 +481,10 @@ export const PreviewPane = () => {
                 projectRef={projectRef}
                 bucketId={selectedBucket?.id}
                 objectName={file.name}
+                path={filePath ?? file.name}
                 versioningState={versioningState}
-                lifecyclePolicy={EMPTY_LIFECYCLE_POLICY}
-                expirationMode="and"
+                lifecyclePolicy={lifecyclePolicy}
+                expirationMode={storedPolicy.expirationMode}
                 mimeType={mimeType}
                 previewedVersionId={previewedVersion?.versionId}
                 onPreview={handlePreviewVersion}
