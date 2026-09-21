@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 import { getMockOAuthAppsAuthorizeApproveResult, USE_MOCKS } from './mocks'
 import type { OAuthAppsAuthorizeApproveResult, OAuthAuthorizeApproveRequest } from './types'
@@ -26,22 +27,30 @@ export async function approveOAuthAppsAuthorize({
 
 type OAuthAppsAuthorizeApproveData = Awaited<ReturnType<typeof approveOAuthAppsAuthorize>>
 
-export const useOAuthAppsAuthorizeApproveMutation = (
-  options: Omit<
-    UseCustomMutationOptions<
-      OAuthAppsAuthorizeApproveData,
-      ResponseError,
-      OAuthAppsAuthorizeApproveVariables
-    >,
-    'mutationFn'
-  > = {}
-) => {
+export const useOAuthAppsAuthorizeApproveMutation = ({
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    OAuthAppsAuthorizeApproveData,
+    ResponseError,
+    OAuthAppsAuthorizeApproveVariables
+  >,
+  'mutationFn'
+> = {}) => {
   return useMutation<
     OAuthAppsAuthorizeApproveData,
     ResponseError,
     OAuthAppsAuthorizeApproveVariables
   >({
     mutationFn: (vars) => approveOAuthAppsAuthorize(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to authorize access to OAuth app: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
     ...options,
   })
 }
