@@ -29,6 +29,7 @@ import {
   SquareCode,
   Trash,
 } from 'lucide-react'
+import type { MarkdownEditorHandle } from 'markdown-editor/types'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -117,12 +118,20 @@ export const ExplorerNotebookTab = () => {
   } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
+  const markdownCellRefs = useRef(new Map<string, MarkdownEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
+  const getFreshNotebook = () => {
+    markdownCellRefs.current.forEach((editor) => editor.flush())
+    const notebook = id ? getNotebooksStateSnapshot().notebooks[id] : undefined
+    return notebook?.projectRef === ref ? notebook : undefined
+  }
+
   const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
     onSuccess: (data) => {
-      if (id && content === savedContentRef.current) {
+      const freshContent = getFreshNotebook()?.notebook.content
+      if (id && freshContent === savedContentRef.current) {
         snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
         if (isSaveBeforeAnalyzeOpen) {
@@ -187,9 +196,8 @@ export const ExplorerNotebookTab = () => {
   }
 
   const getFreshCells = () => {
-    const freshNotebook = id ? getNotebooksStateSnapshot().notebooks[id] : undefined
-    if (!freshNotebook || freshNotebook.projectRef !== ref) return cells
-    return freshNotebook.notebook.content?.cells ?? []
+    const notebook = getFreshNotebook()
+    return notebook ? (notebook.notebook.content?.cells ?? []) : cells
   }
 
   const handleRunNotebook = () => {
@@ -225,14 +233,16 @@ export const ExplorerNotebookTab = () => {
   }
 
   const persistNotebook = () => {
-    const notebookId = currentNotebook?.notebook.id
-    if (!ref || !notebookId || !name || !content) return
+    const freshNotebook = getFreshNotebook()
+    const notebookId = freshNotebook?.notebook.id
+    const freshContent = freshNotebook?.notebook.content
+    if (!ref || !notebookId || !freshNotebook || !freshContent) return
 
     persistNotebookTab()
 
     const writableContent: WritableNotebook = {
-      schema_version: content.schema_version,
-      cells: content.cells.map((cell): WritableCell => {
+      schema_version: freshContent.schema_version,
+      cells: freshContent.cells.map((cell): WritableCell => {
         switch (cell._tag) {
           case 'markdown_cell':
             return cell
@@ -263,19 +273,19 @@ export const ExplorerNotebookTab = () => {
     // [Joshen] For tracking if a notebook is updated while being saved, so that we do not
     // incorrectly show the saved toast if it's subsequently then saved once again while
     // the initial save is midflight
-    savedContentRef.current = content
+    savedContentRef.current = freshContent
 
     updateNotebook({
       projectRef: ref,
       id: notebookId,
-      name,
-      description: currentNotebook?.notebook.description ?? undefined,
+      name: freshNotebook.notebook.name,
+      description: freshNotebook.notebook.description ?? undefined,
       content: writableContent,
     })
   }
 
   const handleSaveNotebook = () => {
-    const notebookId = currentNotebook?.notebook.id
+    const notebookId = getFreshNotebook()?.notebook.id
     if (notebookId && snap.serverDivergedWhileDirty.get(notebookId)) {
       setIsSaveConflictOpen(true)
       return
@@ -308,7 +318,7 @@ export const ExplorerNotebookTab = () => {
   }
 
   const handleClickAnalyze = () => {
-    if (hasDiscardableChanges(currentNotebook)) {
+    if (hasDiscardableChanges(getFreshNotebook())) {
       setIsSaveBeforeAnalyzeOpen(true)
     } else {
       handleAnalyze()
@@ -320,7 +330,7 @@ export const ExplorerNotebookTab = () => {
       await copyToClipboard(
         notebookToMarkdown({
           name: name ?? '',
-          cells,
+          cells: getFreshCells(),
           getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
         }),
         () => toast.success('Copied notebook as Markdown to clipboard')
@@ -503,7 +513,15 @@ export const ExplorerNotebookTab = () => {
                           }}
                         />
                       ) : (
-                        <MarkdownCell key={cell._id} cell={cell} onEdit={persistNotebookTab} />
+                        <MarkdownCell
+                          key={cell._id}
+                          cell={cell}
+                          onEdit={persistNotebookTab}
+                          ref={(instance) => {
+                            if (instance) markdownCellRefs.current.set(cell._id, instance)
+                            else markdownCellRefs.current.delete(cell._id)
+                          }}
+                        />
                       )
                     )}
                   </div>

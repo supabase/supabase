@@ -118,6 +118,7 @@
     "lodash": "catalog:",
     "lodash-es": "catalog:",
     "lucide-react": "^0.436.0",
+    "markdown-editor": "workspace:*",
     "markdown-table": "^3.0.3",
     "mime-db": "^1.53.0",
     "monaco-editor": "catalog:",

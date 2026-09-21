@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { HttpResponse } from 'msw'
@@ -401,6 +401,43 @@ describe('ExplorerNotebookTab', () => {
     await userEvent.click(saveButton)
 
     await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
+  })
+
+  it('saves pending Markdown without waiting for the editor debounce', async () => {
+    seedNotebook([{ ...createMarkdownCellSkeleton(), text: 'Original' }])
+    let savedBody: unknown
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async ({ request }) => {
+        savedBody = await request.json()
+        return HttpResponse.json<null>(null)
+      },
+    })
+    renderNotebookTab()
+    const editor = await screen.findByRole('textbox', { name: 'Markdown cell' })
+    vi.useFakeTimers()
+    try {
+      await act(async () => {
+        editor.querySelector('p')!.textContent = 'Latest Markdown'
+        fireEvent.input(editor)
+        await Promise.resolve()
+      })
+      expect(notebooksState.notebooks[NOTEBOOK_ID].notebook.content?.cells[0]).toMatchObject({
+        text: 'Original',
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+      expect(notebooksState.notebooks[NOTEBOOK_ID].notebook.content?.cells[0]).toMatchObject({
+        text: 'Latest Markdown',
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+    await waitFor(() =>
+      expect(savedBody).toMatchObject({
+        content: { cells: [{ _tag: 'markdown_cell', text: 'Latest Markdown' }] },
+      })
+    )
   })
 
   it('does not mark a newer edit as saved when an earlier save resolves after it', async () => {

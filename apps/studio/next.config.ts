@@ -183,7 +183,15 @@ const nextConfig = {
         : []),
     ],
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'api-types',
+    'icons',
+    'markdown-editor',
+  ],
   serverExternalPackages: ['libpg-query'],
   turbopack: {
     rules: {

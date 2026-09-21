@@ -253,6 +253,12 @@ export const notebooksState = proxy({
     notebooksState.updateCells({ id, cells: nextCells })
   },
 
+  /** Mark an in-progress edit dirty without writing a draft per keystroke. */
+  markEdited: ({ id }: { id: string }) => {
+    const notebook = notebooksState.notebooks[id]
+    if (notebook) notebook.status = statusOnEdit(notebook.status)
+  },
+
   setQueryVisibility: ({ cellId, showQuery }: { cellId: string; showQuery: boolean }) =>
     notebooksState.cellLocalState.set(cellId, {
       ...notebooksState.cellLocalState.get(cellId),

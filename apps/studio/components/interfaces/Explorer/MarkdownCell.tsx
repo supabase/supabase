@@ -1,54 +1,43 @@
-import { Edit } from 'lucide-react'
-import { useState } from 'react'
-import { Button, cn } from 'ui'
+import type { MarkdownEditorHandle } from 'markdown-editor/types'
+import { lazy, Suspense, type Ref } from 'react'
+import { cn } from 'ui'
 
-import { Markdown } from '../Markdown'
 import { AddCellDropdown } from './AddCellDropdown'
 import { MoveCellDropdownContent } from './MoveCellDropdownContent'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { NotebookCodeBlockEditor } from './NotebookCodeBlockEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { type MarkdownCell as MarkdownCellSchema } from '@/data/content/notebooks/notebook-schema'
-import { useLatest } from '@/hooks/misc/useLatest'
-import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { notebooksState, useCurrentNotebook } from '@/state/notebooks/notebooks-state'
+
+const MarkdownEditor = lazy(() =>
+  import('markdown-editor').then((module) => ({ default: module.MarkdownEditor }))
+)
+const components = { CodeBlockEditor: NotebookCodeBlockEditor }
 
 interface MarkdownCellProps {
   cell: MarkdownCellSchema
   onEdit?: () => void
+  ref?: Ref<MarkdownEditorHandle>
 }
 
-// [Joshen] handleUpdateMarkdown could be shifted into notebook-state as a updateCell action
-
-export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
-  const snap = useNotebooksStateSnapshot()
+export const MarkdownCell = ({ cell, onEdit, ref }: MarkdownCellProps) => {
   const currentNotebook = useCurrentNotebook()
-  const cells = currentNotebook?.notebook.content?.cells ?? []
+  const notebookId = currentNotebook?.notebook.id
 
-  const [value, setValue] = useState(cell.text)
-  const [isEditing, setIsEditing] = useState(false)
-
-  const valueRef = useLatest(value)
-
-  const handleStartEditing = () => {
-    setValue(cell.text)
-    setIsEditing(true)
-  }
-
-  const handleCancel = () => {
-    setIsEditing(false)
-  }
-
-  const handleUpdateMarkdown = (cellId: string, text: string) => {
-    const notebookId = currentNotebook?.notebook.id
+  const handleDirty = () => {
     if (!notebookId) return
-
+    notebooksState.markEdited({ id: notebookId })
     onEdit?.()
-    const nextCells = cells.map((c) => (c._id === cellId ? { ...c, text } : c))
-    snap.updateCells({ id: notebookId, cells: nextCells })
-    setIsEditing(false)
   }
 
-  const handleUpdateMarkdownRef = useLatest(handleUpdateMarkdown)
+  const handleChange = (text: string) => {
+    if (!notebookId) return
+    notebooksState.updateCell({
+      id: notebookId,
+      cellId: cell._id,
+      updater: (current) => (current._tag === 'markdown_cell' ? { ...current, text } : current),
+    })
+  }
 
   return (
     <SortableSection
@@ -58,95 +47,33 @@ export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-1.5 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
-      {isEditing ? (
-        <div className={cn('w-full transition', 'overflow-hidden border rounded-md')}>
-          <CodeEditor
-            hideLineNumbers
-            language="markdown"
-            value={value}
-            onInputChange={(e) => setValue(e ?? '')}
-            className="h-[150px]"
-            options={{ quickSuggestions: false, wordBasedSuggestions: 'off' }}
-            onMount={(editor, monaco) => {
-              editor.addCommand(
-                monaco.KeyCode.Escape,
-                handleCancel,
-                [
-                  'editorTextFocus',
-                  '!editorHasSelection',
-                  '!editorHasMultipleSelections',
-                  '!suggestWidgetVisible',
-                  '!findWidgetVisible',
-                  '!parameterHintsVisible',
-                  '!renameInputVisible',
-                  '!inSnippetMode',
-                  '!accessibilityHelpWidgetVisible',
-                  '!inlineSuggestionVisible',
-                ].join(' && ')
-              )
-              editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
-                handleUpdateMarkdownRef.current(cell._id, valueRef.current)
-              )
-              editor.onDidBlurEditorWidget(() =>
-                handleUpdateMarkdownRef.current(cell._id, valueRef.current)
-              )
-            }}
-          />
-          <div className="border-t flex items-center justify-between pl-3 pr-1 py-1">
-            <p className="text-xs text-foreground-lighter">Markdown</p>
-            <div className="flex items-center gap-x-1">
-              <Button variant="text" onMouseDown={(e) => e.preventDefault()} onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button
-                variant="text"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleUpdateMarkdown(cell._id, value)}
-              >
-                Done
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div
-          onDoubleClick={handleStartEditing}
-          className={cn(
-            'group/mdcell relative w-full px-3 py-2 transition',
-            'hover:bg-alternative/50',
-            'border border-transparent rounded-md hover:border-default'
-          )}
-        >
-          <ButtonTooltip
-            variant="text"
-            className={cn(
-              'absolute right-1 top-1 px-1',
-              'opacity-0 group-hover/mdcell:opacity-100 focus-visible:opacity-100'
-            )}
-            icon={<Edit size={14} />}
-            onClick={handleStartEditing}
-            tooltip={{ content: { side: 'bottom', text: 'Edit' } }}
-          />
-          {cell.text ? (
-            <Markdown
-              className={cn(
-                'prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground',
-                '[&>h1]:mb-2 [&>h2]:mb-2',
-                '[&_ol>li]:pl-3',
-                '[--tw-prose-body:var(--foreground-muted)]',
-                '[--tw-prose-headings:var(--foreground-default)]',
-                '[--tw-prose-links:var(--foreground-muted)]',
-                '[--tw-prose-bold:var(--foreground-muted)]',
-                '[--tw-prose-quotes:var(--foreground-muted)]'
-              )}
-            >
+      <div
+        className={cn(
+          'prose prose-sm max-w-none text-foreground-light prose-headings:text-foreground [&>div>p:first-child]:mt-0 [&>div>:last-child]:mb-0',
+          'prose-ol:my-2 prose-ul:my-2 prose-li:my-0.5 prose-li:leading-6',
+          '[&_li>p]:my-1 [&_li>p]:leading-6 [&_li>p:first-child]:mt-0 [&_li>p:last-child]:mb-0',
+          '[&_ol]:pl-0 [&_ol>li]:pl-8 [&_ol>li]:before:left-0 [&_ol>li]:before:top-0.5 [&_ol>li]:before:h-5 [&_ol>li]:before:w-5 [&_ol>li]:before:content-[counter(item)]',
+          '[&_textarea[data-markdown-block-input]]:w-full [&_textarea[data-markdown-block-input]]:resize-none [&_textarea[data-markdown-block-input]]:bg-transparent [&_textarea[data-markdown-block-input]]:font-mono [&_textarea[data-markdown-block-input]]:text-sm'
+        )}
+      >
+        <Suspense
+          fallback={
+            <div aria-busy="true" className="px-3 py-2 whitespace-pre-wrap">
               {cell.text}
-            </Markdown>
-          ) : (
-            <p className="text-foreground-lighter text-sm italic">This cell has no content</p>
-          )}
-        </div>
-      )}
+            </div>
+          }
+        >
+          <MarkdownEditor
+            ref={ref}
+            markdown={cell.text}
+            onChange={handleChange}
+            onDirty={handleDirty}
+            aria-label="Markdown cell"
+            components={components}
+            className="min-h-12 px-3 py-2 border border-transparent rounded-md transition-colors hover:bg-alternative/50 focus:border-default focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </Suspense>
+      </div>
     </SortableSection>
   )
 }

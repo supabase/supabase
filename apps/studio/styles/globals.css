@@ -6,6 +6,7 @@
 @source '../components/**/*.{js,ts,jsx,tsx}';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../packages/markdown-editor/src/**/*.{tsx,ts,js}';
 
 @theme inline {
   --font-heading: var(--font-heading, var(--font-sans));
