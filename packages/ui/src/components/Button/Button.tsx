@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { Slot } from 'radix-ui'
 import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
+import { SIZE_VARIANTS } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
 
@@ -129,13 +129,10 @@ const buttonVariants = cva(
       rounded: {
         true: 'rounded-full',
       },
-      defaultVariants: {
-        //   variant: 'default',
-        //   size: 'default',
-        size: {
-          SIZE_VARIANTS_DEFAULT,
-        },
-      },
+    },
+    // Match <Button size="tiny"> so raw buttonVariants({ variant }) keeps radius.
+    defaultVariants: {
+      size: 'tiny',
     },
   }
 )
