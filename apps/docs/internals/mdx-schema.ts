@@ -67,15 +67,17 @@ export async function inlinePartials(parent: Parent): Promise<void> {
       const partialPath = String(props.path ?? '')
       const variables = parsePartialVariables(props.variables)
       const resolvedPath = resolvePartialPath(partialPath)
+      let subtree: Root
       try {
         const raw = await fs.readFile(resolvedPath, 'utf8')
-        const content = substitutePartialVars(matter(raw).content, variables)
-        const subtree = parseMdx(content)
-        await inlinePartials(subtree)
-        next.push(...(subtree.children as Content[]))
+        subtree = parseMdx(substitutePartialVars(matter(raw).content, variables))
       } catch {
         // missing or broken partials are silently dropped
+        continue
       }
+      // outside the try so an invalid nested $Partial fails the page instead of dropping this one
+      await inlinePartials(subtree)
+      next.push(...(subtree.children as Content[]))
       continue
     }
     if ('children' in child) await inlinePartials(child as Parent)

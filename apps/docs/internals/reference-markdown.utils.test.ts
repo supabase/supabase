@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import fs from 'node:fs/promises'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   proseToMarkdown,
@@ -60,6 +61,16 @@ describe('proseToMarkdown', () => {
   it('inlines $Partial includes', async () => {
     const out = await proseToMarkdown('<$Partial path="api_rate_limits.mdx" />')
     expect(out).toContain('## Rate limits')
+  })
+
+  it('fails on an invalid nested $Partial instead of dropping its parent', async () => {
+    const readFile = vi
+      .spyOn(fs, 'readFile')
+      .mockResolvedValueOnce('Parent prose.\n\n<$Partial path="nested.txt" />')
+    await expect(proseToMarkdown('<$Partial path="parent.mdx" />')).rejects.toThrow(
+      'Invalid $Partial path'
+    )
+    readFile.mockRestore()
   })
 
   it('renders the CLI global flags component from the flags it is given', async () => {
