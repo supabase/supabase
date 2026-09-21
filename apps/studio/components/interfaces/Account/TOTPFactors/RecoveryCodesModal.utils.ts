@@ -6,5 +6,6 @@ const CodeRegex = new RegExp('([a-zA-Z0-9]{4})([a-zA-Z0-9]{4})([a-zA-Z0-9]{4})([
  * dash and transforming them to uppercase
  */
 export const formatRecoveryCode = (code: string) => {
+  if (code.length !== 16) return code
   return code.toUpperCase().replace(CodeRegex, '$1-$2-$3-$4')
 }
