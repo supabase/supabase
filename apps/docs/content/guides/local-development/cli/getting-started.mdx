@@ -4,7 +4,11 @@ description: 'The Supabase CLI provides tools to develop your project locally, d
 subtitle: 'Develop locally, deploy to the Supabase Platform, and set up CI/CD workflows'
 ---
 
-The Supabase CLI lets you run the entire Supabase stack locally, on your machine or in a CI environment. With two commands, you can set up and start a new local project:
+The Supabase CLI lets you run the entire Supabase stack locally, on your machine or in a CI environment.
+
+## Quickstart
+
+With two commands, you can set up and start a new local project:
 
 1. `supabase init` to create a new local project
 2. `supabase start` to launch the Supabase services
@@ -22,7 +26,11 @@ The rest of this page writes examples as `supabase <command>`; translate them to
 
 </Admonition>
 
-## Installing the Supabase CLI
+## Set up a local project
+
+Install the CLI, bring the Supabase stack up on your machine, and stop it when you're done.
+
+### Installing the Supabase CLI
 
 <Tabs
   scrollable
@@ -96,7 +104,7 @@ and run one of the following:
 </TabPanel>
 </Tabs>
 
-## Running a local Supabase project
+### Running a local Supabase project
 
 The most common thing you'll do with the CLI is run the full Supabase stack (Postgres, Auth, Storage, and the rest) on your own machine. That stack runs in Docker containers, so you need a container runtime installed first. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
 
@@ -129,7 +137,7 @@ If you installed the CLI as a project dependency (npm, pnpm, yarn, or bun), run 
 
 This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase stack, and a few additional images useful for local development (like a local SMTP server and a database diff tool).
 
-## Access your project's services
+### Access your project's services
 
 After all the Supabase services are running, the CLI prints your local credentials. The output looks like this, with the URLs and keys you use in your local project:
 
@@ -241,7 +249,7 @@ All logs are stored in the local database under the `_analytics` schema.
 </TabPanel>
 </Tabs>
 
-## Stopping local services
+### Stopping local services
 
 When you finish working, stop the stack. This doesn't reset your local database:
 
@@ -249,7 +257,11 @@ When you finish working, stop the stack. This doesn't reset your local database:
 supabase stop
 ```
 
-## Beta channel
+## Manage your CLI installation
+
+These sections cover the CLI itself rather than your local project.
+
+### Beta channel
 
 Pre-release CLI builds ship from the development branch (`X.Y.Z-beta.N` versions). Use the npm `beta` dist-tag, or install `supabase-beta` via Homebrew / Scoop (separate packages from stable).
 
@@ -307,7 +319,7 @@ Beta builds are attached to [GitHub pre-releases](https://github.com/supabase/cl
 </TabPanel>
 </Tabs>
 
-## Updating the Supabase CLI
+### Updating the Supabase CLI
 
 When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same package manager you installed it with.
 
