@@ -241,6 +241,47 @@ test.describe('Storage', () => {
     await deleteBucketViaApi(bucketName)
   })
 
+  test('searches the whole bucket and jumps to a match', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_search_files`
+    const folderName = 'search_folder'
+    const fileName = 'test-file.txt'
+
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Creating a folder drills into it, so the upload lands inside the folder
+    await createFolder(page, folderName)
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Back at the bucket root the file is a level down, so a folder-scoped search
+    // would not find it
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // The standard find combo focuses the search field
+    await page.keyboard.press('ControlOrMeta+f')
+    const searchInput = page.getByPlaceholder(`Search ${bucketName}...`)
+    await expect(searchInput, 'Search field should be focused by the find shortcut').toBeFocused()
+
+    await searchInput.fill(fileName)
+    const result = page.getByRole('button', { name: `${fileName} in ${folderName}` })
+    await expect(
+      result,
+      'File in a nested folder should be found from the bucket root'
+    ).toBeVisible({ timeout: 30_000 })
+
+    // Selecting the match opens the file where it actually lives
+    await result.click()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+    await expect(page).toHaveURL((url) => url.searchParams.get('preview') === fileName)
+    await expect(searchInput, 'Search should be cleared after jumping to a match').toHaveValue('')
+
+    await deleteBucketViaApi(bucketName)
+  })
+
   test('can rename a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_rename_file`
     const fileName = 'test-file.txt'

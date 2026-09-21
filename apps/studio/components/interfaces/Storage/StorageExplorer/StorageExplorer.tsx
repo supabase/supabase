@@ -21,7 +21,8 @@ export const StorageExplorer = () => {
 
   // Deliberately not in the URL, so a shared link points at a folder, not someone's filter.
   const [itemSearchString, setItemSearchString] = useState('')
-  const debouncedSearchString = useDebounce(itemSearchString, 500)
+  // Searching crawls the whole bucket, so only run it once the typing settles
+  const debouncedSearchString = useDebounce(itemSearchString.trim(), 500)
 
   return (
     <div className="bg-studio flex h-full w-full flex-col">
@@ -31,12 +32,10 @@ export const StorageExplorer = () => {
       <span aria-live="polite" aria-atomic="true" className="sr-only">
         {isBucketReady ? 'Bucket contents loaded' : 'Loading bucket contents'}
       </span>
-      <StorageExplorerNavigationProvider
-        isBucketReady={isBucketReady}
-        searchString={debouncedSearchString}
-      >
+      <StorageExplorerNavigationProvider isBucketReady={isBucketReady}>
         <StorageExplorerContent
           itemSearchString={itemSearchString}
+          debouncedSearchString={debouncedSearchString}
           setItemSearchString={setItemSearchString}
           isLoading={!isBucketReady}
         />

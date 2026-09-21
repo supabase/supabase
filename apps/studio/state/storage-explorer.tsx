@@ -21,7 +21,6 @@ import {
 } from '@/components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
-  EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
@@ -42,6 +41,7 @@ import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation
 import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
 import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
+import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from '@/data/storage/bucket-util'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { moveStorageObject } from '@/data/storage/object-move-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -162,9 +162,6 @@ export function createStorageExplorerState({
       })
     },
 
-    isSearching: false,
-    setIsSearching: (value: boolean) => (state.isSearching = value),
-
     isRefreshing: false,
 
     selectedFilePreview: undefined as StorageItemWithColumn | undefined,
@@ -268,13 +265,11 @@ export function createStorageExplorerState({
       folderId,
       folderName,
       index,
-      searchString,
     }: {
       bucketId: string
       folderId: string | null
       folderName: string
       index: number
-      searchString?: string
     }) => {
       state.abortApiCalls()
       state.updateRowStatus({
@@ -300,7 +295,6 @@ export function createStorageExplorerState({
       const options = {
         limit: LIMIT,
         offset: OFFSET,
-        search: searchString,
         sortBy: getSortOptions(),
       }
 
@@ -352,18 +346,15 @@ export function createStorageExplorerState({
     fetchMoreFolderContents: async ({
       index,
       column,
-      searchString = '',
     }: {
       index: number
       column: StorageColumn
-      searchString?: string
     }) => {
       state.setColumnIsLoadingMore(index)
 
       const options = {
         limit: LIMIT,
         offset: column.items.length,
-        search: searchString,
         sortBy: getSortOptions(),
       }
 
@@ -418,11 +409,9 @@ export function createStorageExplorerState({
      */
     fetchFoldersByPath: async ({
       paths,
-      searchString = '',
       showLoading = false,
     }: {
       paths: string[]
-      searchString?: string
       showLoading?: boolean
     }): Promise<{ missingPaths: string[] }> => {
       if (state.selectedBucket.id === undefined) return { missingPaths: [] }
@@ -447,7 +436,6 @@ export function createStorageExplorerState({
           const options = {
             limit: LIMIT,
             offset: OFFSET,
-            search: searchString,
             sortBy: getSortOptions(),
           }
 
@@ -496,9 +484,9 @@ export function createStorageExplorerState({
         // Folder doesnt exist, FE just scaffolds a "fake" folder
         if (!folderInfo) {
           // Only report a missing segment when the parent listing proves it: a failed
-          // request, a search filter, or a LIMIT cap can all drop a folder that exists.
+          // request or a LIMIT cap can both drop a folder that exists.
           const isParentListingExhaustive =
-            foldersItems[idx].isComplete && !searchString && !parentColumn.hasMoreItems
+            foldersItems[idx].isComplete && !parentColumn.hasMoreItems
           if (isParentListingExhaustive) missingPaths.push(path)
           return {
             id: null,

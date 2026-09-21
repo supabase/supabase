@@ -9,8 +9,6 @@ interface UseFileExplorerHeaderShortcutsParams {
   searchInputRef: RefObject<HTMLInputElement | null>
   canUpdateStorage: boolean
   hasBreadcrumbs: boolean
-  isSearching: boolean
-  setIsSearching: (value: boolean) => void
   addNewFolderPlaceholder: (columnIndex: number) => void
   setView: (view: STORAGE_VIEWS) => void
 }
@@ -20,22 +18,18 @@ export function useFileExplorerHeaderShortcuts({
   searchInputRef,
   canUpdateStorage,
   hasBreadcrumbs,
-  isSearching,
-  setIsSearching,
   addNewFolderPlaceholder,
   setView,
 }: UseFileExplorerHeaderShortcutsParams) {
-  useShortcut(
-    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
-    () => {
-      if (!isSearching) setIsSearching(true)
-      requestAnimationFrame(() => {
-        searchInputRef.current?.focus()
-        searchInputRef.current?.select()
-      })
-    },
-    { label: 'Search files' }
-  )
+  const focusSearch = () => {
+    searchInputRef.current?.focus()
+    searchInputRef.current?.select()
+  }
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, focusSearch, { label: 'Search files' })
+  // The standard find combo lands here too, since searching the bucket is what people
+  // reach for it to do. `Mod+F` fires inside inputs, so it also reselects the term.
+  useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_FOCUS_SEARCH, focusSearch)
 
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_UPLOAD, () => uploadButtonRef.current?.click(), {
     enabled: canUpdateStorage && hasBreadcrumbs,

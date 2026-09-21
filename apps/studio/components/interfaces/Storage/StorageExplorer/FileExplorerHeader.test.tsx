@@ -64,8 +64,6 @@ function createSnapshot() {
     clearOpenedFolders: vi.fn(),
     setSelectedFilePreview: vi.fn(),
     selectedBucket: { id: 'bucket-id', name: 'my-bucket' },
-    isSearching: false,
-    setIsSearching: vi.fn(),
   }
 }
 
@@ -131,7 +129,7 @@ describe('FileExplorerHeader', () => {
     expect(screen.getByRole('button', { name: 'Go up one level' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'my-bucket' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'images' })).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search in 2024...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search my-bucket...')).toBeInTheDocument()
   })
 
   it('does not render the go-up button in column view when not at bucket root', () => {
@@ -161,7 +159,70 @@ describe('FileExplorerHeader', () => {
     )
 
     expect(screen.queryByRole('button', { name: 'Go up one level' })).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search in root directory...')).toBeInTheDocument()
+  })
+
+  it('searches the whole bucket rather than the folder being viewed', () => {
+    // The columns are my-bucket/images/2024, so a folder-scoped field would name 2024
+    render(
+      <FileExplorerHeader
+        itemSearchString=""
+        setItemSearchString={vi.fn()}
+        onFilesUpload={vi.fn()}
+      />
+    )
+
+    expect(screen.getByPlaceholderText('Search my-bucket...')).toBeInTheDocument()
+  })
+
+  it('clears the search from the input action', async () => {
+    const setItemSearchString = vi.fn()
+    render(
+      <FileExplorerHeader
+        itemSearchString="cat"
+        setItemSearchString={setItemSearchString}
+        onFilesUpload={vi.fn()}
+      />
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Clear search' }))
+
+    expect(setItemSearchString).toHaveBeenCalledWith('')
+  })
+
+  it('clears the search on Escape while the field has a value', async () => {
+    const setItemSearchString = vi.fn()
+    render(
+      <FileExplorerHeader
+        itemSearchString="cat"
+        setItemSearchString={setItemSearchString}
+        onFilesUpload={vi.fn()}
+      />
+    )
+
+    const searchInput = screen.getByPlaceholderText('Search my-bucket...')
+    searchInput.focus()
+    await userEvent.keyboard('{Escape}')
+
+    expect(setItemSearchString).toHaveBeenCalledWith('')
+    expect(searchInput).toHaveFocus()
+  })
+
+  it('focuses the search field on the find shortcut', async () => {
+    render(
+      <FileExplorerHeader
+        itemSearchString=""
+        setItemSearchString={vi.fn()}
+        onFilesUpload={vi.fn()}
+      />
+    )
+
+    const searchInput = screen.getByPlaceholderText('Search my-bucket...')
+    expect(searchInput).not.toHaveFocus()
+
+    // `Mod+F` — jsdom reports no platform, so the shortcut resolves Mod to Ctrl here
+    await userEvent.keyboard('{Control>}f{/Control}')
+
+    await waitFor(() => expect(searchInput).toHaveFocus())
   })
 
   it('goes up one folder level when the go-up button is clicked', async () => {

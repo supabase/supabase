@@ -1,6 +1,7 @@
 import type { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import type { StorageFolder } from '@/data/storage/bucket-folders-query'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
+import { scoreStorageMatch } from '@/data/storage/bucket-search-query'
 
 /** Maximum number of folders rendered in the search results list */
 export const MAX_FOLDER_SEARCH_RESULTS = 100
@@ -50,12 +51,8 @@ export function filterFoldersBySearch(
 
   const scored = folders
     .map((folder) => {
-      const name = folder.name.toLowerCase()
-      if (name === query) return { folder, score: 0 }
-      if (name.startsWith(query)) return { folder, score: 1 }
-      if (name.includes(query)) return { folder, score: 2 }
-      if (folder.path.toLowerCase().includes(query)) return { folder, score: 3 }
-      return undefined
+      const score = scoreStorageMatch(folder, query)
+      return score === undefined ? undefined : { folder, score }
     })
     .filter((match) => match !== undefined)
 
@@ -75,11 +72,6 @@ export function toFolders(objects: StorageObject[], parentPath: string): Storage
       name: object.name,
       path: parentPath.length > 0 ? `${parentPath}/${object.name}` : object.name,
     }))
-}
-
-export function getParentPathLabel(folderPath: string, bucketName: string): string {
-  const parentSegments = folderPath.split('/').slice(0, -1)
-  return parentSegments.length > 0 ? parentSegments.join('/') : bucketName
 }
 
 export const BREADCRUMB_ITEMS_TO_DISPLAY = 3

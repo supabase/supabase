@@ -9,7 +9,6 @@ import {
   getDestinationName,
   getMoveBreadcrumbs,
   getMoveItemsTitle,
-  getParentPathLabel,
   getSourcePaths,
   isSameAsSourcePath,
   MAX_FOLDER_SEARCH_RESULTS,
@@ -167,16 +166,6 @@ describe('toFolders', () => {
 
   it('returns nothing for a folder of only files', () => {
     expect(toFolders([{ id: 'id-a', name: 'a.png' }] as typeof objects, '')).toEqual([])
-  })
-})
-
-describe('getParentPathLabel', () => {
-  it('falls back to the bucket name for a top level folder', () => {
-    expect(getParentPathLabel('photos', 'avatars')).toBe('avatars')
-  })
-
-  it('joins the parent segments for a nested folder', () => {
-    expect(getParentPathLabel('archive/2024/photos', 'avatars')).toBe('archive/2024')
   })
 })
 

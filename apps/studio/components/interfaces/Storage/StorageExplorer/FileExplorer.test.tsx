@@ -57,7 +57,6 @@ function applyLayout(
 /** The callbacks have runtime defaults but are required by the prop type. */
 const noopProps = {
   selectedItems: [],
-  itemSearchString: '',
   onFilesUpload: vi.fn(),
   onSelectAllItemsInColumn: vi.fn(),
   onSelectColumnEmptySpace: vi.fn(),

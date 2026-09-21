@@ -75,7 +75,6 @@ export interface FileExplorerColumnProps {
   column: StorageColumn
   fullWidth?: boolean
   selectedItems?: StorageItemWithColumn[]
-  itemSearchString?: string
   onFilesUpload?: (event: any, index: number) => void
   onSelectAllItemsInColumn?: (index: number) => void
   onSelectColumnEmptySpace?: (index: number) => void
@@ -87,7 +86,6 @@ export const FileExplorerColumn = ({
   column,
   fullWidth = false,
   selectedItems = [],
-  itemSearchString = '',
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
@@ -297,33 +295,19 @@ export const FileExplorerColumn = ({
           )}
 
           {/* Drag drop upload CTA for when column is empty */}
-          {!(snap.isSearching && itemSearchString.length > 0) &&
-            column.items.length === 0 &&
-            column.status !== STORAGE_ROW_STATUS.LOADING && (
-              <div className="h-full w-full flex flex-col items-center justify-center">
-                <img
-                  alt="storage-placeholder"
-                  src={`${BASE_PATH}/img/storage-placeholder.svg`}
-                  className="opacity-75 pointer-events-none"
-                />
-                <p className="text-sm my-3 opacity-75">Drop your files here</p>
-                <p className="w-40 text-center text-xs text-foreground-light">
-                  Or upload them via the "Upload file" button above
-                </p>
-              </div>
-            )}
-
-          {snap.isSearching &&
-            itemSearchString.length > 0 &&
-            isEmpty &&
-            column.status !== STORAGE_ROW_STATUS.LOADING && (
-              <div className="h-full w-full flex flex-col items-center justify-center">
-                <p className="text-sm my-3 text-foreground">No results found in this folder</p>
-                <p className="w-40 text-center text-sm text-foreground-light">
-                  Your search for "{itemSearchString}" did not return any results
-                </p>
-              </div>
-            )}
+          {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
+            <div className="h-full w-full flex flex-col items-center justify-center">
+              <img
+                alt="storage-placeholder"
+                src={`${BASE_PATH}/img/storage-placeholder.svg`}
+                className="opacity-75 pointer-events-none"
+              />
+              <p className="text-sm my-3 opacity-75">Drop your files here</p>
+              <p className="w-40 text-center text-xs text-foreground-light">
+                Or upload them via the "Upload file" button above
+              </p>
+            </div>
+          )}
 
           {/* Drag drop upload CTA for when column has files */}
           <DragOverOverlay

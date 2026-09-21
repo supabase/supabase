@@ -7,6 +7,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface UseStorageExplorerShortcutsParams {
+  isSearching: boolean
   onClearSearch: () => void
 }
 
@@ -17,11 +18,13 @@ interface UseStorageExplorerShortcutsParams {
  * Handles refresh, multi-select actions (download, move, delete), and the
  * Escape ladder (selection → preview → search).
  */
-export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplorerShortcutsParams) {
+export function useStorageExplorerShortcuts({
+  isSearching,
+  onClearSearch,
+}: UseStorageExplorerShortcutsParams) {
   const {
     selectedItems,
     selectedFilePreview,
-    isSearching,
     clearSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemsToMove,
