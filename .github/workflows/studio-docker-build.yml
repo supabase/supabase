@@ -47,7 +47,8 @@ jobs:
       - name: Check sharp is not in the image
         if: steps.filter.outputs.studio == 'true'
         run: |
-          traced=$(docker run --rm --entrypoint find supabase-studio:local /app \( -path '*node_modules/sharp*' -o -path '*node_modules/@img*' \) -type f | head -n 40)
+          set -o pipefail
+          traced=$(docker run --rm --entrypoint find supabase-studio:local /app \( -path '*node_modules/sharp*' -o -path '*node_modules/@img*' \) -type f | sed -n '1,40p')
           if [ -n "$traced" ]; then
             echo "::error::sharp was traced into the standalone output"
             echo "$traced"
