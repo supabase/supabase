@@ -1,4 +1,5 @@
 import type { ServerOption, WrapperMeta } from './Wrappers.types'
+import { BRAND_ICONS, resolveLightIconSrc } from '@/lib/brand-icons'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 export const WRAPPER_HANDLERS = {
@@ -1472,7 +1473,8 @@ export const WRAPPERS: WrapperMeta[] = [
     name: 'clickhouse_wrapper',
     handlerName: WRAPPER_HANDLERS.CLICK_HOUSE,
     validatorName: 'click_house_fdw_validator',
-    icon: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
+    // Light variant: IntegrationLogo / wrapper cards force a white tile.
+    icon: resolveLightIconSrc(BRAND_ICONS.clickhouse),
     description: 'Column-oriented analytics database',
     extensionName: 'ClickHouseFdw',
     label: 'ClickHouse',
@@ -1518,7 +1520,7 @@ export const WRAPPERS: WrapperMeta[] = [
     name: 'bigquery_wrapper',
     handlerName: WRAPPER_HANDLERS.BIG_QUERY,
     validatorName: 'big_query_fdw_validator',
-    icon: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
+    icon: resolveLightIconSrc(BRAND_ICONS.bigquery),
     description: 'Serverless data warehouse and analytics',
     extensionName: 'BigQueryFdw',
     label: 'BigQuery',
@@ -2298,7 +2300,7 @@ export const WRAPPERS: WrapperMeta[] = [
     name: 'snowflake_wrapper',
     handlerName: WRAPPER_HANDLERS.SNOWFLAKE,
     validatorName: 'wasm_fdw_validator',
-    icon: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
+    icon: resolveLightIconSrc(BRAND_ICONS.snowflake),
     description: 'Cloud data warehouse platform',
     extensionName: 'snowflakeFdw',
     label: 'Snowflake',
