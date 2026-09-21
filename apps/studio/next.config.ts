@@ -146,12 +146,8 @@ const nextConfig = {
     ]
   },
   images: {
-    // Hosted Studio optimizes images on Vercel. Self-hosted Studio serves
-    // plain <img> tags instead, matching what the TanStack build already
-    // does (`compat/next/image.tsx`): running the optimizer in-process
-    // would need sharp and libvips, which Next otherwise traces into the
-    // standalone output as native binaries the self-hosted image never
-    // needs.
+    // Self-hosted: serve plain <img> (as the TanStack shim does) so Next never
+    // loads sharp. Hosted Studio optimizes images on Vercel.
     unoptimized: !isPlatform,
     dangerouslyAllowSVG: false,
     remotePatterns: [
@@ -191,15 +187,11 @@ const nextConfig = {
         : []),
     ],
   },
-  // Next ships sharp as an optional dependency and traces it into the
-  // standalone output for self-hosted builds (it only skips it on Vercel).
-  // With the image optimizer disabled above it is never loaded, so keep the
-  // native binaries out of the self-hosted image.
-  //
-  // Turbopack resolves these globs relative to `apps/studio`, but pnpm hoists
-  // the store to the monorepo root (`node_modules/.pnpm/...`). Each leading
-  // `../` moves the glob root up one directory, so `../../` anchors the
-  // pattern at the repo root where the packages actually live.
+  // Keep Next's optional sharp dependency out of the self-hosted standalone
+  // output. It is unused with `unoptimized` above, and its native binaries
+  // break the slim-services Studio image (sharp's .node segfaults without
+  // libvips). Globs resolve from `apps/studio`; `../../` anchors them at the
+  // repo root where pnpm hoists the store.
   ...(isPlatform
     ? {}
     : {
