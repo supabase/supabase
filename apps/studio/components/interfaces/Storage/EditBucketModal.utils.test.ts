@@ -5,6 +5,7 @@ import {
   getVersioningFormDefaults,
   isEnablingVersioning,
   isSuspendingVersioning,
+  toVersioningStatusUpdate,
   type BucketVersioningSettings,
 } from './EditBucketModal.utils'
 import { PROJECT_VERSIONING_DEFAULTS } from './StorageVersioning.constants'
@@ -131,5 +132,19 @@ describe('isEnablingVersioning', () => {
     for (const state of ['disabled', 'suspended', 'enabled'] as const) {
       expect(isEnablingVersioning(state, false), state).toBe(false)
     }
+  })
+})
+
+describe('toVersioningStatusUpdate', () => {
+  it('sends ENABLED when versioning is on', () => {
+    expect(toVersioningStatusUpdate('enabled')).toBe('ENABLED')
+  })
+
+  it('sends SUSPENDED when versioning is being turned off', () => {
+    expect(toVersioningStatusUpdate('suspended')).toBe('SUSPENDED')
+  })
+
+  it('sends nothing for a bucket that was never versioned', () => {
+    expect(toVersioningStatusUpdate('disabled')).toBeUndefined()
   })
 })
