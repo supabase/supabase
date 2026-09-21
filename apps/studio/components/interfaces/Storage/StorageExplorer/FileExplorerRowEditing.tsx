@@ -4,12 +4,14 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { StorageRowIcon } from '../StorageRowIcon'
+import { getExplorerRowId } from './FileExplorerKeyboardNavigation.utils'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerRowEditingProps {
   item: StorageItem
   view: STORAGE_VIEWS
   columnIndex: number
+  itemIndex: number
   style?: CSSProperties
 }
 
@@ -17,6 +19,7 @@ export const FileExplorerRowEditing = ({
   item,
   view,
   columnIndex,
+  itemIndex,
   style,
 }: FileExplorerRowEditingProps) => {
   const { renameFile, renameFolder, addNewFolder, updateRowStatus } =
@@ -89,6 +92,9 @@ export const FileExplorerRowEditing = ({
 
   return (
     <div
+      id={getExplorerRowId(columnIndex, itemIndex)}
+      role="option"
+      aria-selected={false}
       style={style}
       className="storage-row flex items-center justify-between rounded-sm bg-gray-500"
     >

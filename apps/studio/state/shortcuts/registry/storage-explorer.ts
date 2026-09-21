@@ -7,6 +7,8 @@ import { RegistryDefinations } from '../types'
  * shortcut and reused here via a contextual `label` override.
  */
 export const STORAGE_EXPLORER_SHORTCUT_IDS = {
+  STORAGE_EXPLORER_START_NAV_DOWN: 'storage-explorer.start-nav-down',
+  STORAGE_EXPLORER_START_NAV_UP: 'storage-explorer.start-nav-up',
   STORAGE_EXPLORER_REFRESH: 'storage-explorer.refresh',
   STORAGE_EXPLORER_UPLOAD: 'storage-explorer.upload',
   STORAGE_EXPLORER_NEW_FOLDER: 'storage-explorer.new-folder',
@@ -24,6 +26,22 @@ export type StorageExplorerShortcutId =
   (typeof STORAGE_EXPLORER_SHORTCUT_IDS)[keyof typeof STORAGE_EXPLORER_SHORTCUT_IDS]
 
 export const storageExplorerRegistry: RegistryDefinations<StorageExplorerShortcutId> = {
+  // Arrow keys inside the list are handled by the list itself; these two only cover
+  // getting into it, so the whole page's arrow keys aren't captured.
+  [STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_START_NAV_DOWN]: {
+    id: STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_START_NAV_DOWN,
+    label: 'Move focus into file list',
+    sequence: ['ArrowDown'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_START_NAV_UP]: {
+    id: STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_START_NAV_UP,
+    label: 'Move focus into file list',
+    sequence: ['ArrowUp'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
   [STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH]: {
     id: STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
     label: 'Refresh',
