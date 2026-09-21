@@ -3,6 +3,7 @@ import { type RegistryItem } from 'shadcn/schema'
 import { clients } from './clients'
 import currentUserAvatar from './default/blocks/current-user-avatar/registry-item.json' with { type: 'json' }
 import dropzone from './default/blocks/dropzone/registry-item.json' with { type: 'json' }
+import headlessAppTanstack from './default/blocks/headless-app-tanstack/registry-item.json' with { type: 'json' }
 import infiniteQueryHook from './default/blocks/infinite-query-hook/registry-item.json' with { type: 'json' }
 import mcpServer from './default/blocks/mcp-server/registry-item.json' with { type: 'json' }
 import oauthConsentNextjs from './default/blocks/oauth-consent-nextjs/registry-item.json' with { type: 'json' }
@@ -38,15 +39,22 @@ const combine = (component: RegistryItem) => {
   })
 }
 
-const withClientAndDocs = (component: RegistryItem, client: RegistryItem) => ({
-  ...registryItemAppend(component, [client]),
-  docs: [component.docs, client.docs].filter(Boolean).join('\n\n'),
-})
-
 const nextjsClient = clients.find((client) => client.name === 'supabase-client-nextjs')
 const reactClient = clients.find((client) => client.name === 'supabase-client-react')
 const tanstackClient = clients.find((client) => client.name === 'supabase-client-tanstack')
 const reactRouterClient = clients.find((client) => client.name === 'supabase-client-react-router')
+
+// Reuse the MCP runtime at build time so installing the headless app writes
+// exactly one tool entrypoint, already wired to its example tools.
+const headlessApp = {
+  ...headlessAppTanstack,
+  files: [
+    ...headlessAppTanstack.files,
+    ...mcpServer.files.filter(
+      (file) => !headlessAppTanstack.files.some((ownFile) => ownFile.target === file.target)
+    ),
+  ],
+} as RegistryItem
 
 export const blocks = [
   safeNextPath as RegistryItem,
@@ -75,10 +83,13 @@ export const blocks = [
   // so it can be installed directly into a Supabase project.
   mcpServer as RegistryItem,
 
-  withClientAndDocs(oauthConsentNextjs as RegistryItem, nextjsClient!),
-  withClientAndDocs(oauthConsentReact as RegistryItem, reactClient!),
-  withClientAndDocs(oauthConsentReactRouter as RegistryItem, reactRouterClient!),
-  withClientAndDocs(oauthConsentTanstack as RegistryItem, tanstackClient!),
+  // Composes the auth, OAuth consent and MCP server blocks into one app.
+  registryItemAppend(headlessApp, [tanstackClient!]),
+
+  registryItemAppend(oauthConsentNextjs as RegistryItem, [nextjsClient!]),
+  registryItemAppend(oauthConsentReact as RegistryItem, [reactClient!]),
+  registryItemAppend(oauthConsentReactRouter as RegistryItem, [reactRouterClient!]),
+  registryItemAppend(oauthConsentTanstack as RegistryItem, [tanstackClient!]),
 
   // tanstack-db is served dynamically via API route, but we register it here for the static build
   registryItemAppend(tanstackDbNextjs as RegistryItem, [nextjsClient!]),

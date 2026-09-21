@@ -8,6 +8,7 @@ import { ExplorerNavResourceWrapper, rowClassName } from './ExplorerLayout.const
 import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
 import type { ChatSession } from '@/state/ai-assistant-state'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 const getVisibleChats = (chats: ChatSession[], search: string): ChatSession[] => {
   const normalizedSearch = search.trim().toLowerCase()
@@ -24,12 +25,13 @@ export const ExplorerNavChats = () => {
   const { id } = useParams()
   const { openChat } = useCreateChat()
   const chatList = useAiAssistantChatList()
+  const tabs = useTabsStateSnapshot()
 
   const chats = getVisibleChats(chatList, search)
 
   return (
     <ExplorerNavResourceWrapper type="chat" search={search} setSearch={setSearch}>
-      <div className="flex flex-1 flex-col gap-px overflow-y-auto px-3 pb-3">
+      <div className="flex flex-1 flex-col gap-px overflow-y-auto p-3">
         {chats.length === 0 ? (
           <p className="px-2 py-2 text-xs text-foreground-lighter">
             {search ? 'No chats found' : 'No chats created yet'}
@@ -45,6 +47,7 @@ export const ExplorerNavChats = () => {
                 tabIndex={0}
                 className={rowClassName(isActive)}
                 onClick={() => openChat(chat.id)}
+                onDoubleClick={() => tabs.makeTabPermanent(createTabId('chat', { id: chat.id }))}
               >
                 <MessageSquare
                   size={14}

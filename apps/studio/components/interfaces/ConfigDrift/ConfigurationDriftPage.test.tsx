@@ -11,9 +11,10 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse_Output']
 type OrganizationResponse = platformComponents['schemas']['OrganizationResponse_Output']
-type ListGitHubConnectionsResponse = platformComponents['schemas']['ListGitHubConnectionsResponse']
+type ListGitHubConnectionsResponse =
+  platformComponents['schemas']['ListGitHubConnectionsResponse_Output']
 type GetGitHubConnectionConfigResponse =
-  platformComponents['schemas']['GetGitHubConnectionConfigResponse']
+  platformComponents['schemas']['GetGitHubConnectionConfigResponse_Output']
 type BranchResponse = apiV1Components['schemas']['BranchResponse_Output']
 type V2ProjectConfigResponse = apiV2Components['schemas']['V2ProjectConfigResponse_Output']
 

@@ -29,7 +29,7 @@ export const instanceSizeSpecs: Record<
   micro: {
     label: 'Micro',
     ram: '1 GB',
-    cpu: '2-core',
+    cpu: 'Shared compute',
     priceHourly: 0.01344,
     priceMonthly: 10,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -37,7 +37,7 @@ export const instanceSizeSpecs: Record<
   small: {
     label: 'Small',
     ram: '2 GB',
-    cpu: '2-core',
+    cpu: 'Shared compute',
     priceHourly: 0.0206,
     priceMonthly: 15,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -45,7 +45,7 @@ export const instanceSizeSpecs: Record<
   medium: {
     label: 'Medium',
     ram: '4 GB',
-    cpu: '2-core',
+    cpu: 'Shared compute',
     priceHourly: 0.0822,
     priceMonthly: 60,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -53,7 +53,7 @@ export const instanceSizeSpecs: Record<
   large: {
     label: 'Large',
     ram: '8 GB',
-    cpu: '2-core',
+    cpu: '2 vCPUs',
     priceHourly: 0.1517,
     priceMonthly: 110,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -61,7 +61,7 @@ export const instanceSizeSpecs: Record<
   xlarge: {
     label: 'XL',
     ram: '16 GB',
-    cpu: '4-core',
+    cpu: '4 vCPUs',
     priceHourly: 0.2877,
     priceMonthly: 210,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -69,7 +69,7 @@ export const instanceSizeSpecs: Record<
   '2xlarge': {
     label: '2XL',
     ram: '32 GB',
-    cpu: '8-core',
+    cpu: '8 vCPUs',
     priceHourly: 0.562,
     priceMonthly: 410,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -77,7 +77,7 @@ export const instanceSizeSpecs: Record<
   '4xlarge': {
     label: '4XL',
     ram: '64 GB',
-    cpu: '16-core',
+    cpu: '16 vCPUs',
     priceHourly: 1.32,
     priceMonthly: 960,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -85,7 +85,7 @@ export const instanceSizeSpecs: Record<
   '8xlarge': {
     label: '8XL',
     ram: '128 GB',
-    cpu: '32-core',
+    cpu: '32 vCPUs',
     priceHourly: 2.562,
     priceMonthly: 1870,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -93,7 +93,7 @@ export const instanceSizeSpecs: Record<
   '12xlarge': {
     label: '12XL',
     ram: '192 GB',
-    cpu: '48-core',
+    cpu: '48 vCPUs',
     priceHourly: 3.836,
     priceMonthly: 2800,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -101,7 +101,7 @@ export const instanceSizeSpecs: Record<
   '16xlarge': {
     label: '16XL',
     ram: '256 GB',
-    cpu: '64-core',
+    cpu: '64 vCPUs',
     priceHourly: 5.12,
     priceMonthly: 3730,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -109,7 +109,7 @@ export const instanceSizeSpecs: Record<
   '24xlarge': {
     label: '24XL',
     ram: '384 GB',
-    cpu: '96-core',
+    cpu: '96 vCPUs',
     priceHourly: 9.73,
     priceMonthly: 7100,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -117,7 +117,7 @@ export const instanceSizeSpecs: Record<
   '24xlarge_optimized_cpu': {
     label: '24XL - Optimized CPU',
     ram: '192 GB',
-    cpu: '96-core',
+    cpu: '96 vCPUs',
     priceHourly: 8.9,
     priceMonthly: 6500,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -125,7 +125,7 @@ export const instanceSizeSpecs: Record<
   '24xlarge_optimized_memory': {
     label: '24XL - Optimized Memory',
     ram: '768 GB',
-    cpu: '96-core',
+    cpu: '96 vCPUs',
     priceHourly: 13.84,
     priceMonthly: 10100,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -133,7 +133,7 @@ export const instanceSizeSpecs: Record<
   '24xlarge_high_memory': {
     label: '24XL - High Memory',
     ram: '1536 GB',
-    cpu: '96-core',
+    cpu: '96 vCPUs',
     priceHourly: 21.91,
     priceMonthly: 16000,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -141,7 +141,7 @@ export const instanceSizeSpecs: Record<
   '48xlarge': {
     label: '48XL',
     ram: '768 GB',
-    cpu: '192-core',
+    cpu: '192 vCPUs',
     priceHourly: 19.47,
     priceMonthly: 14200,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -149,7 +149,7 @@ export const instanceSizeSpecs: Record<
   '48xlarge_optimized_cpu': {
     label: '48XL - Optimized CPU',
     ram: '384 GB',
-    cpu: '192-core',
+    cpu: '192 vCPUs',
     priceHourly: 17.8,
     priceMonthly: 13000,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -157,7 +157,7 @@ export const instanceSizeSpecs: Record<
   '48xlarge_optimized_memory': {
     label: '48XL - Optimized Memory',
     ram: '1536 GB',
-    cpu: '192-core',
+    cpu: '192 vCPUs',
     priceHourly: 27.68,
     priceMonthly: 20200,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
@@ -165,7 +165,7 @@ export const instanceSizeSpecs: Record<
   '48xlarge_high_memory': {
     label: '48XL - High Memory',
     ram: '3072 GB',
-    cpu: '192-core',
+    cpu: '192 vCPUs',
     priceHourly: 43.84,
     priceMonthly: 32000,
     cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],

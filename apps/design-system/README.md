@@ -4,39 +4,59 @@ Design resources for building consistent user experiences at Supabase.
 
 ## Getting started
 
-First, make a copy of _.env.local.example_ and name it _env.local_. Then install any required packages and start the development server:
+From the repo root:
 
 ```bash
+# Copy local env vars (sets NEXT_PUBLIC_BASE_PATH for asset URLs)
+cp apps/design-system/.env.local.example apps/design-system/.env.local
+# Move into the design-system app
 cd apps/design-system
+# Install dependencies
 pnpm i
+# Build the registry and Velite content, then start the dev servers
 pnpm dev
 ```
 
-The `dev` command generates `__registry__`, then runs the Next.js development server and Contentlayer together. That is the recommended workflow.
+Or from `apps/design-system`:
+
+```bash
+# Copy local env vars (sets NEXT_PUBLIC_BASE_PATH for asset URLs)
+cp .env.local.example .env.local
+# Install dependencies
+pnpm i
+# Build the registry and Velite content, then start the dev servers
+pnpm dev
+```
+
+The `dev` command builds the registry and Velite content, then runs the Next.js dev server and Velite watcher in parallel.
+
+Open [http://localhost:3003/design-system](http://localhost:3003/design-system) in your browser to see the result.
+
+Doc pages load compiled MDX from `.velite/codes/*.json` per document. Metadata lives in the smaller `allDocs.json` index (~367KB instead of ~27MB), so content edits only reload the changed doc's code.
 
 ### Alternative commands
 
-You can also run the development server and content watcher separately. Generate the registry first, because `dev:next` and `dev:content` do not:
+You can also run the development server and content watcher separately. Build the registry and content first, because `dev:next` and `dev:content` do not:
 
 ```bash
-pnpm generate:registry
+pnpm build:registry
+pnpm build:content
 
 # Run only the Next.js development server
 pnpm dev:next
 
-# Run only the content watcher (in a separate terminal shell)
+# Run only the Velite content watcher (in a separate terminal shell)
 pnpm dev:content
 ```
 
-From the repo root, `pnpm dev:design-system` runs the same `dev` script, so it also generates `__registry__`. If you split the watchers from the root, generate first:
+From the repo root, `pnpm dev:design-system` runs the same `dev` script. If you split the watchers from the root, build first:
 
 ```bash
-pnpm --filter=design-system generate:registry
+pnpm --filter=design-system build:registry
+pnpm --filter=design-system build:content
 pnpm --filter=design-system dev:next
 pnpm --filter=design-system dev:content
 ```
-
-Open [http://localhost:3003](http://localhost:3003) in your browser to see the result.
 
 ### Watching for MDX changes
 
@@ -64,5 +84,5 @@ Do not edit `__registry__`. `pnpm dev`, `pnpm typecheck`, and `pnpm build` gener
 
 ```bash
 cd apps/design-system
-pnpm generate:registry
+pnpm build:registry
 ```
