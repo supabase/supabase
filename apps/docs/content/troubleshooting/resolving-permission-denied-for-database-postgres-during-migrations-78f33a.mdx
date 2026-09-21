@@ -10,7 +10,7 @@ message = "permission denied for database postgres"
 
 If you encounter a `permission denied for database postgres` error during migrations, it typically occurs when executing `CREATE SCHEMA` or similar commands after a `SET ROLE` statement.
 
-**Why this happens**
+## Why this happens
 Postgres 15 and later versions remove default `CREATE` privileges from the `PUBLIC` role. This means custom roles do not automatically have permission to create objects in the database, even if the session was initiated by the `postgres` user.
 
 **How to resolve the issue**
