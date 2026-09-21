@@ -69,6 +69,14 @@ reviews:
           for both runtimes until the final cleanup pass (tracked in FE-3106).
         Keep this a reminder to verify, not a hard blocker: if no mirror is required,
         say so briefly rather than forcing a change.
+    - path: 'apps/docs/content/**/*.mdx'
+      instructions: |
+        Flag style, terminology, and structure issues as usual. When a page has two or
+        more of them, add one comment pointing the author at the `/write-the-docs` skill
+        for new content or `/edit-the-docs` for an existing page (canonical files in
+        `.agents/skills/`); both apply apps/docs/CONTRIBUTING.md and
+        apps/docs/WORD_LIST.md. Skip that pointer on a single issue, so it stays a
+        signal that the author isn't using the skills rather than boilerplate.
     - path: '{apps,packages}/**/*.{tsx,jsx,css,mdx}'
       instructions: |
         When reviewing UI changes, flag these accessibility gaps. Comments are
@@ -118,23 +126,23 @@ reviews:
           destination. Skip if aria-label or wrapping context already names
           where the link goes.
 
-# Applies our internal engineering skills (.claude/skills/) as CodeRabbit review
+# Applies our internal engineering skills (.agents/skills/) as CodeRabbit review
 # guidelines. The skills are the single source of truth — they are consumed
 # directly, with no copy of their content elsewhere.
 #
 # `applyTo` decouples where a guideline file lives from the code it governs.
 # Without it, CodeRabbit scopes a guideline file to its own directory and below;
-# our skills live in .claude/skills/, which contains no code, so they would never
+# our skills live in .agents/skills/, which contains no code, so they would never
 # reach apps/studio. `applyTo` points them at the right paths instead.
 knowledge_base:
   code_guidelines:
     filePatterns:
       # Studio code conventions — React/TS, UI patterns, composition, data fetching, errors
-      - files: '.claude/skills/{studio-best-practices,studio-ui-patterns,vercel-composition-patterns,studio-queries,studio-error-handling,react-hook-form}/SKILL.md'
+      - files: '.agents/skills/{studio-ui-patterns,vercel-composition-patterns,studio-queries,studio-error-handling,react-hook-form}/SKILL.md'
         applyTo: 'apps/studio/**/*.{ts,tsx}'
       # Studio unit / component test conventions
-      - files: '.claude/skills/{studio-testing,studio-mock-api-tests}/SKILL.md'
+      - files: '.agents/skills/{studio-testing,studio-mock-api-tests}/SKILL.md'
         applyTo: 'apps/studio/**/*.test.{ts,tsx}'
       # Studio end-to-end (Playwright) test conventions
-      - files: '.claude/skills/studio-e2e-tests/SKILL.md'
+      - files: '.agents/skills/studio-e2e-tests/SKILL.md'
         applyTo: 'e2e/studio/**/*.spec.ts'

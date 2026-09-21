@@ -41,14 +41,17 @@ const getRefMarkdown = cache_fullProcess_withDevCacheBust(
 
 interface MDXRemoteRefsProps {
   source: string
+  codeBlockProps?: Partial<ComponentProps<typeof CodeBlock>>
 }
 
-function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
+function MDXRemoteRefs({ source, codeBlockProps }: MDXRemoteRefsProps) {
   const refComponents = {
     ...components,
     // Override the CodeBlock used for normal guides to skip type generation
     // because it is too resource-intensive
-    pre: (props: ComponentProps<typeof CodeBlock>) => <CodeBlock {...props} skipTypeGeneration />,
+    pre: (props: ComponentProps<typeof CodeBlock>) => (
+      <CodeBlock {...props} {...codeBlockProps} skipTypeGeneration />
+    ),
     RefSubLayout,
     CliGlobalFlagsHandler,
   }

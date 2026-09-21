@@ -193,7 +193,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     name="newNamespace"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="newNamespace" label="Name of new namespace">
+                      <FormItemLayout label="Name of new namespace">
                         <FormControl>
                           <Input {...field} placeholder="Provide a name for your new namespace" />
                         </FormControl>
@@ -211,7 +211,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name of table">
+                      <FormItemLayout label="Name of table">
                         <FormControl>
                           <Input {...field} placeholder="Provide a name for your new table" />
                         </FormControl>
@@ -223,7 +223,6 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     <div className="flex items-center justify-between">
                       <p className="text-sm">Columns</p>
                       <Button
-                        variant="default"
                         icon={<Plus />}
                         onClick={() => appendColumn({ name: '', type: 'string' })}
                       >
@@ -259,7 +258,6 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
             <SheetFooter>
               <Button
                 disabled={isCreating}
-                variant="default"
                 onClick={() => {
                   onOpenChange(false)
                   form.reset(defaultValues)
@@ -267,7 +265,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
               >
                 Cancel
               </Button>
-              <Button form={formId} type="submit" loading={isCreating}>
+              <Button variant="primary" form={formId} type="submit" loading={isCreating}>
                 Create table
               </Button>
             </SheetFooter>

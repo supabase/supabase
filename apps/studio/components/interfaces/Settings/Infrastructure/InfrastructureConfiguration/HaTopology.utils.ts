@@ -54,6 +54,8 @@ export const getPoolerStatus = (pooler: Multipooler): HaPoolerStatus => {
   // Lifecycle values may arrive with or without the proto enum prefix.
   const lifecycle = (pooler.lifecycleStatus?.status ?? '').replace(/^LIFECYCLE_/, '')
 
+  // The proto's two terminal states: QUARANTINED (gave up recovering, kept alive
+  // for forensics) and SHUTDOWN (durably down). There is no separate FAILED state.
   if (lifecycle === 'QUARANTINED' || lifecycle === 'SHUTDOWN') return 'unhealthy'
   if (lifecycle === 'STARTING') return 'coming_up'
   if (lifecycle === 'STOPPING') return 'going_down'
@@ -66,7 +68,12 @@ export const getPoolerStatus = (pooler: Multipooler): HaPoolerStatus => {
   return 'healthy'
 }
 
-// Matches the status vocabulary of the read replica surfaces (getStatusLabel).
+// Labels are drawn from the read replica status vocabulary (`getStatusLabel` in
+// ReadReplicas.utils.ts) so both surfaces read the same way, but they are only a
+// subset of it. The read replica labels also cover 'Failed', 'Restarting',
+// 'Resizing' and 'Restoring', which have no one-to-one lifecycle equivalents;
+// the closest to 'Failed' is QUARANTINED, surfaced as 'Unhealthy' alongside
+// SHUTDOWN.
 export const HA_POOLER_STATUS_LABELS: Record<HaPoolerStatus, string> = {
   healthy: 'Healthy',
   coming_up: 'Coming up',

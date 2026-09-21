@@ -80,7 +80,7 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
           return [
             ...prev,
             castOrganizationResponseToOrganization(
-              data as components['schemas']['OrganizationResponse']
+              data as components['schemas']['OrganizationResponse_Output']
             ),
           ]
         }

@@ -47,6 +47,7 @@ export const ReadReplicaEligibilityWarnings = ({
     isBelowSmallCompute,
     isWalgNotEnabled,
     isProWithSpendCapEnabled,
+    isHighAvailability,
     isReachedMaxReplicas,
     maxNumberOfReplicas,
   } = eligibility
@@ -81,9 +82,23 @@ export const ReadReplicaEligibilityWarnings = ({
     return (
       <Admonition type="warning" title="Your organization has overdue invoices">
         <p>Please resolve all outstanding invoices first before deploying a new read replica.</p>
-        <Button asChild variant="default" className="mt-2">
+        <Button asChild className="mt-2">
           <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
         </Button>
+      </Admonition>
+    )
+  }
+
+  if (isHighAvailability) {
+    return (
+      <Admonition
+        type="warning"
+        title="Read replicas are unavailable for High Availability projects"
+      >
+        <p>
+          We're working to bring this feature to High Availability projects. Contact support if this
+          is blocking your work.
+        </p>
       </Admonition>
     )
   }
@@ -124,7 +139,7 @@ export const ReadReplicaEligibilityWarnings = ({
         title="Read replicas can only be deployed with projects on Postgres version 15 and above"
       >
         <p>If you'd like to use read replicas, please contact us via support.</p>
-        <Button asChild variant="default" className="mt-2">
+        <Button asChild className="mt-2">
           <SupportLink
             queryParams={{
               projectRef,
@@ -165,7 +180,6 @@ export const ReadReplicaEligibilityWarnings = ({
           />
         ) : (
           <Button
-            variant="default"
             className="mt-2"
             onClick={() => onRecommendCompute(RECOMMENDED_COMPUTE_FOR_READ_REPLICAS.minimum)}
           >
@@ -208,7 +222,6 @@ export const ReadReplicaEligibilityWarnings = ({
         {refetchInterval === false && (
           <div className="flex items-center gap-x-2 mt-2">
             <Button
-              variant="default"
               loading={isEnabling}
               disabled={isEnabling}
               onClick={() => {
@@ -261,7 +274,6 @@ export const ReadReplicaEligibilityWarnings = ({
               project is on an XL compute or higher.
             </p>
             <Button
-              variant="default"
               className="mt-2"
               onClick={() =>
                 onRecommendCompute(RECOMMENDED_COMPUTE_FOR_READ_REPLICAS.unlockMaxReplicas)

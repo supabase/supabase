@@ -25,6 +25,7 @@ import { MigrationsEmptyState } from './MigrationsEmptyState'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -91,7 +92,7 @@ export const Migrations = () => {
               </>
             }
           >
-            <Button key="contact-support" asChild variant="default">
+            <Button key="contact-support" asChild>
               <SupportLink
                 queryParams={{
                   projectRef: project?.ref,
@@ -176,10 +177,7 @@ export const Migrations = () => {
                                 </Tooltip>
                               </TableCell>
                               <TableCell align="right">
-                                <Button
-                                  variant="default"
-                                  onClick={() => setSelectedMigration(migration)}
-                                >
+                                <Button onClick={() => setSelectedMigration(migration)}>
                                   View migration SQL
                                 </Button>
                               </TableCell>
@@ -187,14 +185,7 @@ export const Migrations = () => {
                           )
                         })
                       ) : (
-                        <TableRow>
-                          <TableCell colSpan={3}>
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{search}" did not return any results
-                            </p>
-                          </TableCell>
-                        </TableRow>
+                        <TableRowNoResults colSpan={3} search={search} />
                       )}
                     </TableBody>
                   </Table>
@@ -212,9 +203,7 @@ export const Migrations = () => {
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
           <div className="flex items-center justify-end p-4 border-t border-overlay-border">
-            <Button variant="default" onClick={() => setSelectedMigration(undefined)}>
-              Close
-            </Button>
+            <Button onClick={() => setSelectedMigration(undefined)}>Close</Button>
           </div>
         }
       >

@@ -71,7 +71,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       header: '',
       cell: ({ row }) => {
         const level = row.getValue<ColumnSchema['level']>('level')
-        return <DataTableColumnLevelIndicator value={level} />
+        return level ? <DataTableColumnLevelIndicator value={level} /> : null
       },
       enableHiding: false,
       enableResizing: false,
@@ -153,8 +153,8 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
                 <TooltipTrigger asChild>
                   <span>
                     <DataTableColumnStatusCode
-                      value={value}
-                      level={row.getValue<ColumnSchema['level']>('level')}
+                      value={value ?? undefined}
+                      level={row.getValue<ColumnSchema['level']>('level') ?? undefined}
                     />
                   </span>
                 </TooltipTrigger>
@@ -162,8 +162,8 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
               </Tooltip>
             ) : (
               <DataTableColumnStatusCode
-                value={value}
-                level={row.getValue<ColumnSchema['level']>('level')}
+                value={value ?? undefined}
+                level={row.getValue<ColumnSchema['level']>('level') ?? undefined}
               />
             )}
           </div>

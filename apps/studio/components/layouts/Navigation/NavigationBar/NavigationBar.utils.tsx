@@ -1,6 +1,15 @@
 import { useParams } from 'common'
-import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, Box, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import {
+  Auth,
+  Compute,
+  Database,
+  EdgeFunctions,
+  Realtime,
+  SqlEditor,
+  Storage,
+  TableEditor,
+} from 'icons'
+import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import {
   useIsExplorerEnabled,
@@ -13,7 +22,7 @@ import type { Project } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
-import { PRODUCT_NAME } from '@/lib/constants/workers'
+import { PRODUCT_NAME } from '@/lib/constants/compute'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RouteContext {
@@ -29,7 +38,7 @@ interface ProductFeatures {
   storage?: boolean
   realtime?: boolean
   authOverviewPage?: boolean
-  workers?: boolean
+  compute?: boolean
 }
 
 interface OtherFeatures {
@@ -101,7 +110,7 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
   const authOverviewPageEnabled = features?.authOverviewPage ?? false
-  const workersEnabled = features?.workers ?? false
+  const computeEnabled = features?.compute ?? false
 
   return [
     {
@@ -160,15 +169,16 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    ...(workersEnabled
+    ...(computeEnabled
       ? [
           {
-            key: 'workers',
+            key: 'compute',
             label: PRODUCT_NAME,
             disabled: !isProjectActive,
-            icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
+            icon: <Compute size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/compute`),
             isNew: true,
+            shortcutId: SHORTCUT_IDS.NAV_COMPUTE,
           },
         ]
       : []),

@@ -9,7 +9,11 @@ import {
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsAwsK8sCloudProvider,
+  useIsHighAvailability,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
 
 export const useCheckEligibilityDeployReplica = () => {
   const { ref: projectRef } = useParams()
@@ -21,6 +25,7 @@ export const useCheckEligibilityDeployReplica = () => {
   const isWalgEnabled = project?.is_physical_backups_enabled
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(org?.plan.id ?? '')
   const isProWithSpendCapEnabled = org?.plan.id === 'pro' && !org.usage_billing_enabled
+  const isHighAvailability = useIsHighAvailability()
 
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
     enabled: isNotOnHigherPlan,
@@ -59,7 +64,8 @@ export const useCheckEligibilityDeployReplica = () => {
     !hasOverdueInvoices &&
     !isAwsK8s &&
     !isProWithSpendCapEnabled &&
-    !isBelowSmallCompute
+    !isBelowSmallCompute &&
+    !isHighAvailability
 
   return {
     can: canDeployReplica,
@@ -71,6 +77,7 @@ export const useCheckEligibilityDeployReplica = () => {
     isWalgNotEnabled: !isWalgEnabled,
     isProWithSpendCapEnabled,
     isReachedMaxReplicas,
+    isHighAvailability,
     maxNumberOfReplicas,
   }
 }

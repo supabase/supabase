@@ -1,34 +1,49 @@
-import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useCallback } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { subscriptionHasHipaaAddon } from '../../Billing/Subscription/Subscription.utils'
+import { type SqlSnippetSource } from '../../SQLEditor/querySource'
+import { buildDebugPromptText } from '../../SQLEditor/SQLEditor.utils'
+import { useCreateChat } from '../hooks'
 import { type QueryResult } from '../types'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { getSqlErrorLines } from '@/data/sql/utils'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 
 export const QueryResultError = ({
   error,
   autoLimit,
+  sql,
+  source,
+  onDebug,
 }: {
   error: NonNullable<QueryResult['error']>
   autoLimit?: QueryResult['autoLimit']
+  sql?: string
+  source?: SqlSnippetSource
+  /** Overrides the default "open a new debug chat" behavior — used when this query block
+   * is already rendered inside an open assistant conversation, so debugging should write
+   * into that conversation's composer instead of abandoning it for a new chat. */
+  onDebug?: (prompt: string) => void
 }) => {
-  const { ref } = useParams()
-
-  const { data: org } = useSelectedOrganizationQuery()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
+  const { createChat, isCreating } = useCreateChat()
 
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+
+  const canDebug = sql !== undefined && source !== undefined
+
+  const buildDebugPrompt = useCallback(
+    () => (canDebug ? buildDebugPromptText(sql, error.message, source) : ''),
+    [canDebug, sql, error.message, source]
+  )
+
+  const handleDebug = () =>
+    onDebug
+      ? onDebug(buildDebugPrompt())
+      : createChat({ name: 'Debug SQL snippet', initialMessage: buildDebugPrompt() })
 
   const isTimeout =
     error.message?.includes('canceling statement due to statement timeout') ||
@@ -44,8 +59,8 @@ export const QueryResultError = ({
   )
 
   return (
-    <div className="w-full bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
-      <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
+    <div className="w-full overflow-y-auto">
+      <div className="flex flex-row justify-between items-start p-3 gap-x-4">
         {isTimeout ? (
           <div className="flex flex-col gap-y-1">
             <p className="font-mono text-sm tracking-tight">
@@ -119,7 +134,6 @@ export const QueryResultError = ({
           {readReplicaError && (
             <Button
               className="py-2"
-              variant="default"
               // [Joshen] TODO
               onClick={() => {}}
             >
@@ -136,15 +150,14 @@ export const QueryResultError = ({
               </TooltipContent>
             </Tooltip>
           )}
-          {!hasHipaaAddon && (
-            // [Joshen] TODO
+          {canDebug && (
             <AiAssistantDropdown
               telemetrySource="sql_debug"
               label="Debug with Assistant"
-              buildPrompt={() => ''}
-              onOpenAssistant={() => {}}
-              disabled={false}
-              loading={false}
+              buildPrompt={buildDebugPrompt}
+              onOpenAssistant={handleDebug}
+              disabled={isCreating}
+              loading={isCreating}
             />
           )}
         </div>

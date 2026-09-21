@@ -154,7 +154,7 @@ export const NewTokenDialog = ({
                   be very careful when using this API.
                 </p>
                 <div className="mt-4">
-                  <Button asChild variant="default" icon={<ExternalLink />}>
+                  <Button asChild icon={<ExternalLink />}>
                     <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                       Experimental API documentation
                     </a>
@@ -183,13 +183,9 @@ export const NewTokenDialog = ({
                 name="tokenName"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout name="tokenName" label="Name">
+                  <FormItemLayout label="Name">
                     <FormControl>
-                      <Input
-                        id="tokenName"
-                        {...field}
-                        placeholder="Provide a name for your token"
-                      />
+                      <Input {...field} placeholder="Provide a name for your token" />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -199,24 +195,24 @@ export const NewTokenDialog = ({
                 name="expiresAt"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout name="expiresAt" label="Expires in">
+                  <FormItemLayout label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl className="grow">
-                        <Select value={field.value} onValueChange={handleExpiryChange}>
+                      <Select value={field.value} onValueChange={handleExpiryChange}>
+                        <FormControl className="grow">
                           <SelectTrigger>
                             <SelectValue placeholder="Expires at" />
                           </SelectTrigger>
-                          <SelectContent>
-                            {Object.values(EXPIRES_AT_OPTIONS).map(
-                              (option: { value: string; label: string }) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                  {option.label}
-                                </SelectItem>
-                              )
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(EXPIRES_AT_OPTIONS).map(
+                            (option: { value: string; label: string }) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
                       {isCustomExpiry && (
                         <DatePicker
                           selectsRange={false}
@@ -239,7 +235,6 @@ export const NewTokenDialog = ({
         </DialogSection>
         <DialogFooter>
           <Button
-            variant="default"
             disabled={isPending}
             onClick={() => {
               form.reset()
@@ -250,7 +245,7 @@ export const NewTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} type="submit" loading={isPending}>
+          <Button variant="primary" form={formId} type="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

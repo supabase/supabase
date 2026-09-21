@@ -1,7 +1,10 @@
+import { AlignLeft } from 'lucide-react'
 import { forwardRef, useState } from 'react'
+import { KeyboardShortcut } from 'ui'
 import { type Snapshot } from 'valtio'
 
 import { AddCellDropdown } from '../AddCellDropdown'
+import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
 import { QueryEditor, type QueryEditorHandle } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
@@ -12,6 +15,7 @@ import {
   getCellDisplay,
   setCellRowLimit,
   setCellSql,
+  shouldInvalidateResultOnSourceChange,
   toQueryModel,
 } from './QueryCell.utils'
 import { SortableSection } from '@/components/ui/SortableSection'
@@ -22,15 +26,22 @@ import {
 import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
+import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const PRETTIFY_SHORTCUT_KEYS = hotkeyToKeys(
+  SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
+)
 
 interface QueryCellProps {
   cell: Snapshot<QueryCellSchema>
   onEdit?: () => void
+  onPrettifyQuery?: () => void
 }
 
 /** Notebook adapter around the shared QueryEditor. */
 export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
-  { cell, onEdit },
+  { cell, onEdit, onPrettifyQuery },
   ref
 ) {
   const snap = useNotebooksStateSnapshot()
@@ -67,11 +78,8 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
 
   const handleSourceChange = (source: QuerySourceBinding) => {
     // The query text carries over (see `changeCellSource`), so the editor's buffer stays
-    // valid — but a result the old backend produced does not, since another engine
-    // returns unrelated columns.
-    const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
-    if (isBackendChange) setResult(undefined)
-
+    // valid — but a result run against the old source (backend or time range) does not.
+    if (shouldInvalidateResultOnSourceChange(cell, source)) setResult(undefined)
     updateQueryCell((candidate) => changeCellSource(candidate, source))
   }
 
@@ -102,14 +110,16 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
   return (
     <SortableSection
       id={cell._id}
+      sectionWidth="48rem"
       actions={<AddCellDropdown cellId={cell._id} />}
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
-      gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
+      gripClassName="mt-2 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       <QueryEditor
         ref={ref}
         id={cell._id}
         variant="embedded"
+        className="min-h-0"
         title={title}
         query={toQueryModel(cell, sql)}
         result={result}
@@ -124,6 +134,18 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
         onResultChange={setResult}
         onRowLimitChange={handleRowLimitChange}
         onDisplayChange={handleDisplayChange}
+        toolbarActions={
+          <ExplorerToolbarAction
+            icon={<AlignLeft size={16} strokeWidth={2} />}
+            tooltip={
+              <div className="flex items-center gap-2.5">
+                <span>Prettify SQL</span>
+                <KeyboardShortcut keys={PRETTIFY_SHORTCUT_KEYS} />
+              </div>
+            }
+            onClick={onPrettifyQuery}
+          />
+        }
       />
     </SortableSection>
   )

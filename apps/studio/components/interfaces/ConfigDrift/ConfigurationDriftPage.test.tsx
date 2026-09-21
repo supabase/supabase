@@ -9,13 +9,14 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse']
-type OrganizationResponse = platformComponents['schemas']['OrganizationResponse']
-type ListGitHubConnectionsResponse = platformComponents['schemas']['ListGitHubConnectionsResponse']
+type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse_Output']
+type OrganizationResponse = platformComponents['schemas']['OrganizationResponse_Output']
+type ListGitHubConnectionsResponse =
+  platformComponents['schemas']['ListGitHubConnectionsResponse_Output']
 type GetGitHubConnectionConfigResponse =
-  platformComponents['schemas']['GetGitHubConnectionConfigResponse']
-type BranchResponse = apiV1Components['schemas']['BranchResponse']
-type V2ProjectConfigResponse = apiV2Components['schemas']['V2ProjectConfigResponse']
+  platformComponents['schemas']['GetGitHubConnectionConfigResponse_Output']
+type BranchResponse = apiV1Components['schemas']['BranchResponse_Output']
+type V2ProjectConfigResponse = apiV2Components['schemas']['V2ProjectConfigResponse_Output']
 
 const PROJECT_REF = 'default'
 const ORGANIZATION_ID = 1
@@ -76,6 +77,7 @@ const PROJECT: ProjectDetailResponse = {
   status: 'ACTIVE_HEALTHY',
   subscription_id: 'subscription-1',
   updated_at: '2025-01-01T00:00:00Z',
+  connectionString: '',
 }
 
 const BRANCH: BranchResponse = {
@@ -105,6 +107,9 @@ const CONNECTION: ListGitHubConnectionsResponse['connections'][number] = {
   workdir: '',
 }
 
+// Field values here are chosen to match @supabase/config's CLI schema defaults (see
+// `getDefaultCliConfig`), so the only drift the tests below see is the one they introduce via
+// the `auth` param — everything else round-trips as "matched" or "unmanaged".
 function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectConfigResponse {
   return {
     data: {
@@ -112,27 +117,30 @@ function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectCo
       type: 'project_config',
       attributes: {
         api: {
-          db_extra_search_path: 'public',
+          db_extra_search_path: 'public,extensions',
           db_pool: null,
           db_pool_acquisition_timeout: 10,
-          db_schema: 'public',
+          db_schema: 'public,graphql_public',
           max_rows: 1000,
         },
         auth,
         database: {
           major_version: 17,
           network_restrictions: {
-            allowed_cidrs: [],
+            allowed_cidrs: [
+              { address: '0.0.0.0/0', type: 'v4' },
+              { address: '::/0', type: 'v6' },
+            ],
             entitlement: 'disallowed',
             status: 'stored',
           },
           postgres_settings: {},
-          ssl_enforced: true,
+          ssl_enforced: false,
         },
         pooler: {
-          default_pool_size: 15,
+          default_pool_size: 20,
           ignore_startup_parameters: '',
-          max_client_conn: 200,
+          max_client_conn: 100,
           pool_mode: 'transaction',
           query_wait_timeout: 120,
           reserve_pool_size: 0,
@@ -154,14 +162,13 @@ function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectCo
           suspend: false,
         },
         storage: {
-          capabilities: { iceberg_catalog: false, list_v2: true },
-          database_pool_mode: 'transaction',
+          capabilities: { iceberg_catalog: false, list_v2: true, object_versioning: false },
           features: {
             iceberg_catalog: { enabled: false, max_catalogs: 0, max_namespaces: 0, max_tables: 0 },
-            image_transformation: { enabled: true },
+            image_transformation: { enabled: false },
             purge_cache: { enabled: false },
-            s3_protocol: { enabled: false },
-            vector_buckets: { enabled: false, max_buckets: 0, max_indexes: 0 },
+            s3_protocol: { enabled: true },
+            vector_buckets: { enabled: true, max_buckets: 10, max_indexes: 5 },
           },
           file_size_limit: 52_428_800,
           migration_version: '0',
@@ -267,6 +274,17 @@ describe('ConfigurationDriftPage', () => {
     customRender(<ConfigurationDriftPage />, { profileContext: PROFILE_CONTEXT })
 
     expect(await screen.findByText('All compared settings match')).toBeInTheDocument()
+  })
+
+  test('shows a config.toml decode error with the offending path', async () => {
+    mockConnectedProject()
+    mockProjectConfig({ disable_signup: false })
+    mockGitHubConfig({ api: { max_rows: 'abc' } })
+
+    customRender(<ConfigurationDriftPage />, { profileContext: PROFILE_CONTEXT })
+
+    expect(await screen.findByText('Could not read config.toml')).toBeInTheDocument()
+    expect(screen.getByText(/api\.max_rows/)).toBeInTheDocument()
   })
 
   test('renders a drift row when the dashboard and config.toml disagree', async () => {

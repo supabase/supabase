@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { apiAuthenticate } from './apiAuthenticate'
 import { apiWrapper } from './apiWrapper'
@@ -27,10 +27,6 @@ describe('apiWrapper', () => {
     json: vi.fn().mockReturnThis(),
   } as unknown as NextApiResponse
   const mockHandler = vi.fn()
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
 
   it('should call handler directly when withAuth is false', async () => {
     await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: false })

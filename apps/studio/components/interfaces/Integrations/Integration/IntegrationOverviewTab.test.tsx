@@ -40,6 +40,7 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
     data: { ref: 'default', connectionString: 'postgres://localhost' },
   }),
   useIsOrioleDb: () => false,
+  useIsHighAvailability: () => false,
 }))
 
 vi.mock('common', async (importOriginal) => {

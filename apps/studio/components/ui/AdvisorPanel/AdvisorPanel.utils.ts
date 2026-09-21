@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
-import { Gauge, Inbox, Shield } from 'lucide-react'
+import { Activity, Gauge, Inbox, Shield } from 'lucide-react'
 import type { ElementType } from 'react'
 
 import type { AdvisorItem, AdvisorLintItem, AdvisorNotificationItem } from './AdvisorPanel.types'
 import { lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
 import type { Lint } from '@/data/lint/lint-query'
 import type { Notification, NotificationData } from '@/data/notifications/notifications-v2-query'
-import type { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
+import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
 
 export const MAX_HOMEPAGE_ADVISOR_ITEMS = 4
 
@@ -40,26 +40,48 @@ export const notificationPriorityToSeverity = (
   }
 }
 
+export type LintCategory = Lint['categories'][number]
+
+/**
+ * A lint can carry more than one category, so the order here decides which one it is
+ * filtered and reported under.
+ */
+const lintCategoryPriority = ['SECURITY', 'PERFORMANCE', 'HEALTH'] as const
+
+const lintToAdvisorCategory = {
+  SECURITY: 'security',
+  PERFORMANCE: 'performance',
+  HEALTH: 'health',
+} as const satisfies Record<LintCategory, AdvisorCategory>
+
+export const getLintCategory = (lint: Lint): LintCategory | undefined =>
+  lintCategoryPriority.find((category) => (lint.categories || []).includes(category))
+
+/**
+ * Telemetry reports the API's own category names. Notifications have no API category;
+ * signals are security-only today.
+ */
+export const getAdvisorItemTelemetryCategory = (item: AdvisorItem): LintCategory | undefined => {
+  if (item.source === 'lint') return getLintCategory(item.original)
+  if (item.source === 'signal') return 'SECURITY'
+  return undefined
+}
+
 export const createAdvisorLintItems = (lintData?: Lint[]): AdvisorLintItem[] => {
   if (!lintData) return []
 
   return lintData
     .map((lint): AdvisorLintItem | null => {
-      const categories = lint.categories || []
-      const tab = categories.includes('SECURITY')
-        ? ('security' as const)
-        : categories.includes('PERFORMANCE')
-          ? ('performance' as const)
-          : undefined
+      const category = getLintCategory(lint)
 
-      if (!tab) return null
+      if (!category) return null
 
       return {
+        category: lintToAdvisorCategory[category],
         id: lint.cache_key,
         title: lint.detail,
         severity: lintLevelToSeverity(lint.level),
         createdAt: undefined,
-        tab,
         source: 'lint',
         original: lint,
       }
@@ -80,7 +102,7 @@ export const createAdvisorNotificationItems = (
       title: data.title,
       severity: notificationPriorityToSeverity(notification.priority),
       createdAt: dayjs(notification.inserted_at).valueOf(),
-      tab: 'messages' as const,
+      category: 'messages' as const,
       source: 'notification' as const,
       original: notification,
       project_ref: data.project_ref,
@@ -150,10 +172,18 @@ export const getAdvisorItemSecondaryText = (
   return undefined
 }
 
-export const tabIconMap: Record<Exclude<AdvisorTab, 'all'>, ElementType> = {
+export const advisorCategoryIcons: Record<AdvisorCategory, ElementType> = {
   security: Shield,
   performance: Gauge,
+  health: Activity,
   messages: Inbox,
+}
+
+export const advisorCategoryLabels: Record<AdvisorCategory, string> = {
+  security: 'Security',
+  performance: 'Performance',
+  health: 'Health',
+  messages: 'Messages',
 }
 
 export const severityColorClasses: Record<AdvisorSeverity, string> = {

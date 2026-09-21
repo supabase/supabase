@@ -5,7 +5,7 @@ import type {
   NotebookCellDiffEntry,
   OperationResultCell,
 } from '@/data/content/notebooks/notebook-operations'
-import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
+import type { ChartConfig, TimeRange } from '@/data/content/notebooks/notebook-schema'
 import type { Database } from '@/data/read-replicas/replicas-query'
 
 type DatabaseDetails = Pick<Database, 'identifier'>
@@ -22,6 +22,11 @@ export type NotebookDatabaseTarget =
   | { status: 'replica' }
   | { status: 'unknown' }
   | { status: 'error' }
+
+export type NotebookCellFields =
+  | { status: 'hidden' }
+  | { status: 'loading' }
+  | { status: 'ready'; source?: string; view?: string }
 
 export type NotebookCellMetadata =
   | { status: 'hidden' }
@@ -139,49 +144,83 @@ function formatDatabaseTarget(target: Exclude<NotebookDatabaseTarget, { status: 
   }
 }
 
-/** Metadata for a query cell's source parameters, kept separate from its SQL diff. */
+function formatChartConfig(chart: ChartConfig): string {
+  const parts = [chart.type, `x: ${chart.x_column}`, `y: ${chart.y_series.join(', ')}`]
+  if (chart.cumulative) parts.push('cumulative')
+  if (chart.scale !== 'linear') parts.push(chart.scale)
+  if (chart.show_labels) parts.push('labels')
+  return parts.join(', ')
+}
+
+function formatCellView(
+  cell: Extract<OperationResultCell, { _tag: 'database_cell' | 'log_cell' }>
+): string {
+  if ((cell.view ?? 'table') !== 'chart') return 'Table'
+  return `Chart (${cell.chart !== undefined ? formatChartConfig(cell.chart) : 'unconfigured'})`
+}
+
 export function getCellMetadata(
   cell: OperationResultCell,
   databaseContext: NotebookDatabaseContext
-): NotebookCellMetadata {
+): NotebookCellFields {
   switch (cell._tag) {
     case 'markdown_cell':
       return { status: 'hidden' }
     case 'database_cell': {
       const target = resolveNotebookDatabaseTarget(cell.database_identifier, databaseContext)
-      return target.status === 'loading'
-        ? { status: 'loading' }
-        : { status: 'ready', text: formatDatabaseTarget(target) }
+      if (target.status === 'loading') return { status: 'loading' }
+
+      return { status: 'ready', source: formatDatabaseTarget(target), view: formatCellView(cell) }
     }
     case 'log_cell':
-      return { status: 'ready', text: `Time range: ${formatTimeRange(cell.time_range)}` }
+      return {
+        status: 'ready',
+        source: `Time range: ${formatTimeRange(cell.time_range)}`,
+        view: formatCellView(cell),
+      }
   }
 }
 
-/** Header metadata for a diff row, including a before → after pair on replacements. */
+/** Joins a cell's fields into display text, dropping the view when it's just the default table. */
+function formatCellFieldsText(fields: { source?: string; view?: string }): string {
+  return [fields.source, fields.view === 'Table' ? undefined : fields.view]
+    .filter((part): part is string => part !== undefined)
+    .join(' · ')
+}
+
+/** A field that's identical before and after carries no information about what changed, so it's dropped. */
+function diffField(before: string | undefined, after: string | undefined): string | undefined {
+  if (before === after) return undefined
+  return `${before ?? 'Not configured'} → ${after ?? 'Not configured'}`
+}
+
+/** Header metadata for a diff row. On a replacement, only the fields that actually changed are shown. */
 export function getEntryMetadata(
   entry: NotebookCellDiffEntry,
   databaseContext: NotebookDatabaseContext
 ): NotebookCellMetadata {
   if (entry._tag !== 'replaced') {
-    return getCellMetadata(entry.cell, databaseContext)
+    const fields = getCellMetadata(entry.cell, databaseContext)
+    if (fields.status !== 'ready') return fields
+
+    const text = formatCellFieldsText(fields)
+    return text === '' ? { status: 'hidden' } : { status: 'ready', text }
   }
 
-  const beforeMetadata = getCellMetadata(entry.before, databaseContext)
-  const afterMetadata = getCellMetadata(entry.after, databaseContext)
-  if (beforeMetadata.status === 'loading' || afterMetadata.status === 'loading') {
-    return { status: 'loading' }
-  }
+  const before = getCellMetadata(entry.before, databaseContext)
+  const after = getCellMetadata(entry.after, databaseContext)
+  if (before.status === 'loading' || after.status === 'loading') return { status: 'loading' }
 
-  const beforeText = beforeMetadata.status === 'ready' ? beforeMetadata.text : null
-  const afterText = afterMetadata.status === 'ready' ? afterMetadata.text : null
-  if (beforeText === null && afterText === null) return { status: 'hidden' }
-  if (beforeText === afterText) return { status: 'ready', text: afterText ?? 'No metadata' }
+  const beforeSource = before.status === 'ready' ? before.source : undefined
+  const afterSource = after.status === 'ready' ? after.source : undefined
+  const beforeView = before.status === 'ready' ? before.view : undefined
+  const afterView = after.status === 'ready' ? after.view : undefined
 
-  return {
-    status: 'ready',
-    text: `${beforeText ?? 'No metadata'} → ${afterText ?? 'No metadata'}`,
-  }
+  const parts = [diffField(beforeSource, afterSource), diffField(beforeView, afterView)].filter(
+    (part): part is string => part !== undefined
+  )
+
+  return parts.length > 0 ? { status: 'ready', text: parts.join(' · ') } : { status: 'hidden' }
 }
 
 export type NotebookDiffSummary =

@@ -89,7 +89,12 @@ export const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="mx-auto">
-                  <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
+                  <Button
+                    variant="primary"
+                    loading={loading}
+                    disabled={loading}
+                    onClick={refetchProjectDetails}
+                  >
                     Return to project
                   </Button>
                 </div>
@@ -107,7 +112,7 @@ export const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Button asChild variant="default">
+                  <Button asChild>
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -119,7 +124,12 @@ export const UpgradingState = () => {
                       Contact support
                     </SupportLink>
                   </Button>
-                  <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
+                  <Button
+                    variant="primary"
+                    loading={loading}
+                    disabled={loading}
+                    onClick={refetchProjectDetails}
+                  >
                     Return to project
                   </Button>
                 </div>

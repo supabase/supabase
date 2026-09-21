@@ -34,6 +34,7 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { getComputeCpuLabel } from '@/lib/compute-labels'
 
 const SKELETON_PLACEHOLDER_COUNT = 6
 
@@ -175,16 +176,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       )?.price
                     : compute.price
 
-                  const cpuLabel = (() => {
-                    const cpuCores = compute.meta?.cpu_cores
-                    if (typeof cpuCores === 'number') {
-                      return `${cpuCores}-core CPU`
-                    }
-                    if (cpuCores) {
-                      return `${cpuCores} CPU`
-                    }
-                    return 'CPU'
-                  })()
+                  const cpuLabel = getComputeCpuLabel(compute.identifier, compute.meta?.cpu_cores)
 
                   return (
                     <RadioGroupCardItem
@@ -193,7 +185,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       key={compute.identifier}
                       value={compute.identifier}
                       className={cn(
-                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group w-full h-[110px]',
+                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 group w-full h-[110px]',
                         lockedOption && 'opacity-50'
                       )}
                       disabled={disabled || lockedOption}
@@ -343,7 +335,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                 size={14}
                                 className="text-foreground-lighter"
                               />
-                              <span>Custom CPU</span>
+                              <span>Custom compute</span>
                             </div>
                           </div>
                         </div>

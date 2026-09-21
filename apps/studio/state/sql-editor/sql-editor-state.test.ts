@@ -62,16 +62,17 @@ describe('addFavorite / removeFavorite', () => {
     sqlEditorState.needsSaving.clear()
   })
 
-  it('marks a loaded snippet as favorite and queues it for saving', () => {
+  it('marks a loaded snippet as favorite without queueing it for saving', () => {
     sqlEditorState.addSnippet({ projectRef: 'ref', snippet: makeSnippet('snippet-1') })
 
     sqlEditorState.addFavorite('snippet-1')
 
     expect(sqlEditorState.snippets['snippet-1'].snippet.favorite).toBe(true)
-    expect(sqlEditorState.needsSaving.get('snippet-1')).toBe(true)
+    // Favorites persist immediately via the save coordinator, not the queue.
+    expect(sqlEditorState.needsSaving.has('snippet-1')).toBe(false)
   })
 
-  it('unmarks a favorited snippet and queues it for saving', () => {
+  it('unmarks a favorited snippet without queueing it for saving', () => {
     sqlEditorState.addSnippet({
       projectRef: 'ref',
       snippet: makeSnippet('snippet-1', { favorite: true }),
@@ -80,7 +81,7 @@ describe('addFavorite / removeFavorite', () => {
     sqlEditorState.removeFavorite('snippet-1')
 
     expect(sqlEditorState.snippets['snippet-1'].snippet.favorite).toBe(false)
-    expect(sqlEditorState.needsSaving.get('snippet-1')).toBe(true)
+    expect(sqlEditorState.needsSaving.has('snippet-1')).toBe(false)
   })
 
   it('ignores addFavorite for a snippet that is not in the store', () => {

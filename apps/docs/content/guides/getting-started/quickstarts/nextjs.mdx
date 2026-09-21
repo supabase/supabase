@@ -39,7 +39,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 
 ## 6. Allow public access to the instruments page
 
-The `with-supabase` template redirects unauthenticated visitors to the login page for most routes. The `instruments` table is publicly readable, so update `lib/supabase/proxy.ts` to skip that redirect for `/instruments`.
+The `with-supabase` template redirects unauthenticated visitors to the sign-in page for most routes. The `instruments` table is publicly readable, so update `lib/supabase/proxy.ts` to skip that redirect for `/instruments`.
 
 Find this `if` statement:
 

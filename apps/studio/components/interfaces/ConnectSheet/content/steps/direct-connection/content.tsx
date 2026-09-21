@@ -1,19 +1,17 @@
-import { useParams } from 'common'
 import { Check, KeyRound } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { buildConnectionStringPooler, getConnectionStrings } from '../../../DatabaseSettings.utils'
-import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import {
+  CONNECTION_SOURCE_LOAD_BALANCER,
   DATABASE_CONNECTION_TYPES,
   type ConnectionStringMethod,
   type DatabaseConnectionType,
 } from '@/components/interfaces/ConnectSheet/Connect.constants'
 import type {
   ConnectionStringPooler,
-  DeploymentMode,
   StepContentProps,
 } from '@/components/interfaces/ConnectSheet/Connect.types'
 import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
@@ -28,113 +26,13 @@ import {
   resolveConnectionString,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
+import { useConnectionStringDatabases } from '@/components/interfaces/ConnectSheet/useConnectionStringDatabases'
 import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { pluckObjectFields } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
-
-/**
- * [Joshen] ConnectStepsSection does something similar but since only this page needs to consider connection strings
- * from all databases (including read replicas), am opting to separate the logic for retrieving connection strings here
- *
- * We can however, consider to shift this logic into ConnectStepsSection, such that we can consider read replicas for
- * the other tabs like "Framework" and "ORM" too. However, leaving them out for now and only updating "Direct"
- */
-const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
-  const { ref: projectRef } = useParams()
-  const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
-  const isHighAvailability = useIsHighAvailability()
-
-  const { data: databases = [] } = useReadReplicasQuery({ projectRef })
-  // Multigres has no pooler, so the pooler config endpoints don't apply
-  const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
-    { projectRef },
-    { enabled: !isHighAvailability }
-  )
-  const { data: supavisorConfig } = useSupavisorConfigurationQuery(
-    { projectRef },
-    { enabled: !isHighAvailability }
-  )
-  const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
-
-  // Memoized so the per-database pooler bag (consumed by resolveConnectionString
-  // downstream) keeps a stable identity across renders. Without this the inner
-  // pluckObjectFields/getConnectionStrings calls would mint fresh objects every
-  // render and ripple through the resolveConnectionString useMemo below.
-  return useMemo(() => {
-    const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
-    const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
-
-    return Object.fromEntries(
-      databases.map((db) => {
-        const connectionInfo = pluckObjectFields(db || emptyState, DB_FIELDS)
-        const poolingConfigurationShared = supavisorConfig?.find(
-          (x) => x.identifier === db.identifier
-        )
-        const poolingConfigurationDedicated = allowPgBouncerSelection ? pgbouncerConfig : undefined
-
-        const connectionStringsShared = getConnectionStrings({
-          connectionInfo,
-          poolingInfo: {
-            connectionString: poolingConfigurationShared?.connection_string ?? '',
-            db_host: poolingConfigurationShared?.db_host ?? '',
-            db_name: poolingConfigurationShared?.db_name ?? '',
-            db_port: poolingConfigurationShared?.db_port ?? 0,
-            db_user: poolingConfigurationShared?.db_user ?? '',
-          },
-          metadata: { projectRef: db.identifier },
-        })
-
-        const connectionStringsDedicated =
-          poolingConfigurationDedicated !== undefined
-            ? getConnectionStrings({
-                connectionInfo,
-                poolingInfo: {
-                  connectionString: poolingConfigurationDedicated.connection_string.replace(
-                    projectRef ?? '_',
-                    db.identifier
-                  ),
-                  db_host: poolingConfigurationDedicated.db_host,
-                  db_name: poolingConfigurationDedicated.db_name,
-                  db_port: poolingConfigurationDedicated.db_port,
-                  db_user: poolingConfigurationDedicated.db_user,
-                },
-                metadata: { projectRef: db.identifier },
-              })
-            : undefined
-
-        return [
-          db.identifier,
-          buildConnectionStringPooler({
-            deploymentMode,
-            connectionInfo,
-            connectionStringsShared,
-            connectionStringsDedicated,
-            ipv4Addon: !!ipv4Addon,
-            isHighAvailability,
-          }),
-        ]
-      })
-    )
-  }, [
-    databases,
-    pgbouncerConfig,
-    supavisorConfig,
-    allowPgBouncerSelection,
-    ipv4Addon,
-    projectRef,
-    deploymentMode,
-    isHighAvailability,
-  ])
-}
 
 const CONNECTION_METHOD_TO_TELEMETRY: Record<
   ConnectionStringMethod,
@@ -156,6 +54,8 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const [temporaryDatabasePassword, setTemporaryDatabasePassword] = useState('')
 
   const connectionSource = state.connectionSource
+  const isLoadBalancerSelected =
+    isHighAvailability && connectionSource === CONNECTION_SOURCE_LOAD_BALANCER
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
   const connectionMethod = (state.connectionMethod as ConnectionStringMethod) ?? 'direct'
   const useSharedPooler = Boolean(state.useSharedPooler)
@@ -239,17 +139,19 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const showPasswordPlaceholder = connectionString.includes(PASSWORD_PLACEHOLDER)
   const showSelfHostedDirectNotice = deploymentMode.isSelfHosted && connectionMethod === 'direct'
   const showPoolerTitle = deploymentMode.isPlatform && !!poolerBadge && !isHighAvailability
+  const titleBadge = isLoadBalancerSelected ? 'Read-only' : poolerBadge
+  const showTitleBadge = isLoadBalancerSelected || showPoolerTitle
   const showResetInTitle =
     deploymentMode.isPlatform && showPasswordPlaceholder && !temporaryDatabasePassword
-  const showStringTitleRow = showPoolerTitle || showResetInTitle
+  const showStringTitleRow = showTitleBadge || showResetInTitle
 
   return (
     <div className="flex flex-col gap-3">
       <div className="overflow-hidden rounded-lg border bg-surface-75">
         {showStringTitleRow && (
           <div className="flex items-center justify-between gap-2 border-b bg-surface-100 py-2 pl-4 pr-2">
-            {showPoolerTitle ? (
-              <span className="text-xs text-foreground-light">{poolerBadge}</span>
+            {showTitleBadge ? (
+              <span className="text-xs text-foreground-light">{titleBadge}</span>
             ) : (
               <span />
             )}
@@ -282,6 +184,15 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
         )}
       </div>
       {showPasswordPlaceholder && <PasswordEncodingNote />}
+      {/* Persistent live region so screen readers announce the read-only state
+          when the load balancer is selected */}
+      <p
+        role="status"
+        className={cn('text-sm text-foreground-lighter', !isLoadBalancerSelected && 'sr-only')}
+      >
+        {isLoadBalancerSelected &&
+          'Replica connections are read-only. Connect to the primary database for writes.'}
+      </p>
       {showSelfHostedDirectNotice && (
         <p className="text-sm text-foreground-lighter">
           Manually{' '}

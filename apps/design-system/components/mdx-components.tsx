@@ -1,6 +1,5 @@
 'use client'
 
-import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
@@ -18,6 +17,7 @@ import {
   cn,
   Tabs,
   TabsContent,
+  TabsIndicator,
   TabsList,
   TabsTrigger,
 } from 'ui'
@@ -43,6 +43,7 @@ import {
 import { Icons } from '@/components/icons'
 import { ThemeSettings } from '@/components/theme-settings'
 import { useConfig } from '@/hooks/use-config'
+import { useMDXComponent } from '@/lib/use-mdx-component'
 import { Style } from '@/registry/styles'
 
 const components = {
@@ -226,16 +227,26 @@ const components = {
   Tabs: ({ className, ...props }: React.ComponentProps<typeof Tabs>) => (
     <Tabs className={cn('relative mt-6 w-full', className)} {...props} />
   ),
-  TabsList: ({ className, ...props }: React.ComponentProps<typeof TabsList>) => (
+  TabsList: ({ className, children, ...props }: React.ComponentProps<typeof TabsList>) => (
     <TabsList
-      className={cn('w-full justify-start rounded-none border-b bg-transparent p-0', className)}
+      className={cn(
+        'w-full justify-start rounded-none bg-transparent p-0',
+        'ps-4 -ms-4 [--tab-track-inset:--spacing(4)]',
+        className
+      )}
       {...props}
-    />
+    >
+      {children}
+      <TabsIndicator />
+    </TabsList>
   ),
   TabsTrigger: ({ className, ...props }: React.ComponentProps<typeof TabsTrigger>) => (
     <TabsTrigger
       className={cn(
-        'relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none',
+        'relative h-9 rounded-none bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none data-[state=active]:text-foreground data-[state=active]:shadow-none',
+        // The first label lines up with the surrounding content, keeping its
+        // padding so the focus ring sits off the glyphs
+        'first:-ms-4',
         className
       )}
       {...props}
