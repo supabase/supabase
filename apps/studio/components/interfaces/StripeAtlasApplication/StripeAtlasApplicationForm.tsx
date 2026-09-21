@@ -42,66 +42,70 @@ export const StripeAtlasApplicationForm = ({ application }: StripeAtlasApplicati
     isSuccess,
   } = useStripeAtlasApplicationCompleteMutation()
 
-  if (isSuccess) {
-    return (
-      <Admonition
-        type="success"
-        title="Application confirmed"
-        description={<p>We've sent your credit code to your Stripe Atlas Merchant email.</p>}
-      />
-    )
-  }
-
   return (
-    <Form {...form}>
-      <form
-        noValidate
-        className="flex flex-col gap-4"
-        onSubmit={form.handleSubmit((values) =>
-          completeApplication({ ...values, stripeAtlasToken: application.stripeAtlasToken })
+    <>
+      <div role="status" aria-live="polite">
+        {isSuccess && (
+          <Admonition
+            type="success"
+            title="Application confirmed"
+            description={<p>We've sent your credit code to your Stripe Atlas Merchant email.</p>}
+          />
         )}
-      >
-        <div className="grid grid-cols-2 gap-3">
-          <FormField
-            control={form.control}
-            name="firstname"
-            render={({ field }) => (
-              <FormItemLayout layout="vertical" label="First name" id="firstname">
-                <FormControl>
-                  <Input {...field} id="firstname" autoComplete="given-name" />
-                </FormControl>
-              </FormItemLayout>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="lastname"
-            render={({ field }) => (
-              <FormItemLayout layout="vertical" label="Last name" id="lastname">
-                <FormControl>
-                  <Input {...field} id="lastname" autoComplete="family-name" />
-                </FormControl>
-              </FormItemLayout>
-            )}
-          />
-        </div>
+      </div>
 
-        <FormField
-          control={form.control}
-          name="companyName"
-          render={({ field }) => (
-            <FormItemLayout layout="vertical" label="Company name" id="companyName">
-              <FormControl>
-                <Input {...field} id="companyName" autoComplete="organization" />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
+      {!isSuccess && (
+        <Form {...form}>
+          <form
+            noValidate
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit((values) =>
+              completeApplication({ ...values, stripeAtlasToken: application.stripeAtlasToken })
+            )}
+          >
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="firstname"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="First name" id="firstname">
+                    <FormControl>
+                      <Input {...field} id="firstname" autoComplete="given-name" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastname"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="Last name" id="lastname">
+                    <FormControl>
+                      <Input {...field} id="lastname" autoComplete="family-name" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </div>
 
-        <Button block size="medium" type="submit" loading={isPending} disabled={isPending}>
-          {isPending ? 'Confirming application...' : 'Confirm application'}
-        </Button>
-      </form>
-    </Form>
+            <FormField
+              control={form.control}
+              name="companyName"
+              render={({ field }) => (
+                <FormItemLayout layout="vertical" label="Company name" id="companyName">
+                  <FormControl>
+                    <Input {...field} id="companyName" autoComplete="organization" />
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+
+            <Button block size="medium" type="submit" loading={isPending} disabled={isPending}>
+              {isPending ? 'Confirming application...' : 'Confirm application'}
+            </Button>
+          </form>
+        </Form>
+      )}
+    </>
   )
 }
