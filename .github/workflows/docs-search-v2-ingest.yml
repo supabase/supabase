@@ -1,0 +1,52 @@
+name: Ingest Docs Content for Search V2
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/docs-search-v2-ingest.yml'
+      - 'apps/docs/content/**/*.mdx'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-prod
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ingest:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    env:
+      SEARCH_V2_SUPABASE_PROJECT_ID: ${{ secrets.SEARCH_V2_SUPABASE_PROJECT_ID }}
+      SEARCH_V2_SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_V2_SUPABASE_SECRET_KEY }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            apps/docs
+            packages
+            patches
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Setup node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Download dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Ingest content
+        working-directory: ./apps/docs
+        run: pnpm run search-v2:ingest
