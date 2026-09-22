@@ -14,7 +14,6 @@ import {
 import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import dayjs from 'dayjs'
 import {
   Check,
   Copy,
@@ -84,7 +83,6 @@ import {
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import {
   getNotebooksStateSnapshot,
   useCurrentNotebook,
@@ -106,8 +104,6 @@ export const ExplorerNotebookTab = () => {
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
-
-  const { data: project } = useSelectedProjectQuery()
 
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
