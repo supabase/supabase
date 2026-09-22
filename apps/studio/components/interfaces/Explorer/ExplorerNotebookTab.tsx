@@ -14,6 +14,7 @@ import {
 import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import dayjs from 'dayjs'
 import {
   Check,
   Copy,
@@ -48,6 +49,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { ExplorerNotebookPrintHeader } from './ExplorerNotebookPrintHeader'
 import {
   findQueryCellsMatchingSql,
   isMutatingSql,
@@ -82,6 +84,7 @@ import {
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import {
   getNotebooksStateSnapshot,
   useCurrentNotebook,
@@ -103,6 +106,8 @@ export const ExplorerNotebookTab = () => {
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
+
+  const { data: project } = useSelectedProjectQuery()
 
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
@@ -471,7 +476,10 @@ export const ExplorerNotebookTab = () => {
         ref={scrollContainerRef}
         className="w-full mx-auto flex-grow min-h-0 overflow-y-auto print:h-auto print:overflow-visible"
       >
-        <div className="p-4 pb-10">
+        <div className="p-4 pb-10 print:pt-0 print:pb-0">
+          {/* [Joshen] This is meant to only render when printing the notebook */}
+          <ExplorerNotebookPrintHeader name={name ?? ''} />
+
           {cells.length === 0 && (
             <EmptyStatePresentational
               icon={<Notebook className="text-foreground-lighter" />}

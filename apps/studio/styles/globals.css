@@ -187,6 +187,16 @@ body,
   box-sizing: border-box;
 }
 
+/* Padding on an in-DOM container only applies once (at the start/end of the
+ * box), not on every printed page it spans, so continuation pages fell back
+ * to whatever margin the print dialog happened to have. Setting only the
+ * vertical page margin here applies it uniformly to every page's top/bottom,
+ * without touching page width or the dialog's own left/right margin. */
+@page {
+  padding-top: 0.5in;
+  padding-bottom: 0.5in;
+}
+
 @media print {
   #panel-content,
   #panel-project-content {

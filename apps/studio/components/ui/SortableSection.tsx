@@ -69,7 +69,7 @@ export const SortableSection = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="group relative will-change-transform flex w-full items-start gap-x-4 min-w-0"
+      className="group relative will-change-transform flex w-full items-start gap-x-4 min-w-0 print:break-inside-avoid"
     >
       <div className={cn('flex items-center', gripClassName)}>
         {actions}
