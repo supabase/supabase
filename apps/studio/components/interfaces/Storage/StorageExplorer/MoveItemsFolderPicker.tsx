@@ -78,7 +78,7 @@ export const MoveItemsFolderPicker = ({
       .flatMap((page) => page.folders)
       .map((folder) => ({
         ...folder,
-        path,
+        path: path ? `${path}/${folder.name}` : folder.name,
       }))
   }, [objectsData, path])
 

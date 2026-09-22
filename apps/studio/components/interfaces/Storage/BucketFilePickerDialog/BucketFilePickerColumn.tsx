@@ -14,6 +14,7 @@ import {
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
 } from '../Storage.constants'
 import type { StorageItem } from '../Storage.types'
@@ -163,9 +164,28 @@ export const BucketFilePickerColumn = ({
   })
 
   const items = useMemo(() => {
-    const objs = (data?.pages ?? []).flatMap((page) => page.objects)
-    return formatFolderItems(objs)
-  }, [data])
+    const pages = data?.pages ?? []
+    const objs = pages.flatMap((page) => page.objects)
+    // v2 returns folders and objects separately; re-combine them into the single sorted list
+    // formatFolderItems expects, tagging folders with `id: null` per its existing convention.
+    const folders = pages
+      .flatMap((page) => page.folders)
+      .map((folder) => ({
+        id: null,
+        name: folder.name,
+        created_at: null,
+        updated_at: null,
+        last_accessed_at: null,
+        metadata: null,
+      }))
+    const direction = sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
+    const merged = [...folders, ...objs].sort((a, b) => {
+      const aValue = (sortColumn === STORAGE_SORT_BY.NAME ? a.name : a[sortColumn]) ?? ''
+      const bValue = (sortColumn === STORAGE_SORT_BY.NAME ? b.name : b[sortColumn]) ?? ''
+      return direction * String(aValue).localeCompare(String(bValue))
+    })
+    return formatFolderItems(merged)
+  }, [data, sortColumn, sortByOrder])
 
   const haveSelectedItems = selectedItems.length > 0
   const columnItemsId = items.map((item) => item.id)
