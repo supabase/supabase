@@ -82,17 +82,18 @@ export const ClickHouseFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Password"
+              labelOptional="Optional"
               description={
                 editMode
                   ? 'Stored password is hidden. Enter a new password to replace it.'
-                  : 'Omit for passwordless access'
+                  : 'Leave blank for passwordless access.'
               }
             >
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
                   type={showPassword ? 'text' : 'password'}
-                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Optional'}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
                     <div className="flex items-center justify-center">

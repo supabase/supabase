@@ -244,8 +244,8 @@ import { Route as ProjectRefExplorerChatIdRouteImport } from './routes/project/$
 import { Route as ProjectRefDatabaseTriggersEventRouteImport } from './routes/project/$ref/database/triggers/event'
 import { Route as ProjectRefDatabaseTriggersDataRouteImport } from './routes/project/$ref/database/triggers/data'
 import { Route as ProjectRefDatabaseTablesIdRouteImport } from './routes/project/$ref/database/tables/$id'
-import { Route as ProjectRefDatabaseReplicationPipelineIdRouteImport } from './routes/project/$ref/database/replication/$pipelineId'
 import { Route as ProjectRefDatabaseReplicationNewRouteImport } from './routes/project/$ref/database/replication/new'
+import { Route as ProjectRefDatabaseReplicationPipelineIdRouteImport } from './routes/project/$ref/database/replication/$pipelineId'
 import { Route as ProjectRefDatabasePublicationsIdRouteImport } from './routes/project/$ref/database/publications/$id'
 import { Route as ProjectRefDatabaseBackupsScheduledRouteImport } from './routes/project/$ref/database/backups/scheduled'
 import { Route as ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport } from './routes/project/$ref/database/backups/restore-to-new-project'
@@ -1614,16 +1614,16 @@ const ProjectRefDatabaseTablesIdRoute =
     path: '/tables/$id',
     getParentRoute: () => ProjectRefDatabaseRoute,
   } as any)
-const ProjectRefDatabaseReplicationPipelineIdRoute =
-  ProjectRefDatabaseReplicationPipelineIdRouteImport.update({
-    id: '/$pipelineId',
-    path: '/$pipelineId',
-    getParentRoute: () => ProjectRefDatabaseReplicationRoute,
-  } as any)
 const ProjectRefDatabaseReplicationNewRoute =
   ProjectRefDatabaseReplicationNewRouteImport.update({
     id: '/new',
     path: '/new',
+    getParentRoute: () => ProjectRefDatabaseReplicationRoute,
+  } as any)
+const ProjectRefDatabaseReplicationPipelineIdRoute =
+  ProjectRefDatabaseReplicationPipelineIdRouteImport.update({
+    id: '/$pipelineId',
+    path: '/$pipelineId',
     getParentRoute: () => ProjectRefDatabaseReplicationRoute,
   } as any)
 const ProjectRefDatabasePublicationsIdRoute =
@@ -5828,18 +5828,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabaseTablesIdRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
     }
-    '/project/$ref/database/replication/$pipelineId': {
-      id: '/project/$ref/database/replication/$pipelineId'
-      path: '/$pipelineId'
-      fullPath: '/project/$ref/database/replication/$pipelineId'
-      preLoaderRoute: typeof ProjectRefDatabaseReplicationPipelineIdRouteImport
-      parentRoute: typeof ProjectRefDatabaseReplicationRoute
-    }
     '/project/$ref/database/replication/new': {
       id: '/project/$ref/database/replication/new'
       path: '/new'
       fullPath: '/project/$ref/database/replication/new'
       preLoaderRoute: typeof ProjectRefDatabaseReplicationNewRouteImport
+      parentRoute: typeof ProjectRefDatabaseReplicationRoute
+    }
+    '/project/$ref/database/replication/$pipelineId': {
+      id: '/project/$ref/database/replication/$pipelineId'
+      path: '/$pipelineId'
+      fullPath: '/project/$ref/database/replication/$pipelineId'
+      preLoaderRoute: typeof ProjectRefDatabaseReplicationPipelineIdRouteImport
       parentRoute: typeof ProjectRefDatabaseReplicationRoute
     }
     '/project/$ref/database/publications/$id': {

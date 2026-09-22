@@ -115,6 +115,9 @@ import { DOCS_URL } from '@/lib/constants'
 
 const formId = 'create-pipeline'
 
+const isSamePageNavigation = (url: string) =>
+  new URL(url, window.location.origin).pathname === window.location.pathname
+
 export const CreatePipelineWizard = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -129,7 +132,15 @@ export const CreatePipelineWizard = () => {
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
-  const [step, setStep] = useState<PipelineCreateStepId>('destination')
+  const [step, setStep] = useQueryState(
+    'step',
+    parseAsStringEnum<PipelineCreateStepId>(PIPELINE_CREATE_STEPS.map(({ id }) => id))
+      .withDefault('destination')
+      .withOptions({
+        history: 'push',
+        clearOnDefault: true,
+      })
+  )
   const [validatedConnectionSignature, setValidatedConnectionSignature] = useState<string | null>(
     null
   )
@@ -334,6 +345,7 @@ export const CreatePipelineWizard = () => {
     shouldConfirmNavigation,
   } = usePreventNavigationOnUnsavedChanges({
     hasChanges: hasUnsavedChanges,
+    shouldBypassNavigation: isSamePageNavigation,
   })
 
   const leaveWizard = () => {

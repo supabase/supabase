@@ -91,7 +91,7 @@ export const DestinationTypeSelection = ({
         {
           value: 'BigQuery',
           label: 'BigQuery',
-          description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
+          description: 'Replicate changes to BigQuery for analytics and BI',
           stage: 'Public Alpha',
           enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
         },
@@ -103,22 +103,21 @@ export const DestinationTypeSelection = ({
         {
           value: 'DuckLake',
           label: 'DuckLake',
-          description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
+          description: 'Replicate changes to DuckLake for open lakehouse storage',
           stage: 'Early Access',
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
         },
         {
           value: 'Snowflake',
           label: 'Snowflake',
-          description:
-            'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
+          description: 'Replicate changes to Snowflake for cloud data warehousing',
           stage: 'Early Access',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
         },
         {
           value: 'ClickHouse',
           label: 'ClickHouse',
-          description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
+          description: 'Replicate changes to ClickHouse for real-time analytics',
           stage: 'Early Access',
           enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
         },
@@ -130,7 +129,7 @@ export const DestinationTypeSelection = ({
         {
           value: 'Analytics Bucket',
           label: 'Analytics Bucket',
-          description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
+          description: 'Replicate changes to Supabase Storage as Apache Iceberg tables',
           stage: 'Deprecated',
           enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
@@ -169,13 +168,18 @@ export const DestinationTypeSelection = ({
                   key={option.value}
                   id={`destination-type-${option.value}`}
                   value={option.value}
+                  className="[&>div]:items-center [&>div]:py-3.5"
                   label={
-                    <span className="flex items-center gap-x-3">
-                      <DestinationLogo type={option.value} />
-                      {option.label}
+                    <span className="flex items-center gap-x-3.5">
+                      <DestinationLogo type={option.value} size="medium" />
+                      <span className="flex flex-col">
+                        <span className="text-foreground font-medium">{option.label}</span>
+                        <span className="text-sm text-foreground-lighter text-balance">
+                          {option.description}
+                        </span>
+                      </span>
                     </span>
                   }
-                  description={option.description}
                 />
               ))}
             </RadioGroupStacked>

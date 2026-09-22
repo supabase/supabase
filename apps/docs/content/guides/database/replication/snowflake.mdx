@@ -14,7 +14,12 @@ The Snowflake destination is in private alpha and available only to approved org
 
 [Snowflake](https://www.snowflake.com/) is a managed data platform. Supabase Pipelines writes an append-only change history for each replicated Postgres table to Snowflake.
 
-[Prepare resources](#prepare-snowflake-resources), [configure the destination](#configure-snowflake-as-a-destination), then [query replicated data](#query-and-materialize-current-state).
+To set up replication to Snowflake, follow these steps:
+
+1. [Prepare the necessary resources in Snowflake](#prepare-snowflake-resources) such as databases, schemas, roles, and users.
+2. [Configure Snowflake as a destination](#configure-snowflake-as-a-destination) in Supabase Pipelines using your prepared resources.
+3. Finally, [query your replicated Postgres data](#query-and-materialize-current-state) in Snowflake, and learn how to materialize the current state from the replication stream.
+   Each step is described in detail below to help you successfully replicate and work with your data.
 
 ## Source table requirements
 

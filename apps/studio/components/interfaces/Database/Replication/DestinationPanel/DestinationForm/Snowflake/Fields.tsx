@@ -31,7 +31,7 @@ export const SnowflakeFields = ({
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Connection</p>
         <p className="text-sm text-foreground-light">
-          Configure the Snowflake account, user, and target namespace for replicated data.
+          Enter the Snowflake account and destination details.
         </p>
       </div>
 
@@ -59,10 +59,10 @@ export const SnowflakeFields = ({
             <FormItemLayout
               layout="horizontal"
               label="User"
-              description="Snowflake user configured for key-pair authentication"
+              description="Snowflake service user with key-pair authentication."
             >
               <FormControl>
-                <Input {...field} placeholder="ETL_USER" value={field.value ?? ''} />
+                <Input {...field} placeholder="PIPELINES_USER" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -78,7 +78,7 @@ export const SnowflakeFields = ({
               description={SNOWFLAKE_DATABASE_FIELD_COPY.description}
             >
               <FormControl>
-                <Input {...field} placeholder="ANALYTICS" value={field.value ?? ''} />
+                <Input {...field} placeholder="PIPELINES_DB" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -94,7 +94,7 @@ export const SnowflakeFields = ({
               description={SNOWFLAKE_SCHEMA_FIELD_COPY.description}
             >
               <FormControl>
-                <Input {...field} placeholder="PUBLIC" value={field.value ?? ''} />
+                <Input {...field} placeholder="REPLICATED" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -107,10 +107,11 @@ export const SnowflakeFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Role"
-              description="Optional Snowflake role to assume after connecting"
+              labelOptional="Optional"
+              description="Snowflake role for SQL requests. Must match the user’s default role."
             >
               <FormControl>
-                <Input {...field} placeholder="ETL_ROLE" value={field.value ?? ''} />
+                <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -135,7 +136,7 @@ export const SnowflakeFields = ({
               description={
                 editMode
                   ? 'Stored private key is hidden. Enter a new private key to replace it.'
-                  : 'RSA private key PEM contents in PKCS#8 or PKCS#1 format'
+                  : 'Snowflake private key as a complete PEM. PKCS #8 is recommended.'
               }
             >
               <FormControl>
@@ -163,17 +164,18 @@ export const SnowflakeFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Private key passphrase"
+              labelOptional="Optional"
               description={
                 editMode
                   ? 'Stored passphrase setting is hidden. Enter a new passphrase to replace it.'
-                  : 'Optional passphrase for encrypted private keys'
+                  : 'Passphrase for an encrypted PKCS #8 private key.'
               }
             >
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
                   type={showPrivateKeyPassphrase ? 'text' : 'password'}
-                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Optional'}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
                     <div className="flex items-center justify-center">

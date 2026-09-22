@@ -6,6 +6,7 @@ import { BASE_PATH } from '@/lib/constants'
 
 interface UsePreventNavigationOnUnsavedChangesOptions {
   hasChanges: boolean
+  shouldBypassNavigation?: (url: string) => boolean
 }
 
 interface UsePreventNavigationOnUnsavedChangesReturn {
@@ -28,6 +29,7 @@ interface PendingTanStackNavigation {
  */
 export const usePreventNavigationOnUnsavedChanges = ({
   hasChanges,
+  shouldBypassNavigation,
 }: UsePreventNavigationOnUnsavedChangesOptions): UsePreventNavigationOnUnsavedChangesReturn => {
   const nextRouter = useNextRouter()
   const tanStackRouter = useTanStackRouter({ warn: false })
@@ -42,7 +44,9 @@ export const usePreventNavigationOnUnsavedChanges = ({
 
     return tanStackRouter.history.block({
       enableBeforeUnload: true,
-      blockerFn: async () => {
+      blockerFn: async ({ nextLocation }) => {
+        if (shouldBypassNavigation?.(nextLocation.href)) return false
+
         if (bypassNavigationGuardRef.current) {
           bypassNavigationGuardRef.current = false
           return false
@@ -58,7 +62,7 @@ export const usePreventNavigationOnUnsavedChanges = ({
         return shouldCancelNavigation
       },
     })
-  }, [hasChanges, tanStackRouter])
+  }, [hasChanges, shouldBypassNavigation, tanStackRouter])
 
   useEffect(() => {
     if (tanStackRouter) return
@@ -71,6 +75,8 @@ export const usePreventNavigationOnUnsavedChanges = ({
     }
 
     const handleBrowseAway = (url: string) => {
+      if (shouldBypassNavigation?.(url)) return
+
       if (bypassNavigationGuardRef.current) {
         bypassNavigationGuardRef.current = false
         setNavigateUrl(undefined)
@@ -91,7 +97,7 @@ export const usePreventNavigationOnUnsavedChanges = ({
       window.removeEventListener('beforeunload', handleBeforeUnload)
       nextRouter.events.off('routeChangeStart', handleBrowseAway)
     }
-  }, [confirmNavigate, hasChanges, nextRouter.events, tanStackRouter])
+  }, [confirmNavigate, hasChanges, nextRouter.events, shouldBypassNavigation, tanStackRouter])
 
   const handleCancelNavigation = useCallback(() => {
     pendingTanStackNavigation?.reset()
