@@ -10,6 +10,7 @@ import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
 import { isLogsFilterColumnValue } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
+import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
 
 export function DataTableFilterCheckboxAsync<TData>({
@@ -21,7 +22,7 @@ export function DataTableFilterCheckboxAsync<TData>({
   const [inputValue, setInputValue] = useState('')
 
   const { table, searchParameters, columnFilters, isLoadingCounts, getFacetedUniqueValues } =
-    useDataTable()
+    useDataTable<TData, unknown, QuerySearchParamsType>()
 
   // [Joshen] JFYI for simplicity currently, i'm adding UnifiedLogs logic into this file
   // despite this supposedly being a reusable component - tbh really, this doesn't need to

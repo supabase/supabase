@@ -62,7 +62,7 @@ interface PreviewFilterPanelProps {
 /**
  * Logs control panel header + wrapper
  */
-const PreviewFilterPanel = ({
+export const PreviewFilterPanel = ({
   isLoading,
   newCount,
   onRefresh,
@@ -189,6 +189,7 @@ const PreviewFilterPanel = ({
 
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_REFRESH} side="bottom">
           <Button
+            aria-label="Refresh logs"
             title="refresh"
             className="px-1.5"
             icon={
@@ -305,5 +306,3 @@ const PreviewFilterPanel = ({
     </div>
   )
 }
-
-export default PreviewFilterPanel

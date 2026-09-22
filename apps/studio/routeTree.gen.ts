@@ -42,6 +42,7 @@ import { Route as ApiCliReleaseVersionRouteImport } from './routes/api/cli-relea
 import { Route as ApiCheckCnameRouteImport } from './routes/api/check-cname'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthSignInSsoRouteImport } from './routes/_auth/sign-in-sso'
+import { Route as AuthSignInRecoveryCodeRouteImport } from './routes/_auth/sign-in-recovery-code'
 import { Route as AuthSignInPartnerRouteImport } from './routes/_auth/sign-in-partner'
 import { Route as AuthSignInMfaRouteImport } from './routes/_auth/sign-in-mfa'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
@@ -497,6 +498,11 @@ const AuthSignUpRoute = AuthSignUpRouteImport.update({
 const AuthSignInSsoRoute = AuthSignInSsoRouteImport.update({
   id: '/sign-in-sso',
   path: '/sign-in-sso',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignInRecoveryCodeRoute = AuthSignInRecoveryCodeRouteImport.update({
+  id: '/sign-in-recovery-code',
+  path: '/sign-in-recovery-code',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthSignInPartnerRoute = AuthSignInPartnerRouteImport.update({
@@ -2153,6 +2159,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof AuthSignInRoute
   '/sign-in-mfa': typeof AuthSignInMfaRoute
   '/sign-in-partner': typeof AuthSignInPartnerRoute
+  '/sign-in-recovery-code': typeof AuthSignInRecoveryCodeRoute
   '/sign-in-sso': typeof AuthSignInSsoRoute
   '/sign-up': typeof AuthSignUpRoute
   '/api/check-cname': typeof ApiCheckCnameRoute
@@ -2474,6 +2481,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthSignInRoute
   '/sign-in-mfa': typeof AuthSignInMfaRoute
   '/sign-in-partner': typeof AuthSignInPartnerRoute
+  '/sign-in-recovery-code': typeof AuthSignInRecoveryCodeRoute
   '/sign-in-sso': typeof AuthSignInSsoRoute
   '/sign-up': typeof AuthSignUpRoute
   '/api/check-cname': typeof ApiCheckCnameRoute
@@ -2785,6 +2793,7 @@ export interface FileRoutesById {
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-in-mfa': typeof AuthSignInMfaRoute
   '/_auth/sign-in-partner': typeof AuthSignInPartnerRoute
+  '/_auth/sign-in-recovery-code': typeof AuthSignInRecoveryCodeRoute
   '/_auth/sign-in-sso': typeof AuthSignInSsoRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/api/check-cname': typeof ApiCheckCnameRoute
@@ -3109,6 +3118,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-in-mfa'
     | '/sign-in-partner'
+    | '/sign-in-recovery-code'
     | '/sign-in-sso'
     | '/sign-up'
     | '/api/check-cname'
@@ -3430,6 +3440,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-in-mfa'
     | '/sign-in-partner'
+    | '/sign-in-recovery-code'
     | '/sign-in-sso'
     | '/sign-up'
     | '/api/check-cname'
@@ -3740,6 +3751,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-in'
     | '/_auth/sign-in-mfa'
     | '/_auth/sign-in-partner'
+    | '/_auth/sign-in-recovery-code'
     | '/_auth/sign-in-sso'
     | '/_auth/sign-up'
     | '/api/check-cname'
@@ -4399,6 +4411,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-in-sso'
       fullPath: '/sign-in-sso'
       preLoaderRoute: typeof AuthSignInSsoRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/sign-in-recovery-code': {
+      id: '/_auth/sign-in-recovery-code'
+      path: '/sign-in-recovery-code'
+      fullPath: '/sign-in-recovery-code'
+      preLoaderRoute: typeof AuthSignInRecoveryCodeRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/sign-in-partner': {
@@ -6515,6 +6534,7 @@ interface AuthRouteChildren {
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignInMfaRoute: typeof AuthSignInMfaRoute
   AuthSignInPartnerRoute: typeof AuthSignInPartnerRoute
+  AuthSignInRecoveryCodeRoute: typeof AuthSignInRecoveryCodeRoute
   AuthSignInSsoRoute: typeof AuthSignInSsoRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
   AuthCliLoginRoute: typeof AuthCliLoginRoute
@@ -6528,6 +6548,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthSignInRoute: AuthSignInRoute,
   AuthSignInMfaRoute: AuthSignInMfaRoute,
   AuthSignInPartnerRoute: AuthSignInPartnerRoute,
+  AuthSignInRecoveryCodeRoute: AuthSignInRecoveryCodeRoute,
   AuthSignInSsoRoute: AuthSignInSsoRoute,
   AuthSignUpRoute: AuthSignUpRoute,
   AuthCliLoginRoute: AuthCliLoginRoute,

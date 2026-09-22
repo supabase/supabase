@@ -14,12 +14,12 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
+  buildSchemasWithTables,
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
   getSchemaTableKey,
   getSelectedTableCount,
   hasSelectionChanged,
-  isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
   type WarehouseSetupTarget,
@@ -108,13 +108,7 @@ export const WarehouseSchemaTablePicker = ({
 
   const schemasWithTables: SchemaWithTables[] = useMemo(() => {
     if (!schemas || !tables) return []
-    return schemas
-      .filter((schema) => isSelectableWarehouseSchema(schema.name))
-      .map((schema) => ({
-        schema: schema.name,
-        tables: tables.filter((table) => table.schema === schema.name).map((table) => table.name),
-      }))
-      .sort((a, b) => a.schema.localeCompare(b.schema))
+    return buildSchemasWithTables(schemas, tables)
   }, [schemas, tables])
 
   const tableKeys = schemasWithTables.flatMap(({ schema, tables }) =>

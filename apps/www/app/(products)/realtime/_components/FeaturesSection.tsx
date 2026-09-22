@@ -628,9 +628,7 @@ function BroadcastSkeleton() {
             key={i}
             className={cn(
               'absolute bottom-6 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-xl border bg-surface-100 shadow-xs dark:shadow-sm transition-all duration-300',
-              isFlashing
-                ? 'border-brand-default text-primary'
-                : 'border-border text-foreground-muted'
+              isFlashing ? 'border-brand-default text-primary' : 'border-border text-foreground-muted'
             )}
             style={{ left: `${xPercent}%` }}
           >
