@@ -4,10 +4,11 @@ description: 'The Supabase CLI provides tools to develop your project locally, d
 subtitle: 'Develop locally, deploy to the Supabase Platform, and set up CI/CD workflows'
 ---
 
-The Supabase CLI runs the entire Supabase stack on your own machine or in a CI environment, so you can build and test locally without touching a hosted project.
+The Supabase CLI runs the entire Supabase stack on your own machine or in a CI environment, so you can build and test locally, then connect your project to a hosted one when you're ready to deploy.
 
 - [Quickstart](#quickstart) is the two-command version, if you already have the CLI and a container runtime.
 - [Set up a local project](#set-up-a-local-project) installs the CLI and brings the stack up on your machine. Start here if you haven't run it before.
+- [Connect to a hosted project](#connect-to-a-hosted-project) links your local directory to a project on the Supabase Platform.
 - [Change your CLI version](#change-your-cli-version) updates the CLI and switches between stable and pre-release builds.
 - [Telemetry](#telemetry) covers what the CLI collects and how to opt out.
 
@@ -129,7 +130,7 @@ To bring the stack up:
    supabase init
    ```
 
-   The command creates a `supabase` directory, which is safe to commit to version control.
+   The command creates a `supabase` directory, which is safe to commit to version control. `init` creates local files only: it doesn't sign you in or connect the directory to a project on the Supabase Platform. To connect one, see [Connect to a hosted project](#connect-to-a-hosted-project).
 
 4. Start the Supabase services from the same directory:
 
@@ -264,6 +265,12 @@ When you finish working, stop the stack. Stopping doesn't reset your local datab
 ```bash
 supabase stop
 ```
+
+## Connect to a hosted project
+
+The stack you started in [Run a local Supabase project](#running-a-local-supabase-project) runs only on your machine. Nothing reaches a hosted project until you sign in to the CLI and link your local directory to one.
+
+For the steps, see [Pushing to a remote project](/docs/guides/local-development/cli-workflows#pushing-to-a-remote-project). To run deployments from CI, see [Configure GitHub Actions](/docs/guides/deployment/managing-environments#configure-github-actions).
 
 ## Change your CLI version
 
