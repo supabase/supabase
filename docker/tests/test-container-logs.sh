@@ -62,31 +62,37 @@ get_container_id() {
     printf '%s' "$1"
 }
 
-# Check that a service's logs contain all expected patterns
+# Check that a service's logs contain all expected patterns.
+# Logs are written to a temp file so that grep -q exits cleanly.
 check_logs() {
     service="$1"
     shift
 
-    logs=$(docker compose logs "$service" 2>/dev/null || true)
-    if [ -z "$logs" ]; then
+    logfile=$(mktemp)
+
+    docker compose logs "$service" > "$logfile" 2>/dev/null || true
+    if [ ! -s "$logfile" ]; then
         container_id=$(get_container_id "$service")
         if [ -n "$container_id" ]; then
-            logs=$(docker logs "$container_id" 2>&1 || true)
+            docker logs "$container_id" > "$logfile" 2>&1 || true
         fi
     fi
 
-    if [ -z "$logs" ]; then
+    if [ ! -s "$logfile" ]; then
+        rm -f "$logfile"
         fail_msg "$service (no logs found)"
         return
     fi
 
     for pattern in "$@"; do
-        if ! echo "$logs" | grep -q -i -E "$pattern"; then
+        if ! grep -q -i -E "$pattern" "$logfile"; then
+            rm -f "$logfile"
             fail_msg "$service (missing: $pattern)"
             return
         fi
     done
 
+    rm -f "$logfile"
     pass_msg "$service"
 }
 
@@ -111,12 +117,10 @@ check_logs db \
 check_logs auth \
     'db worker started'
 
-check_logs_if_running kong \
-    'init.lua.*declarative config loaded'
-
-check_logs_if_running api-gw \
-     'Envoy configuration generated successfully' \
-     'Starting Envoy...'
+# API gateway: Envoy by default, or Kong when the kong override is enabled.
+# The service is named api-gw in both cases, so accept either startup marker.
+check_logs api-gw \
+    'init\.lua.*declarative config loaded|Envoy configuration generated successfully'
 
 check_logs rest \
     'Schema cache loaded in.*milliseconds'
@@ -144,9 +148,19 @@ check_logs_if_running analytics \
     'Executing startup tasks' \
     'Ensuring single tenant user is seeded'
 
-check_logs supavisor \
-    'Connected to Postgres database' \
-    'HEAD /api/health$'
+# Database pooler: Supavisor by default, or PgBouncer when the pgbouncer
+# override is enabled (which disables Supavisor). Check whichever is running.
+if is_service_running supavisor; then
+    check_logs supavisor \
+        'Connected to Postgres database' \
+        'HEAD /api/health$'
+elif is_service_running pgbouncer; then
+    check_logs pgbouncer \
+        'process up: PgBouncer' \
+        'listening on .*6432'
+else
+    fail_msg "pooler (neither supavisor nor pgbouncer is running)"
+fi
 
 check_logs_if_running vector \
     'Vector has started'

@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params
-  const baseDir = path.join(process.cwd(), 'public/docs/guides')
+  const baseDir = path.join(process.cwd(), 'public/markdown/guides')
   const filePath = path.join(baseDir, `${slug.join('/')}.md`)
 
   if (!filePath.startsWith(baseDir + path.sep) && filePath !== baseDir) {
@@ -18,6 +18,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
       headers: {
         'Content-Type': 'text/markdown; charset=utf-8',
         'Cache-Control': 'public, max-age=86400, stale-while-revalidate=3600',
+        Vary: 'Accept',
       },
     })
   } catch {

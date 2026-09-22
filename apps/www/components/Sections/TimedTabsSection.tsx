@@ -21,6 +21,7 @@ interface TabProps {
 
 const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }: TabProps) => (
   <button
+    tabIndex={0}
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
       isActive ? 'flex-2 text-foreground' : 'flex-1 text-foreground-light'
@@ -32,7 +33,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
       {isActive && (
         <motion.div
           className={[
-            'absolute inset-0 w-full right-full bg-brand h-full transition-opacity',
+            'absolute inset-0 w-full right-full bg-brand-default h-full transition-opacity',
             progress! > 99.7 ? 'opacity-0' : 'opacity-100',
           ].join(' ')}
           style={{ x: `${progress! - 100}%` }}
@@ -138,7 +139,7 @@ const TimedTabsSection = ({
           </h2>
           <p className="text-foreground-lighter mb-4 max-w-sm">{paragraph}</p>
           {cta && (
-            <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
+            <Button asChild size="small" icon={<ArrowUpRight />}>
               <Link href={cta.link}>{cta.label ?? 'Explore more'}</Link>
             </Button>
           )}

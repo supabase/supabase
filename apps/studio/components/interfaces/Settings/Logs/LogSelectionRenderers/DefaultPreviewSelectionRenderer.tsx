@@ -1,3 +1,4 @@
+import { safeLocalStorage } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -10,7 +11,7 @@ import {
   DropdownMenuTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
@@ -75,7 +76,7 @@ const PropertyRow = ({
   const [isExpanded, setIsExpanded] = useState(() => {
     try {
       // Storing in local storage so users dont have to click expand every time they change selected log
-      return JSON.parse(localStorage.getItem(storageKey) ?? 'false')
+      return JSON.parse(safeLocalStorage.getItem(storageKey) ?? 'false')
     } catch (_) {
       return false
     }
@@ -83,7 +84,7 @@ const PropertyRow = ({
   const [isCopied, setIsCopied] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(isExpanded))
+    safeLocalStorage.setItem(storageKey, JSON.stringify(isExpanded))
   }, [isExpanded, storageKey])
 
   const handleCopy = () => {
@@ -115,7 +116,7 @@ const PropertyRow = ({
               <Button
                 className="mt-1 w-full"
                 size="tiny"
-                type="outline"
+                variant="outline"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? 'Collapse' : 'Expand'}

@@ -56,6 +56,7 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { buildUnifiedLogsUrl } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
@@ -69,6 +70,8 @@ import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
 import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query'
 import { useUsersCountQuery } from '@/data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
+import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -80,13 +83,37 @@ import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-st
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
 
-const INDEX_WORKER_LOGS_SEARCH_STRING = `select id, auth_logs.timestamp, metadata.level, event_message, metadata.msg as msg, metadata.error
-from auth_logs
-cross join unnest(metadata) as metadata
-where metadata.worker_type = 'apiworker_index_worker'
-  and auth_logs.timestamp >= timestamp_sub(current_timestamp(), interval 3 hour)
-order by timestamp desc
-limit 100`
+const INDEX_WORKER_LOGS_QUERY = safeSql`
+  select
+    id,
+    auth_logs.timestamp,
+    metadata.level,
+    event_message,
+    metadata.msg as msg,
+    metadata.error
+  from auth_logs
+  cross join unnest(metadata) as metadata
+  where metadata.worker_type = 'apiworker_index_worker'
+    and auth_logs.timestamp >= timestamp_sub(current_timestamp(), interval 3 hour)
+  order by timestamp desc
+  limit 100
+`
+
+const INDEX_WORKER_LOGS_QUERY_OTEL = safeSql`
+  select
+    id,
+    timestamp,
+    log_attributes['level'] as level,
+    event_message,
+    log_attributes['msg'] as msg,
+    log_attributes['error'] as error
+  from logs
+  where source = 'auth_logs'
+    and log_attributes['worker_type'] = 'apiworker_index_worker'
+    and timestamp >= now() - interval 3 hour
+  order by timestamp desc
+  limit 100
+`
 
 export const UsersV2 = () => {
   const router = useRouter()
@@ -98,6 +125,12 @@ export const UsersV2 = () => {
     isError: isProjectError,
   } = useSelectedProjectQuery()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const useOtel = useFlag('otelLegacyLogs')
+  const indexWorkerLogsQuery = pickLogsQueryBuilder(
+    useOtel,
+    INDEX_WORKER_LOGS_QUERY_OTEL,
+    INDEX_WORKER_LOGS_QUERY
+  )
 
   const gridRef = useRef<DataGridHandle>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -157,7 +190,6 @@ export const UsersV2 = () => {
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
-
   const [improvedSearchDismissed, setImprovedSearchDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AUTH_USERS_IMPROVED_SEARCH_DISMISSED(projectRef ?? ''),
     false
@@ -373,6 +405,12 @@ export const UsersV2 = () => {
     }
   }
 
+  const onSelectViewLogs = (user: User) => {
+    const identifier = user.id || user.email
+    if (!projectRef || !identifier) return
+    router.push(buildUnifiedLogsUrl({ projectRef, user: identifier }))
+  }
+
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
     xScroll.current = event.currentTarget.scrollLeft
@@ -482,6 +520,7 @@ export const UsersV2 = () => {
         setSortByValue: updateSortByValue,
         onSelectDeleteUser: setSelectedUserToDelete,
         onSelectImpersonateUser,
+        onSelectViewLogs,
       })
       setColumns(columns)
       if (columns.length < userTableColumns.length) {
@@ -544,7 +583,6 @@ export const UsersV2 = () => {
                 icon={<WandSparklesIcon />}
                 onClick={() => setShowCreateIndexesModal(true)}
                 loading={isUpdatingAuthConfig}
-                type="default"
               >
                 Upgrade search
               </Button>
@@ -562,9 +600,9 @@ export const UsersV2 = () => {
                 on the number of users in your project.
               </div>
 
-              <Button type="link" iconRight={<ExternalLinkIcon />} asChild>
+              <Button variant="link" iconRight={<ExternalLinkIcon />} asChild>
                 <Link
-                  href={`/project/${projectRef}/logs/explorer?q=${encodeURI(INDEX_WORKER_LOGS_SEARCH_STRING)}`}
+                  href={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(indexWorkerLogsQuery)}`}
                   target="_blank"
                 >
                   View logs
@@ -577,11 +615,10 @@ export const UsersV2 = () => {
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
-              <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
+              <Button icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
                 Delete {selectedUsers.size} users
               </Button>
               <ButtonTooltip
-                type="default"
                 icon={<X />}
                 className="px-1.5"
                 onClick={() => setSelectedUsers(new Set([]))}
@@ -716,6 +753,7 @@ export const UsersV2 = () => {
                       setSortByValue: updateSortByValue,
                       onSelectDeleteUser: setSelectedUserToDelete,
                       onSelectImpersonateUser,
+                      onSelectViewLogs,
                     })
 
                     setSelectedColumns(value)
@@ -749,7 +787,6 @@ export const UsersV2 = () => {
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
-                  type="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={handleRefresh}
@@ -807,6 +844,7 @@ export const UsersV2 = () => {
                   renderRow(id, props) {
                     return (
                       <Row
+                        key={id}
                         {...props}
                         onClick={() => {
                           const user = users.find((u) => u.id === id)
@@ -957,7 +995,7 @@ export const UsersV2 = () => {
           <li className="marker:text-foreground-light">
             You can monitor the progress in the{' '}
             <InlineLink
-              href={`/project/${projectRef}/logs/explorer?q=${encodeURI(INDEX_WORKER_LOGS_SEARCH_STRING)}`}
+              href={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(indexWorkerLogsQuery)}`}
               target="_blank"
             >
               project logs

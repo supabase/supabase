@@ -26,6 +26,12 @@ export const examples: Registry = [
     files: ['example/admonition-button.tsx'],
   },
   {
+    name: 'admonition-button-split',
+    type: 'components:example',
+    registryDependencies: ['admonition', 'button', 'dropdown-menu'],
+    files: ['example/admonition-button-split.tsx'],
+  },
+  {
     name: 'admonition-description-only',
     type: 'components:example',
     registryDependencies: ['admonition'],
@@ -139,42 +145,42 @@ export const examples: Registry = [
     registryDependencies: ['badge'],
     files: ['example/badge-secondary.tsx'],
   },
-  // {
-  //   name: 'breadcrumb-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-demo.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-separator',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-separator.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-dropdown',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-dropdown.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-ellipsis',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-ellipsis.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-link',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-link.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-responsive',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-responsive.tsx'],
-  // },
+  {
+    name: 'breadcrumb-demo',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb'],
+    files: ['example/breadcrumb-demo.tsx'],
+  },
+  {
+    name: 'breadcrumb-separator',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb'],
+    files: ['example/breadcrumb-separator.tsx'],
+  },
+  {
+    name: 'breadcrumb-dropdown',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb', 'dropdown-menu'],
+    files: ['example/breadcrumb-dropdown.tsx'],
+  },
+  {
+    name: 'breadcrumb-ellipsis',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb'],
+    files: ['example/breadcrumb-ellipsis.tsx'],
+  },
+  {
+    name: 'breadcrumb-link',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb'],
+    files: ['example/breadcrumb-link.tsx'],
+  },
+  {
+    name: 'breadcrumb-responsive',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb', 'button', 'drawer', 'dropdown-menu'],
+    files: ['example/breadcrumb-responsive.tsx'],
+  },
   {
     name: 'button-demo',
     type: 'components:example',
@@ -254,6 +260,12 @@ export const examples: Registry = [
     files: ['example/button-as-child.tsx'],
   },
   {
+    name: 'button-split-dropdown',
+    type: 'components:example',
+    registryDependencies: ['button', 'dropdown-menu'],
+    files: ['example/button-split-dropdown.tsx'],
+  },
+  {
     name: 'calendar-demo',
     type: 'components:example',
     registryDependencies: ['calendar'],
@@ -264,6 +276,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['calendar', 'form', 'popover'],
     files: ['example/calendar-form.tsx'],
+  },
+  {
+    name: 'calendar-disabled-days-demo',
+    type: 'components:example',
+    registryDependencies: ['calendar', 'form', 'popover'],
+    files: ['example/calendar-disabled-days-demo.tsx'],
   },
   {
     name: 'single-value-field-array-demo',
@@ -532,6 +550,18 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['dialog', 'button'],
     files: ['example/dialog-centered-off.tsx'],
+  },
+  {
+    name: 'disabled-focusable',
+    type: 'components:example',
+    registryDependencies: ['button', 'tooltip'],
+    files: ['example/disabled-focusable.tsx'],
+  },
+  {
+    name: 'disabled-unavailable-with-notice',
+    type: 'components:example',
+    registryDependencies: ['admonition', 'button', 'card', 'tooltip'],
+    files: ['example/disabled-unavailable-with-notice.tsx'],
   },
   {
     name: 'drawer-demo',
@@ -891,6 +921,21 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['sonner'],
     files: ['example/sonner-upload.tsx'],
+  },
+  {
+    name: 'success-check-demo',
+    type: 'components:example',
+    files: ['example/success-check-demo.tsx'],
+  },
+  {
+    name: 'success-check-selected',
+    type: 'components:example',
+    files: ['example/success-check-selected.tsx'],
+  },
+  {
+    name: 'success-check-progress',
+    type: 'components:example',
+    files: ['example/success-check-progress.tsx'],
   },
   {
     name: 'switch-demo',
@@ -1319,6 +1364,11 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'skip-to-content-demo',
+    type: 'components:example',
+    files: ['example/skip-to-content-demo.tsx'],
+  },
+  {
     name: 'page-container-demo',
     type: 'components:example',
     files: ['example/page-container-demo.tsx'],
@@ -1364,6 +1414,36 @@ export const examples: Registry = [
     name: 'page-layout-settings',
     type: 'components:example',
     files: ['example/page-layout-settings.tsx'],
+  },
+  {
+    name: 'connect-interstitial-demo',
+    type: 'components:example',
+    files: ['example/connect-interstitial-demo.tsx'],
+  },
+  {
+    name: 'connect-interstitial-action-error',
+    type: 'components:example',
+    files: ['example/connect-interstitial-action-error.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-pair',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-pair.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-single',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-single.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-unknown',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-unknown.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-uploaded',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-uploaded.tsx'],
   },
   {
     name: 'page-layout-auth-emails',
@@ -1444,6 +1524,11 @@ export const examples: Registry = [
     name: 'multi-select-disabled',
     type: 'components:example',
     files: ['example/multi-select-disabled.tsx'],
+  },
+  {
+    name: 'multi-select-without-icon',
+    type: 'components:example',
+    files: ['example/multi-select-without-icon.tsx'],
   },
   {
     name: 'multi-select-badge-limit-wrap',

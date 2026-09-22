@@ -1,13 +1,27 @@
+import { useParams } from 'common'
 import { LoaderCircle, Search } from 'lucide-react'
-import { useEffect, useEffectEvent, useState } from 'react'
-import { FilterBar, FilterCondition, type FilterGroup, type FilterProperty } from 'ui-patterns'
-
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import {
-  isLogsFilterColumnValue,
-  type LogsColumnFilterValue,
-  type LogsFilterOperator,
-} from '../UnifiedLogs.filters'
+  FilterBar,
+  FilterCondition,
+  type FilterBarHandle,
+  type FilterGroup,
+} from 'ui-patterns/FilterBar'
+
+import { isLogsFilterColumnValue } from '../UnifiedLogs.filters'
+import {
+  buildColumnFilterValues,
+  buildFilterProperties,
+  getUserFilterValue,
+  USER_PROPERTY,
+} from './LogsFilterBar.utils'
+import { searchAuthUsers } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { UUID_REGEX } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const buildFilterGroup = (
   columnFilters: { id: string; value: unknown }[],
@@ -15,17 +29,15 @@ const buildFilterGroup = (
 ): FilterGroup => {
   const conditions: FilterCondition[] = []
   for (const { id, value } of columnFilters) {
-    if (!filterableNames.has(id) || value === null || value === undefined) continue
-    // Equality filters carry their operator inside a wrapped value; range/slider
-    // filters arrive as plain arrays and default to `=`.
-    const { operator, values } = isLogsFilterColumnValue(value)
-      ? value
-      : { operator: '=' as LogsFilterOperator, values: Array.isArray(value) ? value : [value] }
-    for (const v of values) {
+    // Non-timerange column filter values are always the wrapped `{ operator, values }`
+    // shape; skip anything else (e.g. the `date` timerange brush, which isn't in
+    // filterableNames, or an unexpected shape).
+    if (!filterableNames.has(id) || !isLogsFilterColumnValue(value)) continue
+    for (const v of value.values) {
       conditions.push({
         propertyName: id,
         value: v as FilterCondition['value'],
-        operator,
+        operator: value.operator,
       })
     }
   }
@@ -33,38 +45,66 @@ const buildFilterGroup = (
 }
 
 export const LogsFilterBar = () => {
+  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { table, filterFields, columnFilters, isFetching } = useDataTable()
 
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_FOCUS_FILTER, () => filterBarRef.current?.focus(), {
+    registerInCommandMenu: true,
+  })
+
+  const filterBarRef = useRef<FilterBarHandle>(null)
   const [freeformText, setFreeformText] = useState('')
 
-  const filterProperties: FilterProperty[] = filterFields
-    .filter((x) => x.type !== 'timerange')
-    .map((filter) => ({
-      label: filter.label,
-      name: filter.value,
-      type: 'string',
-      options: filter.options ?? [],
-      operators:
-        filter.value === 'event_message'
-          ? [
-              { label: 'iLike', value: '~~*', group: 'pattern' },
-              { label: 'Not iLike', value: '!~~*', group: 'pattern' },
-            ]
-          : [
-              { label: 'Equals', value: '=', group: 'comparison' },
-              { label: 'Not equal', value: '<>', group: 'comparison' },
-            ],
-    }))
+  // [Joshen] We're separately declaring useQueryState for user here, as there's no "user" column
+  // in the Tanstack table.
+  const [user, setUser] = useQueryState(USER_PROPERTY, parseAsString)
+
+  // A UUID is matched exactly rather than searched (it's already a resolved id, not a keyword).
+  const searchUserOptions = async (search?: string) => {
+    const value = search?.trim() ?? ''
+    if (UUID_REGEX.test(value)) return [{ label: value, value }]
+    if (!projectRef) return []
+    const users = await searchAuthUsers(projectRef, project?.connectionString ?? null, value).catch(
+      () => []
+    )
+    return users.map((u) => ({ label: u.email ?? u.id, value: u.id }))
+  }
+
+  const filterProperties = buildFilterProperties({
+    fields: filterFields,
+    userOptions: searchUserOptions,
+  })
+
+  const withUserCondition = (group: FilterGroup): FilterGroup => {
+    if (!user) return group
+    return {
+      ...group,
+      conditions: [
+        ...group.conditions,
+        { propertyName: USER_PROPERTY, value: user, operator: '=' },
+      ],
+    }
+  }
+
+  const columnBackedNames = new Set(
+    filterProperties.map((p) => p.name).filter((name) => name !== USER_PROPERTY)
+  )
 
   // Local state because the FilterBar carries transient states
   const [filters, setFilters] = useState<FilterGroup>(() =>
-    buildFilterGroup(columnFilters, new Set(filterProperties.map((p) => p.name)))
+    withUserCondition(buildFilterGroup(columnFilters, columnBackedNames))
   )
 
-  // Read latest filterProperties without making the effect depend on its (per-render) identity.
+  // Read latest values without making the effect depend on their (per-render) identity.
   const syncFromColumnFilters = useEffectEvent(() => {
-    setFilters(buildFilterGroup(columnFilters, new Set(filterProperties.map((p) => p.name))))
+    setFilters(withUserCondition(buildFilterGroup(columnFilters, columnBackedNames)))
   })
+
+  const applyUser = (raw: string | undefined) => {
+    const value = raw?.trim() ?? ''
+    setUser(value || null)
+  }
 
   // No nested conditions in unified logs — type-cast to FilterCondition on read.
   const onApply = (next: FilterGroup) => {
@@ -76,31 +116,19 @@ export const LogsFilterBar = () => {
     )
     if (!isValid) return
 
-    // Coalesce conditions into one wrapped value per column. Mixed operators on
-    // the same column aren't expressible in the column-filter shape — last wins.
-    const wrappedByColumn = new Map<string, LogsColumnFilterValue>()
-    for (const cond of next.conditions as FilterCondition[]) {
-      const operator = cond.operator as LogsFilterOperator
-      const existing = wrappedByColumn.get(cond.propertyName)
-      if (!existing) {
-        wrappedByColumn.set(cond.propertyName, { operator, values: [String(cond.value)] })
-      } else {
-        existing.values.push(String(cond.value))
-        if (existing.operator !== operator) existing.operator = operator
-      }
-    }
+    applyUser(getUserFilterValue(next.conditions as FilterCondition[]))
 
-    for (const [name, wrapped] of wrappedByColumn) {
-      table.getColumn(name)?.setFilterValue(wrapped)
+    const columnFilterValues = buildColumnFilterValues(next.conditions as FilterCondition[])
+    for (const [name, value] of columnFilterValues) {
+      table.getColumn(name)?.setFilterValue(value)
     }
 
     // Only clear filters owned by this bar — leaves externally-set filters
     // (e.g. the timeline date range) untouched.
-    const managedNames = new Set(filterProperties.map((p) => p.name))
-    const nextNames = new Set(wrappedByColumn.keys())
+    const nextNames = new Set(columnFilterValues.keys())
     const filtersToRemove = table
       .getState()
-      .columnFilters.filter((x) => managedNames.has(x.id) && !nextNames.has(x.id))
+      .columnFilters.filter((x) => columnBackedNames.has(x.id) && !nextNames.has(x.id))
     filtersToRemove.forEach((x) => {
       table.getColumn(x.id)?.setFilterValue(undefined)
     })
@@ -108,11 +136,11 @@ export const LogsFilterBar = () => {
 
   useEffect(() => {
     syncFromColumnFilters()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
-  }, [columnFilters])
+  }, [columnFilters, user])
 
   return (
     <FilterBar
+      ref={filterBarRef}
       variant="pill"
       freeformDefaultProperty="event_message"
       className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"

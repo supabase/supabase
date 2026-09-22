@@ -11,7 +11,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { getDocument } from '@/data/documents/document-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -79,12 +79,7 @@ export const SOC2 = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button
-              type="default"
-              icon={<Download />}
-              onClick={handleDownloadClick}
-              disabled={!slug}
-            >
+            <Button icon={<Download />} onClick={handleDownloadClick} disabled={!slug}>
               Download SOC2 Type 2 Report
             </Button>
           </div>

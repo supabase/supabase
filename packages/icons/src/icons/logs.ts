@@ -4,7 +4,7 @@ import createSupabaseIcon from '../createSupabaseIcon';
  * @component @name Logs
  * @description Supabase SVG icon component, renders SVG Element with children.
  *
- * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiICAgIHN0cm9rZS13aWR0aD0iMSI+CiAgICA8cGF0aAogICAgICAgIGQ9Ik00LjUgNS4yMDY3OUg0LjUzNzEzTTcuNDYyNDEgNS4yMTcwN0gxOS41TTQuNSA5LjY1ODM5SDQuNTM3MTNNNy40NjI0MSA5LjY2ODY4SDE5LjVNNC41MjY5MiAxNC4xNjRINC41MzcxM003LjQ2MjQxIDE0LjE3NDJIMTkuNU00LjUyNjkyIDE4LjcwNjhMNC41MzcxMyAxOC42OTY1TTcuNDYyNDEgMTguNzA2OEgxOS41IiAvPgo8L3N2Zz4=)
+ * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiICAgIHN0cm9rZS13aWR0aD0iMS41Ij4KICAgIDxwYXRoCiAgICAgICAgZD0iTTQuNSA1LjIwNjc5SDQuNTM3MTNNNy40NjI0MSA1LjIxNzA3SDE5LjVNNC41IDkuNjU4MzlINC41MzcxM003LjQ2MjQxIDkuNjY4NjhIMTkuNU00LjUyNjkyIDE0LjE2NEg0LjUzNzEzTTcuNDYyNDEgMTQuMTc0MkgxOS41TTQuNTI2OTIgMTguNzA2OEw0LjUzNzEzIDE4LjY5NjVNNy40NjI0MSAxOC43MDY4SDE5LjUiIC8+Cjwvc3ZnPg==)
  *
  * @param {Object} props - Supabase icons props and any valid SVG attribute
  * @returns {JSX.Element} JSX Element
@@ -21,7 +21,7 @@ const Logs = createSupabaseIcon(
       },
     ],
   ],
-  { fill: 'none', stroke: 'currentColor', strokeWidth: '1' },
+  { fill: 'none', stroke: 'currentColor', strokeWidth: '1.5' },
 );
 
 export default Logs;

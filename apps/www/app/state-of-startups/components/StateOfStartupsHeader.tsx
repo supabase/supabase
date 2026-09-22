@@ -12,8 +12,8 @@ const DiagonalStripes = () => (
     style={{
       backgroundImage: `repeating-linear-gradient(
         45deg,
-        hsl(var(--border-muted)) 0px,
-        hsl(var(--border-muted)) 1px,
+        var(--border-muted) 0px,
+        var(--border-muted) 1px,
         transparent 1px,
         transparent 8px
       )`,

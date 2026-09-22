@@ -1,5 +1,5 @@
 import { cn } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 interface HoverCardTimestampProps {
   date: Date

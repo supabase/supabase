@@ -52,11 +52,11 @@ export default function ComposedChartBasic() {
     },
     performance: {
       label: 'Performance',
-      color: 'hsl(var(--chart-2))',
+      color: 'var(--chart-2)',
     },
     efficiency: {
       label: 'Efficiency',
-      color: 'hsl(var(--chart-5))',
+      color: 'var(--chart-5)',
     },
   }
 
@@ -93,7 +93,7 @@ export default function ComposedChartBasic() {
                 showYAxis={true}
                 YAxisProps={{
                   tickFormatter: (value) => `${value}k`,
-                  width: 80,
+                  width: 36,
                 }}
                 isFullHeight={true}
               />
@@ -129,7 +129,7 @@ export default function ComposedChartBasic() {
                 showYAxis={true}
                 YAxisProps={{
                   tickFormatter: (value) => `${value}k`,
-                  width: 80,
+                  width: 36,
                 }}
                 isFullHeight={true}
               />

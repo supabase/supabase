@@ -75,7 +75,6 @@ export const FindTableSelector = forwardRef<HTMLDivElement, FindTableSelectorPro
           <PopoverTrigger asChild>
             <Button
               size={size}
-              type="default"
               disabled={disabled}
               data-testid="find-table-selector"
               icon={<Search size={14} strokeWidth={1.5} className="text-foreground-muted" />}
@@ -120,7 +119,6 @@ export const FindTableSelector = forwardRef<HTMLDivElement, FindTableSelectorPro
                             <Button
                               block
                               size="tiny"
-                              type="default"
                               loading={isFetchingNextPage}
                               onClick={() => fetchNextPage()}
                             >

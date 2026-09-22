@@ -26,14 +26,7 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { isFeatureEnabled } from 'common'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-import {
-  Badge,
-  cn,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
+import { Badge, cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
@@ -94,7 +87,7 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
   const allAvailableVersions = REFERENCES[libraryId.replaceAll('-', '_')].versions
   const isLatestVersion = allAvailableVersions.length === 0 || version === allAvailableVersions[0]
 
-  const sectionLink = `/docs/reference/${libPath}${isLatestVersion ? '' : `/${version}`}#${section.slug}`
+  const sectionLink = `/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}${section.slug}`
 
   switch (section.type) {
     case 'markdown':
@@ -192,7 +185,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                 return (
                   <li key={index} className="ml-4">
                     <RefInternalLink
-                      href={`/reference/cli#${subcommandDetails.id}`}
+                      href={`/reference/cli/${subcommandDetails.id}`}
                       sectionSlug={subcommandDetails.id}
                     >
                       {subcommandDetails.title}
@@ -234,10 +227,10 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {'examples' in command &&
           Array.isArray(command.examples) &&
           command.examples.length > 0 && (
-            <Tabs_Shadcn_ defaultValue={command.examples[0].id}>
-              <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+            <Tabs defaultValue={command.examples[0].id}>
+              <TabsList className="flex-wrap gap-2 border-0">
                 {command.examples.map((example) => (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     key={example.id}
                     value={example.id}
                     className={cn(
@@ -251,19 +244,19 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     )}
                   >
                     {example.name}
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 ))}
-              </TabsList_Shadcn_>
+              </TabsList>
               {command.examples.map((example) => (
-                <TabsContent_Shadcn_ key={example.id} value={example.id}>
+                <TabsContent key={example.id} value={example.id}>
                   <CodeBlock lang="bash" className="mb-6">
                     {example.code}
                   </CodeBlock>
                   <h3 className="text-foreground-lighter text-sm mb-2">Response</h3>
                   <CodeBlock lang="txt">{example.response}</CodeBlock>
-                </TabsContent_Shadcn_>
+                </TabsContent>
               ))}
-            </Tabs_Shadcn_>
+            </Tabs>
           )}
       </div>
     </RefSubLayout.Section>
@@ -282,10 +275,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
-  const endpointFgaPermissionGroups =
-    endpointDetails.security
-      ?.filter((sec) => 'fga_permissions' in sec)
-      .map((sec) => sec.fga_permissions) ?? []
+  const endpointFgaPermissionGroups = endpointDetails['x-fga-permissions'] ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =
@@ -472,7 +462,7 @@ async function FunctionSection({
 
   let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(sdkId, version, fn['$ref'] as string)
   }
 
   const fullDescription = [
@@ -536,10 +526,10 @@ async function FunctionSection({
           if (examples.length === 0) return null
 
           return (
-            <Tabs_Shadcn_ defaultValue={examples[0].id}>
-              <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+            <Tabs defaultValue={examples[0].id}>
+              <TabsList className="flex-wrap gap-2 border-0">
                 {examples.map((example) => (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     key={example.id}
                     value={example.id}
                     className={cn(
@@ -553,12 +543,20 @@ async function FunctionSection({
                     )}
                   >
                     {example.name}
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 ))}
-              </TabsList_Shadcn_>
+              </TabsList>
               {examples.map((example) => (
-                <TabsContent_Shadcn_ key={example.id} value={example.id}>
-                  <MDXRemoteRefs source={example.code} />
+                <TabsContent key={example.id} value={example.id}>
+                  <div
+                    className={cn(
+                      'prose wrap-break-word max-w-none',
+                      '[&_.shiki]:!my-0 [&_.shiki:not(:last-child)]:!mb-4',
+                      '[&_p]:!whitespace-normal'
+                    )}
+                  >
+                    <MDXRemoteRefs source={example.code} />
+                  </div>
                   <div className="flex flex-col gap-2 mt-2">
                     {'data' in example && !!example.data?.sql && (
                       <CollapsibleDetails title="Data source" content={example.data.sql} />
@@ -573,9 +571,9 @@ async function FunctionSection({
                       />
                     )}
                   </div>
-                </TabsContent_Shadcn_>
+                </TabsContent>
               ))}
-            </Tabs_Shadcn_>
+            </Tabs>
           )
         })()}
       </div>

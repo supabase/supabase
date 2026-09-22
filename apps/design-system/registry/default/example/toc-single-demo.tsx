@@ -1,7 +1,13 @@
 'use client'
 
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { AnchorProvider, Toc, TOCItems, TOCScrollArea, type AnchorProviderProps } from 'ui-patterns'
+import {
+  AnchorProvider,
+  Toc,
+  TOCItems,
+  TOCScrollArea,
+  type AnchorProviderProps,
+} from 'ui-patterns/Toc'
 
 export default function MultiSelectDemo() {
   return (

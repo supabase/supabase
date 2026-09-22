@@ -3,9 +3,7 @@ import { FormControl, FormField } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { DATABASE_PASSWORD_REGEX } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
-import { SpecialSymbolsCallout } from './SpecialSymbolsCallout'
 import Panel from '@/components/ui/Panel'
 import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
 import { passwordStrength } from '@/lib/password-strength'
@@ -49,23 +47,18 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
         control={form.control}
         name="dbPass"
         render={({ field }) => {
-          const isInvalidDatabasePassword =
-            field.value.length > 0 && !field.value.match(DATABASE_PASSWORD_REGEX)
-
           return (
             <FormItemLayout
+              id="dbPass"
               label="Database password"
               layout="horizontal"
               description={
-                <>
-                  {isInvalidDatabasePassword && <SpecialSymbolsCallout />}
-                  <PasswordStrengthBar
-                    passwordStrengthScore={form.getValues('dbPassStrength')}
-                    password={field.value}
-                    passwordStrengthMessage={form.getValues('dbPassStrengthMessage')}
-                    generateStrongPassword={generatePassword}
-                  />
-                </>
+                <PasswordStrengthBar
+                  passwordStrengthScore={form.getValues('dbPassStrength')}
+                  password={field.value}
+                  passwordStrengthMessage={form.getValues('dbPassStrengthMessage')}
+                  generateStrongPassword={generatePassword}
+                />
               }
             >
               <FormControl>
@@ -74,6 +67,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                   type="password"
                   placeholder="Type in a strong password"
                   {...field}
+                  id="dbPass"
                   autoComplete="off"
                   onChange={async (event) => {
                     const newValue = event.target.value

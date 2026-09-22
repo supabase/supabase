@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Markdown } from 'ui-patterns/Markdown'
 
-import { Markdown } from '@/components/interfaces/Markdown'
+import { loadIntegrationOverview } from '@/static-data/integrations/overviews'
 
 interface MarkdownContentProps {
   content: string | null | undefined
@@ -21,9 +22,9 @@ export const MarkdownContent = ({
     if (!integrationId || remoteContent) return
 
     let cancelled = false
-    import(`@/static-data/integrations/${integrationId}/overview.md`)
-      .then((module) => {
-        if (!cancelled) setLocalContent(String(module.default))
+    loadIntegrationOverview(integrationId)
+      .then((markdown) => {
+        if (!cancelled && markdown !== null) setLocalContent(markdown)
       })
       .catch((error) => console.error('Error loading markdown:', error))
 
@@ -34,5 +35,5 @@ export const MarkdownContent = ({
 
   const content = remoteContent || localContent
 
-  return <Markdown className="flex flex-col gap-y-4 text-foreground-light">{content}</Markdown>
+  return <Markdown className="text-sm">{content}</Markdown>
 }

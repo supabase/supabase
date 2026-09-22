@@ -1,126 +1,60 @@
-import { Info } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import dayjs from 'dayjs'
+import { type ReactNode } from 'react'
 
-import { SlotLagMetricKey, SlotLagMetrics } from './ReplicationPipelineStatus.types'
+import { SlotLagMetricKey } from './ReplicationPipelineStatus.types'
 import { getFormattedLagValue } from './ReplicationPipelineStatus.utils'
 
-const SLOT_LAG_FIELDS: {
+export interface SlotLagField {
   key: SlotLagMetricKey
   label: string
   type: 'bytes' | 'duration'
-  description: string
-}[] = [
+  description: ReactNode
+  // Friendly label to show in place of a literal "0 bytes" when there's nothing to report.
+  zeroLabel?: string
+  // Friendly label to show when the value is null/absent (e.g. unlimited WAL retention).
+  nullLabel?: string
+  // Optional hover text for the value, derived from the raw value (e.g. an absolute timestamp).
+  getValueTooltip?: (value: number) => string
+}
+
+export const SLOT_LAG_FIELDS: SlotLagField[] = [
   {
     key: 'confirmed_flush_lsn_bytes',
-    label: 'WAL Flush lag (size)',
+    // Same label as the list column. Scoped to the main slot's ongoing change stream, so "Caught
+    // up" stays true while tables are still doing their initial copy.
+    label: 'Lag',
     type: 'bytes',
     description:
-      'Bytes between the newest WAL record applied locally and the latest flushed WAL record acknowledged by ETL.',
-  },
-  {
-    key: 'flush_lag',
-    label: 'WAL Flush lag (time)',
-    type: 'duration',
-    description:
-      'Time between flushing recent WAL locally and receiving notification that ETL has written and flushed it.',
+      'Changes still on their way to the destination, measured on the pipeline’s main slot. Tables in their initial sync use their own slots and aren’t counted.',
+    zeroLabel: 'Caught up',
   },
   {
     key: 'safe_wal_size_bytes',
-    label: 'Remaining WAL size',
+    label: 'WAL retention remaining',
     type: 'bytes',
-    description:
-      'Bytes still available to write to WAL before this slot risks entering the "lost" state.',
+    description: (
+      <>
+        How much more WAL can accumulate before the replication slot is at risk of being lost.
+        Controlled by the <code className="text-code-inline">max_slot_wal_keep_size</code> setting.
+      </>
+    ),
+    nullLabel: 'Unlimited',
+  },
+  {
+    key: 'reply_time_lag',
+    label: 'Last check-in',
+    type: 'duration',
+    description: 'Time since the pipeline last reported back to your database',
+    zeroLabel: 'Just now',
+    // reply_time_lag is "milliseconds ago", so the absolute time is now minus that, in local time.
+    getValueTooltip: (ms) => dayjs().subtract(ms, 'millisecond').format('MMM D, YYYY, h:mm:ss A'),
   },
 ]
 
-export const SlotLagMetricsInline = ({
-  tableName,
-  metrics,
-}: {
-  tableName: string
-  metrics: SlotLagMetrics
-}) => {
-  return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-foreground">
-      <span className="truncate font-medium" title={tableName}>
-        {tableName}
-      </span>
-      <span className="text-foreground-lighter">•</span>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-foreground-light">
-        {SLOT_LAG_FIELDS.map(({ key, label, type }) => {
-          const { display } = getFormattedLagValue(type, metrics[key])
-          return (
-            <span key={`${tableName}-${key}`} className="flex items-center gap-1">
-              <span className="uppercase tracking-wide text-[10px] text-foreground-lighter">
-                {label}
-              </span>
-              <span className="text-foreground">{display}</span>
-            </span>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-export const SlotLagMetricsList = ({
-  metrics,
-  size = 'default',
-  showMetricInfo = true,
-}: {
-  metrics: SlotLagMetrics
-  size?: 'default' | 'compact'
-  showMetricInfo?: boolean
-}) => {
-  const gridClasses =
-    size === 'default'
-      ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-4 gap-x-6'
-      : 'grid-cols-2 gap-y-2 gap-x-4'
-
-  const labelClasses =
-    size === 'default' ? 'text-xs text-foreground-light' : 'text-[11px] text-foreground-lighter'
-
-  const valueClasses =
-    size === 'default'
-      ? 'text-sm font-medium text-foreground'
-      : 'text-xs font-medium text-foreground'
-
-  return (
-    <dl className={`grid ${gridClasses}`}>
-      {SLOT_LAG_FIELDS.map(({ key, label, type, description }) => (
-        <div key={key} className="flex flex-col gap-0.5">
-          <dt className={labelClasses}>
-            <span className="inline-flex items-center gap-1">
-              {label}
-              {showMetricInfo && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      aria-label={`What is ${label}`}
-                      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
-                    >
-                      <Info size={12} />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" align="start" className="max-w-xs text-xs">
-                    {description}
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </span>
-          </dt>
-          {(() => {
-            const { display, detail } = getFormattedLagValue(type, metrics[key])
-            return (
-              <dd className={`flex flex-col ${valueClasses}`}>
-                <span>{display}</span>
-                {detail && <span className="text-[11px] text-foreground-lighter">{detail}</span>}
-              </dd>
-            )
-          })()}
-        </div>
-      ))}
-    </dl>
-  )
+// Resolves a field's value into a display string (+ optional precise detail), honoring the
+// friendly zero/null labels before falling back to the formatted byte/duration value.
+export const getFieldDisplay = (field: SlotLagField, value: number | null | undefined) => {
+  if (value == null) return { display: field.nullLabel ?? 'n/a', detail: undefined }
+  if (field.zeroLabel && value === 0) return { display: field.zeroLabel, detail: undefined }
+  return getFormattedLagValue(field.type, value)
 }

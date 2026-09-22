@@ -4,7 +4,7 @@ import { ButtonProps } from 'ui'
 export interface CTA {
   label: string
   href: string
-  type?: ButtonProps['type']
+  type?: ButtonProps['variant']
   target?: HTMLAnchorElement['target']
   onClick?: MouseEventHandler<HTMLButtonElement>
 }

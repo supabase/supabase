@@ -120,7 +120,7 @@ export function getOperationIcon(operation: string): LucideIcon {
 export function getOperationColor(operation: string): string {
   const op = operation.toLowerCase()
   if (op.includes('seq scan')) return 'text-warning'
-  if (op.includes('index')) return 'text-brand'
+  if (op.includes('index')) return 'text-primary'
   if (op.includes('join')) return 'text-foreground-light'
   if (op.includes('sort') || op.includes('aggregate')) return 'text-foreground-light'
   return 'text-foreground-light'
@@ -131,16 +131,6 @@ export function isExplainQuery(rows: readonly unknown[]): boolean {
   const firstRow = rows[0]
   if (typeof firstRow !== 'object' || firstRow === null) return false
   return 'QUERY PLAN' in firstRow && Object.keys(firstRow).length === 1
-}
-
-export function isTextFormatExplain(rows: readonly unknown[]): boolean {
-  if (!isExplainQuery(rows)) return false
-  const firstRow = rows[0] as Record<string, unknown>
-  return typeof firstRow['QUERY PLAN'] === 'string'
-}
-
-export function isExplainSql(sql: string): boolean {
-  return /^\s*explain\b/i.test(sql)
 }
 
 export function formatNodeDuration(ms: number | undefined): string {
@@ -164,7 +154,7 @@ export function getScanBarColor(operation: string): string {
     op.includes('index only scan') ||
     op.includes('bitmap index scan')
   ) {
-    return 'bg-brand/20'
+    return 'bg-brand-default/20'
   }
 
   // Sequential scans are yellow
@@ -195,36 +185,4 @@ export function getScanBorderColor(operation: string): string {
 
   // Default neutral color for other operations
   return 'border-l-border-muted'
-}
-
-export function splitSqlStatements(sql: string): string[] {
-  // Enhanced tokenizer that handles:
-  // - Single-quoted strings: '...' (with '' escaping)
-  // - Double-quoted strings: "..." (with "" escaping)
-  // - Dollar-quoted strings: $tag$...$tag$
-  // - Line comments: -- (until end of line)
-  // - Block comments: /* ... */ (may be multiline)
-  // - Semicolons: ;
-  const tokens =
-    sql.match(
-      /'([^']|'')*'|"([^"]|"")*"|\$[a-zA-Z0-9_]*\$[\s\S]*?\$[a-zA-Z0-9_]*\$|--[^\r\n]*|\/\*[\s\S]*?\*\/|;|[^'"$;\-\/]+|./g
-    ) || []
-
-  const statements: string[] = []
-  let current = ''
-
-  for (const token of tokens) {
-    if (token === ';') {
-      if (current.trim()) statements.push(current.trim())
-      current = ''
-    } else {
-      current += token
-    }
-  }
-
-  if (current.trim()) {
-    statements.push(current.trim())
-  }
-
-  return statements
 }

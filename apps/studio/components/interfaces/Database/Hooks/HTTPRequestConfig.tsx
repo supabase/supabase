@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/Forms/FormSection'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { buildDatabaseEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 
 interface HTTPRequestConfigProps {
   form: UseFormReturn<WebhookFormValues>
@@ -92,7 +93,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
             <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
             <div className="px-4 py-4 border rounded-sm bg-surface-300 border-strong flex items-center justify-between space-x-4">
               <p className="text-sm">No edge functions created yet</p>
-              <Button asChild>
+              <Button variant="primary" asChild>
                 <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
               </Button>
             </div>
@@ -116,8 +117,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                   <SelectContent>
                     {edgeFunctions.map((fn) => {
                       const restUrl = selectedProject?.restUrl
-                      const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
-                      const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
+                      const functionUrl = buildDatabaseEdgeFunctionUrl(fn.slug, ref ?? '', restUrl)
 
                       return (
                         <SelectItem key={fn.id} value={functionUrl}>
@@ -144,12 +144,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
             >
               <FormControl>
                 <div className="relative">
-                  <Input
-                    {...field}
-                    type="number"
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    className="pr-10"
-                  />
+                  <Input {...field} type="number" className="pr-10" />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-light text-sm">
                     ms
                   </span>

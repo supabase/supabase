@@ -1,0 +1,56 @@
+# PgBouncer override for self-hosted Supabase
+#
+# Replaces the default Supavisor pooler with PgBouncer in transaction mode.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.pgbouncer.yml up -d
+#
+#   Or use run.sh to add PgBouncer to the stack:
+#     sh run.sh config add pgbouncer
+#     sh run.sh start
+#
+
+services:
+  supavisor: !reset null
+
+  # To expose Postgres directly on POSTGRES_PORT (5432), uncomment the "db"
+  # section below.
+  # WARNING: this opens Postgres to the external traffic. Restrict access at the
+  # network level if necessary.
+  #db:
+  #  ports:
+  #    - ${POSTGRES_PORT}:${POSTGRES_PORT}
+
+  pgbouncer:
+    container_name: supabase-pgbouncer
+    image: edoburu/pgbouncer:v1.25.2-p0
+    restart: unless-stopped
+    ports:
+      - ${POOLER_PROXY_PORT_TRANSACTION}:6432
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-h', 'localhost', '-p', '6432']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # PgBouncer connects to Postgres as the dedicated `pgbouncer` role and
+      # looks up every other role's password on demand via the auth_query below.
+      DB_USER: pgbouncer
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      DB_NAME: ${POSTGRES_DB}
+      LISTEN_PORT: 6432
+      AUTH_TYPE: scram-sha-256
+      AUTH_QUERY: SELECT * FROM pgbouncer.get_auth($$1)
+      # POOL_MODE can be: session, transaction, or statement
+      POOL_MODE: transaction
+      DEFAULT_POOL_SIZE: ${POOLER_DEFAULT_POOL_SIZE}
+      MAX_CLIENT_CONN: ${POOLER_MAX_CLIENT_CONN}
+      # Only the `pgbouncer` role may run get_auth / the admin console.
+      ADMIN_USERS: pgbouncer
+      STATS_USERS: pgbouncer

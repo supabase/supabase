@@ -53,7 +53,7 @@ export function CommandMenu({ ...props }: DialogProps) {
   return (
     <>
       <Button
-        type="outline"
+        variant="outline"
         className={cn(
           `relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12
             hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
@@ -62,7 +62,7 @@ export function CommandMenu({ ...props }: DialogProps) {
         onClick={() => setOpen(true)}
         {...props}
       >
-        <span className="hidden lg:inline-flex">Search UI Library...</span>
+        <span className="hidden lg:inline-flex">Search Library...</span>
         <span className="inline-flex lg:hidden">Search...</span>
         <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded-sm border bg-surface-200 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex text-foreground-light">
           <span className="text-sm">⌘</span>K
@@ -95,10 +95,6 @@ export function CommandMenu({ ...props }: DialogProps) {
             <CommandItem onSelect={() => runCommand(() => setTheme('dark'))}>
               <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               Dark
-            </CommandItem>
-            <CommandItem onSelect={() => runCommand(() => setTheme('classic-dark'))}>
-              <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
-              Classic dark
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme('system'))}>
               <LaptopIcon className="mr-2 h-4 w-4" strokeWidth={1} />

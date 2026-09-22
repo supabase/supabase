@@ -10,7 +10,7 @@ import {
   useCronJobsInfiniteQuery,
 } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useCronJobsMinimalInfiniteQuery } from '@/data/database-cron-jobs/database-cron-jobs-minimal-infinite-query'
-import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError } from '@/types'
 
 // =============================================================================

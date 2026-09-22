@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 import {
@@ -20,7 +20,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
       title="A newer version of Postgres is available"
       description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
       actions={
-        <Button asChild type="default">
+        <Button asChild>
           <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
         </Button>
       }
@@ -46,6 +46,10 @@ const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError
       return `${error.schema_name}.${error.obj_name}`
     case 'active_replication_slot':
       return error.slot_name
+    case 'project_hibernating':
+      return 'Project is hibernating'
+    case 'x86_architecture':
+      return 'Project is running on x86 architecture'
   }
 }
 
@@ -67,6 +71,10 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
       return `Move the ${error.obj_type} to your own schema`
     case 'active_replication_slot':
       return 'Drop the active replication slot'
+    case 'project_hibernating':
+      return 'The project is currently hibernating and will wake on next supported request'
+    case 'x86_architecture':
+      return 'The project is running on x86 architecture and cannot be upgraded'
   }
 }
 
@@ -116,7 +124,7 @@ const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValida
         <p className="text-foreground-lighter text-xs">{description}</p>
       </div>
       {manageLink && (
-        <Button size="tiny" type="default" asChild>
+        <Button size="tiny" asChild>
           <Link href={manageLink}>Manage</Link>
         </Button>
       )}
@@ -152,6 +160,12 @@ const getWarningTitle = (warning: ProjectUpgradeEligibilityWarning): string => {
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return 'GraphQL introspection will be disabled by default after upgrade'
+    case 'ltree_reindex_required':
+      return 'ltree indexes must be reindexed after this upgrade'
+    case 'operator_estimator_gate':
+      return 'Custom operators may need attention after this upgrade'
+    case 'btree_gist_nan_reindex':
+      return 'btree_gist indexes on float columns must be reindexed after this upgrade'
   }
 }
 
@@ -159,6 +173,12 @@ const getWarningDescription = (warning: ProjectUpgradeEligibilityWarning): strin
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return 'After upgrading, queries to `__schema` and `__type` will return an error unless introspection is explicitly re-enabled on the schema. Regular data queries are not affected.'
+    case 'ltree_reindex_required':
+      return 'After upgrading, ltree indexes on this database can return incomplete results until they are rebuilt. Run `REINDEX INDEX CONCURRENTLY` on the affected indexes — this runs online with no downtime.'
+    case 'operator_estimator_gate':
+      return 'After upgrading, recreating an operator that references a non-built-in selectivity estimator (for example during a restore or branch) requires superuser and may fail. Most projects are not affected.'
+    case 'btree_gist_nan_reindex':
+      return 'After upgrading, btree_gist indexes on float columns can return wrong results for rows containing NaN until they are rebuilt. If those columns may contain NaN values, run `REINDEX INDEX CONCURRENTLY` on the affected indexes — this runs online with no downtime.'
   }
 }
 
@@ -166,6 +186,12 @@ const getWarningLink = (warning: ProjectUpgradeEligibilityWarning): string => {
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return `${DOCS_URL}/guides/platform/upgrading#upgrading-to-pg_graphql-160`
+    case 'ltree_reindex_required':
+      return `${DOCS_URL}/guides/platform/upgrading#ltree-indexes-require-reindexing-after-upgrade`
+    case 'operator_estimator_gate':
+      return `${DOCS_URL}/guides/platform/upgrading#custom-operator-selectivity-estimators`
+    case 'btree_gist_nan_reindex':
+      return `${DOCS_URL}/guides/platform/upgrading#btree_gist-indexes-on-float-columns-require-reindexing-after-upgrade`
   }
 }
 
@@ -183,7 +209,7 @@ export const ValidationWarningsAdmonition = ({
       title={getWarningTitle(warning)}
       description={getWarningDescription(warning)}
     >
-      <Button asChild type="default" className="mt-2">
+      <Button asChild className="mt-2">
         <Link href={getWarningLink(warning)} target="_blank" rel="noreferrer">
           Read upgrade notes
         </Link>

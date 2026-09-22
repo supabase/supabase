@@ -3,49 +3,16 @@ import { expect, Page } from '@playwright/test'
 import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
+import { createApiResponseWaiter } from '../utils/wait-for-response.js'
 
 /**
  * Helper function to navigate to policies page and wait for it to load
  */
 const navigateToPoliciesPage = async (page: Page, ref: string) => {
-  const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'policies')
-  await page.goto(toUrl(`/project/${ref}/auth/policies`))
+  const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=policies')
+  await page.goto(toUrl(`/project/${ref}/database/policies`))
   await wait
   await page.waitForTimeout(500)
-}
-
-/**
- * Helper function to delete a policy if it exists
- */
-const deletePolicyIfExists = async (page: Page, ref: string, policyNameToDelete: string) => {
-  // Look for the policy in the table
-  const policyButton = page.getByRole('button', { name: policyNameToDelete })
-  const policyExists = (await policyButton.count()) > 0
-
-  if (policyExists) {
-    // Click the policy row actions button
-    await page.getByTestId(`policy-${policyNameToDelete}-actions-button`).click()
-    await page.waitForTimeout(200)
-
-    // Click delete
-    await page.getByText('Delete', { exact: true }).click()
-    await page.waitForTimeout(200)
-
-    const waitForDeletion = waitForApiResponse(page, 'pg-meta', ref, 'query?key=')
-    // Confirm deletion
-    await page.getByRole('button', { name: 'Delete' }).click()
-
-    // Wait for deletion to complete
-    await waitForDeletion
-
-    await expect(
-      page.getByText('Successfully removed policy'),
-      'Policy deletion confirmation should be visible'
-    ).toBeVisible({ timeout: 50000 })
-
-    await page.waitForTimeout(500)
-  }
 }
 
 test.describe('RLS Policies', () => {
@@ -69,7 +36,7 @@ test.describe('RLS Policies', () => {
       ).toBeVisible()
 
       // Check schema selector is present
-      await expect(page.getByRole('button', { name: 'schema public' })).toBeVisible()
+      await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
 
       // Check search/filter input is present
       await expect(page.getByPlaceholder('Filter tables and policies')).toBeVisible()
@@ -108,7 +75,7 @@ test.describe('RLS Policies', () => {
       await navigateToPoliciesPage(page, ref)
 
       // Click schema selector
-      await page.getByRole('button', { name: 'schema public' }).click()
+      await page.getByRole('combobox', { name: 'Schema public' }).click()
 
       // Select auth schema
       await page.getByRole('option', { name: 'auth' }).click()
@@ -118,7 +85,7 @@ test.describe('RLS Policies', () => {
       await expect(page.getByRole('heading', { name: 'users', exact: true })).toBeVisible()
 
       // Switch back to public
-      await page.getByRole('button', { name: 'schema auth' }).click()
+      await page.getByRole('combobox', { name: 'Schema auth' }).click()
       await page.getByRole('option', { name: 'public', exact: true }).click()
       await page.waitForTimeout(1000)
     })
@@ -264,7 +231,7 @@ test.describe('RLS Policies', () => {
       ).toBeVisible({ timeout: 50000 })
 
       // Verify policy appears in the list
-      await expect(page.getByRole('button', { name: policySelectName })).toBeVisible()
+      await expect(page.getByRole('button', { name: policySelectName, exact: true })).toBeVisible()
 
       // Verify policy details
       const policyRow = page.locator(`tr:has-text("${policySelectName}")`)
@@ -321,7 +288,7 @@ test.describe('RLS Policies', () => {
       })
 
       // Verify policy appears with correct details
-      await expect(page.getByRole('button', { name: policyInsertName })).toBeVisible()
+      await expect(page.getByRole('button', { name: policyInsertName, exact: true })).toBeVisible()
       const policyRow = page.locator(`tr:has-text("${policyInsertName}")`)
       await expect(policyRow.locator('code').filter({ hasText: /^INSERT$/ })).toBeVisible()
       await expect(policyRow.locator('code').filter({ hasText: /^authenticated$/ })).toBeVisible()
@@ -382,7 +349,7 @@ test.describe('RLS Policies', () => {
       })
 
       // Verify policy appears
-      await expect(page.getByRole('button', { name: policyUpdateName })).toBeVisible()
+      await expect(page.getByRole('button', { name: policyUpdateName, exact: true })).toBeVisible()
       const policyRow = page.locator(`tr:has-text("${policyUpdateName}")`)
       await expect(policyRow.locator('code').filter({ hasText: /^UPDATE$/ })).toBeVisible()
     })
@@ -434,7 +401,7 @@ test.describe('RLS Policies', () => {
       })
 
       // Verify policy appears
-      await expect(page.getByRole('button', { name: policyDeleteName })).toBeVisible()
+      await expect(page.getByRole('button', { name: policyDeleteName, exact: true })).toBeVisible()
       const policyRow = page.locator(`tr:has-text("${policyDeleteName}")`)
       await expect(policyRow.locator('code').filter({ hasText: /^DELETE$/ })).toBeVisible()
     })

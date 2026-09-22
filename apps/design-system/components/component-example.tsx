@@ -1,13 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  cn,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-} from 'ui'
+import { cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import {
   // CopyButton,

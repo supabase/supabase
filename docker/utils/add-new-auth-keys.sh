@@ -38,17 +38,17 @@ else
         exit 1
     fi
 
-    if ! docker info >/dev/null 2>&1; then
-        echo "Error: docker is installed but the daemon is not running."
+    if ! ${DOCKER:-docker} info >/dev/null; then
+        echo "Error: cannot connect to the Docker daemon."
         exit 1
     fi
 
-    if ! docker image inspect node:22-alpine >/dev/null 2>&1; then
+    if ! ${DOCKER:-docker} image inspect node:22-alpine >/dev/null 2>&1; then
         echo "Pulling node:22-alpine (first-run only)..."
-        docker pull node:22-alpine
+        ${DOCKER:-docker} pull node:22-alpine
     fi
 
-    node_runner="docker run --rm node:22-alpine node"
+    node_runner="${DOCKER:-docker} run --rm node:22-alpine node"
 fi
 
 # Read JWT_SECRET from .env
@@ -163,11 +163,12 @@ echo "JWT_KEYS=${JWT_KEYS}"
 echo ""
 echo "JWT_JWKS=${JWT_JWKS}"
 echo ""
-echo "To enable asymmetric key pair, the following should be enabled in docker-compose.yml:"
+echo "Ensure the following configuration is uncommented in docker-compose.yml for the asymmetric key pair to work:"
 echo ""
 echo "  Auth:     GOTRUE_JWT_KEYS: \${JWT_KEYS:-[]}"
 echo "  Realtime: API_JWT_JWKS: \${JWT_JWKS:-{\"keys\":[]}}"
 echo "  Storage:  JWT_JWKS: \${JWT_JWKS:-{\"keys\":[]}}"
+echo "  Functions:  SUPABASE_JWKS: \${JWT_JWKS:-{\"keys\":[]}}"
 echo ""
 
 if [ "$1" = "--update-env" ]; then
@@ -212,11 +213,13 @@ sed -i.old \
     -e '/^[ ]*#GOTRUE_JWT_KEYS:/ s/#//' \
     -e '/^[ ]*#API_JWT_JWKS:/ s/#//' \
     -e '/^[ ]*#JWT_JWKS:/ s/#//' \
+    -e '/^[ ]*#SUPABASE_JWKS:/ s/#//' \
     docker-compose.yml || true
 
 if grep -q '^[ ]*GOTRUE_JWT_KEYS:' docker-compose.yml && \
    grep -q '^[ ]*API_JWT_JWKS:' docker-compose.yml && \
-   grep -q '^[ ]*JWT_JWKS:' docker-compose.yml; then
+   grep -q '^[ ]*JWT_JWKS:' docker-compose.yml && \
+   grep -q '^[ ]*SUPABASE_JWKS:' docker-compose.yml; then
     echo "Done."
 else
     echo "Warning: could not edit docker-compose.yml. Uncomment auth configuration manually."

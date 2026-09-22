@@ -15,7 +15,7 @@ export const HelpButton = () => {
   return (
     <ButtonTooltip
       id="help-dropdown-button"
-      type={isOpen ? 'secondary' : 'outline'}
+      variant={isOpen ? 'secondary' : 'outline'}
       size="tiny"
       className={cn('rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group')}
       onClick={() => {

@@ -1,0 +1,53 @@
+'use client'
+
+import { aiPrompts, type AiPromptId } from '~/data/ai-prompts.data'
+
+import {
+  Prompt,
+  PromptContent,
+  PromptCopy,
+  PromptMarkdown,
+  PromptPanel,
+  PromptTitle,
+  type PromptPanelTelemetry,
+} from './PromptPanel'
+
+type AiPromptProps = {
+  /** Looks up prompt text from `aiPrompts`. */
+  id: AiPromptId | string
+  /** Includes the prompt body in generated guide Markdown. */
+  includeInMarkdown?: boolean
+  /** Surface reported when the prompt is copied. */
+  telemetry: Omit<PromptPanelTelemetry, 'promptId'>
+}
+
+/**
+ * MDX-facing wrapper around {@link PromptPanel}. Composes the compound
+ * children in this client module so detection does not cross the RSC
+ * boundary (where child types arrive as `react.lazy` and the panel
+ * would otherwise render nothing).
+ *
+ * Prompt text lives in `~/data/ai-prompts.data`. Markdown export is opt-in so
+ * existing quickstarts do not duplicate their instructions in bulk exports.
+ */
+function AiPrompt({ id, telemetry }: AiPromptProps) {
+  const prompt = aiPrompts[id as AiPromptId]
+  if (!prompt) {
+    throw new Error(`Unknown AiPrompt id: ${id}`)
+  }
+
+  return (
+    <PromptPanel telemetry={{ ...telemetry, promptId: id }}>
+      <Prompt value="prompt" expandable>
+        <PromptTitle>Agent Prompt</PromptTitle>
+        <PromptCopy>{prompt}</PromptCopy>
+        <PromptContent>
+          <PromptMarkdown>{prompt}</PromptMarkdown>
+        </PromptContent>
+      </Prompt>
+    </PromptPanel>
+  )
+}
+
+export { AiPrompt }
+export type { AiPromptProps }

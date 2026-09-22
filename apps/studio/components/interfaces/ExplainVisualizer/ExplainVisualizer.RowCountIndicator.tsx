@@ -34,7 +34,7 @@ export function RowCountIndicator({
               -{formatRowCount(rowsRemovedByFilter)}
             </span>
             <ArrowRight size={10} className="text-foreground-muted" />
-            <span className="text-brand font-medium">
+            <span className="text-primary font-medium">
               {formatRowCount(actualRows)} {actualRows === 1 ? 'row' : 'rows'}
             </span>
           </div>

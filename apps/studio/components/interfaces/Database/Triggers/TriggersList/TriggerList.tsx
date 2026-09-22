@@ -14,6 +14,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import {
@@ -24,6 +27,7 @@ import {
 import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
@@ -89,16 +93,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
   }
 
   if (_triggers.length === 0 && filterString.length > 0) {
-    return (
-      <TableRow key={schema}>
-        <TableCell colSpan={7}>
-          <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-foreground-light">
-            Your search for "{filterString}" did not return any results
-          </p>
-        </TableCell>
-      </TableRow>
-    )
+    return <TableRowNoResults key={schema} colSpan={7} search={filterString} />
   }
 
   return (
@@ -107,7 +102,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
         <TableRow key={x.id}>
           <TableCell className="space-x-2">
             <Button
-              type="text"
+              variant="text"
               disabled={isLocked || !canUpdateTriggers}
               onClick={() => editTrigger(x)}
               title={x.name}
@@ -162,7 +157,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
           <TableCell>
             <div className="flex items-center justify-center">
               {x.enabled_mode !== 'DISABLED' ? (
-                <Check strokeWidth={2} className="text-brand" />
+                <Check strokeWidth={2} className="text-primary" />
               ) : (
                 <X strokeWidth={2} />
               )}
@@ -174,14 +169,18 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        aria-label="More options"
-                        type="default"
-                        className="px-1"
-                        icon={<MoreVertical />}
-                      />
-                    </DropdownMenuTrigger>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-label={`${x.function_name} actions`}
+                            className="px-1"
+                            icon={<MoreVertical />}
+                          />
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">More options</TooltipContent>
+                    </Tooltip>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem
                         className="space-x-2"
@@ -240,7 +239,6 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                 ) : (
                   <ButtonTooltip
                     disabled
-                    type="default"
                     className="px-1"
                     icon={<MoreVertical />}
                     tooltip={{

@@ -25,7 +25,7 @@ const TextConfirmModalWithChildren = () => {
 
   return (
     <>
-      <Button type="danger" onClick={onVisibleChange}>
+      <Button variant="danger" onClick={onVisibleChange}>
         Show Text Confirm Dialog
       </Button>
       <TextConfirmModal

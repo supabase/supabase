@@ -80,7 +80,7 @@ const TableSelector = ({
         <PopoverTrigger asChild>
           <Button
             size={size}
-            type="outline"
+            variant="outline"
             disabled={isLoading}
             className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
             icon={isLoading ? <Loader className="animate-spin" size={12} /> : null}
@@ -117,7 +117,7 @@ const TableSelector = ({
                   <AlertDescription className="text-xs mb-2">
                     Error: {(error as any)?.message}
                   </AlertDescription>
-                  <Button type="default" size="tiny" onClick={() => refetch()}>
+                  <Button size="tiny" onClick={() => refetch()}>
                     Reload tables
                   </Button>
                 </Alert>
@@ -143,7 +143,7 @@ const TableSelector = ({
                         >
                           <span>All tables</span>
                           {selectedSchemaName === '*' && (
-                            <Check className="text-brand" strokeWidth={2} />
+                            <Check className="text-primary" strokeWidth={2} />
                           )}
                         </CommandItem>
                       )}
@@ -162,7 +162,7 @@ const TableSelector = ({
                         >
                           <span>{table.name}</span>
                           {selectedSchemaName === table.name && (
-                            <Check className="text-brand" strokeWidth={2} />
+                            <Check className="text-primary" strokeWidth={2} />
                           )}
                         </CommandItem>
                       ))}

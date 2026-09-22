@@ -75,6 +75,7 @@ export const DocsMenu = ({
                 </Link>
               )
             })}
+            {group.footer}
           </div>
         </div>
       ))}

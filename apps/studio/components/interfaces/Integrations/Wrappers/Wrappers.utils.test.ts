@@ -4,8 +4,10 @@ import { SUPABASE_TARGET_SCHEMA_OPTION, WRAPPER_HANDLERS } from './Wrappers.cons
 import { Table } from './Wrappers.types'
 import {
   getEditionFormSchema,
+  getRequiredExtensionsToInstall,
   getTableFormSchema,
   getWrapperCreationFormSchema,
+  hasForeignSchemaSupport,
 } from './Wrappers.utils'
 
 const stripe_wrapper = {
@@ -205,5 +207,84 @@ describe('getTableFormSchema', () => {
     expect(
       result.error?.issues.find((issue) => issue.path.some((p) => p === 'schema_name'))
     ).toBeDefined()
+  })
+})
+
+// ─── getRequiredExtensionsToInstall ──────────────────────────────────────────
+
+describe('getRequiredExtensionsToInstall', () => {
+  const wrappers = { name: 'wrappers', installed_version: null }
+  const vault = { name: 'supabase_vault', installed_version: null }
+  const wrappersInstalled = { name: 'wrappers', installed_version: '0.4.1' }
+  const vaultInstalled = { name: 'supabase_vault', installed_version: '0.2.8' }
+  const unrelated = { name: 'pgmq', installed_version: null }
+
+  it('returns null when extensions are undefined (still loading)', () => {
+    expect(getRequiredExtensionsToInstall(undefined, ['wrappers'])).toBeNull()
+  })
+
+  it('returns empty array when required list is empty', () => {
+    expect(getRequiredExtensionsToInstall([wrappers], [])).toEqual([])
+  })
+
+  it('returns empty array when all required extensions are already installed', () => {
+    expect(
+      getRequiredExtensionsToInstall(
+        [wrappersInstalled, vaultInstalled],
+        ['wrappers', 'supabase_vault']
+      )
+    ).toEqual([])
+  })
+
+  it('returns extensions that are required but not installed', () => {
+    const result = getRequiredExtensionsToInstall(
+      [wrappers, vaultInstalled],
+      ['wrappers', 'supabase_vault']
+    )
+    expect(result).toHaveLength(1)
+    expect(result![0].name).toBe('wrappers')
+  })
+
+  it('returns all required extensions when none are installed', () => {
+    const result = getRequiredExtensionsToInstall([wrappers, vault], ['wrappers', 'supabase_vault'])
+    expect(result).toHaveLength(2)
+  })
+
+  it('excludes extensions that are not in the required list', () => {
+    const result = getRequiredExtensionsToInstall([wrappers, unrelated], ['wrappers'])
+    expect(result).toHaveLength(1)
+    expect(result![0].name).toBe('wrappers')
+  })
+
+  it('returns empty array when extensions list is empty', () => {
+    expect(getRequiredExtensionsToInstall([], ['wrappers'])).toEqual([])
+  })
+})
+
+// ─── hasForeignSchemaSupport ──────────────────────────────────────────────────
+
+describe('hasForeignSchemaSupport', () => {
+  it('returns false when extension is undefined', () => {
+    expect(hasForeignSchemaSupport(undefined)).toBe(false)
+  })
+
+  it('returns false when installed_version is null (not installed)', () => {
+    expect(hasForeignSchemaSupport({ installed_version: null })).toBe(false)
+  })
+
+  it('returns false for version below 0.5.0', () => {
+    expect(hasForeignSchemaSupport({ installed_version: '0.4.9' })).toBe(false)
+    expect(hasForeignSchemaSupport({ installed_version: '0.3.0' })).toBe(false)
+    expect(hasForeignSchemaSupport({ installed_version: '0.1.0' })).toBe(false)
+  })
+
+  it('returns true for exactly version 0.5.0', () => {
+    expect(hasForeignSchemaSupport({ installed_version: '0.5.0' })).toBe(true)
+  })
+
+  it('returns true for version above 0.5.0', () => {
+    expect(hasForeignSchemaSupport({ installed_version: '0.6.0' })).toBe(true)
+    expect(hasForeignSchemaSupport({ installed_version: '0.5.1' })).toBe(true)
+    expect(hasForeignSchemaSupport({ installed_version: '1.0.0' })).toBe(true)
   })
 })

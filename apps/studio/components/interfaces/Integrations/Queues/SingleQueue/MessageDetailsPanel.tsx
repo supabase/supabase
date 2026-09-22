@@ -1,21 +1,24 @@
 import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { isNil, noop } from 'lodash'
+import { isNil } from 'lodash'
 import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
   ResizablePanel,
   Separator,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
-import { MonacoEditor } from '@/components/grid/components/common/MonacoEditor'
 import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useDatabaseQueueMessageArchiveMutation } from '@/data/database-queues/database-queue-messages-archive-mutation'
 import { useDatabaseQueueMessageDeleteMutation } from '@/data/database-queues/database-queue-messages-delete-mutation'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
@@ -88,29 +91,37 @@ export const MessageDetailsPanel = ({
       }}
       className="bg-studio border-t pointer-events-auto"
     >
-      <Button
-        type="text"
-        className="absolute top-3 right-3 px-1"
-        icon={<X />}
-        onClick={() => setSelectedMessage(null)}
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="text"
+            className="absolute top-3 right-3 px-1"
+            icon={<X />}
+            onClick={() => setSelectedMessage(null)}
+            aria-label="Close panel"
+            // Tooltip repeats the label; screen readers would read it twice
+            aria-describedby={undefined}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Close panel</TooltipContent>
+      </Tooltip>
 
-      <Tabs_Shadcn_
+      <Tabs
         value={view}
         className="flex flex-col h-full"
         onValueChange={(value: any) => {
           setView(value)
         }}
       >
-        <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
-          <TabsTrigger_Shadcn_
+        <TabsList className="px-5 flex gap-x-4 min-h-[46px]">
+          <TabsTrigger
             value="details"
             className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
           >
             Overview
-          </TabsTrigger_Shadcn_>
-        </TabsList_Shadcn_>
-        <TabsContent_Shadcn_ value="details" className="w-full mt-0 overflow-y-auto grow">
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="details" className="w-full mt-0 overflow-y-auto grow">
           <div className="flex flex-col px-4 py-4 text-sm">
             <RowData property="Message ID" value={`${selectedMessage.msg_id}`} />
             <RowData
@@ -123,15 +134,15 @@ export const MessageDetailsPanel = ({
             />
             <RowData property="Retries" value={`${selectedMessage.read_ct}`} />
 
-            <div>
-              <h3 className="text-foreground-light py-1">Payload</h3>
-              <MonacoEditor
-                key={selectedMessage.msg_id}
-                onChange={noop}
-                width="100%"
+            <div className="mt-2">
+              <h4 className="text-foreground-light py-1">Payload</h4>
+              <CodeEditor
+                isReadOnly
+                hideLineNumbers
+                id={selectedMessage.msg_id.toString()}
                 value={jsonString || 'NULL'}
                 language="json"
-                readOnly
+                className="h-[200px]"
               />
             </div>
           </div>
@@ -172,7 +183,7 @@ export const MessageDetailsPanel = ({
                     icon: <Archive />,
                     text: 'Archive',
                     isLoading: isLoadingArchive,
-                    type: 'warning',
+                    variant: 'warning',
                     onClick: () => {
                       archiveMessage({
                         projectRef: project!.ref,
@@ -197,7 +208,7 @@ export const MessageDetailsPanel = ({
                   button={{
                     icon: <Trash2 />,
                     text: 'Delete',
-                    type: 'danger',
+                    variant: 'danger',
                     isLoading: isLoadingDelete,
                     onClick: () => {
                       deleteMessage({
@@ -220,8 +231,8 @@ export const MessageDetailsPanel = ({
               </>
             ) : null}
           </div>
-        </TabsContent_Shadcn_>
-      </Tabs_Shadcn_>
+        </TabsContent>
+      </Tabs>
     </ResizablePanel>
   )
 }

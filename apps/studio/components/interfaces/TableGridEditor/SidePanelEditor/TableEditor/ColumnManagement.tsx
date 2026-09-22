@@ -69,6 +69,7 @@ export const ColumnManagement = ({
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+  const [columnIdToFocus, setColumnIdToFocus] = useState<string | null>(null)
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -109,6 +110,7 @@ export const ColumnManagement = ({
   const onAddColumn = () => {
     const defaultColumn = generateColumnField()
     const updatedColumns = columns.concat(defaultColumn)
+    setColumnIdToFocus(defaultColumn.id)
     onColumnsUpdated(updatedColumns)
   }
 
@@ -155,7 +157,7 @@ export const ColumnManagement = ({
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
+            <Button asChild icon={<ExternalLink size={12} strokeWidth={2} />}>
               <a
                 href={`${DOCS_URL}/guides/database/tables#data-types`}
                 target="_blank"
@@ -169,16 +171,15 @@ export const ColumnManagement = ({
                 <div className="py-3 border-r" />
                 {hasImportContent ? (
                   <div className="flex items-center gap-x-2">
-                    <Button type="default" icon={<Edit />} onClick={onSelectImportData}>
+                    <Button icon={<Edit />} onClick={onSelectImportData}>
                       Edit content
                     </Button>
-                    <Button type="danger" icon={<Trash />} onClick={onClearImportContent}>
+                    <Button variant="danger" icon={<Trash />} onClick={onClearImportContent}>
                       Remove content
                     </Button>
                   </div>
                 ) : (
                   <Button
-                    type="default"
                     onClick={() => {
                       onSelectImportData()
                       track('import_data_button_clicked', { tableType: 'New Table' })
@@ -285,6 +286,7 @@ export const ColumnManagement = ({
                       hasForeignKeys={checkIfHaveForeignKeys(column)}
                       isNewRecord={isNewRecord}
                       hasImportContent={hasImportContent}
+                      shouldAutoFocusName={column.id === columnIdToFocus}
                       onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                       onRemoveColumn={() => onRemoveColumn(column)}
                       onEditForeignKey={(fk) => {
@@ -316,6 +318,7 @@ export const ColumnManagement = ({
                     isNewRecord={isNewRecord}
                     hasForeignKeys={checkIfHaveForeignKeys(column)}
                     hasImportContent={hasImportContent}
+                    shouldAutoFocusName={column.id === columnIdToFocus}
                     onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                     onRemoveColumn={() => onRemoveColumn(column)}
                     onEditForeignKey={(fk) => {
@@ -332,9 +335,7 @@ export const ColumnManagement = ({
 
         {!hasImportContent && (
           <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-            <Button type="default" onClick={() => onAddColumn()}>
-              Add column
-            </Button>
+            <Button onClick={() => onAddColumn()}>Add column</Button>
           </div>
         )}
       </div>

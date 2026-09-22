@@ -54,13 +54,12 @@ export default function TableActions() {
               <TableCell>{user.name}</TableCell>
               <TableCell className="text-foreground-lighter">{user.email}</TableCell>
               <TableCell className="flex items-center gap-x-2">
-                <Button type="default" size="tiny" className="hit-area-2">
+                <Button size="tiny" className="hit-area-2">
                   Inspect
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
                       icon={<EllipsisVertical />}
                       aria-label="More actions"
                       className="w-7 hit-area-2"

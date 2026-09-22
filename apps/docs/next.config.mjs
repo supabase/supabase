@@ -61,7 +61,7 @@ const nextConfig = {
   ],
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-    '/api/guides-md/**/*': ['./public/docs/guides/**/*'],
+    '/api/guides-md/**/*': ['./public/markdown/guides/**/*'],
     '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
@@ -132,6 +132,16 @@ const nextConfig = {
    */
   async redirects() {
     return [
+      {
+        source: '/guides/observability/access-data',
+        destination: '/guides/observability',
+        permanent: true,
+      },
+      {
+        source: '/guides/observability/access-data.md',
+        destination: '/guides/observability.md',
+        permanent: true,
+      },
       // Redirect root to docs base path in dev/preview envs
       {
         source: '/',
@@ -156,34 +166,45 @@ const nextConfig = {
         permanent: false,
       },
 
-      // Redirect old external replication slugs in dev/preview envs
+      // Redirect old managed pipeline slugs in dev/preview envs
+      {
+        source: '/guides/database/replication/external-replication-setup',
+        destination: '/guides/database/replication/pipelines',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/external-replication-monitoring',
+        destination: '/guides/database/replication/pipelines-monitoring',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/external-replication-faq',
+        destination: '/guides/database/replication/pipelines-faq',
+        permanent: true,
+      },
       {
         source: '/guides/database/replication/replication-setup',
-        destination: '/guides/database/replication/external-replication-setup',
+        destination: '/guides/database/replication/pipelines',
         permanent: true,
       },
       {
         source: '/guides/database/replication/replication-monitoring',
-        destination: '/guides/database/replication/external-replication-monitoring',
+        destination: '/guides/database/replication/pipelines-monitoring',
         permanent: true,
       },
       {
         source: '/guides/database/replication/replication-faq',
-        destination: '/guides/database/replication/external-replication-faq',
-        permanent: true,
-      },
-            // Reference pages use hash anchors for sections; redirect the legacy
-      // path-style /reference/<lib>/introduction (and versioned variants)
-      // back to the base reference URL. Order matters: introduction first so
-      // it strips to a bare URL, then the section rules add a hash anchor.
-      {
-        source: '/reference/:lib/:version(v\\d+)/:section',
-        destination: '/reference/:lib/:version#:section',
+        destination: '/guides/database/replication/pipelines-faq',
         permanent: true,
       },
       {
-        source: '/reference/:lib/:section((?!v\\d+$)[^/]+)',
-        destination: '/reference/:lib#:section',
+        source: '/guides/database/inspect',
+        destination: '/guides/monitoring-and-debugging/inspect',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/database-advisors',
+        destination: '/guides/observability/advisors',
         permanent: true,
       },
     ]
@@ -212,6 +233,9 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'docs',
+  unstable_sentryWebpackPluginOptions: {
+    applicationKey: 'supabase-docs',
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

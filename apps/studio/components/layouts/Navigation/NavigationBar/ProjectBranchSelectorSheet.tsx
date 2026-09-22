@@ -1,12 +1,5 @@
 import { Box, Boxes, GitBranch } from 'lucide-react'
-import {
-  cn,
-  SheetHeader,
-  SheetTitle,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-} from 'ui'
+import { cn, SheetHeader, SheetTitle, Tabs, TabsContent, TabsList } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 import { ProjectBranchSelectorSheetTabTrigger } from './ProjectBranchSelectorSheetTabTrigger'
@@ -87,13 +80,10 @@ export function ProjectBranchSelectorSheet({
       onOpenChange={onOpenChange}
       className="flex flex-col overflow-hidden h-[85dvh] md:max-h-[500px]"
     >
-      <Tabs_Shadcn_
-        defaultValue={defaultTab}
-        className="flex flex-col flex-1 min-h-0 overflow-hidden p-0"
-      >
+      <Tabs defaultValue={defaultTab} className="flex flex-col flex-1 min-h-0 overflow-hidden p-0">
         <SheetHeader className="border-0 border-default p-0 shrink-0">
           <SheetTitle className="sr-only">Switch organization, project or branch</SheetTitle>
-          <TabsList_Shadcn_
+          <TabsList
             className={cn(
               'w-full grid gap-0 shrink-0',
               tabs.length === 1 && 'grid-cols-1',
@@ -111,33 +101,33 @@ export function ProjectBranchSelectorSheet({
                 isLast={index === tabs.length - 1}
               />
             ))}
-          </TabsList_Shadcn_>
+          </TabsList>
         </SheetHeader>
         {tabs.some((t) => t.value === 'organization') && (
-          <TabsContent_Shadcn_
+          <TabsContent
             value="organization"
             className="flex-1 min-h-0 overflow-hidden flex flex-col mt-0 p-0 data-[state=inactive]:hidden"
           >
             <OrganizationDropdown embedded className={EMBEDDED_CLASSNAME} onClose={onClose} />
-          </TabsContent_Shadcn_>
+          </TabsContent>
         )}
         {tabs.some((t) => t.value === 'project') && (
-          <TabsContent_Shadcn_
+          <TabsContent
             value="project"
             className="flex-1 min-h-0 overflow-hidden flex flex-col mt-0 py-0 data-[state=inactive]:hidden"
           >
             <ProjectDropdown embedded className={EMBEDDED_CLASSNAME} onClose={onClose} />
-          </TabsContent_Shadcn_>
+          </TabsContent>
         )}
         {tabs.some((t) => t.value === 'branch') && (
-          <TabsContent_Shadcn_
+          <TabsContent
             value="branch"
             className="flex-1 min-h-0 overflow-hidden flex flex-col mt-0 p-0 data-[state=inactive]:hidden"
           >
             <BranchDropdown embedded className={EMBEDDED_CLASSNAME} onClose={onClose} />
-          </TabsContent_Shadcn_>
+          </TabsContent>
         )}
-      </Tabs_Shadcn_>
+      </Tabs>
     </MobileSheetNav>
   )
 }

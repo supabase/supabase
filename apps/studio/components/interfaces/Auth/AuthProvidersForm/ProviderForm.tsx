@@ -18,7 +18,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -189,8 +189,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         }
         meta={
           isActive ? (
-            <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
-              <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
+            <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-primary">
+              <span className="rounded-full bg-brand-default p-0.5 text-xs text-brand-200">
                 <Check strokeWidth={2} size={12} />
               </span>
               <span className="px-1">Enabled</span>
@@ -279,8 +279,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
               <DocsButton href={provider.link} />
               <div className="flex items-center gap-x-3">
                 <Button
-                  type="default"
-                  htmlType="reset"
+                  type="reset"
                   onClick={() => {
                     setOpen(false)
                     setUrlProvider(null)
@@ -291,8 +290,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                   Cancel
                 </Button>
                 <ButtonTooltip
+                  variant="primary"
                   form={formId}
-                  htmlType="submit"
+                  type="submit"
                   loading={isUpdatingConfig}
                   disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
                   tooltip={{

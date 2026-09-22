@@ -13,9 +13,11 @@
     "clean": {
       "outputs": [],
       "cache": false,
+      "outputLogs": "errors-only",
     },
     "dev": {
       "cache": false,
+      "persistent": true,
     },
     "test": {
       "cache": false,

@@ -94,6 +94,30 @@ export const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) 
               <Input readOnly size="small" value={selectedLog?.actor.app_name ?? ''} />
             </FormItemLayout>
           )}
+          {selectedLog?.actor.partner && (
+            <FormItemLayout label="Partner" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog?.actor.partner ?? ''} />
+            </FormItemLayout>
+          )}
+          {selectedLog?.actor.partner_installation_id && (
+            <FormItemLayout label="Partner installation ID" isReactForm={false}>
+              <Input
+                readOnly
+                size="small"
+                value={selectedLog?.actor.partner_installation_id ?? ''}
+              />
+            </FormItemLayout>
+          )}
+          {selectedLog?.actor.partner_user_email && (
+            <FormItemLayout label="Partner user email" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog?.actor.partner_user_email ?? ''} />
+            </FormItemLayout>
+          )}
+          {selectedLog?.actor.partner_user_id && (
+            <FormItemLayout label="Partner user ID" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog?.actor.partner_user_id ?? ''} />
+            </FormItemLayout>
+          )}
         </FormSectionContent>
       </FormSection>
 

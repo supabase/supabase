@@ -30,7 +30,7 @@ import { tableEditorKeys } from '@/data/table-editor/keys'
 import { getTableEditor, type TableEditorData } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { fetchAllTableRows } from '@/data/table-rows/table-rows-query'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { DOCS_URL } from '@/lib/constants'
 import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
@@ -259,6 +259,7 @@ type UseExportAllRowsParams =
           type: 'provided_rows'
           table: SupaTable
           rows: Record<string, unknown>[]
+          roleImpersonationState?: RoleImpersonationState
         }
     ))
 
@@ -297,6 +298,7 @@ export const useExportAllRowsGeneric = (
                 table: params.table,
                 projectRef,
                 connectionString,
+                roleImpersonationState: params.roleImpersonationState,
               })
               if (hydrated.status === 'no_primary_key') {
                 return {

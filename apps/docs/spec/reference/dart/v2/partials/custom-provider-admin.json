@@ -1,0 +1,5 @@
+{
+  "id": "custom-provider-admin",
+  "title": "Custom Provider Admin",
+  "notes": "- Methods under the `supabase.auth.admin.customProviders` namespace manage custom OIDC/OAuth providers programmatically. Requires a `secret` key.\n- These are admin methods and should be called on a trusted server. Never expose your `secret` key in the Flutter app.\n- Custom providers are referenced with a `custom:` prefix when signing in (for example `custom:mycompany`), and are distinct from the OAuth 2.1 server clients managed through `supabase.auth.admin.oauth`.\n"
+}

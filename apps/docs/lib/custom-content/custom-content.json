@@ -5,5 +5,9 @@
   "navigation:logo": {
     "light": "/docs/supabase-light.svg",
     "dark": "/docs/supabase-dark.svg"
+  },
+  "mcp:servers": {
+    "local": "http://localhost:54321/mcp",
+    "remote": "https://mcp.supabase.com/mcp"
   }
 }

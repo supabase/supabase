@@ -4,7 +4,7 @@ import createSupabaseIcon from '../createSupabaseIcon';
  * @component @name Realtime
  * @description Supabase SVG icon component, renders SVG Element with children.
  *
- * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiICAgIHN0cm9rZS13aWR0aD0iMSI+CiAgICA8cGF0aAogICAgICAgIGQ9Ik04LjA0MjczIDEuNTgyMDNWNS4zMjIwNU01LjI0MzU0IDUuMzIyMDVMMi4wNDcxMiAyLjAyNzkxTTUuMjQzNTQgNy45MDk3OUgxLjU3NzY0TTE1LjM3NzYgMTUuNTUwN0wyMS4wNzkgMTQuMTMxNkMyMS41NDE3IDE0LjAxNjQgMjEuNTk1OSAxMy4zODA2IDIxLjE1OTUgMTMuMTg4N0w4LjAwODI4IDcuNDA1ODZDNy41OTEzNyA3LjIyMjU0IDcuMTY2NDMgNy42NDY2MSA3LjM0ODkgOC4wNjM4OUwxMy4wMzIxIDIxLjA2MDdDMTMuMjIyNCAyMS40OTYgMTMuODU1NiAyMS40NDU0IDEzLjk3NDMgMjAuOTg1NEwxNS4zNzc2IDE1LjU1MDdaIiAvPgo8L3N2Zz4=)
+ * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiICAgIHN0cm9rZS13aWR0aD0iMS41Ij4KICAgIDxwYXRoCiAgICAgICAgZD0iTTguMDQyNzMgMS41ODIwM1Y1LjMyMjA1TTUuMjQzNTQgNS4zMjIwNUwyLjA0NzEyIDIuMDI3OTFNNS4yNDM1NCA3LjkwOTc5SDEuNTc3NjRNMTUuMzc3NiAxNS41NTA3TDIxLjA3OSAxNC4xMzE2QzIxLjU0MTcgMTQuMDE2NCAyMS41OTU5IDEzLjM4MDYgMjEuMTU5NSAxMy4xODg3TDguMDA4MjggNy40MDU4NkM3LjU5MTM3IDcuMjIyNTQgNy4xNjY0MyA3LjY0NjYxIDcuMzQ4OSA4LjA2Mzg5TDEzLjAzMjEgMjEuMDYwN0MxMy4yMjI0IDIxLjQ5NiAxMy44NTU2IDIxLjQ0NTQgMTMuOTc0MyAyMC45ODU0TDE1LjM3NzYgMTUuNTUwN1oiIC8+Cjwvc3ZnPg==)
  *
  * @param {Object} props - Supabase icons props and any valid SVG attribute
  * @returns {JSX.Element} JSX Element
@@ -21,7 +21,7 @@ const Realtime = createSupabaseIcon(
       },
     ],
   ],
-  { fill: 'none', stroke: 'currentColor', strokeWidth: '1' },
+  { fill: 'none', stroke: 'currentColor', strokeWidth: '1.5' },
 );
 
 export default Realtime;

@@ -1,11 +1,28 @@
-import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
+import { useParams } from 'common'
+import {
+  Auth,
+  Compute,
+  Database,
+  EdgeFunctions,
+  Realtime,
+  SqlEditor,
+  Storage,
+  TableEditor,
+} from 'icons'
 import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
+import {
+  useIsExplorerEnabled,
+  useUnifiedLogsPreview,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
 import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
 import type { Project } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { PRODUCT_NAME } from '@/lib/constants/compute'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RouteContext {
@@ -21,6 +38,7 @@ interface ProductFeatures {
   storage?: boolean
   realtime?: boolean
   authOverviewPage?: boolean
+  compute?: boolean
 }
 
 interface OtherFeatures {
@@ -28,10 +46,6 @@ interface OtherFeatures {
   unifiedLogs?: boolean
   showReports?: boolean
   showLogs?: boolean
-}
-
-interface SettingsFeatures {
-  isPlatform?: boolean
 }
 
 function getRouteContext(ref?: string, project?: Project): RouteContext {
@@ -43,8 +57,12 @@ function getRouteContext(ref?: string, project?: Project): RouteContext {
   }
 }
 
-export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
+export const useGenerateToolRoutes = (): Route[] => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
+  const isExplorerEnabled = useIsExplorerEnabled()
 
   return [
     {
@@ -56,14 +74,27 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       linkElement: <EditorIndexPageLink projectRef={ref} />,
       shortcutId: SHORTCUT_IDS.NAV_TABLE_EDITOR,
     },
-    {
-      key: 'sql',
-      label: 'SQL Editor',
-      disabled: !isProjectActive,
-      icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
-      shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
-    },
+    ...(isExplorerEnabled
+      ? [
+          {
+            key: 'explorer',
+            label: 'Explorer',
+            disabled: !isProjectActive,
+            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/explorer`),
+            shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
+          },
+        ]
+      : [
+          {
+            key: 'sql',
+            label: 'SQL Editor',
+            disabled: !isProjectActive,
+            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+            shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
+          },
+        ]),
   ]
 }
 
@@ -79,6 +110,7 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
   const authOverviewPageEnabled = features?.authOverviewPage ?? false
+  const computeEnabled = features?.compute ?? false
 
   return [
     {
@@ -137,6 +169,19 @@ export const generateProductRoutes = (
           },
         ]
       : []),
+    ...(computeEnabled
+      ? [
+          {
+            key: 'compute',
+            label: PRODUCT_NAME,
+            disabled: !isProjectActive,
+            icon: <Compute size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/compute`),
+            isNew: true,
+            shortcutId: SHORTCUT_IDS.NAV_COMPUTE,
+          },
+        ]
+      : []),
     ...(realtimeEnabled
       ? [
           {
@@ -159,10 +204,10 @@ export const generateOtherRoutes = (
 ): Route[] => {
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
-  const isPlatform = features?.isPlatform ?? IS_PLATFORM
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
+
   return [
     {
       key: 'advisors',
@@ -172,15 +217,20 @@ export const generateOtherRoutes = (
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
-    // Observability is only available on the platform, not for self-hosted/CLI
-    ...(isPlatform && reportsEnabled
+    ...(reportsEnabled
       ? [
           {
             key: 'observability',
             label: 'Observability',
             disabled: !isProjectActive,
             icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : IS_PLATFORM
+                  ? `/project/${ref}/observability`
+                  : `/project/${ref}/query-performance`),
             shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY,
           },
         ]
@@ -210,17 +260,28 @@ export const generateOtherRoutes = (
   ]
 }
 
-export const generateSettingsRoutes = (ref?: string, features?: SettingsFeatures): Route[] => {
-  const isPlatform = features?.isPlatform ?? IS_PLATFORM
+// [Joshen] Main hook to consume as it standardizes the generation of the menu items
+export const useGenerateOtherRoutes = (): Route[] => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
+  const reportsEnabled = useIsFeatureEnabled('reports:all')
+  const logsEnabled = useIsFeatureEnabled('logs:all')
 
+  return generateOtherRoutes(ref, project, {
+    unifiedLogs: unifiedLogsEnabled,
+    showReports: reportsEnabled,
+    showLogs: logsEnabled,
+  })
+}
+
+export const generateSettingsRoutes = (ref?: string): Route[] => {
   return [
     {
       key: 'settings',
       label: 'Project Settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link:
-        ref &&
-        (isPlatform ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
+      link: ref && `/project/${ref}/settings/general`,
       disabled: false,
       shortcutId: SHORTCUT_IDS.NAV_SETTINGS,
     },

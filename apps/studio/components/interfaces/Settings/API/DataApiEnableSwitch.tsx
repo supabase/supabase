@@ -61,7 +61,6 @@ export const DataApiEnableSwitch = () => {
   })
   useEffect(() => {
     syncForm()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [isEnabled])
 
   const doUpdate = useCallback(

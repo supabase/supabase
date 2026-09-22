@@ -105,7 +105,7 @@ Open `index.ts` and set up your MCP server:
 
 ```tsx
 //index.ts
-import { MCPServer, object, text, widget, error } from 'mcp-use/server'
+import { error, MCPServer, object, text, widget } from 'mcp-use/server'
 
 const server = new MCPServer({
   name: 'supabase-explorer',
@@ -197,7 +197,7 @@ const SupabaseStatusWidget: React.FC = () => {
               <h2 className="text-3xl font-bold text-[hsl(var(--foreground))] mb-1">
                 Supabase Status
               </h2>
-              <p className="text-sm text-[hsl(var(--foreground-muted))]">
+              <p className="text-sm text-foreground-muted">
                 Last {props.daysBack} days
               </p>
             </div>

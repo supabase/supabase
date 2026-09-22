@@ -39,18 +39,18 @@ export default function Home() {
                 <div className="flex flex-col gap-8 justify-start pt-16 md:pt-32">
                   <div className="max-w-2xl">
                     <h1 className="text-4xl text-foreground mb-3 font-medium tracking-tight">
-                      UI Blocks for Supabase Projects
+                      Blocks for Supabase Projects
                     </h1>
                     <h2 className="text-lg text-foreground-light mb-4">
-                      A collection of React components and blocks built on the shadcn/ui library
-                      that connect your front-end to your Supabase back-end via a single command.
+                      A collection of components, blocks, and developer tools that connect your
+                      project to Supabase via a single command.
                     </h2>
                     <div className="flex gap-3 mt-4">
                       <Button_Shadcn_ variant="secondary" size="lg">
                         <Link href="/docs/getting-started/quickstart">Get Started</Link>
                       </Button_Shadcn_>
                       <Button_Shadcn_ variant="outline" size="lg">
-                        <Link href="/docs/ai-editors-rules/skills">Install Skills</Link>
+                        <a href="/docs/guides/ai-tools/ai-skills">Install Skills</a>
                       </Button_Shadcn_>
                     </div>
                   </div>
@@ -61,7 +61,7 @@ export default function Home() {
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
                 <span>Password-based Authentication</span>
                 <Link
-                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
                   href="/docs/nextjs/password-based-auth"
                 >
                   Go to block ➔
@@ -79,7 +79,7 @@ export default function Home() {
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
                 <span>Social Authentication</span>
                 <Link
-                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
                   href="/docs/nextjs/social-auth"
                 >
                   Go to block ➔
@@ -97,7 +97,7 @@ export default function Home() {
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
                 <span>Realtime Cursors</span>
                 <Link
-                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
                   href="/docs/nextjs/realtime-cursor"
                 >
                   Go to block ➔
@@ -116,7 +116,7 @@ export default function Home() {
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative  flex justify-between items-center">
                 <span>File Upload</span>
                 <Link
-                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
                   href="/docs/nextjs/dropzone"
                 >
                   Go to block ➔
@@ -134,7 +134,7 @@ export default function Home() {
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
                 <span>Current User Avatar</span>
                 <Link
-                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
                   href="/docs/nextjs/current-user-avatar"
                 >
                   Go to block ➔
@@ -152,7 +152,7 @@ export default function Home() {
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
                 <span>Realtime Avatar Stack</span>
                 <Link
-                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
                   href="/docs/nextjs/realtime-avatar-stack"
                 >
                   Go to block ➔
@@ -170,7 +170,7 @@ export default function Home() {
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
                 <span>Realtime Chat</span>
                 <Link
-                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
                   href="/docs/nextjs/realtime-chat"
                 >
                   Go to block ➔
@@ -189,7 +189,7 @@ export default function Home() {
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
                 <span>Infinite Query Hook</span>
                 <Link
-                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
                   href="/docs/nextjs/social-auth"
                 >
                   Go to block ➔

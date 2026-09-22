@@ -4,11 +4,11 @@ title: Deployment & Branching
 
 Deploying your app makes it live and accessible to users. Most apps have at least two environments: a production environment for users and one or more staging or preview environments for development.
 
-Supabase provides flexible options for both simple and advanced deployment workflows.
+Supabase provides flexible options for deployment workflows of various complexity.
 
 ## Recommended workflow
 
-The simplest way to deploy your Supabase project is with GitHub (recommended, but not required):
+You can deploy your Supabase project with GitHub:
 
 1. Develop locally using the [Supabase CLI](/docs/guides/local-development)
 2. Push changes to your GitHub repository
@@ -41,7 +41,7 @@ You can automate deployments using:
 
 ### Is GitHub required?
 
-No. GitHub integration is recommended for the simplest setup, but you can deploy using the [Supabase CLI](/docs/guides/local-development) in your own CI/CD pipeline without connecting a GitHub repository.
+No. GitHub integration is recommended, but you can deploy using the [Supabase CLI](/docs/guides/local-development) in your own CI/CD pipeline without connecting a GitHub repository.
 
 ### Do you need a paid plan?
 
@@ -49,7 +49,7 @@ No. The GitHub integration and CLI-based deployments work on all plans. Branchin
 
 ### What gets deployed?
 
-Database migrations in your `supabase/` directory, plus Edge Functions and storage buckets that are declared in `supabase/config.toml`. Other local configuration files (such as API or Auth settings) are ignored by default. See the [local development guide](/docs/guides/local-development) for details on the directory structure.
+Database migrations in your `supabase/` directory, plus Edge Functions and Storage buckets that are declared in `supabase/config.toml`. If you use [declarative schemas](/docs/guides/local-development/declarative-database-schemas), only the generated migrations are deployed and not the `supabase/schemas/` files themselves. On preview branches, `config.toml` settings such as `[api]` and `[auth]` are also applied to the branch project by default. On persistent branches, including your production branch, those settings are skipped unless you opt in with a `[remotes]` block for that project. See the [local development guide](/docs/guides/local-development) for details on the directory structure.
 
 ### Can you use your own CI/CD pipeline?
 
@@ -67,7 +67,7 @@ Branching creates isolated preview environments for each pull request, so you ca
 
 Branching gives each pull request its own isolated Supabase environment with a full copy of your database schema (without any production data), so you can validate migrations and test your app end-to-end before merging to `main`.
 
-<Admonition type="tip" title="Self-hosting">
+<Admonition type="note" title="Self-hosting">
 
 Read the [self-hosting guides](/docs/guides/self-hosting) for instructions on hosting your own Supabase stack.
 

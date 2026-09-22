@@ -1,8 +1,9 @@
-import { useFlag } from 'common'
-import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
+import { useDevToolbar } from 'dev-tools'
+import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -15,14 +16,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   singleThemes,
-  Theme,
 } from 'ui'
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
@@ -39,21 +42,32 @@ export function UserDropdown({
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
-  const timezonePickerEnabled = useFlag('timezonePicker')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
+  const { isAvailable: isDevToolbarAvailable } = useDevToolbar()
+  const shouldShowSectionSeparator = IS_PLATFORM || isDevToolbarAvailable
+
+  // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
+  // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
+  // also skips fetching organization data on routes where the CTA can't render.
+  const isOrgScopedRoute =
+    router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
+  const { showUpgradeCta } = useShowUpgradeCta({ enabled: isOrgScopedRoute })
+
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <DropdownMenu
+      open={isOpen}
       onOpenChange={(open) => {
+        setIsOpen(open)
         if (open) track('header_user_dropdown_opened')
       }}
     >
       <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
-          type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
           tooltip={{ content: { text: 'Account settings' } }}
         >
@@ -91,7 +105,9 @@ export function UserDropdown({
                 </span>
               )}
             </div>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
               <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
@@ -102,14 +118,13 @@ export function UserDropdown({
                     }
                   }}
                 >
-                  <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Account preferences
+                  <User2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex gap-2 cursor-pointer"
                 onClick={() => toggleFeaturePreviewModal(true)}
-                // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
@@ -124,10 +139,14 @@ export function UserDropdown({
                   Changelog
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
         )}
+
+        {shouldShowSectionSeparator && <DropdownMenuSeparator />}
+
+        <DevToolbarMenuGroup />
+
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup
@@ -136,7 +155,7 @@ export function UserDropdown({
               setTheme(value)
             }}
           >
-            {singleThemes.map((theme: Theme) => (
+            {singleThemes.map((theme) => (
               <DropdownMenuRadioItem
                 key={theme.value}
                 value={theme.value}
@@ -147,12 +166,27 @@ export function UserDropdown({
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
-        {timezonePickerEnabled && (
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          <TimezoneDropdown />
+        </DropdownMenuGroup>
+
+        {showUpgradeCta && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <TimezoneDropdown />
-            </DropdownMenuGroup>
+            <div className="p-1">
+              <UpgradePlanButton
+                source="user_dropdown"
+                plan="Pro"
+                className="w-full justify-center"
+                onClick={() => {
+                  track('upgrade_cta_clicked', { placement: 'user_dropdown' })
+                  setIsOpen(false)
+                }}
+              />
+            </div>
           </>
         )}
         {IS_PLATFORM && (
@@ -165,7 +199,7 @@ export function UserDropdown({
                   router.push('/logout')
                 }}
               >
-                Log out
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>

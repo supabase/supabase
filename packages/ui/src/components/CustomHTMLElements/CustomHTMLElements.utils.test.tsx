@@ -60,6 +60,25 @@ describe('CustomHTMLElementsUtils', () => {
 
         expect(result).toStrictEqual('function')
       })
+
+      it('flattens nested element children including icons without props.children', () => {
+        const value = [
+          'See ',
+          {
+            props: {
+              children: [
+                'pg_prewarm',
+                // lucide icons (and similar) are objects without useful text children
+                { $$typeof: Symbol.for('react.element'), type: 'svg', props: undefined },
+              ],
+            },
+          },
+        ]
+
+        const result = getAnchor(value)
+
+        expect(result).toStrictEqual('see-pgprewarm')
+      })
     })
 
     describe('when value is a string', () => {

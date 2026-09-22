@@ -187,12 +187,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger
           asChild
-          className={cn(
-            'rounded-md ring-offset-background',
-            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            'relative py-0',
-            className
-          )}
+          className={cn('rounded-md', 'focus-ring', 'relative py-0', className)}
           onKeyDown={(e) => {
             if (e.key === 'ArrowDown') {
               // REMINDER: default behavior is to open the dropdown menu
@@ -224,5 +219,5 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
     )
   }
 
-  return <CopyButton iconOnly type="text" text={String(value)} className="px-1" />
+  return <CopyButton iconOnly variant="text" text={String(value)} className="px-1" />
 }

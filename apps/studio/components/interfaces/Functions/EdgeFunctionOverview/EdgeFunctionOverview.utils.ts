@@ -4,6 +4,7 @@ import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import type { ChartConfig } from 'ui'
 
+import { calculateBarClickTimeRange } from '@/components/interfaces/Settings/Logs/LogsBarChart.utils'
 import type { ChartIntervals } from '@/types'
 
 export type EdgeFunctionChartRawDatum = {
@@ -87,7 +88,7 @@ export const INVOCATION_CHART_CONFIG = {
   },
   warning_count: {
     label: 'Warnings',
-    color: 'hsl(var(--warning-default))',
+    color: 'var(--chart-status-warning)',
   },
   error_count: {
     label: 'Errors',
@@ -105,7 +106,7 @@ export const CPU_TIME_CHART_CONFIG = {
 export const EXECUTION_TIME_CHART_CONFIG = {
   avg_execution_time: {
     label: 'Average Execution Time',
-    color: 'hsl(var(--foreground-default))',
+    color: 'var(--foreground-default)',
   },
   max_execution_time: {
     label: 'Max Execution Time',
@@ -143,6 +144,27 @@ export const getRollingTimeRange = (
   const start = currentTime.subtract(interval.startValue, toManipulateUnit(interval.startUnit))
 
   return [start.toDate(), currentTime.toDate()]
+}
+
+export const getInvocationChartNavigationUrl = ({
+  projectRef,
+  functionSlug,
+  isUnifiedLogsEnabled,
+  rangeStart,
+  rangeEnd,
+  clickedTimestamp,
+}: {
+  projectRef: string
+  functionSlug: string
+  isUnifiedLogsEnabled: boolean
+  rangeStart: string
+  rangeEnd: string
+  clickedTimestamp: string
+}) => {
+  const { start, end } = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTimestamp)
+  const destination = isUnifiedLogsEnabled ? 'logs' : 'invocations'
+
+  return `/project/${projectRef}/functions/${functionSlug}/${destination}?its=${encodeURIComponent(start)}&ite=${encodeURIComponent(end)}`
 }
 
 export const formatChartTimestamp = (value: Date | string | number | undefined, format: string) => {
@@ -224,12 +246,12 @@ export const getInvocationUpdateAnnotation = ({
   windowStart,
   windowEnd,
 }: {
-  updatedAt?: string
+  updatedAt?: number | string
   invocationChartData: InvocationChartDatum[]
   windowStart: Date
   windowEnd: Date
 }): InvocationUpdateAnnotation | undefined => {
-  if (!updatedAt || invocationChartData.length === 0) return undefined
+  if (updatedAt === undefined || invocationChartData.length === 0) return undefined
 
   const updatedAtDate = new Date(updatedAt)
   const updatedAtValue = updatedAtDate.valueOf()

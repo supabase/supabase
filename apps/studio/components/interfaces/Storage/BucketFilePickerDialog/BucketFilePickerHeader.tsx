@@ -97,6 +97,7 @@ const HeaderBreadcrumbs = ({
             ) : (
               <button
                 type="button"
+                tabIndex={0}
                 className="max-w-24 truncate border-0 bg-transparent p-0 text-left text-sm text-foreground-lighter transition-colors hover:text-foreground focus-visible:text-foreground"
                 onClick={() => selectBreadcrumb(crumb.index)}
               >
@@ -218,7 +219,7 @@ export const BucketFilePickerHeader = () => {
                 <Button
                   icon={<ArrowLeft size={16} strokeWidth={2} />}
                   size="tiny"
-                  type="text"
+                  variant="text"
                   className="shrink-0 px-1"
                   disabled={backDisabled}
                   onClick={() => {
@@ -239,7 +240,7 @@ export const BucketFilePickerHeader = () => {
               <Button
                 size="tiny"
                 icon={<RefreshCw />}
-                type="text"
+                variant="text"
                 loading={isRefreshing}
                 onClick={refreshData}
               >
@@ -249,7 +250,7 @@ export const BucketFilePickerHeader = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     icon={
                       view === 'LIST' ? (
                         <List size={16} strokeWidth={2} />
@@ -267,7 +268,7 @@ export const BucketFilePickerHeader = () => {
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {view === option.key && (
-                          <Check size={16} className="text-brand" strokeWidth={2} />
+                          <Check size={16} className="text-primary" strokeWidth={2} />
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -281,7 +282,7 @@ export const BucketFilePickerHeader = () => {
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortBy === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
+                              <Check size={16} className="text-primary" strokeWidth={2} />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -299,7 +300,7 @@ export const BucketFilePickerHeader = () => {
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
+                              <Check size={16} className="text-primary" strokeWidth={2} />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -317,7 +318,7 @@ export const BucketFilePickerHeader = () => {
               </div>
               <ButtonTooltip
                 icon={<Upload size={16} strokeWidth={2} />}
-                type="text"
+                variant="text"
                 disabled={!canUpdateStorage}
                 loading={isUploading}
                 onClick={onSelectUpload}
@@ -346,7 +347,7 @@ export const BucketFilePickerHeader = () => {
                     <Button
                       key="cancel"
                       size="tiny"
-                      type="text"
+                      variant="text"
                       icon={<X />}
                       onClick={onCancelSearch}
                       className="p-0 h-5 w-5"
@@ -361,7 +362,7 @@ export const BucketFilePickerHeader = () => {
                 <Button
                   icon={<Search />}
                   size="tiny"
-                  type="text"
+                  variant="text"
                   className="px-1"
                   onClick={toggleSearch}
                 />

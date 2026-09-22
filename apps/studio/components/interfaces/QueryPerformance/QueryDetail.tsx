@@ -88,7 +88,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
             onOpenAssistant={handleExplainQuery}
             telemetrySource="query_performance"
             size="tiny"
-            type="default"
+            variant="default"
           />
         </div>
         <div
@@ -99,14 +99,12 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         >
           <SqlMonacoBlock
             value={query}
-            height={322}
-            lineNumbers="off"
-            wrapperClassName={cn('pl-3 bg-surface-100', !isExpanded && 'pointer-events-none')}
+            wrapperClassName={cn('bg-surface-100', !isExpanded && 'pointer-events-none')}
           />
           {isLinterWarning && (
             <Alert
               variant="default"
-              className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
+              className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary"
             >
               <Lightbulb />
               <AlertTitle>Suggested optimization: Add an index</AlertTitle>
@@ -114,7 +112,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
                 Adding an index will help this query execute faster
               </AlertDescription>
               <AlertDescription>
-                <Button className="mt-3" onClick={() => onClickViewSuggestion()}>
+                <Button variant="primary" className="mt-3" onClick={() => onClickViewSuggestion()}>
                   View suggestion
                 </Button>
               </AlertDescription>
@@ -129,7 +127,6 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         />
         <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
           <Button
-            type="default"
             className="rounded-full"
             icon={<ChevronsUpDown />}
             onClick={() => setIsExpanded(!isExpanded)}

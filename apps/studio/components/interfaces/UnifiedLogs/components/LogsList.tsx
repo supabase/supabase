@@ -49,7 +49,7 @@ export const LogsList = ({ logs = [] }: LogsListProps) => {
                   ))}
                   <CopyButton
                     iconOnly
-                    type="default"
+                    variant="default"
                     text={log.event_message}
                     className="absolute top-[5px] right-2 z-10 opacity-0 group-hover:opacity-100 transition"
                   />

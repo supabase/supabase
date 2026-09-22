@@ -58,6 +58,21 @@ import { toast } from 'sonner'
 toast('Event has been created.')
 ```
 
+## When to use
+
+Use a toast for short-lived, non-blocking feedback or to confirm an operation
+after its originating surface has closed or navigated away.
+
+Do not use a toast as the only feedback for:
+
+- Field validation. Use `FormMessage` or `FieldError` beside the field.
+- A failed submission that leaves the form or interstitial visible. Show a
+  `role="alert"` message in destructive text near the actions.
+- A blocking or materially changed page state. Use an inline state component
+  such as `Admonition` or `ErrorDisplay`.
+
+Keep error copy specific and include the next step when it is not obvious.
+
 ## Expand
 
 You can change the amount of toasts visible through the visibleToasts prop.

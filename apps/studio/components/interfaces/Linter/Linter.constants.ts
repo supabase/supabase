@@ -16,7 +16,7 @@ export type LintInfo = {
   link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
   linkText: string
   docsLink: string
-  category: 'security' | 'performance'
+  category: 'security' | 'performance' | 'health'
 }
 
 export const LINT_TABS: ReadonlyArray<{

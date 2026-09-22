@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getDevelopmentOperations } from './mcp'
+import { getDebuggingOperations, getDevelopmentOperations } from './mcp'
 
 vi.mock('./settings', () => ({
   getProjectSettings: vi.fn(),
@@ -10,12 +10,19 @@ vi.mock('./generate-types', () => ({
   generateTypescriptTypes: vi.fn(),
 }))
 
+vi.mock('./logs', () => ({
+  retrieveAnalyticsData: vi.fn(),
+}))
+
+vi.mock('./lints', () => ({
+  getLints: vi.fn(),
+}))
+
 describe('api/self-hosted/mcp', () => {
   describe('getDevelopmentOperations.getPublishableKeys', () => {
     let getProjectSettingsMock: ReturnType<typeof vi.fn>
 
     beforeEach(async () => {
-      vi.clearAllMocks()
       vi.unstubAllEnvs()
       const settings = await import('./settings')
       getProjectSettingsMock = vi.mocked(settings.getProjectSettings)
@@ -75,6 +82,56 @@ describe('api/self-hosted/mcp', () => {
 
       await expect(ops.getPublishableKeys('default')).rejects.toThrow(
         'Anon key not found in project settings'
+      )
+    })
+  })
+
+  describe('getDebuggingOperations', () => {
+    let retrieveAnalyticsDataMock: ReturnType<typeof vi.fn>
+
+    beforeEach(async () => {
+      vi.unstubAllEnvs()
+      const logs = await import('./logs')
+      retrieveAnalyticsDataMock = vi.mocked(logs.retrieveAnalyticsData)
+    })
+
+    afterEach(() => {
+      vi.unstubAllEnvs()
+    })
+
+    it('getLogs is not supported on self-hosted (query_logs supersedes it)', async () => {
+      const ops = getDebuggingOperations({})
+
+      // `get_logs` is hidden by the MCP server whenever `queryLogs` is present,
+      // so this method is unreachable over MCP and throws defensively.
+      await expect(ops.getLogs('default', { service: 'api' })).rejects.toThrow(
+        'get_logs is not supported on self-hosted'
+      )
+      expect(retrieveAnalyticsDataMock).not.toHaveBeenCalled()
+    })
+
+    it('queryLogs throws when logs are disabled (self-hosted default)', async () => {
+      vi.stubEnv('ENABLED_FEATURES_LOGS_ALL', 'false')
+
+      const ops = getDebuggingOperations({})
+
+      await expect(ops.queryLogs!('default', { sql: 'select 1' })).rejects.toThrow(
+        'Logs are disabled on this instance'
+      )
+      expect(retrieveAnalyticsDataMock).not.toHaveBeenCalled()
+    })
+
+    it('queryLogs passes the model-provided SQL straight through when logs are enabled', async () => {
+      vi.stubEnv('ENABLED_FEATURES_LOGS_ALL', 'true')
+      retrieveAnalyticsDataMock.mockResolvedValue({ data: ['log entry'], error: null })
+
+      const ops = getDebuggingOperations({})
+      await ops.queryLogs!('default', { sql: 'select * from edge_logs' })
+
+      expect(retrieveAnalyticsDataMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          params: expect.objectContaining({ sql: 'select * from edge_logs' }),
+        })
       )
     })
   })

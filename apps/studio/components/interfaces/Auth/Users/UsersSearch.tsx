@@ -175,7 +175,7 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
           search ? (
             <Button
               size="tiny"
-              type="text"
+              variant="text"
               className="p-0 h-5 w-5"
               icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
               onClick={() => {

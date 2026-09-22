@@ -37,16 +37,25 @@ export const useProjectDeleteMutation = ({
   return useMutation<ProjectDeleteData, ResponseError, ProjectDeleteVariables>({
     mutationFn: (vars) => deleteProject(vars),
     async onSuccess(data, variables, context) {
-      await Promise.all([queryClient.invalidateQueries({ queryKey: projectKeys.detail(data.ref) })])
+      // Free project limits are shared across all of a user's orgs, so clear the cached
+      // check for every org, not just the one the deleted project belonged to.
+      const freeProjectLimitCheckQueries = queryClient
+        .getQueryCache()
+        .findAll({ queryKey: ['organizations'] })
+        .filter((query) => query.queryKey[2] === 'free-project-limit-check')
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(data.ref) }),
+        ...freeProjectLimitCheckQueries.map((query) =>
+          queryClient.invalidateQueries({ queryKey: query.queryKey })
+        ),
+      ])
 
       if (variables.organizationSlug) {
         await Promise.all([
           invalidateProjectsQuery(),
           queryClient.invalidateQueries({
             queryKey: organizationKeys.detail(variables.organizationSlug),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: organizationKeys.freeProjectLimitCheck(variables.organizationSlug),
           }),
         ])
       }

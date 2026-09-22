@@ -70,7 +70,9 @@ export function SupportForm({ initialParams }: SupportFormProps) {
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
     toast.error(`Failed to submit support ticket: ${curr.message}`)
-    Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    if (curr.code !== 429) {
+      Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    }
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
@@ -130,13 +132,17 @@ export function SupportFormStatusButton() {
       <TooltipTrigger asChild>
         <Button
           asChild
-          type="default"
           size="tiny"
           icon={
             isLoading ? (
               <Loader2 className="animate-spin" />
             ) : (
-              <div className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')} />
+              <div
+                className={cn(
+                  'h-2 w-2 rounded-full',
+                  isIncident ? 'bg-warning' : 'bg-brand-default'
+                )}
+              />
             )
           }
         >

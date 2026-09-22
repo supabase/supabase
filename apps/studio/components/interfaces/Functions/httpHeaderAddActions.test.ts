@@ -1,30 +1,220 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildEdgeFunctionHeaderAddActions } from './httpHeaderAddActions'
+import {
+  buildEdgeFunctionHeaderAddActions,
+  ensureEdgeFunctionAuthorizationHeader,
+  getEdgeFunctionAuthHeader,
+} from './httpHeaderAddActions'
 
 describe('buildEdgeFunctionHeaderAddActions', () => {
-  it('includes the apikey header when requested', () => {
+  it('includes the apikey header for secret keys', () => {
     const [authAction] = buildEdgeFunctionHeaderAddActions({
-      apiKey: 'secret-key',
-      includeApiKeyHeader: true,
+      apiKey: 'sb_secret_123',
       createRow: (name, value) => ({ name, value }),
     })
 
-    expect(authAction.createRows()).toEqual([
-      { name: 'Authorization', value: 'Bearer secret-key' },
-      { name: 'apikey', value: 'secret-key' },
-    ])
+    expect(authAction.label).toBe('Add secret key')
+    expect(authAction.description).toBe(
+      'Requires JWT verification to be disabled and authorization handled by the function'
+    )
+    expect(authAction.createRows()).toEqual([{ name: 'apikey', value: 'sb_secret_123' }])
   })
 
-  it('omits the apikey header when not requested', () => {
+  it('falls back to the Authorization header for legacy keys', () => {
     const [authAction] = buildEdgeFunctionHeaderAddActions({
-      apiKey: 'service-key',
-      includeApiKeyHeader: false,
+      apiKey: 'legacy-service-role-jwt',
       createRow: (name, value) => ({ name, value }),
     })
 
+    expect(authAction.label).toBe('Add secret key')
+    expect(authAction.description).toBe('Required for edge functions that enforce JWT verification')
     expect(authAction.createRows()).toEqual([
-      { name: 'Authorization', value: 'Bearer service-key' },
+      { name: 'Authorization', value: 'Bearer legacy-service-role-jwt' },
     ])
   })
+  it('offers no publishable key action unless a publishable key is given', () => {
+    const actions = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'sb_secret_123',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(actions.map(({ key }) => key)).toEqual(['add-auth-header', 'add-source-header'])
+  })
+
+  it('prepends a publishable key action when one is given', () => {
+    const [publishableAction, ...rest] = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'sb_secret_123',
+      publishableKey: 'sb_publishable_123',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(publishableAction.key).toBe('add-publishable-key-header')
+    expect(publishableAction.label).toBe('Add publishable key')
+    expect(publishableAction.description).toBe(
+      'For functions that accept a publishable key and authorize the request themselves'
+    )
+    expect(publishableAction.createRows()).toEqual([
+      { name: 'apikey', value: 'sb_publishable_123' },
+    ])
+    expect(rest.map(({ key }) => key)).toEqual(['add-auth-header', 'add-source-header'])
+  })
+
+  it('labels a legacy anon key in the publishable slot accordingly', () => {
+    const [publishableAction] = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'legacy-service-role-jwt',
+      publishableKey: 'legacy-anon-jwt',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(publishableAction.label).toBe('Add anon key')
+    expect(publishableAction.description).toBe(
+      'Legacy anon key, for edge functions that enforce JWT verification'
+    )
+    expect(publishableAction.createRows()).toEqual([
+      { name: 'Authorization', value: 'Bearer legacy-anon-jwt' },
+    ])
+  })
+
+  it('labels the auth action after the key it carries', () => {
+    const [authAction] = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'sb_publishable_123',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(authAction.label).toBe('Add publishable key')
+  })
+
+  it('does not mislabel a secret key passed in the publishable slot', () => {
+    const [publishableAction] = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'legacy-service-role-jwt',
+      publishableKey: 'sb_secret_999',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(publishableAction.label).toBe('Add secret key')
+  })
+})
+
+describe('getEdgeFunctionAuthHeader', () => {
+  it('returns the apikey header for publishable keys', () => {
+    expect(getEdgeFunctionAuthHeader('sb_publishable_123')).toEqual({
+      name: 'apikey',
+      value: 'sb_publishable_123',
+    })
+  })
+
+  it('returns the Authorization header for non-prefixed keys', () => {
+    expect(getEdgeFunctionAuthHeader('legacy-service-role-jwt')).toEqual({
+      name: 'Authorization',
+      value: 'Bearer legacy-service-role-jwt',
+    })
+  })
+
+  it.each(['sb_secretly_123', 'sb_publishableish_123'])(
+    'does not treat %s as a new API key',
+    (apiKey) => {
+      expect(getEdgeFunctionAuthHeader(apiKey)).toEqual({
+        name: 'Authorization',
+        value: `Bearer ${apiKey}`,
+      })
+    }
+  )
+})
+
+describe('ensureEdgeFunctionAuthorizationHeader', () => {
+  const createRow = (name: string, value: string) => ({ id: 'new', name, value })
+
+  it('preserves apikey while normalizing Authorization rows', () => {
+    const headers = [
+      { id: 'custom-before', name: 'X-Before', value: 'before' },
+      { id: 'authorization', name: ' authorization ', value: 'Bearer old-key' },
+      { id: 'apikey', name: 'apikey', value: 'sb_secret_123' },
+      { id: 'duplicate', name: 'AUTHORIZATION', value: 'Bearer stale-key' },
+      { id: 'custom-after', name: 'X-After', value: 'after' },
+    ]
+
+    expect(
+      ensureEdgeFunctionAuthorizationHeader({
+        headers,
+        serviceRoleKey: 'legacy-service-role-jwt',
+        verifyJwt: true,
+        createRow,
+      })
+    ).toEqual([
+      { id: 'custom-before', name: 'X-Before', value: 'before' },
+      {
+        id: 'authorization',
+        name: 'Authorization',
+        value: 'Bearer old-key',
+      },
+      { id: 'apikey', name: 'apikey', value: 'sb_secret_123' },
+      { id: 'custom-after', name: 'X-After', value: 'after' },
+    ])
+  })
+
+  it('adds Authorization alongside apikey when JWT verification is enabled', () => {
+    const headers = [{ id: 'apikey', name: 'apikey', value: 'sb_secret_123' }]
+
+    expect(
+      ensureEdgeFunctionAuthorizationHeader({
+        headers,
+        serviceRoleKey: 'legacy-service-role-jwt',
+        verifyJwt: true,
+        createRow,
+      })
+    ).toEqual([
+      { id: 'apikey', name: 'apikey', value: 'sb_secret_123' },
+      { id: 'new', name: 'Authorization', value: 'Bearer legacy-service-role-jwt' },
+    ])
+  })
+
+  it('does not change headers without an applicable service role key', () => {
+    const headers = [
+      { id: 'authorization', name: 'Authorization', value: 'Bearer existing-key' },
+      { id: 'apikey', name: 'apikey', value: 'sb_secret_123' },
+    ]
+
+    expect(
+      ensureEdgeFunctionAuthorizationHeader({
+        headers,
+        serviceRoleKey: 'legacy-service-role-jwt',
+        verifyJwt: false,
+        createRow,
+      })
+    ).toBe(headers)
+    expect(ensureEdgeFunctionAuthorizationHeader({ headers, verifyJwt: true, createRow })).toBe(
+      headers
+    )
+    expect(
+      ensureEdgeFunctionAuthorizationHeader({
+        headers,
+        serviceRoleKey: 'sb_secret_456',
+        verifyJwt: true,
+        createRow,
+      })
+    ).toBe(headers)
+  })
+
+  it.each(['Bearer user-entered-token', ''])(
+    'preserves a user-entered Authorization value: %j',
+    (value) => {
+      const headers = [
+        {
+          id: 'authorization',
+          name: 'Authorization',
+          value,
+        },
+        { id: 'apikey', name: 'apikey', value: 'sb_secret_123' },
+      ]
+
+      expect(
+        ensureEdgeFunctionAuthorizationHeader({
+          headers,
+          serviceRoleKey: 'legacy-service-role-jwt',
+          verifyJwt: true,
+          createRow,
+        })
+      ).toBe(headers)
+    }
+  )
 })

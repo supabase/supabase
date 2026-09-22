@@ -9,9 +9,17 @@ The shorthand utility classes below simplify our full color palette by providing
 
 Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
 
+Use `text-primary` for readable branded text such as links, labels, and statuses. On light-theme
+surfaces it meets the 4.5:1 WCAG AA requirement for normal text. Use `bg-brand-default` /
+`border-brand-default` when you need the canonical bright Supabase green as a fill or border.
+
 <Colors definition={'text'} />
 
 ## Background
+
+Use `bg-brand-default` when the canonical Supabase green is required as a fill. The same
+`brand-default` suffix applies to borders and other non-text utilities, such as
+`border-brand-default`.
 
 <Colors definition={'background'} />
 

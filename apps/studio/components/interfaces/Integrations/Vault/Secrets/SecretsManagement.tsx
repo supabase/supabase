@@ -14,6 +14,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -21,7 +24,7 @@ import { AddNewSecretModal } from './AddNewSecretModal'
 import { DeleteSecretModal } from './DeleteSecretModal'
 import { EditSecretModal } from './EditSecretModal'
 import { formatSecretColumns } from './Secrets.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
@@ -114,14 +117,22 @@ export const SecretsManagement = () => {
                 onKeyDown={onSearchInputEscape(searchValue ?? '', setSearchValue)}
                 actions={[
                   searchValue && (
-                    <Button
-                      key="clear"
-                      size="tiny"
-                      type="text"
-                      icon={<X />}
-                      onClick={() => setSearchValue('')}
-                      className="p-0 h-5 w-5"
-                    />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          key="clear"
+                          size="tiny"
+                          variant="text"
+                          icon={<X />}
+                          onClick={() => setSearchValue('')}
+                          className="p-0 h-5 w-5"
+                          aria-label="Clear search"
+                          // Tooltip repeats the label; screen readers would read it twice
+                          aria-describedby={undefined}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Clear search</TooltipContent>
+                    </Tooltip>
                   ),
                 ]}
               />
@@ -144,17 +155,12 @@ export const SecretsManagement = () => {
             </div>
 
             <div className="flex items-center gap-x-2">
-              <Button
-                type="default"
-                icon={<RefreshCw />}
-                loading={isRefetching}
-                onClick={() => refetch()}
-              >
+              <Button icon={<RefreshCw />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
               <DocsButton href={`${DOCS_URL}/guides/database/vault`} />
               <ButtonTooltip
-                type="primary"
+                variant="primary"
                 disabled={!canManageSecrets}
                 onClick={() => setShowAddSecretModal(true)}
                 tooltip={{

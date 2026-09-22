@@ -1,0 +1,68 @@
+---
+id: 'logs'
+title: 'Logs in Studio'
+description: 'Filter, inspect, and export project events in the Logs view'
+---
+
+Use [Logs](/dashboard/project/_/logs) to inspect events across your hosted project's services. For SQL queries through [Explorer](/dashboard/project/_/explorer), MCP, or the API, see [Query logs with SQL](/docs/guides/observability/advanced-log-filtering).
+
+## Find events [#product-logs]
+
+1. Open [Logs](/dashboard/project/_/logs).
+2. Set the **Time Range** in the sidebar, or select a range on the timeline.
+3. Select one or more **Log Type** values.
+4. Add filters in the filter bar, or type text to search event messages.
+5. Select a row to inspect the event.
+
+Without a log type selection, Logs queries **Postgres** and **API Gateway**. Selecting types replaces this default set. The timeline groups events by success, warning, and error.
+
+## Filter events
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+| Filter | Behavior |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Log Type | Select API Gateway, Postgres, Auth, Storage, PostgREST, Edge Function, Realtime, or pooler events. |
+| Level | Match success, warning, or error. |
+| Status | Match an HTTP status or Postgres SQLSTATE. |
+| Method | Match an HTTP method. |
+| Pathname | Match a request path. |
+| Event message | Use **iLike** or **Not iLike** for case-insensitive text matching or exclusion. Plain text matches anywhere in the message; `%` specifies a wildcard pattern. |
+| User | Match the user's ID in Auth actor IDs or API Gateway JWT subjects. Other log types cannot match this filter. |
+
+{/* supa-mdx-lint-enable Rule003Spelling */}
+
+Filters other than **Event message** and **User** support **Equals** and **Not equal**. **User** supports **Equals**. Included values within a field match any selected value; exclusions remove every selected value. Filters on different fields must all match.
+
+### Gateway and service logs
+
+The nested service toggles under **API Gateway** include or exclude gateway request paths. Selecting the separate **Auth**, **Storage**, or **PostgREST** log type retrieves that service's own logs. These are different events.
+
+For SQL source names, see the [Log field reference](/docs/guides/observability/log-field-reference).
+
+### Postgres [#postgres]
+
+Postgres logs contain database activity and errors. Connection events appear when [connection logging](/docs/guides/platform/postgres-connection-logging) is enabled. Clear **Connection logs** under **Postgres** to hide them.
+
+To record additional statement classes, see [Configure statement logging](/docs/guides/observability/configure-logging#postgres-statements).
+
+## Inspect an event [#expanding-results]
+
+Select a row to open its detail panel. **Overview**, when available for the log type, shows service details. **Raw JSON** shows the event data. Dock the panel at the bottom or on the right.
+
+Edge Function invocations can include associated console output. In SQL, invocation events use `function_edge_logs` and console events use `function_logs`.
+
+## Watch, share, and export
+
+- Select **Live** to fetch new events automatically. Select it again to pause. Starting live mode clears the fixed time range and sort; selecting a time range or sort stops live mode.
+- Copy the page URL to share the current filters. Recipients need access to the project.
+- Open **Download logs**, choose CSV or JSON, and select a result limit of 100, 500, or 1,000 rows. The export applies the current filters. Without a fixed time range, choose the duration to retrieve.
+
+For continuous export, use [Log drains](/docs/guides/observability/log-drains).
+
+## Missing results [#single-service-collections]
+
+Check the time range, selected log types, and exclusions first. **User** combined with only Postgres or another unsupported type returns no matches. An empty result does not establish that the user had no activity.
+
+Events must be recorded before they can appear in Logs. See [Configure logging](/docs/guides/observability/configure-logging) and the [source limitations](/docs/guides/observability/log-field-reference#capture-limits).
+
+Retention depends on your [pricing plan](/pricing). See [Manage Logs usage](/docs/guides/platform/manage-your-usage/logs) for billing details.

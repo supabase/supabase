@@ -11,7 +11,7 @@ If you've manually created an additional database within your Supabase project, 
 
 ## Key concepts
 
-Before diving into the problem, let's define some key terms:
+Before diving into the problem, define some key terms:
 
 - **What is a Postgres Cluster?**
   In Postgres terminology, a "cluster" refers to a collection of databases managed by a single Postgres server instance. This single instance can host multiple independent databases, each with its own set of tables, users, and permissions. Every Supabase project runs on top of a full Postgres cluster.
@@ -40,7 +40,7 @@ The core of this behavior stems from the distinction between how Postgres manage
 
 ## Resolution and best practices
 
-To effectively utilize Supabase and its features, consider the following approaches:
+To effectively use Supabase and its features, consider the following approaches:
 
 - **For Supabase Feature Integration:** If you intend for your data to be managed via the Supabase Dashboard, accessed through auto-generated APIs (PostgREST), or integrated with Supabase's Authentication or Storage services, all your data and schemas **must reside within the project's default `postgres` database**. This is the designated database for full Supabase ecosystem compatibility.
 

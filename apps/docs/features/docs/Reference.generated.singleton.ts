@@ -1,46 +1,73 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { parse } from 'yaml'
 
-import type { ModuleTypes } from '~/features/docs/Reference.typeSpec'
-import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { type Json } from '../helpers.types'
 import { type IApiEndPoint } from './Reference.api.utils'
 
-let typeSpec: Array<ModuleTypes>
-
-async function _typeSpecSingleton() {
-  if (!typeSpec) {
-    const rawJson = await readFile(
-      join(process.cwd(), 'features/docs', './generated/typeSpec.json'),
-      'utf-8'
-    )
-    typeSpec = JSON.parse(rawJson, (key, value) => {
-      if (key === 'methods' || key === 'variables') {
-        return new Map(Object.entries(value))
-      } else {
-        return value
-      }
-    })
+/**
+ * Resolves the on-disk path for a generated SDK reference file. For libraries
+ * listed in `SUPPORTS_NEW_REFERENCE_PROCESS` we read from the new
+ * `content/reference/<sdk>/<version>/<name>.json` layout produced by
+ * `scripts/build-reference-content.ts`; otherwise fall back to the legacy
+ * `features/docs/generated/<sdk>.<version>.<name>.json` files (still used by
+ * SDKs whose content hasn't migrated to the new pipeline).
+ */
+function generatedReferencePath(sdkId: string, version: string, name: string): string {
+  if (SUPPORTS_NEW_REFERENCE_PROCESS.has(`${sdkId}-${version}`)) {
+    return join(process.cwd(), 'content/reference', sdkId, version, `${name}.json`)
   }
-
-  return typeSpec
+  return join(process.cwd(), 'features/docs/generated', `${sdkId}.${version}.${name}.json`)
 }
 
 function normalizeRefPath(path: string) {
   return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
 }
 
-export async function getTypeSpec(ref: string) {
-  const modules = await _typeSpecSingleton()
+/**
+ * Per-lib typeSpec cache. Each entry is the parsed
+ * `content/reference/<sdk>/<version>/typeSpec.json` — a `{ methods, variables }`
+ * object keyed by normalised `$ref`. `typeSpec: true` in
+ * `content/navigation.references.ts` is set at the library level, so it
+ * applies to every version of that library — but only versions in
+ * `SUPPORTS_NEW_REFERENCE_PROCESS` actually have a typeSpec file. For
+ * versions without one (legacy versions like javascript-v1), we return an
+ * empty spec so the renderer simply omits signature/comment data instead of
+ * crashing the build.
+ */
+type TypeSpecFile = {
+  methods: Record<string, MethodTypes>
+  variables: Record<string, VariableTypes>
+}
+const EMPTY_TYPESPEC: TypeSpecFile = { methods: {}, variables: {} }
+const typeSpecCache = new Map<string, TypeSpecFile>()
 
+async function loadTypeSpec(sdkId: string, version: string): Promise<TypeSpecFile> {
+  const key = `${sdkId}.${version}`
+  const cached = typeSpecCache.get(key)
+  if (cached) return cached
+
+  try {
+    const rawJson = await readFile(generatedReferencePath(sdkId, version, 'typeSpec'), 'utf-8')
+    const parsed = JSON.parse(rawJson) as TypeSpecFile
+    typeSpecCache.set(key, parsed)
+    return parsed
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      typeSpecCache.set(key, EMPTY_TYPESPEC)
+      return EMPTY_TYPESPEC
+    }
+    throw err
+  }
+}
+
+export async function getTypeSpec(sdkId: string, version: string, ref: string) {
+  const spec = await loadTypeSpec(sdkId, version)
   const normalizedRef = normalizeRefPath(ref)
-  const delimiter = normalizedRef.indexOf('.')
-  const refMod = normalizedRef.substring(0, delimiter)
-
-  const mod = modules.find((mod) => mod.name === refMod)
-  // Check methods first, then variables
-  return mod?.methods.get(normalizedRef) ?? mod?.variables.get(normalizedRef)
+  return spec.methods[normalizedRef] ?? spec.variables[normalizedRef]
 }
 
 let cliSpec: Json
@@ -87,11 +114,7 @@ const functionsList = new Map<string, Array<{ id: unknown }>>()
 export async function getFunctionsList(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
   if (!functionsList.has(key)) {
-    const data = await readFile(
-      join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.functions.json`),
-      'utf-8'
-    )
-
+    const data = await readFile(generatedReferencePath(sdkId, version, 'functions'), 'utf-8')
     functionsList.set(key, JSON.parse(data))
   }
 
@@ -103,11 +126,7 @@ const referenceSections = new Map<string, Array<AbbrevApiReferenceSection>>()
 export async function getReferenceSections(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
   if (!referenceSections.has(key)) {
-    const data = await readFile(
-      join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.sections.json`),
-      'utf-8'
-    )
-
+    const data = await readFile(generatedReferencePath(sdkId, version, 'sections'), 'utf-8')
     referenceSections.set(key, JSON.parse(data))
   }
 
@@ -120,11 +139,7 @@ const flatSections = new Map<string, Array<AbbrevApiReferenceSection>>()
 export async function getFlattenedSections(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
   if (!flatSections.has(key)) {
-    const data = await readFile(
-      join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.flat.json`),
-      'utf-8'
-    )
-
+    const data = await readFile(generatedReferencePath(sdkId, version, 'flat'), 'utf-8')
     flatSections.set(key, JSON.parse(data))
   }
 
@@ -137,12 +152,8 @@ const sectionsBySlug = new Map<string, Map<string, AbbrevApiReferenceSection>>()
 export async function getSectionsBySlug(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
   if (!sectionsBySlug.has(key)) {
-    const data = await readFile(
-      join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.bySlug.json`),
-      'utf-8'
-    )
+    const data = await readFile(generatedReferencePath(sdkId, version, 'bySlug'), 'utf-8')
     const asObject = JSON.parse(data)
-
     sectionsBySlug.set(key, new Map(Object.entries(asObject)))
   }
 

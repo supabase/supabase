@@ -10,7 +10,7 @@ import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunc
 import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
-import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
@@ -21,7 +21,8 @@ import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functi
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH } from '@/lib/constants'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 const CodePage = () => {
@@ -141,6 +142,11 @@ const CodePage = () => {
     return !isEqual(normalizeFiles(initialFiles), normalizeFiles(files))
   }, [initialFiles, files])
 
+  const { handleCancelNavigation, handleConfirmNavigation, shouldConfirmNavigation } =
+    usePreventNavigationOnUnsavedChanges({
+      hasChanges: hasUnsavedChanges,
+    })
+
   return (
     <div className="flex flex-col h-full">
       {isLoadingFiles && (
@@ -170,7 +176,7 @@ const CodePage = () => {
                 </li>
                 <li>
                   3. Or use the{' '}
-                  <InlineLink href="https://supabase.com/docs/reference/api/v1-deploy-a-function">
+                  <InlineLink href={`${DOCS_URL}/reference/api/v1-deploy-a-function`}>
                     Management API
                   </InlineLink>
                 </li>
@@ -208,6 +214,7 @@ const CodePage = () => {
           {IS_PLATFORM && (
             <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
               <ButtonTooltip
+                variant="primary"
                 loading={isDeploying}
                 size="medium"
                 disabled={!canDeployFunction || files.length === 0 || isLoadingFiles}
@@ -243,7 +250,11 @@ const CodePage = () => {
         onConfirm={handleDeployConfirm}
         isDeploying={isDeploying}
       />
-      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges} />
+      <DiscardChangesConfirmationDialog
+        visible={shouldConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        onClose={handleConfirmNavigation}
+      />
     </div>
   )
 }

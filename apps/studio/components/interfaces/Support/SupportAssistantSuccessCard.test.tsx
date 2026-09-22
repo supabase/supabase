@@ -7,15 +7,23 @@ import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportAssistantSuccessCardContent as SupportAssistantSuccessCard } from '@/components/ui/AIAssistantPanel/SupportAssistantSuccessCardContent'
 
-const { chatInstances, mockNewChat, mockOpenSidebar, mockSelectChat, mockTrack } = vi.hoisted(
-  () => ({
-    chatInstances: {} as Record<string, MockChat>,
-    mockNewChat: vi.fn(),
-    mockOpenSidebar: vi.fn(),
-    mockSelectChat: vi.fn(),
-    mockTrack: vi.fn(),
-  })
-)
+const {
+  chatInstances,
+  chats,
+  mockNewChat,
+  mockOpenSidebar,
+  mockSelectChat,
+  mockSyncSupportChatToFront,
+  mockTrack,
+} = vi.hoisted(() => ({
+  chatInstances: {} as Record<string, MockChat>,
+  chats: {} as Record<string, { messages: unknown[]; supportMetadata?: unknown }>,
+  mockNewChat: vi.fn(),
+  mockOpenSidebar: vi.fn(),
+  mockSelectChat: vi.fn(),
+  mockSyncSupportChatToFront: vi.fn(),
+  mockTrack: vi.fn(),
+}))
 
 type MockChat = {
   messages: Array<{ id: string; role: string; parts: Array<{ type: string; text: string }> }>
@@ -40,6 +48,14 @@ vi.mock('@/state/ai-assistant-state', () => ({
     newChat: mockNewChat,
     selectChat: mockSelectChat,
   }),
+  useAiAssistantState: () => ({
+    chats,
+    selectChat: mockSelectChat,
+  }),
+}))
+
+vi.mock('@/state/ai-chat-front-sync', () => ({
+  syncSupportChatToFront: mockSyncSupportChatToFront,
 }))
 
 vi.mock('@/state/sidebar-manager-state', () => ({
@@ -50,6 +66,14 @@ vi.mock('@/state/sidebar-manager-state', () => ({
 
 vi.mock('@/lib/telemetry/track', () => ({
   useTrack: () => mockTrack,
+}))
+
+let mockCurrentProjectRef: string | undefined = 'project-1'
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useSelectedProjectQuery: () => ({
+    data: mockCurrentProjectRef ? { ref: mockCurrentProjectRef } : undefined,
+  }),
 }))
 
 const supportRequest: SubmittedSupportRequest = {
@@ -63,6 +87,8 @@ const supportRequest: SubmittedSupportRequest = {
   library: 'javascript',
   allowSupportAccess: true,
   dashboardLogs: undefined,
+  threadRef: 'thread-ref-1',
+  frontConversationId: 'front-conversation-1',
 }
 
 describe('SupportAssistantSuccessCard', () => {
@@ -81,15 +107,20 @@ describe('SupportAssistantSuccessCard', () => {
 
   beforeEach(() => {
     Object.keys(chatInstances).forEach((key) => delete chatInstances[key])
+    Object.keys(chats).forEach((key) => delete chats[key])
     mockNewChat.mockReset()
     mockOpenSidebar.mockReset()
     mockSelectChat.mockReset()
+    mockSyncSupportChatToFront.mockReset()
     mockTrack.mockReset()
     nextChatMessages = []
     emitChatMessagesChange = undefined
+    mockCurrentProjectRef = 'project-1'
+    sessionStorage.clear()
 
     mockNewChat.mockImplementation(() => {
       chatInstances['chat-1'] = createMockChat(nextChatMessages)
+      chats['chat-1'] = { messages: nextChatMessages }
       return 'chat-1'
     })
   })
@@ -179,6 +210,48 @@ describe('SupportAssistantSuccessCard', () => {
     expect(mockOpenSidebar).toHaveBeenCalledWith('ai-assistant')
   })
 
+  it('tags the chat as a support chat and syncs it to Front on first open', async () => {
+    const user = userEvent.setup()
+    render(<SupportAssistantSuccessCard request={supportRequest} />)
+
+    const button = await screen.findByRole('button', { name: /open assistant response/i })
+    await user.click(button)
+
+    expect(chats['chat-1'].supportMetadata).toMatchObject({
+      isSupportChat: true,
+      lifecycleStatus: 'bot_active',
+      subject: 'API requests fail',
+      category: SupportCategories.PROBLEM,
+      severity: 'Normal',
+      organizationSlug: 'org-1',
+      projectRef: 'project-1',
+      allowSupportAccess: true,
+      threadRef: 'thread-ref-1',
+      frontConversationId: 'front-conversation-1',
+      lastSyncedMessageCount: 0,
+      isSyncing: false,
+      isLifecycleSyncing: false,
+    })
+
+    // The initial flush is behind a dynamic import, so it lands asynchronously
+    await waitFor(() => {
+      expect(mockSyncSupportChatToFront).toHaveBeenCalledWith(
+        'chat-1',
+        expect.objectContaining({ chats })
+      )
+    })
+
+    // A second open must not re-tag the chat or trigger another initial flush
+    const taggedMetadata = chats['chat-1'].supportMetadata
+    await user.click(button)
+
+    await waitFor(() => {
+      expect(mockSelectChat).toHaveBeenCalledTimes(2)
+    })
+    expect(chats['chat-1'].supportMetadata).toBe(taggedMetadata)
+    expect(mockSyncSupportChatToFront).toHaveBeenCalledTimes(1)
+  })
+
   it('opens the generated assistant chat with keyboard activation', async () => {
     const user = userEvent.setup()
     render(<SupportAssistantSuccessCard request={supportRequest} />)
@@ -200,5 +273,46 @@ describe('SupportAssistantSuccessCard', () => {
 
     expect(screen.queryByText(/assistant response/i)).not.toBeInTheDocument()
     expect(mockNewChat).not.toHaveBeenCalled()
+  })
+
+  describe('when not already on the ticket project page', () => {
+    beforeEach(() => {
+      mockCurrentProjectRef = undefined
+    })
+
+    it('renders a handoff link with an opaque token, keeping the ticket content out of the URL', async () => {
+      render(<SupportAssistantSuccessCard request={supportRequest} />)
+
+      expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
+      const link = screen.getByRole('link', { name: /open assistant in project/i })
+      expect(link).toHaveAttribute('href', expect.stringContaining('/project/project-1?'))
+
+      const href = link.getAttribute('href') ?? ''
+      const token = new URL(href, 'https://example.com').searchParams.get('assistantHandoff')
+      expect(token).toBeTruthy()
+      // The message (and the rest of the ticket) must never appear in the URL itself.
+      expect(href).not.toContain(encodeURIComponent(supportRequest.message))
+
+      // The actual ticket content is stashed in sessionStorage instead, keyed by that token.
+      expect(sessionStorage.getItem(`assistant-handoff:${token}`)).toBe(
+        JSON.stringify(supportRequest)
+      )
+      expect(mockNewChat).not.toHaveBeenCalled()
+    })
+
+    it('tracks the click and does not touch the sidebar manager directly', async () => {
+      const user = userEvent.setup()
+      render(<SupportAssistantSuccessCard request={supportRequest} />)
+
+      const link = await screen.findByRole('link', { name: /open assistant in project/i })
+      await user.click(link)
+
+      expect(mockTrack).toHaveBeenCalledWith(
+        'support_assistant_follow_up_card_clicked',
+        { ticketCategory: SupportCategories.PROBLEM },
+        { project: 'project-1', organization: 'org-1' }
+      )
+      expect(mockOpenSidebar).not.toHaveBeenCalled()
+    })
   })
 })

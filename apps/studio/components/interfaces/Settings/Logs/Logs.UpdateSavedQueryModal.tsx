@@ -94,15 +94,15 @@ export const UpdateSavedQueryModal = ({
               />
             </DialogSection>
             <DialogFooter>
-              <Button
-                htmlType="reset"
-                type="default"
-                onClick={handleCancel}
-                disabled={isSubmitting}
-              >
+              <Button type="reset" onClick={handleCancel} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+              <Button
+                variant="primary"
+                type="submit"
+                loading={isSubmitting}
+                disabled={isSubmitting || !isDirty}
+              >
                 Save query
               </Button>
             </DialogFooter>

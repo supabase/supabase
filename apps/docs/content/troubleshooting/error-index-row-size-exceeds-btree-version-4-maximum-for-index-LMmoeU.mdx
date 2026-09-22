@@ -36,7 +36,7 @@ This can be if the index is built on text, JSON column etc. It's not prohibited 
 
 One of the measures of index efficiency is the ratio of index entries to the width of all possible values space for this datatype. If we have say 100000 distinct values of int32 in the index then the ratio is 1/40000. If we have text with length of 2704 bytes (maximum for B-tree index) we can hardly imagine the number of distinct values that gives us even a comparable ratio. That said indexing of that long values stores much redundancy in the index.
 
-The solution is simple: use some king of hashing to transfer the values to much narrower space. I.e. md5. The solution is simple, you build a functional index (=index by expression):
+The solution: use some kind of hashing to transfer the values to much narrower space. I.e. md5. Build a functional index (=index by expression):
 
 ```sql
 create index on table_name (MD5(column_name));
@@ -62,6 +62,6 @@ select * from table_name where column_name = 'search_value';
 
 [More on building index by expression](https://www.postgresql.org/docs/current/sql-createindex.html)
 
-For some datatypes other than text that allows queries by partial inclusion (i.e. that the pair key-value is includes in a JSON or for implementing tsvector phrase search) you'd just use GIST/GIN indexes that inherently have values space much narrower that the whole to be indexed.
+For some non-text datatypes that support queries by partial inclusion—such as checking whether a key-value pair exists in JSON, or implementing `tsvector` phrase search—use GiST or GIN indexes. These index types operate on a narrower value space than the full content being indexed.
 
 [More on GIN/GiST indexes](https://www.postgresql.org/docs/15/textsearch-indexes.html)

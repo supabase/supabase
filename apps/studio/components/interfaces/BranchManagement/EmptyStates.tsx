@@ -32,18 +32,18 @@ export const PullRequestsEmptyState = ({
       </p>
       <div className="flex items-center space-x-2 mt-4">
         {hasGithubConnection ? (
-          <Button type="outline" asChild icon={<Github />}>
+          <Button variant="outline" asChild icon={<Github />}>
             <a href={url} target="_blank" rel="noopener noreferrer">
               Create pull request
             </a>
           </Button>
         ) : (
-          <Button asChild type="outline">
+          <Button asChild variant="outline">
             <Link href={`/project/${projectRef}/settings/integrations`}>Connect to GitHub</Link>
           </Button>
         )}
         <BranchSelector
-          type="outline"
+          variant="outline"
           align="center"
           branches={branches}
           onBranchSelected={onBranchSelected}
@@ -68,7 +68,7 @@ export const PreviewBranchesEmptyState = ({
       </p>
       <div className="flex items-center space-x-2">
         <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-        <Button type="primary" onClick={() => onSelectCreateBranch()}>
+        <Button variant="primary" onClick={() => onSelectCreateBranch()}>
           Create branch
         </Button>
       </div>

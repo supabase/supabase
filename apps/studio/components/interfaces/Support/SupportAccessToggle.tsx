@@ -1,20 +1,20 @@
 // End of third-party imports
 
-import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
-import { Badge, Collapsible, CollapsibleContent, CollapsibleTrigger, FormField, Switch } from 'ui'
+import {
+  Badge,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  FormControl,
+  FormField,
+  Switch,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
-
-export const DISABLE_SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
-  SupportCategories.ACCOUNT_DELETION,
-  SupportCategories.SALES_ENQUIRY,
-  SupportCategories.REFUND,
-]
 
 interface SupportAccessToggleProps {
   form: UseFormReturn<SupportFormValues>
@@ -31,7 +31,6 @@ export function SupportAccessToggle({ form, align = 'left', className }: Support
         return (
           <FormItemLayout
             hideMessage
-            name="allowSupportAccess"
             className={className}
             layout="flex"
             align={align}
@@ -83,12 +82,9 @@ export function SupportAccessToggle({ form, align = 'left', className }: Support
               </div>
             }
           >
-            <Switch
-              size="large"
-              id="allowSupportAccess"
-              checked={field.value}
-              onCheckedChange={field.onChange}
-            />
+            <FormControl>
+              <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
           </FormItemLayout>
         )
       }}

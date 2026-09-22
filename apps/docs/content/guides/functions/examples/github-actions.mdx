@@ -5,14 +5,7 @@ description: 'Deploying Edge Functions with GitHub Actions.'
 video: 'https://www.youtube.com/v/l2KlzGrhB6w'
 ---
 
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/l2KlzGrhB6w"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="l2KlzGrhB6w" title="Deploying Edge Functions with GitHub Actions" />
 
 Use the Supabase CLI together with GitHub Actions to automatically deploy our Supabase Edge Functions. [View on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/github-action-deploy).
 
@@ -45,7 +38,7 @@ jobs:
 
 Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command.
 
-Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+Individual function configuration like [JWT verification](/docs/guides/local-development/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/local-development/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
 ```toml
 [functions.hello-world]

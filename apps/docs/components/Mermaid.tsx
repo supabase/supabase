@@ -6,13 +6,13 @@ interface MermaidProps {
 
 export function Mermaid({ chart }: MermaidProps) {
   const svg = renderMermaidSVG(chart, {
-    bg: 'hsl(var(--background-default))',
-    fg: 'hsl(var(--foreground-default))',
+    bg: 'var(--background-default)',
+    fg: 'var(--foreground-default)',
     accent: 'hsl(var(--brand-default))',
-    muted: 'hsl(var(--foreground-light))',
-    line: 'hsl(var(--border-strong))',
-    border: 'hsl(var(--border-strong))',
-    surface: 'hsl(var(--background-surface-200))',
+    muted: 'var(--foreground-light)',
+    line: 'var(--border-strong)',
+    border: 'var(--border-strong)',
+    surface: 'var(--background-surface-200)',
     transparent: true,
   })
 

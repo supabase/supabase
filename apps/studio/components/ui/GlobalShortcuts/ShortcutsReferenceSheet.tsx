@@ -204,7 +204,7 @@ function ShortcutsReferenceSheetContent() {
               <Button
                 aria-label="Clear search"
                 size="tiny"
-                type="text"
+                variant="text"
                 icon={<CircleX size={14} />}
                 onClick={() => setSearch('')}
                 className="h-5 w-5 p-0"

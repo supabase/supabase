@@ -7,6 +7,8 @@ const pricingMetricBytes = [
   PricingMetric.STORAGE_SIZE,
   PricingMetric.LOG_INGESTION,
   PricingMetric.LOG_QUERYING,
+  PricingMetric.ETL_COPY_BACKFILL_DATA,
+  PricingMetric.ETL_REPLICATED_DATA,
 ]
 
 const pricingMetricNotHrs = [
@@ -22,7 +24,7 @@ const pricingMetricNotHrs = [
 
 export const formatUsage = (
   pricingMetric: PricingMetric,
-  allocation: { usage: number; hours?: number }
+  allocation: { usage: number; hours?: number | null }
 ) => {
   if (pricingMetricBytes.includes(pricingMetric)) {
     const formattedUsage = +(allocation.usage / 1e9).toFixed(2).toLocaleString()
@@ -61,6 +63,7 @@ export const billingMetricUnit = (pricingMetric: PricingMetric) => {
       PricingMetric.PITR_14,
       PricingMetric.PITR_28,
       PricingMetric.LOG_DRAIN,
+      PricingMetric.ETL_PIPELINE,
       PricingMetric.AUTH_MFA_PHONE,
       PricingMetric.AUTH_MFA_WEB_AUTHN,
     ].includes(pricingMetric)

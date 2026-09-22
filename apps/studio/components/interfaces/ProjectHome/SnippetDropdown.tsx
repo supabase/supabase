@@ -29,7 +29,7 @@ type SnippetDropdownProps = {
   align?: 'start' | 'center' | 'end'
   className?: string
   autoFocus?: boolean
-  onSelect: (snippet: { id: string; name: string }) => void
+  onSelect: (snippet: { id: string; name: string; visibility: Content['visibility'] }) => void
 }
 
 type SqlContentItem = Extract<Content, { type: 'sql' }>
@@ -105,6 +105,10 @@ export const SnippetDropdown = ({
               <p className="text-xs text-center text-foreground-lighter py-3">Loading...</p>
             ) : search.length > 0 && snippets.length === 0 ? (
               <p className="text-xs text-center text-foreground-lighter py-3">No snippets found</p>
+            ) : search.length === 0 && snippets.length === 0 ? (
+              <p className="text-xs text-center text-foreground-lighter py-3">
+                No snippets available
+              </p>
             ) : (
               <CommandGroup>
                 <ScrollArea className={snippets.length > 7 ? 'h-[210px]' : ''}>
@@ -112,7 +116,13 @@ export const SnippetDropdown = ({
                     <CommandItem
                       key={snippet.id}
                       value={snippet.id}
-                      onSelect={() => onSelect({ id: snippet.id, name: snippet.name })}
+                      onSelect={() =>
+                        onSelect({
+                          id: snippet.id,
+                          name: snippet.name,
+                          visibility: snippet.visibility,
+                        })
+                      }
                     >
                       {snippet.name}
                     </CommandItem>

@@ -26,7 +26,7 @@ export const InlineEditorButton = () => {
 
   return (
     <ButtonTooltip
-      type="outline"
+      variant="outline"
       size="tiny"
       id="editor-trigger"
       className={cn(

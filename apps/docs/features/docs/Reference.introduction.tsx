@@ -42,7 +42,7 @@ export async function ClientLibIntroduction({
   return (
     <ReferenceSectionWrapper
       id="introduction"
-      link={`/docs/reference/${libPath}${isLatestVersion ? '' : `/${version}`}#introduction`}
+      link={`/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}introduction`}
       className={cn('prose', className)}
     >
       <MDXRemoteRefs source={content} />

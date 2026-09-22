@@ -18,6 +18,7 @@ interface OrganizationSettingsMenuItemsProps {
   showLegalDocuments?: boolean
   showPlatformWebhooks?: boolean
   showPrivateApps?: boolean
+  showAuditLogDrains?: boolean
 }
 
 interface OrganizationSettingsSectionsProps extends OrganizationSettingsMenuItemsProps {
@@ -33,6 +34,7 @@ export const generateOrganizationSettingsMenuItems = ({
   showLegalDocuments = true,
   showPlatformWebhooks = true,
   showPrivateApps: _showPrivateApps = false,
+  showAuditLogDrains = false,
 }: OrganizationSettingsMenuItemsProps) => [
   {
     key: 'general',
@@ -76,6 +78,15 @@ export const generateOrganizationSettingsMenuItems = ({
     label: 'Audit Logs',
     href: `/org/${slug}/audit`,
   },
+  ...(showAuditLogDrains
+    ? [
+        {
+          key: 'audit-log-drains',
+          label: 'Audit Log Drains',
+          href: `/org/${slug}/audit-log-drains`,
+        },
+      ]
+    : []),
   ...(showLegalDocuments
     ? [
         {
@@ -95,6 +106,7 @@ export const generateOrganizationSettingsSections = ({
   showLegalDocuments = true,
   showPlatformWebhooks = true,
   showPrivateApps = false,
+  showAuditLogDrains = false,
 }: OrganizationSettingsSectionsProps): SidebarSection[] => {
   const isLinkActive = (key: string, href: string) =>
     key === 'webhooks'
@@ -166,6 +178,16 @@ export const generateOrganizationSettingsSections = ({
       href: `/org/${slug}/audit`,
       shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT,
     },
+    ...(showAuditLogDrains
+      ? [
+          {
+            key: 'audit-log-drains',
+            label: 'Audit Log Drains',
+            href: `/org/${slug}/audit-log-drains`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT_LOG_DRAINS,
+          },
+        ]
+      : []),
     ...(showLegalDocuments
       ? [
           {
@@ -210,6 +232,7 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const { slug } = useParams()
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
   const showPrivateApps = useFlag('privateApps')
+  const showAuditLogDrains = useFlag('auditLogsLogDrain')
   const fullCurrentPath = useCurrentPath()
   const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
 
@@ -231,6 +254,7 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     showLegalDocuments,
     showPlatformWebhooks,
     showPrivateApps,
+    showAuditLogDrains,
   })
 
   const orgSettingsMenu = useMemo(

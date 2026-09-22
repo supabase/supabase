@@ -88,3 +88,17 @@ export function parseOverrideValue(value: unknown, original: unknown): unknown {
   }
   return value
 }
+
+export function getEventCountBadge(count: number): { label: string; sizeClass: string } | null {
+  if (count <= 0) return null
+
+  if (count > 99) {
+    return { label: '99+', sizeClass: 'h-4 min-w-4 px-1' }
+  }
+
+  if (count < 10) {
+    return { label: String(count), sizeClass: 'size-3.5' }
+  }
+
+  return { label: String(count), sizeClass: 'size-4' }
+}

@@ -53,7 +53,7 @@ export function KeyDetailsDialog({
           <div className="relative">
             <Textarea className="font-mono text-sm pr-10" rows={8} value={jwks} readOnly />
             <CopyButton
-              type="default"
+              variant="default"
               iconOnly
               text={jwks}
               className="absolute top-2 right-2"

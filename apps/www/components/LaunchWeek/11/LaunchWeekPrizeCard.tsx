@@ -1,7 +1,7 @@
+import Panel from '~/components/Panel'
 import { useTheme } from 'next-themes'
 import React from 'react'
 import { cn } from 'ui'
-import Panel from '~/components/Panel'
 
 export default function LaunchWeekPrizeCard({
   content,
@@ -23,9 +23,9 @@ export default function LaunchWeekPrizeCard({
         contentClassName
       )}
       shimmerToColor={
-        resolvedTheme?.includes('dark') ? 'hsl(var(--background-alternative-default))' : undefined
+        resolvedTheme?.includes('dark') ? 'var(--background-alternative-default)' : undefined
       }
-      shimmerFromColor={resolvedTheme?.includes('dark') ? 'hsl(var(--border-default))' : undefined}
+      shimmerFromColor={resolvedTheme?.includes('dark') ? 'var(--border-default)' : undefined}
     >
       {content}
     </Panel>

@@ -1,20 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { AttributeMapping } from './AttributeMapping'
 import { JoinOrganizationOnSignup } from './JoinOrganizationOnSignup'
+import { SSOAdvancedSettings } from './SSOAdvancedSettings'
 import { SSODomains } from './SSODomains'
 import { SSOMetadata } from './SSOMetadata'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -44,6 +45,7 @@ const FormSchema = z
     lastNameMapping: z.array(z.object({ value: z.string().trim() })),
     joinOrgOnSignup: z.boolean(),
     roleOnJoin: z.string().optional(),
+    idjagIssuerUrl: z.string().trim().optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.enableSpInitiated) return
@@ -91,6 +93,7 @@ const defaultValues = {
   lastNameMapping: [{ value: '' }],
   joinOrgOnSignup: false,
   roleOnJoin: 'Developer',
+  idjagIssuerUrl: '',
 }
 
 export const SSOConfig = () => {
@@ -118,8 +121,8 @@ export const SSOConfig = () => {
     defaultValues,
   })
 
-  const isSSOEnabled = form.watch('enabled')
-  const enableSpInitiated = form.watch('enableSpInitiated')
+  const isSSOEnabled = useWatch({ control: form.control, name: 'enabled' })
+  const enableSpInitiated = useWatch({ control: form.control, name: 'enableSpInitiated' })
 
   const { mutate: createSSOConfig, isPending: isCreating } = useSSOConfigCreateMutation({
     onSuccess: () => {
@@ -171,6 +174,7 @@ export const SSOConfig = () => {
         user_name_mapping: values.userNameMapping.map((item) => item.value).filter(Boolean),
         join_org_on_signup_enabled: values.joinOrgOnSignup,
         join_org_on_signup_role: roleOnJoin,
+        idjag_issuer_url: values.idjagIssuerUrl || undefined,
       },
     }
 
@@ -207,13 +211,13 @@ export const SSOConfig = () => {
           ssoConfig.last_name_mapping?.map((lastName) => ({ value: lastName })) || [],
         joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
         roleOnJoin: ssoConfig.join_org_on_signup_role,
+        idjagIssuerUrl: ssoConfig.idjag_issuer_url ?? '',
       })
     }
   })
 
   useEffect(() => {
     syncFormFromConfig()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [ssoConfig, organization?.slug])
 
   // Automatically add an empty domain field when SP-initiated is enabled
@@ -226,7 +230,6 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     ensureDomainField()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [enableSpInitiated])
 
   return (
@@ -259,27 +262,23 @@ export const SSOConfig = () => {
                       name="enabled"
                       render={({ field }) => (
                         <FormItemLayout
-                          layout="flex"
+                          layout="flex-row-reverse"
                           label="Enable Single Sign-On"
                           description={
                             <>
-                              Enable and configure SSO for your organization. Learn more about SSO{' '}
+                              Enable and configure SSO for your organization.{' '}
                               <InlineLink
                                 className="text-foreground-lighter hover:text-foreground"
                                 href={`${DOCS_URL}/guides/platform/sso`}
                               >
-                                here
+                                Learn more
                               </InlineLink>
                               .
                             </>
                           }
                         >
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              size="large"
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -305,7 +304,7 @@ export const SSOConfig = () => {
                           )}
                         />
 
-                        {form.watch('enableSpInitiated') && (
+                        {enableSpInitiated && (
                           <Admonition
                             type="note"
                             title="Understanding SSO login flows"
@@ -337,7 +336,7 @@ export const SSOConfig = () => {
                         )}
                       </CardContent>
 
-                      {form.watch('enableSpInitiated') && (
+                      {enableSpInitiated && (
                         <CardContent>
                           <SSODomains form={form} />
                         </CardContent>
@@ -360,6 +359,10 @@ export const SSOConfig = () => {
                       <CardContent>
                         <JoinOrganizationOnSignup form={form} />
                       </CardContent>
+
+                      <CardContent>
+                        <SSOAdvancedSettings form={form} />
+                      </CardContent>
                     </>
                   )}
 
@@ -367,7 +370,7 @@ export const SSOConfig = () => {
                     <div>
                       {!!ssoConfig && (
                         <Button
-                          type="danger"
+                          variant="danger"
                           icon={<Trash />}
                           onClick={() => setIsDeleteModalVisible(true)}
                           disabled={isCreating || isUpdating || isDeleting}
@@ -378,17 +381,13 @@ export const SSOConfig = () => {
                     </div>
                     <div className="flex space-x-2">
                       {form.formState.isDirty && (
-                        <Button
-                          type="default"
-                          disabled={isCreating || isUpdating}
-                          onClick={() => form.reset()}
-                        >
+                        <Button disabled={isCreating || isUpdating} onClick={() => form.reset()}>
                           Cancel
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         loading={isCreating || isUpdating}
                         disabled={!form.formState.isDirty || isCreating || isUpdating}
                       >

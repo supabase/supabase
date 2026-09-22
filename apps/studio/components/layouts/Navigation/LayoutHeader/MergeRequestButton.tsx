@@ -60,7 +60,6 @@ export const MergeRequestButton = () => {
 
   return (
     <ButtonTooltip
-      type="default"
       className="rounded-full w-[26px] h-[26px]"
       onClick={handleClick}
       loading={isUpdating}
@@ -74,7 +73,7 @@ export const MergeRequestButton = () => {
       icon={
         <div className="relative">
           {hasReviewRequested && (
-            <span className="w-1 h-1 absolute top-0 right-0 rounded-full bg-brand" />
+            <span className="w-1 h-1 absolute top-0 right-0 rounded-full bg-brand-default" />
           )}
           <GitMerge size={16} strokeWidth={1.5} />
         </div>

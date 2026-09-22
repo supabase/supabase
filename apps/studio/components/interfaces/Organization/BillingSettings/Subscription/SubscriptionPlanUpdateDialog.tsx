@@ -8,7 +8,7 @@ import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { toast } from 'sonner'
 import { Button, cn, Dialog, DialogContent } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -64,6 +64,8 @@ type BreakdownItem =
 interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
+  /** Called after the subscription update succeeds, in addition to onClose. */
+  onSuccess?: () => void
   planMeta?: OrgPlan | null
   currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
   subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
@@ -77,6 +79,7 @@ interface Props {
 export const SubscriptionPlanUpdateDialog = ({
   selectedTier,
   onClose,
+  onSuccess,
   planMeta,
   subscriptionPreviewQueryResult,
   currentPlanMeta,
@@ -132,6 +135,7 @@ export const SubscriptionPlanUpdateDialog = ({
       `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
     )
     onClose()
+    onSuccess?.()
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
@@ -361,6 +365,7 @@ export const SubscriptionPlanUpdateDialog = ({
                         onTaxIdChange={onTaxIdChange}
                         useAsDefaultBillingAddress={useAsDefaultBillingAddress}
                         onUseAsDefaultBillingAddressChange={onUseAsDefaultBillingAddressChange}
+                        onClose={onClose}
                       />
                     </div>
                   )}
@@ -377,14 +382,6 @@ export const SubscriptionPlanUpdateDialog = ({
                         <>You will be charged by them directly.</>
                       )}
                     </p>
-                    {billingViaPartner &&
-                      billingPartner === 'fly' &&
-                      subscriptionPreview?.plan_change_type === 'downgrade' && (
-                        <p className="text-sm">
-                          Your organization will be downgraded at the end of your current billing
-                          cycle.
-                        </p>
-                      )}
                   </div>
                 )}
               </div>
@@ -439,7 +436,7 @@ export const SubscriptionPlanUpdateDialog = ({
                             {' '}
                             <Link
                               href={`/org/${selectedOrganization?.slug}/billing#breakdown`}
-                              className="text-sm text-brand hover:text-brand-600 transition"
+                              className="text-sm text-primary hover:text-brand-600 transition"
                               target="_blank"
                             >
                               + current spend
@@ -513,7 +510,7 @@ export const SubscriptionPlanUpdateDialog = ({
                 <Button
                   loading={isUpdating || paymentConfirmationLoading || isConfirming}
                   disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
-                  type="primary"
+                  variant="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
                   size="small"
@@ -568,7 +565,7 @@ export const SubscriptionPlanUpdateDialog = ({
                           className="flex items-center gap-2"
                         >
                           <div className="w-4">
-                            <Check className="h-3 w-3 text-brand" strokeWidth={3} />
+                            <Check className="h-3 w-3 text-primary" strokeWidth={3} />
                           </div>
                           <div className="text-sm">
                             <p>{typeof feature === 'string' ? feature : feature[0]}</p>

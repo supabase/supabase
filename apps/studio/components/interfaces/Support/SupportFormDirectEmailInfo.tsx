@@ -24,7 +24,7 @@ export function SupportFormDirectEmailContent({ projectRef }: SupportFormDirectE
             </code>
           </a>
           <CopyButton
-            type="text"
+            variant="text"
             text="support@supabase.com"
             iconOnly
             onClick={() => toast.success('Copied email address to clipboard')}
@@ -38,7 +38,7 @@ export function SupportFormDirectEmailContent({ projectRef }: SupportFormDirectE
               <code className="text-code-inline !text-foreground-light">{projectRef}</code>
               <CopyButton
                 iconOnly
-                type="text"
+                variant="text"
                 text={projectRef}
                 onClick={() => toast.success('Copied project ID to clipboard')}
               />
