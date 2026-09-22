@@ -89,3 +89,76 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 ### Disabled
 
 <ComponentPreview name="toggle-group-disabled" />
+
+### Segmented
+
+A single bordered container with no gap between items, for switching between views or
+filtering a list. Pair it with `size="tiny"` and `allowDeselect={false}`.
+
+<ComponentPreview name="toggle-group-segmented" />
+
+Segments hug their labels rather than sharing the width evenly. Add `className="flex-1"` to each
+item, and a width to the root, if you need them equal.
+
+#### Sliding indicator
+
+`ToggleGroupIndicator` is an optional child that slides the selected background between segments,
+the same mechanism [Tabs](../components/tabs) uses for its underline. Render it inside the group
+and the items hand their selected fill, border, and shadow over to it:
+
+```tsx
+<ToggleGroup type="single" variant="segmented" size="tiny" allowDeselect={false}>
+  <ToggleGroupIndicator />
+  <ToggleGroupItem value="data">Data</ToggleGroupItem>
+  <ToggleGroupItem value="definition">Definition</ToggleGroupItem>
+</ToggleGroup>
+```
+
+Leave it out and the selected state cuts over instantly — nothing else changes. It respects
+`prefers-reduced-motion`, and it only makes sense on `type="single"` groups, since a single
+indicator cannot track several selected items.
+
+For when to reach for this variant — and when to use a [Select](../components/select),
+[Switch](../components/switch), or [Tabs](../components/tabs) instead — see
+[Segmented controls](../fragments/segmented-controls).
+
+## Props
+
+`ToggleGroup` forwards every prop to the underlying
+[Radix Toggle Group](https://www.radix-ui.com/docs/primitives/components/toggle-group#api-reference),
+and adds the following.
+
+| Prop            | Type                                    | Default     | Description                                                            |
+| --------------- | --------------------------------------- | ----------- | ---------------------------------------------------------------------- |
+| `variant`       | `'default' \| 'outline' \| 'segmented'` | `'default'` | Styles the root and every item. Items inherit it through context.      |
+| `size`          | `'tiny' \| 'sm' \| 'default' \| 'lg'`   | `'default'` | Item height and padding. Items inherit it through context.             |
+| `allowDeselect` | `boolean`                               | `true`      | Whether clicking the active item in a `type="single"` group clears it. |
+
+`ToggleGroupIndicator` takes no props of its own beyond `className` and the usual `span`
+attributes.
+
+### `allowDeselect`
+
+Radix clears the selection when you click the already-active item of a `type="single"` group,
+emitting `''` to `onValueChange`. That is right for a toolbar of optional toggles and wrong for a
+segmented control, which always has exactly one thing selected.
+
+Set `allowDeselect={false}` and the root swallows the empty value — `onValueChange` only fires
+when the selection actually moves to another item.
+
+```tsx
+<ToggleGroup
+  type="single"
+  variant="segmented"
+  size="tiny"
+  value={view}
+  onValueChange={setView}
+  allowDeselect={false}
+>
+  <ToggleGroupItem value="data">Data</ToggleGroupItem>
+  <ToggleGroupItem value="definition">Definition</ToggleGroupItem>
+</ToggleGroup>
+```
+
+It defaults to `true`, so existing groups keep Radix's behavior. It has no effect on
+`type="multiple"` groups, where an empty array is a legitimate value.

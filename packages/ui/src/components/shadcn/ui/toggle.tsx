@@ -14,6 +14,8 @@ const toggleVariants = cva(
         default: 'bg-transparent',
         outline:
           'bg-transparent border border-control hover:bg-accent hover:text-accent-foreground',
+        segmented:
+          'relative z-10 rounded-sm border border-transparent bg-transparent hover:bg-transparent text-foreground-light hover:text-foreground data-[state=on]:bg-overlay-hover data-[state=on]:border-strong data-[state=on]:text-foreground data-[state=on]:shadow-sm aria-checked:bg-overlay-hover aria-checked:text-foreground group-has-[[data-segment-indicator]]/segmented:bg-transparent group-has-[[data-segment-indicator]]/segmented:border-transparent group-has-[[data-segment-indicator]]/segmented:shadow-none',
       },
       size: {
         tiny: 'h-[26px] px-2.5 text-xs',

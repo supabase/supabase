@@ -223,6 +223,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Segmented Controls',
+          href: '/docs/fragments/segmented-controls',
+          items: [],
+        },
+        {
           title: 'Table of Contents (TOC)',
           href: '/docs/fragments/toc',
           items: [],
