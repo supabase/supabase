@@ -26,7 +26,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   })
 
   if (data.url) {
- master
     return redirect(data.url, { headers })
   }
 
