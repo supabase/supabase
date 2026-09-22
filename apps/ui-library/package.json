@@ -7,7 +7,7 @@
     "preinstall": "npx only-allow pnpm",
     "dev:content": "velite dev",
     "dev:next": "next dev --port 3004",
-    "dev": "run-p build:content build:registry build:markdown && run-p --race dev:*",
+    "dev": "pnpm build:registry && run-p build:content build:markdown build:markdown-index && run-p --race dev:*",
     "build:content": "velite build --strict",
     "build:registry": "rimraf -G public/r/* && tsx ./scripts/build-registry.mts && shadcn build public/r/registry.json && tsx scripts/clean-registry.ts",
     "build:markdown": "tsx ./scripts/build-markdown.ts",
