@@ -10,13 +10,29 @@ sidebar_label: 'Snowflake'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-<Admonition type="note" label="Early Access">
-
-The Snowflake destination is in Early Access and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
-
-</Admonition>
+The Snowflake destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
 [Snowflake](https://www.snowflake.com/) is a managed data platform. Supabase Pipelines writes an append-only change history for each replicated Postgres table to Snowflake.
+
+[Prepare resources](#prepare-snowflake-resources), [configure the destination](#configure-snowflake-as-a-destination), then [query replicated data](#query-and-materialize-current-state).
+
+## Source table requirements
+
+Required `REPLICA IDENTITY` depends on the operations enabled in the Postgres publication:
+
+| Published operations | Required replica identity                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `INSERT` only        | No row identity is required.                                                                               |
+| `DELETE`             | A primary key, an identity index (`USING INDEX`), or full identity (`FULL`). Publish all identity columns. |
+| `UPDATE`             | `REPLICA IDENTITY FULL`.                                                                                   |
+
+Set full replica identity before publishing updates:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+`REPLICA IDENTITY FULL` increases WAL volume, but lets Pipelines construct complete new rows when Postgres omits unchanged out-of-line TOAST values. The setting applies only to new WAL records. If retained WAL already contains an incompatible update, restart replication for the affected table after changing the setting.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -41,14 +57,13 @@ create schema if not exists PIPELINES_DB.REPLICATED;
 grant usage on database PIPELINES_DB to role PIPELINES_ROLE;
 grant usage on schema PIPELINES_DB.REPLICATED to role PIPELINES_ROLE;
 grant create table on schema PIPELINES_DB.REPLICATED to role PIPELINES_ROLE;
-grant create pipe on schema PIPELINES_DB.REPLICATED to role PIPELINES_ROLE;
 ```
 
 The pipeline role must own destination tables so it can alter, truncate, or drop them. Don't pre-create destination tables under another role.
 
-The role also needs `CREATE PIPE` so Snowflake can create each table's managed default Snowpipe Streaming pipe, named `<TABLE>-STREAMING`, when Pipelines opens a channel. Pipelines does not need a virtual warehouse, stage, or manually created pipe.
+Snowflake creates each table's managed default pipe, `<TABLE>-STREAMING`, automatically. No virtual warehouse, stage, or manually created pipe is required. See [Snowpipe Streaming access privileges](https://docs.snowflake.com/en/user-guide/snowpipe-streaming/snowpipe-streaming-access-control) for the ingestion requirements.
 
-Use a separate role and warehouse for downstream queries and transformations. The pipeline service role does not need query or transformation privileges.
+Use a separate role and warehouse for downstream queries and transformations.
 
 ### Keep the SQL and streaming roles aligned
 
@@ -57,20 +72,24 @@ Pipelines uses two Snowflake interfaces:
 - SQL requests use the optional **Role** configured in the Dashboard. When **Role** is empty, they use the user's default role.
 - Snowpipe Streaming uses the user's `DEFAULT_ROLE`. It does not use the optional **Role** setting.
 
-Use one dedicated role for both interfaces. Set it as the service user's `DEFAULT_ROLE`. Leave **Role** empty in the Dashboard or set it to the same role. If the roles differ, SQL validation and table creation can succeed while streaming fails.
+Set the pipeline role as the service user's `DEFAULT_ROLE`. Leave **Role** empty or set it to that same role. Otherwise, SQL validation can succeed while streaming fails.
 
 ### Generate a key pair
 
-Pipelines authenticates with an RSA key pair. Snowflake requires a key of at least 2048 bits and recommends PKCS #8. Generate an unencrypted private key:
+Pipelines authenticates with an RSA key pair. Snowflake requires a key of at least 2048 bits and recommends PKCS #8. Choose one of the following commands to generate `rsa_key.p8`.
+
+For an unencrypted private key:
 
 ```bash
-openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8 -nocrypt
+openssl genrsa 2048 | openssl pkcs8 -topk8 \
+  -inform PEM -out rsa_key.p8 -nocrypt
 ```
 
-To use a passphrase, generate an encrypted PKCS #8 private key:
+Or, for a passphrase-protected private key:
 
 ```bash
-openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 -inform PEM -out rsa_key.p8
+openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 \
+  -inform PEM -out rsa_key.p8
 ```
 
 Derive the public key:
@@ -103,27 +122,27 @@ Enter the result as **Account ID**, for example `MYORG-MYACCOUNT`. Do not enter 
 
 ## Configure Snowflake as a destination
 
-1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard.
-2. Click **Add destination**.
-3. Select **Snowflake**. If it isn't available, [request Early Access](/go/supabase-pipelines-new-destinations).
-4. Select a Postgres publication and enter a destination name.
-5. Enter the Snowflake settings:
-   - **Account ID**: The organization and account identifier, such as `MYORG-MYACCOUNT`.
-   - **User**: The dedicated unquoted service user, such as `PIPELINES_USER`.
-   - **Database**: The destination database, such as `PIPELINES_DB`.
-   - **Schema**: The dedicated destination schema, such as `REPLICATED`.
-   - **Role**: Leave empty to use the user's `DEFAULT_ROLE`. If set, enter the same role.
-   - **Private key**: The complete PEM-encoded private key, including its begin and end lines.
-   - **Private key passphrase**: Required only for an encrypted PKCS #8 key.
-6. Review the [source table requirements](#source-table-requirements) and click **Create and start pipeline**.
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) and select **Snowflake**. Enter these settings:
 
-Enter the database and schema identifiers exactly as stored in Snowflake. Unquoted identifiers are stored in uppercase. Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. When possible, use a Snowflake account near Frankfurt.
+| Field                      | Value                                                                                                           |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Account ID**             | `MYORG-MYACCOUNT`, for example; use an organization-account identifier                                          |
+| **User**                   | `PIPELINES_USER`, or your unquoted service user                                                                 |
+| **Database**               | `PIPELINES_DB`, or your destination database                                                                    |
+| **Schema**                 | `REPLICATED`, or your dedicated destination schema                                                              |
+| **Role**                   | The service user's default role name, or empty; see [role alignment](#keep-the-sql-and-streaming-roles-aligned) |
+| **Private key**            | Complete PEM, including begin and end lines                                                                     |
+| **Private key passphrase** | Only for an encrypted PKCS #8 key                                                                               |
+
+Click **Create and start pipeline** and complete the validation and cost confirmations.
+
+Enter the database and schema identifiers exactly as stored in Snowflake. Unquoted identifiers are stored in uppercase. Choose an account near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
 ## How it works
 
-Pipelines uses Snowflake's SQL REST API to validate the database and schema, create, evolve, and reset destination tables, and apply source `TRUNCATE` operations. It sends initial and ongoing row data through Snowpipe Streaming. These operations do not use a virtual warehouse.
+Pipelines uses Snowflake's SQL REST API to validate the database and schema, create, evolve, and recreate destination tables, and apply source `TRUNCATE` operations. It sends initial and ongoing row data through Snowpipe Streaming.
 
-Validation checks authentication, database and schema visibility, and that `QUOTED_IDENTIFIERS_IGNORE_CASE` is `FALSE`. It does not verify that the role can create or own tables, create pipes, or write through Snowpipe Streaming.
+Validation checks authentication, database and schema visibility, and that `QUOTED_IDENTIFIERS_IGNORE_CASE` is `FALSE`. It does not verify that the role can create or own tables or write through Snowpipe Streaming.
 
 ### Destination table names
 
@@ -134,7 +153,7 @@ Pipelines maps each Postgres schema and table pair to one Snowflake table name. 
 | `public.orders`        | `PUBLIC_ORDERS`          |
 | `sales_eu.order_items` | `SALES__EU_ORDER__ITEMS` |
 
-Postgres schema and table names cannot start or end with `_` or contain `"` or `;`. Names that differ only in case map to the same Snowflake name. Use lowercase Postgres names to avoid collisions. Source column names are preserved as quoted identifiers, except for the reserved metadata names below.
+Postgres schema and table names cannot start or end with `_` or contain `"` or `;`. Names that differ only in case map to the same Snowflake name. Use lowercase Postgres names to avoid collisions. Source column names are preserved as quoted identifiers, except for the [reserved metadata names](#append-only-change-history).
 
 ### Append-only change history
 
@@ -151,16 +170,14 @@ Snowflake tables are an event history, not a current-state replica:
 
 - An insert appends the new row.
 - An update appends the complete new row. It does not append a before image.
-- A delete appends the complete old row for `REPLICA IDENTITY FULL`. For a primary-key or `USING INDEX` identity, it appends only the identity columns and sets all other source columns to `NULL`.
+- A delete appends the complete old row for `REPLICA IDENTITY FULL`. For a primary-key or `USING INDEX` identity, it sends only the identity columns. Other columns can contain destination defaults or `NULL`; do not treat them as the deleted row's original values.
 - A source `TRUNCATE` truncates the Snowflake table, resets its streaming state, and does not append a truncate event.
 
-To derive current state, group by a stable source identity and select the row with the latest `_cdc_sequence_number`. Exclude identities whose latest operation is `delete`. See [Query and materialize current state](#query-and-materialize-current-state) for SQL examples.
+The sequence number orders changes but is not a globally unique event ID. Snowpipe committed offsets suppress routine replay; consumers must still tolerate [duplicate processing](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once).
 
-The sequence number is used for ordering and checkpointing. It is not a globally unique event ID. Pipelines provides at-least-once delivery, so consumers must tolerate duplicates. Snowpipe committed offsets suppress routine replay but do not change this guarantee.
+A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops the Snowflake table and managed streaming state, erasing its history. It cannot recover past events. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination history in place.
 
-Resetting a table drops and recreates its Snowflake table and managed streaming state. This erases its history. Removing a table from the Postgres publication stops new changes after the pipeline restarts. The existing Snowflake table remains.
-
-## Query and materialize current state
+## Query replicated data [#query-and-materialize-current-state]
 
 Use the replicated change history to build a current-state dataset for reports and analytics. Pipelines maintains the history table. You create and maintain the queries, views, or dynamic tables that read it.
 
@@ -275,6 +292,12 @@ The five-minute `target_lag` is an example freshness target relative to the hist
 
 Dynamic-table refreshes consume warehouse compute, and the materialized results consume storage. These costs are additional to ingestion and querying. Start with a freshness target that meets your reporting needs and measure a representative workload. A dedicated warehouse helps isolate refresh costs. See Snowflake's [dynamic table cost guide](https://docs.snowflake.com/en/user-guide/dynamic-tables/cost).
 
+### Use streams and tasks
+
+Snowflake [streams and tasks](https://docs.snowflake.com/en/user-guide/data-pipelines-intro) can maintain a separate table with scheduled `MERGE` statements. Use this option when you need control over the update procedure or schedule. Snowflake's [SCD Type 1 examples](https://docs.snowflake.com/en/user-guide/dynamic-tables/migrate-streams-tasks#scd-type-1-upsert) compare this approach with dynamic tables.
+
+Adapt the merge to Pipelines' `"_cdc_operation"` and `"_cdc_sequence_number"` columns. A stream on the history table sees appended rows, including rows representing source updates and deletes. Your job must interpret those operations, load existing history, tolerate replay, and rebuild current state after a source truncate or pipeline table reset.
+
 ### Maintain derived objects
 
 Pipelines maintains the replicated history table, but does not update your view or dynamic-table definitions.
@@ -286,30 +309,6 @@ Pipelines maintains the replicated history table, but does not update your view 
 | Added, renamed, or dropped source column | Review the explicit column list. Add new columns to your definition when needed. Update or recreate derived objects that reference renamed or dropped columns.                                     |
 
 Recreating a dynamic table initializes its contents again and uses compute. See Snowflake's [dynamic table modification guide](https://docs.snowflake.com/en/user-guide/dynamic-tables/modify) for changes that require reinitialization.
-
-### Use streams and tasks
-
-Snowflake [streams and tasks](https://docs.snowflake.com/en/user-guide/data-pipelines-intro) can maintain a separate table with scheduled `MERGE` statements. Use this option when you need control over the update procedure or schedule. Snowflake's [SCD Type 1 examples](https://docs.snowflake.com/en/user-guide/dynamic-tables/migrate-streams-tasks#scd-type-1-upsert) compare this approach with dynamic tables.
-
-Adapt the merge to Pipelines' `"_cdc_operation"` and `"_cdc_sequence_number"` columns. A stream on the history table sees appended rows, including rows representing source updates and deletes. Your job must interpret those operations, load existing history, tolerate replay, and rebuild current state after a source truncate or pipeline table reset.
-
-## Source table requirements
-
-Required `REPLICA IDENTITY` depends on the operations enabled in the Postgres publication:
-
-| Published operations | Required replica identity                                                                                      |
-| -------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `INSERT` only        | No row identity is required.                                                                                   |
-| `DELETE`             | A primary key, `REPLICA IDENTITY USING INDEX`, or `REPLICA IDENTITY FULL`. Identity columns must be published. |
-| `UPDATE`             | `REPLICA IDENTITY FULL`.                                                                                       |
-
-Set full replica identity before publishing updates:
-
-```sql
-alter table public.your_table replica identity full;
-```
-
-`REPLICA IDENTITY FULL` increases WAL volume, but lets Pipelines construct complete new rows when Postgres omits unchanged out-of-line TOAST values. The setting applies only to new WAL records. If retained WAL already contains an incompatible update, reset the affected table after changing the setting.
 
 ## Type mapping
 
@@ -332,46 +331,42 @@ Pipelines uses `VARCHAR` for character and text types, `numeric`, `time with tim
 Additional limits apply:
 
 - Multi-dimensional arrays aren't supported. Non-default lower bounds on one-dimensional arrays aren't preserved.
-- Non-finite floating-point and `numeric` values are rejected.
+- Non-finite `real` and `double precision` values are rejected. Non-finite `numeric` values are preserved as strings in `VARCHAR` columns.
 - An uncompressed serialized row larger than 2 MiB is rejected.
 - Source primary-key, unique, check, length, precision, and nullability constraints aren't copied. Only the two CDC metadata columns are `NOT NULL`.
 
 ## Schema change support
 
-Snowflake schema change support is limited during Early Access.
+Pipelines supports:
 
-Supported changes:
+- Adding, renaming, or dropping columns
+- Adding or removing published columns on tracked tables
 
-- Add a column.
-- Rename a column.
-- Drop a column.
+Replicated columns remain nullable in Snowflake, and changes to existing column defaults are not propagated. Initial table creation can copy compatible literal defaults. Columns added in Postgres can copy string, numeric, or boolean literal defaults; other defaults are omitted. Postgres still supplies the source values through replication.
 
-Unsupported or limited changes:
+Schema changes also affect stored history: renaming a column changes its name in old events, dropping it removes its historical values, and adding one with a default can populate older rows.
 
-- Changing a column type isn't supported.
-- Source table and schema renames aren't supported.
-- Changes to nullability or existing column defaults are ignored.
-- Initial table creation can copy compatible literal defaults. Added columns can copy string, numeric, or boolean literal defaults. Other defaults are omitted.
+Previously excluded columns are added without defaults, leaving historical events `NULL` for those columns. Removing a published column drops its destination values; adding it again does not restore them.
 
-Snowflake DDL changes existing history. Adding a column with a default can populate older rows. Renaming a column changes the historical schema. Dropping a column removes it from old events. Snowflake DDL is not transactional, so an interrupted multi-column change can leave a partially applied schema. Apart from [enabling change tracking](#materialize-with-a-dynamic-table), do not alter managed destination objects manually. If the pipeline remains failed after a restart, [contact support](/dashboard/support/new).
+For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support). Apart from [enabling change tracking](#materialize-with-a-dynamic-table), do not alter managed destination objects manually.
 
 ## Troubleshooting
 
-| Symptom                                               | What to check                                                                                                                                                                                                                                                                |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authentication fails                                  | Confirm the account identifier and user, the registered public-key fingerprint, the complete private-key PEM, and the passphrase. Don't provide a passphrase for an unencrypted key.                                                                                         |
-| Database or schema isn't found                        | Match the database and schema names exactly, including case. Confirm that the role has `USAGE` on both.                                                                                                                                                                      |
-| Validation succeeds but table initialization fails    | Confirm that the role has `CREATE TABLE` and `CREATE PIPE` on the schema. Check that another role does not own a table with the same name. Snowflake manages the default pipe. Use a dedicated empty schema.                                                                 |
-| Validation or table creation succeeds but writes fail | Confirm that the service user's `DEFAULT_ROLE` is the pipeline role. Leave **Role** empty or set it to the same role. Confirm that the role has `CREATE PIPE`. Check that Snowflake network policies allow the account control endpoint and discovered Snowpipe ingest host. |
-| Updates or deletes fail                               | Check the publication's operations, replica identity, and included identity columns. Updates require `REPLICA IDENTITY FULL`.                                                                                                                                                |
-| A row is rejected                                     | Check for multi-dimensional arrays, non-finite numbers, serialized rows larger than 2 MiB, or source columns named `_cdc_operation` or `_cdc_sequence_number`.                                                                                                               |
-| A schema change fails                                 | Check the supported changes above. Snowflake DDL can be partially applied, so do not repair managed tables manually. [Contact support](/dashboard/support/new) with the pipeline ID and error details.                                                                       |
+| Symptom                                    | What to check                                                                                                                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Authentication fails                       | [Account identifier](#find-the-account-identifier), user, [key fingerprint and PEM](#generate-a-key-pair), and passphrase. Omit the passphrase for an unencrypted key.               |
+| Database or schema isn't found             | Exact identifier case and `USAGE` permissions on both objects                                                                                                                        |
+| Validation passes but table creation fails | [Grants and ownership](#prepare-snowflake-resources), including `CREATE TABLE`                                                                                                       |
+| Tables are created but writes fail         | [SQL and streaming role alignment](#keep-the-sql-and-streaming-roles-aligned), table permissions, and network access to the account control and discovered Snowpipe ingest endpoints |
+| Updates or deletes fail                    | [Source replica identity and published columns](#source-table-requirements)                                                                                                          |
+| A row is rejected                          | [Type and row-size limits](#type-mapping) and [reserved metadata columns](#append-only-change-history)                                                                               |
+| A schema change fails                      | [Supported changes](#schema-change-support); do not repair managed tables manually                                                                                                   |
 
-Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) and [replication logs](/dashboard/project/_/logs/replication-logs) to inspect table state, lag, and errors.
+Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors. For unresolved failures, [contact support](/dashboard/support/new) with the pipeline ID and error details.
 
 ## Additional resources
 
 - [Snowflake key-pair authentication](https://docs.snowflake.com/en/user-guide/key-pair-auth)
 - [Snowflake account identifiers](https://docs.snowflake.com/en/user-guide/admin-account-identifier)
 - [Snowpipe Streaming default pipe](https://docs.snowflake.com/en/user-guide/snowpipe-streaming/snowpipe-streaming-pipe-object)
-- [Snowpipe Streaming operations and privileges](https://docs.snowflake.com/en/user-guide/snowpipe-streaming/snowpipe-streaming-operations)
+- [Snowpipe Streaming access control](https://docs.snowflake.com/en/user-guide/snowpipe-streaming/snowpipe-streaming-access-control)

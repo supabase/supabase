@@ -1,22 +1,22 @@
 /*
  * Core semantic color system.
  *
- * Themes override the small set of inputs below; neutral and status colors are
- * derived from them in OKLCH. Primary preserves the original button fill's
- * lightness and chroma while following the semantic primary hue.
- * The stepped numeric scales (brand / warning /
+ * Themes override the small set of inputs below; every semantic color is then
+ * derived from them in OKLCH. The stepped numeric scales (brand / warning /
  * destructive / secondary) are NOT derived here — they live as per-theme values
  * in the theme files and are mapped to utilities in packages/config/css/theme.css.
  */
 
 :root {
   /*
-   * Hue inputs:
-   *   --surface-hue  tints backgrounds, text and borders
-   *   --primary-hue  tints the primary fill and anchors status palettes
-   * Both default to --hue (brand-text-aligned green ≈157.5° OKLCH). Override
-   * either one to let them diverge (e.g. light --surface-hue).
-   */
+   * Hue inputs. A single --hue used to drive both the neutral surface/text ramp
+   * and the brand, so the two could never drift apart. They are now split so a
+   * theme can run, say, a cool-gray surface against the green brand:
+   *   --surface-hue  tints backgrounds, text and borders (the neutral ramp)
+   *   --primary-hue  is the brand hue that --primary is built from
+   * Both default to --hue (Supabase green ≈157.5° in OKLCH), so a theme that only
+   * sets --hue keeps surfaces and brand locked together as before; override
+   * either one to let them diverge. */
   --hue: 157.5;
   --surface-hue: var(--hue);
   --primary-hue: var(--hue);
@@ -159,15 +159,14 @@
   --popover-foreground: var(--foreground);
 
   /*
-   * Dark-theme primary fill. Lightness/chroma stay on a dark plate so light
-   * labels hold contrast; hue follows --primary-hue. Light theme overrides
-   * --primary entirely for a lighter readable fill.
+   * Primary is the accessible functional green (text, controls). Bright
+   * expressive fills use brand-default. Light theme overrides --primary for AA text.
    *
    * Hover shifts lightness only (preserves hue/chroma). Mixing with --foreground
-   * pulls light-mode surface-hue (warm) into the green and read as yellow.
+   * pulls light-mode surface-hue (warm) into the green and reads as yellow.
    * Sign of --tone-span: darken in light, lighten in dark.
    */
-  --primary: oklch(0.43627 0.11 var(--primary-hue));
+  --primary: oklch(0.76 0.15 var(--primary-hue));
   --button-fill-hover-delta: 0.04;
   --primary-hover: oklch(
     from var(--primary)
@@ -177,7 +176,9 @@
       )
       c h
   );
-  --primary-foreground: oklch(0.95 0.00275 var(--primary-hue));
+  --primary-foreground: oklch(
+    min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
+  );
 
   --secondary: oklch(
     from var(--background) calc(l + var(--elevation-step) * var(--elevation-3)) c h
@@ -273,7 +274,7 @@
   --border-destructive: oklch(from var(--destructive) l c h / 30%);
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-info: oklch(from var(--info) l c h / 30%);
-  --border-brand: oklch(from var(--primary) l c h / 30%);
+  --border-brand-default: oklch(from var(--primary) l c h / 30%);
 
   --border: oklch(
     from var(--foreground) l calc(c * 0.54) h / calc(2% + 20% * var(--contrast-border))

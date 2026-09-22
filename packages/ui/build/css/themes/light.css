@@ -16,11 +16,7 @@
   --foreground-lightness: 0.1;
   --muted-foreground-level: 0.65;
   --tertiary-foreground-level: 0.5;
-  /*
-   * Light primary tracks brand-text lightness/chroma: 
-   * slightly darker for ~5:1 white-label contrast, richer chroma. 
-   * Hue comes from --primary-hue.
-   */
+  /* Accessible primary for text/controls (~4.5:1+ on light surfaces). */
   --primary: oklch(0.525 0.12 var(--primary-hue));
   --primary-foreground: oklch(0.99 0.00275 var(--primary-hue));
   /*
@@ -29,7 +25,7 @@
    * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
   --warning-hue: 58;
-  --warning-lightness: 0.58;
+  --warning-lightness: 0.68;
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;
 
@@ -46,7 +42,6 @@
   --secondary-default: 247.8deg 100% 70%;
   --secondary-400: 248.3deg 54.5% 25.9%;
   --secondary-200: 248deg 53.6% 11%;
-  --brand-link: 153.4deg 86.5% 27.8%;
   --brand-default: 152.9deg 60% 52.9%;
   --brand-600: 156.5deg 86.5% 26.1%;
   --brand-500: 155.3deg 78.4% 40%;

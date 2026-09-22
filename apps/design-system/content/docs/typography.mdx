@@ -9,7 +9,9 @@ The shorthands below are composed of core [Tailwind utility classes](../docs/tai
 
 ## Shorthands
 
-| Value              | Usage                                                                        |
-| ------------------ | ---------------------------------------------------------------------------- |
-| `text-code-inline` | Apply to a `code` element for inline code or similar custom inline content   |
-| `text-brand-link`  | Supabase green text that meets contrast requirements in light and dark modes |
+| Value              | Usage                                                                      |
+| ------------------ | -------------------------------------------------------------------------- |
+| `text-code-inline` | Apply to a `code` element for inline code or similar custom inline content |
+| `text-brand`       | Accessible Supabase green for readable branded text                        |
+
+`text-brand` is independent from `bg-brand-default`, `border-brand-default`, and other non-text brand utilities. Its light-mode value has at least 4.5:1 contrast against the light surfaces used by the apps, meeting WCAG AA for normal text.

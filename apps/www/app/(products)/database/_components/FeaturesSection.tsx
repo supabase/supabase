@@ -478,7 +478,9 @@ function RealtimeSkeleton() {
                     key={msg.id}
                     className={cn(
                       'transition-colors duration-500',
-                      tableFlashId === msg.id ? 'bg-brand/15 dark:bg-brand/5' : 'bg-surface-75'
+                      tableFlashId === msg.id
+                        ? 'bg-brand-default/15 dark:bg-brand-default/5'
+                        : 'bg-surface-75'
                     )}
                   >
                     <td className="border-b border-r border-default px-3 py-1.5 text-foreground-muted text-xs truncate max-w-0">
@@ -546,9 +548,9 @@ function RealtimeSkeleton() {
                     className={cn(
                       'max-w-[75%] px-3 py-1.5 rounded-xl text-xs leading-snug transition-colors duration-500',
                       isAlice
-                        ? 'bg-brand/15 text-foreground rounded-br-sm'
+                        ? 'bg-brand-default/15 text-foreground rounded-br-sm'
                         : 'bg-surface-300 text-foreground rounded-bl-sm',
-                      chatFlashId === msg.id && 'ring-1 ring-brand/30'
+                      chatFlashId === msg.id && 'ring-1 ring-brand-default/30'
                     )}
                   >
                     {msg.text}

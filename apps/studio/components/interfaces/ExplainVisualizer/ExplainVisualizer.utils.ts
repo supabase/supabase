@@ -154,7 +154,7 @@ export function getScanBarColor(operation: string): string {
     op.includes('index only scan') ||
     op.includes('bitmap index scan')
   ) {
-    return 'bg-brand/20'
+    return 'bg-brand-default/20'
   }
 
   // Sequential scans are yellow

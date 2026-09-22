@@ -49,8 +49,8 @@ export const BannerTableEditorQueueOperations = () => {
               </div>
 
               <div className="flex gap-2 py-0.5">
-                <span className="text-brand-link select-none font-medium">+</span>
-                <span className="text-brand-link truncate max-w-full">Blue</span>
+                <span className="text-brand select-none font-medium">+</span>
+                <span className="text-brand truncate max-w-full">Blue</span>
               </div>
             </CardContent>
           </Card>

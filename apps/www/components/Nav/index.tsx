@@ -152,7 +152,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           <NavigationMenuTrigger
                             className={cn(
                               buttonVariants({ variant: 'text', size: 'small' }),
-                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2.5 h-full'
+                              'bg-transparent! hover:text-brand data-open:text-brand! focus-ring focus-visible:text-foreground px-2.5 h-full'
                             )}
                           >
                             {menuItem.title}
@@ -180,7 +180,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                             <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
-                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link px-2.5 h-full"
+                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand px-2.5 h-full"
                               hoverColor="brand"
                             />
                           </NavigationMenuLink>

@@ -265,7 +265,7 @@ export function ServiceFlowPanel({
                 language="json"
                 hideCopy
                 wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-                className="rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
+                className="rounded-none border-none !overflow-x-visible [&_code]:!leading-tight [&_pre]:!leading-tight"
               >
                 {JSON.stringify(formattedJsonData, null, 2)}
               </CodeBlock>

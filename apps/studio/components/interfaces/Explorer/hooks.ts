@@ -35,7 +35,7 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
   const hasLoadedNotebook =
     isCurrentProjectNotebook && currentNotebook?.notebook.content !== undefined
 
-  const { data, error, isError } = useNotebookQuery(
+  const { data, error, isError, isLoading } = useNotebookQuery(
     { projectRef, id },
     {
       retry: false,
@@ -82,7 +82,7 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
     mergeNotebook()
   }, [projectRef, id, data, isNotFound, !!profile, !!project])
 
-  return { isNotFound: isNotFound && !isCurrentProjectNotebook }
+  return { isNotFound: isNotFound && !isCurrentProjectNotebook, isLoading }
 }
 
 export const useCreateNotebook = () => {
