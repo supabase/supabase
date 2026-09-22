@@ -257,7 +257,9 @@ export function mapJitMembersToUserRules(
   const memberMap = new Map((projectMembers ?? []).map((member) => [member.user_id, member]))
   const baseRoleIds = roleOptions.map((role) => role.id)
 
-  return (jitMembers ?? []).map((item) => {
+  return (jitMembers ?? []).flatMap((item) => {
+    if (!item.user_id) return []
+
     const mappedMember = memberMap.get(item.user_id)
     const assignedRoles: JitRoleGrantDraft[] = (item.user_roles ?? []).map((roleObj) => {
       const roleWithBranchRestriction = roleObj as typeof roleObj & { branches_only?: boolean }
@@ -294,14 +296,16 @@ export function mapJitMembersToUserRules(
     const email = mappedMember?.primary_email ?? item.user_id
     const name = mappedMember?.username ?? undefined
 
-    return {
-      id: item.user_id,
-      memberId: item.user_id,
-      email,
-      name,
-      grants: cloneGrants(grants),
-      status: computeStatusFromGrants(grants),
-    }
+    return [
+      {
+        id: item.user_id,
+        memberId: item.user_id,
+        email,
+        name,
+        grants: cloneGrants(grants),
+        status: computeStatusFromGrants(grants),
+      },
+    ]
   })
 }
 

@@ -1,4 +1,4 @@
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { CardContent, CardFooter, Form, FormControl, FormField, FormItem, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -23,7 +23,7 @@ export const DataApiEnableSwitchForm = ({
   onSubmit: (values: DataApiFormValues) => void
   handleReset: () => void
 }) => {
-  const watchedEnabled = form.watch('enableDataApi')
+  const watchedEnabled = useWatch({ control: form.control, name: 'enableDataApi' })
 
   return (
     <Form {...form}>

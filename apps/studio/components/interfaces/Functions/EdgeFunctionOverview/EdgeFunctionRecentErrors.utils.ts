@@ -2,15 +2,13 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { parseEdgeFunctionEventMessage } from '../EdgeFunctionRecentInvocations.utils'
-import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
-  genCountQuery,
-  genDefaultQuery,
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { AlertErrorProps } from '@/components/ui/AlertError'
+import { DOCS_URL } from '@/lib/constants'
 
 dayjs.extend(relativeTime)
 
@@ -75,7 +73,7 @@ export const getDisplayErrorMessage = (group: RecentErrorGroup): string => {
   return summarizeErrorMessage(group.message)
 }
 
-const TROUBLESHOOTING_DOCS_BASE = 'https://supabase.com/docs/guides/troubleshooting'
+const TROUBLESHOOTING_DOCS_BASE = `${DOCS_URL}/guides/troubleshooting`
 
 export const buildTroubleshootingDocsUrl = ({ statusCode }: { statusCode?: string }): string => {
   const numericStatusCode = Number(statusCode)
@@ -130,17 +128,21 @@ export const toIsoTimestamp = (value?: string | number) => {
   return Number.isNaN(date.valueOf()) ? undefined : date.toISOString()
 }
 
+export const SINCE_LAST_DEPLOY_MAX_RANGE_MS = 24 * 60 * 60 * 1000
+
 export const getSinceLastDeployLogRange = (updatedAt?: string | number, now: Date = new Date()) => {
   const isoTimestampStart = toIsoTimestamp(updatedAt)
   if (!isoTimestampStart) return {}
 
   const startDate = new Date(isoTimestampStart)
   const normalizedNow = new Date(now)
-  const endDate = Number.isNaN(normalizedNow.valueOf()) ? new Date() : normalizedNow
+  const nowDate = Number.isNaN(normalizedNow.valueOf()) ? new Date() : normalizedNow
+  const endDate = new Date(Math.max(startDate.valueOf(), nowDate.valueOf()))
+  const earliestAllowedStart = endDate.valueOf() - SINCE_LAST_DEPLOY_MAX_RANGE_MS
 
   return {
-    isoTimestampStart,
-    isoTimestampEnd: new Date(Math.max(startDate.valueOf(), endDate.valueOf())).toISOString(),
+    isoTimestampStart: new Date(Math.max(startDate.valueOf(), earliestAllowedStart)).toISOString(),
+    isoTimestampEnd: endDate.toISOString(),
   }
 }
 
@@ -196,20 +198,32 @@ export const getStatusBadgeVariant = (statusCode?: string) => {
 export const getRecentErrorInvocationsSql = (
   functionId?: string,
   limit = RECENT_ERROR_INVOCATIONS_LIMIT
-) =>
-  genDefaultQuery(
-    LOGS_TABLES.fn_edge,
-    {
-      function_id: functionId ?? '__pending__',
-      'status_code.error': true,
-    },
-    limit
-  )
+): string => {
+  const id = escapeSqlString(functionId ?? '__pending__')
+  return `
+-- errors since last deploy
+select
+  toUnixTimestamp64Micro(timestamp) as timestamp,
+  event_message,
+  log_attributes['request.method'] as method,
+  log_attributes['response.status_code'] as status_code,
+  toFloat64OrZero(log_attributes['execution_time_ms']) as execution_time_ms,
+  log_attributes['execution_id'] as execution_id
+from logs
+where
+  source = 'function_edge_logs'
+  and log_attributes['function_id'] = '${id}'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
+order by timestamp desc
+limit ${limit}
+`.trim()
+}
 
-export const getSinceLastDeployInvocationCountSql = (functionId?: string) =>
-  genCountQuery(LOGS_TABLES.fn_edge, {
-    function_id: functionId ?? '__pending__',
-  })
+export const getSinceLastDeployInvocationCountSql = (functionId?: string): string => {
+  const id = escapeSqlString(functionId ?? '__pending__')
+  return `-- invocation count since last deploy
+select count() as count from logs where source = 'function_edge_logs' and log_attributes['function_id'] = '${id}'`
+}
 
 export const getSinceLastDeployInvocationCount = (invocationCountRows: LogData[]) => {
   const count = Number(invocationCountRows[0]?.count ?? 0)
@@ -238,16 +252,29 @@ export const getFunctionRuntimeLogsSql = ({
   functionId?: string
   executionIds: string[]
   limit?: number
-}) => {
+}): string => {
   if (!functionId || executionIds.length === 0) return ''
 
+  const escapedFunctionId = escapeSqlString(functionId)
   const escapedExecutionIds = executionIds.map((id) => `'${escapeSqlString(id)}'`).join(', ')
 
-  return `select id, function_logs.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from function_logs
-cross join unnest(metadata) as metadata
-where metadata.function_id = '${escapeSqlString(functionId)}' and metadata.execution_id in (${escapedExecutionIds})
+  return `
+-- runtime logs for error groups
+select
+  toUnixTimestamp64Micro(timestamp) as timestamp,
+  event_message,
+  log_attributes['level'] as level,
+  log_attributes['event_type'] as event_type,
+  log_attributes['function_id'] as function_id,
+  log_attributes['execution_id'] as execution_id
+from logs
+where
+  source = 'function_logs'
+  and log_attributes['function_id'] = '${escapedFunctionId}'
+  and log_attributes['execution_id'] in (${escapedExecutionIds})
 order by timestamp desc
-limit ${limit}`
+limit ${limit}
+`.trim()
 }
 
 export const getRecentErrorGroupsBase = (

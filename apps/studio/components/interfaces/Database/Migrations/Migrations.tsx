@@ -16,14 +16,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -31,7 +33,7 @@ import { formatMigrationVersionLabel, parseMigrationVersion } from '@/lib/migrat
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const Migrations = () => {
+export const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -90,7 +92,7 @@ const Migrations = () => {
               </>
             }
           >
-            <Button key="contact-support" asChild type="default">
+            <Button key="contact-support" asChild>
               <SupportLink
                 queryParams={{
                   projectRef: project?.ref,
@@ -115,7 +117,7 @@ const Migrations = () => {
                   placeholder="Search for a migration"
                   value={search}
                   className="w-full lg:w-52"
-                  onChange={(e: any) => setSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target.value)}
                   icon={<Search />}
                 />
                 <Card>
@@ -175,10 +177,7 @@ const Migrations = () => {
                                 </Tooltip>
                               </TableCell>
                               <TableCell align="right">
-                                <Button
-                                  type="default"
-                                  onClick={() => setSelectedMigration(migration)}
-                                >
+                                <Button onClick={() => setSelectedMigration(migration)}>
                                   View migration SQL
                                 </Button>
                               </TableCell>
@@ -186,14 +185,7 @@ const Migrations = () => {
                           )
                         })
                       ) : (
-                        <TableRow>
-                          <TableCell colSpan={3}>
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{search}" did not return any results
-                            </p>
-                          </TableCell>
-                        </TableRow>
+                        <TableRowNoResults colSpan={3} search={search} />
                       )}
                     </TableBody>
                   </Table>
@@ -211,19 +203,21 @@ const Migrations = () => {
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
           <div className="flex items-center justify-end p-4 border-t border-overlay-border">
-            <Button type="default" onClick={() => setSelectedMigration(undefined)}>
-              Close
-            </Button>
+            <Button onClick={() => setSelectedMigration(undefined)}>Close</Button>
           </div>
         }
       >
         <div className="h-full">
           <div className="relative h-full">
             <CodeEditor
+              // The CodeEditor does not react to content only changes,
+              // specifically when two projects have migrations with the same version but different content.
+              // Setting the key ensure it always update when the migration changes
+              key={`${project?.ref}-${selectedMigration?.version}`}
               isReadOnly
               id={selectedMigration?.version ?? ''}
               language="pgsql"
-              defaultValue={
+              value={
                 selectedMigration?.statements?.join(';\n') +
                 (selectedMigration?.statements?.length ? ';' : '')
               }
@@ -234,5 +228,3 @@ const Migrations = () => {
     </>
   )
 }
-
-export default Migrations

@@ -27,7 +27,7 @@ import Tabs, { TabPanel } from '~/components/Tabs/Tabs'
 import { ArrowUpRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import { Badge, cn, Heading } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Image, type ImageProps } from 'ui-patterns/Image'
 import { Mermaid } from 'ui-patterns/Mermaid'
 

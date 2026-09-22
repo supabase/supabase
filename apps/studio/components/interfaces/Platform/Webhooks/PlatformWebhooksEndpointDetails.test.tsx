@@ -27,18 +27,15 @@ vi.mock('@/components/ui/ButtonTooltip', () => ({
     type: _type,
     ...props
   }: any) => (
-    <button type="button" {...props}>
+    <button tabIndex={0} type="button" {...props}>
       {icon}
       {children}
     </button>
   ),
 }))
 
-vi.mock('ui-patterns', async () => {
-  const actual = await vi.importActual<typeof import('ui-patterns')>('ui-patterns')
-
+vi.mock('ui-patterns/TimestampInfo', async () => {
   return {
-    ...actual,
     TimestampInfo: ({ utcTimestamp, className }: { utcTimestamp: string; className?: string }) => (
       <span className={className}>{utcTimestamp}</span>
     ),

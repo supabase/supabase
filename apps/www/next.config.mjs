@@ -75,12 +75,12 @@ const nextConfig = {
    * /llms.txt enumerates top-level guide directories at runtime via fs.readdir
    * on apps/docs/content/guides and reads each <dir>.mdx for its frontmatter
    * title. /llms-full.txt recursively reads the generated .md files under
-   * apps/docs/public/docs/guides. Both directories live in a sibling app, so
+   * apps/docs/public/markdown/. Both directories live in a sibling app, so
    * they have to be explicitly traced into this lambda's bundle.
    */
   outputFileTracingIncludes: {
     '/llms.txt': ['../docs/content/guides/*'],
-    '/llms-full.txt': ['../docs/public/docs/guides/**/*.md'],
+    '/llms-full.txt': ['../docs/public/markdown/guides/**/*.md'],
   },
   reactStrictMode: true,
   images: {
@@ -194,7 +194,20 @@ const nextConfig = {
     ]
   },
   async rewrites() {
-    return rewrites
+    return {
+      afterFiles: rewrites,
+      fallback: [
+        {
+          source: '/:path(.*\\.md)',
+          destination: '/api-v2/md-404/:path',
+        },
+        {
+          source: '/:path*',
+          has: [{ type: 'header', key: 'accept', value: '.*text/(markdown|\\*).*' }],
+          destination: '/api-v2/md-404/:path*',
+        },
+      ],
+    }
   },
   async redirects() {
     // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages
@@ -234,6 +247,9 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'www',
+  unstable_sentryWebpackPluginOptions: {
+    applicationKey: 'supabase-www',
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

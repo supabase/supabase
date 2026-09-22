@@ -69,10 +69,12 @@ export const ConfirmRestoreDialog = ({
         </DialogSection>
         <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
         <DialogFooter>
-          <Button type="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => onSelectContinue()}>Continue</Button>
+          <Button variant="primary" onClick={() => onSelectContinue()}>
+            Continue
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

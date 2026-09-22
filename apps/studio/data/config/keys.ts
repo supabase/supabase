@@ -27,4 +27,8 @@ export const configKeys = {
   diskAutoscaleConfig: (projectRef: string | undefined) =>
     ['projects', projectRef, 'disk-autoscale-config'] as const,
   deploymentMode: () => ['deployment-mode'] as const,
+  postgresConfig: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'postgres-config'] as const,
+  // used for entire project state, includes all configs, matches `config.toml` schema
+  projectConfig: (projectRef: string | undefined) => ['projects', projectRef, 'config'] as const,
 }

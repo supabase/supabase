@@ -1,8 +1,8 @@
 'use client'
 
 import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
-import Link from 'next/link'
 import { useRouter } from 'next/compat/router'
+import Link from 'next/link'
 import { Fragment, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react'
 import { useClickAway } from 'react-use'
 import {
@@ -93,7 +93,7 @@ const RightClickBrandLogo = () => {
           onContextMenu={handleRightClick}
           onFocus={handleKeyboardOpen}
           onKeyDown={(e) => e.key === 'Enter' && router?.push('/')}
-          className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs"
+          className="block w-auto h-6 focus-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative rounded-xs"
         >
           <SupabaseWordmark />
         </Link>
@@ -126,6 +126,8 @@ const RightClickBrandLogo = () => {
                     </Link>
                   ) : (
                     menuItem.type === 'clipboard' && (
+                      // DropdownMenuItem asChild manages roving tabIndex; don't override it.
+                      // eslint-disable-next-line supabase/require-explicit-tabindex -- in-menu item
                       <button
                         className="group/menu-item w-full text-left flex justify-between gap-2 items-center"
                         onClick={() => handleCopyToClipboard(menuItem)}

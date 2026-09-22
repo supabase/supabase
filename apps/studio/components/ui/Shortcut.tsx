@@ -1,5 +1,5 @@
-import { TooltipContentProps } from '@ui/components/shadcn/ui/tooltip'
 import type { ReactNode } from 'react'
+import { TooltipContentProps } from 'ui'
 
 import { ShortcutTooltip } from './ShortcutTooltip'
 import type { ShortcutId } from '@/state/shortcuts/registry'

@@ -9,7 +9,7 @@ import {
   PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageHeader'
 
 import { getMarketplaceSource, MarketplaceSourceBadge } from './Marketplace.constants'
 import { IntegrationLogo } from '@/components/interfaces/Integrations/Integration/IntegrationLogo'

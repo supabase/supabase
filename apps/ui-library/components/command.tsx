@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { CommandCopyButton } from './command-copy-button'
 import { useLocalStorage } from './use-local-storage'
@@ -58,7 +58,7 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
         }
 
   return (
-    <Tabs_Shadcn_ value={value} onValueChange={setValue} className="w-full">
+    <Tabs value={value} onValueChange={setValue} className="w-full">
       <div className="w-full group relative rounded-lg bg-surface-200 dark:bg-surface-100 px-4 py-2 overflow-hidden">
         {highlight && (
           <motion.div
@@ -75,16 +75,16 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
         )}
 
         <div className="flex flex-col">
-          <TabsList_Shadcn_ className="gap-2 relative mb-2 z-10">
+          <TabsList className="gap-2 relative mb-2 z-10">
             {(Object.keys(commands) as PackageManager[]).map((manager) => (
-              <TabsTrigger_Shadcn_ key={manager} value={manager} className="text-xs">
+              <TabsTrigger key={manager} value={manager} className="text-xs">
                 {manager}
-              </TabsTrigger_Shadcn_>
+              </TabsTrigger>
             ))}
-          </TabsList_Shadcn_>
+          </TabsList>
 
           {(Object.keys(commands) as PackageManager[]).map((manager) => (
-            <TabsContent_Shadcn_ key={manager} value={manager} className="m-0">
+            <TabsContent key={manager} value={manager} className="m-0">
               <div className="flex items-center">
                 <div className="flex-1 font-mono text-sm text-foreground relative z-10">
                   <span className="mr-2 text-[#888] select-none">$</span>
@@ -94,10 +94,10 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
                   <CommandCopyButton command={commands[manager]} />
                 </div>
               </div>
-            </TabsContent_Shadcn_>
+            </TabsContent>
           ))}
         </div>
       </div>
-    </Tabs_Shadcn_>
+    </Tabs>
   )
 }

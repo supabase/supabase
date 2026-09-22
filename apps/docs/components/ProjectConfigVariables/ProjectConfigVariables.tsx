@@ -29,11 +29,12 @@ import {
   useProjectsInfiniteQuery,
 } from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useOnLogout } from '~/lib/userAuth'
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, Copy } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { withErrorBoundary } from 'react-error-boundary'
 import { Button_Shadcn_ as Button, cn, Input } from 'ui'
@@ -302,7 +303,15 @@ function BranchSelector() {
   ) : null
 }
 
-function VariableView({ variable, className }: { variable: Variable; className?: string }) {
+function VariableView({
+  variable,
+  inputId,
+  className,
+}: {
+  variable: Variable
+  inputId: string
+  className?: string
+}) {
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
 
@@ -389,12 +398,14 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   }
 
   const { copied, handleCopy } = useCopy()
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <>
       <div className={cn('flex items-center gap-2', className)}>
         <Input
-          disabled
+          readOnly
+          id={inputId}
           type="text"
           className="font-mono"
           value={
@@ -413,12 +424,21 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             disabled={!variableValue}
             variant="ghost"
             className="px-0"
-            onClick={handleCopy}
-            aria-label="Copy"
+            onClick={() => {
+              handleCopy()
+              sendTelemetryEvent({
+                action: 'docs_project_config_variables_copy_button_clicked',
+                properties: { variable },
+              })
+            }}
+            aria-label={`Copy ${prettyFormatVariable[variable]}`}
           >
-            {copied ? <Check /> : <Copy />}
+            {copied ? <Check size="18" aria-hidden /> : <Copy size="18" aria-hidden />}
           </Button>
         </CopyToClipboard>
+        <span className="sr-only" role="status">
+          {copied ? `${prettyFormatVariable[variable]} copied` : ''}
+        </span>
       </div>
       {stateSummary === 'loggedIn.selectedProject.dataError' && (
         <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
@@ -445,7 +465,7 @@ function LoginHint({ variable }: { variable: Variable }) {
   if (isUserLoading || isLoggedIn) return null
 
   return (
-    <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
+    <p className="not-prose text-foreground-muted text-sm mt-2 mb-0 ml-1">
       To get your {prettyFormatVariable[variable]},{' '}
       <Link
         className="text-foreground-muted"
@@ -464,14 +484,21 @@ function ProjectConfigVariablesInternal({ variable }: { variable: Variable }) {
   const { clear: clearSharedStoreData } = useSnapshot(projectsStore)
   useOnLogout(clearSharedStoreData)
 
+  const inputId = useId()
+
   return (
     <div className="max-w-[min(100%, 500px)] my-6">
-      <h6 className={cn('mt-0 mb-1', 'text-foreground')}>{prettyFormatVariable[variable]}</h6>
+      <label
+        htmlFor={inputId}
+        className={cn('block mt-0 mb-1 font-heading font-semibold', 'text-foreground')}
+      >
+        {prettyFormatVariable[variable]}
+      </label>
       <div className="flex flex-wrap gap-x-6">
         <OrgProjectSelector />
         <BranchSelector />
       </div>
-      <VariableView variable={variable} className="mt-1" />
+      <VariableView variable={variable} inputId={inputId} className="mt-1" />
       <LoginHint variable={variable} />
     </div>
   )

@@ -10,11 +10,13 @@ import Link from 'next/link'
 import type { FC } from 'react'
 import { memo, useState } from 'react'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
+import { SearchV2Trigger, useSearchV2Variant } from '@/features/SearchV2'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
@@ -27,12 +29,13 @@ const TopNavBar: FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const user = useUser()
   const menu = useDropdownMenu(user)
+  const searchVariant = useSearchV2Variant()
 
   return (
     <>
       <nav
         aria-label="top bar"
-        className="w-full z-40 flex flex-col border-b backdrop-blur-sm backdrop-filter bg-default/75"
+        className="w-full z-40 flex flex-col subhighlight-border backdrop-blur-sm backdrop-filter bg-default/75"
       >
         <div className="w-full px-5 lg:pl-10 flex justify-between h-(--header-height) gap-3">
           <div className="hidden lg:flex h-full items-center justify-center gap-2">
@@ -46,18 +49,32 @@ const TopNavBar: FC = () => {
 
             <div className="flex gap-2 items-center">
               <DevToolbarTrigger />
-              <CommandMenuTriggerInput
-                placeholder={
-                  <>
-                    Search
-                    <span className="hidden xl:inline ml-1"> docs...</span>
-                  </>
-                }
-              />
+              {searchVariant === 'search-v2-active' ? (
+                <SearchV2Trigger
+                  className="[&>div>p]:text-foreground-lighter"
+                  placeholder={
+                    <>
+                      Search
+                      <span className="hidden xl:inline ml-1"> docs...</span>
+                    </>
+                  }
+                />
+              ) : (
+                <CommandMenuTriggerInput
+                  className="[&>div>p]:text-foreground-lighter"
+                  placeholder={
+                    <>
+                      Search
+                      <span className="hidden xl:inline ml-1"> docs...</span>
+                    </>
+                  }
+                />
+              )}
               <button
+                tabIndex={0}
                 title="Menu dropdown button"
                 className={cn(
-                  buttonVariants({ type: 'default' }),
+                  buttonVariants({ variant: 'default' }),
                   'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30'
                 )}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -68,7 +85,7 @@ const TopNavBar: FC = () => {
           </div>
           <div className="hidden lg:flex items-center justify-end gap-3">
             {!isUserLoading && (
-              <Button asChild>
+              <Button variant="primary" asChild>
                 <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
                   {isLoggedIn ? 'Dashboard' : 'Sign up'}
                 </a>
@@ -96,13 +113,7 @@ const HeaderLogo = memo(() => {
   const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
-    <Link
-      href="/"
-      className={cn(
-        buttonVariants({ type: 'default' }),
-        'flex shrink-0 items-center w-fit bg-transparent! border-none! shadow-none!'
-      )}
-    >
+    <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
       <Image
         className={cn('hidden dark:block m-0!', largeLogo && 'h-[36px]')}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
@@ -121,7 +132,7 @@ const HeaderLogo = memo(() => {
         height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
-      <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+      <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
     </Link>
   )
 })

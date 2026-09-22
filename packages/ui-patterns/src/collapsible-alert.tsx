@@ -3,13 +3,7 @@
 import { type VariantProps } from 'class-variance-authority'
 import { ChevronDown } from 'lucide-react'
 import * as React from 'react'
-import { Button, cn } from 'ui'
-import { alertVariants } from 'ui/src/components/shadcn/ui/alert'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from 'ui/src/components/shadcn/ui/collapsible'
+import { alertVariants, Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 export interface CollapsibleAlertProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof alertVariants> {
@@ -34,7 +28,7 @@ const CollapsibleAlert = React.forwardRef<HTMLDivElement, CollapsibleAlertProps>
           <span className="font-medium">{trigger}</span>
           <CollapsibleTrigger asChild>
             <Button
-              type="outline"
+              variant="outline"
               size="tiny"
               className={cn('px-0! w-[26px]', '[&[data-state=open]_svg]:rotate-180')}
               aria-label="Toggle"

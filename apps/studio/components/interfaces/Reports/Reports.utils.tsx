@@ -13,7 +13,7 @@ import {
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
 import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
-import useLogsQuery, { LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
+import { useLogsQuery, type LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
 import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
 
 /**
@@ -21,6 +21,21 @@ import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
  */
 export const queryParamsToObject = (params: string) => {
   return Object.fromEntries(new URLSearchParams(params))
+}
+
+/**
+ * Decodes a URI component, returning the original string if it is malformed.
+ *
+ * `decodeURIComponent` throws a `URIError` on invalid percent-encoding (e.g. a
+ * literal `%` such as `?discount=100%`). Request paths are user-controlled, so
+ * decoding inline during render can crash the page.
+ */
+export const safeDecodeURIComponent = (value: string) => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
 }
 
 export type PresetHookResult = LogsQueryHook | DbQueryHook
@@ -32,7 +47,9 @@ type PresetHooks = Record<keyof PresetConfig['queries'], () => PresetHookResult>
  */
 export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
-  projectRef: string
+  projectRef?: string,
+  useOtel = false,
+  enabled = true
 ): PresetHooks => {
   const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce((acc, [k, query]) => {
     if (query.queryType === 'db') {
@@ -43,16 +60,26 @@ export const queriesFactory = <T extends string>(
     } else {
       return {
         ...acc,
-        [k]: () => useLogsQuery(projectRef),
+        [k]: () => useLogsQuery({ projectRef, enabled, options: { useOtel } }),
       }
     }
   }, {})
   return hooks
 }
 
-export function getLogsSql(query: ReportQuery, filters: ReportFilterItem[]): SafeLogSqlFragment {
+export function getLogsSql(
+  query: ReportQuery,
+  filters: ReportFilterItem[],
+  useOtel = false
+): SafeLogSqlFragment {
   if (query.queryType !== 'logs') {
     throw new Error(`Expected logs query, got ${query.queryType}`)
+  }
+  if (useOtel) {
+    if (query.safeSqlOtel === undefined) {
+      throw new Error('Expected an OTEL logs query')
+    }
+    return query.safeSqlOtel(filters)
   }
   return query.safeSql(filters)
 }

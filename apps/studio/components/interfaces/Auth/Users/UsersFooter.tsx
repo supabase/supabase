@@ -82,7 +82,7 @@ export const UsersFooter = ({
                   <TooltipTrigger asChild>
                     <Button
                       size="tiny"
-                      type="text"
+                      variant="text"
                       className="px-1.5"
                       icon={<HelpCircle />}
                       onClick={() => {
@@ -98,7 +98,9 @@ export const UsersFooter = ({
                         This is an estimated value as your project has more than{' '}
                         {THRESHOLD_COUNT.toLocaleString()} users.
                         <br />
-                        <span className="text-brand">Click to retrieve the exact count.</span>{' '}
+                        <span className="text-primary">
+                          Click to retrieve the exact count.
+                        </span>{' '}
                       </>
                     ) : (
                       <>

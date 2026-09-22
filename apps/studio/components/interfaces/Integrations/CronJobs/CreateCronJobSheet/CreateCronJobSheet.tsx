@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useWatch } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -21,9 +20,10 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
+  useWatch,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CRONJOB_DEFINITIONS } from '../CronJobs.constants'
@@ -40,6 +40,7 @@ import { HttpRequestSection } from '../HttpRequestSection'
 import { SqlFunctionSection } from '../SqlFunctionSection'
 import { SqlSnippetSection } from '../SqlSnippetSection'
 import {
+  DEFAULT_TIMEOUT,
   FormSchema,
   type CreateCronJobForm,
   type CronJobType,
@@ -122,7 +123,11 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     'extensions'
   )
 
-  const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '', project?.ref!)
+  const cronJobValues = parseCronJobCommand(
+    selectedCronJob?.command || '',
+    project?.ref!,
+    project?.restUrl
+  )
 
   const defaultValues = {
     name: selectedCronJob?.jobname || '',
@@ -264,6 +269,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     endpoint,
     method,
     // for some reason, the httpHeaders are not memoized and cause the useEffect to trigger even when the value is the same
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     JSON.stringify(httpHeaders),
     httpBody,
     timeoutMs,
@@ -330,7 +336,16 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                               name="function_type"
                               value={field.value}
                               disabled={field.disabled}
-                              onValueChange={(value) => field.onChange(value)}
+                              onValueChange={(value) => {
+                                field.onChange(value)
+
+                                if (value === 'http_request' || value === 'edge_function') {
+                                  form.setValue('values.timeoutMs', DEFAULT_TIMEOUT, {
+                                    shouldDirty: false,
+                                    shouldTouch: false,
+                                  })
+                                }
+                              }}
                             >
                               {CRONJOB_DEFINITIONS.map((definition) => (
                                 <RadioGroupStackedItem
@@ -390,7 +405,6 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                               within your cron jobs
                             </span>
                             <ButtonTooltip
-                              type="default"
                               className="w-min"
                               disabled={!canToggleExtensions}
                               onClick={() => setShowEnableExtensionModal(true)}
@@ -435,20 +449,14 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
               </Form>
             </div>
             <SheetFooter>
-              <Button
-                size="tiny"
-                type="default"
-                htmlType="button"
-                onClick={confirmOnClose}
-                disabled={isLoading}
-              >
+              <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isLoading}>
                 Cancel
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 disabled={isLoading}
                 loading={isLoading}
               >

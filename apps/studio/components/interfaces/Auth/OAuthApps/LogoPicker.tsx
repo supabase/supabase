@@ -48,7 +48,7 @@ export function LogoPicker({ open, onOpenChange, onSelect }: StorageFilePickerPr
             {selectedBucket ? (
               <SheetHeader className="flex flex-row items-center gap-2 border-b border-overlay px-6 py-4">
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   icon={<ChevronLeft size={16} />}
                   className="shrink-0"
@@ -87,7 +87,7 @@ export function LogoPicker({ open, onOpenChange, onSelect }: StorageFilePickerPr
             {selectedBucket ? (
               <DialogHeader className="flex flex-row items-center gap-2 border-b border-overlay px-6 py-4 h-[60px]">
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   icon={<ChevronLeft size={16} />}
                   className="shrink-0"

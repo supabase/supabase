@@ -1,7 +1,19 @@
+import {
+  acceptUntrustedSql as pgAcceptUntrustedSql,
+  safeSql as pgSafeSql,
+  untrustedSql as pgUntrustedSql,
+} from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
-import { analyticsLiteral, keyword, quotedIdent, safeSql } from './safe-analytics-sql'
+import {
+  acceptUntrustedLogsSql,
+  analyticsLiteral,
+  keyword,
+  quotedIdent,
+  safeSql,
+  untrustedLogSql,
+} from './safe-analytics-sql'
 
 describe('keyword', () => {
   it('returns the matching SafeLogSqlFragment from the allow-list', () => {
@@ -97,6 +109,44 @@ describe('executeAnalyticsSql — compile-time boundary', () => {
         iso_timestamp_start: '2024-01-01T00:00:00Z',
         iso_timestamp_end: '2024-01-02T00:00:00Z',
       })
+    expect(_check).toBeDefined()
+  })
+})
+
+describe('untrusted logs SQL brands', () => {
+  it('untrustedLogSql preserves the raw text', () => {
+    expect(untrustedLogSql('SELECT 1 FROM logs')).toBe('SELECT 1 FROM logs')
+  })
+
+  it('acceptUntrustedLogsSql promotes untrusted text to a runnable fragment unchanged', () => {
+    const untrusted = untrustedLogSql('SELECT 1 FROM logs')
+    const safe = acceptUntrustedLogsSql(untrusted)
+    expect(safe).toBe('SELECT 1 FROM logs')
+  })
+
+  it('a promoted logs fragment composes via safeSql', () => {
+    const safe = acceptUntrustedLogsSql(untrustedLogSql('SELECT 1'))
+    expect(safeSql`${safe}`).toBe('SELECT 1')
+  })
+
+  it('rejects an unbranded string at the acceptUntrustedLogsSql boundary', () => {
+    const plain: string = 'SELECT 1'
+    // @ts-expect-error — only UntrustedLogSqlFragment may be promoted
+    const _check = () => acceptUntrustedLogsSql(plain)
+    expect(_check).toBeDefined()
+  })
+
+  it('rejects Postgres-branded fragments at the logs boundary (brands are disjoint)', () => {
+    // The logs boundary must not accept Postgres SQL, whether it is still untrusted or
+    // already promoted.
+    const pgUntrusted = pgUntrustedSql('SELECT 1')
+    const pgSafe = pgAcceptUntrustedSql(pgSafeSql`SELECT 1`)
+    const _check = () => [
+      // @ts-expect-error — pg untrusted brand is not assignable to UntrustedLogSqlFragment
+      acceptUntrustedLogsSql(pgUntrusted),
+      // @ts-expect-error — pg safe brand is not assignable to UntrustedLogSqlFragment
+      acceptUntrustedLogsSql(pgSafe),
+    ]
     expect(_check).toBeDefined()
   })
 })

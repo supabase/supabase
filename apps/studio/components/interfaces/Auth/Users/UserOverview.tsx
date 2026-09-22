@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Separator } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
@@ -263,7 +263,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
                   {authenticationSignInProviders && (
-                    <Button asChild type="default" className="mt-2">
+                    <Button asChild className="mt-2">
                       <Link
                         href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
                       >
@@ -273,8 +273,8 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   )}
                 </div>
                 {isActive ? (
-                  <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
-                    <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
+                  <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-primary">
+                    <span className="rounded-full bg-brand-default p-0.5 text-xs text-brand-200">
                       <Check strokeWidth={2} size={12} />
                     </span>
                     <span className="px-1">Enabled</span>
@@ -420,7 +420,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             description="User will no longer have access to the project"
             button={{
               icon: <Trash />,
-              type: 'danger',
+              variant: 'danger',
               text: 'Delete user',
               disabled: !canRemoveUser,
               onClick: () => setIsDeleteModalOpen(true),
@@ -505,7 +505,7 @@ export const RowData = ({ property, value }: { property: string; value?: string 
             {!!value && (
               <CopyButton
                 iconOnly
-                type="text"
+                variant="text"
                 icon={<Copy />}
                 className="transition opacity-0 group-hover:opacity-100 px-1"
                 text={value}
@@ -530,7 +530,7 @@ export const RowAction = ({
   description: string
   button: {
     icon: ReactNode
-    type?: ComponentProps<typeof Button>['type']
+    variant?: ComponentProps<typeof Button>['variant']
     text: string
     disabled?: boolean
     isLoading?: boolean
@@ -554,8 +554,8 @@ export const RowAction = ({
       </div>
 
       <ButtonTooltip
-        type={button?.type ?? 'default'}
-        icon={success ? <Check className="text-brand" /> : button.icon}
+        variant={button?.variant ?? 'default'}
+        icon={success ? <Check className="text-primary" /> : button.icon}
         loading={button.isLoading ?? false}
         onClick={button.onClick}
         disabled={disabled}

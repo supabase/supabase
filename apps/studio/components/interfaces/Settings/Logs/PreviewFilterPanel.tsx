@@ -62,7 +62,7 @@ interface PreviewFilterPanelProps {
 /**
  * Logs control panel header + wrapper
  */
-const PreviewFilterPanel = ({
+export const PreviewFilterPanel = ({
   isLoading,
   newCount,
   onRefresh,
@@ -158,7 +158,7 @@ const PreviewFilterPanel = ({
                 {hasEdits && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <InputGroupButton type="text" onClick={() => handleInputSearch(search)}>
+                      <InputGroupButton variant="text" onClick={() => handleInputSearch(search)}>
                         <span>↲</span>
                       </InputGroupButton>
                     </TooltipTrigger>
@@ -170,7 +170,7 @@ const PreviewFilterPanel = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <InputGroupButton
-                        type="text"
+                        variant="text"
                         onClick={() => {
                           setSearch('')
                           handleInputSearch('')
@@ -189,14 +189,14 @@ const PreviewFilterPanel = ({
 
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_REFRESH} side="bottom">
           <Button
+            aria-label="Refresh logs"
             title="refresh"
-            type="default"
             className="px-1.5"
             icon={
               <div className="relative">
                 {newCount > 0 && (
                   <div className="absolute -top-3 -right-3 flex items-center justify-center">
-                    <div className="absolute h-4 w-4 animate-ping rounded-full bg-brand opacity-60"></div>
+                    <div className="absolute h-4 w-4 animate-ping rounded-full bg-brand-default opacity-60"></div>
                     <div className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-medium leading-none text-white">
                       {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                     </div>
@@ -257,7 +257,6 @@ const PreviewFilterPanel = ({
         <div className="flex items-center space-x-2">
           <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_CHART} side="bottom">
             <Button
-              type="default"
               onClick={() => onToggleEventChart()}
               icon={isShowingEventChart ? <Eye /> : <EyeOff />}
             >
@@ -268,7 +267,7 @@ const PreviewFilterPanel = ({
         {Boolean(csvData) && (
           <DownloadResultsButton
             iconOnly
-            type="default"
+            variant="default"
             align="center"
             results={csvData ?? []}
             fileName={`supabase-${logName}-${ref}.csv`}
@@ -280,7 +279,7 @@ const PreviewFilterPanel = ({
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
+              <Button asChild className="px-1.5" icon={<Terminal />}>
                 <Link href={queryUrl} />
               </Button>
             </TooltipTrigger>
@@ -300,12 +299,10 @@ const PreviewFilterPanel = ({
           />
         </div>
       ) : (
-        <Button asChild type="default" onClick={onExploreClick}>
+        <Button asChild onClick={onExploreClick}>
           <Link href={queryUrl}>Explore via query</Link>
         </Button>
       )}
     </div>
   )
 }
-
-export default PreviewFilterPanel

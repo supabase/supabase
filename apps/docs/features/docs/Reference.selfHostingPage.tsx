@@ -48,7 +48,7 @@ export async function SelfHostingReferencePage({
   const name = REFERENCES[servicePath.replaceAll('-', '_')].name
 
   return (
-    <ReferenceContentScrollHandler>
+    <ReferenceContentScrollHandler libPath={servicePath} version="latest" isLatestVersion={true}>
       <SidebarSkeleton
         menuId={menuId}
         NavigationMenu={

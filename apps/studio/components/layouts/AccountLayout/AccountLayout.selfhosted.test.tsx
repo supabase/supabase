@@ -55,7 +55,7 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 }))
 
 vi.mock('@/hooks/misc/useLocalStorage', () => ({
-  useLocalStorageQuery: () => [''],
+  useLocalStorageQuery: () => ['', vi.fn(), { isLoading: false, isSuccess: true }],
 }))
 
 vi.mock('@/hooks/misc/withAuth', () => ({

@@ -5,7 +5,8 @@ import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useState, type MouseEvent } from 'react'
 import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
-import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { formatErrorRate } from './EdgeFunctionsListItem.utils'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
@@ -32,7 +33,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const functionUrl = `${endpoint}/functions/v1/${item.slug}`
 
   const handleNavigation = createNavigationHandler(
-    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/details`}`,
+    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/code`}`,
     router
   )
 
@@ -61,7 +62,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       onAuxClick={handleNavigation}
       onKeyDown={handleNavigation}
       tabIndex={0}
-      className="cursor-pointer inset-focus"
+      className="cursor-pointer focus-inset"
     >
       <TableCell>
         <p className="text-sm text-foreground whitespace-nowrap py-2">{item.name}</p>
@@ -73,6 +74,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           </p>
           <button
             type="button"
+            tabIndex={0}
             className="text-foreground-lighter hover:text-foreground transition"
             onClick={(event: MouseEvent<HTMLButtonElement>) => {
               function onCopy(value: string) {
@@ -85,7 +87,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
             }}
           >
             {isCopied ? (
-              <div className="text-brand">
+              <div className="text-primary">
                 <Check size={14} strokeWidth={3} />
               </div>
             ) : (

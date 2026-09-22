@@ -1,20 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { type ComponentProps, type ReactNode } from 'react'
 import { cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { type AdmonitionProps } from 'ui-patterns/Admonition/Admonition.types'
 
-/**
- * @deprecated Use Admonition from ui-patterns instead
- * Pass actions as a prop to the Admonition component
- */
-
-interface NoticeBarProps extends Omit<ComponentProps<typeof Admonition>, 'description'> {
-  title?: string
-  description?: string
-  icon?: ReactNode
+// Temporary animation shim while callers migrate to Admonition from ui-patterns.
+interface NoticeBarProps extends AdmonitionProps {
   visible: boolean
-  actions?: ReactNode
 }
+
 export function NoticeBar({ visible, description, actions, ...props }: NoticeBarProps) {
   return (
     <AnimatePresence>
@@ -25,12 +18,12 @@ export function NoticeBar({ visible, description, actions, ...props }: NoticeBar
           exit={{ opacity: 0, height: 0, y: 4 }}
           transition={{ duration: 0.15 }}
         >
-          <Admonition {...props} className={cn(props.className, 'mb-0')}>
-            {description}
-            <div className="flex flex-col gap-2">
-              {actions && <div className="mt-2">{actions}</div>}
-            </div>
-          </Admonition>
+          <Admonition
+            {...props}
+            description={description}
+            actions={actions}
+            className={cn(props.className, 'mb-0')}
+          />
         </motion.div>
       )}
     </AnimatePresence>

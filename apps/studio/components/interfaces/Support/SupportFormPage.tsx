@@ -6,7 +6,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
@@ -82,7 +82,9 @@ function SupportFormPageContent() {
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
     toast.error(`Failed to submit support ticket: ${curr.message}`)
-    Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    if (curr.code !== 429) {
+      Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    }
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
@@ -137,7 +139,7 @@ function SupportFormHeader() {
       </div>
 
       <div className="flex items-center gap-x-3">
-        <Button asChild type="default" icon={<Wrench />}>
+        <Button asChild icon={<Wrench />}>
           <Link
             href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
             target="_blank"
@@ -150,13 +152,15 @@ function SupportFormHeader() {
           <TooltipTrigger asChild>
             <Button
               asChild
-              type="default"
               icon={
                 isLoading ? (
                   <Loader2 className="animate-spin" />
                 ) : (
                   <div
-                    className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')}
+                    className={cn(
+                      'h-2 w-2 rounded-full',
+                      isIncident ? 'bg-warning' : 'bg-brand-default'
+                    )}
                   />
                 )
               }
@@ -211,7 +215,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 </code>
               </a>
               <CopyButton
-                type="text"
+                variant="text"
                 text="support@supabase.com"
                 iconOnly
                 onClick={() => toast.success('Copied email address to clipboard')}
@@ -225,7 +229,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 <code className="text-code-inline text-foreground-light!">{projectRef}</code>
                 <CopyButton
                   iconOnly
-                  type="text"
+                  variant="text"
                   text={projectRef}
                   onClick={() => toast.success('Copied project ID to clipboard')}
                 />
@@ -258,8 +262,7 @@ function SupportFormBody({
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md',
-        `${isSuccess ? 'pt-8' : 'py-8'}`,
+        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md py-8',
         'border-default'
       )}
     >

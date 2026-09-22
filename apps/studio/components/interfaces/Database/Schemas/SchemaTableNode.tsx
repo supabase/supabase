@@ -72,7 +72,7 @@ const TableNodeComponent = ({
         <header
           className={cn(
             'text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center',
-            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+            hasEdgesSelected ? 'outline outline-1 outline-brand-default' : undefined
           )}
         >
           {data.name}
@@ -89,7 +89,7 @@ const TableNodeComponent = ({
         <div
           className={cn(
             'border-[0.5px] overflow-hidden rounded-[4px] shadow-xs',
-            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+            hasEdgesSelected ? 'outline outline-1 outline-brand-default' : undefined
           )}
           style={{ width: TABLE_NODE_WIDTH / 2 }}
         >
@@ -122,7 +122,7 @@ const TableNodeComponent = ({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          type="text"
+                          variant="text"
                           className="px-0 w-[16px] h-[16px] rounded-sm nodrag nopan"
                         >
                           <MoreVertical size={10} />
@@ -249,15 +249,7 @@ const TableNodeComponent = ({
                 )}
               >
                 {column.isPrimary && (
-                  <Key
-                    size={8}
-                    strokeWidth={1}
-                    className={cn(
-                      // 'sb-grid-column-header__inner__primary-key'
-                      'shrink-0',
-                      'text-light'
-                    )}
-                  />
+                  <Key size={8} strokeWidth={1} className={cn('shrink-0', 'text-light')} />
                 )}
                 {column.isNullable && (
                   <DiamondIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
@@ -283,7 +275,7 @@ const TableNodeComponent = ({
                     'text-ellipsis overflow-hidden whitespace-nowrap min-w-0 max-w-[80%]',
                     schemaGraphContext.selectedEdge?.sourceHandle === column.id ||
                       schemaGraphContext.selectedEdge?.targetHandle === column.id
-                      ? 'text-brand'
+                      ? 'text-primary'
                       : undefined
                   )}
                   title={column.name}
@@ -313,7 +305,7 @@ const TableNodeComponent = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     // Use opacity to hide the button so that it remains accessible (users can tab to it)
                     className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-open:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded-sm"
                   >

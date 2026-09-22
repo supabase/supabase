@@ -10,7 +10,7 @@ import { ProfileContext, type ProfileContextType } from '@/lib/profile'
 
 type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
 
-const CustomWrapper = ({
+export const CustomWrapper = ({
   children,
   queryClient,
   nuqs,
@@ -66,7 +66,7 @@ export const customRender = (component: React.ReactElement, renderOptions?: Cust
   })
 }
 
-export const customRenderHook = (hook: () => any, renderOptions?: CustomRenderOpts) => {
+export const customRenderHook = <T,>(hook: () => T, renderOptions?: CustomRenderOpts) => {
   return renderHook(hook, {
     wrapper: ({ children }) =>
       CustomWrapper({

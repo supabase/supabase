@@ -1,9 +1,12 @@
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 import { type AuthTemplateType, type KebabCase } from './EmailTemplates.types'
 import type { components } from '@/data/api'
 import type { Organization } from '@/types'
+
+dayjs.extend(utc)
 
 type AuthConfig = components['schemas']['GoTrueConfigResponse']
 
@@ -46,7 +49,7 @@ export const isCustomEmailTemplateRestrictionStatusKnown = ({
 }
 
 export const isBeforeFreeTierTemplateBlockCutoff = (projectInsertedAt?: string) => {
-  return dayjs(projectInsertedAt).isBefore(FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE)
+  return dayjs.utc(projectInsertedAt).isBefore(FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE)
 }
 
 export const isCustomEmailTemplateEditingRestricted = ({

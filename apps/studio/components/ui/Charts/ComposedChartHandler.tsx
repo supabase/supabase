@@ -18,6 +18,11 @@ import { ProjectDailyStatsAttribute } from '@/data/analytics/project-daily-stats
 import type { UpdateDateRange } from '@/pages/project/[ref]/observability/database'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
+const parseChartTimestamp = (value: string) => {
+  const asNumber = Number(value)
+  return value !== '' && Number.isFinite(asNumber) ? dayjs(asNumber) : dayjs(value)
+}
+
 export interface ComposedChartHandlerProps {
   id?: string
   label: string
@@ -55,7 +60,7 @@ export interface ComposedChartHandlerProps {
 /**
  * Wrapper component that handles intersection observer logic for lazy loading
  */
-const LazyChartWrapper = ({ children }: PropsWithChildren) => {
+const LazyChartWrapper = ({ id, children }: PropsWithChildren<{ id: string }>) => {
   const [isVisible, setIsVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -86,7 +91,7 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
   }, [])
 
   return (
-    <div ref={ref}>
+    <div ref={ref} id={id} className="scroll-mt-16">
       {React.cloneElement(children as React.ReactElement<{ isVisible: boolean }>, { isVisible })}
     </div>
   )
@@ -250,7 +255,9 @@ const ComposedChartHandler = ({
         onSelect: ({ start, end }) => {
           const projectRef = ref as string
           if (!projectRef) return
-          const url = `/project/${projectRef}/logs/postgres-logs?its=${start}&ite=${end}`
+          const its = parseChartTimestamp(start).toISOString()
+          const ite = parseChartTimestamp(end).toISOString()
+          const url = `/project/${projectRef}/logs/postgres-logs?its=${its}&ite=${ite}`
           router.push(url)
         },
       },
@@ -273,7 +280,7 @@ const ComposedChartHandler = ({
 
   if (!combinedData) {
     return (
-      <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
+      <div className="flex h-64 w-full flex-col items-center justify-center gap-y-2 border border-dashed rounded-md">
         <WarningIcon />
         <p className="text-xs text-foreground-lighter">Unable to load data for {label}</p>
       </div>
@@ -284,9 +291,8 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative w-full scroll-mt-16', className)}
+      className={cn('relative w-full', className)}
       wrapWithLoading={false}
-      id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
       <Panel.Content className="flex flex-col gap-4">
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
@@ -378,8 +384,9 @@ const useAttributeQueries = (
 export function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
   if (props.hide) return null
 
+  const anchorId = props.id ?? props.label.toLowerCase().replaceAll(' ', '-')
   return (
-    <LazyChartWrapper>
+    <LazyChartWrapper id={anchorId}>
       <ComposedChartHandler {...props} />
     </LazyChartWrapper>
   )

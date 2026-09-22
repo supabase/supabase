@@ -265,7 +265,15 @@ export function usePrivilegesState({
   }
 }
 
-export function useApplyPrivilegeOperations(callback?: () => void) {
+export function useApplyPrivilegeOperations({
+  schema,
+  table,
+  onSuccess,
+}: {
+  schema: string
+  table?: string
+  onSuccess?: () => void
+}) {
   const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
 
@@ -343,17 +351,19 @@ export function useApplyPrivilegeOperations(callback?: () => void) {
       }
 
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: privilegeKeys.tablePrivilegesList(project.ref) }),
         queryClient.invalidateQueries({
-          queryKey: privilegeKeys.columnPrivilegesList(project.ref),
+          queryKey: privilegeKeys.tablePrivilegesList(project.ref, [schema]),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.columnPrivilegesList(project.ref, schema, table),
         }),
       ])
 
       setIsLoading(false)
 
-      callback?.()
+      onSuccess?.()
     },
-    [callback, project, queryClient]
+    [onSuccess, project, queryClient, schema, table]
   )
 
   return { apply, isLoading }

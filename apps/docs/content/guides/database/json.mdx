@@ -23,7 +23,7 @@ Don't go overboard with `json/jsonb` columns. They are a useful tool, but most o
 
 ## Create JSONB columns
 
-`json/jsonb` is just another "data type" for Postgres columns. You can create a `jsonb` column in the same way you would create a `text` or `int` column:
+`json/jsonb` is another "data type" for Postgres columns. You can create a `jsonb` column in the same way you would create a `text` or `int` column:
 
 <Tabs
   scrollable
@@ -392,6 +392,51 @@ supabase.from_('books').insert([
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+[Table("books")]
+class Book : BaseModel
+{
+    [Column("title")]
+    public string Title { get; set; }
+
+    [Column("author")]
+    public string Author { get; set; }
+
+    [Column("metadata")]
+    public BookMetadata Metadata { get; set; }
+}
+
+class BookMetadata
+{
+    [JsonProperty("description")]
+    public string Description { get; set; }
+
+    [JsonProperty("price")]
+    public double Price { get; set; }
+
+    [JsonProperty("ages")]
+    public List<int> Ages { get; set; }
+}
+```
+
+```c#
+var books = new List<Book>
+{
+    new Book { Title = "The Poky Little Puppy", Author = "Janette Sebring Lowrey", Metadata = new BookMetadata { Description = "Puppy is slower than other, bigger animals.", Price = 5.95, Ages = new List<int> { 3, 6 } } },
+    new Book { Title = "The Tale of Peter Rabbit", Author = "Beatrix Potter", Metadata = new BookMetadata { Description = "Rabbit eats some vegetables.", Price = 4.49, Ages = new List<int> { 2, 5 } } },
+    new Book { Title = "Tootle", Author = "Gertrude Crampton", Metadata = new BookMetadata { Description = "Little toy train has big dreams.", Price = 3.99, Ages = new List<int> { 2, 5 } } },
+    new Book { Title = "Green Eggs and Ham", Author = "Dr. Seuss", Metadata = new BookMetadata { Description = "Sam has changing food preferences and eats unusually colored food.", Price = 7.49, Ages = new List<int> { 4, 8 } } },
+    new Book { Title = "Harry Potter and the Goblet of Fire", Author = "J.K. Rowling", Metadata = new BookMetadata { Description = "Fourth year of school starts, big drama ensues.", Price = 24.95, Ages = new List<int> { 10, 99 } } }
+};
+
+await supabase.From<Book>().Insert(books);
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Query JSON data
@@ -480,6 +525,18 @@ data = supabase.from_('books').select("""
   high_age: metadata->ages->1
 """
 ).execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Select("title, description:metadata->>description, price:metadata->price, low_age:metadata->ages->0, high_age:metadata->ages->1")
+  .Get();
 ```
 
 </TabPanel>

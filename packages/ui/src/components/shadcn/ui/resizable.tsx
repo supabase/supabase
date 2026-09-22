@@ -9,16 +9,30 @@ import { cn } from '../../../lib/utils/cn'
 const transformLayoutKey = (key: string) =>
   key.replace('react-resizable-panels:', 'react-resizable-panels-v4:')
 
+// Reading/writing localStorage can throw or be unavailable (SSR, Safari private
+// browsing, sandboxed iframes, storage disabled). Persistence is best-effort, so
+// swallow failures rather than crashing the panel group.
 const serverCompatibleLocalStorage = {
   getItem: (k: string) => {
     if (typeof window === 'undefined') return null
-    const key = transformLayoutKey(k)
-    return localStorage.getItem(key)
+    try {
+      const value = localStorage.getItem(transformLayoutKey(k))
+      if (value === null) return null
+      // react-resizable-panels JSON.parses this value itself with no guard;
+      // validate here so a corrupted value falls back to null instead of crashing.
+      JSON.parse(value)
+      return value
+    } catch {
+      return null
+    }
   },
   setItem: (k: string, value: string) => {
     if (typeof window === 'undefined') return
-    const key = transformLayoutKey(k)
-    localStorage.setItem(key, value)
+    try {
+      localStorage.setItem(transformLayoutKey(k), value)
+    } catch {
+      // Silently ignore — layout persistence is non-critical.
+    }
   },
 }
 

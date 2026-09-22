@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { viewKeys } from './keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -55,7 +55,7 @@ export const useViewDeleteMutation = ({
       const { id, projectRef, schema } = variables
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, id) }),
-        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, schema) }),
+        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, [schema]) }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
       ])
 

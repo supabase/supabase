@@ -1,5 +1,6 @@
 // End of third-party imports
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import {
   DocsSearchResultType as PageType,
   type DocsSearchResult as Page,
@@ -17,13 +18,30 @@ import {
   type UseQueryStatesKeysMap,
 } from 'nuqs'
 
-import { CATEGORY_OPTIONS } from './Support.constants'
+import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 import { getProjectDetail } from '@/data/projects/project-detail-query'
 import { DOCS_URL } from '@/lib/constants'
 import type { Organization } from '@/types'
 
 export const NO_PROJECT_MARKER = 'no-project'
 export const NO_ORG_MARKER = 'no-org'
+
+export const DISABLE_SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
+  SupportCategories.ACCOUNT_DELETION,
+  SupportCategories.SALES_ENQUIRY,
+  SupportCategories.REFUND,
+]
+
+export function canAllowSupportAccess(
+  category: ExtendedSupportCategories | undefined,
+  projectRef: string
+): boolean {
+  return (
+    !!category &&
+    !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) &&
+    projectRef !== NO_PROJECT_MARKER
+  )
+}
 
 export const formatMessage = ({
   message,
@@ -205,4 +223,35 @@ export async function selectInitialOrgAndProject({
     projectRef: null,
     orgSlug: orgs[0]?.slug ?? null,
   }
+}
+
+// Chrome blocks scrollIntoView (triggered by .focus()) when overflow-x: hidden and
+// overflow-y: auto are on the same element. Manually scroll the sidebar instead.
+export function scrollToRequiredField(formId: string, fieldName: string) {
+  const form = document.getElementById(formId)
+  if (!form) return
+
+  // Selects use data-support-field since they have no name attr; inputs/textareas use name.
+  const el =
+    form.querySelector(`[data-support-field="${fieldName}"]`) ??
+    form.querySelector(`[name="${fieldName}"]`)
+  if (!(el instanceof HTMLElement)) return
+
+  const scrollContainer = findScrollableParent(el)
+  if (scrollContainer) {
+    const offset = el.getBoundingClientRect().top - scrollContainer.getBoundingClientRect().top - 80
+    scrollContainer.scrollTo({ top: scrollContainer.scrollTop + offset, behavior: 'smooth' })
+  }
+
+  el.focus({ preventScroll: true })
+}
+
+function findScrollableParent(el: HTMLElement): HTMLElement | null {
+  let parent = el.parentElement
+  while (parent && parent !== document.body) {
+    const { overflowY } = window.getComputedStyle(parent)
+    if (overflowY === 'auto' || overflowY === 'scroll') return parent
+    parent = parent.parentElement
+  }
+  return null
 }

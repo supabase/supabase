@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { Edit, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -16,26 +16,42 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
-import { FormattedWrapperTable, getWrapperCreationFormSchema, NewTable } from './Wrappers.utils'
+import {
+  FormattedWrapperTable,
+  getRequiredExtensionsToInstall,
+  getWrapperCreationFormSchema,
+  hasForeignSchemaSupport,
+  NewTable,
+} from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
+import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
+import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
 import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
+import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
 import { invalidateSchemasQuery, useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
+import type { ResponseError } from '@/types'
 
 const FORM_ID = 'create-wrapper-form'
 
@@ -53,24 +69,27 @@ export const CreateWrapperSheet = ({
   onCloseWithConfirmation,
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+  const { integration } = useIntegrationDetail()
 
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
-
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<
-    FormattedWrapperTable | undefined
-  >()
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
+  // null while the query is in flight — distinct from [] which means "all installed"
+  const requiredExtensionsToInstall = useMemo(
+    () => getRequiredExtensionsToInstall(extensions, integration?.requiredExtensions ?? []),
+    [extensions, integration?.requiredExtensions]
+  )
+
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
-  // The import foreign schema requires a minimum extension version of 0.5.0
-  const hasRequiredVersionForeignSchema = wrappersExtension?.installed_version
-    ? wrappersExtension?.installed_version >= '0.5.0'
-    : false
+  const hasRequiredVersionForeignSchema = hasForeignSchemaSupport(wrappersExtension)
+  const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
+  const isExtensionDataLoading = isMarketplaceEnabled && requiredExtensionsToInstall === null
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref!,
@@ -113,7 +132,34 @@ export const CreateWrapperSheet = ({
     name: 'tables',
   })
 
-  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
+    undefined
+  )
+
+  const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation({ onError: () => {} })
+  const { mutateAsync: createSchema } = useSchemaCreateMutation({ onError: () => {} })
+  const { mutateAsync: createFDW } = useFDWCreateMutation({ onError: () => {} })
+
+  const installRequiredExtensions = async () => {
+    if (!project) return
+    const { ref: projectRef, connectionString } = project
+    const results = await Promise.allSettled(
+      (requiredExtensionsToInstall ?? []).map((ext) => {
+        const schema = getExtensionDefaultSchema(ext) ?? 'extensions'
+        return enableExtension({
+          projectRef,
+          connectionString,
+          schema,
+          name: ext.name,
+          version: ext.default_version,
+          cascade: true,
+          createSchema: false,
+        })
+      })
+    )
+    const failure = results.find((r) => r.status === 'rejected')
+    if (failure) throw new Error((failure as PromiseRejectedResult).reason.message)
+  }
 
   const onUpdateTable = (values: FormattedWrapperTable) => {
     if (values.index !== undefined) {
@@ -124,19 +170,6 @@ export const CreateWrapperSheet = ({
     }
     setSelectedTableToEdit(undefined)
   }
-
-  const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
-    onSuccess: () => {
-      toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
-
-      const { tables } = getValues()
-      const hasNewSchema = (tables as Record<string, any>[]).some((table) => table.is_new_schema)
-      if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
-
-      onClose()
-      form.reset()
-    },
-  })
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
     const { mode, tables = [], ...wrapperValues } = values
@@ -158,13 +191,28 @@ export const CreateWrapperSheet = ({
       }
     }
 
+    if (isExtensionDataLoading) return
+
+    const toastId = toast.loading(
+      needsExtensions
+        ? `Installing extensions ${(requiredExtensionsToInstall ?? []).map((e) => e.name).join(', ')}…`
+        : `Creating ${wrapperMeta.label} wrapper…`
+    )
+
     try {
+      if (needsExtensions) {
+        await installRequiredExtensions()
+        toast.loading(`Creating ${wrapperMeta.label} wrapper…`, { id: toastId })
+      }
+
       if (mode === 'schema') {
+        toast.loading(`Creating schema "${wrapperValues.target_schema}"…`, { id: toastId })
         await createSchema({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           name: wrapperValues.target_schema,
         })
+        toast.loading(`Creating ${wrapperMeta.label} wrapper…`, { id: toastId })
       }
 
       await createFDW({
@@ -182,14 +230,24 @@ export const CreateWrapperSheet = ({
         targetSchema: wrapperValues.target_schema,
       })
 
+      const { tables: formTables } = getValues()
+      const hasNewSchema = (formTables as Record<string, any>[]).some((t) => t.is_new_schema)
+      if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
+
       track('foreign_data_wrapper_created', { wrapperType: wrapperMeta.label })
+      toast.success(`Successfully created ${wrapperMeta.label} foreign data wrapper`, {
+        id: toastId,
+      })
+      onClose()
+      form.reset()
     } catch (error) {
-      console.error(error)
-      // The error will be handled by the mutation onError callback (toast.error)
+      toast.error(
+        `Failed to create ${wrapperMeta.label} wrapper: ${(error as ResponseError).message}`,
+        { id: toastId }
+      )
     }
   }
 
-  const isLoading = isCreatingWrapper || isCreatingSchema
   const wrapper_name = useWatch({ name: 'wrapper_name', control: form.control })
   const mode = useWatch({ name: 'mode', control: form.control })
 
@@ -205,7 +263,19 @@ export const CreateWrapperSheet = ({
             <SheetHeader>
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
-            <div className="flex-grow overflow-y-auto">
+            <div className="grow overflow-y-auto">
+              {isMarketplaceEnabled && (
+                <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
+                  {needsExtensions && (
+                    <Admonition
+                      type="warning"
+                      title="Required extensions will be installed"
+                      description="Proceeding will also install the extensions required by this wrapper."
+                    />
+                  )}
+                  <RequiredExtensionsSection hideSeparator />
+                </div>
+              )}
               <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
@@ -215,7 +285,6 @@ export const CreateWrapperSheet = ({
                       <FormItemLayout
                         layout="vertical"
                         label="Wrapper Name"
-                        name="wrapper_name"
                         description={
                           wrapper_name.length > 0 ? (
                             <>
@@ -228,7 +297,7 @@ export const CreateWrapperSheet = ({
                         }
                       >
                         <FormControl>
-                          <Input id="wrapper_name" {...field} />
+                          <Input {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -306,7 +375,7 @@ export const CreateWrapperSheet = ({
                                     <WarningIcon />
                                     <span className="text-xs text-left">
                                       This feature requires the{' '}
-                                      <span className="text-brand">wrappers</span> extension to be
+                                      <span className="text-primary">wrappers</span> extension to be
                                       of minimum version of 0.5.0.
                                     </span>
                                   </div>
@@ -360,29 +429,43 @@ export const CreateWrapperSheet = ({
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<Edit />}
-                                onClick={() => {
-                                  setSelectedTableToEdit(table)
-                                }}
-                              />
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<Trash />}
-                                onClick={() => {
-                                  removeTable(tableIndex)
-                                }}
-                              />
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    className="px-1"
+                                    icon={<Edit />}
+                                    onClick={() => {
+                                      setSelectedTableToEdit(table)
+                                    }}
+                                    aria-label={`Edit ${table.table_name} foreign table`}
+                                    // Tooltip repeats the label; screen readers would read it twice
+                                    aria-describedby={undefined}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">{`Edit ${table.table_name} foreign table`}</TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    className="px-1"
+                                    icon={<Trash />}
+                                    onClick={() => {
+                                      removeTable(tableIndex)
+                                    }}
+                                    aria-label={`Remove ${table.table_name} foreign table`}
+                                    // Tooltip repeats the label; screen readers would read it twice
+                                    aria-describedby={undefined}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">{`Remove ${table.table_name} foreign table`}</TooltipContent>
+                              </Tooltip>
                             </div>
                           </div>
                         )
                       })}
 
                       <div className="flex justify-end">
-                        <Button type="default" onClick={() => setSelectedTableToEdit(NewTable)}>
+                        <Button onClick={() => setSelectedTableToEdit(NewTable)}>
                           Add foreign table
                         </Button>
                       </div>
@@ -440,20 +523,19 @@ export const CreateWrapperSheet = ({
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                type="button"
                 onClick={onCloseWithConfirmation}
-                disabled={isLoading}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
-                disabled={isSubmitting || isLoading}
-                loading={isLoading}
+                type="submit"
+                disabled={isSubmitting || isExtensionDataLoading}
+                loading={isSubmitting}
               >
                 Create wrapper
               </Button>

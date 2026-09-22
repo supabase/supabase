@@ -11,7 +11,11 @@ export const MissingExtensionAlert = ({ extension }: { extension: DatabaseExtens
   if (!extensionInstalled) {
     return (
       <>
-        <Button type="primary" className="w-min" onClick={() => setShowEnableExtensionModal(true)}>
+        <Button
+          variant="primary"
+          className="w-min"
+          onClick={() => setShowEnableExtensionModal(true)}
+        >
           Enable {extension.name}
         </Button>
 

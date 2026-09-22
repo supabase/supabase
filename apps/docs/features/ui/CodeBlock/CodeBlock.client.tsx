@@ -1,18 +1,86 @@
 'use client'
 
-import { Check, Copy, WrapText, ArrowRightFromLine } from 'lucide-react'
-import { type MouseEvent, useCallback, useEffect, useState, useRef } from 'react'
-import { type ThemedToken } from 'shiki'
+import { ArrowRightFromLine, Check, Copy, WrapText, type LucideIcon } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { type NodeHover } from 'twoslash'
-import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { getFontStyle } from './CodeBlock.utils'
+import { Button, cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+type CodeAnnotation = Pick<NodeHover, 'text' | 'docs' | 'tags'>
+export type CodeToken = [
+  content: string,
+  className: string | undefined,
+  annotations?: Array<CodeAnnotation>,
+]
+
+export function CodeBlockTokens({
+  lines,
+  lineNumbers,
+}: {
+  lines: Array<Array<CodeToken>>
+  lineNumbers: boolean
+}) {
+  return (
+    <pre>
+      <code
+        className={cn(
+          '[contain:content]',
+          lineNumbers && 'grid grid-cols-[auto_1fr] w-fit min-w-full py-3',
+          '[--row-rest:var(--background-200)]',
+          '[--row-hover:color-mix(in_srgb,var(--foreground)_3%,var(--background-200))]'
+        )}
+      >
+        {lineNumbers ? (
+          lines.map((line, idx) => (
+            <div key={idx} className="group/row contents">
+              <div aria-hidden="true" className="code-line-number">
+                {idx + 1}
+              </div>
+              <div className="code-content code-line-content">
+                <CodeLine tokens={line} />
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="code-content p-6">
+            {lines.map((line, idx) => (
+              <CodeLine key={idx} tokens={line} />
+            ))}
+          </div>
+        )}
+      </code>
+    </pre>
+  )
+}
+
+function CodeLine({ tokens }: { tokens: Array<CodeToken> }) {
+  return (
+    <span className="block min-h-5 leading-5">
+      {tokens.map(([content, className, annotations], idx) =>
+        annotations ? (
+          <AnnotatedSpan
+            key={idx}
+            content={content}
+            className={className}
+            annotations={annotations}
+          />
+        ) : (
+          <span key={idx} className={className}>
+            {content}
+          </span>
+        )
+      )}
+    </span>
+  )
+}
 
 export function AnnotatedSpan({
-  token,
+  content,
+  className,
   annotations,
 }: {
-  token: ThemedToken
-  annotations: Array<NodeHover>
+  content: string
+  className: string | undefined
+  annotations: Array<CodeAnnotation>
 }) {
   const [open, setOpen] = useState(false)
 
@@ -45,13 +113,14 @@ export function AnnotatedSpan({
     <Tooltip open={open} onOpenChange={onOpenChange}>
       <TooltipTrigger asChild onClick={handleClick}>
         <button
-          style={token.htmlStyle}
+          tabIndex={0}
           className={cn(
+            className,
             isTouchDevice &&
               'underline underline-offset-4 decoration-dashed decoration-[rgba(from_currentColor_r_g_b/0.5)]'
           )}
         >
-          {token.content}
+          {content}
         </button>
       </TooltipTrigger>
       <TooltipContent className="max-w-[min(80vw,400px)] p-0 divide-y">
@@ -63,7 +132,7 @@ export function AnnotatedSpan({
   )
 }
 
-function Annotation({ annotation }: { annotation: NodeHover }) {
+function Annotation({ annotation }: { annotation: CodeAnnotation }) {
   const { text, docs, tags } = annotation
   return (
     <div className="flex flex-col gap-2">
@@ -86,70 +155,148 @@ function Annotation({ annotation }: { annotation: NodeHover }) {
   )
 }
 
-export function CodeCopyButton({ className, content }: { className?: string; content: string }) {
+function CrossfadeIcon({
+  active,
+  activeIcon: ActiveIcon,
+  inactiveIcon: InactiveIcon,
+}: {
+  active: boolean
+  activeIcon: LucideIcon
+  inactiveIcon: LucideIcon
+}) {
+  const iconClass = (shown: boolean) =>
+    cn(
+      'absolute inset-0 m-auto text-lighter group-hover/btn:text-foreground',
+      'transition-[opacity,scale,filter,color] duration-300 [transition-timing-function:cubic-bezier(0.2,0,0,1)]',
+      'motion-reduce:transition-none',
+      shown ? 'opacity-100 scale-100 blur-none' : 'opacity-0 scale-[0.25] blur-[4px]'
+    )
+
+  return (
+    <span className="relative block size-3.5">
+      <ActiveIcon size={14} aria-hidden="true" className={iconClass(active)} />
+      <InactiveIcon size={14} aria-hidden="true" className={iconClass(!active)} />
+    </span>
+  )
+}
+
+export function CodeCopyButton({
+  className,
+  content,
+  label = 'Copy code',
+  copiedLabel = 'Code copied',
+  onCopied,
+}: {
+  className?: string
+  content: string
+  label?: string
+  copiedLabel?: string
+  /** Runs after a successful clipboard write. */
+  onCopied?: () => void
+}) {
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!copied) return
+
+    const timeout = window.setTimeout(() => setCopied(false), 2000)
+    return () => window.clearTimeout(timeout)
+  }, [copied])
 
   const handleCopy = async () => {
     copyToClipboard(content, () => {
       setCopied(true)
-      setTimeout(() => setCopied(false), 1000)
+      onCopied?.()
     })
   }
 
+  const resetStatus = () => {
+    setCopied(false)
+  }
+
   return (
-    <button
-      onClick={handleCopy}
-      className={cn(
-        'border rounded-md p-1',
-        copied && 'bg-selection',
-        'hover:bg-selection transition',
-        className
-      )}
-    >
-      {copied ? (
-        <Check size={14} className="text-lighter" />
-      ) : (
-        <Copy size={14} className="text-lighter" />
-      )}
-    </button>
+    <>
+      <span className="sr-only" aria-live="polite">
+        {copied ? copiedLabel : ''}
+      </span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            tabIndex={0}
+            onClick={handleCopy}
+            onBlur={resetStatus}
+            className={cn(
+              'group/btn size-6 p-1 cursor-pointer bg-200 hover:border-strong',
+              copied && 'bg-[var(--btn-active)]',
+              'hover:bg-[var(--btn-active)]',
+              className
+            )}
+            aria-label={label}
+            // Tooltip repeats the label; screen readers would read it twice
+            aria-describedby={undefined}
+          >
+            <CrossfadeIcon active={copied} activeIcon={Check} inactiveIcon={Copy} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{label}</TooltipContent>
+      </Tooltip>
+    </>
   )
 }
 
 export function CodeBlockControls({ content }: { content: string }) {
   const [isWrapped, setIsWrapped] = useState(false)
+  // Empty until the first toggle, so nothing is announced on mount
+  const [wrapStatus, setWrapStatus] = useState('')
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   const toggleWrap = useCallback(() => {
-    setIsWrapped((prev) => {
-      const newValue = !prev
-      // Find the parent code block and toggle the wrap data attribute
-      const codeBlock = wrapperRef.current?.closest('.shiki')
-      if (codeBlock) {
-        if (newValue) {
-          codeBlock.setAttribute('data-wrapped', 'true')
-        } else {
-          codeBlock.removeAttribute('data-wrapped')
-        }
+    const newValue = !isWrapped
+    setIsWrapped(newValue)
+    setWrapStatus(newValue ? 'Word wrap enabled' : 'Word wrap disabled')
+
+    const codeBlock = wrapperRef.current?.closest('.shiki')
+    if (codeBlock) {
+      if (newValue) {
+        codeBlock.setAttribute('data-wrapped', 'true')
+      } else {
+        codeBlock.removeAttribute('data-wrapped')
       }
-      return newValue
-    })
-  }, [])
+    }
+  }, [isWrapped])
 
   return (
-    <div ref={wrapperRef} className="hidden group-hover:flex absolute top-2 right-2 gap-1">
+    <div
+      ref={wrapperRef}
+      className={cn(
+        'opacity-0 flex group-hover:opacity-100 group-focus-within:opacity-100 absolute top-[9.5px] right-[9.5px] gap-1',
+        '[--btn-active:color-mix(in_srgb,var(--foreground)_4%,var(--background-200))]'
+      )}
+    >
+      <span className="sr-only" aria-live="polite">
+        {wrapStatus}
+      </span>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button
+          <Button
+            variant="outline"
+            tabIndex={0}
             onClick={toggleWrap}
-            className={cn('border rounded-md p-1', 'hover:bg-selection transition')}
-            aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
-          >
-            {isWrapped ? (
-              <ArrowRightFromLine size={14} className="text-lighter" />
-            ) : (
-              <WrapText size={14} className="text-lighter" />
+            className={cn(
+              'group/btn size-6 p-1 cursor-pointer bg-200 hover:border-strong',
+              'hover:bg-[var(--btn-active)]'
             )}
-          </button>
+            aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
+            // Tooltip repeats the label; screen readers would read it twice
+            aria-describedby={undefined}
+          >
+            <CrossfadeIcon
+              active={isWrapped}
+              activeIcon={ArrowRightFromLine}
+              inactiveIcon={WrapText}
+            />
+          </Button>
         </TooltipTrigger>
         <TooltipContent>{isWrapped ? 'Disable word wrap' : 'Enable word wrap'}</TooltipContent>
       </Tooltip>

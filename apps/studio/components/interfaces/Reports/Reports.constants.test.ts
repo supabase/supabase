@@ -116,6 +116,18 @@ describe('generateRegexpWhereSafe', () => {
       },
     ]
     const result = generateRegexpWhereSafe(filters, true)
-    expect(result).toBe("WHERE `request`.`method` = 'get'")
+    expect(result).toBe("WHERE `request`.`method` = 'GET'")
+  })
+
+  it('should preserve value casing so uppercase HTTP methods match', () => {
+    const filters: ReportFilterItem[] = [
+      {
+        key: 'request.method',
+        value: 'DELETE',
+        compare: 'is',
+      },
+    ]
+    const result = generateRegexpWhereSafe(filters, true)
+    expect(result).toBe("WHERE `request`.`method` = 'DELETE'")
   })
 })

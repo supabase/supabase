@@ -1,6 +1,5 @@
 import { preprocessMdxWithDefaults } from '~/features/directives/utils'
 import { components } from '~/features/docs/MdxBase.shared'
-import { guidesData } from '~/lib/guidesData'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { isFeatureEnabled } from 'common'
 import { MDXRemote } from 'next-mdx-remote-client/rsc'
@@ -39,7 +38,7 @@ const MDXRemoteBase = async ({
   } = mdxOptions
 
   const finalOptions = {
-    scope: { isFeatureEnabled, ...guidesData },
+    scope: { isFeatureEnabled },
     ...mdxOptions,
     ...otherOptions,
     mdxOptions: {

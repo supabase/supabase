@@ -1,3 +1,4 @@
+import { safeLocalStorage } from 'common'
 import { useCallback, useEffect, useState } from 'react'
 
 interface ChartHoverState {
@@ -21,21 +22,20 @@ let globalState: ChartHoverState = {
 // Subscribers for state changes
 const subscribers = new Set<(state: ChartHoverState) => void>()
 
-// Load initial sync settings from localStorage
+// Load initial sync settings from localStorage. safeLocalStorage handles SSR and
+// unavailable storage; the try/catch only guards JSON.parse against bad values.
 try {
-  if (typeof window !== 'undefined') {
-    const hoverSyncStored = localStorage.getItem(CHART_HOVER_SYNC_STORAGE_KEY)
-    const tooltipSyncStored = localStorage.getItem(CHART_TOOLTIP_SYNC_STORAGE_KEY)
+  const hoverSyncStored = safeLocalStorage.getItem(CHART_HOVER_SYNC_STORAGE_KEY)
+  const tooltipSyncStored = safeLocalStorage.getItem(CHART_TOOLTIP_SYNC_STORAGE_KEY)
 
-    if (hoverSyncStored !== null) {
-      globalState.syncHover = JSON.parse(hoverSyncStored)
-    }
-    if (tooltipSyncStored !== null) {
-      globalState.syncTooltip = JSON.parse(tooltipSyncStored)
-    }
+  if (hoverSyncStored !== null) {
+    globalState.syncHover = JSON.parse(hoverSyncStored)
+  }
+  if (tooltipSyncStored !== null) {
+    globalState.syncTooltip = JSON.parse(tooltipSyncStored)
   }
 } catch (error) {
-  console.warn('Failed to load chart sync settings from localStorage:', error)
+  console.warn('Failed to parse chart sync settings from localStorage:', error)
 }
 
 function notifySubscribers() {
@@ -48,18 +48,13 @@ function updateGlobalState(updates: Partial<ChartHoverState>) {
 
   // Save sync settings to localStorage when they change
   if (updates.syncHover !== undefined) {
-    try {
-      localStorage.setItem(CHART_HOVER_SYNC_STORAGE_KEY, JSON.stringify(globalState.syncHover))
-    } catch (error) {
-      console.warn('Failed to save chart hover sync setting to localStorage:', error)
-    }
+    safeLocalStorage.setItem(CHART_HOVER_SYNC_STORAGE_KEY, JSON.stringify(globalState.syncHover))
   }
   if (updates.syncTooltip !== undefined) {
-    try {
-      localStorage.setItem(CHART_TOOLTIP_SYNC_STORAGE_KEY, JSON.stringify(globalState.syncTooltip))
-    } catch (error) {
-      console.warn('Failed to save chart tooltip sync setting to localStorage:', error)
-    }
+    safeLocalStorage.setItem(
+      CHART_TOOLTIP_SYNC_STORAGE_KEY,
+      JSON.stringify(globalState.syncTooltip)
+    )
   }
 
   // Only notify if state actually changed

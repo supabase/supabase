@@ -5,4 +5,5 @@ export const miscKeys = {
   ipAddress: () => ['ip-address'] as const,
   clockSkew: () => ['clock-skew'] as const,
   enabledFeaturesOverride: () => ['enabled-features-override'] as const,
+  localS3Keys: () => ['local-s3-keys'] as const,
 }

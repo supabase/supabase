@@ -1,5 +1,5 @@
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from './Storage.constants'
-import type { PolicyFormField } from '@/components/interfaces/Auth/Policies/Policies.types'
+import { PolicyFormField } from './StoragePolicies/StoragePolicies.types'
 
 export interface StoragePolicyFormField extends PolicyFormField {
   allowedOperations: string[]

@@ -18,7 +18,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
     params: {
       path: { ref: payload.projectRef },
       query: {
-        reveal: false,
+        reveal: 'false',
       },
     },
     body: {
@@ -29,7 +29,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
               role: 'service_role',
             },
           }
-        : name),
+        : {}),
 
       type: payload.type,
       name: payload.name,

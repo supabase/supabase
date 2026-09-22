@@ -1,7 +1,7 @@
-import { XCircle } from 'lucide-react'
-import { type FC, type PropsWithChildren, useState } from 'react'
-import { CollapsibleContent, CollapsibleTrigger, Collapsible, cn } from 'ui'
 import ApiSchema from '~/components/ApiSchema'
+import { XCircle } from 'lucide-react'
+import { useState, type FC, type PropsWithChildren } from 'react'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 interface IOptions {
   name?: string
@@ -19,6 +19,7 @@ const ApiSchemaOptions: FC<PropsWithChildren<IOptions>> & OptionsSubComponents =
     <Collapsible open={open} onOpenChange={setOpen} className="mt-0">
       <CollapsibleTrigger asChild>
         <button
+          tabIndex={0}
           className={cn(
             'px-5',
             'border-t border-l border-r border-default',

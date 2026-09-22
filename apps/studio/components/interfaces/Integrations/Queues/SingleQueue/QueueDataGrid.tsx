@@ -7,7 +7,7 @@ import { Badge, Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
 import type { ResponseError } from '@/types'
 
@@ -198,7 +198,7 @@ export const QueueMessagesDataGrid = ({
                 <p className="text-foreground-light">
                   The selected queue doesn't have any messages.
                 </p>
-                <Button className="mt-2" onClick={() => showMessageModal()}>
+                <Button variant="primary" className="mt-2" onClick={() => showMessageModal()}>
                   Add message
                 </Button>
               </div>

@@ -60,7 +60,7 @@ export function RotateKeyDialog({
         <DialogTitle>Rotate JWT signing key</DialogTitle>
         <DialogDescription>
           Change the key used by Supabase Auth to create new JSON Web Tokens. Non-expired tokens
-          remain <span className="text-brand">valid and accepted</span>!
+          remain <span className="text-primary">valid and accepted</span>!
         </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
@@ -152,7 +152,6 @@ export function RotateKeyDialog({
                 All of my application's components have picked up the standby key.
               </p>
               <ButtonTooltip
-                type="default"
                 icon={<Info />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
@@ -188,7 +187,6 @@ export function RotateKeyDialog({
                 To invalidate non-expired JWTs I need to explicitly revoke the currently used key.
               </p>
               <ButtonTooltip
-                type="default"
                 icon={<Info />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
@@ -197,7 +195,7 @@ export function RotateKeyDialog({
                     text: (
                       <p>
                         Rotating the signing key only changes what key is used by Supabase Auth to
-                        issue <em className="text-brand not-italic">new tokens</em>
+                        issue <em className="text-primary not-italic">new tokens</em>
                         .<br />
                         <br />
                         To prevent users from being prematurely signed out, you have to manually
@@ -242,7 +240,7 @@ export function RotateKeyDialog({
                     )}
                 </p>
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   icon={<Info />}
                   className="px-1.5 py-2 mt-0.5"
                   tooltip={{
@@ -252,9 +250,11 @@ export function RotateKeyDialog({
                         <p>
                           Some of your Edge Functions are set up to require a JWT in the{' '}
                           <code>Authorization</code> header signed with the{' '}
-                          <em className="text-brand not-italic">legacy JWT secret</em>. Rotation
+                          <em className="text-primary not-italic">legacy JWT secret</em>. Rotation
                           causes{' '}
-                          <em className="text-brand not-italic">invocations by signed-in users</em>{' '}
+                          <em className="text-primary not-italic">
+                            invocations by signed-in users
+                          </em>{' '}
                           to fail with HTTP 401 Unauthorized, as the JWT no longer meets this
                           requirement.
                           <br />
@@ -275,6 +275,7 @@ export function RotateKeyDialog({
       </DialogSection>
       <DialogFooter>
         <Button
+          variant="primary"
           onClick={() => mutate({ projectRef, keyId: standbyKey.id, status: 'in_use' })}
           disabled={
             isLoadingEdgeFunctions ||

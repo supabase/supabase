@@ -63,7 +63,7 @@ describe('ProjectNeedsSecuring.utils: buildSecurityPromptMarkdown', () => {
 describe('ProjectNeedsSecuring.utils: getTablePoliciesHref', () => {
   it('builds the policies href with plain values', () => {
     expect(getTablePoliciesHref('abc', 'public', 'invoices')).toBe(
-      '/project/abc/auth/policies?schema=public&search=invoices'
+      '/project/abc/database/policies?schema=public&search=invoices'
     )
   })
 
@@ -90,7 +90,7 @@ describe('ProjectNeedsSecuring.utils: getTablePoliciesHref', () => {
 
   it('falls back to empty strings for undefined inputs', () => {
     expect(getTablePoliciesHref(undefined, undefined, undefined)).toBe(
-      '/project//auth/policies?schema=&search='
+      '/project//database/policies?schema=&search='
     )
   })
 })

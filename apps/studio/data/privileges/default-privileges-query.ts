@@ -2,7 +2,7 @@ import { getDefaultPrivilegesStateSql } from '@supabase/pg-meta'
 import { queryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError } from '@/types'
 
 export type DefaultPrivilegesVariables = {

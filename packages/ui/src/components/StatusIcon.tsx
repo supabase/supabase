@@ -38,7 +38,7 @@ const InfoIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       {...props}
       className={cn(
         !hideBackground
-          ? 'w-4 h-4 p-0.5 bg-foreground-lighter text-background-surface-200 rounded-sm'
+          ? 'w-4 h-4 p-0.5 bg-foreground-lighter text-background rounded-sm'
           : 'w-3 h-3 text-foreground-lighter',
         props.className
       )}

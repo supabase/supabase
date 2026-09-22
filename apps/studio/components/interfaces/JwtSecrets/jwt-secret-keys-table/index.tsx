@@ -196,7 +196,7 @@ export const JWTSecretKeysTable = () => {
                 onClick={() => setShownDialog('rotate')}
                 loading={isUpdatingJWTSigningKey}
                 icon={<RotateCw className="size-4" />}
-                type="primary"
+                variant="primary"
               />
             ) : (
               <ActionPanel
@@ -205,7 +205,7 @@ export const JWTSecretKeysTable = () => {
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isPendingMutation}
-                type="primary"
+                variant="primary"
                 icon={<Timer className="size-4" />}
                 shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />
@@ -283,7 +283,7 @@ export const JWTSecretKeysTable = () => {
               <h2>Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
                 These JWT signing keys are still used to{' '}
-                <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
+                <em className="text-primary not-italic">verify tokens</em> that are yet to expire.
                 Revoke once all tokens have expired.
               </p>
             </div>
@@ -412,6 +412,7 @@ export const JWTSecretKeysTable = () => {
           </DialogSection>
           <DialogFooter>
             <Button
+              variant="primary"
               loading={isMigrating}
               onClick={() => migrateJWTSecret({ projectRef: projectRef! })}
             >

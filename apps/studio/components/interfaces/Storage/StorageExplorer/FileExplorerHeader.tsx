@@ -44,6 +44,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 import { pageChromeRowClassName } from './storageExplorerChrome'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
 import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -118,10 +119,8 @@ const NavigateDialog = ({
           </FieldDescription>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="primary" onClick={onSubmit}>
+          <Button onClick={onCancel}>Cancel</Button>
+          <Button variant="primary" onClick={onSubmit}>
             Navigate
           </Button>
         </DialogFooter>
@@ -145,7 +144,6 @@ export const FileExplorerHeader = ({
   const track = useTrack()
 
   const [pathString, setPathString] = useState('')
-  const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isPathDialogOpen, setIsPathDialogOpen] = useState(false)
 
@@ -156,17 +154,13 @@ export const FileExplorerHeader = ({
   const {
     projectRef,
     columns,
-    popColumn,
-    popColumnAtIndex,
-    popOpenedFolders,
-    fetchFoldersByPath,
     refetchAllOpenedFolders,
     refreshAll,
     isRefreshing,
     addNewFolderPlaceholder,
-    clearOpenedFolders,
     setSelectedFilePreview,
   } = useStorageExplorerStateSnapshot()
+  const { goUpOneLevel, navigateToPath } = useStorageExplorerNavigation()
   const {
     view,
     setView,
@@ -218,9 +212,7 @@ export const FileExplorerHeader = ({
   }, [breadcrumbs])
 
   const onSelectBack = () => {
-    popColumn()
-    popOpenedFolders()
-    setSelectedFilePreview(undefined)
+    goUpOneLevel()
   }
 
   const onSelectUpload = () => {
@@ -240,7 +232,7 @@ export const FileExplorerHeader = ({
     setPathString(event.target.value)
   }
 
-  const navigateByPathString = async (event?: SyntheticEvent) => {
+  const navigateByPathString = (event?: SyntheticEvent) => {
     if (event) {
       event.preventDefault()
       event.stopPropagation()
@@ -248,23 +240,11 @@ export const FileExplorerHeader = ({
 
     const paths = compact(pathString.split('/'))
     setIsPathDialogOpen(false)
-    await onSetPathByString(paths)
+    // Writing the URL is enough — the navigation provider rebuilds the columns from it.
+    navigateToPath(paths)
 
     if (paths.length > 0) {
       track('storage_explorer_navigate_submitted')
-    }
-  }
-
-  const onSetPathByString = async (paths: string[]) => {
-    if (paths.length === 0) {
-      popColumnAtIndex(0)
-      clearOpenedFolders()
-      setSelectedFilePreview(undefined)
-    } else {
-      const pathString = paths.join('/')
-      setLoading({ isLoading: true, message: `Navigating to ${pathString}...` })
-      await fetchFoldersByPath({ paths })
-      setLoading({ isLoading: false, message: '' })
     }
   }
 
@@ -303,7 +283,7 @@ export const FileExplorerHeader = ({
             {isListView && !isBucketRoot && (
               <Button
                 size="tiny"
-                type="outline"
+                variant="outline"
                 aria-label="Go up one level"
                 className="w-7 shrink-0 px-1"
                 icon={<ArrowLeft size={14} />}
@@ -324,7 +304,7 @@ export const FileExplorerHeader = ({
                       <Button
                         key="cancel"
                         size="tiny"
-                        type="text"
+                        variant="text"
                         icon={<X />}
                         onClick={onCancelSearch}
                         className="p-0 h-5 w-5"
@@ -346,10 +326,10 @@ export const FileExplorerHeader = ({
                 <Button
                   size="tiny"
                   icon={<Edit2 />}
-                  type="outline"
+                  variant="outline"
                   aria-label="Navigate"
                   className="w-7 px-1"
-                  disabled={isPathDialogOpen || loading.isLoading}
+                  disabled={isPathDialogOpen}
                   onClick={onOpenNavigate}
                 />
               )}
@@ -357,7 +337,7 @@ export const FileExplorerHeader = ({
                 <Button
                   size="tiny"
                   icon={<RefreshCw />}
-                  type="outline"
+                  variant="outline"
                   aria-label="Reload"
                   className="w-7 px-1"
                   loading={isRefreshing}
@@ -368,7 +348,7 @@ export const FileExplorerHeader = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="outline"
+                    variant="outline"
                     size="tiny"
                     aria-label="View options"
                     className="w-7 px-1"
@@ -380,7 +360,7 @@ export const FileExplorerHeader = ({
                     <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {view === option.key && <Check size={16} className="text-brand" />}
+                        {view === option.key && <Check size={16} className="text-primary" />}
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -392,7 +372,7 @@ export const FileExplorerHeader = ({
                         <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
-                            {sortBy === option.key && <Check size={16} className="text-brand" />}
+                            {sortBy === option.key && <Check size={16} className="text-primary" />}
                           </div>
                         </DropdownMenuItem>
                       ))}
@@ -409,7 +389,7 @@ export const FileExplorerHeader = ({
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" />
+                              <Check size={16} className="text-primary" />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -431,7 +411,7 @@ export const FileExplorerHeader = ({
               >
                 <ButtonTooltip
                   icon={<FolderPlus size={16} />}
-                  type="outline"
+                  variant="outline"
                   disabled={!canUpdateStorage || breadcrumbs.length === 0}
                   onClick={() => addNewFolderPlaceholder(-1)}
                   tooltip={{
@@ -453,7 +433,7 @@ export const FileExplorerHeader = ({
               >
                 <ButtonTooltip
                   icon={<Upload size={16} />}
-                  type="primary"
+                  variant="primary"
                   disabled={!canUpdateStorage || breadcrumbs.length === 0}
                   onClick={onSelectUpload}
                   tooltip={{

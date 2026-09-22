@@ -141,9 +141,11 @@ describe('generateAuthMenu', () => {
     const menu = generateAuthMenu({ ...allFeaturesEnabled, ref: 'my-project' })
     const users = findItem(menu, 'Users')
     const oauthApps = findItem(menu, 'OAuth Apps')
+    const policies = findItem(menu, 'Policies')
 
     expect(users?.url).toBe('/project/my-project/auth/users')
     expect(oauthApps?.url).toBe('/project/my-project/auth/oauth-apps')
+    expect(policies?.url).toBe('/project/my-project/database/policies')
   })
 
   it('hides Passkeys when passkeys feature is false', () => {

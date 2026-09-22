@@ -1,11 +1,3 @@
-import { toHtml } from 'hast-util-to-html'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { mdxFromMarkdown } from 'mdast-util-mdx'
-import { toHast } from 'mdast-util-to-hast'
-import { mdxjs } from 'micromark-extension-mdxjs'
-import { notFound } from 'next/navigation'
-import { visit } from 'unist-util-visit'
-
 import { REFERENCES } from '~/content/navigation.references'
 import {
   getFlattenedSections,
@@ -16,6 +8,13 @@ import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { BASE_PATH } from '~/lib/constants'
+import { toHtml } from 'hast-util-to-html'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { mdxFromMarkdown } from 'mdast-util-mdx'
+import { toHast } from 'mdast-util-to-hast'
+import { mdxjs } from 'micromark-extension-mdxjs'
+import { notFound } from 'next/navigation'
+import { visit } from 'unist-util-visit'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -138,7 +137,7 @@ async function functionDetails(
 
   let types: MethodTypes | VariableTypes | undefined
   if (libraryMeta.typeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(lib, version ?? libraryMeta.versions[0], fn['$ref'] as string)
   }
 
   const fullDescription = [
@@ -151,7 +150,7 @@ async function functionDetails(
     .join('')
 
   const parameters = parametersToHtml(fn, types)
-  const examples = examplesToHtml(fn)
+  const examples = examplesToHtml(fn, types)
 
   return fullDescription + parameters + examples
 }
@@ -219,13 +218,24 @@ function parametersToHtml(fn: any, types: MethodTypes | VariableTypes | undefine
   return result
 }
 
-function examplesToHtml(fn: any) {
-  if (!fn.examples || fn.examples.length === 0) return ''
+function examplesToHtml(fn: any, types?: MethodTypes | VariableTypes) {
+  // Prefer hand-authored YAML/JSON examples on the section entry; fall back to
+  // TSDoc-extracted `@example` blocks on the method's normalised comment. The
+  // page renderer in `Reference.sections.tsx` does the same merge, so the
+  // crawler stays consistent with what a browser sees.
+  const examples =
+    Array.isArray(fn.examples) && fn.examples.length > 0
+      ? fn.examples
+      : (types?.comment?.examples ?? [])
+  if (examples.length === 0) return ''
 
   let result = '<h2 id="examples">Examples</h2>'
 
-  result += fn.examples
-    .map((example) => `<h3>${example.name ?? ''}</h3>` + mdxToHtml(example.code ?? ''))
+  result += examples
+    .map(
+      (example: { name?: string; code?: string }) =>
+        `<h3>${example.name ?? ''}</h3>` + mdxToHtml(example.code ?? '')
+    )
     .join('')
 
   return result

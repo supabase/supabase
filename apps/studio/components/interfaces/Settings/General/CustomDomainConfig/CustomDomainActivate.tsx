@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -95,15 +95,11 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
           <div className="flex items-center justify-between">
             <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
             <div className="flex items-center space-x-2">
-              <Button
-                type="default"
-                className="self-end"
-                onClick={onCancelCustomDomain}
-                loading={isDeleting}
-              >
+              <Button className="self-end" onClick={onCancelCustomDomain} loading={isDeleting}>
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 disabled={isDeleting}
                 onClick={() => setIsActivateConfirmModalVisible(true)}
                 className="self-end"

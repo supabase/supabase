@@ -1,4 +1,21 @@
-import type { UIMessage } from 'ai'
+import {
+  isToolUIPart,
+  type UIDataTypes,
+  type UIMessage,
+  type UIMessagePart,
+  type UITools,
+} from 'ai'
+
+type UIPart = UIMessagePart<UIDataTypes, UITools>
+
+/** Strips `update_notebook`'s `previous_content` snapshot — display-only, never re-uploaded. */
+function stripNotebookSnapshot(part: UIPart): UIPart {
+  if (!isToolUIPart(part) || part.type !== 'tool-update_notebook') return part
+  if (!part.output || typeof part.output !== 'object') return part
+
+  const { previous_content, ...sanitizedOutput } = part.output as Record<string, unknown>
+  return { ...part, output: sanitizedOutput } as UIPart
+}
 
 /**
  * Prepares messages for API transmission by cleaning and limiting history
@@ -18,8 +35,47 @@ export function prepareMessagesForAPI(messages: UIMessage[]): UIMessage[] {
     if (message.role === 'assistant' && message.results) {
       delete cleanedMessage.results
     }
+    // Map into a new array rather than mutating in place — `parts` is shared by reference
+    // with the locally persisted message the assistant panel reads from.
+    if (cleanedMessage.parts) {
+      cleanedMessage.parts = cleanedMessage.parts.map(stripNotebookSnapshot)
+    }
     return cleanedMessage as UIMessage
   })
 
   return cleanedMessages
+}
+
+/**
+ * Approval id when the part is waiting on a human Approve/Deny.
+ * Narrows with `isToolUIPart` first, matching the AI SDK `useChat` approval pattern:
+ * `state === 'approval-requested' && !approval.isAutomatic`.
+ *
+ * @see https://ai-sdk.dev/docs/agents/tool-approvals
+ */
+export function getManualApprovalId(part: UIPart): string | undefined {
+  if (!isToolUIPart(part) || part.state !== 'approval-requested') return undefined
+  if ('isAutomatic' in part.approval && part.approval.isAutomatic === true) return undefined
+  return part.approval.id
+}
+
+/** True when the part is waiting on a human Approve/Deny, not an automatic policy decision. */
+export function isManualApprovalRequested(part: UIPart): boolean {
+  return getManualApprovalId(part) !== undefined
+}
+
+/**
+ * Returns approval IDs to auto-deny when the model issues multiple approval-required
+ * tool calls in the same turn — all but the first, so the model reissues them sequentially.
+ */
+export function getParallelApprovalIdsToReject(messages: UIMessage[]): string[] {
+  const lastMessage = messages.findLast((m) => m.role === 'assistant')
+  if (!lastMessage) return []
+
+  const pendingIds: string[] = []
+  for (const part of lastMessage.parts ?? []) {
+    const id = getManualApprovalId(part)
+    if (id) pendingIds.push(id)
+  }
+  return pendingIds.slice(1)
 }

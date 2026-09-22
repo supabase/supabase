@@ -1,5 +1,5 @@
 import { Auth, Realtime, Storage } from 'icons'
-import { ActivityIcon, DatabaseIcon, HeartIcon, ServerIcon } from 'lucide-react'
+import { ActivityIcon, DatabaseIcon, HeartPulseIcon, ServerIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 
 export type Metric = {
@@ -16,40 +16,52 @@ type MetricCategory = {
   key: string
 }
 
+export const InstanceHealthIcon = ({
+  className,
+  size = 16,
+}: {
+  className?: string
+  size?: number
+}) => <HeartPulseIcon size={size} strokeWidth={1.5} className={className} />
+
 export const METRIC_CATEGORIES = {
   API: {
     label: 'All API usage',
-    icon: (className?: string) => <ActivityIcon size={16} className={className} />,
+    icon: (className?: string) => (
+      <ActivityIcon size={16} strokeWidth={1.5} className={className} />
+    ),
     key: 'api',
   },
   API_DATABASE: {
     label: 'Database API',
-    icon: (className?: string) => <DatabaseIcon size={16} className={className} />,
+    icon: (className?: string) => (
+      <DatabaseIcon size={16} strokeWidth={1.5} className={className} />
+    ),
     key: 'api_database',
   },
   API_AUTH: {
     label: 'Authentication',
-    icon: (className?: string) => <Auth size={16} className={className} />,
+    icon: (className?: string) => <Auth size={16} strokeWidth={1.5} className={className} />,
     key: 'api_auth',
   },
   API_STORAGE: {
     label: 'Storage',
-    icon: (className?: string) => <Storage size={16} className={className} />,
+    icon: (className?: string) => <Storage size={16} strokeWidth={1.5} className={className} />,
     key: 'api_storage',
   },
   API_REALTIME: {
     label: 'Realtime',
-    icon: (className?: string) => <Realtime size={16} className={className} />,
+    icon: (className?: string) => <Realtime size={16} strokeWidth={1.5} className={className} />,
     key: 'api_realtime',
   },
   INSTANCE: {
     label: 'Instance health',
-    icon: (className?: string) => <HeartIcon size={16} className={className} />,
+    icon: (className?: string) => <InstanceHealthIcon className={className} />,
     key: 'instance',
   },
   SUPAVISOR: {
     label: 'Supavisor',
-    icon: (className?: string) => <ServerIcon size={16} className={className} />,
+    icon: (className?: string) => <ServerIcon size={16} strokeWidth={1.5} className={className} />,
     key: 'supavisor',
   },
 }

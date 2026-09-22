@@ -1,10 +1,16 @@
+import dynamic from 'next/dynamic'
 import type { PropsWithChildren } from 'react'
 
 import { MarketplaceDetailRail } from './MarketplaceDetailRail'
 import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
-import { FilesViewer } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/FilesViewer'
 import { MarkdownContent } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/MarkdownContent'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+
+const FilesViewer = dynamic(() =>
+  import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/FilesViewer').then(
+    (mod) => mod.FilesViewer
+  )
+)
 
 interface OverviewTabProps extends PropsWithChildren {
   integration: IntegrationDefinition

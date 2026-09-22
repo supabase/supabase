@@ -1,15 +1,7 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { MessageSquareMore } from 'lucide-react'
 import { useRouter } from 'next/router'
-import {
-  cn,
-  Tabs_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { cn, Tabs, TabsList, TabsTrigger, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LINT_TABS, LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
@@ -61,7 +53,7 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
   }
 
   return (
-    <Tabs_Shadcn_
+    <Tabs
       value={currentTab}
       onValueChange={(value) => {
         setCurrentTab(value as LINTER_LEVELS)
@@ -69,7 +61,7 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
         router.push({ ...router, query: { ...rest, preset: value, id: null } })
       }}
     >
-      <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10 relative')}>
+      <TabsList className={cn('flex gap-0 border-0 items-end z-10 relative')}>
         {LINT_TABS.map((tab) => (
           <ShortcutTooltip
             key={tab.id}
@@ -78,7 +70,7 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
             side="top"
             align="start"
           >
-            <TabsTrigger_Shadcn_
+            <TabsTrigger
               value={tab.id}
               className={cn(
                 'group relative',
@@ -116,11 +108,11 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
                 </Tooltip>
               </div>
               <LintCountLabel tab={tab} />
-            </TabsTrigger_Shadcn_>
+            </TabsTrigger>
           </ShortcutTooltip>
         ))}
-      </TabsList_Shadcn_>
-    </Tabs_Shadcn_>
+      </TabsList>
+    </Tabs>
   )
 }
 

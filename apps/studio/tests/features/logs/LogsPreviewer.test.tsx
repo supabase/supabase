@@ -6,10 +6,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { LOGS_API_MOCKS } from './logs.mocks'
 import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
-import {
-  calculateBarClickTimeRange,
-  LogsPreviewer,
-} from '@/components/interfaces/Settings/Logs/LogsPreviewer'
+import { calculateBarClickTimeRange } from '@/components/interfaces/Settings/Logs/LogsBarChart.utils'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 import useLogsPreview from '@/hooks/analytics/useLogsPreview'
 import { customRender, customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -138,6 +136,20 @@ test('can click load older', async () => {
   await userEvent.click(loadOlder)
 
   expect(handleClick).toHaveBeenCalled()
+})
+
+test('loads its/ite from the URL into the date picker and opens without crashing', async () => {
+  const its = dayjs('2024-01-15T12:00:00.000Z')
+  const ite = dayjs('2024-01-15T12:02:00.000Z')
+
+  customRender(
+    <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />,
+    { nuqs: { searchParams: { its: its.toISOString(), ite: ite.toISOString() } } }
+  )
+
+  const label = `${its.format('DD MMM, HH:mm')} - ${ite.format('DD MMM, HH:mm')}`
+  await userEvent.click(await screen.findByText(label))
+  expect(await screen.findByText('Apply')).toBeInTheDocument()
 })
 
 describe('calculateBarClickTimeRange', () => {

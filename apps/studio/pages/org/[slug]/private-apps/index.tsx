@@ -67,7 +67,7 @@ function PrivateAppsContent() {
                   tooltipOpen={showCreate ? false : undefined}
                 >
                   <Button
-                    type="primary"
+                    variant="primary"
                     icon={<Plus size={14} />}
                     onClick={() => setShowCreate(true)}
                   >

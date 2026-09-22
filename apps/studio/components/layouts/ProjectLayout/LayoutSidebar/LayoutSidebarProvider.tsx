@@ -5,7 +5,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useEffectEvent, type PropsWithChildren } from 'react'
 
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -57,7 +57,6 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     router.query.ref as string | undefined
   )
 
-  const sidebarURLParamRef = useLatest(sidebarURLParam)
   const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
   useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, !!project)
@@ -102,18 +101,16 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSidebar])
 
-  // Handle toggling of sidebars on page init
   // Prioritize URL params first, then local storage
   useEffect(() => {
     if (router.isReady && isLoadedLocalStorage) {
       if (
-        typeof sidebarURLParamRef.current === 'string' &&
+        typeof sidebarURLParam === 'string' &&
         Object.values(SIDEBAR_KEYS).includes(
-          sidebarURLParamRef.current as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
+          sidebarURLParam as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
         )
       ) {
-        console.log('Open sidebar based on URL')
-        openSidebar(sidebarURLParamRef.current)
+        openSidebar(sidebarURLParam)
       } else if (
         !!sidebarLocalStorageRef.current &&
         Object.values(SIDEBAR_KEYS).includes(
@@ -124,7 +121,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, isLoadedLocalStorage])
+  }, [router.isReady, isLoadedLocalStorage, sidebarURLParam])
 
   return <>{children}</>
 }

@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState, type PropsWithChildren } from 'react'
-import { AnchorProvider } from 'ui-patterns'
+import { AnchorProvider } from 'ui-patterns/Toc'
+
 import { TocAnchorsContext, useSubscribeTocRerender } from './GuidesMdx.state'
 
 interface TOCHeader {

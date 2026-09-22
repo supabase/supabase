@@ -1,4 +1,3 @@
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { Auth, Realtime, Storage } from 'icons'
 import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
@@ -13,6 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select,
   SelectContent,
   SelectGroup,
@@ -236,7 +238,6 @@ const ReportFilterBar = ({
             side="bottom"
           >
             <Button
-              type="default"
               disabled={isLoading}
               icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
               className="w-7"
@@ -263,7 +264,6 @@ const ReportFilterBar = ({
             >
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="default"
                   className="inline-flex flex-row gap-2"
                   iconRight={<ChevronDown size={14} />}
                 >
@@ -325,7 +325,7 @@ const ReportFilterBar = ({
             <span className="text-foreground-lighter">{filter.compare}</span>
             <span className="">{filter.value}</span>
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className="p-0! space-x-0!"
               onClick={() => onRemoveFilters([filter])}
@@ -342,11 +342,7 @@ const ReportFilterBar = ({
             open={showAdder ? false : undefined}
           >
             <PopoverTrigger asChild>
-              <Button
-                type="default"
-                size="tiny"
-                icon={<Plus className={`text-foreground-light `} />}
-              >
+              <Button size="tiny" icon={<Plus className={`text-foreground-light `} />}>
                 Add filter
               </Button>
             </PopoverTrigger>
@@ -433,7 +429,7 @@ const ReportFilterBar = ({
 
             <div className="flex items-center justify-end gap-2 border-t border-default p-2">
               <Button
-                type="primary"
+                variant="primary"
                 size="tiny"
                 onClick={() => {
                   onAddFilter(addFilterValues)

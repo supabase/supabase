@@ -5,7 +5,6 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Badge,
   FormControl,
   FormField,
   FormInputGroupInput,
@@ -20,7 +19,19 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { TableOptions } from './BigQuery/TableOptions'
+import {
+  DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+  DEFAULT_MAX_FILL_MS,
+  DEFAULT_MAX_TABLE_SYNC_WORKERS,
+} from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
+
+const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
+  error: 'Block startup',
+  recreate: 'Recreate slot',
+}
 
 export const AdvancedSettings = ({
   type,
@@ -30,25 +41,24 @@ export const AdvancedSettings = ({
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
   const handleNumberChange =
-    (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value
-      field.onChange(val === '' ? undefined : Number(val))
+    (field: { onChange: (value: number | '') => void }) => (e: ChangeEvent<HTMLInputElement>) => {
+      const parsed = e.target.valueAsNumber
+      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? '' : parsed)
     }
 
   return (
-    <div className="px-5">
+    <div className="w-full">
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
+          <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional performance tuning
+                Optional settings to control the pipeline in more depth
               </span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
-            {/* Batch wait time - applies to all destinations */}
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
             <FormField
               control={form.control}
               name="maxFillMs"
@@ -56,27 +66,18 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description={
-                    <>
-                      <p>
-                        Maximum time pipeline waits to collect additional changes before flushing a
-                        batch.
-                      </p>
-                      <p>
-                        Lower values reduce replication latency, higher values improve batching
-                        efficiency.
-                      </p>
-                    </>
-                  }
+                  description="How long the pipeline waits before sending a partially filled batch."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={0}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 10000"
+                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>
@@ -94,23 +95,18 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Table sync workers"
                   layout="horizontal"
-                  description={
-                    <>
-                      <p>Number of tables copied in parallel during the initial snapshot phase.</p>
-                      <p>
-                        Each worker uses one replication slot (up to N + 1 total while syncing).
-                      </p>
-                    </>
-                  }
+                  description="Maximum number of tables synced at the same time."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={1}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 4"
+                        placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>workers</InputGroupText>
@@ -126,28 +122,20 @@ export const AdvancedSettings = ({
               name="maxCopyConnectionsPerTable"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Copy connections per table"
+                  label="Initial sync connections per table"
                   layout="horizontal"
-                  description={
-                    <>
-                      <p>
-                        Number of parallel connections each table copy can use during initial sync.
-                      </p>
-                      <p>
-                        More connections speed up large table copies, but use more database
-                        connections.
-                      </p>
-                    </>
-                  }
+                  description="Maximum number of source connections used to sync existing rows for each table."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={1}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 2"
+                        placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>connections</InputGroupText>
@@ -165,22 +153,24 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Invalidated slot behavior"
                   layout="horizontal"
-                  description="Behavior when the replication slot is invalidated"
+                  description="What the pipeline does when its replication slot becomes invalid."
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
-                      <SelectTrigger className="capitalize">{field.value ?? 'error'}</SelectTrigger>
-                      <SelectContent>
+                      <SelectTrigger>
+                        {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
+                      </SelectTrigger>
+                      <SelectContent side="bottom" collisionPadding={16}>
                         <SelectItem value="error" className="[&>span]:top-2.5">
-                          <p>Error</p>
+                          <p>Block startup</p>
                           <p className="text-foreground-lighter">
-                            Blocks startup for manual recovery
+                            Blocks startup for manual recovery.
                           </p>
                         </SelectItem>
                         <SelectItem value="recreate" className="[&>span]:top-2.5">
-                          <p>Recreate</p>
+                          <p>Recreate slot</p>
                           <p className="text-foreground-lighter">
-                            Rebuilds the slot and restarts replication from scratch
+                            Replaces destination tables and runs a new, billable initial sync.
                           </p>
                         </SelectItem>
                       </SelectContent>
@@ -197,30 +187,20 @@ export const AdvancedSettings = ({
                   name="connectionPoolSize"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={
-                        <div className="flex flex-col gap-y-2">
-                          <span>Connection pool size</span>
-                          <Badge className="w-min">BigQuery only</Badge>
-                        </div>
-                      }
+                      label="Connection pool size"
                       layout="horizontal"
-                      description={
-                        <>
-                          <p>Size of the BigQuery Storage Write API connection pool.</p>
-                          <p>
-                            More connections allow more parallel writes, but consume more resources.
-                          </p>
-                        </>
-                      }
+                      description="Number of BigQuery connections used for destination writes."
                     >
                       <FormControl>
                         <InputGroup>
                           <FormInputGroupInput
                             {...field}
                             type="number"
+                            min={1}
+                            step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: 4"
+                            placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>connections</InputGroupText>
@@ -236,34 +216,19 @@ export const AdvancedSettings = ({
                   name="maxStalenessMins"
                   render={({ field }) => (
                     <FormItemLayout
-                      label={
-                        <div className="flex flex-col gap-y-2">
-                          <span>Maximum staleness</span>
-                          <Badge className="w-min">BigQuery only</Badge>
-                        </div>
-                      }
+                      label="Maximum staleness"
                       layout="horizontal"
-                      description={
-                        <>
-                          <p>
-                            Maximum allowed age for BigQuery cached metadata before reading base
-                            tables.
-                          </p>
-                          <p>
-                            Lower values improve freshness, higher values can reduce query cost and
-                            latency.
-                          </p>
-                        </>
-                      }
+                      description="Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results."
                     >
                       <FormControl>
                         <InputGroup>
                           <FormInputGroupInput
                             {...field}
                             type="number"
+                            min={0}
+                            step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: None (No staleness limit)"
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>minutes</InputGroupText>
@@ -273,6 +238,17 @@ export const AdvancedSettings = ({
                     </FormItemLayout>
                   )}
                 />
+
+                <div className="flex flex-col gap-y-3">
+                  <div className="flex flex-col gap-y-1">
+                    <span className="text-sm text-foreground">Table layout</span>
+                    <p className="text-sm text-foreground-lighter">
+                      Partitioning and clustering for each BigQuery table. Applied when a
+                      destination table is first created or reset.
+                    </p>
+                  </div>
+                  <TableOptions control={form.control} />
+                </div>
               </>
             )}
           </AccordionContent>

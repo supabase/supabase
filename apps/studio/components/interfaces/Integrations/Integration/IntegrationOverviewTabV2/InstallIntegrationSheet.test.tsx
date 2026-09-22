@@ -15,6 +15,7 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: () => ({
     data: { ref: 'default', connectionString: 'postgres://localhost' },
   }),
+  useIsHighAvailability: () => false,
 }))
 
 vi.mock('@/hooks/useProtectedSchemas', () => ({

@@ -25,7 +25,7 @@ This demonstrates how to use:
 
 The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-vue&repo-name=supabase-ionic-vue&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&repository-url=https%3A%2F%2Fgithub.com%2Fmhartington%2Fsupabase-ionic-vue%2Ftree%2Fmain&env=VUE_APP_SUPABASE_URL%2CVUE_APP_SUPABASE_PUBLISHABLE_KEY)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-vue&repo-name=supabase-ionic-vue&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&repository-url=https%3A%2F%2Fgithub.com%2Fmhartington%2Fsupabase-ionic-vue%2Ftree%2Fmain&env=VUE_APP_SUPABASE_URL%2CVUE_APP_SUPABASE_KEY)
 
 ## Build from scratch
 
@@ -55,7 +55,7 @@ Update your environment file `environment.ts`
 export const environment = {
   // ...
   supabaseUrl: "YOUR_SUPABASE_URL",
-  supabasePublishableKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
+  supabaseKey: "YOUR_SUPABASE_KEY"
 };
 ```
 

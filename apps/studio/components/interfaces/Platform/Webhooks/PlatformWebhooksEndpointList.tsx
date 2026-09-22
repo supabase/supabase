@@ -17,8 +17,9 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
@@ -121,7 +122,7 @@ export const PlatformWebhooksEndpointList = ({
           label="New endpoint"
           onTrigger={onCreateEndpoint}
         >
-          <Button type="primary" icon={<Plus />} onClick={onCreateEndpoint}>
+          <Button variant="primary" icon={<Plus />} onClick={onCreateEndpoint}>
             New endpoint
           </Button>
         </Shortcut>
@@ -133,9 +134,7 @@ export const PlatformWebhooksEndpointList = ({
           title="No endpoints yet"
           description="Create an endpoint to start receiving webhook deliveries."
         >
-          <Button type="default" onClick={onCreateEndpoint}>
-            Create endpoint
-          </Button>
+          <Button onClick={onCreateEndpoint}>Create endpoint</Button>
         </EmptyStatePresentational>
       ) : (
         <Card className="overflow-hidden">
@@ -169,7 +168,7 @@ export const PlatformWebhooksEndpointList = ({
                 return (
                   <TableRow
                     key={endpoint.id}
-                    className="relative cursor-pointer inset-focus"
+                    className="relative cursor-pointer focus-inset"
                     onClick={createNavigationHandler(
                       `${webhooksHref}/${encodeURIComponent(endpoint.id)}`,
                       router
@@ -214,11 +213,7 @@ export const PlatformWebhooksEndpointList = ({
                       >
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              type="default"
-                              icon={<MoreVertical />}
-                              className="w-7 hit-area-2"
-                            />
+                            <Button icon={<MoreVertical />} className="w-7 hit-area-2" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="end" className="w-40">
                             <DropdownMenuItem

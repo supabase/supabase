@@ -3,7 +3,7 @@ import type { ColumnTypeRef } from '@supabase/pg-meta/src/pg-meta-columns'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateColumnBody = {

@@ -142,7 +142,7 @@ as $$
       (
         user_id,
         factor_id,
-        last_refreshed_at
+        last_failed_at
       )
       values
       (
@@ -151,7 +151,7 @@ as $$
         now()
       )
       on conflict do update
-        set last_refreshed_at = now();
+        set last_failed_at = now();
 
     -- finally let Supabase Auth do the default behavior for a failed attempt
     return jsonb_build_object('decision', 'continue');

@@ -4,13 +4,15 @@ title: 'pgsodium (pending deprecation): Encryption Features'
 description: 'Encryption library for Postgres'
 ---
 
-Supabase DOES NOT RECOMMEND any new usage of [`pgsodium`](https://github.com/michelp/pgsodium).
+Supabase **does not recommend** the usage of [pgsodium](https://github.com/michelp/pgsodium) as it will be deprecated. Use [Supabase Vault](/docs/guides/database/vault) instead.
 
-The [`pgsodium`](https://github.com/michelp/pgsodium) extension is expected to go through a deprecation cycle in the near future. We will reach out to owners of impacted projects to assist with migrations away from [`pgsodium`](https://github.com/michelp/pgsodium) once the deprecation process begins.
+We will reach out to owners of impacted projects to assist with migrations away from [pgsodium](https://github.com/michelp/pgsodium) once the deprecation process begins.
+
+Vault and `pgsodium` are **separate** extensions. Vault doesn't depend on `pgsodium` and **is not** affected by this deprecation.
 
 <Admonition type="note">
 
-The [Vault extension](/docs/guides/database/vault) won’t be impacted. Its internal implementation will shift away from pgsodium, but the interface and API will remain unchanged.
+Vault is self-contained and doesn't depend on `pgsodium`. It shares the same per-project [root key](/docs/guides/database/vault#encryption-key-location) (same format and location) but exposes its own interface - the `vault.secrets` table and `decrypted_secrets` view - so switching to Vault does not change how your key is managed.
 
 </Admonition>
 
@@ -22,14 +24,11 @@ Note that Supabase projects are encrypted at rest by default which likely is suf
 
 ## Get the root encryption key for your Supabase project
 
-Encryption requires keys. Keeping the keys in the same database as the encrypted data would be unsafe. For more information about managing the `pgsodium` root encryption key on your Supabase project see **[encryption key location](/docs/guides/database/vault#encryption-key-location)**. This key is required to decrypt values stored in [Supabase Vault](/docs/guides/database/vault) and data encrypted with Transparent Column Encryption.
+Encryption requires keys. Keeping the keys in the same database as the encrypted data would be unsafe. Supabase Vault and `pgsodium` share the same per-project root encryption key; for more information about managing it see **[encryption key location](/docs/guides/database/vault#encryption-key-location)**. This key is required to decrypt values stored in [Supabase Vault](/docs/guides/database/vault) and data encrypted with Transparent Column Encryption.
 
 ## Resources
 
 - [Supabase Vault](/docs/guides/database/vault)
 - Read more about Supabase Vault in the [blog post](/blog/vault-now-in-beta)
 - [Supabase Vault on GitHub](https://github.com/supabase/vault)
-
-## Resources
-
 - Official [`pgsodium` documentation](https://github.com/michelp/pgsodium)

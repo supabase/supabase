@@ -14,6 +14,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -21,10 +24,11 @@ import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringL
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { CreateIndexSidePanel } from './CreateIndexSidePanel'
-import AlertError from '@/components/ui/AlertError'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { AlertError } from '@/components/ui/AlertError'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabaseIndexDeleteMutation } from '@/data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/indexes-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
@@ -195,7 +199,7 @@ export const Indexes = () => {
               >
                 <Button
                   className="ml-auto grow lg:grow-0"
-                  type="primary"
+                  variant="primary"
                   onClick={() => setShowCreateIndex(true)}
                   disabled={!isSuccessSchemas}
                 >
@@ -237,14 +241,7 @@ export const Indexes = () => {
                       </TableRow>
                     )}
                     {indexes.length === 0 && search.length > 0 && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-light">
-                            Your search for "{search}" did not return any results
-                          </p>
-                        </TableCell>
-                      </TableRow>
+                      <TableRowNoResults colSpan={4} search={search} />
                     )}
                     {indexes.length > 0 &&
                       indexes.map((index) => (
@@ -260,17 +257,22 @@ export const Indexes = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center space-x-2">
-                              <Button type="default" onClick={() => setEditIndexId(index.name)}>
+                              <Button onClick={() => setEditIndexId(index.name)}>
                                 View definition
                               </Button>
                               {!isSchemaLocked && (
-                                <Button
-                                  aria-label="Delete index"
-                                  type="text"
-                                  className="px-1"
-                                  icon={<Trash />}
-                                  onClick={() => setDeleteIndexId(index.name)}
-                                />
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      aria-label="Delete index"
+                                      variant="text"
+                                      className="px-1"
+                                      icon={<Trash />}
+                                      onClick={() => setDeleteIndexId(index.name)}
+                                    />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">Delete index</TooltipContent>
+                                </Tooltip>
                               )}
                             </div>
                           </TableCell>

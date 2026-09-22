@@ -22,13 +22,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
@@ -58,11 +58,11 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
     <Sheet open={open} onOpenChange={setOpen}>
       {/* Move into overflow menu after vectors added */}
       <SheetTrigger asChild>
-        <Button type="default" icon={<ListPlus size={12} className="text-foreground-lighter" />}>
+        <Button icon={<ListPlus size={12} className="text-foreground-lighter" />}>
           Insert vectors
         </Button>
       </SheetTrigger>
-      <SheetContent tabIndex={undefined}>
+      <SheetContent>
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
             <SheetTitle>
@@ -143,8 +143,8 @@ function VectorBucketIndexExamples({
     PermissionAction.READ,
     'service_api_keys'
   )
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
-  const { secretKey } = canReadAPIKeys ? getKeys(apiKeys) : { secretKey: null }
+  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { secretKey } = apiKeysData ?? {}
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
   const foreignTable = wrapperInstance?.tables?.find((x) => x.name === indexName)
@@ -177,7 +177,7 @@ values
 
   const jsCode = `import { createClient } from '@supabase/supabase-js'
 
-// Adding vector data requires a secret or service role key 
+// Adding vector data requires a secret or service role key
 // This code SHOULD NOT be run on the client side as you will be vulnerable to a data leak
 const client = createClient(
   process.env.SUPABASE_URL,
@@ -219,7 +219,6 @@ const result = await index.putVectors({
                   Language
                 </span>
                 <Button
-                  type="default"
                   iconRight={<ChevronDown size={14} strokeWidth={2} />}
                   className="rounded-l-none"
                 >
@@ -268,11 +267,7 @@ const result = await index.putVectors({
             type="default"
             title="Insert data via SQL with a Foreign Data Wrapper"
             description="Data from vector tables can be queried and inserted from Postgres with the S3 Vectors Wrapper as foreign tables."
-            actions={
-              <Button type="default" onClick={onSelectQueryFromPostgres}>
-                Query from Postgres
-              </Button>
-            }
+            actions={<Button onClick={onSelectQueryFromPostgres}>Query from Postgres</Button>}
           />
         ) : (
           <>
@@ -284,11 +279,7 @@ const result = await index.putVectors({
               value={sqlCode}
             />
             <div className="flex justify-end">
-              <Button
-                type="default"
-                asChild
-                icon={<SqlEditor size={12} className="text-foreground-lighter" />}
-              >
+              <Button asChild icon={<SqlEditor size={12} className="text-foreground-lighter" />}>
                 <Link
                   target="_blank"
                   rel="noreferrer"

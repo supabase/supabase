@@ -2,7 +2,7 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Loader2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Button, SidePanel } from 'ui'
+import { Button, SidePanel, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { convertByteaToHex } from '../RowEditor.utils'
@@ -123,12 +123,13 @@ export const ForeignRowSelector = ({
 
   // Load sorts from local storage
   useEffect(() => {
-    if (!project?.ref || !table?.name || !table?.schema) return
+    if (!project?.ref || !table) return
 
     try {
       const savedState = loadTableEditorStateFromLocalStorage(project.ref, table.id)
       const urlSorts = savedState?.sorts ?? []
-      const parsedSorts = formatSortURLParams(table.name, urlSorts)
+      const parsedSorts = formatSortURLParams(table, urlSorts)
+
       if (parsedSorts.length > 0) {
         setFiltersAndSorts((prev) => ({ ...prev, sort: parsedSorts }))
       }
@@ -137,7 +138,7 @@ export const ForeignRowSelector = ({
     } finally {
       setShouldSaveSorts(true)
     }
-  }, [project?.ref, table?.schema, table?.name, table?.id])
+  }, [project?.ref, table])
 
   // Persist sorts to local storage
   useEffect(() => {
@@ -174,7 +175,18 @@ export const ForeignRowSelector = ({
                 <p className="text-xs text-foreground-light">Saving</p>
               </div>
             )}
-            <Button type="text" icon={<X />} className="w-7" onClick={closePanel} />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="text"
+                  icon={<X />}
+                  className="w-7"
+                  onClick={closePanel}
+                  aria-label="Close panel"
+                />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Close panel</TooltipContent>
+            </Tooltip>
           </div>
         </div>
       }
@@ -226,7 +238,6 @@ export const ForeignRowSelector = ({
                     {isNullable && (
                       <div className="pl-3">
                         <Button
-                          type="default"
                           onClick={() => {
                             if (columns?.length === 1) onSelect({ [columns[0].source]: null })
                           }}

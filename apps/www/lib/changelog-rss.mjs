@@ -1,6 +1,6 @@
 /**
  * Pure ESM changelog RSS document builder (used by generateStaticContent.mjs and re-exported from rss.tsx).
- * @typedef {{ number?: number; slug?: string; title: string; url: string; sortDate: string; labels?: string[] }} ChangelogRssItemInput
+ * @typedef {{ slug: string; title: string; sortDate: string; affectedProducts?: string[] }} ChangelogRssItemInput
  */
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
@@ -25,11 +25,7 @@ function buildItemsXml(sorted) {
   return sorted
     .map((e) => {
       const encodedTitle = xmlEncodeRss(e.title)
-      const canonicalUrl = e.slug
-        ? `https://supabase.com/changelog/${e.slug}`
-        : e.number
-          ? `https://supabase.com/changelog/${e.number}`
-          : e.url
+      const canonicalUrl = `https://supabase.com/changelog/${e.slug}`
       const encodedCanonical = xmlEncodeRss(canonicalUrl)
       const pubDate = formatRssPubDate(e.sortDate)
       return `      <item>
@@ -43,24 +39,8 @@ function buildItemsXml(sorted) {
 }
 
 /**
- * Generates the URL slug for a changelog entry: `<number>-<slugified-title>`.
- * Mirrors changelogEntrySlug in apps/www/lib/changelog.utils.ts.
- * @param {number} number
- * @param {string} title
- */
-export function changelogEntrySlug(number, title) {
-  const titlePart = String(title ?? '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80)
-    .replace(/-+$/, '')
-  return `${number}-${titlePart}`
-}
-
-/**
  * Converts a display label into a lowercase, URL-safe filename slug.
- * e.g. "Edge Functions" → "edge-functions", "AI & Vector" → "ai-vector"
+ * e.g. "Edge Functions" → "edge-functions", "Data APIs" → "data-apis"
  * @param {string} label
  */
 export function labelToFileSlug(label) {
@@ -72,8 +52,7 @@ export function labelToFileSlug(label) {
 
 /** @param {ChangelogRssItemInput[]} entries */
 export function generateChangelogRssXml(entries) {
-  const visible = entries.filter((e) => !e.title.includes('[d]'))
-  const sorted = [...visible].sort(
+  const sorted = [...entries].sort(
     (a, b) => dayjs(b.sortDate).valueOf() - dayjs(a.sortDate).valueOf()
   )
 
@@ -98,16 +77,17 @@ ${buildItemsXml(sorted)}
 
 /**
  * Generates a tag-filtered RSS feed.
- * @param {ChangelogRssItemInput[]} allEntries - all entries with labels as lowercase strings
- * @param {{ githubLabelSlug: string; displayLabel: string }} tag
+ * @param {ChangelogRssItemInput[]} allEntries - all entries, with `affected_products` display strings
+ * @param {{ displayLabel: string }} tag
  */
 export function generateChangelogTagRssXml(allEntries, tag) {
-  const { githubLabelSlug, displayLabel } = tag
+  const { displayLabel } = tag
   const fileSlug = labelToFileSlug(displayLabel)
 
-  const filtered = allEntries.filter(
-    (e) =>
-      !e.title.includes('[d]') && (e.labels ?? []).includes(githubLabelSlug.toLowerCase())
+  const filtered = allEntries.filter((e) =>
+    (e.affectedProducts ?? []).some(
+      (product) => product.toLowerCase() === displayLabel.toLowerCase()
+    )
   )
   const sorted = [...filtered].sort(
     (a, b) => dayjs(b.sortDate).valueOf() - dayjs(a.sortDate).valueOf()

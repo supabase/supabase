@@ -15,7 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { ProjectSecret } from '@/data/secrets/secrets-query'
@@ -68,17 +68,12 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
         <div className="flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                aria-label="More options"
-                type="default"
-                className="px-1"
-                icon={<MoreVertical />}
-              />
+              <Button aria-label="More options" className="px-1" icon={<MoreVertical />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem asChild>
                 <ButtonTooltip
-                  type="text"
+                  variant="text"
                   icon={<Edit2 size={14} />}
                   className="w-full justify-start group text-inherit"
                   disabled={!canUpdateSecrets}
@@ -100,7 +95,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
 
               <DropdownMenuItem asChild>
                 <ButtonTooltip
-                  type="text"
+                  variant="text"
                   icon={<Trash size={14} className="group-not-disabled:text-destructive" />}
                   className="w-full justify-start group text-inherit"
                   disabled={!canUpdateSecrets}

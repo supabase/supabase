@@ -15,6 +15,7 @@ interface NoDataPlaceholderProps {
   isFullHeight?: boolean
   titleTooltip?: string
   hideTotalPlaceholder?: boolean
+  docsUrl?: string
 }
 const NoDataPlaceholder = ({
   attribute,
@@ -26,6 +27,7 @@ const NoDataPlaceholder = ({
   isFullHeight = false,
   titleTooltip,
   hideTotalPlaceholder = false,
+  docsUrl,
 }: NoDataPlaceholderProps) => {
   const { minHeight } = useChartSize(size)
 
@@ -37,6 +39,7 @@ const NoDataPlaceholder = ({
           format={format}
           highlightedValue={hideTotalPlaceholder ? undefined : 0}
           titleTooltip={titleTooltip}
+          docsUrl={docsUrl}
         />
       )}
       <div
