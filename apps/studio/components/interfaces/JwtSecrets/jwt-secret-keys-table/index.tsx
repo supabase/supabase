@@ -283,7 +283,7 @@ export const JWTSecretKeysTable = () => {
               <h2>Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
                 These JWT signing keys are still used to{' '}
-                <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
+                <em className="text-primary not-italic">verify tokens</em> that are yet to expire.
                 Revoke once all tokens have expired.
               </p>
             </div>

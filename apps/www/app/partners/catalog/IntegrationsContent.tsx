@@ -193,7 +193,7 @@ export default function IntegrationsContent({
     <DefaultLayout>
       <SectionContainer>
         <div className="flex flex-col gap-3 mb-8">
-          <span className="text-brand font-mono uppercase tracking-widest text-sm">
+          <span className="text-primary font-mono uppercase tracking-widest text-sm">
             Partner Catalog
           </span>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">

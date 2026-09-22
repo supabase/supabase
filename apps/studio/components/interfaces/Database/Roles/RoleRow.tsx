@@ -140,8 +140,8 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               {role.activeConnections > 0 && (
                 <div className="relative h-2 w-2">
                   <span className="flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand opacity-75"></span>
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-default opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-default opacity-75"></span>
                   </span>
                 </div>
               )}

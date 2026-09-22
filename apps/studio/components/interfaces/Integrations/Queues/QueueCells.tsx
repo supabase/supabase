@@ -49,7 +49,7 @@ export const QueueRLSCell = ({ queue }: QueueCellProps) => {
 
   return (
     <div className="flex items-center">
-      {isRlsEnabled ? <Check size={14} className="text-brand" /> : <X size={14} />}
+      {isRlsEnabled ? <Check size={14} className="text-primary" /> : <X size={14} />}
     </div>
   )
 }

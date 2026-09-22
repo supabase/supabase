@@ -89,7 +89,7 @@ export function RegisterContent() {
                 <h1 className="text-6xl md:text-8xl font-light text-foreground leading-[0.92] tracking-tight">
                   The State <br /> of Startups
                   <br />
-                  <span className="text-brand-600 dark:text-brand font-medium">2026</span>
+                  <span className="text-brand-600 dark:text-primary font-medium">2026</span>
                 </h1>
               </div>
 
@@ -192,13 +192,13 @@ function PreviousResultsCta() {
       className="group grid gap-8 transition-colors md:grid-cols-[auto_1fr_auto] md:items-end md:gap-12"
     >
       <div className="flex w-fit flex-col gap-2" aria-hidden="true">
-        <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand md:text-[2.25rem] md:leading-10">
+        <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-primary md:text-[2.25rem] md:leading-10">
           State
         </div>
-        <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand md:text-[2.25rem] md:leading-10">
+        <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-primary md:text-[2.25rem] md:leading-10">
           of
         </div>
-        <div className="w-fit bg-brand px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-background dark:text-brand-200 md:text-[2.25rem] md:leading-10">
+        <div className="w-fit bg-brand-default px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-background dark:text-brand-200 md:text-[2.25rem] md:leading-10">
           Startups
         </div>
         <div className="w-fit bg-brand-500 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand-300 md:text-[2.25rem] md:leading-10">
