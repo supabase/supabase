@@ -3,6 +3,7 @@ import { AiIconAnimation } from 'ui'
 
 import { type LogData } from '../Settings/Logs/Logs.types'
 import { buildLogsPrompt, formatLogsAsJson } from '../Settings/Logs/Logs.utils'
+import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { getRawLogData } from './UnifiedLogs.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -22,11 +23,12 @@ export const LogSelectionActions = ({ rows }: { rows: ColumnSchema[] }) => {
   const copyButtonRef = useRef<HTMLButtonElement>(null)
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
-  const selectedRows = rows.map((row) => ({
-    ...getRawLogData(row),
-    event_message: row.event_message ?? '',
-    metadata: logsMetadata ? row.metadata : undefined,
-  })) as LogData[]
+  const selectedRows = rows.map((row) =>
+    getLogDataForMetadataVisibility(
+      { ...getRawLogData(row), event_message: row.event_message ?? '' },
+      logsMetadata
+    )
+  ) as LogData[]
 
   const handleOpenAiAssistant = () => {
     const prompt = buildLogsPrompt(selectedRows)
