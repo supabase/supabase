@@ -10,6 +10,10 @@ vi.mock('@/data/projects/project-detail-query', () => ({
   getProjectDetail: vi.fn(),
 }))
 
+vi.mock('@/data/config/project-settings-v2-query', () => ({
+  getProjectSettings: vi.fn(),
+}))
+
 vi.mock('@/hooks/misc/useOrgOptedIntoAi', () => ({
   getAiOptInLevel: vi.fn(),
 }))
@@ -26,17 +30,20 @@ const PROJECT_REF = 'test-project'
 describe('getAIDetails', () => {
   let mockGetOrganizations: ReturnType<typeof vi.fn>
   let mockGetProjectDetail: ReturnType<typeof vi.fn>
+  let mockGetProjectSettings: ReturnType<typeof vi.fn>
   let mockGetAiOptInLevel: ReturnType<typeof vi.fn>
   let mockCheckEntitlement: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     const orgsQuery = await import('@/data/organizations/organizations-query')
     const projectQuery = await import('@/data/projects/project-detail-query')
+    const settingsQuery = await import('@/data/config/project-settings-v2-query')
     const aiHook = await import('@/hooks/misc/useOrgOptedIntoAi')
     const entitlementsQuery = await import('@/data/entitlements/entitlements-query')
 
     mockGetOrganizations = vi.mocked(orgsQuery.getOrganizations)
     mockGetProjectDetail = vi.mocked(projectQuery.getProjectDetail)
+    mockGetProjectSettings = vi.mocked(settingsQuery.getProjectSettings)
     mockGetAiOptInLevel = vi.mocked(aiHook.getAiOptInLevel)
     mockCheckEntitlement = vi.mocked(entitlementsQuery.checkEntitlement)
 
@@ -48,6 +55,7 @@ describe('getAIDetails', () => {
       region: 'us-east-1',
       organization_id: 1,
     })
+    mockGetProjectSettings.mockResolvedValue({ is_sensitive: false })
     mockCheckEntitlement.mockResolvedValue({ hasAccess: false })
     mockGetAiOptInLevel.mockReturnValue('schema')
   })
@@ -66,7 +74,20 @@ describe('getAIDetails', () => {
       orgSlug: ORG_SLUG,
       planId: 'pro',
       region: 'us-east-1',
+      isHighComplianceProject: false,
     })
+  })
+
+  it('flags a High Compliance project', async () => {
+    mockGetProjectSettings.mockResolvedValue({ is_sensitive: true })
+
+    const result = await getAIDetails({
+      orgSlug: ORG_SLUG,
+      projectRef: PROJECT_REF,
+      authorization: AUTH,
+    })
+
+    expect(result.isHighComplianceProject).toBe(true)
   })
 
   it('calls getAiOptInLevel with the matched org opt_in_tags', async () => {
@@ -125,6 +146,11 @@ describe('getAIDetails', () => {
     )
     expect(mockGetProjectDetail).toHaveBeenCalledWith(
       { ref: PROJECT_REF, skipWake: true },
+      undefined,
+      HEADERS
+    )
+    expect(mockGetProjectSettings).toHaveBeenCalledWith(
+      { projectRef: PROJECT_REF },
       undefined,
       HEADERS
     )

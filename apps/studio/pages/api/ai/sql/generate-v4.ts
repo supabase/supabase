@@ -122,6 +122,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
   let projectRegion: string | undefined
+  let isHighComplianceProject: boolean | undefined
   let orgId: number | undefined
   let orgSlug: string | undefined
   let planId: string | undefined
@@ -141,6 +142,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       orgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
       projectRegion = aiDetails.region
+      isHighComplianceProject = aiDetails.isHighComplianceProject
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -229,6 +231,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       orgId,
       orgSlug,
       planId,
+      isHighComplianceProject,
       includesLogsSnippets,
       isExplorerEnabled: explorerEnabled,
       requestedModel,
