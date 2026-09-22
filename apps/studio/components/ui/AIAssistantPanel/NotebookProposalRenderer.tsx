@@ -113,7 +113,7 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
   const canOpenNotebook = mode !== 'delete' && state === 'output-available'
   const footerAction =
     canOpenNotebook && parsedOutput.success && ref ? (
-      <Button asChild variant="default" size="tiny">
+      <Button asChild size="tiny">
         <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
           Open notebook
         </Link>
@@ -175,10 +175,10 @@ function UpdateNotebookTerminalSummary({
         : 'Skipped notebook update'
 
   return (
-    <div className="flex items-center justify-between gap-2 my-2 mx-4 px-3 py-1.5 text-sm border rounded-md bg-surface-75">
+    <div className="flex items-center justify-between gap-2 my-2 px-3 py-1.5 text-sm border rounded-md bg-surface-75">
       <span className="text-foreground-light truncate">{label}</span>
       {state === 'output-available' && parsedOutput.success && ref && (
-        <Button asChild variant="default" size="tiny">
+        <Button asChild size="tiny">
           <Link href={`/project/${ref}/explorer/notebook/${parsedOutput.data.id}`}>
             Open notebook
           </Link>
@@ -458,7 +458,7 @@ function UpdateNotebookProposal({
 
   if (isLoading) {
     return (
-      <div className="my-4 mx-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
+      <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
         <Loader2 className="w-4 h-4 animate-spin" />
         Loading notebook...
       </div>
@@ -572,7 +572,7 @@ function DeleteNotebookProposal({
 
   if (isLoading) {
     return (
-      <div className="my-4 mx-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
+      <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
         <Loader2 className="w-4 h-4 animate-spin" />
         Loading notebook...
       </div>

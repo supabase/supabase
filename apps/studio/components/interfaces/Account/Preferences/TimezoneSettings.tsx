@@ -1,11 +1,10 @@
-import { useFlag } from 'common'
-import { CheckIcon, ChevronsUpDown, Globe } from 'lucide-react'
+import { CheckIcon, Globe } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import {
-  Button,
   Card,
   CardContent,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -35,11 +34,10 @@ import { useTrack } from '@/lib/telemetry/track'
 const AUTO_OPTION_VALUE = '__auto__'
 
 export const TimezoneSettings = () => {
-  const timezonePickerEnabled = useFlag('timezonePicker')
-  const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
   const track = useTrack()
-  const [open, setOpen] = useState(false)
   const listboxId = useId()
+  const [open, setOpen] = useState(false)
+  const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
 
   // Browser timezone is captured once and stays stable even when the user has
   // overridden the dashboard timezone — that's the value the "Auto detect"
@@ -47,8 +45,6 @@ export const TimezoneSettings = () => {
   const browserTimezone = useMemo(() => guessLocalTimezone(), [])
 
   const triggerLabel = useMemo(() => findTimezoneByIana(timezone)?.text ?? timezone, [timezone])
-
-  if (!timezonePickerEnabled) return null
 
   const handleSelect = (nextStored: string) => {
     setTimezone(nextStored)
@@ -87,20 +83,19 @@ export const TimezoneSettings = () => {
             >
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                  <Button
-                    role="combobox"
+                  <ComboboxTrigger
                     aria-expanded={open}
                     aria-controls={listboxId}
-                    className="w-full justify-between"
-                    variant="default"
+                    data-state={open ? 'open' : 'closed'}
                     size="small"
-                    icon={<Globe />}
-                    iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} />}
                   >
-                    <span className="truncate text-left">
-                      {isAutoDetected ? `Auto detect (${timezone})` : triggerLabel}
+                    <span className="flex min-w-0 items-center gap-2">
+                      <Globe aria-hidden="true" className="h-4 w-4 shrink-0" />
+                      <span className="truncate">
+                        {isAutoDetected ? `Auto detect (${timezone})` : triggerLabel}
+                      </span>
                     </span>
-                  </Button>
+                  </ComboboxTrigger>
                 </PopoverTrigger>
                 <PopoverContent id={listboxId} className="w-[--radix-popover-trigger-width] p-0">
                   <Command>

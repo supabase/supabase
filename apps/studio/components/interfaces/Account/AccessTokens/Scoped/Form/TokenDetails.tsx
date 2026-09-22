@@ -72,25 +72,25 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
         name="expiresAt"
         control={control}
         render={({ field }) => (
-          <FormItemLayout id="expiresAt" label="Expires in" layout="flex-row-reverse">
+          <FormItemLayout label="Expires in" layout="flex-row-reverse">
             <div className="flex gap-2 w-full">
-              <FormControl className="grow">
-                <Select value={field.value} onValueChange={handleExpiryChange}>
-                  <SelectTrigger id="expiresAt">
+              <Select value={field.value} onValueChange={handleExpiryChange}>
+                <FormControl className="grow">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select an expiry" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {EXPIRY_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        <span className="flex items-center gap-2">
-                          {option.label}
-                          {option.recommended && <Badge variant="success">Recommended</Badge>}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
+                </FormControl>
+                <SelectContent>
+                  {EXPIRY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="flex items-center gap-2">
+                        {option.label}
+                        {option.recommended && <Badge variant="success">Recommended</Badge>}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               {field.value === 'custom' && (
                 <FormField

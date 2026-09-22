@@ -234,6 +234,7 @@ describe('createPrivacyMessageTool', () => {
 
     const result = await privacyTool.execute({}, {})
     expect(result.status).toContain("You don't have permission to use this tool")
+    expect(result.status).toContain('third-party AI providers')
   })
 })
 

@@ -34,18 +34,18 @@ vi.mock('@/hooks/misc/useDeploymentMode', () => ({
 
 const createStorageConfig = (vectorBucketsEnabled: boolean): ProjectStorageConfigData =>
   ({
-    capabilities: { iceberg_catalog: false, list_v2: false },
-    databasePoolMode: 'transaction',
+    capabilities: { iceberg_catalog: false, list_v2: false, object_versioning: false },
     external: { upstreamTarget: 'main' },
     features: {
       icebergCatalog: { enabled: false, maxCatalogs: 0, maxNamespaces: 0, maxTables: 0 },
       imageTransformation: { enabled: false },
       s3Protocol: { enabled: false },
+      purgeCache: { enabled: false },
       vectorBuckets: { enabled: vectorBucketsEnabled, maxBuckets: 0, maxIndexes: 0 },
     },
     fileSizeLimit: 0,
     migrationVersion: 'v1',
-  }) as ProjectStorageConfigData
+  }) as const
 
 const deploymentMode = (overrides: Partial<DeploymentMode>): DeploymentMode => ({
   isPlatform: false,

@@ -27,7 +27,7 @@ import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPa
 import { DetailSectionHeader } from './ServiceFlow/components/shared/DetailSection'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
-import { getRowTimestampMs } from './UnifiedLogs.utils'
+import { getRawLogData, getRowTimestampMs } from './UnifiedLogs.utils'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import {
   SERVICE_FLOW_TYPES,
@@ -42,6 +42,20 @@ interface ServiceFlowPanelProps {
   selectedRow?: ColumnSchema
   selectedRowKey: string
   searchParameters: QuerySearchParamsType
+}
+
+export function getLogDataForMetadataVisibility(data: unknown, metadataVisible: boolean) {
+  if (metadataVisible || typeof data !== 'object' || data === null) return data
+
+  const redactedData = { ...data, metadata: undefined }
+  const rawLogData = 'raw_log_data' in data ? data.raw_log_data : undefined
+
+  if (typeof rawLogData !== 'object' || rawLogData === null) return redactedData
+
+  return {
+    ...redactedData,
+    raw_log_data: { ...rawLogData, metadata: undefined },
+  }
 }
 
 export function ServiceFlowPanel({
@@ -105,14 +119,8 @@ export function ServiceFlowPanel({
   // Prepare JSON data for Raw JSON tab
   const jsonData =
     shouldShowServiceFlow && serviceFlowData?.result?.[0] ? serviceFlowData.result[0] : selectedRow
-
-  const formattedJsonData =
-    !logsMetadata && 'raw_log_data' in jsonData && 'metadata' in jsonData.raw_log_data
-      ? {
-          ...jsonData,
-          raw_log_data: { ...jsonData.raw_log_data, metadata: undefined },
-        }
-      : jsonData
+  const rawLogData = getRawLogData(jsonData)
+  const formattedJsonData = getLogDataForMetadataVisibility(rawLogData, logsMetadata)
 
   return (
     <>
@@ -240,7 +248,6 @@ export function ServiceFlowPanel({
               <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
                 <Button
                   size="tiny"
-                  variant="default"
                   className="pointer-events-auto px-1.5"
                   icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
                   onClick={() => {
@@ -256,7 +263,7 @@ export function ServiceFlowPanel({
                 language="json"
                 hideCopy
                 wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-                className="rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
+                className="rounded-none border-none !overflow-x-visible [&_code]:!leading-tight [&_pre]:!leading-tight"
               >
                 {JSON.stringify(formattedJsonData, null, 2)}
               </CodeBlock>

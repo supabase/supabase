@@ -299,7 +299,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                               isChecking ? (
                                 <Loader2 size={14} className="animate-spin" />
                               ) : isGitBranchValid ? (
-                                <Check size={14} className="text-brand" strokeWidth={2} />
+                                <Check size={14} className="text-primary" strokeWidth={2} />
                               ) : null
                             ) : null}
                           </div>
@@ -311,7 +311,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
             </DialogSection>
 
             <DialogFooter padding="medium">
-              <Button disabled={isUpdating} variant="default" onClick={onClose}>
+              <Button disabled={isUpdating} onClick={onClose}>
                 Cancel
               </Button>
               <Button

@@ -7,7 +7,7 @@ import type { components } from '@/data/api'
 import { customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-const NOTEBOOK_ROW: components['schemas']['GetUserContentResponse']['data'][number] = {
+const NOTEBOOK_ROW: components['schemas']['GetUserContentResponse_Output']['data'][number] = {
   id: 'd3aadd77-7c3c-4de7-aa5c-5aa8ac270b44',
   type: 'notebook',
   name: 'Signup funnel',
@@ -33,7 +33,7 @@ describe('useNotebooksInfiniteQuery', () => {
       method: 'get',
       path: '/platform/projects/:ref/content',
       response: () =>
-        HttpResponse.json<components['schemas']['GetUserContentResponse']>({
+        HttpResponse.json<components['schemas']['GetUserContentResponse_Output']>({
           cursor: undefined,
           data: [NOTEBOOK_ROW],
         }),

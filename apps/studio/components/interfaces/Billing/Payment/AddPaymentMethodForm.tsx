@@ -235,14 +235,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         </div>
       </DialogSection>
       <DialogFooter>
-        <Button
-          type="button"
-          size="small"
-          variant="default"
-          onClick={onCancel}
-          block
-          disabled={isSaving}
-        >
+        <Button type="button" size="small" onClick={onCancel} block disabled={isSaving}>
           Cancel
         </Button>
         <Button

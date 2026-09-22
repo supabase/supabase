@@ -7,7 +7,7 @@ import { ThemeToggle } from './ThemeToggle'
 // search, no user menu, no dashboard link — kb doesn't have any of that yet.
 function Header() {
   return (
-    <header className="backdrop-blur-sm backdrop-filter bg-default/75 border-b w-full px-5 lg:pl-10 items-center flex h-(--header-height) gap-3">
+    <header className="backdrop-blur-sm backdrop-filter bg-default/75 border-b border-default w-full px-5 lg:pl-10 items-center flex h-(--header-height) gap-3">
       <div className="flex basis-full h-full items-center justify-center gap-2">
         <Logo />
         <Nav />

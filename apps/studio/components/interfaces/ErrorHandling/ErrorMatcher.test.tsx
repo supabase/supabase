@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
 import { ConnectionTimeoutError } from '@/types/api-errors'
@@ -20,8 +20,6 @@ vi.mock('./RestartProjectDialog', () => ({
 }))
 
 describe('ErrorMatcher', () => {
-  beforeEach(() => vi.clearAllMocks())
-
   it('renders the provided title and error message', () => {
     render(
       <ErrorMatcher

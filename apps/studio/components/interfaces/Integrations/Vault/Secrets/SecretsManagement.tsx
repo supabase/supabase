@@ -14,6 +14,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -114,14 +117,22 @@ export const SecretsManagement = () => {
                 onKeyDown={onSearchInputEscape(searchValue ?? '', setSearchValue)}
                 actions={[
                   searchValue && (
-                    <Button
-                      key="clear"
-                      size="tiny"
-                      variant="text"
-                      icon={<X />}
-                      onClick={() => setSearchValue('')}
-                      className="p-0 h-5 w-5"
-                    />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          key="clear"
+                          size="tiny"
+                          variant="text"
+                          icon={<X />}
+                          onClick={() => setSearchValue('')}
+                          className="p-0 h-5 w-5"
+                          aria-label="Clear search"
+                          // Tooltip repeats the label; screen readers would read it twice
+                          aria-describedby={undefined}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Clear search</TooltipContent>
+                    </Tooltip>
                   ),
                 ]}
               />
@@ -144,12 +155,7 @@ export const SecretsManagement = () => {
             </div>
 
             <div className="flex items-center gap-x-2">
-              <Button
-                variant="default"
-                icon={<RefreshCw />}
-                loading={isRefetching}
-                onClick={() => refetch()}
-              >
+              <Button icon={<RefreshCw />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
               <DocsButton href={`${DOCS_URL}/guides/database/vault`} />
