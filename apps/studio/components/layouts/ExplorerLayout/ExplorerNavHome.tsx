@@ -14,7 +14,7 @@ import {
 } from './ExplorerLayout.constants'
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
 import { ExplorerNavItem } from './ExplorerNavItem'
-import { useCreateChat, useCreateQuery } from '@/components/interfaces/Explorer/hooks'
+import { useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
@@ -27,11 +27,10 @@ export const ExplorerNavHome = ({
   onSelectSection: (section: ExplorerResourceType) => void
 }) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const appStateSnapshot = useAppStateSnapshot()
 
-  const { openChat } = useCreateChat()
   const { createQuery } = useCreateQuery()
 
   const { data: notebooksData } = useNotebooksInfiniteQuery({ projectRef: ref, limit: 100 })
@@ -104,6 +103,8 @@ export const ExplorerNavHome = ({
             <p className="px-2 text-xs text-foreground-lighter">Nothing edited yet</p>
           ) : (
             recentItems.map((item) => {
+              const isActive = id === item.id
+
               const href =
                 item.type === 'chat'
                   ? `/project/${ref}/explorer/chat/${item.id}`
@@ -121,9 +122,10 @@ export const ExplorerNavHome = ({
                 <ExplorerNavItem
                   key={item.id}
                   type={item.type}
-                  onDoubleClick={onDoubleClick}
                   href={href}
                   name={item.label}
+                  isActive={isActive}
+                  onDoubleClick={onDoubleClick}
                   description={formatRelativeTimeShort(item.updatedAt)}
                 />
               )
