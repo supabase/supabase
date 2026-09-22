@@ -74,7 +74,7 @@
   --color-brand-400: hsl(var(--brand-400));
   --color-brand-500: hsl(var(--brand-500));
   --color-brand-600: hsl(var(--brand-600));
-  /* text-brand uses accessible --primary; fills use brand-default. */
+  /* text-brand uses accessible --primary; fills, borders, and --ring use brand-default. */
   --color-brand: var(--primary);
   --color-brand-default: hsl(var(--brand-default));
   --color-_secondary-200: hsl(var(--secondary-200));

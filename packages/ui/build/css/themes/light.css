@@ -16,7 +16,8 @@
   --foreground-lightness: 0.1;
   --muted-foreground-level: 0.65;
   --tertiary-foreground-level: 0.5;
-  /* Accessible primary for text/controls (~4.5:1+ on light surfaces). */
+  /* Accessible primary for text and solid primary fills (~4.5:1+ on light
+     surfaces). Focus rings and bright brand chrome stay on --brand-default. */
   --primary: oklch(0.525 0.12 var(--primary-hue));
   --primary-foreground: oklch(0.99 0.00275 var(--primary-hue));
   /*

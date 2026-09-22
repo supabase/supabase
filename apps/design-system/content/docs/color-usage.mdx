@@ -12,6 +12,8 @@ Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid 
 Use `text-brand` for readable branded text such as links, labels, and statuses. On light-theme
 surfaces it meets the 4.5:1 WCAG AA requirement for normal text. Use `bg-brand-default` /
 `border-brand-default` when you need the canonical bright Supabase green as a fill or border.
+Focus rings (`ring-ring` / `focus-ring`) also stay on that bright brand; they do not track the
+darkened accessible `--primary` used for text.
 
 <Colors definition={'text'} />
 
@@ -19,7 +21,9 @@ surfaces it meets the 4.5:1 WCAG AA requirement for normal text. Use `bg-brand-d
 
 Use `bg-brand-default` when the canonical Supabase green is required as a fill. The same
 `brand-default` suffix applies to borders and other non-text utilities, such as
-`border-brand-default`.
+`border-brand-default`. Shared focus chrome (`--ring`) and selected control chrome (radio
+borders, slider fills, checked field cards) are derived from `brand-default` too. Keep
+`text-primary` / `text-brand` for readable branded text.
 
 <Colors definition={'background'} />
 

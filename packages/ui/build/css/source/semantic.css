@@ -158,8 +158,10 @@
   --popover: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
   --popover-foreground: var(--foreground);
 
-  /* Primary is the accessible functional green (text, controls). Bright
-     expressive fills use brand-default. Light theme overrides --primary for AA text. */
+  /* Primary is the accessible functional green for text and on-color
+     surfaces (bg-primary, text-primary, text-brand). Bright expressive fills,
+     borders, and focus chrome use brand-default. Light theme overrides
+     --primary for AA text. */
   --primary: oklch(0.76 0.15 var(--primary-hue));
   --primary-foreground: oklch(
     min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
@@ -243,7 +245,8 @@
   --border-destructive: oklch(from var(--destructive) l c h / 30%);
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-info: oklch(from var(--info) l c h / 30%);
-  --border-brand-default: oklch(from var(--primary) l c h / 30%);
+  /* Soft brand border tint: bright brand-default, not accessible --primary. */
+  --border-brand-default: oklch(from hsl(var(--brand-default)) l c h / 30%);
 
   --border: oklch(
     from var(--foreground) l calc(c * 0.54) h / calc(2% + 20% * var(--contrast-border))
@@ -259,5 +262,7 @@
   --border-control-hover: oklch(
     from var(--foreground) l calc(c * 0.5) h / calc(12% + 58% * var(--contrast-border))
   );
-  --ring: oklch(from var(--primary) l c h / 55%);
+  /* Focus chrome stays on bright brand-default. Accessible --primary is for
+     readable text / solid primary fills, not rings. */
+  --ring: oklch(from hsl(var(--brand-default)) l c h / 55%);
 }

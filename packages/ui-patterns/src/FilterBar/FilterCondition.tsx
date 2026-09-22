@@ -259,7 +259,7 @@ export function FilterCondition({
       className={cn(
         'flex items-stretch px-0 h-[26px] bg-muted group shrink-0',
         variant === 'pill' ? 'rounded-sm border' : 'border-r',
-        isHighlighted && 'ring-2 ring-primary'
+        isHighlighted && 'ring-2 ring-brand-default'
       )}
       data-testid={`filter-condition-${property.name}`}
       data-highlighted={isHighlighted}
