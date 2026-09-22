@@ -20,6 +20,7 @@ interface ExplorerNavItemProps {
   isActive?: boolean
   style?: CSSProperties
   onDoubleClick: () => void
+  onSelectDelete: () => void
 }
 
 export const ExplorerNavItem = ({
@@ -30,6 +31,7 @@ export const ExplorerNavItem = ({
   isActive = false,
   style,
   onDoubleClick,
+  onSelectDelete,
 }: ExplorerNavItemProps) => {
   return (
     <ContextMenu modal={false}>
@@ -59,7 +61,7 @@ export const ExplorerNavItem = ({
           </Link>
         </ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuItem className="gap-x-2">
+        <ContextMenuItem className="gap-x-2" onSelect={onSelectDelete}>
           <Trash size={14} />
           <span>Delete {type}</span>
         </ContextMenuItem>

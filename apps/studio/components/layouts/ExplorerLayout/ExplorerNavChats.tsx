@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { ExplorerNavResourceWrapper } from './ExplorerLayout.constants'
 import { ExplorerNavItem } from './ExplorerNavItem'
+import { useExplorerDeleteItem } from './ExplorerProvider'
 import type { ChatSession } from '@/state/ai-assistant-state'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -23,6 +24,7 @@ export const ExplorerNavChats = () => {
   const { id, ref } = useParams()
   const chatList = useAiAssistantChatList()
   const tabs = useTabsStateSnapshot()
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const chats = getVisibleChats(chatList, search)
 
@@ -45,6 +47,9 @@ export const ExplorerNavChats = () => {
                 isActive={isActive}
                 href={`/project/${ref}/explorer/chat/${chat.id}`}
                 onDoubleClick={() => tabs.makeTabPermanent(createTabId('chat', { id: chat.id }))}
+                onSelectDelete={() =>
+                  onSelectDelete({ id: chat.id, type: 'chat', name: chat.name })
+                }
               />
             )
           })

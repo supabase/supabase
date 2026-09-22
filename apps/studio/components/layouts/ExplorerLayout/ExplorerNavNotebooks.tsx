@@ -6,6 +6,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ExplorerNavResourceWrapper } from './ExplorerLayout.constants'
 import { ExplorerNavItem } from './ExplorerNavItem'
+import { useExplorerDeleteItem } from './ExplorerProvider'
 import {
   InfiniteListDefault,
   LoaderForIconMenuItems,
@@ -22,6 +23,7 @@ const NOTEBOOK_ROW_HEIGHT = 28
 type NotebookListItemProps = RowComponentBaseProps<NotebookRow> & {
   projectRef: string | undefined
   activeNotebookId: string | undefined
+  onSelectDelete: (item: { id: string; type: 'notebook' | 'chat'; name: string }) => void
 }
 
 const NotebookListItem = ({
@@ -29,6 +31,7 @@ const NotebookListItem = ({
   style,
   projectRef,
   activeNotebookId,
+  onSelectDelete,
 }: NotebookListItemProps) => {
   const isActive = activeNotebookId === notebook.id
   const tabs = useTabsStateSnapshot()
@@ -41,6 +44,9 @@ const NotebookListItem = ({
       style={style}
       href={`/project/${projectRef}/explorer/notebook/${notebook.id}`}
       onDoubleClick={() => tabs.makeTabPermanent(createTabId('notebook', { id: notebook.id }))}
+      onSelectDelete={() =>
+        onSelectDelete({ id: notebook.id, type: 'notebook', name: notebook.name })
+      }
     />
   )
 }
@@ -48,6 +54,7 @@ const NotebookListItem = ({
 export const ExplorerNavNotebooks = () => {
   const router = useRouter()
   const { ref, id } = useParams()
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
@@ -71,7 +78,10 @@ export const ExplorerNavNotebooks = () => {
 
   const activeNotebookId = router.pathname.includes('/explorer/notebook/') ? id : undefined
 
-  const itemProps = useMemo(() => ({ projectRef: ref, activeNotebookId }), [ref, activeNotebookId])
+  const itemProps = useMemo(
+    () => ({ projectRef: ref, activeNotebookId, onSelectDelete }),
+    [ref, activeNotebookId, onSelectDelete]
+  )
 
   return (
     <ExplorerNavResourceWrapper type="notebook" search={search} setSearch={setSearch}>

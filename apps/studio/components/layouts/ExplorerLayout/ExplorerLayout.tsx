@@ -20,6 +20,7 @@ import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { ExplorerProvider } from './ExplorerProvider'
 import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
@@ -75,42 +76,44 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
   }
 
   return (
-    <ProjectLayoutWithAuth
-      product="Explorer"
-      browserTitle={mergedBrowserTitle}
-      productMenuHeader={
-        <ExplorerNavHeader
-          section={section}
-          onBack={() => setSection(undefined)}
-          rootAction={<BackToSqlEditorButton />}
-        />
-      }
-      productMenu={
-        <div className="relative h-full overflow-hidden">
-          <AnimatePresence mode="wait">
-            {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
-            {section === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
-            {section === 'chat' && <ExplorerNavChats key="chats" />}
-          </AnimatePresence>
-        </div>
-      }
-    >
-      <ExplorerQueryTabCoordinator />
-
-      <ExplorerNotebookTabCoordinator />
-
-      <div className="flex flex-col h-full">
-        <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
-          <EditorTabs
-            isCollapseButtonHidden
-            customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}
-            newTabButton={<NewTabButton />}
-            onTabChange={handleTabChange}
+    <ExplorerProvider>
+      <ProjectLayoutWithAuth
+        product="Explorer"
+        browserTitle={mergedBrowserTitle}
+        productMenuHeader={
+          <ExplorerNavHeader
+            section={section}
+            onBack={() => setSection(undefined)}
+            rootAction={<BackToSqlEditorButton />}
           />
+        }
+        productMenu={
+          <div className="relative h-full overflow-hidden">
+            <AnimatePresence mode="wait">
+              {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
+              {section === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
+              {section === 'chat' && <ExplorerNavChats key="chats" />}
+            </AnimatePresence>
+          </div>
+        }
+      >
+        <ExplorerQueryTabCoordinator />
+
+        <ExplorerNotebookTabCoordinator />
+
+        <div className="flex flex-col h-full">
+          <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
+            <EditorTabs
+              isCollapseButtonHidden
+              customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}
+              newTabButton={<NewTabButton />}
+              onTabChange={handleTabChange}
+            />
+          </div>
+          <div className="flex-grow min-h-0">{children}</div>
         </div>
-        <div className="flex-grow min-h-0">{children}</div>
-      </div>
-    </ProjectLayoutWithAuth>
+      </ProjectLayoutWithAuth>
+    </ExplorerProvider>
   )
 }
 

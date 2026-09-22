@@ -14,6 +14,7 @@ import {
 } from './ExplorerLayout.constants'
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
 import { ExplorerNavItem } from './ExplorerNavItem'
+import { useExplorerDeleteItem } from './ExplorerProvider'
 import { useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
@@ -32,6 +33,7 @@ export const ExplorerNavHome = ({
   const appStateSnapshot = useAppStateSnapshot()
 
   const { createQuery } = useCreateQuery()
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const { data: notebooksData } = useNotebooksInfiniteQuery({ projectRef: ref, limit: 100 })
   const notebooks = notebooksData?.pages.flatMap((page) => page.content) ?? []
@@ -126,6 +128,9 @@ export const ExplorerNavHome = ({
                   name={item.label}
                   isActive={isActive}
                   onDoubleClick={onDoubleClick}
+                  onSelectDelete={() =>
+                    onSelectDelete({ id: item.id, type: item.type, name: item.label })
+                  }
                   description={formatRelativeTimeShort(item.updatedAt)}
                 />
               )
