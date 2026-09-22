@@ -37,11 +37,13 @@ A failed statement aborts the transaction, so Postgres skips everything after it
 Remove the `ALTER TABLE` line. Keep the policy:
 
 ```sql
-create policy "authenticated can read their topic"
-on realtime.messages
+create policy "authenticated can read messages on room-1"
+on "realtime"."messages"
 for select
 to authenticated
-using ( (select auth.uid()) is not null );
+using (
+  (select realtime.topic()) = 'room-1'
+);
 ```
 
 Run it from the SQL editor or with `supabase db push`. Both connect as `postgres`.
