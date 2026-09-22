@@ -38,8 +38,10 @@ export const LogTypeIcon = ({
 
   return (
     <Tooltip>
-      <TooltipTrigger>
-        <Icon size={size} strokeWidth={strokeWidth} className={className} />
+      <TooltipTrigger asChild>
+        <span className="inline-flex" role="img" aria-label={type}>
+          <Icon size={size} strokeWidth={strokeWidth} className={className} />
+        </span>
       </TooltipTrigger>
       <TooltipContent side="left">
         <div className="text-xs">{type}</div>
