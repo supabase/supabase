@@ -8,6 +8,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import type { OAuthAppOverviewItem } from '@/data/oauth-apps/types'
@@ -48,9 +51,14 @@ export const OAuthAppsAuthorizedRow = ({
       <TableCell>{getGrantsLabel(app)}</TableCell>
       <TableCell className="text-right">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button icon={<MoreVertical />} className="px-1" />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button icon={<MoreVertical />} className="px-1" aria-label="Actions" />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>Actions</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent align="end" side="bottom" className="w-40">
             <DropdownMenuItem onClick={onSelectViewGrants}>View grants</DropdownMenuItem>
             {showRevoke && (
