@@ -14,7 +14,11 @@ The Snowflake destination is in private alpha and available only to approved org
 
 [Snowflake](https://www.snowflake.com/) is a managed data platform. Supabase Pipelines writes an append-only change history for each replicated Postgres table to Snowflake.
 
-[Prepare resources](#prepare-snowflake-resources), [configure the destination](#configure-snowflake-as-a-destination), then [query replicated data](#query-and-materialize-current-state).
+To replicate data to Snowflake:
+
+1. [Prepare a database, schema, role, service user, and key pair](#prepare-snowflake-resources) in Snowflake.
+2. [Configure the Snowflake destination](#configure-snowflake-as-a-destination) in the Dashboard.
+3. [Query or materialize the replicated data](#query-and-materialize-current-state) in Snowflake.
 
 ## Source table requirements
 
@@ -38,9 +42,9 @@ alter table public.your_table replica identity full;
 
 ## Prepare Snowflake resources
 
-Create a dedicated Snowflake database, schema, role, and service user for Pipelines. Keep the schema otherwise empty to avoid ownership conflicts. Use unquoted identifiers for the service user and role. Pipelines converts the account and user names to uppercase during authentication.
+Create a Snowflake database, schema, role, and service user for Pipelines. Keep the schema empty so Pipelines can own and manage every table it creates. Use unquoted identifiers for the service user and role because Pipelines converts account and user names to uppercase during authentication.
 
-Run the following as a Snowflake administrator. Change the example names as needed:
+Run this setup as a Snowflake administrator. Change the example names as needed:
 
 ```sql
 create role if not exists PIPELINES_ROLE;
@@ -69,14 +73,14 @@ Use a separate role and warehouse for downstream queries and transformations.
 
 Pipelines uses two Snowflake interfaces:
 
-- SQL requests use the optional **Role** configured in the Dashboard. When **Role** is empty, they use the user's default role.
+- SQL requests use the optional **Role** under **Advanced settings** in the Dashboard. When **Role** is empty, they use the user's default role.
 - Snowpipe Streaming uses the user's `DEFAULT_ROLE`. It does not use the optional **Role** setting.
 
-Set the pipeline role as the service user's `DEFAULT_ROLE`. Leave **Role** empty or set it to that same role. Otherwise, SQL validation can succeed while streaming fails.
+Use a dedicated role such as `PIPELINES_ROLE`, grant it the permissions above, and set it as the service user's `DEFAULT_ROLE`. Leave **Role** empty in the Dashboard or enter the same role explicitly. This keeps SQL validation and streaming on the same role.
 
 ### Generate a key pair
 
-Pipelines authenticates with an RSA key pair. Snowflake requires a key of at least 2048 bits and recommends PKCS #8. Choose one of the following commands to generate `rsa_key.p8`.
+Pipelines authenticates with an RSA key pair. Snowflake requires at least 2048 bits and recommends PKCS #8. From the directory where you want to store the keys, create `rsa_key.p8` with one of these commands.
 
 For an unencrypted private key:
 
@@ -92,17 +96,19 @@ openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 \
   -inform PEM -out rsa_key.p8
 ```
 
-Derive the public key:
+Derive the matching public key. Snowflake uses it to verify connections signed with `rsa_key.p8`:
 
 ```bash
 openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
 ```
 
-Register only the public-key body with the service user. Omit the `BEGIN PUBLIC KEY` and `END PUBLIC KEY` lines:
+Open `rsa_key.pub` and copy the text between the `BEGIN PUBLIC KEY` and `END PUBLIC KEY` lines. Replace the entire `<public-key-body>` placeholder, including the angle brackets, with that text:
 
 ```sql
 alter user PIPELINES_USER set rsa_public_key = '<public-key-body>';
 ```
+
+Keep `rsa_key.p8` for the Dashboard configuration. Paste or upload the complete file, including its begin and end lines, into **Private key**. If you generated a passphrase-protected key, enter its passphrase into **Private key passphrase**.
 
 Keep `rsa_key.p8` and its passphrase secret. Don't commit them, paste them into logs, or send them to support. The Dashboard accepts unencrypted PKCS #1 or PKCS #8 keys, and encrypted PKCS #8 keys with a passphrase. It does not support encrypted PKCS #1 keys.
 
@@ -124,17 +130,17 @@ Enter the result as **Account ID**, for example `MYORG-MYACCOUNT`. Do not enter 
 
 Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) and select **Snowflake**. Enter these settings:
 
-| Field                      | Value                                                                                                           |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| **Account ID**             | `MYORG-MYACCOUNT`, for example; use an organization-account identifier                                          |
-| **User**                   | `PIPELINES_USER`, or your unquoted service user                                                                 |
-| **Database**               | `PIPELINES_DB`, or your destination database                                                                    |
-| **Schema**                 | `REPLICATED`, or your dedicated destination schema                                                              |
-| **Role**                   | The service user's default role name, or empty; see [role alignment](#keep-the-sql-and-streaming-roles-aligned) |
-| **Private key**            | Complete PEM, including begin and end lines                                                                     |
-| **Private key passphrase** | Only for an encrypted PKCS #8 key                                                                               |
+| Field                      | Value                                                                                  |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| **Account ID**             | `MYORG-MYACCOUNT`, for example; use an organization-account identifier                 |
+| **User**                   | `PIPELINES_USER`, or your unquoted service user                                        |
+| **Database**               | `PIPELINES_DB`, or your destination database                                           |
+| **Schema**                 | `REPLICATED`, or your dedicated destination schema                                     |
+| **Role**                   | Leave empty to use the service user's default role, or enter that same role explicitly |
+| **Private key**            | Paste or upload the complete `rsa_key.p8` private-key PEM file                         |
+| **Private key passphrase** | Only for an encrypted PKCS #8 key                                                      |
 
-Click **Create and start pipeline** and complete the validation and cost confirmations.
+Click **Start pipeline** and complete the validation and cost confirmations.
 
 Enter the database and schema identifiers exactly as stored in Snowflake. Unquoted identifiers are stored in uppercase. Choose an account near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
@@ -179,7 +185,7 @@ A [table restart](/docs/guides/database/replication/pipelines-monitoring#restart
 
 ## Query replicated data [#query-and-materialize-current-state]
 
-Use the replicated change history to build a current-state dataset for reports and analytics. Pipelines maintains the history table. You create and maintain the queries, views, or dynamic tables that read it.
+Use the replicated change history to build current-state datasets for reports and analytics. Pipelines maintains the history table. You maintain the queries, views, or dynamic tables that read it.
 
 | Approach                                           | When to use it                                            | Tradeoff                                                                               |
 | -------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------- |
