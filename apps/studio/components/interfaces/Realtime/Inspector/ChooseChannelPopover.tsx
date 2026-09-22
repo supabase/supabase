@@ -163,7 +163,7 @@ export const ChooseChannelPopover = ({
                                 <InputGroupButton
                                   variant="primary"
                                   disabled={form.getValues().channel.length === 0}
-                                  onClick={() => onSubmit()}
+                                  type="submit"
                                 >
                                   Listen to channel
                                 </InputGroupButton>
