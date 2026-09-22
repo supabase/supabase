@@ -36,7 +36,12 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
       enabled: enableAuthRecoveryCodes,
     })
 
-  const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation()
+  const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation({
+    onSettled: () => {
+      onClose()
+      setIsRecoveryCodesModalOpen(true)
+    },
+  })
 
   const [isRecoveryCodesModalOpen, setIsRecoveryCodesModalOpen] = useState<boolean>(false)
 
@@ -57,7 +62,11 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
         visible={visible && Boolean(data)}
         factorName={data?.friendly_name ?? ''}
         factor={data as Extract<typeof data, { type: 'totp' }>}
-        isLoading={isEnrolling || (enableAuthRecoveryCodes && isRecoveryCodesStatusPending)}
+        isLoading={
+          isEnrolling ||
+          (enableAuthRecoveryCodes &&
+            (isRecoveryCodesStatusPending || recoveryCodesGenerateMutation.isPending))
+        }
         onClose={async () => {
           if (enableAuthRecoveryCodes) {
             const { data: currentRecoveryCodesStatus } = await refetchRecoveryCodesStatus()
@@ -65,7 +74,7 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
 
             if (shouldGenerateRecoveryCodes) {
               recoveryCodesGenerateMutation.mutate({})
-              setIsRecoveryCodesModalOpen(true)
+              return
             }
           }
           onClose()
