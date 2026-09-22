@@ -6,6 +6,10 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  BIGQUERY_DATASET_ID_FIELD_COPY,
+  BIGQUERY_PROJECT_ID_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 
 const MAX_SERVICE_ACCOUNT_KEY_LENGTH = 5000
 
@@ -101,8 +105,8 @@ export const BigQueryFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Project ID"
-              description="The Google Cloud project ID where data will be sent"
+              label={BIGQUERY_PROJECT_ID_FIELD_COPY.label}
+              description={BIGQUERY_PROJECT_ID_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="my-gcp-project" />
@@ -116,9 +120,9 @@ export const BigQueryFields = ({
           name="datasetId"
           render={({ field }) => (
             <FormItemLayout
-              label="Dataset ID"
+              label={BIGQUERY_DATASET_ID_FIELD_COPY.label}
               layout="horizontal"
-              description="The BigQuery dataset where replicated tables will be created"
+              description={BIGQUERY_DATASET_ID_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="my_dataset" />
