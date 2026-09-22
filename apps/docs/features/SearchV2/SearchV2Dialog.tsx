@@ -1,6 +1,6 @@
 'use client'
 
-import { useDocsSearch, type DocsSearchResult } from 'common'
+import { useDocsSearchV2, type DocsSearchV2Result } from 'common'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { VisuallyHidden } from 'radix-ui'
@@ -25,14 +25,14 @@ interface SearchV2DialogProps {
 
 export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
   const router = useRouter()
-  const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearch()
+  const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2()
 
   // Clear stale results once the dialog closes
   useEffect(() => {
     if (!open) resetSearch()
   }, [open, resetSearch])
 
-  const results: DocsSearchResult[] =
+  const results: DocsSearchV2Result[] =
     'results' in searchState
       ? searchState.results
       : 'staleResults' in searchState
@@ -108,15 +108,15 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
                 {results.map((page) => (
                   <CommandItem
                     key={page.id}
-                    value={String(page.id)}
+                    value={page.id}
                     forceMount
                     onSelect={() => handleSelect(page.path)}
                   >
                     <div className="flex flex-col">
                       <span className="text-sm">{page.title}</span>
-                      {(page.description || page.subtitle) && (
+                      {(page.heading !== page.title ? page.heading : page.excerpt) && (
                         <span className="text-xs text-foreground-muted">
-                          {page.description || page.subtitle}
+                          {page.heading !== page.title ? page.heading : page.excerpt}
                         </span>
                       )}
                     </div>
