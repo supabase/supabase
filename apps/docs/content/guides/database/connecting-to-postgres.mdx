@@ -189,7 +189,7 @@ Direct connections and session mode support all three, so none of this applies t
 
 <Admonition type="caution">
 
-**Query pipelining** isn't supported yet either: transaction mode returns a connection to the pool as soon as it sees one reply finish, even if the client already queued more queries on it. `postgres.js` pipelines queries by default, so this combination can hang queries or return mismatched rows — see the [Postgres.js guide](/docs/guides/database/postgres-js) for how to avoid it. Supavisor v2.10 will add native pipelining support.
+**Query pipelining** isn't supported yet either: transaction mode returns a connection to the pool as soon as it sees one reply finish, even if the client already queued more queries on it. `postgres.js` pipelines queries by default, so this combination can hang queries or return mismatched rows — see the [Postgres.js guide](/docs/guides/database/postgres-js) for how to avoid it. An upcoming Supavisor release will add native pipelining support.
 
 </Admonition>
 
