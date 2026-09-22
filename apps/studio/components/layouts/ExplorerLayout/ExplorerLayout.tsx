@@ -28,6 +28,7 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import { useTrack } from '@/lib/telemetry/track'
 import {
@@ -46,6 +47,7 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
+  const { setLastVisitedExplorerTab } = useDashboardHistory()
   const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
   const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
@@ -66,6 +68,10 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     ...browserTitle,
     section: title ?? browserTitle?.section,
     entity: browserTitle?.entity ?? activeTabLabel,
+  }
+
+  const handleTabChange = (id: string) => {
+    if (id === EXPLORER_HOME_TAB_ID) setLastVisitedExplorerTab(undefined)
   }
 
   return (
@@ -99,6 +105,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
             isCollapseButtonHidden
             customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}
             newTabButton={<NewTabButton />}
+            onTabChange={handleTabChange}
           />
         </div>
         <div className="flex-grow min-h-0">{children}</div>
