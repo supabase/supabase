@@ -144,19 +144,28 @@ Hover: light uses `hover:bg-muted`; dark uses `dark:hover:bg-accent`.
 
 ### Floating over content
 
-If a default button is absolutely or sticky-positioned over code, tables, maps, or other busy UI, wrap it in a solid plate so nothing bleeds through:
+If a default button is absolutely or sticky-positioned over code, tables, maps, or other busy UI, wrap it in [`FloatingPlate`](#floating-plate) so nothing bleeds through:
+
+<ComponentPreview name="button-floating-plate" peekCode />
+
+Keep positioning, z-index, and hover/focus reveal on the plate's `className`. Use `rounded="full"` when the child is a pill. For clusters (split toggles, parallel actions), wrap the group once.
+
+Do not override the button fill with `bg-popover` at the callsite. The plate owns occlusion; the button stays a normal default control.
+
+## Floating plate
+
+`FloatingPlate` is an opaque `bg-popover` shell for floating default buttons (and small clusters).
 
 ```tsx
-<div className="inline-flex rounded-lg bg-background">
-  <Button size="tiny" icon={<Copy />}>
-    Copy
-  </Button>
-</div>
+import { Button, FloatingPlate } from 'ui'
 ```
 
-Use `bg-background` or `bg-popover` to match the surrounding surface. Keep positioning and visibility on the wrapper when the control needs to stay aligned.
+| Prop        | Default | Notes                                                           |
+| ----------- | ------- | --------------------------------------------------------------- |
+| `rounded`   | `lg`    | `md`, `lg`, or `full`. Match or exceed the child button radius. |
+| `className` | —       | Positioning, opacity, gaps for clusters.                        |
 
-A dedicated `floating` prop (for example backdrop blur) may replace these wrappers later. Until then, wrap floaters at the callsite.
+See [Floating over content](#floating-over-content) for when to use it.
 
 ## Accessibility
 

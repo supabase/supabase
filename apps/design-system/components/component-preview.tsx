@@ -2,7 +2,7 @@
 
 import { ChevronRight, Expand } from 'lucide-react'
 import * as React from 'react'
-import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, FloatingPlate } from 'ui'
 
 import { Index } from '@/__registry__'
 import { useConfig } from '@/hooks/use-config'
@@ -122,7 +122,7 @@ export function ComponentPreview({
           >
             {Code}
             <div className="absolute bottom-0 w-full flex justify-center mb-4">
-              <div className="inline-flex rounded-full bg-background">
+              <FloatingPlate rounded="full">
                 <Button
                   className="rounded-full"
                   onClick={() => setExpandState(!expand)}
@@ -130,7 +130,7 @@ export function ComponentPreview({
                 >
                   {expand ? 'Collapse code' : 'Expand code'}
                 </Button>
-              </div>
+              </FloatingPlate>
             </div>
           </div>
         </div>

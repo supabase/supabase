@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, FloatingPlate } from 'ui'
 
 export interface SkipToContentProps {
   /** Hash href to the main content landmark, e.g. `#main`. */
@@ -17,9 +17,9 @@ export interface SkipToContentProps {
  */
 function SkipToContent({ href, children = 'Skip to content', className }: SkipToContentProps) {
   return (
-    <div
+    <FloatingPlate
       className={cn(
-        'fixed top-0 left-[10px] z-[100] inline-flex w-fit rounded-lg bg-background',
+        'fixed top-0 left-[10px] z-[100] w-fit',
         '-translate-y-full focus-within:translate-y-[10px]',
         'transition-transform duration-200 ease-out',
         className
@@ -28,7 +28,7 @@ function SkipToContent({ href, children = 'Skip to content', className }: SkipTo
       <Button size="tiny" asChild>
         <a href={href}>{children}</a>
       </Button>
-    </div>
+    </FloatingPlate>
   )
 }
 

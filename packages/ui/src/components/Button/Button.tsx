@@ -29,6 +29,9 @@ const buttonVariants = cva(
   [--button-edge-strength:calc(var(--contrast-border,0.275625)/0.275625*0.6)]
   dark:[--button-edge-strength:calc(var(--contrast-border,0.275625)/0.275625)]
   [--button-edge-color:var(--colors-black)] dark:[--button-edge-color:var(--colors-white)]
+  [--button-shadow-drop:0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity))]
+  [--button-shadow-raised:var(--button-shadow-drop),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+  [--button-shadow-default:var(--button-shadow-drop),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_-1px_0_0_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
   `,
   {
     variants: {
@@ -38,7 +41,7 @@ const buttonVariants = cva(
           bg-primary
           bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
           text-primary-foreground
-          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          shadow-[var(--button-shadow-raised)]
           hover:bg-[var(--primary-hover)]
           data-[state=open]:bg-[var(--primary-hover)]
           `,
@@ -47,14 +50,14 @@ const buttonVariants = cva(
           border-0
           bg-card hover:bg-muted dark:bg-muted dark:hover:bg-accent
           dark:bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
-          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_-1px_0_0_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          shadow-[var(--button-shadow-default)]
           data-[state=open]:bg-muted dark:data-[state=open]:bg-accent
           `,
         secondary: `
           bg-foreground
           text-background
           border-0
-          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity))]
+          shadow-[var(--button-shadow-drop)]
           hover:bg-foreground/90
           data-[state=open]:bg-foreground/90
         `,
@@ -92,7 +95,7 @@ const buttonVariants = cva(
           bg-destructive
           bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
           text-destructive-foreground
-          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          shadow-[var(--button-shadow-raised)]
           hover:bg-[var(--destructive-hover)]
           data-[state=open]:bg-[var(--destructive-hover)]
         `,
@@ -101,7 +104,7 @@ const buttonVariants = cva(
           bg-warning
           bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
           text-warning-foreground
-          shadow-[0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity)),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+          shadow-[var(--button-shadow-raised)]
           hover:bg-[var(--warning-hover)]
           data-[state=open]:bg-[var(--warning-hover)]
         `,

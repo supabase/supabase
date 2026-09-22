@@ -1,7 +1,7 @@
 import { ChevronsUpDown, Lightbulb } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
-import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, cn, FloatingPlate } from 'ui'
 
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
@@ -127,7 +127,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
           )}
         />
         <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
-          <div className="inline-flex rounded-full bg-background">
+          <FloatingPlate rounded="full">
             <Button
               type="button"
               className="rounded-full"
@@ -138,7 +138,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
             >
               {isExpanded ? 'Collapse' : 'Expand'}
             </Button>
-          </div>
+          </FloatingPlate>
         </div>
       </QueryPanelSection>
       <QueryPanelSection className="pb-3 pt-6">

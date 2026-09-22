@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
-import { Button, cn, Tabs, TabsList, TabsTrigger } from 'ui'
+import { Button, cn, FloatingPlate, Tabs, TabsList, TabsTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -422,7 +422,7 @@ export const QueryInsightsTable = ({
               : 'opacity-0 translate-y-4 pointer-events-none',
           ].join(' ')}
         >
-          <div className="inline-flex rounded-full bg-background">
+          <FloatingPlate rounded="full">
             <Button
               size="tiny"
               className="rounded-full shadow-md"
@@ -430,7 +430,7 @@ export const QueryInsightsTable = ({
             >
               Clear query
             </Button>
-          </div>
+          </FloatingPlate>
         </div>
         {isLoading ? (
           <div className="px-6 py-4">

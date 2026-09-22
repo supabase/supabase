@@ -1,7 +1,7 @@
 import { ArrowUpRight, Check, Copy } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, cn, FloatingPlate, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
@@ -52,7 +52,7 @@ const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => {
       <div className="p-4 relative">
         {prompt.copyable && (
           <Tooltip>
-            <div className="absolute top-2 right-2 inline-flex rounded-lg bg-background">
+            <FloatingPlate className="absolute top-2 right-2">
               <TooltipTrigger asChild>
                 <Button
                   className="text-foreground-light hover:text-foreground w-7 h-7 p-1 shadow-lg"
@@ -64,7 +64,7 @@ const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => {
                   {text === 'copy' ? <Copy className="w-3 h-3" /> : <Check className="w-3 h-3" />}
                 </Button>
               </TooltipTrigger>
-            </div>
+            </FloatingPlate>
             <TooltipContent>Copy to clipboard</TooltipContent>
           </Tooltip>
         )}

@@ -1,5 +1,5 @@
 import { Expand } from 'lucide-react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, FloatingPlate, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatCellValue, isLargeValue } from './DataGridResults.utils'
 import { NullValue } from '@/components/grid/components/common/NullValue'
@@ -25,7 +25,7 @@ export const ResultCell = ({ column, value, onContextMenu, onExpand }: ResultCel
       {value === null ? <NullValue /> : formatCellValue(value)}
       {showExpand && (
         <Tooltip>
-          <div className="absolute right-1 top-1/2 inline-flex -translate-y-1/2 rounded-lg bg-background opacity-0 group-hover/cell:opacity-100 focus-within:opacity-100">
+          <FloatingPlate className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/cell:opacity-100 focus-within:opacity-100">
             <TooltipTrigger asChild>
               <Button
                 size="tiny"
@@ -38,7 +38,7 @@ export const ResultCell = ({ column, value, onContextMenu, onExpand }: ResultCel
                 }}
               />
             </TooltipTrigger>
-          </div>
+          </FloatingPlate>
           <TooltipContent side="left">View full cell content</TooltipContent>
         </Tooltip>
       )}

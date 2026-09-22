@@ -28,7 +28,7 @@ import swift from 'react-syntax-highlighter/dist/cjs/languages/hljs/swift'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import xml from 'react-syntax-highlighter/dist/cjs/languages/hljs/xml'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
-import { Button, cn, copyToClipboard } from 'ui'
+import { Button, cn, copyToClipboard, FloatingPlate } from 'ui'
 
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
@@ -266,12 +266,12 @@ export const CodeBlock = ({
             {codeValue}
           </SyntaxHighlighter>
           {!hideCopy && (value || children) && className ? (
-            <div
-              className={[
-                'absolute right-2 top-2 inline-flex rounded-lg bg-surface-100 dark:bg-200',
+            <FloatingPlate
+              className={cn(
+                'absolute right-2 top-2 bg-surface-100 dark:bg-200',
                 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition',
-                `${isDarkTheme ? 'dark' : ''}`,
-              ].join(' ')}
+                isDarkTheme && 'dark'
+              )}
             >
               <Button
                 className="px-1.5 dark:bg-200! dark:hover:bg-button! hover:bg-alternative!"
@@ -281,7 +281,7 @@ export const CodeBlock = ({
               >
                 {copied ? 'Copied' : ''}
               </Button>
-            </div>
+            </FloatingPlate>
           ) : null}
         </div>
       ) : (

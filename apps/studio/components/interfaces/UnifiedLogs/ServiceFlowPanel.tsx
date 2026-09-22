@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   copyToClipboard,
+  FloatingPlate,
   ResizableHandle,
   ResizablePanel,
   Skeleton,
@@ -246,7 +247,7 @@ export function ServiceFlowPanel({
                 </div>
               )}
               <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
-                <div className="inline-flex rounded-lg bg-background pointer-events-auto">
+                <FloatingPlate className="pointer-events-auto">
                   <Button
                     size="tiny"
                     className="px-1.5"
@@ -259,7 +260,7 @@ export function ServiceFlowPanel({
                   >
                     {jsonCopied ? 'Copied' : ''}
                   </Button>
-                </div>
+                </FloatingPlate>
               </div>
               <CodeBlock
                 language="json"

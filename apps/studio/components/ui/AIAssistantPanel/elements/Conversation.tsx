@@ -1,7 +1,7 @@
 import { ArrowDownIcon } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
 import { useCallback } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, FloatingPlate } from 'ui'
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 
 type ConversationProps = Omit<ComponentProps<typeof StickToBottom>, 'children'> & {
@@ -60,7 +60,7 @@ export const ConversationScrollButton = ({
 
   return (
     !isAtBottom && (
-      <div className="absolute bottom-4 left-[50%] inline-flex translate-x-[-50%] rounded-full bg-background">
+      <FloatingPlate rounded="full" className="absolute bottom-4 left-[50%] translate-x-[-50%]">
         <Button
           className={cn('rounded-full', className)}
           onClick={handleScrollToBottom}
@@ -69,7 +69,7 @@ export const ConversationScrollButton = ({
         >
           <ArrowDownIcon className="size-4" />
         </Button>
-      </div>
+      </FloatingPlate>
     )
   )
 }
