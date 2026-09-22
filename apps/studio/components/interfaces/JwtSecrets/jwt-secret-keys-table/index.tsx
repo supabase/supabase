@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { AnimatePresence } from 'framer-motion'
 import { AlertCircle, RotateCw, Timer } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
@@ -63,6 +63,7 @@ export const JWTSecretKeysTable = () => {
   const [selectedKey, setSelectedKey] = useState<JWTSigningKey>()
   const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
   const [shownDialog, setShownDialog] = useState<DialogType>()
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.SECRETS_READ,
@@ -79,7 +80,7 @@ export const JWTSecretKeysTable = () => {
       isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
       isoTimestampEnd: now.toISOString(),
     },
-    { enabled: canReadAPIKeys }
+    { enabled: canReadAPIKeys && showApiKeysLastUsed }
   )
   const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
     {
@@ -255,7 +256,7 @@ export const JWTSecretKeysTable = () => {
                         Type
                       </TableHead>
                       <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                        {IS_PLATFORM && 'Last used'}
+                        {IS_PLATFORM && showApiKeysLastUsed && 'Last used'}
                       </TableHead>
                       <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Actions
@@ -280,7 +281,7 @@ export const JWTSecretKeysTable = () => {
                           lastUsedAt={getLastUsedAt(standbyKey.id)}
                           isLoadingLastUsed={isLoadingLastUsed}
                           isLastUsedError={isLastUsedError}
-                          isLastUsedVisible={IS_PLATFORM}
+                          isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                         />
                       )}
                       {inUseKey && (
@@ -296,7 +297,7 @@ export const JWTSecretKeysTable = () => {
                           lastUsedAt={getLastUsedAt(inUseKey.id)}
                           isLoadingLastUsed={isLoadingLastUsed}
                           isLastUsedError={isLastUsedError}
-                          isLastUsedVisible={IS_PLATFORM}
+                          isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                         />
                       )}
                     </AnimatePresence>
@@ -330,7 +331,7 @@ export const JWTSecretKeysTable = () => {
                         <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Type
                         </TableHead>
-                        {IS_PLATFORM && (
+                        {IS_PLATFORM && showApiKeysLastUsed && (
                           <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                             Last used
                           </TableHead>
@@ -359,7 +360,7 @@ export const JWTSecretKeysTable = () => {
                             lastUsedAt={getLastUsedAt(key.id)}
                             isLoadingLastUsed={isLoadingLastUsed}
                             isLastUsedError={isLastUsedError}
-                            isLastUsedVisible={IS_PLATFORM}
+                            isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                           />
                         ))}
                       </AnimatePresence>
@@ -404,7 +405,7 @@ export const JWTSecretKeysTable = () => {
                     <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                       Type
                     </TableHead>
-                    {IS_PLATFORM && (
+                    {IS_PLATFORM && showApiKeysLastUsed && (
                       <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Last used
                       </TableHead>
@@ -432,7 +433,7 @@ export const JWTSecretKeysTable = () => {
                         lastUsedAt={getLastUsedAt(key.id)}
                         isLoadingLastUsed={isLoadingLastUsed}
                         isLastUsedError={isLastUsedError}
-                        isLastUsedVisible={IS_PLATFORM}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                       />
                     ))}
                   </AnimatePresence>

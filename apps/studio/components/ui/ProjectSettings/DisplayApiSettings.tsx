@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useRef } from 'react'
@@ -53,6 +53,7 @@ export const DisplayApiSettings = ({
   const isApiKeysEmpty = apiKeys.length === 0
 
   const now = useRef(new Date()).current
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
   const {
     isLoading: isLoadingLastUsed,
     isError: isLastUsedError,
@@ -63,7 +64,7 @@ export const DisplayApiSettings = ({
       isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
       isoTimestampEnd: now.toISOString(),
     },
-    { enabled: canReadAPIKeys }
+    { enabled: canReadAPIKeys && showApiKeysLastUsed }
   )
 
   const lastUsedAPIKeys = useMemo(() => {
@@ -210,7 +211,7 @@ export const DisplayApiSettings = ({
               />
             </FormLayout>
 
-            {IS_PLATFORM && (
+            {IS_PLATFORM && showApiKeysLastUsed && (
               <div
                 className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
                 data-invisible={isLoadingLastUsed}
