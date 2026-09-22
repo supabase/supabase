@@ -90,10 +90,18 @@ export async function GET() {
   const content = [
     '# Supabase Docs',
     '',
-    'For the complete documentation in a single file, see [Full Documentation](https://supabase.com/llms-full.txt).',
+    'Supabase is a Postgres development platform. Pick an interface by task:',
+    '',
+    '- **Build an application**: Use a client SDK. Start from the reference for your language below.',
+    '- **Operate a project from an agent**: Use the MCP server. It also exposes `search_docs` for querying these docs. Connecting it requires authentication, so follow its setup guide.',
+    '- **Develop and test locally**: Use the Supabase CLI. It runs the full stack on your machine for schema changes and migrations, without a hosted project.',
+    '- **Automate the platform**: Use the Management API for organizations, projects, branches, and configuration.',
+    '',
+    'For a specific question, read the relevant guide or SDK reference below. Download the [full documentation](https://supabase.com/llms-full.txt) only for bulk ingestion.',
     '',
     '## Documentation',
     '',
+    '- [Supabase](https://supabase.com/index.md)',
     sourceLinks,
     '',
     '## Pricing',
@@ -107,7 +115,7 @@ export async function GET() {
 
   return new Response(content, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
+      'Content-Type': 'text/markdown; charset=utf-8',
       'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
     },
   })
