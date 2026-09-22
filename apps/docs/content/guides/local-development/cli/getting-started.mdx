@@ -106,28 +106,32 @@ and run one of the following:
 
 ### Running a local Supabase project
 
-The most common thing you'll do with the CLI is run the full Supabase stack (Postgres, Auth, Storage, and the rest) on your own machine. That stack runs in Docker containers, so you need a container runtime installed first. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
-
-Alternatively, you can use a different container tool that offers Docker-compatible APIs.
+The full Supabase stack, including Postgres, Auth, and Storage, runs in Docker containers, so you need a container runtime first. Install [Docker Desktop](https://docs.docker.com/desktop), or another tool that offers Docker-compatible APIs:
 
 - [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
 - [Podman](https://podman.io/) (macOS, Windows, Linux)
 - [OrbStack](https://orbstack.dev/) (macOS)
 - [colima](https://github.com/abiosoft/colima) (macOS)
 
-With a container runtime running, go to the folder where you want to create your project and initialize it:
+To bring the stack up:
 
-```bash
-supabase init
-```
+1. Start your container runtime.
 
-This creates a new `supabase` folder. It's safe to commit this folder to version control.
+2. Open a terminal in the folder where you want to create your project.
 
-Now, from the same folder, start the Supabase stack:
+3. Initialize the project:
 
-```bash
-supabase start
-```
+   ```bash
+   supabase init
+   ```
+
+   This creates a `supabase` folder, which is safe to commit to version control.
+
+4. Start the Supabase services from the same folder:
+
+   ```bash
+   supabase start
+   ```
 
 <Admonition type="note">
 
@@ -135,7 +139,7 @@ If you installed the CLI as a project dependency (npm, pnpm, yarn, or bun), run 
 
 </Admonition>
 
-This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase stack, and a few additional images useful for local development (like a local SMTP server and a database diff tool).
+The first run takes time while the CLI downloads the Docker images. It pulls the entire Supabase stack, plus a few extra images useful for local development, such as a local SMTP server and a database diff tool.
 
 ### Access your project's services
 
