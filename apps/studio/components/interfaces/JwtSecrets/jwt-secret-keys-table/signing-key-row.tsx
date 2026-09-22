@@ -38,9 +38,50 @@ interface SigningKeyRowProps {
   legacyKey?: JWTSigningKey | null
   standbyKey?: JWTSigningKey | null
   isLoading?: boolean
+  lastUsedAt?: number
+  isLoadingLastUsed?: boolean
+  isLastUsedError?: boolean
+  isLastUsedVisible?: boolean
 }
 
 const MotionTableRow = motion.create(TableRow)
+
+const hasRotationTimestamp = (status: JWTSigningKey['status']) =>
+  status === 'previously_used' || status === 'revoked'
+
+const LastUsedCell = ({
+  lastUsedAt,
+  isLoading,
+  isError,
+}: {
+  lastUsedAt?: number
+  isLoading: boolean
+  isError: boolean
+}) => {
+  const className =
+    'text-right py-2 text-sm text-foreground-light whitespace-nowrap data-[invisible=true]:invisible'
+
+  if (isLoading) {
+    return (
+      <TableCell aria-label="Loading last used timestamp" className={className} data-invisible />
+    )
+  }
+
+  if (isError) return <TableCell className={className}>Unable to load</TableCell>
+  if (lastUsedAt === undefined) {
+    return <TableCell className={className}>No requests in the past 24 hours</TableCell>
+  }
+
+  return (
+    <TableCell className={className}>
+      <TimestampInfo
+        className="text-sm"
+        utcTimestamp={new Date(lastUsedAt).toISOString()}
+        label={dayjs(lastUsedAt).fromNow()}
+      />
+    </TableCell>
+  )
+}
 
 export const SigningKeyRow = ({
   signingKey,
@@ -51,6 +92,10 @@ export const SigningKeyRow = ({
   legacyKey,
   standbyKey,
   isLoading = false,
+  lastUsedAt,
+  isLoadingLastUsed = false,
+  isLastUsedError = false,
+  isLastUsedVisible = false,
 }: SigningKeyRowProps) => (
   <MotionTableRow
     key={signingKey.id}
@@ -107,7 +152,15 @@ export const SigningKeyRow = ({
         legacy={signingKey.id === legacyKey?.id}
       />
     </TableCell>
-    {signingKey.status === 'previously_used' || signingKey.status === 'revoked' ? (
+    {isLastUsedVisible && (
+      <LastUsedCell
+        lastUsedAt={lastUsedAt}
+        isLoading={isLoadingLastUsed}
+        isError={isLastUsedError}
+      />
+    )}
+    {!isLastUsedVisible && !hasRotationTimestamp(signingKey.status) && <TableCell />}
+    {hasRotationTimestamp(signingKey.status) && (
       <TableCell className="max-w-[100px] text-right py-2 text-sm text-foreground-light whitespace-nowrap hidden lg:table-cell">
         <TimestampInfo
           className="text-sm"
@@ -115,8 +168,6 @@ export const SigningKeyRow = ({
           label={dayjs(signingKey.updated_at).fromNow()}
         />
       </TableCell>
-    ) : (
-      <TableCell />
     )}
     <TableCell className="text-right py-2">
       {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (
