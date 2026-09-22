@@ -1,5 +1,5 @@
 import { GripVertical, Settings2 } from 'lucide-react'
-import { useId, useMemo, useState } from 'react'
+import { memo, useId, useMemo, useState } from 'react'
 import {
   Checkbox,
   Command,
@@ -17,7 +17,7 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { Sortable, SortableDragHandle, SortableItem } from './primitives/Sortable'
 import { useDataTable } from './providers/DataTableProvider'
 
-export function DataTableViewOptions() {
+export const DataTableViewOptions = memo(function DataTableViewOptions() {
   const { table, enableColumnOrdering } = useDataTable()
   const [open, setOpen] = useState(false)
   const [drag, setDrag] = useState(false)
@@ -99,4 +99,4 @@ export function DataTableViewOptions() {
       </PopoverContent>
     </Popover>
   )
-}
+})

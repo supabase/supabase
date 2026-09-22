@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { RowSelectionModifiers, selectTableRow, TableRowSelection } from './rowSelection.utils'
 
@@ -16,10 +16,13 @@ export function useTableRowSelection({ scope, initialId }: { scope: string; init
     setSelection({ selected: {} })
   }
 
-  const selectRow = (orderedIds: string[], id: string, modifiers?: RowSelectionModifiers) =>
-    setSelection((previous) => selectTableRow(previous, orderedIds, id, modifiers))
+  const selectRow = useCallback(
+    (orderedIds: string[], id: string, modifiers?: RowSelectionModifiers) =>
+      setSelection((previous) => selectTableRow(previous, orderedIds, id, modifiers)),
+    []
+  )
 
-  const clearSelection = () => setSelection({ selected: {} })
+  const clearSelection = useCallback(() => setSelection({ selected: {} }), [])
 
   return { selection, selectRow, clearSelection }
 }

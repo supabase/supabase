@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { LoaderCircle, Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { memo, useEffect, useEffectEvent, useRef, useState } from 'react'
 import {
   FilterBar,
   FilterCondition,
@@ -44,7 +44,7 @@ const buildFilterGroup = (
   return { logicalOperator: 'AND', conditions }
 }
 
-export const LogsFilterBar = () => {
+export const LogsFilterBar = memo(function LogsFilterBar() {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { table, filterFields, columnFilters, isFetching } = useDataTable()
@@ -160,4 +160,4 @@ export const LogsFilterBar = () => {
       }
     />
   )
-}
+})

@@ -1,4 +1,5 @@
 import { Check, ChevronDown, ChevronUp, PanelBottom, PanelRight, X } from 'lucide-react'
+import { useMemo } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -8,7 +9,11 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import {
+  useDataTable,
+  useDataTableSelection,
+  useDataTableSelectionActions,
+} from '@/components/ui/DataTable/providers/DataTableProvider'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -22,9 +27,12 @@ export const ServiceFlowPanelControls = ({
   dock = 'bottom',
   setDock,
 }: ServiceFlowPanelControlsProps) => {
-  const { table, openRowId, setOpenRowId, onSelectRow } = useDataTable()
+  const { table } = useDataTable()
+  const { openRowId } = useDataTableSelection()
+  const { setOpenRowId, onSelectRow, rowNavigationRef } = useDataTableSelectionActions()
   const rows = table.getRowModel().rows
-  const index = rows.findIndex((row) => row.id === openRowId)
+  const indexById = useMemo(() => new Map(rows.map((row, index) => [row.id, index])), [rows])
+  const index = openRowId ? (indexById.get(openRowId) ?? -1) : -1
   const prevId = rows[index - 1]?.id
   const nextId = rows[index + 1]?.id
 
@@ -32,9 +40,7 @@ export const ServiceFlowPanelControls = ({
     if (!id) return
     if (onSelectRow) onSelectRow(id, { shiftKey })
     else setOpenRowId(id)
-    const row = document.getElementById(id)
-    row?.scrollIntoView({ block: 'nearest' })
-    if (document.activeElement?.closest('tbody')) row?.focus({ preventScroll: true })
+    rowNavigationRef.current?.scrollToRow(id, !!document.activeElement?.closest('tbody'))
   }
   const onPrev = () => handleNavigate(prevId)
   const onNext = () => handleNavigate(nextId)

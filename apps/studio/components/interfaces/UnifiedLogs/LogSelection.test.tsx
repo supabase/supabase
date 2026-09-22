@@ -1,10 +1,10 @@
 import { QueryClient } from '@tanstack/react-query'
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { fireEvent, screen, within } from '@testing-library/react'
+import { ColumnDef, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useQueryStates } from 'nuqs'
 import { ResizablePanelGroup } from 'ui'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { generateDynamicColumns } from './components/Columns'
 import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPanelControls'
@@ -19,6 +19,47 @@ import { miscKeys } from '@/data/misc/keys'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
+// jsdom has no layout; keep the real virtualizer and supply viewport/row sizes.
+beforeEach(() => {
+  vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (
+    this: HTMLElement
+  ) {
+    return this.tagName === 'TR' ? 30 : 300
+  })
+  vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(1000)
+  vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(300)
+  vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockImplementation(function (
+    this: HTMLElement
+  ) {
+    return Number(this.querySelector('table')?.getAttribute('aria-rowcount') ?? 10) * 30 + 36
+  })
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: HTMLElement
+  ) {
+    return {
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: 1000,
+      bottom: 300,
+      width: 1000,
+      height: this.tagName === 'TR' ? 30 : 300,
+      toJSON: () => ({}),
+    }
+  })
+  Object.defineProperty(HTMLElement.prototype, 'scrollTo', {
+    configurable: true,
+    value: function (this: HTMLElement, options: ScrollToOptions) {
+      if (typeof options === 'object' && this.scrollTop !== (options.top ?? 0)) {
+        this.scrollTop = options.top ?? 0
+        fireEvent.scroll(this)
+      }
+    },
+  })
+})
+afterEach(() => Reflect.deleteProperty(HTMLElement.prototype, 'scrollTo'))
+
 const logs: ColumnSchema[] = ['first', 'second', 'third', 'fourth'].map((id) => ({
   id,
   log_type: 'realtime',
@@ -30,19 +71,23 @@ const logs: ColumnSchema[] = ['first', 'second', 'third', 'fourth'].map((id) => 
   pathname: null,
   status: null,
 }))
-const { columns } = generateDynamicColumns({ data: logs })
+const { columns: defaultColumns } = generateDynamicColumns({ data: logs })
 
 function SelectionHarness({
   scope = 'logs',
   showPanel = false,
+  data = logs,
+  columns = defaultColumns,
 }: {
   scope?: string
   showPanel?: boolean
+  data?: ColumnSchema[]
+  columns?: ColumnDef<ColumnSchema>[]
 }) {
   const [searchParameters] = useQueryStates(SEARCH_PARAMS_PARSER)
   const { selection, selectRow, clearSelection } = useTableRowSelection({ scope })
   const table = useReactTable({
-    data: logs,
+    data,
     columns,
     getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
@@ -53,7 +98,7 @@ function SelectionHarness({
     selectedRows.find((row) => row.id === selection.activeId)?.id ?? selectedRows.at(-1)?.id
   const onSelectRow = (id: string, modifiers?: RowSelectionModifiers) =>
     selectRow(
-      logs.map((row) => row.id),
+      data.map((row) => row.id),
       id,
       modifiers
     )
@@ -68,6 +113,7 @@ function SelectionHarness({
       isFetching={false}
       isLoadingCounts={false}
       openRowId={activeId}
+      rowSelection={selection.selected}
       onSelectRow={onSelectRow}
       setOpenRowId={(id) => (id ? onSelectRow(id) : clearSelection())}
     >
@@ -110,6 +156,22 @@ describe('log row selection', () => {
     expect(selected()).toEqual(['fourth'])
   })
 
+  it('only rerenders cells in rows whose selection changed', () => {
+    const renderCell = vi.fn(({ row }: { row: { id: string } }) => row.id)
+    const columns = defaultColumns.map((column) =>
+      'accessorKey' in column && column.accessorKey === 'event_message'
+        ? { ...column, cell: renderCell }
+        : column
+    )
+    customRender(<SelectionHarness columns={columns} />)
+    renderCell.mockClear()
+    fireEvent.click(row('first'))
+    expect(renderCell.mock.calls.map(([{ row }]) => row.id)).toEqual(['first'])
+    renderCell.mockClear()
+    fireEvent.click(row('third'))
+    expect(renderCell.mock.calls.map(([{ row }]) => row.id)).toEqual(['first', 'third'])
+  })
+
   it('supports shift-click ranges and extends and shrinks with the keyboard', () => {
     customRender(<SelectionHarness />)
     fireEvent.click(row('second'))
@@ -124,6 +186,35 @@ describe('log row selection', () => {
     fireEvent.keyDown(document, { key: 'ArrowUp', code: 'ArrowUp' })
     fireEvent.keyUp(document, { key: 'ArrowUp', code: 'ArrowUp' })
     expect(selected()).toEqual(['third'])
+  })
+
+  it('navigates beyond the rendered window without mounting all loaded rows', async () => {
+    const data = Array.from({ length: 500 }, (_, index) => ({
+      ...logs[0],
+      id: `log-${index}`,
+      event_message: `message-${index}`,
+    }))
+    customRender(<SelectionHarness data={data} />)
+    expect(screen.getAllByRole('checkbox').length).toBeLessThan(40)
+    expect(screen.queryByText('message-100')).not.toBeInTheDocument()
+    const lastVisibleIndex = screen.getAllByRole('checkbox').length - 1
+    const targetIndex = lastVisibleIndex + 3
+    expect(screen.queryByText(`message-${targetIndex}`)).not.toBeInTheDocument()
+    act(() => row(`message-${lastVisibleIndex}`).focus())
+    fireEvent.keyDown(row(`message-${lastVisibleIndex}`), { key: 'Enter' })
+    for (let index = 0; index < 3; index++) {
+      await act(async () => {
+        fireEvent.keyDown(document, { key: 'ArrowDown', code: 'ArrowDown' })
+        fireEvent.keyUp(document, { key: 'ArrowDown', code: 'ArrowDown' })
+        await new Promise(requestAnimationFrame)
+      })
+    }
+    await waitFor(() => expect(row(`message-${targetIndex}`)).toHaveFocus())
+    expect(selected()).toEqual([`log-${targetIndex}`])
+    expect(screen.getAllByRole('checkbox').length).toBeLessThan(40)
+    fireEvent.keyDown(document, { key: 'ArrowUp', code: 'ArrowUp', shiftKey: true })
+    fireEvent.keyUp(document, { key: 'ArrowUp', code: 'ArrowUp', shiftKey: true })
+    expect(selected()).toEqual([`log-${targetIndex - 1}`, `log-${targetIndex}`])
   })
 
   it('supports keyboard activation and clears on closing or changing filters', () => {
@@ -141,7 +232,7 @@ describe('log row selection', () => {
 })
 
 describe('selected log details', () => {
-  function renderPanel() {
+  function renderPanel(data = logs) {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -167,8 +258,55 @@ describe('selected log details', () => {
     })
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
-    return customRender(<SelectionHarness showPanel />, { queryClient })
+    return customRender(<SelectionHarness showPanel data={data} />, { queryClient })
   }
+
+  it('bounds large previews while copying the complete selection', async () => {
+    const user = userEvent.setup()
+    const copy = vi.spyOn(navigator.clipboard, 'writeText')
+    const data = Array.from({ length: 50 }, (_, index) => ({
+      ...logs[0],
+      id: `log-${index}`,
+      event_message: `message-${index}`,
+    }))
+    renderPanel(data)
+    fireEvent.click(row('message-0'))
+    fireEvent.scroll(screen.getByRole('table').parentElement!, { target: { scrollTop: 1250 } })
+    fireEvent.click(row('message-49'), { shiftKey: true })
+    expect(screen.getByRole('status')).toHaveTextContent('50 logs selected')
+    const preview = screen.getByRole('region', { name: 'Selected logs JSON' })
+    expect(preview).toHaveTextContent('Preview shortened')
+    expect(preview).not.toHaveTextContent('message-49')
+    await user.click(screen.getByRole('button', { name: 'Copy selected logs' }))
+    expect(JSON.parse(copy.mock.calls[0][0])).toHaveLength(50)
+    expect(JSON.parse(copy.mock.calls[0][0])[49].id).toBe('log-49')
+  })
+
+  it('bounds large raw JSON rendering while copying the full log', async () => {
+    const user = userEvent.setup()
+    const copy = vi.spyOn(navigator.clipboard, 'writeText')
+    const data = [{ ...logs[0], metadata: { message: 'x'.repeat(120_000), end: 'complete-log' } }]
+    renderPanel(data)
+    await user.click(row('first'))
+    await user.click(screen.getByRole('tab', { name: 'Raw JSON' }))
+    const detail = screen.getByRole('tabpanel')
+    expect(detail).toHaveTextContent('Preview shortened')
+    expect(detail).not.toHaveTextContent('complete-log')
+    await user.click(screen.getByRole('button', { name: 'Copy log as JSON' }))
+    expect(JSON.parse(copy.mock.calls[0][0]).metadata.end).toBe('complete-log')
+  })
+
+  it('keeps the active detail tab while navigating to a different log', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    await user.click(row('first'))
+    await user.click(screen.getByRole('tab', { name: 'Raw JSON' }))
+    await user.click(screen.getByRole('button', { name: 'Next log' }))
+    expect(screen.getByRole('tab', { name: 'Raw JSON' })).toHaveAttribute('aria-selected', 'true')
+    const detail = screen.getByRole('tabpanel')
+    expect(detail).toHaveTextContent('second')
+    expect(detail).not.toHaveTextContent('first')
+  })
 
   it('offers both tabs for a log without a specialized overview', async () => {
     const user = userEvent.setup()

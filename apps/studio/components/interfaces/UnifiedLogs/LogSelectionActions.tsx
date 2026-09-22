@@ -22,14 +22,15 @@ export const LogSelectionActions = ({ rows }: { rows: ColumnSchema[] }) => {
   const copyButtonRef = useRef<HTMLButtonElement>(null)
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
-  const selectedRows = rows.map((row) => ({
-    ...getRawLogData(row),
-    event_message: row.event_message ?? '',
-    metadata: logsMetadata ? row.metadata : undefined,
-  })) as LogData[]
+  const getSelectedRows = () =>
+    rows.map((row) => ({
+      ...getRawLogData(row),
+      event_message: row.event_message ?? '',
+      metadata: logsMetadata ? row.metadata : undefined,
+    })) as LogData[]
 
   const handleOpenAiAssistant = () => {
-    const prompt = buildLogsPrompt(selectedRows)
+    const prompt = buildLogsPrompt(getSelectedRows())
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({ initialMessage: prompt })
     track('ai_assistant_dropdown_button_clicked', { source: 'log_explorer' })
@@ -43,7 +44,7 @@ export const LogSelectionActions = ({ rows }: { rows: ColumnSchema[] }) => {
       <Shortcut
         id={SHORTCUT_IDS.RESULTS_COPY_JSON}
         onTrigger={handleCopyShortcut}
-        options={{ enabled: selectedRows.length > 0, registerInCommandMenu: true }}
+        options={{ enabled: rows.length > 0, registerInCommandMenu: true }}
         side="bottom"
         label="Copy selected logs as JSON"
       >
@@ -54,7 +55,7 @@ export const LogSelectionActions = ({ rows }: { rows: ColumnSchema[] }) => {
           variant="text"
           className="px-1"
           aria-label="Copy selected logs"
-          asyncText={() => formatLogsAsJson(selectedRows)}
+          asyncText={() => formatLogsAsJson(getSelectedRows())}
         />
       </Shortcut>
 
