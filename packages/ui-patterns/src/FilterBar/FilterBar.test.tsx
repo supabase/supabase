@@ -75,6 +75,62 @@ describe('FilterBar', () => {
     })
   })
 
+  it('keeps a custom picker value formatted while active and stores the selected raw value', async () => {
+    const user = userEvent.setup()
+    const onFilterChange = vi.fn()
+    const properties: FilterProperty[] = [
+      {
+        label: 'Time range',
+        name: 'date',
+        type: 'date',
+        operators: ['='],
+        formatValue: (value) => (value === 'range-30m' ? 'Last 30 minutes' : 'Last 60 minutes'),
+        options: {
+          component: ({ onChange, search }) => (
+            <button onClick={() => onChange('range-30m')} data-current-range={search}>
+              Last 30 minutes
+            </button>
+          ),
+        },
+      },
+    ]
+    function PickerFilterBar() {
+      const [filters, setFilters] = useState<FilterGroup>({
+        logicalOperator: 'AND',
+        conditions: [{ propertyName: 'date', operator: '=', value: 'range-60m' }],
+      })
+      return (
+        <FilterBar
+          filterProperties={properties}
+          filters={filters}
+          onFilterChange={(next) => {
+            setFilters(next)
+            onFilterChange(next)
+          }}
+          freeformText=""
+          onFreeformTextChange={vi.fn()}
+        />
+      )
+    }
+    render(<PickerFilterBar />)
+    const valueInput = screen.getByLabelText('Value for Time range')
+    expect(valueInput).toHaveValue('Last 60 minutes')
+    await user.click(valueInput)
+    const preset = await screen.findByRole('button', { name: 'Last 30 minutes' })
+    expect(valueInput).toHaveValue('Last 60 minutes')
+    expect(valueInput).toHaveAttribute('readonly')
+    expect(preset).toHaveAttribute('data-current-range', 'range-60m')
+    await user.keyboard('x')
+    expect(valueInput).toHaveValue('Last 60 minutes')
+    expect(onFilterChange).not.toHaveBeenCalled()
+    await user.click(preset)
+    await waitFor(() => expect(valueInput).toHaveValue('Last 30 minutes'))
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'date', operator: '=', value: 'range-30m' }],
+    })
+  })
+
   it('renders with empty state', () => {
     render(
       <FilterBar

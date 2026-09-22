@@ -9,6 +9,7 @@ import { useFilterBar } from './FilterBarContext'
 import { useDeferredBlur, useHighlightNavigation } from './hooks'
 import { buildOperatorItems, buildPropertyChangeItems, buildValueItems } from './menuItems'
 import { FilterCondition as FilterConditionType } from './types'
+import { isCustomOptionObject } from './utils'
 
 export type FilterConditionProps = {
   condition: FilterConditionType
@@ -59,8 +60,11 @@ export function FilterCondition({
 
   const conditionOperator = condition.operator ?? ''
   const conditionValue = (condition.value ?? '').toString()
+  const hasFormattedCustomValue = !!property?.formatValue && isCustomOptionObject(property.options)
   const displayedValue =
-    !isActive && property?.formatValue ? property.formatValue(condition.value) : localValue
+    (!isActive || hasFormattedCustomValue) && property?.formatValue
+      ? property.formatValue(condition.value)
+      : localValue
 
   // Reset "has typed" state when focus changes
   useEffect(() => {
@@ -377,6 +381,7 @@ export function FilterCondition({
               ref={valueRef}
               type="text"
               value={displayedValue}
+              readOnly={hasFormattedCustomValue}
               onChange={onValueChange}
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
