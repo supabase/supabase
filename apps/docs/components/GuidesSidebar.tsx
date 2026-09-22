@@ -62,7 +62,7 @@ function AiTools({ className }: { className?: string }) {
           className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
         >
           {copied ? (
-            <Check size={14} strokeWidth={1.5} className="text-brand" aria-hidden />
+            <Check size={14} strokeWidth={1.5} className="text-primary" aria-hidden />
           ) : (
             <Copy size={14} strokeWidth={1.5} aria-hidden />
           )}
