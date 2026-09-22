@@ -92,6 +92,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
           />
         </div>
         <div
+          id="query-detail-sql-panel"
           className={cn(
             'overflow-hidden pb-0 z-0 relative transition-all duration-300',
             isExpanded ? 'h-[348px]' : 'h-[120px]'
@@ -128,8 +129,11 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
           <div className="inline-flex rounded-full bg-background">
             <Button
+              type="button"
               className="rounded-full"
               icon={<ChevronsUpDown />}
+              aria-expanded={isExpanded}
+              aria-controls="query-detail-sql-panel"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? 'Collapse' : 'Expand'}
