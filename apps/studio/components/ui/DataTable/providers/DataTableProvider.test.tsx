@@ -1,6 +1,7 @@
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { fireEvent, screen } from '@testing-library/react'
 import { memo, useState } from 'react'
+import { Button } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
 import { DataTableFilterField } from '../DataTable.types'
@@ -15,9 +16,9 @@ const TableControls = memo(function TableControls({ onRender }: { onRender: () =
   const { table } = useDataTable()
   onRender()
   return (
-    <button onClick={() => table.getColumn('message')?.toggleVisibility()}>
+    <Button onClick={() => table.getColumn('message')?.toggleVisibility()}>
       {table.getColumn('message')?.getIsVisible() ? 'Hide message' : 'Show message'}
-    </button>
+    </Button>
   )
 })
 
@@ -38,7 +39,7 @@ function Harness({ onRender }: { onRender: () => void }) {
       openRowId={openRowId}
       setOpenRowId={setOpenRowId}
     >
-      <button onClick={() => setOpenRowId('first')}>Select log</button>
+      <Button onClick={() => setOpenRowId('first')}>Select log</Button>
       <TableControls onRender={onRender} />
     </DataTableProvider>
   )
