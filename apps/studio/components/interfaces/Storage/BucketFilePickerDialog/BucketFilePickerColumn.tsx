@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -10,7 +10,12 @@ import { toast } from 'sonner'
 import { Checkbox, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
+import {
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+  STORAGE_SORT_BY,
+  STORAGE_VIEWS,
+} from '../Storage.constants'
 import type { StorageItem } from '../Storage.types'
 import { formatFolderItems } from '../StorageExplorer/StorageExplorer.utils'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
@@ -19,7 +24,7 @@ import { BucketFilePickerRow } from './BucketFilePickerRow'
 import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-infinite-query'
+import { bucketObjectsInfiniteQueryOptions } from '@/data/storage/bucket-objects-infinite-query'
 import { storageKeys } from '@/data/storage/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
@@ -136,26 +141,29 @@ export const BucketFilePickerColumn = ({
   const isLastFolder = index === columns.length
 
   const { view, sortBy, sortByOrder } = useStoragePreference(projectRef!)
+  // v2's sortBy.column doesn't support 'last_accessed_at'; the picker's own sort dropdown no
+  // longer offers it, but the preference is shared with the (still v1) main file explorer.
+  const sortColumn = sortBy === STORAGE_SORT_BY.LAST_ACCESSED_AT ? STORAGE_SORT_BY.NAME : sortBy
 
   const debouncedSearchString = useDebounce(itemSearchString, 500)
-  const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useBucketObjectsInfiniteQuery(
-    {
+  const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useInfiniteQuery({
+    ...bucketObjectsInfiniteQueryOptions({
       projectRef,
       bucketId: bucket.id,
       path,
       options: {
         sortBy: {
-          column: sortBy,
+          column: sortColumn,
           order: sortByOrder,
         },
         // When a user tries to search, only search in the last opened folder (rightmost column)
         ...(isLastFolder && debouncedSearchString ? { search: debouncedSearchString } : {}),
       },
-    }
-  )
+    }),
+  })
 
   const items = useMemo(() => {
-    const objs = data?.pages.flatMap((page) => page) || []
+    const objs = (data?.pages ?? []).flatMap((page) => page.objects)
     return formatFolderItems(objs)
   }, [data])
 
