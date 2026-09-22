@@ -1,14 +1,7 @@
-import { ExternalLink, MessageSquare, NotebookText, Trash } from 'lucide-react'
+import { MessageSquare, NotebookText, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties } from 'react'
-import {
-  cn,
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from 'ui'
+import { cn, ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from 'ui'
 
 import { rowClassName } from './ExplorerLayout.constants'
 
@@ -54,13 +47,6 @@ export const ExplorerNavItem = ({
         </Link>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem asChild className="gap-x-2" onFocusCapture={(e) => e.stopPropagation()}>
-          <Link target="_self" rel="noreferrer" href={href}>
-            <ExternalLink size={14} />
-            <span>Open in new tab</span>
-          </Link>
-        </ContextMenuItem>
-        <ContextMenuSeparator />
         <ContextMenuItem className="gap-x-2" onSelect={onSelectDelete}>
           <Trash size={14} />
           <span>Delete {type}</span>
