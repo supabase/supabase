@@ -166,7 +166,7 @@ export const RowMenu = ({
             />
             {hasUpdate && (
               <span
-                className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full"
+                className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand-default rounded-full"
                 aria-hidden
               />
             )}

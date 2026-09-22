@@ -14,10 +14,10 @@
    * theme can run, say, a cool-gray surface against the green brand:
    *   --surface-hue  tints backgrounds, text and borders (the neutral ramp)
    *   --primary-hue  is the brand hue that --primary is built from
-   * Both default to --hue (Supabase green ≈159° in OKLCH), so a theme that only
+   * Both default to --hue (Supabase green ≈157.5° in OKLCH), so a theme that only
    * sets --hue keeps surfaces and brand locked together as before; override
    * either one to let them diverge. */
-  --hue: 159;
+  --hue: 157.5;
   --surface-hue: var(--hue);
   --primary-hue: var(--hue);
   /* Root defaults mirror the dark theme (the app's default appearance). */
@@ -104,7 +104,7 @@
    * (matching the "no additional charge" badge); like the others it pulls a touch
    * with the brand --primary-hue but clamps so it always reads violet.
    */
-  --brand-hue-reference: 159;
+  --brand-hue-reference: 157.5;
   --status-hue-pull: 0.15;
   --warning-hue: clamp(
     65,
@@ -158,12 +158,8 @@
   --popover: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
   --popover-foreground: var(--foreground);
 
-  /* Primary is the brand-derived accent: a fixed, vivid Supabase green on
-     --primary-hue, mode-invariant and decoupled from the --chroma knob so it
-     holds its identity even as neutrals desaturate. NOTE: the `brand` utility
-     (--color-brand in theme.css) is deliberately NOT this — it maps to the
-     per-theme --brand-default scale (master behavior) while we resolve how
-     `brand` is used across the interface. */
+  /* Primary is the accessible functional green (text, controls). Bright
+     expressive fills use brand-default. Light theme overrides --primary for AA text. */
   --primary: oklch(0.76 0.15 var(--primary-hue));
   --primary-foreground: oklch(
     min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
@@ -247,7 +243,7 @@
   --border-destructive: oklch(from var(--destructive) l c h / 30%);
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-info: oklch(from var(--info) l c h / 30%);
-  --border-brand: oklch(from var(--primary) l c h / 30%);
+  --border-brand-default: oklch(from var(--primary) l c h / 30%);
 
   --border: oklch(
     from var(--foreground) l calc(c * 0.54) h / calc(2% + 20% * var(--contrast-border))

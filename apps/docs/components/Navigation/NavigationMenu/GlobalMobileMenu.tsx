@@ -137,7 +137,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                   height={24}
                   alt="Supabase Logo"
                 />
-                <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+                <span className="font-mono text-sm font-medium text-brand mb-px">DOCS</span>
               </Link>
               <div className="flex gap-4 items-center">
                 <ThemeToggle contentClassName="bg-surface-200" />

@@ -24,7 +24,7 @@ export function SurveyPullQuoteGrid({ quotes }: { quotes: PullQuoteGridItem[] })
           {quotes.map((q, i) => (
             <div key={i} className="flex flex-col gap-4 px-8 py-12">
               {q.theme && (
-                <span className="text-brand-link dark:text-brand text-xs font-mono uppercase tracking-widest">
+                <span className="text-brand text-xs font-mono uppercase tracking-widest">
                   {q.theme}
                 </span>
               )}

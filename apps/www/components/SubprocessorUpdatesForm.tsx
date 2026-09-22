@@ -66,7 +66,7 @@ const SubprocessorUpdatesForm = () => {
         with our{' '}
         <Link
           href="https://supabase.com/privacy"
-          className="text-brand-link hover:underline"
+          className="text-brand hover:underline"
           target="_blank"
           rel="noopener noreferrer"
         >

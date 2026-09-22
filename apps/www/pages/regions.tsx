@@ -128,7 +128,7 @@ const RegionsPage = () => {
           </div>
           <p className="text-sm text-foreground-light">
             Need the database in your own cloud?{' '}
-            <Link href="/go/byoc-early-access" className="text-brand-link hover:underline">
+            <Link href="/go/byoc-early-access" className="text-brand hover:underline">
               Ask about early access to BYOC
             </Link>
             .

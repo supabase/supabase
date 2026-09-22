@@ -274,7 +274,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 </div>
                 {isActive ? (
                   <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
-                    <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
+                    <span className="rounded-full bg-brand-default p-0.5 text-xs text-brand-200">
                       <Check strokeWidth={2} size={12} />
                     </span>
                     <span className="px-1">Enabled</span>
