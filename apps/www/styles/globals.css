@@ -264,7 +264,7 @@ h6:not(.overwrite) {
 }
 
 .toc-animate {
-  @apply translate-x-1! text-brand!;
+  @apply translate-x-1! text-primary!;
 }
 
 .prose-toc a {

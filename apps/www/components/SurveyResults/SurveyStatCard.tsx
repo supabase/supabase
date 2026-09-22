@@ -105,7 +105,7 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
       {/* Text */}
       <div className="flex flex-col gap-2">
         <p
-          className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-brand' : 'text-foreground-muted'} transition-colors duration-1000`}
+          className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-primary' : 'text-foreground-muted'} transition-colors duration-1000`}
         >
           {displayValue}
           <span className="md:text-4xl">%</span>

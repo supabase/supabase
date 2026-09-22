@@ -240,7 +240,7 @@ interface DeletionSuccessProps {
 }
 
 const DeletionSuccess = ({ totalRowsDeleted }: DeletionSuccessProps) => (
-  <div className="flex items-center gap-2 text-brand">
+  <div className="flex items-center gap-2 text-primary">
     <CheckCircle2 size={16} />
     <span className="text-sm">Successfully deleted {totalRowsDeleted.toLocaleString()} rows.</span>
   </div>
@@ -265,7 +265,7 @@ const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
 
 const ScheduleSuccess = () => (
   <div className="space-y-2">
-    <div className="flex items-center gap-2 text-brand">
+    <div className="flex items-center gap-2 text-primary">
       <CheckCircle2 size={16} />
       <span className="text-sm">Daily cleanup job scheduled successfully.</span>
     </div>

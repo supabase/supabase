@@ -275,7 +275,7 @@ const TableNodeComponent = ({
                     'text-ellipsis overflow-hidden whitespace-nowrap min-w-0 max-w-[80%]',
                     schemaGraphContext.selectedEdge?.sourceHandle === column.id ||
                       schemaGraphContext.selectedEdge?.targetHandle === column.id
-                      ? 'text-brand'
+                      ? 'text-primary'
                       : undefined
                   )}
                   title={column.name}
