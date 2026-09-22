@@ -100,7 +100,7 @@ export const ProjectTableRow = ({
                   >
                     {projectRef}
                     {isCopied ? (
-                      <Check size={12} strokeWidth={1.25} className="text-brand" />
+                      <Check size={12} strokeWidth={1.25} className="text-primary" />
                     ) : (
                       <Copy
                         size={12}

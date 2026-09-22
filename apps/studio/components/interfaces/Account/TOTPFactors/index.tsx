@@ -34,7 +34,7 @@ export const TOTPFactors = () => {
   const totpFactors = data?.totp ?? []
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
-  const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length === 1
+  const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes
 
   const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
     enabled: shouldVerifyRecoveryCodes,

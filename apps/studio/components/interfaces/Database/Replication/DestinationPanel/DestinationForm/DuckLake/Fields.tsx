@@ -94,7 +94,7 @@ const DuckLakeModeSelector = ({
             <div className="flex items-start justify-between">
               <Icon size={18} strokeWidth={1.5} className="text-foreground-light" />
               {selected ? (
-                <Check size={16} className="text-brand" />
+                <Check size={16} className="text-primary" />
               ) : (
                 <span className="h-4 w-4 rounded-full border border-strong" />
               )}

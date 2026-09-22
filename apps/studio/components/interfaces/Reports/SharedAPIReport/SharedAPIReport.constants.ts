@@ -1,13 +1,17 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { isEqual } from 'lodash'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 
-import { generateRegexpWhereSafe } from '../Reports.constants'
+import { generateRegexpWhereSafe, PRESET_CONFIG } from '../Reports.constants'
 import { ReportFilterItem } from '../Reports.types'
+import { getLogsSql } from '../Reports.utils'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { reportKeys } from '@/data/reports/keys'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const SOURCE_TABLE: Record<string, SafeLogSqlFragment> = {
   edge_logs: safeSql`edge_logs`,
@@ -200,8 +204,6 @@ export const SHARED_API_REPORT_SQL = {
 
 export type SharedAPIReportKey = keyof typeof SHARED_API_REPORT_SQL
 
-const DEFAULT_KEYS = ['shared-api-report']
-
 export type SharedAPIReportFilterBy =
   | 'auth'
   | 'realtime'
@@ -209,6 +211,7 @@ export type SharedAPIReportFilterBy =
   | 'graphql'
   | 'functions'
   | 'postgrest'
+
 type SharedAPIReportParams = {
   filterBy: SharedAPIReportFilterBy
   start: string
@@ -225,6 +228,8 @@ export const useSharedAPIReport = ({
   const { ref } = useParams() as { ref: string }
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const queryClient = useQueryClient()
+  const flagUseOtel = useFlag('otelReports')
+  const { hasLoaded: hasLoadedFlags } = useContext(FeatureFlagContext)
   const filterByMapSource = {
     functions: 'function_edge_logs',
     realtime: 'edge_logs',
@@ -250,31 +255,53 @@ export const useSharedAPIReport = ({
   }
 
   const allFilters = [baseFilter, ...filters]
+  const source = filterByMapSource[filterBy]
+  const isDataApiReport = filterBy === 'postgrest'
+  const useOtel = IS_PLATFORM && isDataApiReport && Boolean(flagUseOtel)
+  const isQueryModeReady = !IS_PLATFORM || !isDataApiReport || hasLoadedFlags === true
+  const keys = Object.keys(SHARED_API_REPORT_SQL) as SharedAPIReportKey[]
+  const getQuerySql = (queryName: SharedAPIReportKey) =>
+    useOtel
+      ? getLogsSql(PRESET_CONFIG.api.queries[queryName], allFilters, true)
+      : SHARED_API_REPORT_SQL[queryName].safeSql(allFilters, source)
+  const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
+    totalRequests: getQuerySql('totalRequests'),
+    topRoutes: getQuerySql('topRoutes'),
+    errorCounts: getQuerySql('errorCounts'),
+    topErrorRoutes: getQuerySql('topErrorRoutes'),
+    responseSpeed: getQuerySql('responseSpeed'),
+    topSlowRoutes: getQuerySql('topSlowRoutes'),
+    networkTraffic: getQuerySql('networkTraffic'),
+  }
 
   const queries = useQueries({
-    queries: Object.entries(SHARED_API_REPORT_SQL).map(([key, value]) => ({
-      queryKey: [
-        ...DEFAULT_KEYS,
+    queries: keys.map((queryName) => ({
+      queryKey: reportKeys.sharedApiMetric({
         filterBy,
-        key,
-        filterByMapSource[filterBy],
+        queryName,
+        source,
         filters,
         start,
         end,
-        ref,
-      ],
-      enabled: enabled && !!ref && !!filterBy,
-      queryFn: async () => {
+        projectRef: ref,
+        useOtel,
+      }),
+      enabled: enabled && isQueryModeReady && !!ref && !!filterBy,
+      queryFn: async ({ signal }) => {
         try {
           const data = await executeAnalyticsSql({
             projectRef: ref,
-            endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
-            sql: value.safeSql(allFilters, filterByMapSource[filterBy]),
+            endpoint: logsAllEndpointUrl(useOtel),
+            sql: SQLMap[queryName],
             iso_timestamp_start: start,
             iso_timestamp_end: end,
             method: 'get',
+            signal,
           })
-          if (data?.error) throw data.error
+          if (data?.error !== undefined) {
+            const message = typeof data.error === 'string' ? data.error : data.error.message
+            throw new Error(message)
+          }
           return data
         } catch (err) {
           Sentry.captureException({ message: 'Shared API Report Error', data: { error: err } })
@@ -283,8 +310,6 @@ export const useSharedAPIReport = ({
       },
     })),
   })
-
-  const keys = Object.keys(SHARED_API_REPORT_SQL) as Array<keyof typeof SHARED_API_REPORT_SQL>
 
   const data = keys.reduce(
     (acc, key, i) => {
@@ -296,15 +321,15 @@ export const useSharedAPIReport = ({
 
   const error = keys.reduce(
     (acc, key, i) => {
-      acc[key] = queries[i].error as unknown as string
+      acc[key] = queries[i].error
       return acc
     },
-    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: string }
+    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: Error | null }
   )
 
   const isLoading = keys.reduce(
     (acc, key, i) => {
-      acc[key] = queries[i].isLoading
+      acc[key] = !isQueryModeReady || queries[i].isLoading
       return acc
     },
     {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: boolean }
@@ -333,38 +358,13 @@ export const useSharedAPIReport = ({
 
   const isLoadingData = Object.values(isLoading).some(Boolean)
 
-  const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
-    totalRequests: SHARED_API_REPORT_SQL.totalRequests.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    topRoutes: SHARED_API_REPORT_SQL.topRoutes.safeSql(allFilters, filterByMapSource[filterBy]),
-    errorCounts: SHARED_API_REPORT_SQL.errorCounts.safeSql(allFilters, filterByMapSource[filterBy]),
-    topErrorRoutes: SHARED_API_REPORT_SQL.topErrorRoutes.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    responseSpeed: SHARED_API_REPORT_SQL.responseSpeed.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    topSlowRoutes: SHARED_API_REPORT_SQL.topSlowRoutes.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    networkTraffic: SHARED_API_REPORT_SQL.networkTraffic.safeSql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-  }
-
   return {
     data,
     error,
     isLoading,
     isLoadingData,
-    isRefetching: queryClient.isFetching({ queryKey: DEFAULT_KEYS }) > 0 || false,
-    refetch: () => queryClient.invalidateQueries({ queryKey: DEFAULT_KEYS }),
+    isRefetching: queryClient.isFetching({ queryKey: reportKeys.allSharedApi }) > 0 || false,
+    refetch: () => queryClient.invalidateQueries({ queryKey: reportKeys.allSharedApi }),
     filters,
     addFilter,
     removeFilters,

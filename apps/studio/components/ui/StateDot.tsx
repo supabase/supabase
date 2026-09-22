@@ -20,12 +20,7 @@ interface StateDotProps extends ComponentPropsWithoutRef<'span'> {
   labelClassName?: string
 }
 
-/**
- * A coloured dot with a label: the one way a state is shown across Replication. Green means
- * streaming or healthy, red means broken, amber means in motion or at risk, grey means waiting.
- *
- * Forwards its ref and spreads props so it can be the child of a Radix `asChild` trigger.
- */
+/** A coloured dot with a label for compact operational states. */
 export const StateDot = forwardRef<HTMLSpanElement, StateDotProps>(
   (
     { variant, children, isPulsing = false, pulseDelayMs = 0, className, labelClassName, ...props },
