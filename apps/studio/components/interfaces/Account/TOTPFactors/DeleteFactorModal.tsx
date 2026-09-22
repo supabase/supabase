@@ -1,5 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { organizationKeys } from '@/data/organizations/keys'
@@ -8,6 +17,7 @@ import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganizat
 
 interface DeleteFactorModalProps {
   visible: boolean
+  hasRecoveryCodes: boolean
   factorId: string | null
   lastFactorToBeDeleted: boolean
   onClose: () => void
@@ -16,6 +26,7 @@ interface DeleteFactorModalProps {
 const DeleteFactorModal = ({
   visible,
   factorId,
+  hasRecoveryCodes,
   lastFactorToBeDeleted,
   onClose,
 }: DeleteFactorModalProps) => {
@@ -33,6 +44,33 @@ const DeleteFactorModal = ({
       onClose()
     },
   })
+
+  // Users can't delete their last MFA if they have recovery codes, they must delete them first
+  // This is enforced by the backend
+  if (lastFactorToBeDeleted && hasRecoveryCodes) {
+    return (
+      <AlertDialog
+        open={visible}
+        onOpenChange={(open) => {
+          if (open) return
+          onClose()
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Recovery codes are still available</AlertDialogTitle>
+            <AlertDialogDescription>
+              You can't delete the last factor configured for your account if you still have
+              recovery codes available. Please delete them first.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    )
+  }
 
   return (
     <ConfirmationModal

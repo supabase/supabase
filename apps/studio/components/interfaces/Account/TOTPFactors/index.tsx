@@ -23,7 +23,7 @@ import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
-import { DATETIME_FORMAT, IS_STAGING_OR_LOCAL } from '@/lib/constants'
+import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
@@ -71,7 +71,7 @@ export const TOTPFactors = () => {
                   </p>
                   <div className="flex gap-2 ml-auto">
                     <RegenerateRecoveryCodesModal />
-                    {IS_STAGING_OR_LOCAL && <UnenrollRecoveryCodesModal />}
+                    <UnenrollRecoveryCodesModal />
                   </div>
                 </CardContent>
               </Card>
@@ -156,6 +156,7 @@ export const TOTPFactors = () => {
         factorId={factorToBeDeleted}
         lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
+        hasRecoveryCodes={recoveryCodesStatus?.status === 'available'}
       />
     </>
   )
