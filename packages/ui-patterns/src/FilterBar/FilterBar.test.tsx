@@ -37,6 +37,44 @@ describe('FilterBar', () => {
   const mockOnFilterChange = vi.fn()
   const mockOnFreeformTextChange = vi.fn()
 
+  it('formats a value for display without changing its stored or editable value', async () => {
+    const user = userEvent.setup()
+    const onApply = vi.fn()
+    const onFilterChange = vi.fn()
+    render(
+      <FilterBar
+        filterProperties={[
+          {
+            label: 'Time range',
+            name: 'date',
+            type: 'date',
+            operators: ['='],
+            formatValue: () => 'Last 60 minutes',
+          },
+        ]}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'date', operator: '=', value: 'precise-range' }],
+        }}
+        onFilterChange={onFilterChange}
+        onApply={onApply}
+        freeformText=""
+        onFreeformTextChange={vi.fn()}
+      />
+    )
+    const valueInput = screen.getByLabelText('Value for Time range')
+    expect(valueInput).toHaveValue('Last 60 minutes')
+    await user.click(valueInput)
+    expect(valueInput).toHaveValue('precise-range')
+    await user.click(document.body)
+    await waitFor(() => expect(valueInput).toHaveValue('Last 60 minutes'))
+    expect(onFilterChange).not.toHaveBeenCalled()
+    expect(onApply).toHaveBeenLastCalledWith({
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'date', operator: '=', value: 'precise-range' }],
+    })
+  })
+
   it('renders with empty state', () => {
     render(
       <FilterBar

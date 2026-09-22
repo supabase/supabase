@@ -59,6 +59,8 @@ export function FilterCondition({
 
   const conditionOperator = condition.operator ?? ''
   const conditionValue = (condition.value ?? '').toString()
+  const displayedValue =
+    !isActive && property?.formatValue ? property.formatValue(condition.value) : localValue
 
   // Reset "has typed" state when focus changes
   useEffect(() => {
@@ -374,7 +376,7 @@ export function FilterCondition({
             <Input
               ref={valueRef}
               type="text"
-              value={localValue}
+              value={displayedValue}
               onChange={onValueChange}
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
@@ -388,7 +390,9 @@ export function FilterCondition({
               data-lpignore="true"
               data-form-type="other"
             />
-            <span className="invisible whitespace-pre text-xs block px-1">{localValue || ' '}</span>
+            <span className="invisible whitespace-pre text-xs block px-1">
+              {displayedValue || ' '}
+            </span>
           </div>
         </PopoverAnchor>
         <PopoverContent
