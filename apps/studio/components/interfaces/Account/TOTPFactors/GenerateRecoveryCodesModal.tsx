@@ -19,6 +19,9 @@ export const GenerateRecoveryCodesModal = () => {
       description="Recovery codes are important to ensure you can recover your account if you loose access to your MFA."
       actions={
         <>
+          <span aria-live="polite" className="sr-only">
+            {recoveryCodesGenerateMutation.isPending ? 'Generating your recovery codes...' : ''}
+          </span>
           <Button
             onClick={() => {
               recoveryCodesGenerateMutation.mutate({})
