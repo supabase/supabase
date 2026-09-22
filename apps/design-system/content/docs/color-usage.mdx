@@ -5,15 +5,28 @@ description: Colors system breakdown with best practices.
 
 The shorthand utility classes below simplify our full color palette by providing sensible, contrast-checked defaults. Use them whenever possible to ensure accessible text colors and balanced background fills.
 
+## Brand green: two jobs
+
+Supabase green is not one token. Light mode in particular needs two greens with different jobs:
+
+| Job           | Token / utilities                                                                  | Use when                                                                                                                                                      |
+| ------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Readable ink  | `--primary`, `text-primary`, `border-primary`                                      | The colour must be _read_ or recognised at a small size: links, labels, statuses, radio borders/dots, step dots                                               |
+| Bright chrome | `brand-default`, `--ring`, `bg-brand-default`, `border-brand-default`, `ring-ring` | The colour should feel on-brand and obvious as chrome: focus rings, highlight rings, larger selected fills (choice cards, slider ranges), solid brand buttons |
+
+**Rule of thumb:** if thin 12px type in that green would fail WCAG AA on the surface, use accessible primary. If the green is identification, energy, or a ring around a control, use bright `brand-default`.
+
+Do not point focus rings or other bright chrome at `--primary` just because text uses it. That was how light-mode focus rings went muddy after brand text was darkened for AA. Dark mode is largely the same green for both jobs; the split matters most on light surfaces.
+
+See also [Typography](../docs/typography) (`text-primary`) and [Accessibility](../docs/accessibility#focus-management) (shared focus ring).
+
 ## Text
 
 Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
 
 Use `text-primary` for readable branded text such as links, labels, and statuses. On light-theme
-surfaces it meets the 4.5:1 WCAG AA requirement for normal text. Use `bg-brand-default` /
-`border-brand-default` when you need the canonical bright Supabase green as a fill or border.
-Focus rings (`ring-ring` / `focus-ring`) also stay on that bright brand; they do not track the
-darkened accessible `--primary` used for text.
+surfaces it meets the 4.5:1 WCAG AA requirement for normal text. For fills, borders, and focus
+chrome, see [Brand green: two jobs](#brand-green-two-jobs).
 
 <Colors definition={'text'} />
 
@@ -21,10 +34,8 @@ darkened accessible `--primary` used for text.
 
 Use `bg-brand-default` when the canonical Supabase green is required as a fill. The same
 `brand-default` suffix applies to borders and other non-text utilities, such as
-`border-brand-default`. Shared focus chrome (`--ring`) and larger selected fills (sliders,
-checked field cards) stay on `brand-default`. Small selected indicators that need to read
-clearly on light surfaces (radio borders/dots, step dots) use accessible `--primary` /
-`border-primary` instead. Keep `text-primary` for readable branded text.
+`border-brand-default`. Prefer accessible `--primary` / `border-primary` for small selected
+indicators (radios, step dots). Details in [Brand green: two jobs](#brand-green-two-jobs).
 
 <Colors definition={'background'} />
 
