@@ -6,10 +6,10 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import type { Klass, LexicalNode } from 'lexical'
 
 /**
- * `@lexical/markdown`'s default TRANSFORMERS cover headings, blockquotes, ordered/unordered
- * lists, fenced code blocks, links, and the standard text formats (bold/italic/strikethrough/
- * inline code) — with no tables or task-list checkboxes. That's exactly this editor's supported
- * node set, so the defaults are used as-is rather than assembling a custom subset.
+ * [Joshen] Passthrough export here in case we want to expand more transformers
+ * in the future - the default TRANSFORMERS cover the basics like headings, blockquotes,
+ * lists, code blocks, links, and standard text formats.
+ * If we'd like to support tables for example then we can expand this const
  */
 export const MARKDOWN_TRANSFORMERS = TRANSFORMERS
 
