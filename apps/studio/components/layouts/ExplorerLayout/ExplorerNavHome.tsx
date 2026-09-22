@@ -144,7 +144,7 @@ export const ExplorerNavHome = ({
 
       <div className="shrink-0 border-t border-default p-3">
         <Link
-          href="/account/me"
+          href="/account/me#dashboard"
           className={rowClassName(false)}
           onClick={() => appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)}
         >
