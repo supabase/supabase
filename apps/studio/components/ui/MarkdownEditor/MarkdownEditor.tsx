@@ -43,9 +43,37 @@ const MarkdownClassName = cn(
   '[--tw-prose-quotes:var(--foreground-muted)]'
 )
 
-const MarkdownShortcutsPlugin = () => {
+const EDITOR_OWNED_SHORTCUT_KEYS = new Set(['b', 'i', 'u', 'z'])
+
+const isEditorOwnedShortcut = (event: Pick<KeyboardEvent, 'metaKey' | 'ctrlKey' | 'key'>) =>
+  (event.metaKey || event.ctrlKey) && EDITOR_OWNED_SHORTCUT_KEYS.has(event.key.toLowerCase())
+
+const EditorKeyboardShortcutsPlugin = () => {
   const [editor] = useLexicalComposerContext()
-  useEffect(() => registerMarkdownShortcuts(editor, MARKDOWN_TRANSFORMERS), [editor])
+
+  useEffect(() => {
+    const unregisterMarkdownShortcuts = registerMarkdownShortcuts(editor, MARKDOWN_TRANSFORMERS)
+
+    /**
+     * [Joshen] This just ensures that the markdown editor shortcuts take precedence.
+     * e.g Cmd+I to italicize a text should not toggle the inline editor panel
+     */
+    const unregisterRootListener = editor.registerRootListener((rootElement) => {
+      if (!rootElement) return
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (isEditorOwnedShortcut(event)) event.stopPropagation()
+      }
+      rootElement.addEventListener('keydown', handleKeyDown)
+      return () => rootElement.removeEventListener('keydown', handleKeyDown)
+    })
+
+    return () => {
+      unregisterMarkdownShortcuts()
+      unregisterRootListener()
+    }
+  }, [editor])
+
   return null
 }
 
@@ -140,7 +168,7 @@ export const MarkdownEditor = ({
         <ListPlugin />
         <LinkPlugin />
         <TabIndentationPlugin />
-        <MarkdownShortcutsPlugin />
+        <EditorKeyboardShortcutsPlugin />
         <SyncExternalValuePlugin
           value={value}
           isFocused={() => isFocusedRef.current}
