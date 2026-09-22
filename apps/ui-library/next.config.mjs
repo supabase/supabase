@@ -12,6 +12,7 @@ const nextConfig = {
   },
   outputFileTracingIncludes: {
     '/api/docs-md/**/*': ['./public/markdown/docs/**/*'],
+    '/api/index-md/**/*': ['./public/markdown/index.md'],
   },
   async redirects() {
     return [
