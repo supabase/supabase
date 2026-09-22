@@ -606,9 +606,6 @@ importers:
       '@redocly/cli':
         specifier: ^2.26.0
         version: 2.34.0
-      '@supabase/supa-mdx-lint':
-        specifier: 0.3.2
-        version: 0.3.2
       '@testing-library/react':
         specifier: ^16.3.3
         version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -860,9 +857,6 @@ importers:
       '@shikijs/compat':
         specifier: ^1.1.7
         version: 1.6.0
-      '@supabase/supa-mdx-lint':
-        specifier: 0.3.1
-        version: 0.3.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.14
@@ -1522,9 +1516,6 @@ importers:
       '@supabase/postgrest-js':
         specifier: 'catalog:'
         version: 2.116.0
-      '@supabase/supa-mdx-lint':
-        specifier: 0.2.6-alpha
-        version: 0.2.6-alpha
       '@supabase/vue-blocks':
         specifier: workspace:*
         version: link:../../blocks/vue
@@ -8398,141 +8389,6 @@ packages:
     resolution: {integrity: sha512-6/3hR6vccBP6oGM5B6RfbwZcTCKmQOodd/ZWQdsw8yJsU5zO/a//oBL6yLnmgxcjnHSrelW8rsO7hL5DPybyUQ==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/supa-mdx-lint-darwin@0.2.6-alpha':
-    resolution: {integrity: sha512-tDyl2SWfuFb5yckD1cyd5CfmkAbvx9onaxXFrMTP/1bB/sYM3RI2BJQ7/lfZy0jcIiMvc70LroJe5EYx37yYsQ==}
-    engines: {node: '>=10'}
-    os: [darwin]
-
-  '@supabase/supa-mdx-lint-darwin@0.3.1':
-    resolution: {integrity: sha512-kX4cFMIP9OStV1j9zWy/wfrk5KKrn3DtBwP7y8GPHe05Y7nTfQOoqHpIKbHswJRB5OxFC3ETpI6DocQeWcrZ6Q==}
-    engines: {node: '>=10'}
-    os: [darwin]
-
-  '@supabase/supa-mdx-lint-darwin@0.3.2':
-    resolution: {integrity: sha512-GGG0X1DiQLldkKIw8CDFQFYqK4aLgx6DIdzhOMwZrH34ADcE+WdExVnsHqaSE4eRwKsX531Hz+iJgiybWx1TBA==}
-    engines: {node: '>=10'}
-    os: [darwin]
-
-  '@supabase/supa-mdx-lint-linux-arm64@0.2.6-alpha':
-    resolution: {integrity: sha512-y51H1VW4VIpsFB/ui8GEU1h15tPp9fL8p2NMDltNEUrjSYpH7hzbj+surxy/FA0JdXllpqNV+7UvDm/FIz/Klg==}
-    engines: {node: '>=10'}
-    cpu: [arm64]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-arm64@0.3.1':
-    resolution: {integrity: sha512-4zVQkqxnn+HYSbYED9egnw/nuF5/Z8pK1Kp2vmv5cNUaQvyreHZzC1opRjO11HgqBZZGMm5AybsY3lEEQ5pqpg==}
-    engines: {node: '>=10'}
-    cpu: [arm64]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-arm64@0.3.2':
-    resolution: {integrity: sha512-qRxTxZQBGc7uHVTH3mMAYilIgnZ7CvMQYeoJa5LbVhjAUmDjKwx5hTu1SoW2OyhkueMJcz887+Kynas2WO8ADw==}
-    engines: {node: '>=10'}
-    cpu: [arm64]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-arm@0.2.6-alpha':
-    resolution: {integrity: sha512-8UOMo8nRUDtaDuFjMlSjtaA6WjuZVRz5jRFFoFotm16QxA4+JMS00g6rmYl2nyt6Vjj/bCiFdS60oOWzPHFtBQ==}
-    engines: {node: '>=10'}
-    cpu: [arm]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-arm@0.3.1':
-    resolution: {integrity: sha512-fcR7oKKgrXbVHKtOLjbtPPP3fg/FxaYLnnYYVulJM4Xh+0dPFmCox1xIo7OZKbHy7pEa+GJUwSgT1WlhZLN34Q==}
-    engines: {node: '>=10'}
-    cpu: [arm]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-arm@0.3.2':
-    resolution: {integrity: sha512-KCCJ6iP6/s3SrbkvwWo/cjX6+LOp56C/mSM0NkVzaRpsc9VcN39/4gA1Ls7O2jOV/g2fnIEWfdRef6dY9ob+bA==}
-    engines: {node: '>=10'}
-    cpu: [arm]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-i686@0.2.6-alpha':
-    resolution: {integrity: sha512-Vjcn3hGNsw4V9x6RpI9S75byeqlkHbkVNPtKihm4hof9hgaMoxEA+/EPX7f0L/1rnPR39dkV1rbBojoV/XBd6w==}
-    engines: {node: '>=10'}
-    cpu: [x86, ia32]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-i686@0.3.1':
-    resolution: {integrity: sha512-09HNDDy11ox8IiEXe2SWecRtvdFOJu2lDvQo+vmEtVLhvO5eji65bG+vmESfdCcS79gaGxWoR+XWMreVhlVZ/Q==}
-    engines: {node: '>=10'}
-    cpu: [x86, ia32]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-i686@0.3.2':
-    resolution: {integrity: sha512-74J96VQzublrNAeNyVuymfBJM0teEWC4oCHVF6mdJ8sAJs4nGPv/QWG6aTFMzh2dvAlbS6jw4zlc0PoPluLCYg==}
-    engines: {node: '>=10'}
-    cpu: [x86, ia32]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-x64@0.2.6-alpha':
-    resolution: {integrity: sha512-nq0GB/WaqKyt4LWvx1+Z7XboSIlWtKmmqxyG1OtTQPcgKrImHvGrOJ3GuoUEcpJ9JyByCb2Tj3BJ6zIV8ngIJQ==}
-    engines: {node: '>=10'}
-    cpu: [x64]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-x64@0.3.1':
-    resolution: {integrity: sha512-4ZioHRmm5Tt1/EF1K2FcmhrZVEYWcT+5z4smNvMqznutCXKowb3EYCtvDm1TOPXh8JjxzOnlch18+TN6MexsKA==}
-    engines: {node: '>=10'}
-    cpu: [x64]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-linux-x64@0.3.2':
-    resolution: {integrity: sha512-mort3Vc/LWNG9boV2QFnGHnPBWuKcNoOgkZXkjwqckAoMCpJ25dxVRmrGeQeP4MSiJSsw4+LTT0lfCegVgsr2w==}
-    engines: {node: '>=10'}
-    cpu: [x64]
-    os: [linux, freebsd]
-
-  '@supabase/supa-mdx-lint-win32-i686@0.2.6-alpha':
-    resolution: {integrity: sha512-htjCjhElGSt9LTrtFHtN+iCsVHa4fZmVBBQPsO6Tqsubis00voFInKXkQGDsMkT9swOyEBCAaYe7XK3FEnYEXA==}
-    engines: {node: '>=10'}
-    cpu: [x86, ia32]
-    os: [win32]
-
-  '@supabase/supa-mdx-lint-win32-i686@0.3.1':
-    resolution: {integrity: sha512-u7H840/2fxjrLuNI2ohdslIyrZ8bJoBFhvTiC8J13cQBbpOP4FQOEzgeh1hqZGJNuWAUBgYJkwiZl/gc8Yv4Eg==}
-    engines: {node: '>=10'}
-    cpu: [x86, ia32]
-    os: [win32]
-
-  '@supabase/supa-mdx-lint-win32-i686@0.3.2':
-    resolution: {integrity: sha512-Fb2K/U2IpnoPQbXVSI51nG6Gd4C76SwXIs7RdAsXPgf1KTEh4R0YgzmBxqCVGL7flxPxmnMSM++QKDD9qqTslQ==}
-    engines: {node: '>=10'}
-    cpu: [x86, ia32]
-    os: [win32]
-
-  '@supabase/supa-mdx-lint-win32-x64@0.2.6-alpha':
-    resolution: {integrity: sha512-/hyZAA6SWMJsiPYeofN4NPkf6X/Fcywtls9I83PVFGYMaiK5jU2AvnjC22rMQSWgEFKKrF9K75yU7Qsd5teSpg==}
-    engines: {node: '>=10'}
-    cpu: [x64]
-    os: [win32]
-
-  '@supabase/supa-mdx-lint-win32-x64@0.3.1':
-    resolution: {integrity: sha512-AWAc7MwC0OU3NDuhZUVTVc1JYqXVY6UH6sL1lS/bM3j8eDAG1hTw2Bt4f85sAfYlt6BVDyEqLgNa3govsUQ5Jg==}
-    engines: {node: '>=10'}
-    cpu: [x64]
-    os: [win32]
-
-  '@supabase/supa-mdx-lint-win32-x64@0.3.2':
-    resolution: {integrity: sha512-3Bt4JVD1wwnDFrXoSZ1srV29w4RBWV5B5UITlG4EXBbpmOFDHbgH0nUbf65tSPzNEVIcwaW+5iFzwSi69gAbsA==}
-    engines: {node: '>=10'}
-    cpu: [x64]
-    os: [win32]
-
-  '@supabase/supa-mdx-lint@0.2.6-alpha':
-    resolution: {integrity: sha512-rfp+xsnTaQ/UB5LNNZEh6w00JxxkZMoZnjjIgb/TBvqr/E1DbWyLHSyWwMD8sBoC+LX8q20ym75GRAXhvxIONA==}
-    hasBin: true
-
-  '@supabase/supa-mdx-lint@0.3.1':
-    resolution: {integrity: sha512-TNbBLSofM6jQg3JwzO4lttd59dScTTzW4p504/OWcgRWghQLRNfxXRJJtdui83gBMLWpgeUZqvgtfYIwS1Flzw==}
-    hasBin: true
-
-  '@supabase/supa-mdx-lint@0.3.2':
-    resolution: {integrity: sha512-iqJHDk/ToyxFMa/um9A5gsp9jYN7iI0cIabNq9nyBpK/Yat/J9I2IIMueQwIMy3TsG6a2qdPyUkZkuPC37SdRg==}
-    hasBin: true
-
   '@supabase/supabase-js@2.116.0':
     resolution: {integrity: sha512-YyWmKXt2NspV9iO8FPnlswUFJIRnrLd3oTCb+3ZyYRuKZtBH0xCUDgnUqoyA0fGUxpM/UhfwDjYf/dht/9bp7g==}
     engines: {node: '>=22.0.0'}
@@ -14933,9 +14789,6 @@ packages:
     resolution: {integrity: sha512-WWdIxpyjEn+FhQJQQv9aQAYlHoNVdzIzUySNV1gHUPDSdZJ3yZn7pAAbQcV7B56Mvu881q9FZV+0Vx2xC44VWA==}
     engines: {node: ^18.17.0 || >=20.5.0}
 
-  nan@2.22.1:
-    resolution: {integrity: sha512-pfRR4ZcNTSm2ZFHaztuvbICf+hyiG6ecA06SfAxoPmuHjvMu0KUIae7Y8GyVkbBqeEIidsmXeYooWIX9+qjfRQ==}
-
   nano-css@5.6.2:
     resolution: {integrity: sha512-+6bHaC8dSDGALM1HJjOHVXpuastdu2xFoZlC77Jh4cg+33Zcgm+Gxd+1xsnpZK14eyHObSp82+ll5y3SX75liw==}
     peerDependencies:
@@ -15139,9 +14992,6 @@ packages:
         optional: true
       '@types/node':
         optional: true
-
-  node-pty@1.0.0:
-    resolution: {integrity: sha512-wtBMWWS7dFZm/VgqElrTvtfMq4GzJ6+edFI0Y0zyzygUSZMgZdraDUMUhCIvkjhJjme15qWmbyJbtAx4ot4uZA==}
 
   node-releases@2.0.53:
     resolution: {integrity: sha512-D9UOmYG3UH1V+ENW56t5QXBwJw1YEY18ruVeus89Rw+SyIgjPkCO84bRzO3uNIYosJbNwiabWVn48o3uJLjxFQ==}
@@ -25351,102 +25201,6 @@ snapshots:
       iceberg-js: 0.8.1
       tslib: 2.8.1
 
-  '@supabase/supa-mdx-lint-darwin@0.2.6-alpha':
-    optional: true
-
-  '@supabase/supa-mdx-lint-darwin@0.3.1':
-    optional: true
-
-  '@supabase/supa-mdx-lint-darwin@0.3.2':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-arm64@0.2.6-alpha':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-arm64@0.3.1':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-arm64@0.3.2':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-arm@0.2.6-alpha':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-arm@0.3.1':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-arm@0.3.2':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-i686@0.2.6-alpha':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-i686@0.3.1':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-i686@0.3.2':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-x64@0.2.6-alpha':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-x64@0.3.1':
-    optional: true
-
-  '@supabase/supa-mdx-lint-linux-x64@0.3.2':
-    optional: true
-
-  '@supabase/supa-mdx-lint-win32-i686@0.2.6-alpha':
-    optional: true
-
-  '@supabase/supa-mdx-lint-win32-i686@0.3.1':
-    optional: true
-
-  '@supabase/supa-mdx-lint-win32-i686@0.3.2':
-    optional: true
-
-  '@supabase/supa-mdx-lint-win32-x64@0.2.6-alpha':
-    optional: true
-
-  '@supabase/supa-mdx-lint-win32-x64@0.3.1':
-    optional: true
-
-  '@supabase/supa-mdx-lint-win32-x64@0.3.2':
-    optional: true
-
-  '@supabase/supa-mdx-lint@0.2.6-alpha':
-    optionalDependencies:
-      '@supabase/supa-mdx-lint-darwin': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-linux-arm': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-linux-arm64': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-linux-i686': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-linux-x64': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-win32-i686': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-win32-x64': 0.2.6-alpha
-      node-pty: 1.0.0
-
-  '@supabase/supa-mdx-lint@0.3.1':
-    optionalDependencies:
-      '@supabase/supa-mdx-lint-darwin': 0.3.1
-      '@supabase/supa-mdx-lint-linux-arm': 0.3.1
-      '@supabase/supa-mdx-lint-linux-arm64': 0.3.1
-      '@supabase/supa-mdx-lint-linux-i686': 0.3.1
-      '@supabase/supa-mdx-lint-linux-x64': 0.3.1
-      '@supabase/supa-mdx-lint-win32-i686': 0.3.1
-      '@supabase/supa-mdx-lint-win32-x64': 0.3.1
-      node-pty: 1.0.0
-
-  '@supabase/supa-mdx-lint@0.3.2':
-    optionalDependencies:
-      '@supabase/supa-mdx-lint-darwin': 0.3.2
-      '@supabase/supa-mdx-lint-linux-arm': 0.3.2
-      '@supabase/supa-mdx-lint-linux-arm64': 0.3.2
-      '@supabase/supa-mdx-lint-linux-i686': 0.3.2
-      '@supabase/supa-mdx-lint-linux-x64': 0.3.2
-      '@supabase/supa-mdx-lint-win32-i686': 0.3.2
-      '@supabase/supa-mdx-lint-win32-x64': 0.3.2
-      node-pty: 1.0.0
-
   '@supabase/supabase-js@2.116.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@supabase/auth-js': 2.116.0
@@ -33270,9 +33024,6 @@ snapshots:
 
   mute-stream@2.0.0: {}
 
-  nan@2.22.1:
-    optional: true
-
   nano-css@5.6.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -33602,11 +33353,6 @@ snapshots:
       type-is: 1.6.18
     optionalDependencies:
       '@types/node': 22.13.14
-
-  node-pty@1.0.0:
-    dependencies:
-      nan: 2.22.1
-    optional: true
 
   node-releases@2.0.53: {}
 
