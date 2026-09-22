@@ -175,7 +175,7 @@ export function ExamplesCombobox({
     >
       <div
         className={cn(
-          'flex items-stretch overflow-hidden',
+          'flex items-stretch',
           'relative z-1',
           'rounded-t-lg border border-b-0 border-default bg-surface-75'
         )}
@@ -184,7 +184,7 @@ export function ExamplesCombobox({
           ref={tabListRef}
           className={cn(
             'min-w-0 items-stretch border-0',
-            'overflow-x-auto overscroll-x-none [scrollbar-width:none]'
+            'rounded-tl-lg overflow-x-auto overscroll-x-none [scrollbar-width:none]'
           )}
         >
           {examples.map((example) => (
@@ -216,7 +216,7 @@ export function ExamplesCombobox({
                   'h-full w-auto gap-0 rounded-none border-0 bg-transparent px-2',
                   '[&_svg]:transition-colors hover:[&_svg]:text-foreground',
                   'data-[state=open]:[&_svg]:text-foreground',
-                  'focus-visible:ring-inset focus-visible:ring-offset-0'
+                  'focus-visible:rounded-md focus-visible:ring-inset focus-visible:ring-offset-0'
                 )}
               >
                 <span className="sr-only">Select example</span>
