@@ -435,12 +435,12 @@ export const PostgrestConfig = () => {
                               description="Grants privileges to Data API roles by default, exposing new tables. We recommend disabling this to control access manually."
                             >
                               <FormControl>
-                                  <Switch
-                                    size="large"
-                                    disabled={!canUpdateExposedEntities}
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
+                                <Switch
+                                  size="large"
+                                  disabled={!canUpdateExposedEntities}
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
                               </FormControl>
                             </FormItemLayout>
                           </FormItem>
