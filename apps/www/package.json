@@ -6,8 +6,9 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "pnpm run content:build && next --port 3000",
-    "prebuild": "pnpm --filter=docs run build:federated-content && pnpm --filter=docs run build:guides-markdown",
-    "build": "pnpm run content:build && next build",
+    "prebuild": "pnpm --filter=docs run build:federated-content && pnpm --filter=docs run build:guides-markdown && pnpm run content:build",
+    "build": "turbo run build:next --filter=www",
+    "build:next": "next build && node ./internals/generate-sitemap.mjs",
     "export": "next export",
     "start": "next start",
     "lint": "eslint .",
@@ -18,7 +19,7 @@
     "content:build": "pnpm run content:build:core && node scripts/fetchAgentSkills.mjs",
     "test": "vitest --run",
     "test:watch": "vitest watch",
-    "postbuild": "node ./internals/generate-sitemap.mjs && ./../../scripts/upload-static-assets.sh"
+    "postbuild": "./../../scripts/upload-static-assets.sh"
   },
   "dependencies": {
     "@bsmnt/scrollytelling": "^0.3.3",
