@@ -1,13 +1,11 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { NotebookText } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ExplorerNavResourceWrapper, rowClassName } from './ExplorerLayout.constants'
+import { ExplorerNavResourceWrapper } from './ExplorerLayout.constants'
+import { ExplorerNavItem } from './ExplorerNavItem'
 import {
   InfiniteListDefault,
   LoaderForIconMenuItems,
@@ -36,15 +34,14 @@ const NotebookListItem = ({
   const tabs = useTabsStateSnapshot()
 
   return (
-    <Link
-      href={`/project/${projectRef}/explorer/notebook/${notebook.id}`}
-      className={rowClassName(isActive)}
+    <ExplorerNavItem
+      name={notebook.name}
+      type="notebook"
+      isActive={isActive}
       style={style}
+      href={`/project/${projectRef}/explorer/notebook/${notebook.id}`}
       onDoubleClick={() => tabs.makeTabPermanent(createTabId('notebook', { id: notebook.id }))}
-    >
-      <NotebookText size={14} className={cn('shrink-0', isActive && 'text-foreground')} />
-      <span className="truncate text-left">{notebook.name}</span>
-    </Link>
+    />
   )
 }
 

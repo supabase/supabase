@@ -13,6 +13,7 @@ import {
   rowClassName,
 } from './ExplorerLayout.constants'
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
+import { ExplorerNavItem } from './ExplorerNavItem'
 import { useCreateChat, useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
@@ -103,39 +104,28 @@ export const ExplorerNavHome = ({
             <p className="px-2 text-xs text-foreground-lighter">Nothing edited yet</p>
           ) : (
             recentItems.map((item) => {
-              const Icon = EXPLORER_SECTIONS.find((section) => section.type === item.type)?.icon
-              const content = (
-                <>
-                  {Icon && <Icon size={14} className="shrink-0" aria-hidden="true" />}
-                  <span className="flex-1 truncate text-left">{item.label}</span>
-                  <span className="shrink-0 text-xs text-foreground-lighter">
-                    {formatRelativeTimeShort(item.updatedAt)}
-                  </span>
-                </>
-              )
+              const href =
+                item.type === 'chat'
+                  ? `/project/${ref}/explorer/chat/${item.id}`
+                  : `/project/${ref}/explorer/notebook/${item.id}`
 
-              return item.type === 'chat' ? (
-                <button
+              const onDoubleClick = () => {
+                if (item.type === 'chat') {
+                  tabs.makeTabPermanent(createTabId('chat', { id: item.id }))
+                } else {
+                  tabs.makeTabPermanent(createTabId('notebook', { id: item.id }))
+                }
+              }
+
+              return (
+                <ExplorerNavItem
                   key={item.id}
-                  type="button"
-                  tabIndex={0}
-                  className={rowClassName(false)}
-                  onClick={() => openChat(item.id)}
-                  onDoubleClick={() => tabs.makeTabPermanent(createTabId('chat', { id: item.id }))}
-                >
-                  {content}
-                </button>
-              ) : (
-                <Link
-                  key={item.id}
-                  href={`/project/${ref}/explorer/notebook/${item.id}`}
-                  className={rowClassName(false)}
-                  onDoubleClick={() =>
-                    tabs.makeTabPermanent(createTabId('notebook', { id: item.id }))
-                  }
-                >
-                  {content}
-                </Link>
+                  type={item.type}
+                  onDoubleClick={onDoubleClick}
+                  href={href}
+                  name={item.label}
+                  description={formatRelativeTimeShort(item.updatedAt)}
+                />
               )
             })
           )}
