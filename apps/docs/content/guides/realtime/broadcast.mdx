@@ -1021,6 +1021,8 @@ Broadcast Changes allows you to trigger messages from your database. To achieve 
 
 It uses partitioned tables per day, which allows performant deletion of your previous messages by dropping the physical tables of this partitioned table. Tables older than 3 days are deleted.
 
+A client connecting over WebSocket creates those daily partitions. `realtime.send` does not. With no partition for today, the insert fails and Postgres logs a `WarnSendingBroadcastMessage` warning, so connect a client before you broadcast from the database. See [Realtime: `WarnSendingBroadcastMessage`](/docs/guides/troubleshooting/realtime-warn-sending-broadcast-message) if you hit that warning.
+
 Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON payloads. [Realtime Authorization](/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
 
 Broadcast Changes provides two functions to help you send messages:
