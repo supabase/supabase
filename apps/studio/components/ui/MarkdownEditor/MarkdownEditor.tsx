@@ -72,7 +72,8 @@ const SyncExternalValuePlugin = ({
 /**
  * [Joshen] Deliberately omitted support for MD tables for now, can investigate separately
  * Also deliberately having this in components/ui for now since Explorer is its only consumer
- * Can shift to packages/ui if deem necessary (e.g if a second consumer needs it)
+ * Can shift to packages/ui if deem necessary (e.g if a second consumer needs it - e.g TextEditor
+ * in the side panel for the table editor when editing a text cell)
  */
 export const MarkdownEditor = ({
   value,
