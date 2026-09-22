@@ -232,7 +232,7 @@ const SecondStep = ({
       title={`Verify new factor ${factorName}`}
       confirmLabel="Confirm"
       confirmLabelLoading="Confirming"
-      loading={isVerifying}
+      loading={isVerifying || isLoading}
       onCancel={() => {
         // If a factor has been created (but not verified), unenroll it. This will be run as a
         // side effect so that it's not confusing to the user why the modal stays open while
