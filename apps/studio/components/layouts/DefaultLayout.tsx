@@ -98,10 +98,10 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
-              <SkipToContent href="#main" />
+              <SkipToContent href="#main" className="print:hidden" />
               {/* Top Banner */}
               <AppBannerWrapper />
-              <div className="shrink-0">
+              <div className="shrink-0 print:hidden">
                 {isMobile && (
                   <MobileNavigationBar
                     hideMobileMenu={hideMobileMenu}
@@ -112,9 +112,9 @@ export const DefaultLayout = ({
                 {showConfigDrift && ref && <GitHubConfigDriftBanner />}
               </div>
               {/* Main Content Area */}
-              <div className="flex flex-1 w-full overflow-y-hidden">
+              <div className="flex flex-1 w-full overflow-y-hidden print:h-auto print:overflow-visible">
                 {/* Sidebar - Only show for project pages, not account pages */}
-                {!router.pathname.startsWith('/account') && <Sidebar />}
+                {!router.pathname.startsWith('/account') && <Sidebar className="print:hidden" />}
                 {/* Main Content with Layout Sidebar */}
                 <ResizablePanelGroup
                   orientation="horizontal"
@@ -130,7 +130,11 @@ export const DefaultLayout = ({
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}
                   >
-                    <main id="main" tabIndex={-1} className="h-full overflow-y-auto outline-hidden">
+                    <main
+                      id="main"
+                      tabIndex={-1}
+                      className="h-full overflow-y-auto outline-hidden print:h-auto print:overflow-visible"
+                    >
                       {children}
                     </main>
                   </ResizablePanel>

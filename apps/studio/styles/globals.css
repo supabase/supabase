@@ -187,6 +187,40 @@ body,
   box-sizing: border-box;
 }
 
+@media print {
+  #panel-content,
+  #panel-project-content {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+
+  /* --foreground, --border, --background, etc. are all derived from these
+   * primitives (see semantic.css). Forcing the light theme's primitives
+   * recomputes every derived color for print, instead of hand-picking
+   * literal overrides for each derived variable individually. */
+  :root {
+    --hue: 157.5 !important;
+    --surface-hue: 34 !important;
+    --chroma: 0 !important;
+    --surface: 0.995 !important;
+    --elevation-step: 0.024 !important;
+    --contrast: 0.53 !important;
+    --foreground-lightness: 0.1 !important;
+    --muted-foreground-level: 0.65 !important;
+    --tertiary-foreground-level: 0.5 !important;
+  }
+
+  /* github-markdown-css (markdown-preview.css) sets these based on
+   * prefers-color-scheme, independent of the app's foreground tokens above.
+   * If the OS/app is in dark mode this stays near-white and is unreadable on
+   * a printed white page, so force the light-mode values here. */
+  .markdown-body {
+    --color-fg-default: #1f2328 !important;
+    --color-fg-muted: #656d76 !important;
+    --color-fg-subtle: #6e7781 !important;
+  }
+}
+
 @layer base {
   h1,
   h2,

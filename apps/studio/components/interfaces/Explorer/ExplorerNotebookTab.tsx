@@ -24,6 +24,7 @@ import {
   Notebook,
   NotebookText,
   Play,
+  Printer,
   Save,
   SearchX,
   SquareCode,
@@ -378,7 +379,7 @@ export const ExplorerNotebookTab = () => {
 
   return (
     <div className="flex flex-col h-full bg-surface-100">
-      <ExplorerToolbar className="px-4">
+      <ExplorerToolbar className="px-4 print:hidden">
         <ExplorerToolbarIcon>
           <NotebookText size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
@@ -434,6 +435,10 @@ export const ExplorerNotebookTab = () => {
                   <Copy size={14} />
                   <span>Copy as Markdown</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem className="gap-x-2" onClick={() => window.print()}>
+                  <Printer size={14} />
+                  <span>Print notebook</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="gap-x-2"
@@ -462,7 +467,10 @@ export const ExplorerNotebookTab = () => {
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
-      <div ref={scrollContainerRef} className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
+      <div
+        ref={scrollContainerRef}
+        className="w-full mx-auto flex-grow min-h-0 overflow-y-auto print:h-auto print:overflow-visible"
+      >
         <div className="p-4 pb-10">
           {cells.length === 0 && (
             <EmptyStatePresentational
@@ -505,7 +513,7 @@ export const ExplorerNotebookTab = () => {
                 </SortableContext>
               </DndContext>
 
-              <div className="flex items-center justify-center gap-x-2 mt-4">
+              <div className="flex items-center justify-center gap-x-2 mt-4 print:hidden">
                 <ButtonTooltip
                   variant="outline"
                   size="small"

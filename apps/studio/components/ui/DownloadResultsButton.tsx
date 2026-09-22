@@ -135,11 +135,16 @@ export const DownloadResultsButton = ({
             aria-describedby={undefined}
             icon={<Download />}
             disabled={results.length === 0}
-            className="w-7"
+            className="w-7 print:hidden"
             tooltip={{ content: { side: 'bottom', text: 'Download results' } }}
           />
         ) : (
-          <Button variant={variant} iconRight={<ChevronDown />} disabled={results.length === 0}>
+          <Button
+            variant={variant}
+            className="print:hidden"
+            iconRight={<ChevronDown />}
+            disabled={results.length === 0}
+          >
             {text}
           </Button>
         )}

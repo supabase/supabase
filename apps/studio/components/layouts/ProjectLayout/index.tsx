@@ -312,6 +312,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 defaultSize={256}
                 id="panel-left"
                 disabled={!resizableSidebar}
+                className="print:hidden"
               >
                 <AnimatePresence initial={false}>
                   <motion.div
@@ -343,7 +344,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               <ResizableHandle
                 withHandle
                 disabled={resizableSidebar ? false : true}
-                className="hidden md:flex"
+                className="hidden md:flex print:hidden"
               />
             )}
             <ResizablePanel
@@ -351,7 +352,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               id="panel-project-content"
             >
               <main
-                className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
+                className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container print:h-auto print:overflow-visible"
                 ref={combinedRef}
               >
                 {showStripeProjectBanner && (

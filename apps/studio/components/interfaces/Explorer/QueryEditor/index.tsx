@@ -547,7 +547,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           ) : (
             <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
           )}
-          <ExplorerToolbarActions>
+          <ExplorerToolbarActions className="print:hidden">
             {onSourceChange && (
               <QuerySourceMenu
                 disabled={pendingProposal !== null}

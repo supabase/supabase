@@ -102,7 +102,11 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
         <ExplorerNotebookTabCoordinator />
 
         <div className="flex flex-col h-full">
-          <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
+          <div
+            className={cn(
+              'h-10 md:min-h-(--header-height) flex items-center bg-surface-100 print:hidden'
+            )}
+          >
             <EditorTabs
               isCollapseButtonHidden
               customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}

@@ -38,7 +38,8 @@ export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
         className={cn(
           'w-full transition',
           'border border-transparent rounded-md',
-          'hover:border-default focus-within:border-default'
+          'hover:border-default focus-within:border-default',
+          !cell.text && 'print:hidden'
         )}
       >
         <MarkdownEditor

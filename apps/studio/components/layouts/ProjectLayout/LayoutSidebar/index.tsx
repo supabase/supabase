@@ -48,7 +48,7 @@ export const LayoutSidebar = ({
 
   return (
     <>
-      <ResizableHandle withHandle />
+      <ResizableHandle withHandle className="print:hidden" />
       <ResizablePanel
         id="panel-side"
         key={activeSidebar?.id ?? 'default'}
@@ -60,7 +60,8 @@ export const LayoutSidebar = ({
           'h-dvh',
           isMaximisedSidebar ? 'md:absolute md:h-auto md:w-full' : 'md:absolute md:h-auto md:w-1/2',
           !isMaximisedSidebar && 'lg:w-2/5',
-          'xl:relative xl:border-l-0'
+          'xl:relative xl:border-l-0',
+          'print:hidden'
         )}
       >
         {activeSidebar?.component()}
