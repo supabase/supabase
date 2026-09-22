@@ -7,6 +7,7 @@ import { ResizablePanelGroup } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
 import { generateDynamicColumns } from './components/Columns'
+import { LogSelectionActions } from './LogSelectionActions'
 import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPanelControls'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -141,7 +142,56 @@ describe('log row selection', () => {
 })
 
 describe('selected log details', () => {
-  function renderPanel() {
+  it.each([false, true])(
+    'copies selected logs with metadata visibility %s',
+    async (metadataVisible) => {
+      const user = userEvent.setup()
+      const copy = vi.spyOn(navigator.clipboard, 'writeText')
+      const rows = [
+        {
+          ...logs[0],
+          event_message: undefined,
+          metadata: { source: 'worker_guest_logs' },
+          raw_log_data: {
+            event_message: 'Worker failed',
+            metadata: { request_id: 'request-id' },
+          },
+        },
+        { ...logs[1], log_type: 'compute' as const, metadata: { host: 'compute-host' } },
+      ]
+      renderPanel(<LogSelectionActions rows={rows} />, metadataVisible)
+
+      await user.click(screen.getByRole('button', { name: 'Copy selected logs' }))
+
+      expect(copy).toHaveBeenCalledOnce()
+      expect(JSON.parse(copy.mock.calls[0][0])).toEqual(
+        JSON.parse(
+          JSON.stringify([
+            {
+              ...rows[0],
+              event_message: '',
+              metadata: metadataVisible ? rows[0].metadata : undefined,
+              raw_log_data: {
+                event_message: 'Worker failed',
+                metadata: metadataVisible ? { request_id: 'request-id' } : undefined,
+              },
+            },
+            {
+              id: rows[1].id,
+              timestamp: rows[1].timestamp,
+              event_message: rows[1].event_message,
+              metadata: metadataVisible ? rows[1].metadata : undefined,
+            },
+          ])
+        )
+      )
+      expect(rows[0]).toMatchObject({
+        raw_log_data: { metadata: { request_id: 'request-id' } },
+      })
+    }
+  )
+
+  function renderPanel(children = <SelectionHarness showPanel />, metadataVisible = true) {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -166,8 +216,10 @@ describe('selected log details', () => {
       },
     })
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-    queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
-    return customRender(<SelectionHarness showPanel />, { queryClient })
+    queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), {
+      disabled_features: metadataVisible ? [] : ['logs:metadata'],
+    })
+    return customRender(children, { queryClient })
   }
 
   it('offers both tabs for a log without a specialized overview', async () => {
