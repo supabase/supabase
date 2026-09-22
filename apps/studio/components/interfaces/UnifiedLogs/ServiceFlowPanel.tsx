@@ -248,7 +248,6 @@ export function ServiceFlowPanel({
               <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
                 <Button
                   size="tiny"
-                  variant="default"
                   className="pointer-events-auto px-1.5"
                   icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
                   onClick={() => {
@@ -264,7 +263,7 @@ export function ServiceFlowPanel({
                 language="json"
                 hideCopy
                 wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-                className="rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
+                className="rounded-none border-none !overflow-x-visible [&_code]:!leading-tight [&_pre]:!leading-tight"
               >
                 {JSON.stringify(formattedJsonData, null, 2)}
               </CodeBlock>

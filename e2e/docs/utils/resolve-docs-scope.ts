@@ -19,6 +19,14 @@ const PARTIALS_PREFIX = 'apps/docs/content/_partials/'
 const DOCS_GUIDES_URL_PREFIX = '/docs/guides/'
 const DOCS_TROUBLESHOOTING_URL_PREFIX = '/docs/guides/troubleshooting/'
 const FEDERATED_CONTENT_SOURCES_DIR = 'apps/docs/scripts/federated-content/sources'
+export const GUIDE_LIST_COMPONENT =
+  'apps/docs/components/Navigation/NavigationMenu/NavigationMenuGuideListItems.tsx'
+
+export const GUIDE_LIST_COMPONENT_PAGES = [
+  '/docs/guides/getting-started/api-keys',
+  '/docs/guides/getting-started/quickstarts/nextjs',
+  '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
+]
 
 const PARTIAL_PATH_RE = /<\$Partial\b[\s\S]*?\bpath\s*=\s*"([^"]+)"[\s\S]*?\/?>/g
 const SOURCE_SECTION_RE = /\bsection:\s*'([^']+)'/g
@@ -246,9 +254,15 @@ export async function resolveDocsScope(
 
   const maxPages = options.maxPages ?? MAX_SCOPED_PAGES
   const pages = new Set<string>()
+  const requiredPages = new Set<string>()
   const changedPartials: string[] = []
 
   for (const file of options.changedFiles) {
+    if (normalizeRepoPath(file) === GUIDE_LIST_COMPONENT) {
+      for (const page of GUIDE_LIST_COMPONENT_PAGES) requiredPages.add(page)
+      continue
+    }
+
     const page = changedFileToPagePath(file)
     if (page) {
       pages.add(page)
@@ -271,7 +285,13 @@ export async function resolveDocsScope(
     }
   }
 
-  const sorted = [...pages].sort().slice(0, maxPages)
+  const selectedRequiredPages = [...requiredPages].sort().slice(0, maxPages)
+  const remainingSlots = Math.max(0, maxPages - selectedRequiredPages.length)
+  const selectedPages = [...pages]
+    .filter((page) => !requiredPages.has(page))
+    .sort()
+    .slice(0, remainingSlots)
+  const sorted = [...selectedRequiredPages, ...selectedPages].sort()
 
   return {
     pages: sorted,

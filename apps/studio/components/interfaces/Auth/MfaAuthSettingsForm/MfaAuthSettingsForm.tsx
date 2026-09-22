@@ -421,9 +421,7 @@ export const MfaAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {totpForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => totpForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => totpForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"
@@ -568,9 +566,7 @@ export const MfaAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {phoneForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => phoneForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => phoneForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant={promptProPlanUpgrade ? 'default' : 'primary'}
@@ -657,9 +653,7 @@ export const MfaAuthSettingsForm = () => {
                 )}
                 <CardFooter className="justify-end space-x-2">
                   {securityForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => securityForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => securityForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"

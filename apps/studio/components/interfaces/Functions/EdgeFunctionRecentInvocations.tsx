@@ -40,7 +40,6 @@ export const EdgeFunctionRecentInvocations = ({
           </p>
         </div>
         <Button
-          variant="default"
           loading={isLoading}
           disabled={isLoading}
           icon={<RefreshCw size={14} />}
@@ -91,7 +90,7 @@ export const EdgeFunctionRecentInvocations = ({
                     <div
                       className={cn(
                         'flex items-center justify-center border px-1.5 py-0.5 rounded-sm text-xs font-mono',
-                        is2xx && 'text-brand border-brand bg-brand-300',
+                        is2xx && 'text-brand border-brand-default bg-brand-300',
                         is4xx && 'text-warning border-warning bg-warning-300',
                         is5xx && 'text-destructive border-destructive bg-destructive-300',
                         !is2xx &&

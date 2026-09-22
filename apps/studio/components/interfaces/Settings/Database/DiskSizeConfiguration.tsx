@@ -107,7 +107,6 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                         </p>
                         {!isAwsNimbus && (
                           <ButtonTooltip
-                            variant="default"
                             className="w-min ml-auto"
                             disabled={!canUpdateDiskSizeConfig || isHighAvailability || disabled}
                             onClick={() => setShowIncreaseDiskSizeModal(true)}
@@ -142,11 +141,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
 
                           {reportsAll && (
                             <div className="col-span-2 mt-4">
-                              <Button
-                                asChild
-                                variant="default"
-                                iconRight={<ExternalLink size={14} />}
-                              >
+                              <Button asChild iconRight={<ExternalLink size={14} />}>
                                 <Link
                                   href={`/project/${projectRef}/reports/database#database-size-report`}
                                 >
@@ -202,7 +197,7 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
                     disable your spend cap.
                   </p>
                 )}
-                <Button asChild variant="default" className="mt-3">
+                <Button asChild className="mt-3">
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=${
                       hasAccessToDiskSizeConfig === false ? 'subscriptionPlan' : 'costControl'

@@ -76,7 +76,7 @@ export const InsertButton = () => {
                     <div
                       className={cn([
                         'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                        'transition duration-200 group-data-highlighted:border-brand group-data-highlighted:translate-x-0',
+                        'transition duration-200 group-data-highlighted:border-brand-default group-data-highlighted:translate-x-0',
                       ])}
                     />
                   </div>
@@ -97,7 +97,7 @@ export const InsertButton = () => {
                     <div
                       className={cn([
                         'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                        'transition duration-200 group-data-highlighted:border-brand group-data-highlighted:translate-y-0',
+                        'transition duration-200 group-data-highlighted:border-brand-default group-data-highlighted:translate-y-0',
                       ])}
                     />
                   </div>

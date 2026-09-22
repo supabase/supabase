@@ -137,7 +137,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                   height={24}
                   alt="Supabase Logo"
                 />
-                <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+                <span className="font-mono text-sm font-medium text-brand mb-px">DOCS</span>
               </Link>
               <div className="flex gap-4 items-center">
                 <ThemeToggle contentClassName="bg-surface-200" />
@@ -164,10 +164,10 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                     </Button>
                   ) : (
                     <>
-                      <Button block size="medium" variant="default" asChild>
+                      <Button block size="medium" asChild>
                         <Link href="https://supabase.com/dashboard/sign-in">Sign in</Link>
                       </Button>
-                      <Button block size="medium" asChild>
+                      <Button variant="primary" block size="medium" asChild>
                         <Link href="https://supabase.com/dashboard/sign-up">
                           Start your project
                         </Link>

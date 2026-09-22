@@ -182,7 +182,6 @@ vi.mock('ui', async () => {
 
 describe('LocalDropdown', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseDevToolbar.mockReturnValue({
       isAvailable: false,
       isEnabled: false,

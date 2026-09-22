@@ -21,6 +21,12 @@
         "title": "Get security advisors",
         "slug": "v1-get-security-advisors",
         "type": "operation"
+      },
+      {
+        "id": "v2-run-project-advisors",
+        "title": "Run project advisors",
+        "slug": "v2-run-project-advisors",
+        "type": "operation"
       }
     ]
   },
@@ -608,6 +614,12 @@
         "id": "v1-create-a-branch",
         "title": "Create a branch",
         "slug": "v1-create-a-branch",
+        "type": "operation"
+      },
+      {
+        "id": "v2-create-a-branch",
+        "title": "Create a branch",
+        "slug": "v2-create-a-branch",
         "type": "operation"
       },
       {

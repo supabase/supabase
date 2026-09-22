@@ -1,24 +1,25 @@
 ---
 id: 'automate-with-agents-performance'
 title: 'Performance monitor'
-subtitle: 'Performance monitor is a read-only agent. It inspects query statistics, blocking sessions, and Performance Advisor findings, then proposes the next change for a person to apply.'
-description: 'A query health agent that looks for slow queries, lock waits, and performance advisor findings.'
+subtitle: 'A read-only agent that inspects query performance, blocking sessions, and Performance Advisor findings once per hour.'
+description: 'Hourly monitoring for query regressions, blocking sessions, and performance findings'
 ---
 
 ```mermaid
 flowchart TD
   Schedule([Once per hour]) --> Inspect[get_advisors and execute_sql]
-  Inspect --> Signals["Slow queries, lock waits, advisor findings"]
-  Signals --> Review{Needs a change?}
-  Review -->|Yes| Report[Finding and verification plan]
+  Inspect --> Signals["Query regressions, blockers, advisor findings"]
+  Signals --> Review{Anything new to report?}
+  Review -->|Yes| Report[Finding and next step]
   Review -->|No| Silent[Stay silent]
+  Inspect -->|Missing data or access| Gap[Report new or changed gaps]
 ```
 
 ## What it watches
 
-- Slow or regressing queries
-- Lock waits and long-running sessions
-- Unindexed foreign keys and other Performance Advisor findings
+- Long-running sessions and the PIDs blocking other sessions
+- Query execution-time regressions across saved hourly measurements
+- Performance Advisor findings at warning and error level
 
 It uses `get_advisors` and read-only `execute_sql` on project-scoped [Supabase MCP](/docs/guides/ai-tools/mcp). It does not create indexes, rewrite queries, or cancel sessions.
 
@@ -28,10 +29,14 @@ It uses `get_advisors` and read-only `execute_sql` on project-scoped [Supabase M
 
 ## What it will output
 
-Performance monitor reports slow or regressing queries, lock waits, and Performance Advisor findings, with a verification plan. It can recommend that a person cancel a session. It does not cancel the session or create indexes.
+Performance monitor reports new or changed findings with the affected query, session, or object, plus an investigation and verification step. It does not infer a regression without comparable measurements or recommend cancellation based only on query age. See [what triggers a performance report](/docs/guides/observability/detecting#performance).
+
+If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 
 <$Partial path="monitoring_agent_output.mdx" />
 
 ## Set up the agent
+
+Allow the agent to read the documentation linked in its prompt. Configure your harness to save measurements and alert state, then reload them on each run. Query comparisons need three hourly snapshots; the first runs can still report current blockers and advisor findings.
 
 <AgentSetup id="performance" />

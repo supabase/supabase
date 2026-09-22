@@ -30,6 +30,8 @@ import {
   getAvailableRegions,
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
+import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
@@ -85,6 +87,8 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
+  const { getRegionRestriction } = useRegionRestriction()
+
   const { data: statusData } = useIncidentStatusQuery()
   const { incidents = [] } = statusData ?? {}
 
@@ -131,6 +135,10 @@ export const RegionSelector = ({
     [...unfilteredRegionOptions],
     highAvailability
   )
+  const regionOptionsWithRestriction = regionOptions.map((region) => ({
+    ...region,
+    restriction: getRegionRestriction(region),
+  }))
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
 
   const isLocalEnvironment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
@@ -181,6 +189,13 @@ export const RegionSelector = ({
           const selectedRegionLabel = selectedRegion?.name
             ? getDisplayNameForSmartRegion(selectedRegion.name)
             : dbRegion
+          const selectedRestriction = regionOptionsWithRestriction.find(
+            (region) => region.name === dbRegion
+          )?.restriction
+          const selectedRestrictionCopy =
+            selectedRestriction !== undefined
+              ? getRegionRestrictionCopy(selectedRestriction)
+              : undefined
           const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
 
           const affectingIncidents = incidents.filter((incident) => {
@@ -237,6 +252,7 @@ export const RegionSelector = ({
                     disabled={isLoading}
                   >
                     <SelectTrigger
+                      ref={field.ref}
                       id="region"
                       className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
                     >
@@ -298,16 +314,19 @@ export const RegionSelector = ({
                         <SelectLabel>
                           {highAvailability ? 'High Availability Regions' : 'Specific regions'}
                         </SelectLabel>
-                        {regionOptions.map((value) => {
+                        {regionOptionsWithRestriction.map((value) => {
+                          const restrictionCopy =
+                            value.restriction !== undefined
+                              ? getRegionRestrictionCopy(value.restriction)
+                              : undefined
                           return (
                             <SelectItem
                               key={value.code}
                               value={value.name}
                               className={cn(
                                 'w-full [&>:nth-child(2)]:w-full',
-                                value.status !== undefined && 'pointer-events-auto!'
+                                restrictionCopy !== undefined && 'pointer-events-auto!'
                               )}
-                              disabled={value.status !== undefined}
                             >
                               <div className="flex flex-row items-center justify-between w-full gap-x-2">
                                 <div className="flex items-center gap-x-3">
@@ -325,16 +344,14 @@ export const RegionSelector = ({
                                     Recommended
                                   </Badge>
                                 )}
-                                {value.status !== undefined && value.status === 'capacity' && (
+                                {restrictionCopy !== undefined && (
                                   <Tooltip>
                                     <TooltipTrigger>
                                       <Badge variant="warning" className="mr-1">
-                                        Unavailable
+                                        {restrictionCopy.badge}
                                       </Badge>
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                      Temporarily unavailable due to this region being at capacity.
-                                    </TooltipContent>
+                                    <TooltipContent>{restrictionCopy.tooltip}</TooltipContent>
                                   </Tooltip>
                                 )}
                               </div>
@@ -362,6 +379,17 @@ export const RegionSelector = ({
                         .
                       </>
                     }
+                    className="mt-3"
+                  />
+                </FormItemLayout>
+              )}
+
+              {selectedRestrictionCopy !== undefined && (
+                <FormItemLayout layout="horizontal" isReactForm={false}>
+                  <Admonition
+                    type="warning"
+                    title={selectedRestrictionCopy.title}
+                    description={`${selectedRestrictionCopy.notice} ${SELECT_DIFFERENT_REGION}`}
                     className="mt-3"
                   />
                 </FormItemLayout>

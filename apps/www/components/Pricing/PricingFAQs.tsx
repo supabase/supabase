@@ -35,7 +35,7 @@ const PricingFAQs = () => {
           <a
             target="_blank"
             href="https://supabase.help"
-            className="transition underline text-brand-link hover:text-brand-600"
+            className="transition underline text-brand hover:text-brand-600"
           >
             Open a support ticket
           </a>{' '}

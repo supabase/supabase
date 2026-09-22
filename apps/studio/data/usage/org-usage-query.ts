@@ -13,8 +13,8 @@ export type OrgUsageVariables = {
   end?: Date
 }
 
-export type OrgUsageResponse = components['schemas']['OrgUsageResponse']
-export type OrgMetricsUsage = components['schemas']['OrgUsageResponse']['usages'][0]
+export type OrgUsageResponse = components['schemas']['OrgUsageResponse_Output']
+export type OrgMetricsUsage = components['schemas']['OrgUsageResponse_Output']['usages'][0]
 
 export async function getOrgUsage(
   { orgSlug, projectRef, start, end }: OrgUsageVariables,

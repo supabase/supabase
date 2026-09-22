@@ -18,7 +18,7 @@ export function SurveyRankedAnswersPair({
             {item.answers.map((answer, answerIndex) => (
               <div
                 key={answerIndex}
-                className={`${['h-20 md:h-32', 'h-12 md:h-20', 'h-4 md:h-8'][answerIndex] || 'hidden'} w-full pointer-events-none ${['bg-brand', 'bg-brand-500', 'bg-brand-300'][answerIndex] || 'bg-brand-300'}`}
+                className={`${['h-20 md:h-32', 'h-12 md:h-20', 'h-4 md:h-8'][answerIndex] || 'hidden'} w-full pointer-events-none ${['bg-brand-default', 'bg-brand-500', 'bg-brand-300'][answerIndex] || 'bg-brand-300'}`}
                 style={{
                   maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
                   maskSize: '4px',

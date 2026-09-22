@@ -189,7 +189,6 @@ const ChartActions = React.forwardRef<HTMLDivElement, ChartActionsProps>(
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
                   <Button
-                    variant="default"
                     size="tiny"
                     className={cn('px-1.5 text-foreground-lighter', action.className)}
                     onClick={action.onClick}
@@ -270,7 +269,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
             <span
               className={cn(
                 'shrink-0 w-1.5 h-1.5 rounded-full flex',
-                status === 'positive' && 'bg-brand',
+                status === 'positive' && 'bg-brand-default',
                 status === 'negative' && 'bg-destructive',
                 status === 'warning' && 'bg-warning',
                 status === 'default' && 'bg-foreground-lighter'

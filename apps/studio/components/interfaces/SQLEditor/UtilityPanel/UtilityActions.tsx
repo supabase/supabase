@@ -116,7 +116,6 @@ export const UtilityActions = ({
               <Button
                 aria-label="More actions"
                 data-testid="sql-editor-utility-actions"
-                variant="default"
                 className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
                 icon={<MoreVertical className="text-foreground-light" />}
               />
@@ -140,7 +139,9 @@ export const UtilityActions = ({
                   size={14}
                   strokeWidth={2}
                   className={
-                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                    isFavorite
+                      ? 'fill-brand-default stroke-none'
+                      : 'fill-none stroke-foreground-light'
                   }
                 />
                 {isFavorite ? 'Remove from' : 'Add to'} favorites
@@ -199,7 +200,7 @@ export const UtilityActions = ({
                   size="tiny"
                   onClick={() => saveFavorite(id, false)}
                   className="px-1"
-                  icon={<Heart className="fill-brand stroke-none" />}
+                  icon={<Heart className="fill-brand-default stroke-none" />}
                   aria-label="Remove from favorites"
                 />
               ) : (
@@ -269,10 +270,7 @@ export const UtilityActions = ({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="default"
-                  iconRight={<ChevronDown size={14} className="text-foreground-light" />}
-                >
+                <Button iconRight={<ChevronDown size={14} className="text-foreground-light" />}>
                   <span className="text-foreground-light">Limit</span>{' '}
                   {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
                 </Button>

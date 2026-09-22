@@ -8,12 +8,13 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
+vi.mock(`hooks/misc/useCheckPermissions`, () => ({
+  useCheckPermissions: vi.fn(),
+  useAsyncCheckPermissions: vi.fn().mockImplementation(() => ({ can: true })),
+}))
+
 describe(`CreateBucketModal`, () => {
   beforeEach(() => {
-    vi.mock(`hooks/misc/useCheckPermissions`, () => ({
-      useCheckPermissions: vi.fn(),
-      useAsyncCheckPermissions: vi.fn().mockImplementation(() => ({ can: true })),
-    }))
     // useParams
     routerMock.setCurrentUrl(`/project/default/storage/buckets`)
     // useSelectedProject -> Project

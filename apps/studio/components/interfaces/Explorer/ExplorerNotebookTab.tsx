@@ -16,6 +16,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Check,
+  Copy,
   FileText,
   Keyboard,
   Loader2,
@@ -36,6 +37,7 @@ import {
   Badge,
   Button,
   Checkbox,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -49,6 +51,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   findQueryCellsMatchingSql,
   isMutatingSql,
+  notebookToMarkdown,
   type QueryCellSummary,
 } from './ExplorerNotebookTab.utils'
 import {
@@ -266,7 +269,7 @@ export const ExplorerNotebookTab = () => {
       projectRef: ref,
       id: notebookId,
       name,
-      description: currentNotebook?.notebook.description,
+      description: currentNotebook?.notebook.description ?? undefined,
       content: writableContent,
     })
   }
@@ -309,6 +312,22 @@ export const ExplorerNotebookTab = () => {
       setIsSaveBeforeAnalyzeOpen(true)
     } else {
       handleAnalyze()
+    }
+  }
+
+  const handleCopyAsMarkdown = async () => {
+    try {
+      await copyToClipboard(
+        notebookToMarkdown({
+          name: name ?? '',
+          cells,
+          getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+        }),
+        () => toast.success('Copied notebook as Markdown to clipboard')
+      )
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error('Failed to copy notebook as Markdown: ' + message)
     }
   }
 
@@ -419,6 +438,10 @@ export const ExplorerNotebookTab = () => {
                   </div>
                   {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
                 </DropdownMenuItem>
+                <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
+                  <Copy size={14} />
+                  <span>Copy as Markdown</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
                   <Trash size={14} />
@@ -427,16 +450,20 @@ export const ExplorerNotebookTab = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
-          <ExplorerToolbarAction
+          <ButtonTooltip
+            type="button"
+            variant="default"
+            size="tiny"
+            className="ml-1"
             aria-label="Run notebook"
             icon={<Play size={16} strokeWidth={2} />}
-            tooltip="Run notebook"
+            tooltip={{ content: { side: 'bottom', text: 'Run notebook' } }}
             loading={isRunningNotebook}
             disabled={queryCellIds.length === 0}
             onClick={handleRunNotebook}
           >
             Run
-          </ExplorerToolbarAction>
+          </ButtonTooltip>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
@@ -450,12 +477,8 @@ export const ExplorerNotebookTab = () => {
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
             >
               <div className="flex items-center gap-x-2">
-                <Button variant="default" onClick={() => onSelectAddCell('query')}>
-                  Add query cell
-                </Button>
-                <Button variant="default" onClick={() => onSelectAddCell('markdown')}>
-                  Add markdown cell
-                </Button>
+                <Button onClick={() => onSelectAddCell('query')}>Add query</Button>
+                <Button onClick={() => onSelectAddCell('markdown')}>Add markdown</Button>
               </div>
             </EmptyStatePresentational>
           )}
@@ -490,17 +513,19 @@ export const ExplorerNotebookTab = () => {
               <div className="flex items-center justify-center gap-x-2 mt-4">
                 <ButtonTooltip
                   variant="outline"
+                  size="small"
                   icon={<SquareCode />}
-                  className="w-7"
+                  className="w-[34px]"
                   onClick={() => onSelectAddCell('query')}
-                  tooltip={{ content: { side: 'bottom', text: 'Add query cell' } }}
+                  tooltip={{ content: { side: 'bottom', text: 'Add query' } }}
                 />
                 <ButtonTooltip
                   variant="outline"
+                  size="small"
                   icon={<FileText />}
-                  className="w-7"
+                  className="w-[34px]"
                   onClick={() => onSelectAddCell('markdown')}
-                  tooltip={{ content: { side: 'bottom', text: 'Add markdown cell' } }}
+                  tooltip={{ content: { side: 'bottom', text: 'Add markdown' } }}
                 />
               </div>
             </>

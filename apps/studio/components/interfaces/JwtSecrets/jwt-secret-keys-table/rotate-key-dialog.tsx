@@ -152,7 +152,6 @@ export function RotateKeyDialog({
                 All of my application's components have picked up the standby key.
               </p>
               <ButtonTooltip
-                variant="default"
                 icon={<Info />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
@@ -188,7 +187,6 @@ export function RotateKeyDialog({
                 To invalidate non-expired JWTs I need to explicitly revoke the currently used key.
               </p>
               <ButtonTooltip
-                variant="default"
                 icon={<Info />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
@@ -275,6 +273,7 @@ export function RotateKeyDialog({
       </DialogSection>
       <DialogFooter>
         <Button
+          variant="primary"
           onClick={() => mutate({ projectRef, keyId: standbyKey.id, status: 'in_use' })}
           disabled={
             isLoadingEdgeFunctions ||

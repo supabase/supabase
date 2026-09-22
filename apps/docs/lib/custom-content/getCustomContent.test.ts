@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 beforeEach(() => {
-  vi.clearAllMocks()
   vi.resetModules()
 })
 

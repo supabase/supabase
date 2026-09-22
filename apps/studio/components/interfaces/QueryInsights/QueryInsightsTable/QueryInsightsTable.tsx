@@ -423,7 +423,6 @@ export const QueryInsightsTable = ({
           ].join(' ')}
         >
           <Button
-            variant="default"
             size="tiny"
             className="rounded-full shadow-md"
             onClick={() => onCurrentSelectQuery?.(null)}

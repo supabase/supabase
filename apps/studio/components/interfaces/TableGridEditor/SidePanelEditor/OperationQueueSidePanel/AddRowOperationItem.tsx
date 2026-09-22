@@ -76,7 +76,7 @@ export const AddRowOperationItem = ({
         />
       </CardHeader>
 
-      <CardContent className="py-2 px-3 font-mono text-xs text-brand-link">
+      <CardContent className="py-2 px-3 font-mono text-xs text-brand">
         {previewColumns.length === 0 && (
           <span className="text-foreground-light">
             No data provided, default values will be used
@@ -84,7 +84,7 @@ export const AddRowOperationItem = ({
         )}
         {previewColumns.map(([key, value]) => (
           <div key={key} className="flex gap-2 py-0.5">
-            <span className="text-brand-link select-none font-medium">+</span>
+            <span className="text-brand select-none font-medium">+</span>
             <span className="shrink-0">{key}:</span>
             <span className="truncate min-w-0" title={formatOperationItemValue(value)}>
               {formatOperationItemValue(value)}
@@ -93,7 +93,7 @@ export const AddRowOperationItem = ({
         ))}
         {remainingCount > 0 && (
           <div className="flex gap-2 py-0.5">
-            <span className="text-brand-link select-none font-medium">+</span>
+            <span className="text-brand select-none font-medium">+</span>
             <span>+{remainingCount} more column(s)</span>
           </div>
         )}

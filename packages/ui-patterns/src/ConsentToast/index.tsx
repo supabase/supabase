@@ -45,12 +45,7 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
       </div>
 
       <div className="flex items-center space-x-2">
-        <Button
-          variant="default"
-          onClick={onAccept}
-          size={isMobile ? 'small' : 'tiny'}
-          block={isMobile}
-        >
+        <Button onClick={onAccept} size={isMobile ? 'small' : 'tiny'} block={isMobile}>
           Accept
         </Button>
         <Button

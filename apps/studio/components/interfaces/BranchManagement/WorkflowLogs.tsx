@@ -70,7 +70,6 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="default"
           icon={
             showStatusIcon ? (
               <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />

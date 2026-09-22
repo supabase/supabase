@@ -3,7 +3,7 @@ import { Button } from 'ui'
 
 export default function ButtonAsChild() {
   return (
-    <Button asChild>
+    <Button variant="primary" asChild>
       <Link href="/login">Sign in</Link>
     </Button>
   )

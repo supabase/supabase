@@ -35,7 +35,7 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
   const hasLoadedNotebook =
     isCurrentProjectNotebook && currentNotebook?.notebook.content !== undefined
 
-  const { data, error, isError } = useNotebookQuery(
+  const { data, error, isError, isLoading } = useNotebookQuery(
     { projectRef, id },
     {
       retry: false,
@@ -82,7 +82,7 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
     mergeNotebook()
   }, [projectRef, id, data, isNotFound, !!profile, !!project])
 
-  return { isNotFound: isNotFound && !isCurrentProjectNotebook }
+  return { isNotFound: isNotFound && !isCurrentProjectNotebook, isLoading }
 }
 
 export const useCreateNotebook = () => {
@@ -187,16 +187,23 @@ export const useCreateQuery = () => {
   const { data: project } = useSelectedProjectQuery()
   const querySnap = useExplorerQueryStateSnapshot()
 
-  const createQuery = ({ sql, name }: { sql?: string; name?: string } = {}) => {
+  const createQuery = ({
+    sql,
+    name,
+    autoRun,
+    replace = false,
+  }: { sql?: string; name?: string; autoRun?: boolean; replace?: boolean } = {}) => {
     if (!project) return console.error('Project is required')
 
     const id = generateUuid()
-    querySnap.createDraft({ id, projectRef: project.ref, sql, name })
+    querySnap.createDraft({ id, projectRef: project.ref, sql, name, autoRun })
 
-    router.push(`/project/${project.ref}/explorer/query/${id}`)
+    const url = `/project/${project.ref}/explorer/query/${id}`
+    if (replace) router.replace(url)
+    else router.push(url)
 
     return id
   }
 
-  return { createQuery }
+  return { createQuery, projectRef: project?.ref }
 }
