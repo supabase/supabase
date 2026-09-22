@@ -41,7 +41,6 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
@@ -108,14 +107,12 @@ export const Destinations = () => {
   useRedirectLegacyReadReplicaDestination()
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
 
   const firstPipelineType = getFirstEnabledPipelineType({
     BigQuery: etlEnableBigQuery,
-    'Analytics Bucket': etlEnableIceberg,
     DuckLake: etlEnableDucklake,
     Snowflake: etlEnableSnowflake,
     ClickHouse: etlEnableClickHouse,
@@ -126,6 +123,7 @@ export const Destinations = () => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
+  const [shouldCreatePipelineAfterEnabling, setShouldCreatePipelineAfterEnabling] = useState(false)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
   const [urlDestinationType] = useQueryState(
@@ -236,6 +234,23 @@ export const Destinations = () => {
 
   const openCreate = () => {
     if (!projectRef || !firstPipelineType) return
+
+    if (replicationNotEnabled) {
+      setShouldCreatePipelineAfterEnabling(true)
+      setShowEnablePipelinesDialog(true)
+      return
+    }
+
+    router.push(getCreatePipelineHref(projectRef, firstPipelineType))
+  }
+
+  const handleEnablePipelinesDialogOpenChange = (open: boolean) => {
+    setShowEnablePipelinesDialog(open)
+    if (!open) setShouldCreatePipelineAfterEnabling(false)
+  }
+
+  const handlePipelinesEnabled = () => {
+    if (!projectRef || !firstPipelineType || !shouldCreatePipelineAfterEnabling) return
     router.push(getCreatePipelineHref(projectRef, firstPipelineType))
   }
 
@@ -320,7 +335,12 @@ export const Destinations = () => {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {replicationNotEnabled ? (
-                <DropdownMenuItem onClick={() => setShowEnablePipelinesDialog(true)}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setShouldCreatePipelineAfterEnabling(false)
+                    setShowEnablePipelinesDialog(true)
+                  }}
+                >
                   Enable Pipelines
                 </DropdownMenuItem>
               ) : (
@@ -442,7 +462,8 @@ export const Destinations = () => {
 
       <EnablePipelinesModal
         open={showEnablePipelinesDialog}
-        onOpenChange={setShowEnablePipelinesDialog}
+        onOpenChange={handleEnablePipelinesDialogOpenChange}
+        onSuccess={handlePipelinesEnabled}
       />
 
       <DisablePipelinesDialog

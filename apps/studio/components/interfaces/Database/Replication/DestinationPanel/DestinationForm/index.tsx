@@ -461,7 +461,7 @@ export const DestinationForm = ({
                   <p className="text-sm font-medium text-foreground">Destination details</p>
 
                   <div className="flex flex-col gap-y-4">
-                    <DestinationNameInput form={form} />
+                    <DestinationNameInput form={form} destinationType={selectedType} />
                     <PublicationSelection
                       form={form}
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}

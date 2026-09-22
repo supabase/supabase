@@ -53,10 +53,10 @@ describe('PipelineReviewSummary', () => {
     expect(screen.getAllByRole('button', { name: /Edit / })).toHaveLength(3)
   })
 
-  test('notes that destination type cannot be changed after creation', () => {
-    customRender(
+  test('shows the destination logo and lifecycle information', () => {
+    const { container } = customRender(
       <PipelineReviewSummary
-        type="BigQuery"
+        type="Snowflake"
         values={values}
         publication={undefined}
         onGoToStep={vi.fn()}
@@ -64,8 +64,14 @@ describe('PipelineReviewSummary', () => {
     )
 
     expect(
-      screen.getByText('Cannot be changed after creation. In public alpha and may change.')
+      screen.getByText(
+        'Destination type cannot be changed after creation. Snowflake support is in early access.'
+      )
     ).toBeInTheDocument()
+    expect(container.querySelector('img')).toHaveAttribute(
+      'src',
+      expect.stringContaining('/img/icons/snowflake-icon.svg')
+    )
   })
 
   test('shows the pipeline name field description from the connection step', () => {

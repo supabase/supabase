@@ -1254,19 +1254,19 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'BigQuery',
-              url: '/guides/database/replication/bigquery' as `/${string}`,
+              url: '/guides/database/replication/pipelines/bigquery' as `/${string}`,
             },
             {
               name: 'ClickHouse',
-              url: '/guides/database/replication/clickhouse' as `/${string}`,
+              url: '/guides/database/replication/pipelines/clickhouse' as `/${string}`,
             },
             {
               name: 'DuckLake',
-              url: '/guides/database/replication/ducklake' as `/${string}`,
+              url: '/guides/database/replication/pipelines/ducklake' as `/${string}`,
             },
             {
               name: 'Snowflake',
-              url: '/guides/database/replication/snowflake' as `/${string}`,
+              url: '/guides/database/replication/pipelines/snowflake' as `/${string}`,
             },
             {
               name: 'Monitoring',

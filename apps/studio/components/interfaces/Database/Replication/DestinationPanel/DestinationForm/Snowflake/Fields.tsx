@@ -1,5 +1,5 @@
-import { Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
+import { Eye, EyeOff, Upload } from 'lucide-react'
+import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { Button, cn, FormControl, FormField, Input, TextArea } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
@@ -13,6 +13,54 @@ import {
   SNOWFLAKE_SCHEMA_FIELD_COPY,
 } from '../DestinationFormFieldCopy'
 
+const MAX_PRIVATE_KEY_LENGTH = 10000
+
+const isPrivateKey = (contents: string) =>
+  /-----BEGIN (?:ENCRYPTED |RSA )?PRIVATE KEY-----/.test(contents)
+
+const readPrivateKeyFile = async (
+  file: File,
+  form: UseFormReturn<DestinationPanelSchemaType>,
+  isCurrentRequest: () => boolean
+) => {
+  if (file.size > MAX_PRIVATE_KEY_LENGTH) {
+    if (isCurrentRequest()) {
+      form.setError('snowflakePrivateKey', {
+        message: 'Private key must be 10,000 characters or fewer.',
+      })
+    }
+    return
+  }
+
+  try {
+    const contents = await file.text()
+    if (!isCurrentRequest()) return
+
+    if (contents.length > MAX_PRIVATE_KEY_LENGTH) {
+      form.setError('snowflakePrivateKey', {
+        message: 'Private key must be 10,000 characters or fewer.',
+      })
+      return
+    }
+
+    if (!isPrivateKey(contents)) {
+      form.setError('snowflakePrivateKey', { message: 'Select a P8 or PEM private key.' })
+      return
+    }
+
+    form.setValue('snowflakePrivateKey', contents, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    })
+    form.clearErrors('snowflakePrivateKey')
+  } catch {
+    if (isCurrentRequest()) {
+      form.setError('snowflakePrivateKey', { message: 'Could not read the selected private key.' })
+    }
+  }
+}
+
 export const SnowflakeFields = ({
   form,
   editMode,
@@ -23,6 +71,40 @@ export const SnowflakeFields = ({
   className?: string
 }) => {
   const [showPrivateKeyPassphrase, setShowPrivateKeyPassphrase] = useState(false)
+  const privateKeyFileInputRef = useRef<HTMLInputElement>(null)
+  const fileReadRequestIdRef = useRef(0)
+  const [isDraggingPrivateKey, setIsDraggingPrivateKey] = useState(false)
+
+  const handlePrivateKeyFile = async (file: File | undefined) => {
+    if (!file) return
+    const requestId = ++fileReadRequestIdRef.current
+    await readPrivateKeyFile(file, form, () => requestId === fileReadRequestIdRef.current)
+  }
+
+  const handlePrivateKeyFileInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    await handlePrivateKeyFile(file)
+  }
+
+  const handlePrivateKeyDragOver = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDraggingPrivateKey(true)
+  }
+
+  const handlePrivateKeyDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDraggingPrivateKey(false)
+  }
+
+  const handlePrivateKeyDrop = async (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDraggingPrivateKey(false)
+    await handlePrivateKeyFile(event.dataTransfer.files?.[0])
+  }
 
   return (
     <div className={cn('flex flex-col gap-y-6 p-5', className)}>
@@ -62,7 +144,16 @@ export const SnowflakeFields = ({
               description="Snowflake service user with key-pair authentication."
             >
               <FormControl>
-                <Input {...field} placeholder="PIPELINES_USER" value={field.value ?? ''} />
+                <Input
+                  {...field}
+                  placeholder="PIPELINES_USER"
+                  value={field.value ?? ''}
+                  autoComplete="off"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-form-type="other"
+                  data-bwignore
+                />
               </FormControl>
             </FormItemLayout>
           )}
@@ -99,23 +190,6 @@ export const SnowflakeFields = ({
             </FormItemLayout>
           )}
         />
-
-        <FormField
-          control={form.control}
-          name="snowflakeRole"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="horizontal"
-              label="Role"
-              labelOptional="Optional"
-              description="Snowflake role for SQL requests. Must match the user’s default role."
-            >
-              <FormControl>
-                <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
       </div>
 
       <div className="flex flex-col gap-y-1">
@@ -136,23 +210,63 @@ export const SnowflakeFields = ({
               description={
                 editMode
                   ? 'Stored private key is hidden. Enter a new private key to replace it.'
-                  : 'Snowflake private key as a complete PEM. PKCS #8 is recommended.'
+                  : 'Paste or upload a complete RSA private key in PKCS #8 or PKCS #1 PEM format.'
               }
             >
-              <FormControl>
-                <TextArea
-                  {...field}
-                  rows={8}
-                  maxLength={10000}
-                  placeholder={
-                    editMode
-                      ? STORED_SECRET_PLACEHOLDER
-                      : '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'
-                  }
-                  value={field.value ?? ''}
-                  className="font-mono text-xs"
-                />
-              </FormControl>
+              <div
+                className="relative"
+                onDragOver={handlePrivateKeyDragOver}
+                onDragLeave={handlePrivateKeyDragLeave}
+                onDrop={handlePrivateKeyDrop}
+              >
+                <div
+                  className={cn(
+                    'space-y-2 transition-opacity',
+                    isDraggingPrivateKey && 'opacity-40'
+                  )}
+                >
+                  <FormControl>
+                    <TextArea
+                      {...field}
+                      onChange={(event) => {
+                        fileReadRequestIdRef.current += 1
+                        field.onChange(event)
+                      }}
+                      rows={8}
+                      maxLength={MAX_PRIVATE_KEY_LENGTH}
+                      placeholder={
+                        editMode
+                          ? STORED_SECRET_PLACEHOLDER
+                          : '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'
+                      }
+                      value={field.value ?? ''}
+                      className="font-mono text-xs"
+                    />
+                  </FormControl>
+                  <input
+                    ref={privateKeyFileInputRef}
+                    type="file"
+                    accept=".p8,.pem,application/x-pem-file"
+                    aria-label="Upload private key"
+                    className="hidden"
+                    onChange={handlePrivateKeyFileInputChange}
+                  />
+                  <Button
+                    type="button"
+                    size="tiny"
+                    icon={<Upload size={14} />}
+                    onClick={() => privateKeyFileInputRef.current?.click()}
+                  >
+                    Upload private key
+                  </Button>
+                </div>
+                {isDraggingPrivateKey ? (
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 rounded-md ring-2 ring-brand ring-offset-2 ring-offset-background"
+                  />
+                ) : null}
+              </div>
             </FormItemLayout>
           )}
         />

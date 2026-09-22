@@ -9,6 +9,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -31,11 +32,10 @@ import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 
 export type AdvancedSettingsGroup = 'all' | 'connection' | 'data'
 
-const DATA_DESCRIPTION = 'Optional settings for initial sync and replication slots.'
-const ALL_DESCRIPTION = 'Optional settings to control the pipeline in more depth.'
+const DATA_DESCRIPTION = 'Adjust initial sync and replication slot behavior.'
+const ALL_DESCRIPTION = 'Overrides for pipeline behavior.'
 
-const getConnectionDescription = (type: DestinationType) =>
-  `Optional settings for how data is written to ${type}.`
+const getConnectionDescription = (type: DestinationType) => `Adjust how data is written to ${type}.`
 
 const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
   error: 'Block startup',
@@ -99,7 +99,7 @@ export const AdvancedSettings = ({
                   <FormItemLayout
                     layout="horizontal"
                     label="Batch wait time"
-                    description="How long the pipeline waits before sending a partially filled batch."
+                    description="Maximum time before sending a partially filled batch. Default: 10,000 milliseconds."
                   >
                     <FormControl>
                       <InputGroup>
@@ -110,7 +110,7 @@ export const AdvancedSettings = ({
                           step={1}
                           value={field.value ?? ''}
                           onChange={handleNumberChange(field)}
-                          placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
+                          placeholder={String(DEFAULT_MAX_FILL_MS)}
                         />
                         <InputGroupAddon align="inline-end">
                           <InputGroupText>milliseconds</InputGroupText>
@@ -262,8 +262,8 @@ export const AdvancedSettings = ({
                       layout="horizontal"
                       description={
                         group === 'all'
-                          ? 'BigQuery only. Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results.'
-                          : 'Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results.'
+                          ? 'BigQuery only. Maximum age of BigQuery query results for newly created or recreated tables. Leave blank for the freshest results.'
+                          : 'Maximum age of BigQuery query results for newly created or recreated tables. Leave blank for the freshest results.'
                       }
                     >
                       <FormControl>
@@ -285,6 +285,25 @@ export const AdvancedSettings = ({
                   )}
                 />
               </>
+            )}
+
+            {showConnection && type === 'Snowflake' && (
+              <FormField
+                control={form.control}
+                name="snowflakeRole"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Role"
+                    labelOptional="Optional"
+                    layout="horizontal"
+                    description="Role for SQL requests. Leave blank to use the service user’s default role."
+                  >
+                    <FormControl>
+                      <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
             )}
 
             {showData && type === 'BigQuery' && (

@@ -103,7 +103,7 @@ export const PipelineCostEstimate = ({
                   <TableBody className="[&_td]:py-2 [&_td]:text-sm">
                     {visibleTables.map((table) => (
                       <TableRow key={JSON.stringify([table.schema, table.name])}>
-                        <TableCell className="font-mono" translate="no">
+                        <TableCell translate="no">
                           {table.schema}.{table.name}
                         </TableCell>
                         <TableCell className="text-right">

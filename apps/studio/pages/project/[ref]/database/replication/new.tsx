@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreatePipelineWizard } from '@/components/interfaces/Database/Replication/CreatePipeline/CreatePipelineWizard'
@@ -43,9 +42,9 @@ const DatabaseReplicationNewPage: NextPageWithLayout = () => {
   return (
     <PipelineRequestStatusProvider>
       {isPending ? (
-        <PageContainer size="full">
+        <div className="mx-auto w-full max-w-[760px] px-6 py-8">
           <GenericSkeletonLoader />
-        </PageContainer>
+        </div>
       ) : (
         <CreatePipelineWizard />
       )}

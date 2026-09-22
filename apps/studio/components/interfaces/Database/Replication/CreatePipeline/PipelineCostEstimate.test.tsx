@@ -50,7 +50,7 @@ describe('PipelineCostEstimate', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Estimated costs' })).toBeInTheDocument()
-    expect(screen.getByText('public.orders')).toBeInTheDocument()
+    expect(screen.getByText('public.orders')).not.toHaveClass('font-mono')
     expect(screen.queryByText('billing.invoices')).not.toBeInTheDocument()
     expect(screen.getByText('$0.05/hour')).toBeInTheDocument()
     expect(screen.getByText('$3.00/GB')).toBeInTheDocument()

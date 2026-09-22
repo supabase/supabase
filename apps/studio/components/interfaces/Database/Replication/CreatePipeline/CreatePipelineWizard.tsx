@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
@@ -27,14 +26,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { AdvancedSettings } from '../DestinationPanel/DestinationForm/AdvancedSettings'
-import { getAnalyticsBucketValidationIssues } from '../DestinationPanel/DestinationForm/AnalyticsBucket/AnalyticsBucket.utils'
-import { AnalyticsBucketFields } from '../DestinationPanel/DestinationForm/AnalyticsBucket/Fields'
-import {
-  BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
-  getBigQueryValidationIssues,
-} from '../DestinationPanel/DestinationForm/BigQuery/BigQuery.utils'
+import { BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE } from '../DestinationPanel/DestinationForm/BigQuery/BigQuery.utils'
 import { BigQueryFields } from '../DestinationPanel/DestinationForm/BigQuery/Fields'
-import { getClickHouseValidationIssues } from '../DestinationPanel/DestinationForm/ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from '../DestinationPanel/DestinationForm/ClickHouse/Fields'
 import {
   DestinationPanelFormSchema as FormSchema,
@@ -42,19 +35,17 @@ import {
 } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import {
   areValidationFailuresEqual,
-  buildTableSyncCopyConfig,
+  buildTableSyncCopyConfigPreview,
   generateDefaultValues,
   pruneStaleSelectedTableIds,
 } from '../DestinationPanel/DestinationForm/DestinationForm.utils'
 import { DestinationNameInput } from '../DestinationPanel/DestinationForm/DestinationNameInput'
-import { getDucklakeValidationIssues } from '../DestinationPanel/DestinationForm/DuckLake/DuckLake.utils'
 import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fields'
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { NoDestinationsAvailable } from '../DestinationPanel/DestinationForm/NoDestinationsAvailable'
 import { PipelineRegionField } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import { PublicationSelection } from '../DestinationPanel/DestinationForm/PublicationSelection'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
-import { getSnowflakeValidationIssues } from '../DestinationPanel/DestinationForm/Snowflake/Snowflake.utils'
 import { TableCopySelection } from '../DestinationPanel/DestinationForm/TableCopySelection'
 import { useDestinationForm } from '../DestinationPanel/DestinationForm/useDestinationForm'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
@@ -64,18 +55,21 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
   useIsETLPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from '../useRedirectLegacyReadReplicaDestination'
 import { CreatePipelineGate } from './CreatePipelineGate'
 import {
+  getAccessiblePipelineCreateStep,
   getCreatePipelineSubmitLabel,
   getPipelineCreateConnectionStepFieldNames,
+  getPipelineCreateConnectionValidationIssues,
   getPipelineCreateStepDocsUrl,
   getPipelineCreateStepHeader,
   hasCreatePipelineUnsavedChanges,
+  hasValidDataStep,
+  isCreatePipelineNextDisabled,
   isCreatePipelineSubmitDisabled,
   isPipelineDestinationType,
   mergeFormValuesForDestinationTypeChange,
@@ -92,12 +86,10 @@ import {
   PipelineValidationAdmonition,
   SANDWICHED_ADMONITION_CLASS,
 } from './PipelineValidationAdmonition'
-import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { useRegisterIsolatedStudioFlowClose } from '@/components/layouts/Navigation/LayoutHeader/IsolatedStudioFlowClose'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
@@ -107,7 +99,6 @@ import {
   useReplicationSourceId,
   useReplicationSourcesQuery,
 } from '@/data/replication/sources-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
@@ -126,11 +117,9 @@ export const CreatePipelineWizard = () => {
   const isFlagStoreLoaded = Object.keys(flagStore).length > 0
   const enablePgReplicate = useIsETLPrivateAlpha()
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [step, setStep] = useQueryState(
     'step',
@@ -148,7 +137,6 @@ export const CreatePipelineWizard = () => {
     null
   )
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-  const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const validationSectionRef = useRef<React.ComponentRef<typeof PipelineValidationAdmonition>>(null)
 
   useRedirectLegacyReadReplicaDestination()
@@ -157,7 +145,6 @@ export const CreatePipelineWizard = () => {
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
-      'Analytics Bucket',
       'DuckLake',
       'Snowflake',
       'ClickHouse',
@@ -189,18 +176,11 @@ export const CreatePipelineWizard = () => {
   const availableDestinations = useMemo(() => {
     const destinations: DestinationType[] = []
     if (etlEnableBigQuery) destinations.push('BigQuery')
-    if (etlEnableIceberg) destinations.push('Analytics Bucket')
     if (etlEnableDucklake) destinations.push('DuckLake')
     if (etlEnableSnowflake) destinations.push('Snowflake')
     if (etlEnableClickHouse) destinations.push('ClickHouse')
     return destinations
-  }, [
-    etlEnableBigQuery,
-    etlEnableDucklake,
-    etlEnableIceberg,
-    etlEnableSnowflake,
-    etlEnableClickHouse,
-  ])
+  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableSnowflake, etlEnableClickHouse])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const sourceId = useReplicationSourceId({ projectRef })
@@ -211,12 +191,6 @@ export const CreatePipelineWizard = () => {
   } = useReplicationPublicationNamesQuery({ projectRef, sourceId })
   const publicationNamesList = publicationNameRows.map((publication) => publication.name)
 
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys && selectedType === 'Analytics Bucket' }
-  )
-  const { serviceKey } = apiKeysData ?? {}
-  const catalogToken = serviceKey?.api_key ?? ''
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
   const {
@@ -234,12 +208,12 @@ export const CreatePipelineWizard = () => {
   const defaultValues = useMemo(
     () =>
       generateDefaultValues({
-        catalogToken,
+        catalogToken: '',
         region: projectSettings?.region,
         projectRef,
         editMode: false,
       }),
-    [catalogToken, projectSettings, projectRef]
+    [projectSettings, projectRef]
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -264,29 +238,11 @@ export const CreatePipelineWizard = () => {
           addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table.')
         }
 
-        if (selectedType === 'BigQuery') {
-          getBigQueryValidationIssues(data, { validateJson: false }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
-        } else if (selectedType === 'Analytics Bucket') {
-          getAnalyticsBucketValidationIssues(data).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
-        } else if (selectedType === 'DuckLake') {
-          getDucklakeValidationIssues(data).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
-        } else if (selectedType === 'Snowflake') {
-          getSnowflakeValidationIssues(data).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
-        } else if (selectedType === 'ClickHouse') {
-          getClickHouseValidationIssues(data).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
-        }
+        getPipelineCreateConnectionValidationIssues({
+          type: selectedType,
+          data,
+          validateBigQueryJson: false,
+        }).forEach(({ path, message }) => addRequiredFieldError(path, message))
       })
     ),
     defaultValues,
@@ -296,8 +252,11 @@ export const CreatePipelineWizard = () => {
   const formValues = useWatch({ control: form.control })
   const reviewValues = { ...defaultValues, ...formValues } as DestinationPanelSchemaType
   const { publicationName } = formValues
-  const { data: selectedPublication, isSuccess: isSuccessPublication } =
-    useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
+  const {
+    data: selectedPublication,
+    isPending: isPublicationPending,
+    isSuccess: isSuccessPublication,
+  } = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
   const connectionSignature = JSON.stringify([
     selectedType,
     ...(selectedType === null
@@ -309,6 +268,13 @@ export const CreatePipelineWizard = () => {
   const publicationNames = publicationNamesList
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
+  const hasValidData = hasValidDataStep({
+    publicationName: publicationName ?? '',
+    tableSyncCopyMode: reviewValues.tableSyncCopyMode,
+    tableSyncCopyTableIds: reviewValues.tableSyncCopyTableIds,
+    publicationNames,
+    publication: selectedPublication,
+  })
 
   const allValidationFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
   const hasValidationFailures = allValidationFailures.some((f) => f.failure_type === 'critical')
@@ -316,7 +282,7 @@ export const CreatePipelineWizard = () => {
 
   const tableSyncCopy = useMemo(
     () =>
-      buildTableSyncCopyConfig({
+      buildTableSyncCopyConfigPreview({
         mode: reviewValues.tableSyncCopyMode,
         selectedTableIds: reviewValues.tableSyncCopyTableIds,
       }),
@@ -383,6 +349,15 @@ export const CreatePipelineWizard = () => {
     isSuccessPublications,
     isSelectedPublicationMissing,
     hasNoAvailableDestinations,
+    isConnectionVerified,
+    hasValidData,
+  })
+
+  const accessibleStep = getAccessiblePipelineCreateStep({
+    requestedStep: step,
+    hasDestination: selectedType !== null,
+    isConnectionVerified,
+    hasValidData,
   })
 
   const submitLabel = getCreatePipelineSubmitLabel({
@@ -412,9 +387,10 @@ export const CreatePipelineWizard = () => {
     }
 
     if (selectedType === 'BigQuery') {
-      const jsonIssue = getBigQueryValidationIssues(data).find(
-        (issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE
-      )
+      const jsonIssue = getPipelineCreateConnectionValidationIssues({
+        type: selectedType,
+        data,
+      }).find((issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE)
       if (jsonIssue) {
         form.setError(jsonIssue.path, { message: jsonIssue.message })
         setStep('connection')
@@ -471,12 +447,19 @@ export const CreatePipelineWizard = () => {
       }
 
       const valid = await form.trigger(getPipelineCreateConnectionStepFieldNames(selectedType))
-      if (!valid) return
+      const connectionIssues = getPipelineCreateConnectionValidationIssues({
+        type: selectedType,
+        data: form.getValues(),
+        validateBigQueryJson: false,
+      })
+      connectionIssues.forEach(({ path, message }) => form.setError(path, { message }))
+      if (!valid || connectionIssues.length > 0) return
 
       if (selectedType === 'BigQuery') {
-        const jsonIssue = getBigQueryValidationIssues(form.getValues()).find(
-          (issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE
-        )
+        const jsonIssue = getPipelineCreateConnectionValidationIssues({
+          type: selectedType,
+          data: form.getValues(),
+        }).find((issue) => issue.message === BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE)
         if (jsonIssue) {
           form.setError(jsonIssue.path, { message: jsonIssue.message })
           return
@@ -503,11 +486,21 @@ export const CreatePipelineWizard = () => {
 
     if (step === 'data') {
       const valid = await form.trigger([...PIPELINE_CREATE_DATA_STEP_FIELD_NAMES])
-      if (valid) setStep('review')
+      if (valid && hasValidData) setStep('review')
     }
   }
 
-  const nextDisabled = step === 'destination' && !canContinueFromDestination
+  const nextDisabled = isCreatePipelineNextDisabled({
+    step,
+    hasDestination: canContinueFromDestination,
+    hasPublicationName: !!publicationName,
+    isPublicationReady: isSuccessPublication,
+    isSelectedPublicationMissing,
+  })
+
+  useEffect(() => {
+    if (step !== accessibleStep) setStep(accessibleStep)
+  }, [accessibleStep, setStep, step])
 
   useEffect(() => {
     if (!selectedType) {
@@ -631,7 +624,10 @@ export const CreatePipelineWizard = () => {
             nextLabel={
               step === 'connection' && !isConnectionVerified ? 'Test connection' : 'Continue'
             }
-            nextLoading={step === 'connection' && isValidating}
+            nextLoading={
+              (step === 'connection' && isValidating) ||
+              (step === 'data' && !!publicationName && isPublicationPending)
+            }
             onNext={handleNext}
             onCancel={confirmOnClose}
             navigationDisabled={isSaving || isValidating}
@@ -649,7 +645,7 @@ export const CreatePipelineWizard = () => {
                   title={stepHeader.title}
                   description={<PipelineCreateStepDescription step={step} />}
                 >
-                  <LocalReplicationUnavailableAdmonition className="pt-2" />
+                  <LocalReplicationUnavailableAdmonition className="mt-2" />
                 </SteppedFlowHeader>
                 <CardContent>
                   <DestinationTypeSelection variant="radio" />
@@ -667,20 +663,12 @@ export const CreatePipelineWizard = () => {
                   actions={pipelineCreateDocsButton}
                 />
                 <CardContent className="space-y-6">
-                  <DestinationNameInput form={form} />
+                  <DestinationNameInput form={form} destinationType={selectedType} />
                   <PipelineRegionField destinationType={selectedType} />
                 </CardContent>
                 <CardContent>
                   {selectedType === 'BigQuery' && etlEnableBigQuery && (
                     <BigQueryFields form={form} editMode={false} className="p-0" />
-                  )}
-                  {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-                    <AnalyticsBucketFields
-                      form={form}
-                      editMode={false}
-                      className="p-0"
-                      onSelectNewBucket={() => setNewBucketSheetVisible(true)}
-                    />
                   )}
                   {selectedType === 'DuckLake' && etlEnableDucklake && (
                     <DuckLakeFields form={form} editMode={false} className="p-0" />
@@ -781,11 +769,6 @@ export const CreatePipelineWizard = () => {
           }
           setPublicationPanelVisible(false)
         }}
-      />
-
-      <CreateAnalyticsBucketSheet
-        open={newBucketSheetVisible}
-        onOpenChange={setNewBucketSheetVisible}
       />
 
       {discardChangesDialog}

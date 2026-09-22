@@ -64,7 +64,7 @@ const DUCKLAKE_MODE_OPTIONS = [
     value: DUCKLAKE_MODE_CUSTOM,
     icon: SlidersHorizontal,
     label: 'Custom parameters',
-    description: 'Bring your own PostgreSQL catalog and S3-compatible object storage credentials.',
+    description: 'Bring your own Postgres catalog and S3-compatible object storage credentials.',
   },
 ] as const
 
@@ -194,7 +194,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          The selected project's Postgres database is used as the PostgreSQL DuckLake catalog
+          The selected project's Postgres database is used as the DuckLake catalog.
         </p>
       </div>
 
@@ -230,7 +230,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <FormItemLayout
             layout="horizontal"
             label="Pool size"
-            description="Number of concurrent DuckDB connections to the catalog"
+            description="Number of concurrent DuckDB connections to the catalog."
           >
             <FormControl>
               <Input
@@ -255,7 +255,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <FormItemLayout
             layout="horizontal"
             label="Metadata schema"
-            description="Schema used for DuckLake metadata tables in the catalog's Postgres"
+            description="Schema used for DuckLake metadata tables in the catalog's Postgres."
           >
             <FormControl>
               <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
@@ -384,7 +384,7 @@ const DuckLakeCustomFields = ({
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          Configure the PostgreSQL DuckLake catalog and S3-compatible storage for replicated data
+          Configure the Postgres DuckLake catalog and S3-compatible storage for replicated data.
         </p>
       </div>
 
@@ -450,7 +450,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Pool size"
-              description="Number of concurrent DuckDB connections to use"
+              description="Number of concurrent DuckDB connections to use."
             >
               <FormControl>
                 <Input
@@ -489,7 +489,7 @@ const DuckLakeCustomFields = ({
               description={
                 editMode
                   ? 'Stored access key ID is hidden. Enter a new key ID to replace it.'
-                  : 'Required access key ID for the object storage provider'
+                  : 'Required access key ID for the object storage provider.'
               }
             >
               <FormControl>
@@ -513,7 +513,7 @@ const DuckLakeCustomFields = ({
               description={
                 editMode
                   ? 'Stored secret access key is hidden. Enter a new secret to replace it.'
-                  : 'Required secret access key for the object storage provider'
+                  : 'Required secret access key for the object storage provider.'
               }
               className="relative"
             >
@@ -541,7 +541,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="S3 region"
-              description="Required region for the object storage provider"
+              description="Required region for the object storage provider."
             >
               <FormControl>
                 <Input {...field} placeholder="us-east-1" value={field.value ?? ''} />
@@ -557,7 +557,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="S3 endpoint"
-              description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`"
+              description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`."
             >
               <FormControl>
                 <Input {...field} placeholder="127.0.0.1:5000/s3" value={field.value ?? ''} />
@@ -573,7 +573,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="S3 URL style"
-              description="Choose `path` for MinIO/Supabase-style endpoints or `vhost` for AWS-style virtual host addressing"
+              description="Choose `path` for MinIO/Supabase-style endpoints or `vhost` for AWS-style virtual host addressing."
             >
               <FormControl>
                 <Select value={field.value ?? 'path'} onValueChange={field.onChange}>
@@ -595,7 +595,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Use SSL"
-              description="Whether to use SSL when connecting to the S3-compatible endpoint"
+              description="Whether to use SSL when connecting to the S3-compatible endpoint."
             >
               <FormControl>
                 <Select
@@ -629,7 +629,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Metadata schema"
-              description="Schema used for DuckLake metadata tables in PostgreSQL"
+              description="Schema used for DuckLake metadata tables in Postgres."
             >
               <FormControl>
                 <Input {...field} placeholder="ducklake" value={field.value ?? ''} />

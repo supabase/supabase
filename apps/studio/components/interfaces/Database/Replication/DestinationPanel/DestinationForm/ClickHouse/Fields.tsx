@@ -66,7 +66,7 @@ export const ClickHouseFields = ({
             <FormItemLayout
               layout="horizontal"
               label="User"
-              description="ClickHouse user with permission to write to the target database"
+              description="ClickHouse user with permission to write to the target database."
             >
               <FormControl>
                 <Input {...field} value={field.value ?? ''} placeholder="default" />
@@ -142,10 +142,12 @@ export const ClickHouseFields = ({
                   value={field.value ?? 'replacing_merge_tree'}
                   onValueChange={field.onChange}
                 >
-                  <SelectTrigger>{field.value ?? 'replacing_merge_tree'}</SelectTrigger>
+                  <SelectTrigger>
+                    {field.value === 'merge_tree' ? 'MergeTree' : 'ReplacingMergeTree'}
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="replacing_merge_tree">replacing_merge_tree</SelectItem>
-                    <SelectItem value="merge_tree">merge_tree</SelectItem>
+                    <SelectItem value="replacing_merge_tree">ReplacingMergeTree</SelectItem>
+                    <SelectItem value="merge_tree">MergeTree</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>

@@ -4,12 +4,9 @@ import { Button, CardContent, Input } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { DestinationTypeReadonly } from '../DestinationIcon'
-import { CREATE_NEW_NAMESPACE } from '../DestinationPanel/DestinationForm/DestinationForm.constants'
+import { DestinationLogo } from '../DestinationLogo'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import {
-  ANALYTICS_BUCKET_BUCKET_FIELD_COPY,
-  ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
   BIGQUERY_DATASET_ID_FIELD_COPY,
   BIGQUERY_PROJECT_ID_FIELD_COPY,
   CLICKHOUSE_DATABASE_FIELD_COPY,
@@ -98,9 +95,6 @@ export const PipelineReviewSummary = ({
     .filter((table): table is ReplicationPublicationData['tables'][number] => table != null)
     .map(tableLabel)
 
-  const namespace =
-    values.namespace === CREATE_NEW_NAMESPACE ? values.newNamespaceName : values.namespace
-
   const dataRows: ReviewRow[] = [
     {
       label: PUBLICATION_FIELD_COPY.label,
@@ -142,7 +136,12 @@ export const PipelineReviewSummary = ({
         {
           label: 'Type',
           description: getDestinationTypeCreateDescription(type),
-          content: <DestinationTypeReadonly type={type} />,
+          content: (
+            <div className="flex min-w-0 items-center gap-x-2 rounded-md border bg-surface-200 p-2 text-sm">
+              <DestinationLogo type={type} />
+              <span className="min-w-0 truncate text-foreground">{type}</span>
+            </div>
+          ),
         },
       ],
     },
@@ -155,7 +154,7 @@ export const PipelineReviewSummary = ({
           value: values.name?.trim() || 'Untitled pipeline',
           description: PIPELINE_NAME_FIELD_COPY.description,
         },
-        ...getDestinationRows(type, values, namespace),
+        ...getDestinationRows(type, values),
         {
           label: 'Pipeline region',
           description: getPipelineRegionDescription(type),
@@ -259,8 +258,7 @@ export const PipelineReviewSummary = ({
 
 const getDestinationRows = (
   type: PipelineDestinationType,
-  values: DestinationPanelSchemaType,
-  namespace?: string
+  values: DestinationPanelSchemaType
 ): ReviewRow[] => {
   if (type === 'BigQuery') {
     return [
@@ -273,21 +271,6 @@ const getDestinationRows = (
         label: BIGQUERY_DATASET_ID_FIELD_COPY.label,
         value: values.datasetId || '—',
         description: BIGQUERY_DATASET_ID_FIELD_COPY.description,
-      },
-    ]
-  }
-
-  if (type === 'Analytics Bucket') {
-    return [
-      {
-        label: ANALYTICS_BUCKET_BUCKET_FIELD_COPY.label,
-        value: values.warehouseName || '—',
-        description: ANALYTICS_BUCKET_BUCKET_FIELD_COPY.description,
-      },
-      {
-        label: ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.label,
-        value: namespace || '—',
-        description: ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.description,
       },
     ]
   }
@@ -361,7 +344,7 @@ const getDestinationRows = (
       },
       {
         label: CLICKHOUSE_ENGINE_FIELD_COPY.label,
-        value: values.clickhouseEngine || 'replacing_merge_tree',
+        value: values.clickhouseEngine === 'merge_tree' ? 'MergeTree' : 'ReplacingMergeTree',
         description: CLICKHOUSE_ENGINE_FIELD_COPY.description,
       },
     ]

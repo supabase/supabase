@@ -1,4 +1,3 @@
-import { getAnalyticsBucketValidationIssues } from '../DestinationPanel/DestinationForm/AnalyticsBucket/AnalyticsBucket.utils'
 import { getBigQueryValidationIssues } from '../DestinationPanel/DestinationForm/BigQuery/BigQuery.utils'
 import { getClickHouseValidationIssues } from '../DestinationPanel/DestinationForm/ClickHouse/ClickHouse.utils'
 import {
@@ -17,16 +16,24 @@ export const PIPELINE_CREATE_DOCS_URL = `${DOCS_URL}/guides/database/replication
 
 export const PIPELINE_PUBLICATION_DOCS_URL = `${DOCS_URL}/guides/database/replication/pipelines#step-1-create-a-postgres-publication`
 
-export const getDestinationSetupDocsUrl = (destinationType: DestinationType) =>
-  destinationType === 'BigQuery'
-    ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
-    : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
+const DESTINATION_SETUP_DOCS_PATHS: Partial<Record<DestinationType, string>> = {
+  BigQuery: '/guides/database/replication/pipelines/bigquery#configure-bigquery-as-a-destination',
+  ClickHouse:
+    '/guides/database/replication/pipelines/clickhouse#configure-clickhouse-as-a-destination',
+  DuckLake: '/guides/database/replication/pipelines/ducklake#choose-a-configuration-mode',
+  Snowflake: '/guides/database/replication/pipelines/snowflake#prepare-snowflake-resources',
+}
 
-export type PipelineDestinationType = DestinationType
+export const getDestinationSetupDocsUrl = (destinationType: DestinationType) =>
+  `${DOCS_URL}${
+    DESTINATION_SETUP_DOCS_PATHS[destinationType] ??
+    '/guides/database/replication/pipelines#step-3-configure-a-destination'
+  }`
+
+export type PipelineDestinationType = Exclude<DestinationType, 'Analytics Bucket'>
 
 export const PIPELINE_DESTINATION_TYPES: PipelineDestinationType[] = [
   'BigQuery',
-  'Analytics Bucket',
   'DuckLake',
   'Snowflake',
   'ClickHouse',
@@ -142,13 +149,61 @@ export const isCreatePipelineSubmitDisabled = ({
   isSuccessPublications,
   isSelectedPublicationMissing,
   hasNoAvailableDestinations,
+  isConnectionVerified,
+  hasValidData,
 }: {
   isSaving: boolean
   isSuccessPublications: boolean
   isSelectedPublicationMissing: boolean
   hasNoAvailableDestinations: boolean
+  isConnectionVerified: boolean
+  hasValidData: boolean
 }) =>
-  isSaving || !isSuccessPublications || isSelectedPublicationMissing || hasNoAvailableDestinations
+  isSaving ||
+  !isSuccessPublications ||
+  isSelectedPublicationMissing ||
+  hasNoAvailableDestinations ||
+  !isConnectionVerified ||
+  !hasValidData
+
+export const getAccessiblePipelineCreateStep = ({
+  requestedStep,
+  hasDestination,
+  isConnectionVerified,
+  hasValidData,
+}: {
+  requestedStep: PipelineCreateStepId
+  hasDestination: boolean
+  isConnectionVerified: boolean
+  hasValidData: boolean
+}): PipelineCreateStepId => {
+  if (requestedStep === 'destination' || !hasDestination) return 'destination'
+  if (requestedStep === 'connection' || !isConnectionVerified) return 'connection'
+  if (requestedStep === 'data' || !hasValidData) return 'data'
+  return 'review'
+}
+
+export const isCreatePipelineNextDisabled = ({
+  step,
+  hasDestination,
+  hasPublicationName,
+  isPublicationReady,
+  isSelectedPublicationMissing,
+}: {
+  step: PipelineCreateStepId
+  hasDestination: boolean
+  hasPublicationName: boolean
+  isPublicationReady: boolean
+  isSelectedPublicationMissing: boolean
+}) => {
+  if (step === 'destination') return !hasDestination
+
+  if (step === 'data' && hasPublicationName) {
+    return !isPublicationReady || isSelectedPublicationMissing
+  }
+
+  return false
+}
 
 export const hasValidConnection = ({
   type,
@@ -159,13 +214,26 @@ export const hasValidConnection = ({
 }): boolean => {
   if (!data.name?.trim()) return false
 
-  if (type === 'BigQuery') return getBigQueryValidationIssues(data).length === 0
-  if (type === 'Analytics Bucket') return getAnalyticsBucketValidationIssues(data).length === 0
-  if (type === 'DuckLake') return getDucklakeValidationIssues(data).length === 0
-  if (type === 'Snowflake') return getSnowflakeValidationIssues(data).length === 0
-  if (type === 'ClickHouse') return getClickHouseValidationIssues(data).length === 0
+  return getPipelineCreateConnectionValidationIssues({ type, data }).length === 0
+}
 
-  return false
+export const getPipelineCreateConnectionValidationIssues = ({
+  type,
+  data,
+  validateBigQueryJson = true,
+}: {
+  type: PipelineDestinationType
+  data: DestinationPanelSchemaType
+  validateBigQueryJson?: boolean
+}) => {
+  if (type === 'BigQuery') {
+    return getBigQueryValidationIssues(data, { validateJson: validateBigQueryJson })
+  }
+  if (type === 'DuckLake') return getDucklakeValidationIssues(data)
+  if (type === 'Snowflake') return getSnowflakeValidationIssues(data)
+  if (type === 'ClickHouse') return getClickHouseValidationIssues(data)
+
+  return []
 }
 
 export const hasValidDataStep = ({
@@ -207,15 +275,6 @@ const PIPELINE_CREATE_CONNECTION_STEP_FIELDS: Record<
   (keyof DestinationPanelSchemaType)[]
 > = {
   BigQuery: ['name', 'projectId', 'datasetId', 'serviceAccountKey'],
-  'Analytics Bucket': [
-    'name',
-    'warehouseName',
-    'namespace',
-    'newNamespaceName',
-    's3Region',
-    's3AccessKeyId',
-    's3SecretAccessKey',
-  ],
   DuckLake: [
     'name',
     'ducklakeMode',

@@ -1,7 +1,7 @@
 import type { DestinationType } from '../DestinationPanel.types'
 
 export const PIPELINE_NAME_FIELD_COPY = {
-  label: 'Name',
+  label: 'Pipeline name',
   description: 'Used to identify this pipeline in Supabase.',
 } as const
 
@@ -29,13 +29,20 @@ const DESTINATION_TYPE_STAGES: Record<
 
 export const getDestinationTypeCreateDescription = (type: DestinationType) => {
   const stage = DESTINATION_TYPE_STAGES[type]
-  const stageDescription = stage ? DESTINATION_TYPE_STAGE_DESCRIPTIONS[stage] : null
 
-  if (!stageDescription) {
-    return DESTINATION_TYPE_FIELD_COPY.cannotChangeAfterCreation
+  if (stage === 'Public Alpha') {
+    return `Destination type cannot be changed after creation. ${type} support is in public alpha.`
   }
 
-  return `${DESTINATION_TYPE_FIELD_COPY.cannotChangeAfterCreation} ${stageDescription}`
+  if (stage === 'Early Access') {
+    return `Destination type cannot be changed after creation. ${type} support is in early access.`
+  }
+
+  if (stage === 'Deprecated') {
+    return `Destination type cannot be changed after creation. ${type} is deprecated.`
+  }
+
+  return 'Destination type cannot be changed after creation.'
 }
 
 export const BIGQUERY_PROJECT_ID_FIELD_COPY = {
@@ -76,7 +83,7 @@ export const DUCKLAKE_BUCKET_FIELD_COPY = {
 
 export const DUCKLAKE_CATALOG_URL_FIELD_COPY = {
   label: 'Catalog URL',
-  createDescription: 'A PostgreSQL connection string for the DuckLake catalog.',
+  createDescription: 'A Postgres connection string for the DuckLake catalog.',
   editDescription: 'Stored catalog URL is hidden. Enter a new URL to replace it.',
 } as const
 
@@ -87,7 +94,7 @@ export const DUCKLAKE_DATA_PATH_FIELD_COPY = {
 
 export const SNOWFLAKE_ACCOUNT_ID_FIELD_COPY = {
   label: 'Account ID',
-  description: 'Snowflake organization and account joined with a hyphen.',
+  description: 'Snowflake organization and account identifiers joined with a hyphen.',
 } as const
 
 export const SNOWFLAKE_DATABASE_FIELD_COPY = {
@@ -101,7 +108,7 @@ export const SNOWFLAKE_SCHEMA_FIELD_COPY = {
 } as const
 
 export const CLICKHOUSE_URL_FIELD_COPY = {
-  label: 'URL',
+  label: 'HTTPS URL',
   description: 'The HTTPS endpoint for your ClickHouse server, including port.',
 } as const
 
@@ -112,7 +119,7 @@ export const CLICKHOUSE_DATABASE_FIELD_COPY = {
 
 export const CLICKHOUSE_ENGINE_FIELD_COPY = {
   label: 'Table engine',
-  description: 'Server defaults to replacing_merge_tree when unset.',
+  description: 'Defaults to ReplacingMergeTree.',
 } as const
 
 export const PUBLICATION_FIELD_COPY = {

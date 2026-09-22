@@ -3,17 +3,21 @@ import { describe, expect, it } from 'vitest'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import { DUCKLAKE_MODE_CUSTOM } from '../DestinationPanel/DestinationForm/DuckLake/DuckLake.constants'
 import {
+  getAccessiblePipelineCreateStep,
   getCreatePipelineHref,
   getCreatePipelineSubmitLabel,
   getDestinationSetupDocsUrl,
   getFirstEnabledPipelineType,
   getPipelineCreateConnectionStepFieldNames,
+  getPipelineCreateConnectionValidationIssues,
   getPipelineCreateStepDocsUrl,
   getPipelineCreateStepHeader,
   hasCreatePipelineUnsavedChanges,
   hasValidConnection,
   hasValidDataStep,
+  isCreatePipelineNextDisabled,
   isCreatePipelineSubmitDisabled,
+  isPipelineDestinationType,
   mergeFormValuesForDestinationTypeChange,
   PIPELINE_PUBLICATION_DOCS_URL,
 } from './CreatePipelineWizard.utils'
@@ -31,10 +35,9 @@ describe('getFirstEnabledPipelineType', () => {
     expect(
       getFirstEnabledPipelineType({
         BigQuery: false,
-        'Analytics Bucket': true,
         DuckLake: true,
       })
-    ).toBe('Analytics Bucket')
+    ).toBe('DuckLake')
   })
 
   it('returns null when no pipeline types are enabled', () => {
@@ -42,10 +45,16 @@ describe('getFirstEnabledPipelineType', () => {
   })
 })
 
+describe('isPipelineDestinationType', () => {
+  it('excludes the deprecated Analytics Bucket destination', () => {
+    expect(isPipelineDestinationType('Analytics Bucket')).toBe(false)
+  })
+})
+
 describe('getCreatePipelineHref', () => {
   it('encodes the destination type in the query string', () => {
-    expect(getCreatePipelineHref('abc', 'Analytics Bucket')).toBe(
-      '/project/abc/database/replication/new?destinationType=Analytics%20Bucket'
+    expect(getCreatePipelineHref('abc', 'ClickHouse')).toBe(
+      '/project/abc/database/replication/new?destinationType=ClickHouse'
     )
   })
 })
@@ -94,6 +103,8 @@ describe('isCreatePipelineSubmitDisabled', () => {
         isSuccessPublications: false,
         isSelectedPublicationMissing: false,
         hasNoAvailableDestinations: false,
+        isConnectionVerified: true,
+        hasValidData: true,
       })
     ).toBe(true)
 
@@ -103,31 +114,164 @@ describe('isCreatePipelineSubmitDisabled', () => {
         isSuccessPublications: true,
         isSelectedPublicationMissing: true,
         hasNoAvailableDestinations: false,
+        isConnectionVerified: true,
+        hasValidData: true,
       })
     ).toBe(true)
   })
 
-  it('enables submit when publications are ready', () => {
+  it('disables submit until the connection and data steps are complete', () => {
     expect(
       isCreatePipelineSubmitDisabled({
         isSaving: false,
         isSuccessPublications: true,
         isSelectedPublicationMissing: false,
         hasNoAvailableDestinations: false,
+        isConnectionVerified: false,
+        hasValidData: true,
+      })
+    ).toBe(true)
+
+    expect(
+      isCreatePipelineSubmitDisabled({
+        isSaving: false,
+        isSuccessPublications: true,
+        isSelectedPublicationMissing: false,
+        hasNoAvailableDestinations: false,
+        isConnectionVerified: true,
+        hasValidData: false,
+      })
+    ).toBe(true)
+  })
+
+  it('enables submit when all steps are complete', () => {
+    expect(
+      isCreatePipelineSubmitDisabled({
+        isSaving: false,
+        isSuccessPublications: true,
+        isSelectedPublicationMissing: false,
+        hasNoAvailableDestinations: false,
+        isConnectionVerified: true,
+        hasValidData: true,
+      })
+    ).toBe(false)
+  })
+})
+
+describe('getAccessiblePipelineCreateStep', () => {
+  it('returns to destination when no destination is selected', () => {
+    expect(
+      getAccessiblePipelineCreateStep({
+        requestedStep: 'review',
+        hasDestination: false,
+        isConnectionVerified: false,
+        hasValidData: false,
+      })
+    ).toBe('destination')
+  })
+
+  it('returns a refreshed review step to connection verification', () => {
+    expect(
+      getAccessiblePipelineCreateStep({
+        requestedStep: 'review',
+        hasDestination: true,
+        isConnectionVerified: false,
+        hasValidData: false,
+      })
+    ).toBe('connection')
+  })
+
+  it('returns review to data when the connection is verified but data is incomplete', () => {
+    expect(
+      getAccessiblePipelineCreateStep({
+        requestedStep: 'review',
+        hasDestination: true,
+        isConnectionVerified: true,
+        hasValidData: false,
+      })
+    ).toBe('data')
+  })
+
+  it('keeps review accessible when every preceding step is complete', () => {
+    expect(
+      getAccessiblePipelineCreateStep({
+        requestedStep: 'review',
+        hasDestination: true,
+        isConnectionVerified: true,
+        hasValidData: true,
+      })
+    ).toBe('review')
+  })
+})
+
+describe('isCreatePipelineNextDisabled', () => {
+  it('disables destination continuation until a destination is selected', () => {
+    expect(
+      isCreatePipelineNextDisabled({
+        step: 'destination',
+        hasDestination: false,
+        hasPublicationName: false,
+        isPublicationReady: false,
+        isSelectedPublicationMissing: false,
+      })
+    ).toBe(true)
+  })
+
+  it('keeps data continuation disabled while the selected publication loads', () => {
+    expect(
+      isCreatePipelineNextDisabled({
+        step: 'data',
+        hasDestination: true,
+        hasPublicationName: true,
+        isPublicationReady: false,
+        isSelectedPublicationMissing: false,
+      })
+    ).toBe(true)
+  })
+
+  it('allows an empty publication field to surface form validation', () => {
+    expect(
+      isCreatePipelineNextDisabled({
+        step: 'data',
+        hasDestination: true,
+        hasPublicationName: false,
+        isPublicationReady: false,
+        isSelectedPublicationMissing: false,
+      })
+    ).toBe(false)
+  })
+
+  it('enables data continuation once the selected publication is ready', () => {
+    expect(
+      isCreatePipelineNextDisabled({
+        step: 'data',
+        hasDestination: true,
+        hasPublicationName: true,
+        isPublicationReady: true,
+        isSelectedPublicationMissing: false,
       })
     ).toBe(false)
   })
 })
 
 describe('getDestinationSetupDocsUrl', () => {
-  it('uses the BigQuery destination guide when BigQuery is selected', () => {
-    expect(getDestinationSetupDocsUrl('BigQuery')).toBe(
-      `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
-    )
+  it.each([
+    [
+      'BigQuery',
+      '/guides/database/replication/pipelines/bigquery#configure-bigquery-as-a-destination',
+    ],
+    [
+      'ClickHouse',
+      '/guides/database/replication/pipelines/clickhouse#configure-clickhouse-as-a-destination',
+    ],
+    ['DuckLake', '/guides/database/replication/pipelines/ducklake#choose-a-configuration-mode'],
+    ['Snowflake', '/guides/database/replication/pipelines/snowflake#prepare-snowflake-resources'],
+  ] as const)('uses the %s destination guide when selected', (destinationType, path) => {
+    expect(getDestinationSetupDocsUrl(destinationType)).toBe(`${DOCS_URL}${path}`)
   })
 
-  it('uses the generic destination setup guide otherwise', () => {
-    expect(getDestinationSetupDocsUrl('Snowflake')).toBe(
+  it('uses the generic setup guide for the deprecated Analytics Bucket destination', () => {
+    expect(getDestinationSetupDocsUrl('Analytics Bucket')).toBe(
       `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
     )
   })
@@ -252,6 +396,23 @@ describe('hasValidConnection', () => {
         },
       })
     ).toBe(true)
+  })
+})
+
+describe('getPipelineCreateConnectionValidationIssues', () => {
+  it('returns every required Snowflake field for an empty connection', () => {
+    expect(
+      getPipelineCreateConnectionValidationIssues({
+        type: 'Snowflake',
+        data: emptyForm,
+      })
+    ).toEqual([
+      { path: 'snowflakeAccountId', message: 'Account ID is required.' },
+      { path: 'snowflakeUser', message: 'User is required.' },
+      { path: 'snowflakePrivateKey', message: 'Private key is required.' },
+      { path: 'snowflakeDatabase', message: 'Database is required.' },
+      { path: 'snowflakeSchema', message: 'Schema is required.' },
+    ])
   })
 })
 

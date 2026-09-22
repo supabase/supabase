@@ -59,7 +59,7 @@ export const DestinationPanel = () => {
 
   const docsUrl =
     destinationType === 'BigQuery'
-      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
+      ? `${DOCS_URL}/guides/database/replication/pipelines/bigquery#configure-bigquery-as-a-destination`
       : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
 
   useEffect(() => {
