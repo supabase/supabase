@@ -26,7 +26,6 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
 
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const { filters, clearFilters } = useTableFilter()
   const { sorts } = useTableSort()
 
@@ -92,7 +91,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
     return <IcebergUnauthorizedError error={error} />
   }
 
-  return <GeneralError error={error} projectRef={project?.ref} orgSlug={org?.slug} />
+  return <GeneralError error={error} />
 }
 
 const ForeignTableMissingVaultKeyError = () => {
@@ -196,22 +195,16 @@ const IcebergUnauthorizedError = ({ error }: { error: ResponseError }) => {
   )
 }
 
-const GeneralError = ({
-  error,
-  projectRef,
-  orgSlug,
-}: {
-  error: ResponseError
-  projectRef?: string
-  orgSlug?: string
-}) => {
+const GeneralError = ({ error }: { error: ResponseError }) => {
   const { filters } = useTableFilter()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   return (
     <AlertError
       error={error}
-      projectRef={projectRef}
-      orgSlug={orgSlug}
+      projectRef={project?.ref}
+      orgSlug={org?.slug}
       className="pointer-events-auto"
       subject="Failed to retrieve rows from table"
     >

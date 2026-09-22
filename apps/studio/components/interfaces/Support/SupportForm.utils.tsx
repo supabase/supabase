@@ -195,38 +195,27 @@ export async function selectInitialOrgAndProject({
   if (projectRef) {
     try {
       const projectDetails = await getProjectDetail({ ref: projectRef })
-      if (projectDetails?.organization_id) {
-        const org = orgs.find((o) => o.id === projectDetails.organization_id)
-        if (org?.slug) {
-          return {
-            projectRef,
-            orgSlug: org.slug,
-          }
+      const projectOrg = orgs.find((o) => o.id === projectDetails?.organization_id)
+      if (projectOrg?.slug) {
+        return {
+          projectRef,
+          orgSlug: projectOrg.slug,
         }
       }
     } catch {
-      // Can safely ignore, consider provided project ref invalid
-    }
-
-    // Project details lookup failed or didn't resolve to a known org (e.g. the
-    // Management API request errored) — fall back to the caller-provided orgSlug
-    // instead of losing the already-known projectRef.
-    if (orgSlug) {
-      const org = orgs.find((o) => o.slug === orgSlug)
-      if (org?.slug) {
-        return {
-          projectRef,
-          orgSlug: org.slug,
-        }
-      }
+      // Can safely ignore, fall through to the orgSlug fallback below
     }
   }
 
+  // Reached when there's no projectRef, or the project lookup above failed to
+  // resolve a known org (e.g. the Management API request errored). Returning
+  // `projectRef` here (rather than hardcoding `null`) preserves it when we
+  // still have one, instead of silently discarding it.
   if (orgSlug) {
     const org = orgs.find((o) => o.slug === orgSlug)
     if (org?.slug) {
       return {
-        projectRef: null,
+        projectRef,
         orgSlug: org.slug,
       }
     }

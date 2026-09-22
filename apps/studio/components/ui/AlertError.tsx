@@ -103,26 +103,17 @@ export const AlertError = ({
         </>
       }
       actions={
-        hideContactSupport ? (
-          (additionalActions ?? null)
-        ) : additionalActions ? (
-          <>
-            {additionalActions}
+        <>
+          {additionalActions}
+          {!hideContactSupport && (
             <ContactSupportButton
               projectRef={projectRef}
               orgSlug={orgSlug}
               subject={subject}
               error={error}
             />
-          </>
-        ) : (
-          <ContactSupportButton
-            projectRef={projectRef}
-            orgSlug={orgSlug}
-            subject={subject}
-            error={error}
-          />
-        )
+          )}
+        </>
       }
       className={className}
     />
