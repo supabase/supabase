@@ -174,7 +174,7 @@ function ControlCard({
     >
       <div className="w-full">
         <div className="flex items-center space-x-2">
-          <p className="text-brand text-sm uppercase">{plan.name}</p>
+          <p className="text-primary text-sm uppercase">{plan.name}</p>
           {isCurrentPlan ? (
             <div className="text-xs bg-surface-300 text-foreground-light rounded-sm px-2 py-0.5">
               Current plan
@@ -207,7 +207,7 @@ function ControlCard({
             <li key={typeof feature === 'string' ? feature : feature[0]} className="flex py-2">
               <div className="w-[12px]">
                 <Check
-                  className="h-3 w-3 text-brand translate-y-[2.5px]"
+                  className="h-3 w-3 text-primary translate-y-[2.5px]"
                   aria-hidden="true"
                   strokeWidth={3}
                 />
@@ -331,7 +331,7 @@ function ParityCard({
             >
               <div className="flex items-center">
                 <div className="flex w-5">
-                  <Check className="h-4 w-4 text-brand" aria-hidden="true" strokeWidth={3} />
+                  <Check className="h-4 w-4 text-primary" aria-hidden="true" strokeWidth={3} />
                 </div>
                 <span className="text-foreground">
                   {typeof feature === 'string' ? feature : feature[0]}

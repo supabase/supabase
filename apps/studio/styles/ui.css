@@ -293,7 +293,7 @@
     }
 
     .is-highlighted {
-      @apply text-brand;
+      @apply text-primary;
     }
   }
   .codeblock-container + .codeblock-container {
@@ -404,7 +404,7 @@
 
 .form-field-markdown {
   a {
-    @apply text-brand transition opacity-75 hover:opacity-100 underline;
+    @apply text-primary transition opacity-75 hover:opacity-100 underline;
   }
 }
 

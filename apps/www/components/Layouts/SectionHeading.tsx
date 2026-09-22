@@ -22,7 +22,7 @@ const SectionHeading = ({
     )}
   >
     {eyebrow && (
-      <span className="text-brand font-mono text-sm uppercase tracking-wide">{eyebrow}</span>
+      <span className="text-primary font-mono text-sm uppercase tracking-wide">{eyebrow}</span>
     )}
     <h2 className="text-foreground text-3xl md:text-4xl tracking-tight max-w-[35ch] text-balance">
       {title}

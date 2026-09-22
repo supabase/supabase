@@ -21,5 +21,5 @@ test('does not show a green copied icon for primary buttons', async () => {
 
   const icon = container.querySelector('svg')
   expect(icon).toHaveClass('text-inherit')
-  expect(icon).not.toHaveClass('text-brand')
+  expect(icon).not.toHaveClass('text-primary')
 })

@@ -528,7 +528,7 @@ const ChartValueDifferential = React.forwardRef<HTMLDivElement, ChartValueDiffer
         ref={ref}
         className={cn(
           variant === 'positive'
-            ? 'text-brand'
+            ? 'text-primary'
             : variant === 'negative'
               ? 'text-destructive'
               : 'text-foreground-light',

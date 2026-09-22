@@ -120,7 +120,7 @@ export function getOperationIcon(operation: string): LucideIcon {
 export function getOperationColor(operation: string): string {
   const op = operation.toLowerCase()
   if (op.includes('seq scan')) return 'text-warning'
-  if (op.includes('index')) return 'text-brand'
+  if (op.includes('index')) return 'text-primary'
   if (op.includes('join')) return 'text-foreground-light'
   if (op.includes('sort') || op.includes('aggregate')) return 'text-foreground-light'
   return 'text-foreground-light'
