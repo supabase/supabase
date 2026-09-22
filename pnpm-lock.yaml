@@ -1066,8 +1066,8 @@ importers:
         specifier: 'catalog:'
         version: 2.116.0
       '@supabase/shared-types':
-        specifier: 0.1.95
-        version: 0.1.95
+        specifier: 0.1.96
+        version: 0.1.96
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.116.0(@opentelemetry/api@1.9.1)
@@ -2641,8 +2641,8 @@ importers:
   packages/shared-data:
     dependencies:
       '@supabase/shared-types':
-        specifier: 0.1.95
-        version: 0.1.95
+        specifier: 0.1.96
+        version: 0.1.96
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -8374,8 +8374,8 @@ packages:
     resolution: {integrity: sha512-MHAnlXxi2s6yiJsZsQMfs2B3RFxeVfQWxerqYhIMqcCQV/FuY3LIeouPEkXw/ah7wUWMLYwempF9MOCUScyddg==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/shared-types@0.1.95':
-    resolution: {integrity: sha512-Z/L/nHCiQVqj6nRIBerfQJLcEgYUUFTw+pIr/RMCbldibFrsAg8AkZQxVx/Oe9kSlwgKVxiWHj8m89CLtqo6lg==}
+  '@supabase/shared-types@0.1.96':
+    resolution: {integrity: sha512-2qB7Cmtu/59VgDpSjFN11hQhmhKK0RXgmGuF8F4fKDFHiTWA5Tu3EhPpcU5/j7jKhEsgUPFLXiZaGxn9hNQk/g==}
 
   '@supabase/sql-to-rest@0.1.6':
     resolution: {integrity: sha512-06KgjeINtc6405XQvfnchBE1azEsU8G2NElfadmvVHKmHa5l2bFzjbtFbpaYgpgTzccHlcDmBaCgedVf2Gyl8Q==}
@@ -25180,7 +25180,7 @@ snapshots:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
-  '@supabase/shared-types@0.1.95': {}
+  '@supabase/shared-types@0.1.96': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
