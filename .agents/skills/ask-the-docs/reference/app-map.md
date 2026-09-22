@@ -194,15 +194,14 @@ markdown string to substitute.
 See [`ci-and-lint.md`](./ci-and-lint.md) for the full CI surface. Local
 commands:
 
-| Tool                                                | Where       | What it catches                                                                                                |
-| --------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
-| `pnpm test:local:unwatch <path>` (from `apps/docs`) | per-test    | Vitest suite for `lib/` and `data/` schemas; needs local Supabase + DB reset first — see `apps/docs/AGENTS.md` |
-| `pnpm format`                                       | repo root   | Prettier — run before opening a PR                                                                             |
-| `pnpm lint --filter=docs`                           | repo root   | ESLint over `apps/docs`                                                                                        |
-| `pnpm typecheck`                                    | repo root   | TS across packages                                                                                             |
-| `pnpm build --filter=docs`                          | repo root   | Includes markdown generation; failures here block release                                                      |
-| `pnpm lint:mdx`                                     | `apps/docs` | MDX content lint (whole `content/` tree)                                                                       |
-| Typos check (`.github/workflows/avoid-typos.yml`)   | CI only     | `runner / misspell` job at error severity — no local command; fix flagged words before merge                   |
+| Tool                                                | Where     | What it catches                                                                                                |
+| --------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------- |
+| `pnpm test:local:unwatch <path>` (from `apps/docs`) | per-test  | Vitest suite for `lib/` and `data/` schemas; needs local Supabase + DB reset first — see `apps/docs/AGENTS.md` |
+| `pnpm format`                                       | repo root | Prettier — run before opening a PR                                                                             |
+| `pnpm lint --filter=docs`                           | repo root | ESLint over `apps/docs`                                                                                        |
+| `pnpm typecheck`                                    | repo root | TS across packages                                                                                             |
+| `pnpm build --filter=docs`                          | repo root | Includes markdown generation; failures here block release                                                      |
+| Typos check (`.github/workflows/avoid-typos.yml`)   | CI only   | `runner / misspell` job at error severity — no local command; fix flagged words before merge                   |
 
 Before adding a custom lint job, check whether the existing one can absorb
 the check (see [`adding-features.md`](./adding-features.md) "Reuse
