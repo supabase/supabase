@@ -22,12 +22,15 @@ async function generate() {
   for (const sourceFile of sources) {
     const relativePath = path.relative(CONTENT_DIR, sourceFile)
     const slug = getDocSlug(relativePath)
+    // Keep the "index" segment here (unlike slug) so relative links inside
+    // foo/index.mdx resolve against foo/, not foo's parent directory.
+    const documentBasePath = relativePath.replace(/\\/g, '/').replace(/\.mdx$/, '')
     const outPath = path.join(OUTPUT_DIR, `${slug}.md`)
     const raw = await fs.readFile(sourceFile, 'utf8')
 
     let output: string
     try {
-      output = transformLibraryMdx(raw, { documentSlugs, documentSlug: slug })
+      output = transformLibraryMdx(raw, { documentSlugs, documentBasePath })
     } catch (err) {
       throw new Error(
         `Failed to process ${sourceFile}: ${err instanceof Error ? err.message : err}`,

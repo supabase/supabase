@@ -87,7 +87,7 @@ function applySchema(
 
 function rewriteLibraryLinks(tree: Root, options: MarkdownOptions): void {
   visit(tree, 'link', (node) => {
-    node.url = toAgentHref(node.url, options.documentSlugs, options.documentSlug)
+    node.url = toAgentHref(node.url, options.documentSlugs, options.documentBasePath)
   })
 }
 

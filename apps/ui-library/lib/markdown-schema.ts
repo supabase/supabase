@@ -9,7 +9,7 @@ import { toAgentHref } from './library-documents'
 export type MarkdownOptions = {
   registryDirectory?: string
   documentSlugs?: ReadonlySet<string>
-  documentSlug?: string
+  documentBasePath?: string
 }
 
 type HandlerContext = {
@@ -108,7 +108,7 @@ function AccordionTrigger({ children }: HandlerContext): string {
 }
 
 function LinkedCard({ props, children, options }: HandlerContext): string {
-  const href = toAgentHref(String(props.href ?? ''), options.documentSlugs, options.documentSlug)
+  const href = toAgentHref(String(props.href ?? ''), options.documentSlugs, options.documentBasePath)
   const label = children.replace(/\s+/g, ' ').trim()
   return href ? `- [${label || href}](${href})` : label
 }
@@ -131,7 +131,7 @@ function TanstackDBGenerator(): string {
 }
 
 function Anchor({ props, children, options }: HandlerContext): string {
-  const href = toAgentHref(String(props.href ?? ''), options.documentSlugs, options.documentSlug)
+  const href = toAgentHref(String(props.href ?? ''), options.documentSlugs, options.documentBasePath)
   return href ? `[${children}](${href})` : children
 }
 

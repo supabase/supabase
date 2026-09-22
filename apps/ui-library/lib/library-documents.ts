@@ -36,14 +36,17 @@ export function getDocSlug(relativePath: string): string {
 export function toAgentHref(
   href: string,
   documentSlugs?: ReadonlySet<string>,
-  documentSlug?: string
+  documentBasePath?: string
 ): string {
   if (!href || href.startsWith('#') || href.startsWith('//')) return href
   const isRelative = !/^[a-z][a-z\d+.-]*:/i.test(href)
   if (!isRelative && !href.startsWith('https://supabase.com/library/docs/')) return href
-  if (isRelative && !href.startsWith('/') && !documentSlug) return href
+  if (isRelative && !href.startsWith('/') && !documentBasePath) return href
 
-  const url = new URL(href, `https://supabase.com/library/docs/${documentSlug ?? ''}`)
+  // documentBasePath is the source-relative path (e.g. "foo/index"), not the
+  // flattened doc slug ("foo") — that keeps relative links from foo/index.mdx
+  // resolving inside foo/, instead of jumping to foo's parent directory.
+  const url = new URL(href, `https://supabase.com/library/docs/${documentBasePath ?? ''}`)
   if (url.pathname.startsWith('/library/docs/')) {
     const slug = url.pathname.slice('/library/docs/'.length).replace(/\.md$/, '')
     if (documentSlugs && !documentSlugs.has(slug)) {
