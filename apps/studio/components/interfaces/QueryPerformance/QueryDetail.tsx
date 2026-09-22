@@ -104,7 +104,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
           {isLinterWarning && (
             <Alert
               variant="default"
-              className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
+              className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary"
             >
               <Lightbulb />
               <AlertTitle>Suggested optimization: Add an index</AlertTitle>

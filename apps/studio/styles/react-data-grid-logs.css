@@ -29,7 +29,7 @@
 
   .rdg-row {
     &.rdg-row--focused {
-      @apply border-r border-brand;
+      @apply border-r border-brand-default;
       border-right-width: 4px;
     }
 
@@ -71,7 +71,7 @@
 
   .rdg-row {
     &.rdg-row--focused {
-      @apply border-r border-brand;
+      @apply border-r border-brand-default;
       border-right-width: 4px;
     }
 
