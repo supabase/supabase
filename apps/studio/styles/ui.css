@@ -303,7 +303,7 @@
 
 ::-moz-selection {
   /* Code for Firefox */
-  @apply bg-brand;
+  @apply bg-brand-default;
   color: #333 !important;
 }
 

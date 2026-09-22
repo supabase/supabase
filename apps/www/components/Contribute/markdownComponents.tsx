@@ -19,7 +19,7 @@ export const markdownComponents: Components = {
   a: ({ node, ...props }) => (
     <a
       {...props}
-      className="text-brand-link hover:underline break-all"
+      className="text-brand hover:underline break-all"
       target="_blank"
       rel="noopener noreferrer"
     />
