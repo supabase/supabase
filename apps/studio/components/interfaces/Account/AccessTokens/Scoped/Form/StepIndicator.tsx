@@ -15,7 +15,7 @@ export const StepIndicator = ({ step, total, label }: StepIndicatorProps) => (
           key={index}
           className={cn(
             'h-1.5 w-1.5 rounded-full transition-colors',
-            index < step ? 'bg-brand-default' : 'bg-border-stronger'
+            index < step ? 'bg-primary' : 'bg-border-stronger'
           )}
         />
       ))}

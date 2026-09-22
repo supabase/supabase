@@ -21,9 +21,10 @@ darkened accessible `--primary` used for text.
 
 Use `bg-brand-default` when the canonical Supabase green is required as a fill. The same
 `brand-default` suffix applies to borders and other non-text utilities, such as
-`border-brand-default`. Shared focus chrome (`--ring`) and selected control chrome (radio
-borders, slider fills, checked field cards) are derived from `brand-default` too. Keep
-`text-primary` / `text-brand` for readable branded text.
+`border-brand-default`. Shared focus chrome (`--ring`) and larger selected fills (sliders,
+checked field cards) stay on `brand-default`. Small selected indicators that need to read
+clearly on light surfaces (radio borders/dots, step dots) use accessible `--primary` /
+`border-primary` instead. Keep `text-primary` / `text-brand` for readable branded text.
 
 <Colors definition={'background'} />
 
