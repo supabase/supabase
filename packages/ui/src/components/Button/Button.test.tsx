@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { Button } from './Button'
+import { Button, buttonVariants } from './Button'
 
 const SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'] as const
 const TYPES = [
@@ -33,6 +33,12 @@ describe('#Button', () => {
     expect(button.className).toContain('bg-card')
     expect(button.className).toContain('hover:bg-muted')
     expect(button.className).not.toContain('bg-primary')
+  })
+
+  it('should apply tiny size classes when buttonVariants omits size', () => {
+    const className = buttonVariants({ variant: 'default' })
+    expect(className).toContain('h-[26px]')
+    expect(className).toContain('px-2.5')
   })
 
   it('should allow an explicit primary variant override', () => {

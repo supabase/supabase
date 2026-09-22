@@ -135,6 +135,11 @@ const buttonVariants = cva(
         true: 'rounded-full',
       },
     },
+    // Match <Button size="tiny"> so raw buttonVariants({ variant }) keeps sizing.
+    // Fixed icon shells that omit size must override padding (e.g. px-0 with h/w-[30px]).
+    defaultVariants: {
+      size: 'tiny',
+    },
   }
 )
 
