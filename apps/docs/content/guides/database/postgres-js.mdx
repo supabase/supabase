@@ -42,7 +42,7 @@ hideToc: true
 
     `postgres.js` pipelines queries by default. Combined with transaction mode, this can hang queries or return mismatched rows. `postgres.js` has no working option to turn pipelining off directly: `max_pipeline: 0` breaks `sql.begin()` transactions instead, a known upstream bug ([porsager/postgres#1189](https://github.com/porsager/postgres/issues/1189)).
 
-    Bind at least one parameter in every query instead, which forces a synchronous round trip and avoids pipelining, or use session mode. An upcoming supavisor release will add native pipelining support, removing the need for workarounds.
+    Bind at least one parameter in every query instead, which forces a synchronous round trip and avoids pipelining, or use session mode. An upcoming Supavisor release will add native pipelining support, removing the need for workarounds.
 
     If you need more guidance on the pipelining with `postgres.js`, [contact support](/dashboard/support/new).
 
