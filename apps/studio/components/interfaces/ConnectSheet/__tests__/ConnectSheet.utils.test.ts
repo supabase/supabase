@@ -14,6 +14,7 @@ const EMPTY_QUERY: ConnectSheetQueryParams = {
   method: null,
   type: null,
   mcpClient: null,
+  warehouseQueryEngine: null,
 }
 
 const EMPTY_PREFS: ConnectSheetPrefs = {}
@@ -172,5 +173,26 @@ describe('resolveConnectSheetHydration', () => {
     expect(result.mode).toBe('server')
     expect(result.fieldUpdates).toEqual([])
     expect(result.urlUpdates).toEqual({})
+  })
+
+  test('hydrates the Warehouse query engine from stored preferences', () => {
+    const result = resolveConnectSheetHydration(
+      { ...EMPTY_QUERY, connectTab: 'warehouse' },
+      { warehouseQueryEngine: 'duckdb' },
+      [...ALL_MODES, 'warehouse']
+    )
+
+    expect(result.mode).toBe('warehouse')
+    expect(result.urlUpdates.warehouseQueryEngine).toBe('duckdb')
+  })
+
+  test('keeps the Warehouse query engine already present in the URL', () => {
+    const result = resolveConnectSheetHydration(
+      { ...EMPTY_QUERY, connectTab: 'warehouse', warehouseQueryEngine: 'duckdb' },
+      { warehouseQueryEngine: 'flightsql' },
+      [...ALL_MODES, 'warehouse']
+    )
+
+    expect(result.urlUpdates.warehouseQueryEngine).toBeUndefined()
   })
 })

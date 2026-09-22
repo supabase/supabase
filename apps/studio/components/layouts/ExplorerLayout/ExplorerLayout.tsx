@@ -20,6 +20,8 @@ import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { ExplorerProvider } from './ExplorerProvider'
+import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
 import {
@@ -27,6 +29,7 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import { useTrack } from '@/lib/telemetry/track'
 import {
@@ -45,6 +48,9 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
+  const { setLastVisitedExplorerTab } = useDashboardHistory()
+  const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
+  const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
   const [section, setSection] = useState<ExplorerResourceType>()
 
@@ -65,42 +71,49 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     entity: browserTitle?.entity ?? activeTabLabel,
   }
 
+  const handleTabChange = (id: string) => {
+    if (id === EXPLORER_HOME_TAB_ID) setLastVisitedExplorerTab(undefined)
+  }
+
   return (
-    <ProjectLayoutWithAuth
-      product="Explorer"
-      browserTitle={mergedBrowserTitle}
-      productMenuHeader={
-        <ExplorerNavHeader
-          section={section}
-          onBack={() => setSection(undefined)}
-          rootAction={<BackToSqlEditorButton />}
-        />
-      }
-      productMenu={
-        <div className="relative h-full overflow-hidden">
-          <AnimatePresence mode="wait">
-            {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
-            {section === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
-            {section === 'chat' && <ExplorerNavChats key="chats" />}
-          </AnimatePresence>
-        </div>
-      }
-    >
-      <ExplorerQueryTabCoordinator />
-
-      <ExplorerNotebookTabCoordinator />
-
-      <div className="flex flex-col h-full">
-        <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
-          <EditorTabs
-            isCollapseButtonHidden
-            customTabs={<HomeTabButton />}
-            newTabButton={<NewTabButton />}
+    <ExplorerProvider>
+      <ProjectLayoutWithAuth
+        product="Explorer"
+        browserTitle={mergedBrowserTitle}
+        productMenuHeader={
+          <ExplorerNavHeader
+            section={section}
+            onBack={() => setSection(undefined)}
+            rootAction={<BackToSqlEditorButton />}
           />
+        }
+        productMenu={
+          <div className="relative h-full overflow-hidden">
+            <AnimatePresence mode="wait">
+              {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
+              {section === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
+              {section === 'chat' && <ExplorerNavChats key="chats" />}
+            </AnimatePresence>
+          </div>
+        }
+      >
+        <ExplorerQueryTabCoordinator />
+
+        <ExplorerNotebookTabCoordinator />
+
+        <div className="flex flex-col h-full">
+          <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
+            <EditorTabs
+              isCollapseButtonHidden
+              customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}
+              newTabButton={<NewTabButton />}
+              onTabChange={handleTabChange}
+            />
+          </div>
+          <div className="flex-grow min-h-0">{children}</div>
         </div>
-        <div className="flex-grow min-h-0">{children}</div>
-      </div>
-    </ProjectLayoutWithAuth>
+      </ProjectLayoutWithAuth>
+    </ExplorerProvider>
   )
 }
 
