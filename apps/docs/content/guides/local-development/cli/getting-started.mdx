@@ -30,7 +30,7 @@ The rest of this page writes examples as `supabase <command>`; translate them to
 
 Install the CLI, bring the Supabase stack up on your machine, and stop it when you're done.
 
-### Installing the Supabase CLI
+### Install the Supabase CLI [#installing-the-supabase-cli]
 
 <Tabs
   scrollable
@@ -104,7 +104,7 @@ and run one of the following:
 </TabPanel>
 </Tabs>
 
-### Running a local Supabase project
+### Run a local Supabase project [#running-a-local-supabase-project]
 
 The full Supabase stack, including Postgres, Auth, and Storage, runs in Docker containers, so you need a container runtime first. Install [Docker Desktop](https://docs.docker.com/desktop), or another tool that offers Docker-compatible APIs:
 
@@ -135,7 +135,7 @@ To bring the stack up:
 
 <Admonition type="note">
 
-If you installed the CLI as a project dependency (npm, pnpm, yarn, or bun), run these as `npx supabase init` and `npx supabase start` instead. See [Installing the Supabase CLI](#installing-the-supabase-cli).
+If you installed the CLI as a project dependency (npm, pnpm, yarn, or bun), run these as `npx supabase init` and `npx supabase start` instead. See [Install the Supabase CLI](#installing-the-supabase-cli).
 
 </Admonition>
 
@@ -240,7 +240,7 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 </TabPanel>
 <TabPanel id="analytics" label="Analytics">
 
-Local logs rely on the Supabase Analytics Server which accesses the docker logging driver by either volume mounting `/var/run/docker.sock` domain socket on Linux and macOS, or exposing `tcp://localhost:2375` daemon socket on Windows. Configure these settings manually after [installing the Supabase CLI](#installing-the-supabase-cli).
+Local logs rely on the Supabase Analytics Server which accesses the docker logging driver by either volume mounting `/var/run/docker.sock` domain socket on Linux and macOS, or exposing `tcp://localhost:2375` daemon socket on Windows. Configure these settings manually after [installing the CLI](#installing-the-supabase-cli).
 
 <Admonition type="note">
 
@@ -253,7 +253,7 @@ All logs are stored in the local database under the `_analytics` schema.
 </TabPanel>
 </Tabs>
 
-### Stopping local services
+### Stop local services [#stopping-local-services]
 
 When you finish working, stop the stack. This doesn't reset your local database:
 
@@ -265,7 +265,7 @@ supabase stop
 
 These sections cover the CLI itself rather than your local project.
 
-### Beta channel
+### Use the beta channel [#beta-channel]
 
 Pre-release CLI builds ship from the development branch (`X.Y.Z-beta.N` versions). Use the npm `beta` dist-tag, or install `supabase-beta` via Homebrew / Scoop (separate packages from stable).
 
@@ -323,7 +323,7 @@ Beta builds are attached to [GitHub pre-releases](https://github.com/supabase/cl
 </TabPanel>
 </Tabs>
 
-### Updating the Supabase CLI
+### Update the Supabase CLI [#updating-the-supabase-cli]
 
 When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same package manager you installed it with.
 
