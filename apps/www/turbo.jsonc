@@ -15,6 +15,7 @@
         "CI",
         "CF_ACCESS_CLIENT_ID",
         "CF_ACCESS_CLIENT_SECRET",
+        "GITHUB_TOKEN",
         "NEXT_PUBLIC_MISC_USE_URL",
         "NEXT_PUBLIC_MISC_USE_ANON_KEY",
         "NEXT_PUBLIC_STUDIO_URL",
