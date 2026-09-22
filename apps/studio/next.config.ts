@@ -35,6 +35,8 @@ function getAssetPrefix() {
   return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 12) ?? 'unknown'}`
 }
 
+const isPlatform = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+
 const marketplaceApiUrl = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL
   ? new URL(process.env.NEXT_PUBLIC_MARKETPLACE_API_URL)
   : null
@@ -71,6 +73,7 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     clientRouterFilter: false,
+    turbopackFileSystemCacheForBuild: false,
   },
   async rewrites() {
     return [
@@ -87,7 +90,6 @@ const nextConfig = {
     // auto-prepends `basePath` to source and destination on its own,
     // except for the special `/` → basePath bounce below which opts out
     // via `basePath: false`.
-    const isPlatform = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     const maintenance = process.env.MAINTENANCE_MODE === 'true'
     return [
       ...(isPlatform ? PLATFORM_REDIRECTS : SELF_HOSTED_REDIRECTS),
@@ -160,6 +162,9 @@ const nextConfig = {
     ]
   },
   images: {
+    // Self-hosted: serve plain <img> (as the TanStack shim does) so Next never
+    // loads sharp. Hosted Studio optimizes images on Vercel.
+    unoptimized: !isPlatform,
     dangerouslyAllowSVG: false,
     remotePatterns: [
       {
@@ -198,6 +203,18 @@ const nextConfig = {
         : []),
     ],
   },
+  // Keep Next's optional sharp dependency out of the self-hosted standalone
+  // output. It is unused with `unoptimized` above, and its native binaries
+  // break the slim-services Studio image (sharp's .node segfaults without
+  // libvips). Globs resolve from `apps/studio`; `../../` anchors them at the
+  // repo root where pnpm hoists the store.
+  ...(isPlatform
+    ? {}
+    : {
+        outputFileTracingExcludes: {
+          '*': ['../../**/node_modules/sharp/**/*', '../../**/node_modules/@img/**/*'],
+        },
+      }),
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
   serverExternalPackages: ['libpg-query'],
   turbopack: {
@@ -235,7 +252,8 @@ const platformConfig =
 
 export default process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
   ? withSentryConfig(platformConfig, {
-      silent: true,
+      silent: false,
+      debug: true,
 
       // For all available options, see:
       // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/

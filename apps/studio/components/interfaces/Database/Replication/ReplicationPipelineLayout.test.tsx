@@ -1,15 +1,18 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { ReactNode, type AnchorHTMLAttributes } from 'react'
+import { ReactNode, useRef, type AnchorHTMLAttributes } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
+import { replicationKeys } from '@/data/replication/keys'
 import {
   PipelineRequestStatusProvider,
+  PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
@@ -47,14 +50,36 @@ const renderLayout = (children?: ReactNode) =>
   )
 
 const TableResetFixture = () => {
-  const { setTableResetting } = usePipelineRequestStatus()
+  const queryClient = useQueryClient()
+  const { runWithRequestStatus } = usePipelineRequestStatus()
+  const finishReset = useRef<() => void>(() => {})
 
   return (
     <>
-      <button tabIndex={0} onClick={() => setTableResetting(42, true)}>
+      <button
+        tabIndex={0}
+        onClick={() =>
+          void runWithRequestStatus(
+            42,
+            PipelineStatusRequestStatus.StopRequested,
+            () =>
+              new Promise<void>((resolve) => {
+                finishReset.current = resolve
+              })
+          )
+        }
+      >
         Begin table reset
       </button>
-      <button tabIndex={0} onClick={() => setTableResetting(42, false)}>
+      <button
+        tabIndex={0}
+        onClick={async () => {
+          finishReset.current()
+          await queryClient.invalidateQueries({
+            queryKey: replicationKeys.pipelinesStatus('default', 42),
+          })
+        }}
+      >
         Finish table reset
       </button>
     </>

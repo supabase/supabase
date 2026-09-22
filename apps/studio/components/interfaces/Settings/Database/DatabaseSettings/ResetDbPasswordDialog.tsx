@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -155,6 +156,10 @@ export const ResetDbPasswordDialog = ({
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="w-full space-y-8">
+          <Admonition type="warning" title="This password is shared across every connection method">
+            Resetting it will disconnect the pooler, read replicas, and any app, ORM, or tool still
+            using the old password. Update it everywhere before switching over.
+          </Admonition>
           <FormItemLayout
             layout="vertical"
             isReactForm={false}
