@@ -9,12 +9,6 @@ const Command = dynamic(() => import('./command').then((mod) => mod.Command), { 
 
 interface BlockItemProps {
   name: string
-  /**
-   * Declares whether v0 can open this registry item. The page header renders the
-   * button, so this attribute is read from the MDX source at build time
-   * (see `getV0RegistryName` in velite.config.js) rather than used here.
-   */
-  showOpenInV0?: boolean
   framework?: ShadcnFramework
 }
 
