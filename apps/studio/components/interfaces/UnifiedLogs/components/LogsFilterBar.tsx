@@ -91,6 +91,14 @@ export const LogsFilterBar = () => {
     withUserCondition(buildFilterGroup(columnFilters, columnBackedNames))
   )
 
+  const hasTimeRangeFilter = filters.conditions.some(
+    (condition) => 'propertyName' in condition && condition.propertyName === TIME_RANGE_PROPERTY
+  )
+  const filterPropertiesWithAvailability = filterProperties.map((property) => ({
+    ...property,
+    isAvailable: property.name !== TIME_RANGE_PROPERTY || !hasTimeRangeFilter,
+  }))
+
   // Read latest values without making the effect depend on their (per-render) identity.
   const syncFromColumnFilters = useEffectEvent(() => {
     setFilters(withUserCondition(buildFilterGroup(columnFilters, columnBackedNames)))
@@ -146,7 +154,7 @@ export const LogsFilterBar = () => {
       variant="pill"
       freeformDefaultProperty="event_message"
       className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"
-      filterProperties={filterProperties}
+      filterProperties={filterPropertiesWithAvailability}
       freeformText={freeformText}
       filters={filters}
       onFilterChange={setFilters}

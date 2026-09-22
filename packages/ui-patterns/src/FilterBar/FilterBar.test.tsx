@@ -101,7 +101,10 @@ describe('FilterBar', () => {
       })
       return (
         <FilterBar
-          filterProperties={properties}
+          filterProperties={properties.map((property) => ({
+            ...property,
+            isAvailable: filters.conditions.length === 0,
+          }))}
           filters={filters}
           onFilterChange={(next) => {
             setFilters(next)
@@ -129,6 +132,14 @@ describe('FilterBar', () => {
       logicalOperator: 'AND',
       conditions: [{ propertyName: 'date', operator: '=', value: 'range-30m' }],
     })
+    const freeform = screen.getByTestId('filter-bar-freeform-input')
+    await user.click(freeform)
+    expect(screen.queryByRole('option', { name: 'Time range' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Remove Time range filter' }))
+    await user.click(freeform)
+    await user.click(await screen.findByRole('option', { name: 'Time range' }))
+    await user.click(await screen.findByRole('button', { name: 'Last 30 minutes' }))
+    expect(screen.getAllByLabelText('Value for Time range')).toHaveLength(1)
   })
 
   it('renders with empty state', () => {
