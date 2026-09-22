@@ -3,7 +3,6 @@
 import { useFeatureFlags, useSearchParamsShallow } from 'common'
 
 import { SEARCH_V2_FLAG, type SearchV2Variant } from './constants'
-import { IS_PRODUCTION } from '@/lib/constants'
 
 const VARIANTS: SearchV2Variant[] = ['control', 'search-v2-active']
 
