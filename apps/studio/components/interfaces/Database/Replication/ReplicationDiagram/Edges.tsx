@@ -3,7 +3,6 @@ import { useParams, useReducedMotion } from 'common'
 import { useMemo } from 'react'
 
 import { getStatusName } from '../Pipeline.utils'
-import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import {
   EdgeVisualChip,
   getEdgeVisual,
@@ -43,7 +42,7 @@ export const SmoothstepEdge = ({
   )
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
-    { enabled: !!pipeline?.id, refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
+    { enabled: !!pipeline?.id }
   )
   const { getRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id

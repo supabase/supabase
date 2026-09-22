@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
 import { setCellSql } from '../QueryCell/QueryCell.utils'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
+import { ExplorerProvider } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
@@ -84,7 +85,9 @@ const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved'
 const renderNotebookTab = (tabsState = createTabsState('default')) =>
   customRender(
     <TabsStateContext.Provider value={tabsState}>
-      <ExplorerNotebookTab />
+      <ExplorerProvider>
+        <ExplorerNotebookTab />
+      </ExplorerProvider>
     </TabsStateContext.Provider>
   )
 
@@ -131,12 +134,15 @@ afterEach(() => {
 })
 
 describe('ExplorerNotebookTab', () => {
-  it('hides SQL by default for saved notebooks and caps query cells at 6xl', () => {
+  it('hides SQL by default for saved notebooks and caps query cells from their sortable row', () => {
     renderNotebookTab()
 
     const queryCells = Array.from(document.querySelectorAll('[data-slot="explorer-query"]'))
     expect(queryCells).toHaveLength(2)
-    queryCells.forEach((cell) => expect(cell).toHaveClass('max-w-6xl'))
+    queryCells.forEach((cell) => {
+      expect(cell).not.toHaveClass('max-w-6xl')
+      expect(cell.closest('[style*="max-width"]')).not.toBeNull()
+    })
 
     expect(screen.queryByRole('textbox', { name: 'SQL editor' })).not.toBeInTheDocument()
   })

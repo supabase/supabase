@@ -18,6 +18,7 @@ Alex Hsu
 Alexander Alexandrov
 Alexander Korotkov
 Ali Waseem
+Alice Crosbie
 Allan S
 Amir Issaei
 Amogh Rao
@@ -138,6 +139,7 @@ Inian P
 Iryna Deans
 Ivan Vasilov
 Jamie Boyd
+Jake Ng
 Jared Patterson
 Jason Farber
 Jason Voegele
@@ -168,6 +170,7 @@ Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
+Juan Manuel Valenzuela
 Julian Domke
 Julien Goux
 Kai M
@@ -261,6 +264,7 @@ Richard Kasprzak
 Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
+Román Cuellar
 Roman Hernandez
 Ronan Lehane
 Rory Wilding
@@ -331,6 +335,7 @@ Yara Lacerda
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov
+Zoë Braddock
 Zsolt Pazmandy
 ____________
 

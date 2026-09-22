@@ -51,7 +51,6 @@ export interface AssistantChatHeaderProps {
   isChatLoading: boolean
   showMetadataWarning: boolean
   updatedOptInSinceMCP: boolean
-  isHipaaProjectDisallowed: boolean
   aiOptInLevel: 'disabled' | 'schema' | 'full' | string | undefined
 }
 
@@ -110,7 +109,7 @@ export const AssistantChat = ({
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   // Whether attached queries are sent at all. One definition, shared by the chat form
   // (which folds them into the message text) and the message metadata (which states
   // whether any of them was a logs query), so the two can't disagree.
@@ -559,12 +558,11 @@ export const AssistantChat = ({
           isChatLoading,
           showMetadataWarning,
           updatedOptInSinceMCP,
-          isHipaaProjectDisallowed,
           aiOptInLevel,
         })}
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
+            <ConversationContent className="w-full py-8 mb-10">
               {renderedMessages}
               <div className="w-full max-w-3xl mx-auto">
                 {error && (

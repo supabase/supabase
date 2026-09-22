@@ -5,7 +5,23 @@ export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
   oxc: { jsx: { runtime: 'automatic' } },
   test: {
-    environment: 'jsdom',
-    include: ['tests/**/*.test.tsx'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'jsdom',
+          environment: 'jsdom',
+          include: ['tests/**/*.test.tsx'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          environment: 'node',
+          include: ['middleware.test.ts', 'scripts/*.test.ts', './lib/*.test.ts'],
+        },
+      },
+    ],
   },
 })

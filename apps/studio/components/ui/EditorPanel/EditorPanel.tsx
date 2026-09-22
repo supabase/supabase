@@ -47,6 +47,7 @@ import { SaveSnippetDialog } from './SaveSnippetDialog'
 import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { useCreateQuery } from '@/components/interfaces/Explorer/hooks'
+import { SaveQueryDropdown } from '@/components/interfaces/Explorer/SaveQueryDropdown'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
@@ -324,7 +325,7 @@ export const EditorPanel = () => {
         {isEditingTitle ? (
           <input
             ref={titleInputRef}
-            aria-label="Snippet name"
+            aria-label="Query title"
             value={titleInput}
             onChange={(e) => setTitleInput(e.target.value)}
             onBlur={commitRename}
@@ -373,7 +374,7 @@ export const EditorPanel = () => {
                     text: 'Open snippet',
                   },
                 }}
-              ></ButtonTooltip>
+              />
             </PopoverTrigger>
             <PopoverContent align="end" className="w-[300px] p-0">
               <Command shouldFilter={false}>
@@ -629,43 +630,53 @@ export const EditorPanel = () => {
               </span>
             </div>
           )}
-          <Button
-            size="tiny"
-            disabled={
-              !currentValue ||
-              isExecuting ||
-              isUpserting ||
-              (!!activeSnippet &&
-                currentValue === originalSnippetRef.current?.sql &&
-                activeSnippet.name === originalSnippetRef.current?.name)
-            }
-            onClick={() => {
-              if (!ref || !profile || !project) return
-              if (activeSnippet) {
-                setSaveStatus('idle')
-                upsertContent({
-                  projectRef: ref,
-                  payload: {
-                    id: activeSnippet.id,
-                    type: 'sql',
-                    name: activeSnippet.name,
-                    description: activeSnippet.description ?? '',
-                    visibility: activeSnippet.visibility ?? 'user',
-                    project_id: project.id,
-                    owner_id: profile.id,
-                    content: {
-                      ...activeSnippet.content,
-                      unchecked_sql: untrustedSql(currentValue),
-                    },
-                  },
-                })
-              } else {
-                setIsSaveDialogOpen(true)
+
+          {isExplorerEnabled ? (
+            <SaveQueryDropdown
+              query={{ title: activeSnippet?.name ?? 'Run SQL', sql: currentValue }}
+            >
+              <Button size="tiny">Save</Button>
+            </SaveQueryDropdown>
+          ) : (
+            <Button
+              size="tiny"
+              disabled={
+                !currentValue ||
+                isExecuting ||
+                isUpserting ||
+                (!!activeSnippet &&
+                  currentValue === originalSnippetRef.current?.sql &&
+                  activeSnippet.name === originalSnippetRef.current?.name)
               }
-            }}
-          >
-            {activeSnippet ? 'Update snippet' : 'Save as snippet'}
-          </Button>
+              onClick={() => {
+                if (!ref || !profile || !project) return
+                if (activeSnippet) {
+                  setSaveStatus('idle')
+                  upsertContent({
+                    projectRef: ref,
+                    payload: {
+                      id: activeSnippet.id,
+                      type: 'sql',
+                      name: activeSnippet.name,
+                      description: activeSnippet.description ?? '',
+                      visibility: activeSnippet.visibility ?? 'user',
+                      project_id: project.id,
+                      owner_id: profile.id,
+                      content: {
+                        ...activeSnippet.content,
+                        unchecked_sql: untrustedSql(currentValue),
+                      },
+                    },
+                  })
+                } else {
+                  setIsSaveDialogOpen(true)
+                }
+              }}
+            >
+              {activeSnippet ? 'Update snippet' : 'Save as snippet'}
+            </Button>
+          )}
+
           <SqlRunButton
             isDisabled={isExecuting}
             isExecuting={isExecuting}

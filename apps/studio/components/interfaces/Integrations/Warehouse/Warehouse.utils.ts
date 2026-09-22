@@ -6,9 +6,9 @@ import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 export type WarehouseSetupTarget = WarehouseSetupBody['targets'][number]
 export type WarehouseSetupStatus =
-  components['schemas']['WarehouseSetupStatusResponse']['setup_status']
+  components['schemas']['WarehouseSetupStatusResponse_Output']['setup_status']
 export type WarehouseSetupTable =
-  components['schemas']['WarehouseSetupStatusResponse']['tables'][number]
+  components['schemas']['WarehouseSetupStatusResponse_Output']['tables'][number]
 
 export function isWarehouseProvisioned(setupStatus?: WarehouseSetupStatus): boolean {
   return setupStatus === 'complete'
@@ -53,6 +53,22 @@ export function isSelectableWarehouseSchema(schemaName: string): boolean {
     !NON_SELECTABLE_SCHEMAS.has(schemaName) &&
     schemaName !== WAREHOUSE_METADATA_SCHEMA
   )
+}
+
+/**
+ * Groups the project's tables under the schemas Warehouse can replicate, sorted by schema name.
+ */
+export function buildSchemasWithTables(
+  schemas: { name: string }[],
+  tables: { schema: string; name: string }[]
+): SchemaWithTables[] {
+  return schemas
+    .filter((schema) => isSelectableWarehouseSchema(schema.name))
+    .map((schema) => ({
+      schema: schema.name,
+      tables: tables.filter((table) => table.schema === schema.name).map((table) => table.name),
+    }))
+    .sort((a, b) => a.schema.localeCompare(b.schema))
 }
 
 export function getSelectedTableCount(selection: SchemaTableSelection): number {
@@ -143,5 +159,5 @@ export function buildRetryTargets(
 }
 
 export type WarehouseCatalogCredentials = NonNullable<
-  components['schemas']['WarehouseCatalogResponse']['credentials']
+  components['schemas']['WarehouseCatalogResponse_Output']['credentials']
 >
