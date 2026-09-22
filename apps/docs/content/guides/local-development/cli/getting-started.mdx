@@ -36,19 +36,21 @@ Install the CLI, bring the Supabase stack up on your machine, and stop it when y
 >
 <TabPanel id="npm" label="npm">
 
-Install the CLI as a project dev dependency. This adds it to a single project rather than installing a global command:
+1. Install the CLI as a project dev dependency. This adds it to a single project rather than installing a global command:
 
-```sh
-npm install supabase --save-dev
-# or: pnpm add -D supabase / yarn add -D supabase / bun add -D supabase
-```
+   ```sh
+   npm install supabase --save-dev
+   # or: pnpm add -D supabase / yarn add -D supabase / bun add -D supabase
+   ```
 
-Pin the version in `package.json` so your whole team uses the same CLI version. Then run every command through your package runner:
+2. Pin the version in `package.json` so your whole team uses the same CLI version.
 
-```sh
-npx supabase --help
-# or: pnpm supabase / yarn supabase / bunx supabase
-```
+3. Run the CLI through your package runner:
+
+   ```sh
+   npx supabase --help
+   # or: pnpm supabase / yarn supabase / bunx supabase
+   ```
 
 <Admonition type="caution">
 
@@ -89,12 +91,12 @@ brew install supabase/tap/supabase
 #### Linux packages
 
 Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
-To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager
-and run one of the following:
 
-- `sudo apk add --allow-untrusted <...>.apk`
-- `sudo dpkg -i <...>.deb`
-- `sudo rpm -i <...>.rpm`
+1. Download the `.apk`, `.deb`, or `.rpm` file for your package manager.
+2. Install the package:
+   - `sudo apk add --allow-untrusted <...>.apk`
+   - `sudo dpkg -i <...>.deb`
+   - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
 </Tabs>
@@ -401,13 +403,25 @@ If you have any Supabase containers running locally, stop them and delete their 
 
 Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
 
-```sh
-supabase db diff -f my_schema
-supabase db dump --local --data-only > supabase/seed.sql
-supabase stop --no-backup
-```
-
 </Admonition>
+
+1. Save local schema changes as a migration:
+
+   ```sh
+   supabase db diff -f my_schema
+   ```
+
+2. Dump local data to your seed file:
+
+   ```sh
+   supabase db dump --local --data-only > supabase/seed.sql
+   ```
+
+3. Stop the containers and delete their data volumes:
+
+   ```sh
+   supabase stop --no-backup
+   ```
 
 ## Telemetry
 
@@ -415,18 +429,19 @@ The Supabase CLI collects telemetry data about general usage. Participating in t
 
 ### How to opt out
 
-Disable telemetry:
+1. Disable telemetry:
 
-```bash
-supabase telemetry disable
-```
+   ```bash
+   supabase telemetry disable
+   ```
 
-Check the current status, or re-enable:
+2. Confirm the current setting:
 
-```bash
-supabase telemetry status
-supabase telemetry enable
-```
+   ```bash
+   supabase telemetry status
+   ```
+
+To turn telemetry back on, run `supabase telemetry enable`.
 
 You can also opt out using the `SUPABASE_TELEMETRY_DISABLED=1` environment variable. The broader `DO_NOT_TRACK=1` convention is also respected.
 
