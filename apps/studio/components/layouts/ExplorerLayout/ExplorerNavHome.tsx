@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { motion } from 'framer-motion'
 import { ChevronRight, Plus, Settings, SquareCode } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -16,6 +17,7 @@ import { useCreateChat, useCreateQuery } from '@/components/interfaces/Explorer/
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
+import { useAppStateSnapshot } from '@/state/app-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNavHome = ({
@@ -23,9 +25,12 @@ export const ExplorerNavHome = ({
 }: {
   onSelectSection: (section: ExplorerResourceType) => void
 }) => {
+  const router = useRouter()
   const { ref } = useParams()
-  const { openChat } = useCreateChat()
   const tabs = useTabsStateSnapshot()
+  const appStateSnapshot = useAppStateSnapshot()
+
+  const { openChat } = useCreateChat()
   const { createQuery } = useCreateQuery()
 
   const { data: notebooksData } = useNotebooksInfiniteQuery({ projectRef: ref, limit: 100 })
@@ -138,7 +143,11 @@ export const ExplorerNavHome = ({
       </div>
 
       <div className="shrink-0 border-t border-default p-3">
-        <Link href="/account/me#dashboard" className={rowClassName(false)}>
+        <Link
+          href="/account/me#dashboard"
+          className={rowClassName(false)}
+          onClick={() => appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)}
+        >
           <Settings size={14} className="shrink-0" />
           <span className="flex-1 text-left">Preferences</span>
         </Link>
