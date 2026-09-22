@@ -473,7 +473,6 @@ export const ForeignKeySelector = ({
                           </div>
                           <div className="col-span-1 flex justify-end items-center">
                             <Button
-                              variant="default"
                               className="px-1"
                               icon={<X />}
                               disabled={fk.columns.length === 1}
@@ -484,9 +483,7 @@ export const ForeignKeySelector = ({
                       ))}
                     </div>
                     <div className="space-y-2">
-                      <Button variant="default" onClick={addColumn}>
-                        Add another column
-                      </Button>
+                      <Button onClick={addColumn}>Add another column</Button>
                       {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
                       {hasTypeErrors && (
                         <Alert variant="warning">

@@ -258,7 +258,7 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
                                 href={source.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sm text-brand hover:underline"
+                                className="text-sm text-primary hover:underline"
                               >
                                 {source.url}
                               </a>
@@ -320,7 +320,7 @@ function ErrorState({ handleReset }: { handleReset: () => void }) {
         Sorry, looks like Supabase AI is having a hard time!
       </p>
       <p className="text-sm text-foreground-lighter text-center">Please try again in a bit.</p>
-      <Button size="tiny" variant="default" onClick={handleReset}>
+      <Button size="tiny" onClick={handleReset}>
         Try again?
       </Button>
     </div>

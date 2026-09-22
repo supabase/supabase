@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "realtime-chat-vue",
-  "type": "registry:block",
   "title": "Realtime Chat",
   "description": "Component which provides a realtime chat interface.",
   "dependencies": [
@@ -37,5 +36,6 @@
       "type": "registry:component",
       "target": "composables/useRealtimeChat.ts"
     }
-  ]
+  ],
+  "type": "registry:block"
 }

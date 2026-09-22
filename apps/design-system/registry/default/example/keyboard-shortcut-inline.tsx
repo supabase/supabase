@@ -5,10 +5,7 @@ export default function KeyboardShortcutInline() {
     <div className="flex w-full max-w-xl flex-col gap-4">
       <div className="flex flex-wrap gap-3">
         <Button iconRight={<KeyboardShortcut keys={['Meta', 'S']} variant="inline" />}>Save</Button>
-        <Button
-          variant="default"
-          iconRight={<KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />}
-        >
+        <Button iconRight={<KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />}>
           Apply
         </Button>
       </div>

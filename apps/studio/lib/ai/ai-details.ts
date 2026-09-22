@@ -66,11 +66,8 @@ export const getAIDetails = async ({
 
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
-  // Mirrors the client-side gate in useOrgAiOptInLevel, which had no server-side equivalent
-  const isRestrictedByHipaa = hasHipaaAddon && isSensitive !== false
-
   return {
-    aiOptInLevel: isRestrictedByHipaa ? 'disabled' : getAiOptInLevel(selectedOrg.opt_in_tags),
+    aiOptInLevel: getAiOptInLevel(selectedOrg.opt_in_tags),
     hasAccessToAdvanceModel: advanceModelAccess.hasAccess,
     hasHipaaAddon,
     orgId: selectedOrg.id,

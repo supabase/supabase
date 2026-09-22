@@ -85,6 +85,7 @@
         "SITE_NAME",
         "SUPABASE_SECRET_KEY",
       ],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": [".next/**", "!.next/cache/**"],
     },

@@ -210,7 +210,7 @@ const AssistantCommandsPopover = forwardRef<
                         // closing of the popover is handled by the keydown event in AssistantChatForm
                       }}
                     >
-                      <span className="text-brand">/</span>
+                      <span className="text-primary">/</span>
                       <span className="text-default">{command}</span>
                     </CommandItem>
                   ))}

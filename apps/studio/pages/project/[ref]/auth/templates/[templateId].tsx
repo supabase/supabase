@@ -181,7 +181,7 @@ const RedirectToTemplates = () => {
           title="Unable to find template"
           description={`${templateId ? `The template "${templateId}"` : 'This template'} doesn’t seem to exist.`}
         >
-          <Button asChild variant="default" className="mt-2">
+          <Button asChild className="mt-2">
             <Link href={`/project/${ref}/auth/templates`}>Head back</Link>
           </Button>
         </Admonition>
@@ -260,9 +260,7 @@ const RedirectToTemplates = () => {
                         </CardContent>
                         <CardFooter className="justify-end space-x-2">
                           {templateForm.formState.isDirty && (
-                            <Button variant="default" onClick={() => templateForm.reset()}>
-                              Cancel
-                            </Button>
+                            <Button onClick={() => templateForm.reset()}>Cancel</Button>
                           )}
                           <Button
                             variant="primary"

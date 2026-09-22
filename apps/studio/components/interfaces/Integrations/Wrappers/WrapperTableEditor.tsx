@@ -120,7 +120,6 @@ const WrapperTableEditor = ({
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
-                  variant="default"
                   role="combobox"
                   aria-expanded={open}
                   aria-controls={listboxId}
@@ -493,11 +492,7 @@ const TableForm = ({
                 />
               </div>
             ))}
-            <Button
-              variant="default"
-              onClick={() => appendColumn({ name: '', type: 'text' })}
-              className="self-start"
-            >
+            <Button onClick={() => appendColumn({ name: '', type: 'text' })} className="self-start">
               Add column
             </Button>
             {errors.columns != null && errors.columns.message != null && (
