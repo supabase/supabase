@@ -54,10 +54,11 @@ async function handler(request: Request) {
           value: string
         }[]
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, cacheHeaders) {
         cookiesToSet.forEach(({ name, value, options }) =>
           headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
         )
+        Object.entries(cacheHeaders).forEach(([key, value]) => headers.set(key, value))
       },
     },
   })
