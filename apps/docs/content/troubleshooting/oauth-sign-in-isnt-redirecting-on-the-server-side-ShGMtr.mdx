@@ -39,9 +39,11 @@ throw redirect(303, data.url)
 
 ```ts
 import { redirect } from "@remix-run/node"; // or cloudflare/deno
+// Your server client factory: createServerClient with a setAll that appends
+// Set-Cookie to `headers`, returning both. See the PKCE flow's Server example.
+import { createClient } from "~/lib/supabase.server";
 ...
-const headers = new Headers()
-// Configure createServerClient so setAll appends to `headers`
+const { supabase, headers } = createClient(request)
 const { data } = await supabase.auth.signInWithOAuth({
   provider: 'github',
 })
