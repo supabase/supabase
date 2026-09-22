@@ -69,14 +69,14 @@ Wrapping the `ALTER TABLE` in a function or a `do` block changes nothing either.
 
 The `Yes` rows are what `supautils` delegates, plus the privileges granted to `postgres` directly.
 
-| Statement | Allowed |
-| --- | --- |
-| `create policy`, `alter policy`, `drop policy` | Yes |
-| `comment on policy` | Yes |
-| `select`, `insert` | Yes |
-| `grant select`, `grant insert` to your own roles | Yes |
-| `alter table` in any form | No |
-| `drop table` | No |
-| Creating tables or functions in the `realtime` schema | No |
+| Statement                                             | Allowed |
+| ----------------------------------------------------- | ------- |
+| `create policy`, `alter policy`, `drop policy`        | Yes     |
+| `comment on policy`                                   | Yes     |
+| `select`, `insert`                                    | Yes     |
+| `grant select`, `grant insert` to your own roles      | Yes     |
+| `alter table` in any form                             | No      |
+| `drop table`                                          | No      |
+| Creating tables or functions in the `realtime` schema | No      |
 
 See [Realtime Authorization](/docs/guides/realtime/authorization) for writing the policies.
