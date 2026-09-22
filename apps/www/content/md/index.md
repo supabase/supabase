@@ -1,3 +1,8 @@
+---
+title: Supabase
+canonical: https://supabase.com/
+---
+
 # Supabase
 
 > Build in a weekend. Scale to millions.

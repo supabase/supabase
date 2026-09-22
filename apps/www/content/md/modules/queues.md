@@ -1,3 +1,8 @@
+---
+title: Supabase Queues
+canonical: https://supabase.com/modules/queues
+---
+
 # Supabase Queues
 
 > Durable message queues with guaranteed delivery, powered by Postgres and pgmq.

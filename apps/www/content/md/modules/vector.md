@@ -1,3 +1,8 @@
+---
+title: Supabase Vector
+canonical: https://supabase.com/modules/vector
+---
+
 # Supabase Vector
 
 > Store, index, and query vector embeddings in Postgres with pgvector.

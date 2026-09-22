@@ -1,3 +1,8 @@
+---
+title: Supabase Storage
+canonical: https://supabase.com/storage
+---
+
 # Supabase Storage
 
 > S3-compatible object storage with a global CDN, image transformations, and three purpose-built bucket types.

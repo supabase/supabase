@@ -1,3 +1,8 @@
+---
+title: Supabase Auth
+canonical: https://supabase.com/auth
+---
+
 # Supabase Auth
 
 > Built-in authentication, authorization, and user management for every Supabase project.

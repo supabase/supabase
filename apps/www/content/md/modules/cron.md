@@ -1,3 +1,8 @@
+---
+title: Supabase Cron
+canonical: https://supabase.com/modules/cron
+---
+
 # Supabase Cron
 
 > Schedule and manage recurring jobs directly in Postgres with pg_cron.

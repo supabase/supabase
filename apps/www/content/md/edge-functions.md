@@ -1,3 +1,8 @@
+---
+title: Supabase Edge Functions
+canonical: https://supabase.com/edge-functions
+---
+
 # Supabase Edge Functions
 
 > Globally distributed TypeScript serverless functions, deployed in seconds.

@@ -1,3 +1,8 @@
+---
+title: Supabase Realtime
+canonical: https://supabase.com/realtime
+---
+
 # Supabase Realtime
 
 > Sync client state globally over WebSockets in real time.

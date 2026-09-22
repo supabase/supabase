@@ -1,3 +1,8 @@
+---
+title: Supabase Database
+canonical: https://supabase.com/database
+---
+
 # Supabase Database
 
 > Every Supabase project is a dedicated Postgres database, trusted by millions of developers.
