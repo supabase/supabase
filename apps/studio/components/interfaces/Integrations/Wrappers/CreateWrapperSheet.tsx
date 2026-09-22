@@ -372,7 +372,7 @@ export const CreateWrapperSheet = ({
                                     <WarningIcon />
                                     <span className="text-xs text-left">
                                       This feature requires the{' '}
-                                      <span className="text-brand">wrappers</span> extension to be
+                                      <span className="text-primary">wrappers</span> extension to be
                                       of minimum version of 0.5.0.
                                     </span>
                                   </div>

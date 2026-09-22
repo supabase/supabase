@@ -159,7 +159,7 @@
   --popover-foreground: var(--foreground);
 
   /* Primary is the accessible functional green for text and on-color
-     surfaces (bg-primary, text-primary, text-brand). Bright expressive fills,
+     surfaces (bg-primary, text-primary). Bright expressive fills,
      borders, and focus chrome use brand-default. Light theme overrides
      --primary for AA text. */
   --primary: oklch(0.76 0.15 var(--primary-hue));

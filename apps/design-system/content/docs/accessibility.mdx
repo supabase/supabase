@@ -76,7 +76,7 @@ Rules:
 
 - Prefer `:focus-visible` over `:focus` so click/tap does not show a focus indicator
 - Never use `outline-none` / `outline-hidden` without a ring or outline replacement
-- Always use the shared color (`ring-ring` / `outline-ring`). Variants (primary, danger, warning) do not change focus color. The shared color is bright brand green (`brand-default`), independent of accessible `text-brand` / `--primary`
+- Always use the shared color (`ring-ring` / `outline-ring`). Variants (primary, danger, warning) do not change focus color. The shared color is bright brand green (`brand-default`), independent of accessible `text-primary` / `--primary`
 - Do not animate the focus indicator; avoid `transition-all` / `transition` on controls that show one (prefer `transition-colors`)
 - Prefer `focus-ring` / `focus-inset` over copy-pasting the class stack
 - On interactive `<tr>`s, use `focus-inset` only. `focus-ring` will look fine in some browsers and invisible in others

@@ -202,7 +202,7 @@ const MetricCardDifferential = React.forwardRef<HTMLDivElement, MetricCardDiffer
         ref={ref}
         className={cn(
           variant === 'positive'
-            ? 'text-brand'
+            ? 'text-primary'
             : variant === 'negative'
               ? 'text-destructive'
               : 'text-foreground-light',
