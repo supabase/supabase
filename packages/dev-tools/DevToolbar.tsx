@@ -85,7 +85,7 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
             <span
               className={cn(
                 'w-1.5 h-1.5 rounded-[2px] shrink-0',
-                event.source === 'client' ? 'bg-brand' : 'bg-foreground-lighter'
+                event.source === 'client' ? 'bg-brand-default' : 'bg-foreground-lighter'
               )}
             />
             <span

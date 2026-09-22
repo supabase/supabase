@@ -20,4 +20,4 @@ It also means that we can switch to any documentation system we want. On this si
 
 ## Contributing
 
-To contribute to docs, see the [developers' guide](https://github.com/supabase/supabase/blob/master/apps/docs/DEVELOPERS.md) and [contributing guide](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md).
+To contribute to docs, see the [developers' guide](https://github.com/supabase/supabase/blob/master/apps/docs/DEVELOPERS.md) and [contributing guide](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md). If you write with an AI coding agent, use the `/write-the-docs` skill to draft and `/edit-the-docs` to revise an existing page.

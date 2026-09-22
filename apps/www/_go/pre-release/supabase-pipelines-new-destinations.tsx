@@ -138,7 +138,7 @@ const page: GoPageInput = {
             className="group flex h-full flex-col gap-3 rounded-lg border border-muted bg-surface-100 p-5 text-left transition-colors hover:border-brand-600 hover:bg-surface-200"
           >
             <span className="text-sm text-foreground-lighter">Blog</span>
-            <span className="text-lg font-medium text-foreground group-hover:text-brand-link">
+            <span className="text-lg font-medium text-foreground group-hover:text-brand">
               Introducing Supabase Pipelines
             </span>
             <span className="text-sm leading-relaxed text-foreground-light">
@@ -151,7 +151,7 @@ const page: GoPageInput = {
             className="group flex h-full flex-col gap-3 rounded-lg border border-muted bg-surface-100 p-5 text-left transition-colors hover:border-brand-600 hover:bg-surface-200"
           >
             <span className="text-sm text-foreground-lighter">Docs</span>
-            <span className="text-lg font-medium text-foreground group-hover:text-brand-link">
+            <span className="text-lg font-medium text-foreground group-hover:text-brand">
               Set up Pipelines
             </span>
             <span className="text-sm leading-relaxed text-foreground-light">
@@ -164,7 +164,7 @@ const page: GoPageInput = {
             className="group flex h-full flex-col gap-3 rounded-lg border border-muted bg-surface-100 p-5 text-left transition-colors hover:border-brand-600 hover:bg-surface-200"
           >
             <span className="text-sm text-foreground-lighter">Guide</span>
-            <span className="text-lg font-medium text-foreground group-hover:text-brand-link">
+            <span className="text-lg font-medium text-foreground group-hover:text-brand">
               Realtime or Pipelines?
             </span>
             <span className="text-sm leading-relaxed text-foreground-light">

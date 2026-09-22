@@ -193,7 +193,7 @@ function FloatingStatBubbles() {
             },
           }}
         >
-          <p className="text-sm font-mono font-medium text-brand-link dark:text-brand whitespace-nowrap">
+          <p className="text-sm font-mono font-medium text-brand whitespace-nowrap">
             {bubble.stat.value}
           </p>
           <p className="text-xs text-foreground-light whitespace-nowrap">{bubble.stat.label}</p>
