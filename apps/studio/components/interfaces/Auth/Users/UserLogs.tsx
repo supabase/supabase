@@ -38,8 +38,8 @@ const getApiLogsQueryOtel = (userId: string) => safeSql`
     event_message,
     log_attributes
   from logs
-  where source = 'edge_logs'
-    and log_attributes['request.sb.jwt.authorization.payload.subject'] = ${analyticsLiteral(userId)}
+  where source = 'auth_logs'
+    and log_attributes['auth_event.actor_id'] = ${analyticsLiteral(userId)}
   order by timestamp desc
   limit 100
 `
@@ -84,10 +84,8 @@ export const UserLogs = ({ user }: UserLogsProps) => {
 
       <div className={cn('flex flex-col gap-y-3', PANEL_PADDING)}>
         <div>
-          <p>API logs</p>
-          <p className="text-sm text-foreground-light">
-            View edge logs for requests made by this user
-          </p>
+          <p>Auth API logs</p>
+          <p className="text-sm text-foreground-light">View logs associated with this Auth user</p>
         </div>
 
         <Button asChild className="w-min">
