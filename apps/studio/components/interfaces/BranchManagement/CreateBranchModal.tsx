@@ -401,7 +401,7 @@ export const CreateBranchModal = () => {
                               isCheckingGHBranchValidity ? (
                                 <Loader2 size={14} className="animate-spin" />
                               ) : isGitBranchValid ? (
-                                <Check size={14} className="text-brand" strokeWidth={2} />
+                                <Check size={14} className="text-primary" strokeWidth={2} />
                               ) : null
                             ) : null}
                           </div>

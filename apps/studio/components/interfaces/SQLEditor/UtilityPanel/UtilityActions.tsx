@@ -129,7 +129,7 @@ export const UtilityActions = ({
               <Keyboard size={14} className="text-foreground-light" />
               Intellisense enabled
             </span>
-            {intellisenseEnabled && <Check className="text-brand" size={16} />}
+            {intellisenseEnabled && <Check className="text-primary" size={16} />}
           </DropdownMenuItem>
           {IS_PLATFORM && (
             <>
@@ -186,7 +186,7 @@ export const UtilityActions = ({
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
               Intellisense enabled
-              {intellisenseEnabled && <Check className="text-brand" size={16} />}
+              {intellisenseEnabled && <Check className="text-primary" size={16} />}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
