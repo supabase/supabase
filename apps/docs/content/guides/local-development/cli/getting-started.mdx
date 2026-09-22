@@ -13,16 +13,11 @@ With two commands, you can set up and start a new local project:
 1. `supabase init` to create a new local project
 2. `supabase start` to launch the Supabase services
 
-<Admonition type="note" label="Global command vs. project dependency">
+<Admonition type="note" title="Global command or project dependency">
 
-There are two ways to install the CLI, and they change the command you type:
+How you type a CLI command depends on how you install it. Homebrew, Scoop, and the Linux packages give you a global `supabase` command. Installing with npm, pnpm, yarn, or bun adds the CLI to one project instead, so you run it through your package runner as `npx supabase <command>`. This page writes every example as `supabase <command>`.
 
-- **Project dependency** with `npm`, `pnpm`, or `yarn` installs the CLI into a single project (there is no global `supabase` command with this method). Run it through your package runner instead, for example `npx supabase <command>`.
-- **Global install** with Homebrew, Scoop, or Linux packages. Run commands as `supabase <command>`.
-
-Either way, the CLI is **project-scoped**: most commands (including `start`) expect to run inside a directory that has been initialized with `supabase init`, which creates the `supabase/` folder and `config.toml`. Run `init` first, then the other commands from the same directory.
-
-The rest of this page writes examples as `supabase <command>`; translate them to `npx supabase <command>` if you installed the CLI as a project dependency.
+The CLI is project-scoped either way. Most commands, including `start`, expect a directory that `supabase init` has already set up with a `supabase` folder and a `config.toml`. Run `init` first, then the rest from the same directory.
 
 </Admonition>
 
