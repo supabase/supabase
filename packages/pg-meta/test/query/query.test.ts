@@ -825,7 +825,9 @@ describe('End-to-end query chaining', () => {
     const filterBuilder: IQueryFilter = query.from('users', 'public').select()
     filterBuilder.filter(['id', 'version'], '=', [1, 2])
     const modifierBuilder: IQueryModifier = filterBuilder
-    const sql = modifierBuilder.toSql({ isCTE: false, isFinal: false })
-    expect(sql).toBe('select * from public.users where (id, version) = (1, 2)')
+    const sqlDefault = modifierBuilder.toSql()
+    expect(sqlDefault).toBe('select * from public.users where (id, version) = (1, 2);')
+    const sqlWithOptions = modifierBuilder.toSql({ isCTE: false, isFinal: false })
+    expect(sqlWithOptions).toBe('select * from public.users where (id, version) = (1, 2)')
   })
 })
