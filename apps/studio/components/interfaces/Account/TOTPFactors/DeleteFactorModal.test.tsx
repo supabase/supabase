@@ -5,11 +5,28 @@ import { DeleteFactorModal } from './DeleteFactorModal'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return {
+    ...actual,
+    useFlag: () => true,
+  }
+})
+
 describe('DeleteFactorModal', () => {
   test("Requests users confirmation before deleting an MFA when it's not the last", async () => {
     const unenroll = vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({
       data: {
         id: 'some_id',
+      },
+      error: null,
+    })
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue({
+      data: {
+        id: 'some_id',
+        total: 10,
+        remaining: 10,
+        type: 'recovery_code',
       },
       error: null,
     })
@@ -25,7 +42,6 @@ describe('DeleteFactorModal', () => {
       <DeleteFactorModal
         visible
         factorId="some_id"
-        hasRecoveryCodes={false}
         lastFactorToBeDeleted={false}
         onClose={onClose}
       />
@@ -38,12 +54,19 @@ describe('DeleteFactorModal', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled())
     expect(unenrollRecoveryCodes).not.toHaveBeenCalled()
   })
-  test("Requests users confirmation before deleting an MFA when it's the last one but not recovery codes are available", async () => {
+  test("Requests users confirmation before deleting an MFA when it's the last one but no recovery codes are available", async () => {
     const unenroll = vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({
       data: {
         id: 'some_id',
       },
       error: null,
+    })
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue({
+      data: null,
+      // @ts-expect-error Simplified error for tests
+      error: {
+        code: 'mfa_factor_not_found',
+      },
     })
     const unenrollRecoveryCodes = vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
       data: {
@@ -54,13 +77,7 @@ describe('DeleteFactorModal', () => {
     const onClose = vi.fn()
 
     customRender(
-      <DeleteFactorModal
-        visible
-        factorId="some_id"
-        hasRecoveryCodes={false}
-        lastFactorToBeDeleted
-        onClose={onClose}
-      />
+      <DeleteFactorModal visible factorId="some_id" lastFactorToBeDeleted onClose={onClose} />
     )
     await screen.findByText('Confirm to delete factor')
     await screen.findByText('Multi-factor authentication will be disabled')
@@ -77,6 +94,15 @@ describe('DeleteFactorModal', () => {
       },
       error: null,
     })
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue({
+      data: {
+        id: 'some_id',
+        total: 10,
+        remaining: 10,
+        type: 'recovery_code',
+      },
+      error: null,
+    })
     const unenrollRecoveryCodes = vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
       data: {
         id: 'some_id',
@@ -86,13 +112,7 @@ describe('DeleteFactorModal', () => {
     const onClose = vi.fn()
 
     customRender(
-      <DeleteFactorModal
-        visible
-        factorId="some_id"
-        hasRecoveryCodes
-        lastFactorToBeDeleted
-        onClose={onClose}
-      />
+      <DeleteFactorModal visible factorId="some_id" lastFactorToBeDeleted onClose={onClose} />
     )
     await screen.findByText('Confirm to delete factor')
     await screen.findByText('Multi-factor authentication will be disabled')
@@ -109,6 +129,13 @@ describe('DeleteFactorModal', () => {
       },
       error: null,
     })
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue({
+      data: null,
+      // @ts-expect-error Simplified error for tests
+      error: {
+        code: 'mfa_factor_not_found',
+      },
+    })
     const unenrollRecoveryCodes = vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
       data: {
         id: 'some_id',
@@ -121,7 +148,6 @@ describe('DeleteFactorModal', () => {
       <DeleteFactorModal
         visible
         factorId="some_id"
-        hasRecoveryCodes={false}
         lastFactorToBeDeleted={false}
         onClose={onClose}
       />

@@ -52,10 +52,9 @@ export const DeleteFactorModal = ({
   })
 
   const loading =
-    (enableAuthRecoveryCodes && recoveryCodesStatusQuery.isPending) ||
+    (enableAuthRecoveryCodes && lastFactorToBeDeleted && recoveryCodesStatusQuery.isPending) ||
     unenrollMFAMutation.isPending ||
     unenrollRecoveryCodesMutation.isPending
-
   const hasRecoveryCodes =
     enableAuthRecoveryCodes && recoveryCodesStatusQuery.data?.status === 'available'
 
@@ -73,7 +72,6 @@ export const DeleteFactorModal = ({
         // If users have recovery codes and this is the last MFA for their account,
         // we must first delete the recovery codes (they don't make sense without any MFA)
         const shouldDeleteRecoveryCodes = lastFactorToBeDeleted && hasRecoveryCodes
-
         if (factorId && !shouldDeleteRecoveryCodes) {
           return unenrollMFAMutation.mutate({ factorId })
         }
