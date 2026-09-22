@@ -3,7 +3,7 @@ import path from 'node:path'
 import { PROD_URL } from '~/lib/constants'
 import { describe, expect, it, vi } from 'vitest'
 
-import { mdAlternate } from './md-alternates'
+import { homepageMdAlternate, mdAlternate } from './md-alternates'
 
 vi.mock('~/public/markdown/manifest.json', () => ({
   default: [
@@ -38,11 +38,18 @@ describe('mdAlternate', () => {
   })
 })
 
+describe('homepageMdAlternate', () => {
+  it('points at the www-served docs index, outside the guides basePath', () => {
+    expect(homepageMdAlternate()).toEqual({ 'text/markdown': 'https://supabase.com/docs.md' })
+  })
+})
+
 const WIRING: [string, string][] = [
   ['features/docs/GuidesMdx.utils.tsx', 'mdAlternate('],
   ['app/guides/troubleshooting/[slug]/page.tsx', 'mdAlternate(`troubleshooting/${slug}`)'],
   ['app/guides/troubleshooting/page.tsx', "mdAlternate('troubleshooting')"],
   ['features/docs/TroubleshootingSection.page.tsx', 'mdAlternate(`${topic}/troubleshooting`)'],
+  ['app/page.tsx', 'homepageMdAlternate()'],
 ]
 
 describe('markdown alternate wiring', () => {

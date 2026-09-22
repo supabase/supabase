@@ -10,6 +10,7 @@ import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker
 import { IconLinkImage, IconLinkList, IconLinkMenuIcon } from '@/features/ui/IconLink'
 import HomeLayout from '@/layouts/HomeLayout'
 import { BASE_PATH } from '@/lib/constants'
+import { homepageMdAlternate } from '@/lib/md-alternates'
 
 const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
   'sdk:csharp',
@@ -28,8 +29,11 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: parentAlternates.types || undefined,
       }),
+      types: {
+        ...(parentAlternates?.types ?? {}),
+        ...homepageMdAlternate(),
+      },
     },
   }
 }

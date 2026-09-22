@@ -116,6 +116,13 @@ describe('www middleware', () => {
       expect(res.headers.get('x-middleware-rewrite')).toBeNull()
     })
 
+    it('passes /docs.md through to routing instead of the product-content handler', () => {
+      const req = makeRequest('/docs.md')
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+    })
+
     it('rewrites /index.md to the homepage markdown', () => {
       const req = makeRequest('/index.md')
       const res = middleware(req)

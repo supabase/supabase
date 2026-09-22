@@ -62,6 +62,23 @@ describe('next.config.mjs', () => {
     ).toBeLessThan(redirects.findIndex((redirect) => redirect.source === '/ui/:path*'))
   })
 
+  it('serves the docs Markdown entry point from the shared index, exact match only', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const rewrites = await config.rewrites?.()
+    const afterFiles = (rewrites && 'afterFiles' in rewrites && rewrites.afterFiles) || []
+
+    const docsMdRule = afterFiles.find((rule) => rule.source === '/docs.md')
+
+    expect(docsMdRule).toBeDefined()
+    expect(docsMdRule?.destination).toBe('/llms.txt')
+
+    const matchDocsMd = getPathMatch(docsMdRule!.source)
+    expect(matchDocsMd('/docs.md')).toBeTruthy()
+    expect(matchDocsMd('/docs')).toBe(false)
+    expect(matchDocsMd('/docs/guides/auth.md')).toBe(false)
+    expect(matchDocsMd('/docs/index.md')).toBe(false)
+  })
+
   it('routes unmatched markdown-negotiated paths to the md-404 handler via fallback rewrites', async () => {
     const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
     const rewrites = await config.rewrites?.()

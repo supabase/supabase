@@ -93,6 +93,10 @@ const rewrites = [
     destination: 'https://api.supabase.com/api/v1-json',
   },
   { source: '/feed.xml', destination: `/rss.xml` },
+  {
+    source: '/docs.md',
+    destination: '/llms.txt',
+  },
 ]
 
 module.exports = rewrites
