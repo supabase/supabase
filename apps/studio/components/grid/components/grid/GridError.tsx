@@ -14,6 +14,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-mutation'
 import { tableRowKeys } from '@/data/table-rows/keys'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
@@ -25,6 +26,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
 
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { filters, clearFilters } = useTableFilter()
   const { sorts } = useTableSort()
 
@@ -90,7 +92,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
     return <IcebergUnauthorizedError error={error} />
   }
 
-  return <GeneralError error={error} />
+  return <GeneralError error={error} projectRef={project?.ref} orgSlug={org?.slug} />
 }
 
 const ForeignTableMissingVaultKeyError = () => {
@@ -194,12 +196,22 @@ const IcebergUnauthorizedError = ({ error }: { error: ResponseError }) => {
   )
 }
 
-const GeneralError = ({ error }: { error: ResponseError }) => {
+const GeneralError = ({
+  error,
+  projectRef,
+  orgSlug,
+}: {
+  error: ResponseError
+  projectRef?: string
+  orgSlug?: string
+}) => {
   const { filters } = useTableFilter()
 
   return (
     <AlertError
       error={error}
+      projectRef={projectRef}
+      orgSlug={orgSlug}
       className="pointer-events-auto"
       subject="Failed to retrieve rows from table"
     >

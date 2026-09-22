@@ -207,6 +207,19 @@ export async function selectInitialOrgAndProject({
     } catch {
       // Can safely ignore, consider provided project ref invalid
     }
+
+    // Project details lookup failed or didn't resolve to a known org (e.g. the
+    // Management API request errored) — fall back to the caller-provided orgSlug
+    // instead of losing the already-known projectRef.
+    if (orgSlug) {
+      const org = orgs.find((o) => o.slug === orgSlug)
+      if (org?.slug) {
+        return {
+          projectRef,
+          orgSlug: org.slug,
+        }
+      }
+    }
   }
 
   if (orgSlug) {
