@@ -1,18 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
+import { useRecoveryCodesUnenrollMutation } from '@/data/recovery-codes/recovery-codes-unenroll'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 
 interface DeleteFactorModalProps {
@@ -23,7 +15,7 @@ interface DeleteFactorModalProps {
   onClose: () => void
 }
 
-const DeleteFactorModal = ({
+export const DeleteFactorModal = ({
   visible,
   factorId,
   hasRecoveryCodes,
@@ -33,7 +25,7 @@ const DeleteFactorModal = ({
   const queryClient = useQueryClient()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
-  const { mutate: unenroll, isPending } = useMfaUnenrollMutation({
+  const unenrollMFAMutation = useMfaUnenrollMutation({
     onSuccess: async () => {
       if (lastVisitedOrganization) {
         await queryClient.invalidateQueries({
@@ -45,32 +37,14 @@ const DeleteFactorModal = ({
     },
   })
 
-  // Users can't delete their last MFA if they have recovery codes, they must delete them first
-  // This is enforced by the backend
-  if (lastFactorToBeDeleted && hasRecoveryCodes) {
-    return (
-      <AlertDialog
-        open={visible}
-        onOpenChange={(open) => {
-          if (open) return
-          onClose()
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Recovery codes are still available</AlertDialogTitle>
-            <AlertDialogDescription>
-              You can't delete the last factor configured for your account if you still have
-              recovery codes available. Please delete them first.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Close</AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    )
-  }
+  const unenrollRecoveryCodesMutation = useRecoveryCodesUnenrollMutation({
+    onSuccess: () => {
+      if (!factorId) return // Should never happen
+      unenrollMFAMutation.mutate({ factorId })
+    },
+  })
+
+  const loading = unenrollMFAMutation.isPending || unenrollRecoveryCodesMutation.isPending
 
   return (
     <ConfirmationModal
@@ -80,9 +54,18 @@ const DeleteFactorModal = ({
       title="Confirm to delete factor"
       confirmLabel="Delete"
       confirmLabelLoading="Deleting"
-      loading={isPending}
+      loading={loading}
       onCancel={onClose}
-      onConfirm={() => factorId && unenroll({ factorId })}
+      onConfirm={() => {
+        // If users have recovery codes and this is the last MFA for their account,
+        // we must first delete the recovery codes (they don't make sense without any MFA)
+        const shouldDeleteRecoveryCodes = lastFactorToBeDeleted && hasRecoveryCodes
+
+        if (factorId && !shouldDeleteRecoveryCodes) {
+          return unenrollMFAMutation.mutate({ factorId })
+        }
+        unenrollRecoveryCodesMutation.mutate()
+      }}
       alert={{
         title: lastFactorToBeDeleted
           ? 'Multi-factor authentication will be disabled'
@@ -101,6 +84,7 @@ const DeleteFactorModal = ({
             <li>
               You will lose access to any organization that enforces multi-factor authentication
             </li>
+            {hasRecoveryCodes && <li>Your recovery codes will be deleted too</li>}
           </>
         ) : (
           <>
@@ -112,5 +96,3 @@ const DeleteFactorModal = ({
     </ConfirmationModal>
   )
 }
-
-export default DeleteFactorModal

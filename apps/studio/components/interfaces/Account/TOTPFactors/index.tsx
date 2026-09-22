@@ -16,7 +16,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
-import DeleteFactorModal from './DeleteFactorModal'
+import { DeleteFactorModal } from './DeleteFactorModal'
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
