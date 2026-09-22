@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { AiIconAnimation } from 'ui'
 
 import { buildLogsPrompt, formatLogsAsJson } from '../Settings/Logs/Logs.utils'
@@ -21,7 +21,7 @@ export const LogSelectionActions = ({ rows }: { rows: ColumnSchema[] }) => {
   const copyButtonRef = useRef<HTMLButtonElement>(null)
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
-  const selectedLogs = parseSelectedLogs(rows, logsMetadata)
+  const selectedLogs = useMemo(() => parseSelectedLogs(rows, logsMetadata), [rows, logsMetadata])
   const selectedRows = selectedLogs.success ? selectedLogs.data : []
   const hasValidSelection = selectedRows.length > 0
 

@@ -8,7 +8,7 @@ import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogLevelDot } from './LogLevelDot'
 import { LogTypeIcon } from './LogTypeIcon'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { useDataTableSelectionActions } from '@/components/ui/DataTable/providers/DataTableProvider'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -283,7 +283,7 @@ function LogSelectionIndicator({
   level: ColumnSchema['level']
   isSelected: boolean
 }) {
-  const { onSelectRow } = useDataTable()
+  const { onSelectRow } = useDataTableSelectionActions()
   return (
     <div className="relative flex h-4 w-4 items-center justify-center">
       <div

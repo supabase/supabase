@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
-import { cloneElement, Dispatch, SetStateAction, useEffect } from 'react'
+import { cloneElement, Dispatch, memo, SetStateAction, useEffect } from 'react'
 import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
@@ -19,7 +19,7 @@ interface FilterSideBarProps {
   dateRangeDisabled?: DateRangeDisabled
 }
 
-export function FilterSideBar({
+export const FilterSideBar = memo(function FilterSideBar({
   isFilterBarOpen,
   setIsFilterBarOpen,
   dateRangeDisabled,
@@ -94,4 +94,4 @@ export function FilterSideBar({
       </div>
     </ResizablePanel>
   )
-}
+})

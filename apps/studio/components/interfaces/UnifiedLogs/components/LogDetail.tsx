@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 import { Skeleton } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { LogOverview } from '../ServiceFlow/LogOverview'
 import { getLogDataForMetadataVisibility } from '../ServiceFlowPanel.utils'
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { getRawLogData, getRowTimestampMs } from '../UnifiedLogs.utils'
+import { LogJsonPreview } from './LogJsonPreview'
 import { AlertError } from '@/components/ui/AlertError'
 import CopyButton from '@/components/ui/CopyButton'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
@@ -45,6 +45,7 @@ export function LogDetail({
   const rawData = getLogDataForMetadataVisibility(getRawLogData(enrichedData ?? row), logsMetadata)
 
   if (tab === 'raw-json') {
+    const json = JSON.stringify(rawData, null, 2)
     return (
       <>
         {isLoading && (
@@ -58,18 +59,11 @@ export function LogDetail({
             iconOnly
             aria-label="Copy log as JSON"
             variant="default"
-            text={JSON.stringify(rawData, null, 2)}
+            text={json}
             className="pointer-events-auto"
           />
         </div>
-        <CodeBlock
-          language="json"
-          hideCopy
-          wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-          className="rounded-none border-none !overflow-x-visible [&_code]:!leading-tight [&_pre]:!leading-tight"
-        >
-          {JSON.stringify(rawData, null, 2)}
-        </CodeBlock>
+        <LogJsonPreview json={json} />
       </>
     )
   }

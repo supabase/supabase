@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import { SearchIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { Bar, BarChart, CartesianGrid, ReferenceArea, XAxis } from 'recharts'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
@@ -34,7 +34,7 @@ interface TimelineChartProps<TChart extends BaseChartSchema> {
   chartConfig: ChartConfig
 }
 
-export function TimelineChart<TChart extends BaseChartSchema>({
+export const TimelineChart = memo(function TimelineChart<TChart extends BaseChartSchema>({
   data,
   className,
   columnId,
@@ -193,7 +193,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
       <ChartHighlightActions chartHighlight={chartHighlight} actions={highlightActions} />
     </div>
   )
-}
+})
 
 // TODO: check what's a good abbreviation for month vs. minutes
 function calculatePeriod(interval: number): '10m' | '1d' | '1w' | '1mo' {

@@ -7,7 +7,7 @@ import type {
   Table,
   VisibilityState,
 } from '@tanstack/react-table'
-import { createContext, ReactNode, useContext, useMemo } from 'react'
+import { createContext, ReactNode, RefObject, useContext, useMemo, useRef } from 'react'
 
 import { DataTableFilterField } from '../DataTable.types'
 import { RowSelectionModifiers } from '../rowSelection.utils'
@@ -19,15 +19,11 @@ import { ResponseError } from '@/types'
 interface DataTableStateContextType<TSearchParams = unknown> {
   columnFilters: ColumnFiltersState
   sorting: SortingState
-  rowSelection: RowSelectionState
   columnOrder: string[]
   columnVisibility: VisibilityState
   pagination: PaginationState
   enableColumnOrdering: boolean
   searchParameters: TSearchParams
-  openRowId: string | undefined
-  setOpenRowId: (id: string | undefined) => void
-  onSelectRow?: (id: string, modifiers?: RowSelectionModifiers) => void
 }
 
 interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
@@ -48,31 +44,132 @@ interface DataTableContextType<TData = unknown, TValue = unknown, TSearchParams 
 
 export const DataTableContext = createContext<DataTableContextType<any, any, any> | null>(null)
 
+interface DataTableSelectionState {
+  rowSelection: RowSelectionState
+  openRowId: string | undefined
+}
+
+interface DataTableSelectionActions {
+  setOpenRowId: (id: string | undefined) => void
+  onSelectRow?: (id: string, modifiers?: RowSelectionModifiers) => void
+  rowNavigationRef: RefObject<{
+    scrollToRow: (id: string, focus: boolean) => void
+  } | null>
+}
+
+const SelectionContext = createContext<DataTableSelectionState | null>(null)
+const SelectionActionsContext = createContext<DataTableSelectionActions | null>(null)
+const EMPTY_SELECTION: RowSelectionState = {}
+const noop = () => {}
+
 export function DataTableProvider<TData, TValue, TSearchParams = unknown>({
   children,
-  ...props
+  rowSelection = EMPTY_SELECTION,
+  openRowId,
+  setOpenRowId = noop,
+  onSelectRow,
+  table,
+  error,
+  columns,
+  filterFields,
+  columnFilters,
+  sorting,
+  columnOrder,
+  columnVisibility,
+  pagination,
+  enableColumnOrdering = false,
+  searchParameters,
+  isFetching,
+  isError,
+  isLoading,
+  isLoadingCounts,
+  getFacetedUniqueValues,
+  getFacetedMinMaxValues,
 }: Partial<DataTableStateContextType<TSearchParams>> &
+  Partial<DataTableSelectionState> &
+  Pick<Partial<DataTableSelectionActions>, 'setOpenRowId' | 'onSelectRow'> &
   DataTableBaseContextType<TData, TValue> & {
     children: ReactNode
   }) {
+  const rowNavigationRef = useRef<DataTableSelectionActions['rowNavigationRef']['current']>(null)
+  const selection = useMemo(() => ({ rowSelection, openRowId }), [rowSelection, openRowId])
+  const actions = useMemo(
+    () => ({ setOpenRowId, onSelectRow, rowNavigationRef }),
+    [setOpenRowId, onSelectRow]
+  )
+  // TanStack's table object is stable even when its data or internal sizing changes.
+  const { columnSizing, columnSizingInfo } = table.getState()
+  const data = table.options.data
+  const tableColumns = table.options.columns
   const value = useMemo(
     () => ({
-      ...props,
-      columnFilters: props.columnFilters ?? [],
-      sorting: props.sorting ?? [],
-      rowSelection: props.rowSelection ?? {},
-      columnOrder: props.columnOrder ?? [],
-      columnVisibility: props.columnVisibility ?? {},
-      pagination: props.pagination ?? { pageIndex: 0, pageSize: 10 },
-      enableColumnOrdering: props.enableColumnOrdering ?? false,
-      searchParameters: props.searchParameters ?? ({} as any),
-      openRowId: props.openRowId,
-      setOpenRowId: props.setOpenRowId ?? (() => {}),
+      table,
+      error,
+      columns,
+      filterFields,
+      columnFilters: columnFilters ?? [],
+      sorting: sorting ?? [],
+      columnOrder: columnOrder ?? [],
+      columnVisibility: columnVisibility ?? {},
+      pagination: pagination ?? { pageIndex: 0, pageSize: 10 },
+      enableColumnOrdering,
+      searchParameters,
+      isFetching,
+      isError,
+      isLoading,
+      isLoadingCounts,
+      getFacetedUniqueValues,
+      getFacetedMinMaxValues,
+      columnSizing,
+      columnSizingInfo,
+      data,
+      tableColumns,
     }),
-    [props]
+    [
+      table,
+      error,
+      columns,
+      filterFields,
+      columnFilters,
+      sorting,
+      columnOrder,
+      columnVisibility,
+      pagination,
+      enableColumnOrdering,
+      searchParameters,
+      isFetching,
+      isError,
+      isLoading,
+      isLoadingCounts,
+      getFacetedUniqueValues,
+      getFacetedMinMaxValues,
+      columnSizing,
+      columnSizingInfo,
+      data,
+      tableColumns,
+    ]
   )
 
-  return <DataTableContext.Provider value={value}>{children}</DataTableContext.Provider>
+  return (
+    <DataTableContext.Provider value={value}>
+      <SelectionActionsContext.Provider value={actions}>
+        <SelectionContext.Provider value={selection}>{children}</SelectionContext.Provider>
+      </SelectionActionsContext.Provider>
+    </DataTableContext.Provider>
+  )
+}
+
+export function useDataTableSelection() {
+  const context = useContext(SelectionContext)
+  if (!context) throw new Error('useDataTableSelection must be used within a DataTableProvider')
+  return context
+}
+
+export function useDataTableSelectionActions() {
+  const context = useContext(SelectionActionsContext)
+  if (!context)
+    throw new Error('useDataTableSelectionActions must be used within a DataTableProvider')
+  return context
 }
 
 export function useDataTable<TData, TValue, TSearchParams = unknown>() {

@@ -1,14 +1,32 @@
 import { type FetchNextPageOptions } from '@tanstack/react-query'
-import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack/react-table'
+import type { Cell, ColumnDef, Row, VisibilityState } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { LoaderCircle } from 'lucide-react'
-import { Fragment, KeyboardEvent, MouseEvent, ReactNode, UIEvent, useCallback, useRef } from 'react'
+import {
+  Fragment,
+  KeyboardEvent,
+  memo,
+  MouseEvent,
+  ReactNode,
+  UIEvent,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '../AlertError'
 import { formatCompactNumber } from './DataTable.utils'
-import { useDataTable } from './providers/DataTableProvider'
+import {
+  useDataTable,
+  useDataTableSelection,
+  useDataTableSelectionActions,
+} from './providers/DataTableProvider'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -32,7 +50,6 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   errorSubject?: string
 }
 
-// [Joshen] JFYI this component is NOT virtualized and hence will struggle handling many data points
 export function DataTableInfinite<TData, TValue, TMeta>({
   columns,
   defaultColumnVisibility = {},
@@ -47,12 +64,64 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   errorSubject = 'Failed to retrieve data',
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const tableRef = useRef<HTMLTableElement>(null)
-  const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId, onSelectRow } =
-    useDataTable()
+  const { table, error, isError, isLoading, isFetching } = useDataTable()
+  const { openRowId } = useDataTableSelection()
+  const { setOpenRowId, onSelectRow, rowNavigationRef } = useDataTableSelectionActions()
 
   const headerGroups = table.getHeaderGroups()
   const headers = headerGroups[0].headers
-  const rows = table.getRowModel().rows ?? []
+  const rows = table.getRowModel().rows
+
+  const indexById = useMemo(() => new Map(rows.map((row, index) => [row.id, index])), [rows])
+  const getItemKey = useCallback((index: number) => rows[index].id, [rows])
+  const virtualizer = useVirtualizer<HTMLElement, HTMLTableRowElement>({
+    count: rows.length,
+    getScrollElement: () => tableRef.current?.parentElement ?? null,
+    estimateSize: () => 30,
+    getItemKey,
+    overscan: 8,
+    paddingStart: 36,
+    scrollPaddingStart: 36,
+  })
+  const virtualRows = virtualizer.getVirtualItems()
+  const paddingTop = virtualRows.length ? virtualRows[0].start - 36 : 0
+  const paddingBottom = virtualRows.length
+    ? virtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
+    : 0
+  const focusFrame = useRef<number | undefined>(undefined)
+  const pendingFocus = useRef(false)
+  useEffect(() => () => cancelAnimationFrame(focusFrame.current ?? 0), [])
+  useImperativeHandle(
+    rowNavigationRef,
+    () => ({
+      scrollToRow(id, focus) {
+        const index = indexById.get(id)
+        if (index === undefined) return
+        cancelAnimationFrame(focusFrame.current ?? 0)
+        virtualizer.scrollToIndex(index, { align: 'auto' })
+        pendingFocus.current = focus || pendingFocus.current
+        if (pendingFocus.current) {
+          // Scrolling can mount a previously offscreen row. Focus after that commit.
+          focusFrame.current = requestAnimationFrame(() => {
+            const row = document.getElementById(id)
+            if (row && tableRef.current?.contains(row)) row.focus({ preventScroll: true })
+            pendingFocus.current = false
+          })
+        }
+      },
+    }),
+    [indexById, virtualizer]
+  )
+
+  const selectionActions = useLatest({ onSelectRow, setOpenRowId, openRowId })
+  const handleSelect = useCallback(
+    (id: string, event: MouseEvent<HTMLTableRowElement> | KeyboardEvent<HTMLTableRowElement>) => {
+      const { onSelectRow, setOpenRowId, openRowId } = selectionActions.current
+      if (onSelectRow) onSelectRow(id, event)
+      else setOpenRowId(id === openRowId ? undefined : id)
+    },
+    [selectionActions]
+  )
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {
@@ -82,6 +151,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     <>
       <Table
         ref={tableRef}
+        aria-rowcount={rows.length + 1}
         containerProps={{
           onScroll,
           className: 'h-full w-full overflow-auto caption-bottom text-sm @container',
@@ -141,18 +211,43 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           style={{ scrollMarginTop: 'calc(var(--top-bar-height))' }}
         >
           {rows.length ? (
-            rows.map((row) => (
-              <DataTableRow
-                key={row.id}
-                row={row}
-                table={table}
-                selected={onSelectRow ? row.getIsSelected() : row.id === openRowId}
-                onSelect={(event) => {
-                  if (onSelectRow) onSelectRow(row.id, event)
-                  else setOpenRowId(row.id === openRowId ? undefined : row.id)
-                }}
-              />
-            ))
+            <>
+              {paddingTop > 0 && (
+                <TableRow aria-hidden="true">
+                  <TableCell
+                    colSpan={headers.length}
+                    className="p-0! border-0"
+                    style={{ height: paddingTop }}
+                  />
+                </TableRow>
+              )}
+              {virtualRows.map((virtualRow) => {
+                const row = rows[virtualRow.index]
+                return (
+                  <DataTableRow
+                    key={row.id}
+                    row={row}
+                    index={virtualRow.index}
+                    measureElement={virtualizer.measureElement}
+                    cells={row.getVisibleCells()}
+                    rowClassName={(
+                      table.options.meta as { getRowClassName?: (row: Row<unknown>) => string }
+                    )?.getRowClassName?.(row)}
+                    selected={onSelectRow ? row.getIsSelected() : row.id === openRowId}
+                    onSelect={handleSelect}
+                  />
+                )
+              })}
+              {paddingBottom > 0 && (
+                <TableRow aria-hidden="true">
+                  <TableCell
+                    colSpan={headers.length}
+                    className="p-0! border-0"
+                    style={{ height: paddingBottom }}
+                  />
+                </TableRow>
+              )}
+            </>
           ) : isLoading ? (
             <Fragment>
               {new Array(15).fill(0).map((_, x) => (
@@ -262,33 +357,36 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   )
 }
 
-/**
- * REMINDER: this is the heaviest component in the table if lots of rows
- * Some other components are rendered more often necessary, but are fixed size (not like rows that can grow in height)
- * e.g. DataTableFilterControls, DataTableFilterCommand, DataTableToolbar, DataTableHeader
- */
-
-function DataTableRow<TData>({
+const DataTableRow = memo(function DataTableRow<TData>({
   row,
-  table,
+  cells,
+  index,
+  measureElement,
+  rowClassName,
   selected,
   onSelect,
 }: {
   row: Row<TData>
-  table: TTable<TData>
+  cells: Cell<TData, unknown>[]
+  index: number
+  measureElement: (element: HTMLTableRowElement | null) => void
+  rowClassName?: string
   selected?: boolean
-  onSelect: (event: MouseEvent<HTMLTableRowElement> | KeyboardEvent<HTMLTableRowElement>) => void
+  onSelect: (
+    id: string,
+    event: MouseEvent<HTMLTableRowElement> | KeyboardEvent<HTMLTableRowElement>
+  ) => void
 }) {
-  const rowClassName = cn('group/row', (table.options.meta as any)?.getRowClassName?.(row))
-  const cells = row.getVisibleCells()
-
   return (
     <TableRow
       id={row.id}
+      ref={measureElement}
+      data-index={index}
+      aria-rowindex={index + 2}
       tabIndex={0}
       data-state={selected && 'selected'}
       aria-selected={!!selected}
-      onClick={onSelect}
+      onClick={(event) => onSelect(row.id, event)}
       onMouseDown={(event) => {
         if (event.shiftKey) event.preventDefault()
       }}
@@ -296,10 +394,10 @@ function DataTableRow<TData>({
         if (event.target !== event.currentTarget) return
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
-          onSelect(event)
+          onSelect(row.id, event)
         }
       }}
-      className={cn(TableRowClassName, 'cursor-pointer', rowClassName)}
+      className={cn(TableRowClassName, 'group/row cursor-pointer', rowClassName)}
     >
       {cells.map((cell) => {
         const cellClassName = (cell.column.columnDef.meta as any)?.cellClassName
@@ -311,4 +409,4 @@ function DataTableRow<TData>({
       })}
     </TableRow>
   )
-}
+})

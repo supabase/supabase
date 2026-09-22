@@ -13,9 +13,10 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
+import { omit } from 'lodash'
 import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
@@ -89,12 +90,15 @@ export const CHART_CONFIG = {
   },
 } satisfies ChartConfig
 
+const QUERY_SEARCH_PARAMS_PARSER = omit(SEARCH_PARAMS_PARSER, ['id', 'live'])
+
 export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
+  const [querySearch] = useQueryStates(QUERY_SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const computeEnabled = !!useFlag('compute')
@@ -146,12 +150,11 @@ export const UnifiedLogs = () => {
     []
   )
 
-  // Create a stable query key object by removing nulls/undefined, id, and live
-  // Mainly to prevent the react queries from unnecessarily re-fetching
+  // Keep selection URL updates from invalidating memoized filters and details.
   const searchParameters = useMemo(() => {
-    const parameters = Object.entries(search).reduce(
+    const parameters = Object.entries(querySearch).reduce(
       (acc, [key, value]) => {
-        if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
+        if (value !== null && value !== undefined) {
           acc[key] = value
         }
         return acc
@@ -167,7 +170,7 @@ export const UnifiedLogs = () => {
         }) ?? null
     }
     return parameters
-  }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [querySearch, showMultigresLogs, computeAvailability.canQueryCompute])
 
   const { selection, selectRow, clearSelection } = useTableRowSelection({
     scope: JSON.stringify([projectRef, searchParameters]),
@@ -224,8 +227,11 @@ export const UnifiedLogs = () => {
   }, [unifiedLogsData?.pages])
   // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
   const flatData = useMemo(() => {
-    return rawFlatData.filter((value, idx) => {
-      return idx === rawFlatData.findIndex((x) => x.id === value.id)
+    const seen = new Set<string>()
+    return rawFlatData.filter(({ id }) => {
+      if (seen.has(id)) return false
+      seen.add(id)
+      return true
     })
   }, [rawFlatData])
   const liveMode = useLiveMode(flatData)
@@ -234,6 +240,7 @@ export const UnifiedLogs = () => {
   const filterDBRowCount = flatData.length
 
   const facets = counts?.facets
+  const facetedUniqueValues = useMemo(() => getFacetedUniqueValues<ColumnSchema>(facets), [facets])
   const totalFetched = flatData?.length
 
   // Create a filtered version of the chart config based on level filters in the URL.
@@ -264,13 +271,18 @@ export const UnifiedLogs = () => {
     return generateDynamicColumns({ data: flatData })
   }, [flatData])
 
+  const mergedColumnVisibility = useMemo(
+    () => ({ ...dynamicColumnVisibility, ...columnVisibility }),
+    [dynamicColumnVisibility, columnVisibility]
+  )
+
   const table: Table<ColumnSchema> = useReactTable({
     data: flatData,
     columns: dynamicColumns,
     state: {
       columnFilters,
       sorting,
-      columnVisibility: { ...dynamicColumnVisibility, ...columnVisibility },
+      columnVisibility: mergedColumnVisibility,
       rowSelection,
       columnOrder,
     },
@@ -295,17 +307,22 @@ export const UnifiedLogs = () => {
   const selectedRow =
     selectedRows.find((row) => row.id === selection.activeId) ?? selectedRows.at(-1)
   const openRowId = selectedRow?.id
-  const handleSelectRow = (id: string, modifiers?: RowSelectionModifiers) => {
-    selectRow(
-      table.getRowModel().rows.map((row) => row.id),
-      id,
-      modifiers
-    )
-  }
-  const setOpenRowId = (id: string | undefined) => {
-    if (id) handleSelectRow(id)
-    else clearSelection()
-  }
+  const rows = table.getRowModel().rows
+  const orderedIds = useMemo(() => rows.map((row) => row.id), [rows])
+  const selectedLogRows = useMemo(() => selectedRows.map((row) => row.original), [selectedRows])
+  const handleSelectRow = useCallback(
+    (id: string, modifiers?: RowSelectionModifiers) => {
+      selectRow(orderedIds, id, modifiers)
+    },
+    [orderedIds, selectRow]
+  )
+  const setOpenRowId = useCallback(
+    (id: string | undefined) => {
+      if (id) handleSelectRow(id)
+      else clearSelection()
+    },
+    [handleSelectRow, clearSelection]
+  )
 
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
@@ -382,6 +399,7 @@ export const UnifiedLogs = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openRowId, selectedRow, isLoading, isFetching])
 
+  const dateRangeDisabled = useMemo(() => ({ after: new Date() }), [])
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
@@ -421,14 +439,14 @@ export const UnifiedLogs = () => {
       isError={isError}
       isLoading={isLoading}
       isLoadingCounts={isLoadingCounts}
-      getFacetedUniqueValues={getFacetedUniqueValues(facets)}
+      getFacetedUniqueValues={facetedUniqueValues}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
         <ResizablePanelGroup orientation="horizontal" autoSaveId="logs-layout">
           <FilterSideBar
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
-            dateRangeDisabled={{ after: new Date() }}
+            dateRangeDisabled={dateRangeDisabled}
           />
           <ResizableHandle withHandle />
           <ResizablePanel
@@ -545,7 +563,7 @@ export const UnifiedLogs = () => {
                   <ServiceFlowPanel
                     dock={dock}
                     setDock={setDock}
-                    selectedRows={selectedRows.map((row) => row.original)}
+                    selectedRows={selectedLogRows}
                     searchParameters={searchParameters}
                   />
                 </>
