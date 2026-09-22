@@ -156,7 +156,7 @@ export const TOTPFactors = () => {
         factorId={factorToBeDeleted}
         lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
-        hasRecoveryCodes={recoveryCodesStatus?.status === 'available'}
+        hasRecoveryCodes={shouldVerifyRecoveryCodes && recoveryCodesStatus?.status === 'available'}
       />
     </>
   )
