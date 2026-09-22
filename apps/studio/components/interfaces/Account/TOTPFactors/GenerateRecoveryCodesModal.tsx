@@ -6,7 +6,9 @@ import { RecoveryCodesModal } from './RecoveryCodesModal'
 import { useRecoveryCodesGenerateMutation } from '@/data/recovery-codes/recovery-codes-generate-mutation'
 
 export const GenerateRecoveryCodesModal = () => {
-  const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation()
+  const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation({
+    onSettled: () => setOpen(true),
+  })
   const [open, setOpen] = useState(false)
 
   return (
@@ -19,9 +21,9 @@ export const GenerateRecoveryCodesModal = () => {
         <>
           <Button
             onClick={() => {
-              setOpen(true)
               recoveryCodesGenerateMutation.mutate({})
             }}
+            loading={recoveryCodesGenerateMutation.isPending}
           >
             Generate recovery codes
           </Button>
