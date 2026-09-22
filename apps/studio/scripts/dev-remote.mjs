@@ -63,7 +63,7 @@ for (const [key, value] of Object.entries(defaults)) {
 
 console.log(`\n▶ Studio remote dev — target: ${targetName}`)
 console.log(`   control plane : ${env.REMOTE_API_URL}`)
-console.log(`   auth (GoTrue) : ${env.REMOTE_GOTRUE_URL}`)
+console.log(`   auth (GoTrue) : [set]`)
 console.log(`   local URL     : ${ORIGIN}`)
 console.log(`   ⚠  Points at a hosted backend — treat every action as real.\n`)
 
