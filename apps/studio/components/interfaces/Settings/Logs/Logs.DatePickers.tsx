@@ -86,9 +86,9 @@ export const LogsDatePicker = ({
     return generated ?? []
   }, [customValue, helpers])
 
-  // Reset the state when the popover closes
+  // Reset when the popover closes, or sync an inline picker with the committed range.
   useEffect(() => {
-    if (!open) {
+    if (!open || variant === 'inline') {
       setCustomValue('')
       setStartDate(toValidDate(value.from))
       const defaultEndDate = toValidDate(value.to) ?? new Date()
@@ -115,7 +115,7 @@ export const LogsDatePicker = ({
         ss: toDate?.getSeconds().toString().padStart(2, '0') || nowSS,
       })
     }
-  }, [open, value])
+  }, [open, value.from, value.to, variant])
 
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = displayedHelpers.find((h) => h.text === newValue)
@@ -258,7 +258,7 @@ export const LogsDatePicker = ({
   }, [pasted])
 
   useEffect(() => {
-    if (open) {
+    if (open && variant === 'popover') {
       document.addEventListener('paste', handlePaste)
       document.addEventListener('copy', handleCopy)
     }
@@ -266,7 +266,7 @@ export const LogsDatePicker = ({
       document.removeEventListener('paste', handlePaste)
       document.removeEventListener('copy', handleCopy)
     }
-  }, [open, startDate, endDate, handleCopy])
+  }, [open, variant, startDate, endDate, handleCopy])
 
   const isLargeRange =
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
