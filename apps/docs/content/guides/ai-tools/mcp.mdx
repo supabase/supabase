@@ -115,7 +115,7 @@ Treat elicitations as a guardrail, not a guarantee of human review or approval. 
 
 ### Client support
 
-Elicitations require the server to offer the flow for the tool and your client to support the corresponding mode for the request.
+Elicitations require your MCP client to support the corresponding mode for the request.
 
 | Mode | Supabase use                                                                                                |
 | ---- | ----------------------------------------------------------------------------------------------------------- |
@@ -139,11 +139,7 @@ Project creation with a zero-cost quote does not trigger a cost confirmation pro
 
 If form-based cost confirmation is unavailable, unsupported by your client, or [skipped for the tool](#skip-form-confirmations), the legacy cost confirmation workflow applies: the agent quotes the cost in chat, uses `get_cost` and `confirm_cost`, and passes the returned `confirm_cost_id` to `create_project` or `create_branch`. These helpers are account tools and are not exposed in project-scoped connections. Skipping the form does not approve the cost or avoid charges.
 
-The bundled version 0.13 CLI stdio server does not offer elicitation and uses the legacy cost confirmation workflow.
-
 To check which flow a creation tool uses, ask your client to list the available Supabase tools and the resource types accepted by `get_cost` and `confirm_cost`. The resource types accepted by these helpers use the legacy cost confirmation workflow; another resource type can use form-based cost confirmation on the same connection. Their absence does not prove that form-based cost confirmation is active: project scoping, account feature settings, or server availability can also hide them.
-
-A supplied `confirm_cost_id` is ignored only for a tool call that uses form-based cost confirmation. A tool call that uses the legacy cost confirmation workflow still validates the cost confirmation against the current quote.
 
 Your MCP client controls how the confirmation is collected. Some clients support hooks or rules that answer elicitations automatically, so treat cost confirmation as a guardrail rather than proof that a person approved each action.
 
@@ -151,9 +147,9 @@ Troubleshooting: If you expect a dialog and don't see one, see [Cost confirmatio
 
 ### Destructive SQL confirmations
 
-When SQL elicitation is available and your client supports forms, `execute_sql` and `apply_migration` ask for confirmation when they detect destructive SQL. The `execute_sql` confirmation applies only outside read-only mode. SQL not classified as destructive proceeds without this additional warning. Detection uses limited regular-expression checks, not a complete SQL parser: it does not catch every destructive operation and is not a security guarantee.
+When SQL elicitation is available and your client supports forms, `execute_sql` and `apply_migration` ask for confirmation when they detect destructive SQL. The `execute_sql` confirmation applies only outside read-only mode. SQL not classified as destructive proceeds without this additional warning. Treat this elicitation as a guardrail - it may not catch every destructive operation and is not a security guarantee.
 
-If SQL elicitation is unavailable, unsupported by your client, or skipped with `skip_elicitations`, SQL follows the existing execution path without an additional MCP confirmation. Read-only restrictions and permissions still apply. Keep the [security recommendations](#recommendations) in place.
+If SQL elicitation is unavailable, unsupported by your client, or skipped with [`skip_elicitations`](#skip-form-confirmations), SQL follows the existing execution path without an additional MCP confirmation. Read-only restrictions and permissions still apply. Keep the [security recommendations](#recommendations) in place.
 
 Troubleshooting: If you expect a dialog and don't see one, see [SQL confirmations do not appear in your MCP client](/docs/guides/troubleshooting/sql-confirmations-do-not-appear-in-your-mcp-client-sQf7Kp).
 
@@ -163,7 +159,7 @@ Troubleshooting: If you expect a dialog and don't see one, see [SQL confirmation
 
 Enter secret values only in the Supabase Dashboard, never in chat, model input, or MCP tool arguments. The tool requests the secret name and project, not the secret value.
 
-1. Ask your AI assistant to use `create_edge_function_secret` for the project and secret name, without providing the value.
+1. Ask your AI assistant to add an Edge Function secret, specifying the project and secret name without providing the value.
 2. Open the Supabase Dashboard URL presented by your MCP client.
 3. Enter and save the secret value in the Dashboard.
 4. Return to your MCP client and confirm that you saved it.
@@ -199,11 +195,11 @@ Names are case-sensitive. Omit the parameter or leave it empty to skip none; thi
 
 In the panel, skip choices are hidden for read-only and local connections. Cost confirmation choices require a connection not scoped to a project with account helpers enabled; `create_branch` also requires branching. SQL-confirmation choices require the database feature group. These limits apply to the panel, not to manually supplied URL parameters.
 
-Skip form-based cost confirmation: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=create_project,create_branch</code>
+Skip cost confirmation: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=create_project,create_branch</code>
 
-Skip SQL forms: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=execute_sql,apply_migration</code>
+Skip SQL confirmations: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=execute_sql,apply_migration</code>
 
-Skipping form-based cost confirmation retains the [legacy cost confirmation workflow](#cost-confirmation). Skipping SQL forms uses the existing SQL execution path without an additional MCP confirmation. Neither option bypasses authentication, permissions, read-only restrictions, or charges.
+Skipping cost confirmations retains the [legacy cost confirmation workflow](#cost-confirmation). Skipping SQL confirmations uses the existing SQL execution path without an additional MCP confirmation. Neither option bypasses authentication, permissions, read-only restrictions, or charges.
 
 ## Manual authentication
 
@@ -276,7 +272,7 @@ We recommend the following best practices to mitigate security risks when using 
 - **Read-only mode**: Set unattended monitoring and diagnostic routines to [read-only](#configuration-options) mode, which executes SQL queries as a read-only Postgres user.
 - **Project scoping**: Scope your MCP server to a [specific project](#configuration-options), limiting access to only that project's resources. This prevents LLMs from accessing data from other projects in your Supabase account.
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
-- **Cost confirmation**: When your connection uses form-based cost confirmation, the server asks for [confirmation through your client](#cost-confirmation) before it creates resources that incur charges. This is a guardrail on top of authentication and authorization, not a replacement for them.
+- **Cost confirmation**: When your connection uses cost confirmation dialogs, the server asks for [confirmation through your client](#cost-confirmation) before it creates resources that incur charges. This is a guardrail on top of authentication and authorization, not a replacement for them.
 - **Feature groups**: Restrict which [tool groups](#available-tools) are available using the `features` [configuration option](#configuration-options). This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
 
 ## On GitHub

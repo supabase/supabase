@@ -16,13 +16,13 @@ The Supabase MCP server can ask for [confirmation before running detected destru
 
 ## Form-based SQL confirmation is unavailable or unsupported
 
-SQL confirmation dialogs require the server to offer form-based SQL confirmation and your client to support form elicitations for the request. Check your connection against [Client support](/docs/guides/ai-tools/mcp#client-support).
+SQL confirmation dialogs require your client to support form elicitations for the request. Check your connection against [Client support](/docs/guides/ai-tools/mcp#client-support).
 
 If form-based SQL confirmation is unavailable or unsupported, the tools follow their existing SQL execution behavior without an additional MCP confirmation prompt. Permissions and read-only restrictions still apply. There is no legacy cost-style confirmation workflow for SQL.
 
 ## The SQL does not trigger detection
 
-The tools only request confirmation for SQL detected as destructive. Detection uses regular expressions, not a full SQL parser, and does not catch every destructive statement. A missing prompt does not prove that SQL is safe.
+The tools only request confirmation for SQL detected as destructive. Detection does not catch every destructive statement. A missing prompt does not prove that SQL is safe.
 
 Review the SQL itself rather than relying on a confirmation dialog. Do not run destructive SQL to test whether a prompt appears.
 
