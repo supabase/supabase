@@ -4,10 +4,7 @@ import type { ArchivedObject } from '@/data/storage/versioning/archived-objects-
 
 const splitPath = (path: string): string[] => path.split('/').filter((segment) => segment !== '')
 
-/**
- * The only place that interprets `ArchivedObject.path`, so a different API shape
- * is a one-function change.
- */
+/** The only place that interprets `ArchivedObject.path`. */
 export const getArchivedSegments = (object: ArchivedObject): string[] => splitPath(object.path)
 
 const isUnderFolder = (folderSegments: string[], objectSegments: string[]): boolean => {
@@ -16,17 +13,13 @@ const isUnderFolder = (folderSegments: string[], objectSegments: string[]): bool
 }
 
 export interface ArchivedOverlayInput {
-  /** Empty at the bucket root. */
   folderSegments: string[]
   archivedObjects: ArchivedObject[]
-  /** Names from the live listing; a live item of the same name always wins. */
+  /** Names from the live listing; a live item of the same name wins. */
   existingItemNames: Set<string>
 }
 
-/**
- * Objects deeper down are coalesced into one folder row per next segment, so
- * drilling in runs this again a level lower.
- */
+/** Objects deeper down coalesce into one folder row per next segment. */
 export const getArchivedOverlayItems = ({
   folderSegments,
   archivedObjects,
