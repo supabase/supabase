@@ -14,7 +14,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string | null
-  wrapper: { name: string }
+  wrapper: { name: string; server_name: string }
   wrapperMeta: WrapperMeta
 }
 
