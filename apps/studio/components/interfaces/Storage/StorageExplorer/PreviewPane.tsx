@@ -22,7 +22,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { fromLifecycleRules } from '../BucketVersioningFields.lifecycle'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
@@ -38,7 +37,6 @@ import { VersionHistory } from './VersionHistory'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { bucketLifecycleQueryOptions } from '@/data/storage/bucket-lifecycle-query'
-import { useObjectPurgeMutation } from '@/data/storage/versioning/object-purge-mutation'
 import { useObjectVersionRestoreMutation } from '@/data/storage/versioning/object-version-restore-mutation'
 import {
   objectVersionsQueryOptions,
@@ -336,6 +334,7 @@ export const PreviewPane = () => {
     selectedFilePreview: file,
     openedFolders,
     setSelectedItemsToDelete,
+    setItemToPurge,
     setSelectedFileCustomExpiry,
     downloadFile,
   } = useStorageExplorerStateSnapshot()
@@ -352,7 +351,6 @@ export const PreviewPane = () => {
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [previewedVersion, setPreviewedVersion] = useState<ObjectVersion>()
-  const [isPurgeConfirmVisible, setIsPurgeConfirmVisible] = useState(false)
 
   const versioningState = getBucketVersioningState(selectedBucket)
 
@@ -388,13 +386,6 @@ export const PreviewPane = () => {
     },
   })
 
-  const { mutate: purgeObject, isPending: isPurging } = useObjectPurgeMutation({
-    onSuccess: () => {
-      setIsPurgeConfirmVisible(false)
-      clearPreviewedFile()
-    },
-  })
-
   if (!file) return null
 
   const size = file.metadata ? formatBytes(file.metadata.size) : null
@@ -414,11 +405,6 @@ export const PreviewPane = () => {
       path: filePath,
       versionId: previewedVersion.versionId,
     })
-  }
-
-  const handlePurge = () => {
-    if (!projectRef || !selectedBucket?.id || !filePath) return
-    purgeObject({ projectRef, bucketId: selectedBucket.id, path: filePath })
   }
 
   // The compare widget replaces the top of the panel, so scroll up to show it.
@@ -468,7 +454,7 @@ export const PreviewPane = () => {
             onDownload={() => downloadFile(file)}
             onCustomExpiry={() => setSelectedFileCustomExpiry(file)}
             onDelete={() => setSelectedItemsToDelete([file])}
-            onPurge={() => setIsPurgeConfirmVisible(true)}
+            onPurge={() => setItemToPurge(file)}
           />
         )}
 
@@ -495,23 +481,6 @@ export const PreviewPane = () => {
           )}
         </div>
       </div>
-
-      <ConfirmationModal
-        variant="destructive"
-        visible={isPurgeConfirmVisible}
-        title={<span className="wrap-break-word">Permanently delete {file.name}?</span>}
-        confirmLabel="Delete permanently"
-        confirmLabelLoading="Deleting..."
-        loading={isPurging}
-        onCancel={() => setIsPurgeConfirmVisible(false)}
-        onConfirm={handlePurge}
-        alert={{
-          base: { variant: 'destructive' },
-          title: 'This cannot be undone',
-          description:
-            'This deletes the file and every noncurrent version of it. None of them can be restored afterwards.',
-        }}
-      />
     </div>
   )
 }

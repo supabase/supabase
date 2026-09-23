@@ -149,6 +149,13 @@ export function createStorageExplorerState({
       state.selectedItemsToDelete = items
     },
 
+    // Separate from `selectedItemsToDelete`: on a versioned bucket that one archives,
+    // while this one takes the file and every retained version with it.
+    itemToPurge: undefined as StorageItemWithColumn | undefined,
+    setItemToPurge: (item?: StorageItemWithColumn) => {
+      state.itemToPurge = item
+    },
+
     selectedItemsToMove: [] as StorageItemWithColumn[],
     setSelectedItemsToMove: (items: StorageItemWithColumn[]) => {
       state.selectedItemsToMove = items
