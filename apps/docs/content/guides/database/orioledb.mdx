@@ -16,9 +16,9 @@ OrioleDB addresses Postgres's scalability limitations by removing bottlenecks in
   height={609}
 />
 
-<Admonition type="note">
+<Admonition type="note" title="OrioleDB is in public beta">
 
-OrioleDB is in active development and has [certain limitations](https://www.orioledb.com/docs/usage/getting-started#current-limitations). Native B-tree indexes give the best performance, and an Index Access Method bridge provides experimental support for other index types built for heap storage, including pg_vector's HNSW indexes. In the Supabase OrioleDB image the default storage method has been updated to use OrioleDB, granting better performance out of the box.
+Projects that use OrioleDB have access to the same paid features as other Supabase projects. OrioleDB has [some limitations](https://www.orioledb.com/docs/usage/getting-started#current-limitations) compared to the default heap storage engine, so review them before you choose it for a project. Native B-tree indexes give the best performance, and an Index Access Method bridge provides experimental support for other index types built for heap storage, including pg_vector's HNSW indexes. In the Supabase OrioleDB image the default storage method has been updated to use OrioleDB, granting better performance out of the box.
 
 </Admonition>
 
