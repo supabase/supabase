@@ -436,7 +436,7 @@ export const SubscriptionPlanUpdateDialog = ({
                             {' '}
                             <Link
                               href={`/org/${selectedOrganization?.slug}/billing#breakdown`}
-                              className="text-sm text-primary hover:text-[var(--primary-hover)] transition"
+                              className="text-sm text-primary hover:text-primary-hover transition"
                               target="_blank"
                             >
                               + current spend

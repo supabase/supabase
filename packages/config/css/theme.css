@@ -14,6 +14,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-bright: var(--primary-bright);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-solid: var(--primary-solid);
