@@ -38,6 +38,25 @@ describe('SnowflakeFields', () => {
     expect(textarea).toHaveValue(`${PRIVATE_KEY}\n`)
   })
 
+  it('does not overwrite a manual edit when a file read resolves late', async () => {
+    const { container } = customRender(<TestForm />)
+    let resolveFileText!: (contents: string) => void
+    const fileText = new Promise<string>((resolve) => {
+      resolveFileText = resolve
+    })
+    const file = new File([PRIVATE_KEY], 'rsa_key.p8', { type: 'application/x-pem-file' })
+    Object.defineProperty(file, 'text', { value: vi.fn(() => fileText) })
+
+    const fileInput = container.querySelector<HTMLInputElement>('input[type="file"]')
+    fireEvent.change(fileInput!, { target: { files: [file] } })
+
+    const textarea = screen.getByRole('textbox', { name: 'Private key' })
+    fireEvent.change(textarea, { target: { value: 'manual private key' } })
+    resolveFileText(PRIVATE_KEY)
+
+    await waitFor(() => expect(textarea).toHaveValue('manual private key'))
+  })
+
   it('imports a dropped PEM private key file', async () => {
     customRender(<TestForm />)
     const file = new File([PRIVATE_KEY], 'rsa_key.pem', { type: 'application/x-pem-file' })
