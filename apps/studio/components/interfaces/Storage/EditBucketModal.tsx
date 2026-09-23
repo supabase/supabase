@@ -224,9 +224,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       ? toVersioningStatusUpdate(nextVersioningState)
       : undefined
 
-    // The retention policy is stored beside the bucket, so it saves separately.
-    // Writing it first means a rejected policy leaves the bucket untouched.
-    // Suspending keeps the policy: retained versions still expire under it.
+    // Saved first, so a rejected policy leaves the bucket untouched.
     if (
       isStorageVersioningEnabled &&
       nextVersioningState !== 'disabled' &&
@@ -562,8 +560,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         confirmLabelLoading="Suspending versioning..."
         loading={isUpdating}
         onCancel={() => setPendingSuspendValues(null)}
-        // Cleared by the mutation's `onSuccess`/`onError` rather than here, so the
-        // dialog stays up showing its loading state while the save is in flight.
+        // Cleared by the mutation, so the dialog keeps its loading state while the save runs.
         onConfirm={() => {
           if (pendingSuspendValues !== null) persistChanges(pendingSuspendValues)
         }}
