@@ -267,7 +267,7 @@
     }
 
     a:hover {
-      @apply text-brand-600;
+      @apply text-primary;
     }
 
     p:last-child {
@@ -301,15 +301,10 @@
   }
 }
 
-::-moz-selection {
-  /* Code for Firefox */
-  @apply bg-brand-default;
-  color: #333 !important;
-}
-
+::-moz-selection,
 ::selection {
-  background-color: #6ee7b7;
-  color: #333 !important;
+  background-color: oklch(from var(--primary-bright) l c h / 28%);
+  color: var(--foreground) !important;
 }
 
 .has-hidden-children {

@@ -14,6 +14,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-bright: var(--primary-bright);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-solid: var(--primary-solid);
   --color-primary-solid-foreground: var(--primary-solid-foreground);
@@ -76,8 +77,7 @@
   --color-brand-400: hsl(var(--brand-400));
   --color-brand-500: hsl(var(--brand-500));
   --color-brand-600: hsl(var(--brand-600));
-  /* Alias leftover bg-brand / border-brand to the bright fill. Prefer brand-default /
-     primary. Focus rings (--ring) also derive from brand-default. */
+  /* Brand remains the fixed Supabase palette. Functional chrome uses primary. */
   --color-brand: hsl(var(--brand-default));
   --color-brand-default: hsl(var(--brand-default));
   --color-_secondary-200: hsl(var(--secondary-200));
@@ -337,6 +337,7 @@
   --color-border-warning: var(--border-warning);
   --color-border-info: var(--border-info);
   --color-border-brand-default: var(--border-brand-default);
+  --color-border-primary-bright: var(--border-primary-bright);
   /*
    * This will generate colors only for border utilities
    * i.e. bg-muted and they'll only have border-color: var(--border-muted) rule

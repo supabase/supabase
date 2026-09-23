@@ -76,12 +76,12 @@ const buttonVariants = cva(
           data-[state=open]:border-control-hover
         `,
         link: `
-          text-brand-600
+          text-primary
           border
           border-transparent/0
-          hover:bg-brand-400
+          hover:bg-primary-bright/15
           shadow-none
-          data-[state=open]:bg-brand-400
+          data-[state=open]:bg-primary-bright/15
         `,
         text: `
           text-foreground
@@ -161,7 +161,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
-      link: 'text-brand-600',
+      link: 'text-primary',
       text: 'text-foreground-lighter',
       danger: 'text-destructive-foreground/50',
       warning: 'text-warning-foreground/50',
@@ -179,7 +179,7 @@ const loadingVariants = cva('', {
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
-      link: 'text-brand-600',
+      link: 'text-primary',
       text: 'text-foreground-muted',
       danger: 'text-destructive-foreground/50',
       warning: 'text-warning-foreground/50',

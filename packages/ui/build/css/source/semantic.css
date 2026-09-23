@@ -13,7 +13,7 @@
    * and the brand, so the two could never drift apart. They are now split so a
    * theme can run, say, a cool-gray surface against the green brand:
    *   --surface-hue  tints backgrounds, text and borders (the neutral ramp)
-   *   --primary-hue  is the brand hue that --primary is built from
+   *   --primary-hue  is the spot hue that functional primary colors use
    * Both default to --hue (Supabase green ≈157.5° in OKLCH), so a theme that only
    * sets --hue keeps surfaces and brand locked together as before; override
    * either one to let them diverge. */
@@ -166,16 +166,26 @@
    *   --primary-solid        Deeper button plate (dark mode). Light theme
    *                          aliases these to --primary so ink and buttons
    *                          share one green there.
-   * Bright expressive chrome, including focus rings, uses brand-default.
+   * --primary-bright keeps rings and selected chrome vivid while sharing the
+   * hue of --primary. It is brighter than readable ink in light mode.
    *
    * Hover shifts lightness only (preserves hue/chroma). Mixing with --foreground
    * pulls light-mode surface-hue (warm) into the green and reads as yellow.
    * Sign of --tone-span: darken in light, lighten in dark.
    */
   --primary: oklch(0.76 0.15 var(--primary-hue));
+  --primary-bright: oklch(from var(--primary) max(l, 0.7) max(c, 0.15) h);
   --button-fill-hover-delta: 0.04;
   --primary-hover: oklch(
     from var(--primary)
+      calc(
+        l + var(--button-fill-hover-delta) * var(--tone-span) /
+          max(var(--tone-span), calc(var(--tone-span) * -1))
+      )
+      c h
+  );
+  --primary-bright-hover: oklch(
+    from var(--primary-bright)
       calc(
         l + var(--button-fill-hover-delta) * var(--tone-span) /
           max(var(--tone-span), calc(var(--tone-span) * -1))
@@ -291,8 +301,9 @@
   --border-destructive: oklch(from var(--destructive) l c h / 30%);
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-info: oklch(from var(--info) l c h / 30%);
-  /* Soft brand border tint: bright brand-default, not accessible --primary. */
+  /* Keep the brand border for explicitly Supabase-branded surfaces. */
   --border-brand-default: oklch(from hsl(var(--brand-default)) l c h / 30%);
+  --border-primary-bright: oklch(from var(--primary-bright) l c h / 30%);
 
   --border: oklch(
     from var(--foreground) l calc(c * 0.54) h / calc(2% + 20% * var(--contrast-border))
@@ -308,6 +319,6 @@
   --border-control-hover: oklch(
     from var(--foreground) l calc(c * 0.5) h / calc(12% + 58% * var(--contrast-border))
   );
-  /* Focus chrome uses translucent brand-default in both themes. */
-  --ring: oklch(from hsl(var(--brand-default)) l c h / 55%);
+  /* Focus chrome follows the theme's primary hue without muddy light-mode ink. */
+  --ring: oklch(from var(--primary-bright) l c h / 55%);
 }
