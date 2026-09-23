@@ -32,6 +32,8 @@ export const contentKeys = {
     id?: string,
     options?: { sort?: 'inserted_at' | 'name'; name?: string }
   ) => ['projects', projectRef, 'content', 'folders', id, options].filter(Boolean),
+  notebookByName: (projectRef: string | undefined, name: string) =>
+    ['projects', projectRef, 'content', 'notebook-by-name', name] as const,
   resource: (projectRef: string | undefined, id?: string) =>
     ['projects', projectRef, 'content-id', id] as const,
   count: (
