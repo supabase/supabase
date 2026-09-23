@@ -40,7 +40,7 @@ The bridge files for the four frameworks that had adapters live in the server re
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    Copy [`hono/supabase-middleware.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/hono/supabase-middleware.ts) into your project. `toHono` returns Hono middleware. Register it with `.use()` in a chain, and the contributed keys type through to `c.var` with no `Env` declaration of your own. `withSupabaseClient<Database>()` threads the generic through, so `c.var.supabase` is a `SupabaseClient<Database>`.
+    Copy [`hono/supabase-middleware.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/hono/supabase-middleware.ts) into your project. `toHono` returns Hono middleware. Register it with `.use()` in a chain, and the contributed keys type through to `c.var` with no `Env` declaration of your own. Register it before the routes it gates. Hono applies middleware only to routes added after it, so a route added first runs with no gate and no error. `withSupabaseClient<Database>()` threads the generic through, so `c.var.supabase` is a `SupabaseClient<Database>`.
 
     One line in the bridge looks redundant: `c.res` is cleared before it is assigned. When a response-phase entry returns a new `Response`, Hono's `res` setter copies the previous response's headers onto it, which reverts any header the entry rewrote. Clearing first makes the assignment final. Keep the line and its comment.
 
@@ -120,6 +120,8 @@ The bridge files for the four frameworks that had adapters live in the server re
 
     `supabaseCtx<typeof entries>()` types the route context. Pass the same tuple type that `wrapElysia` receives. Because the entries wrap the whole app, they apply app-wide. For per-route scoping, use Elysia's `.group()` with a separately wrapped sub-app.
 
+    The two functions work only as a pair. If you serve the app without `wrapElysia`, with `app.listen()` or `export default app`, the entries never run and `supabaseCtx()` throws on every route.
+
   </RefSubLayout.Details>
 
   <RefSubLayout.Examples>
@@ -156,7 +158,7 @@ The bridge files for the four frameworks that had adapters live in the server re
 
     Copy [`nestjs/supabase.guard.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/nestjs/supabase.guard.ts) into your project. `toNestGuard` returns a guard class. A guard covers context and short-circuit. The response phase is not available: Nest's interceptors receive the controller's return value, not a `Response`, so an entry's `yield` has nothing to act on. For CORS, use `app.enableCors()`.
 
-    A short-circuit becomes an `HttpException` with the entry's status and its `{ message, code }` body. The bridge builds a Web `Request` from Nest's request with the headers and method. The body is not forwarded, so entries that read it do not work through this bridge. `Injectable()` is applied as a call, so the file works without a decorator transform.
+    Call `toNestGuard` once and reuse the class on every route, so the pipeline folds once. On a short-circuit the guard copies the entry's headers onto the response, then throws an `HttpException` with the entry's status and its `{ message, code }` body. The bridge builds a Web `Request` from Nest's request with the headers and method. The body is not forwarded, so entries that read it do not work through this bridge. A contribution whose key matches a property Nest's request already has, such as `body` or `query`, throws instead of overwriting it. `Injectable()` is applied as a call, so the file works without a decorator transform.
 
   </RefSubLayout.Details>
 
@@ -171,11 +173,12 @@ The bridge files for the four frameworks that had adapters live in the server re
     import { toNestGuard } from './lib/supabase.guard.js'
 
     const entries = [withRequiredClaims(), withSupabaseClient()] as const
+    const SupabaseGuard = toNestGuard(entries)
 
     @Controller('todos')
     export class TodosController {
       @Get()
-      @UseGuards(toNestGuard(entries))
+      @UseGuards(SupabaseGuard)
       async list(@Req() req: Contributions<typeof entries>) {
         const { data, error } = await req.supabase.from('todos').select()
         if (error) throw error
@@ -677,6 +680,8 @@ condense, or drop comments from it.
 
 STEP 4: SWAP each registration to the bridge called on an entry array, e.g.
   toHono([withRequiredClaims(), withSupabaseClient()])
+For NestJS, call toNestGuard(entries) once, assign it to a const, and pass
+that const to every @UseGuards().
 Import the client entries from '@supabase/server/middleware/client' and
 '@supabase/server/middleware/admin-client'. Only include
 withSupabaseAdminClient() where the old code actually read supabaseAdmin.
