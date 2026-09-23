@@ -53,13 +53,17 @@ const LastUsedCell = ({
   lastUsedAt,
   isLoading,
   isError,
+  isLastUsedSupported,
 }: {
   lastUsedAt?: number
   isLoading: boolean
   isError: boolean
+  isLastUsedSupported: boolean
 }) => {
   const className =
     'text-right py-2 text-sm text-foreground-light whitespace-nowrap data-[invisible=true]:invisible'
+
+  if (!isLastUsedSupported) return <TableCell />
 
   if (isLoading) {
     return (
@@ -157,6 +161,7 @@ export const SigningKeyRow = ({
         lastUsedAt={lastUsedAt}
         isLoading={isLoadingLastUsed}
         isError={isLastUsedError}
+        isLastUsedSupported={signingKey.id !== legacyKey?.id}
       />
     )}
     {!isLastUsedVisible && !hasRotationTimestamp(signingKey.status) && <TableCell />}
