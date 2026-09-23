@@ -82,7 +82,10 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
           </TableHeader>
           <TableBody>
             {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
-              return <WrapperRow key={x.id} wrapper={x} />
+              const isShared = data?.some(
+                (wrapper) => wrapper.id !== x.id && wrapper.name === x.name
+              )
+              return <WrapperRow key={x.id} wrapper={x} isShared={isShared ?? false} />
             })}
           </TableBody>
           <TableFooter

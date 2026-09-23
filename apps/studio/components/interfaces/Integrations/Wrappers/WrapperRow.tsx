@@ -14,9 +14,10 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface WrapperRowProps {
   wrapper: FDW
+  isShared: boolean
 }
 
-export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
+export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
   const { ref, id } = useParams()
   const { can: canManageWrappers } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -39,11 +40,20 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   )
 
   const _tables = formatWrapperTables(wrapper, integration?.meta)
+  const canEdit = canManageWrappers && !isShared
+  let editTooltip = 'Edit wrapper'
+  if (!canManageWrappers) editTooltip = 'You need additional permissions to edit wrappers'
+  else if (isShared) editTooltip = 'Shared wrappers cannot be edited in the dashboard'
 
   return (
     <TableRow>
       <TableCell className="gap-2 align-top py-3! min-w-80">
         {wrapper.name}
+        {isShared && (
+          <p className="text-sm text-foreground-light">
+            This wrapper is shared with another connection and cannot be edited in the dashboard.
+          </p>
+        )}
 
         {visibleMetadata.map((metadata) => (
           <div
@@ -122,16 +132,14 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
       <TableCell className="flex-nowrap">
         <div className="flex items-center gap-x-2">
           <ButtonTooltip
-            disabled={!canManageWrappers}
+            disabled={!canEdit}
             icon={<Edit strokeWidth={1.5} />}
             className="px-1.5"
             onClick={() => setSelectedWrapperToEdit(wrapper.id.toString())}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !canManageWrappers
-                  ? 'You need additional permissions to edit wrappers'
-                  : 'Edit wrapper',
+                text: editTooltip,
               },
             }}
           />
