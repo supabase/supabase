@@ -171,9 +171,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         versioning_status: isVersioningEnabled ? 'ENABLED' : 'DISABLED',
       })
 
-      // Storage keeps the lifecycle policy separately from the bucket, so it is a
-      // second call. The bucket exists either way; a failure here leaves it
-      // versioned with no retention policy rather than rolling the creation back.
+      // A second call, so a failure here leaves the bucket versioned with no retention policy.
       const lifecycleRules = isVersioningEnabled ? toLifecycleRules(values) : []
       if (lifecycleRules.length > 0) {
         await updateLifecycle({ projectRef: ref, bucketId: values.name, rules: lifecycleRules })
