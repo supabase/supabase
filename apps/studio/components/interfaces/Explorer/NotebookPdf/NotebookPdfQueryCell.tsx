@@ -1,8 +1,9 @@
-import { Image as PdfImage, Text, View } from '@react-pdf/renderer'
+import { Text, View } from '@react-pdf/renderer'
 import type { ReactElement } from 'react'
 import type { Snapshot } from 'valtio'
 
 import { type QueryResult } from '../types'
+import { NotebookPdfChart } from './NotebookPdfChart'
 import { NotebookPdfTable } from './NotebookPdfTable'
 import { pdfStyles } from './theme'
 import { formatTimeRange } from '@/components/ui/AIAssistantPanel/AssistantNotebookPreview.utils'
@@ -28,11 +29,11 @@ function ResultsTable({ rows }: { rows: readonly Record<string, unknown>[] }) {
 function QueryResultsSection({
   result,
   view,
-  chartImage,
+  chart,
 }: {
   result: QueryResult | undefined
   view: 'table' | 'chart'
-  chartImage: string | undefined
+  chart: Snapshot<QueryCell>['chart']
 }): ReactElement {
   if (!result) {
     return (
@@ -60,12 +61,10 @@ function QueryResultsSection({
   }
 
   if (view === 'chart') {
-    return chartImage ? (
+    return (
       <View style={pdfStyles.resultsBox}>
-        <PdfImage style={pdfStyles.chartImage} src={chartImage} />
+        <NotebookPdfChart chart={chart} rows={rows} />
       </View>
-    ) : (
-      <ResultsTable rows={rows} />
     )
   }
 
@@ -75,11 +74,9 @@ function QueryResultsSection({
 interface NotebookPdfQueryCellProps {
   cell: Snapshot<QueryCell>
   result: QueryResult | undefined
-  /** A rasterized PNG data URL of the cell's live chart, when `cell.view === 'chart'` and one was captured. */
-  chartImage?: string
 }
 
-export function NotebookPdfQueryCell({ cell, result, chartImage }: NotebookPdfQueryCellProps) {
+export function NotebookPdfQueryCell({ cell, result }: NotebookPdfQueryCellProps) {
   const view = cell.view ?? 'table'
   const rowCount = result?.rows?.length ?? 0
   const rowLimit = cell._tag === 'database_cell' ? cell.row_limit : undefined
@@ -95,7 +92,7 @@ export function NotebookPdfQueryCell({ cell, result, chartImage }: NotebookPdfQu
 
       <SqlBlock sql={cell.unchecked_sql} />
 
-      <QueryResultsSection result={result} view={view} chartImage={chartImage} />
+      <QueryResultsSection result={result} view={view} chart={cell.chart} />
 
       <View style={pdfStyles.footerRow}>
         <Text style={pdfStyles.footerText}>

@@ -155,7 +155,6 @@ export const pdfStyles = StyleSheet.create({
   resultsBox: { paddingHorizontal: 10, paddingVertical: 8 },
   resultsPlaceholder: { fontSize: 9, color: pdfColors.textTertiary },
   resultsError: { fontSize: 9, color: pdfColors.errorText },
-  chartImage: { width: '100%', height: 220, marginTop: 2 },
   resultsHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

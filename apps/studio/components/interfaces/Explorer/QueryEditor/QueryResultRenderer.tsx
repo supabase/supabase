@@ -1,5 +1,4 @@
 import { Play } from 'lucide-react'
-import { type Ref } from 'react'
 
 import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
@@ -16,8 +15,6 @@ interface QueryResultRendererProps {
   sql?: string
   source?: SqlSnippetSource
   onDebug?: (prompt: string) => void
-  /** Exposes the rendered chart's DOM node, e.g. for rasterizing it into a PDF export. */
-  chartRef?: Ref<HTMLDivElement>
 }
 
 export const QueryResultRenderer = ({
@@ -27,7 +24,6 @@ export const QueryResultRenderer = ({
   sql,
   source,
   onDebug,
-  chartRef,
 }: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
 
@@ -58,7 +54,7 @@ export const QueryResultRenderer = ({
 
   if (rows && rows.length > 0) {
     if (view === 'table') return <DataGridResults rows={rows} />
-    if (view === 'chart') return <QueryResultChart chart={chart} result={result} chartRef={chartRef} />
+    if (view === 'chart') return <QueryResultChart chart={chart} result={result} />
   }
 
   return null

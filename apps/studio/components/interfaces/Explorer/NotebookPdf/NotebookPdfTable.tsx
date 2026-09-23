@@ -21,7 +21,6 @@ export function NotebookPdfTable({ rows }: NotebookPdfTableProps): ReactElement 
   return (
     <View style={pdfStyles.table}>
       <View style={pdfStyles.tableHeaderRow}>
-        <Text style={pdfStyles.tableIndexCell} />
         {columns.map((column) => (
           <Text key={column} style={pdfStyles.tableHeaderCell}>
             {column}
@@ -38,7 +37,6 @@ export function NotebookPdfTable({ rows }: NotebookPdfTableProps): ReactElement 
           }
           wrap={false}
         >
-          <Text style={pdfStyles.tableIndexCell}>{rowIndex + 1}</Text>
           {columns.map((column) => {
             const value = row[column]
             return value === null ? (

@@ -336,7 +336,6 @@ export const ExplorerNotebookTab = () => {
         projectName: project?.name,
         cells,
         getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
-        getChartElement: (cellId) => queryCellRefs.current.get(cellId)?.getChartElement(),
       })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)

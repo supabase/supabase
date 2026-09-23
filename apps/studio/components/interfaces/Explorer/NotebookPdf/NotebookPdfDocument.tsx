@@ -13,8 +13,6 @@ interface NotebookPdfDocumentProps {
   projectName?: string
   cells: readonly Snapshot<Cell>[]
   results: ReadonlyMap<string, QueryResult>
-  /** Rasterized PNG data URLs for chart-view query cells, keyed by cell id. */
-  chartImages: ReadonlyMap<string, string>
 }
 
 /** The Supabase bolt mark (packages/common/assets/images/supabase-logo-icon.svg), flattened to
@@ -39,7 +37,6 @@ export function NotebookPdfDocument({
   projectName,
   cells,
   results,
-  chartImages,
 }: NotebookPdfDocumentProps) {
   const exportedDate = dayjs().format('MMM D, YYYY')
 
@@ -66,12 +63,7 @@ export function NotebookPdfDocument({
 
         {cells.map((cell) =>
           isQueryCell(cell) ? (
-            <NotebookPdfQueryCell
-              key={cell._id}
-              cell={cell}
-              result={results.get(cell._id)}
-              chartImage={chartImages.get(cell._id)}
-            />
+            <NotebookPdfQueryCell key={cell._id} cell={cell} result={results.get(cell._id)} />
           ) : (
             <NotebookPdfMarkdown key={cell._id} markdown={cell.text} />
           )
