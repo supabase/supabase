@@ -13,6 +13,7 @@ import {
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
   getStorageExplorerUrlForItem,
+  getStorageItemPath,
   getStoragePathForItem,
   parseStoragePath,
   sanitizeNameForDuplicateInColumn,
@@ -450,5 +451,28 @@ describe('clipboard helpers', () => {
 
     onCopied?.()
     expect(toast.success).toHaveBeenCalledWith('Copied URL for "photo.png"')
+  })
+})
+
+describe('getStorageItemPath', () => {
+  const openedFolders = [makeFolder('images'), makeFolder('2024'), makeFolder('january')]
+
+  it('returns the bare name for an item at the bucket root', () => {
+    expect(getStorageItemPath({ openedFolders }, { name: 'avatar.png', columnIndex: 0 })).toBe(
+      'avatar.png'
+    )
+  })
+
+  it('prefixes the folders opened above the item', () => {
+    expect(getStorageItemPath({ openedFolders }, { name: 'avatar.png', columnIndex: 2 })).toBe(
+      'images/2024/avatar.png'
+    )
+  })
+
+  it('ignores folders opened below the item', () => {
+    // The user drilled into january, but the item sits in the 2024 column.
+    expect(getStorageItemPath({ openedFolders }, { name: 'notes.txt', columnIndex: 1 })).toBe(
+      'images/notes.txt'
+    )
   })
 })
