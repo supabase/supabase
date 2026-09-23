@@ -79,7 +79,7 @@ const Subscription = () => {
               {isSuccess && (
                 <div className="space-y-6 w-full">
                   <div className="flex justify-between items-center">
-                    <p className="text-2xl text-brand leading-none">
+                    <p className="text-2xl text-primary leading-none">
                       {currentPlan?.name ?? 'Unknown'} Plan
                     </p>
 

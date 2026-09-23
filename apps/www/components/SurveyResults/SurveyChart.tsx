@@ -377,7 +377,7 @@ export function SurveyChart({
                         className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums transition-colors duration-300 ${
                           shouldAnimateBars
                             ? item.value === maxValue
-                              ? 'text-brand'
+                              ? 'text-primary'
                               : 'text-foreground'
                             : 'text-foreground-muted'
                         }`}

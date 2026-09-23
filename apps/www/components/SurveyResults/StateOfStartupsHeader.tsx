@@ -96,7 +96,7 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
           <TextBlock
             text="State"
             bgColor="bg-brand-300"
-            textColor="text-brand"
+            textColor="text-primary"
             showProgressBar={showProgressBars}
             delay={randomDelays[0]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
@@ -105,7 +105,7 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
           <TextBlock
             text="of"
             bgColor="bg-brand-300"
-            textColor="text-brand"
+            textColor="text-primary"
             showProgressBar={showProgressBars}
             delay={randomDelays[1]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"

@@ -323,7 +323,7 @@ export const LogsDatePicker = ({
                 value={helper.text}
                 disabled={helper.disabled}
                 aria-disabled={helper.disabled}
-              ></RadioGroupItem>
+              />
               {helper.text}
               {showHelperBadge(helper) ? (
                 <Lock size={12} className="text-foreground-muted" />
@@ -404,9 +404,7 @@ export const LogsDatePicker = ({
               variant="text"
               size="tiny"
               onClick={handleCopy}
-              className={cn({
-                'text-brand-link': copied || pasted,
-              })}
+              className={cn({ 'text-brand-link': copied || pasted })}
             >
               {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}
             </Button>
