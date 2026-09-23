@@ -25,6 +25,7 @@
    * against the near-white surface (a light amber on white disappears). Lightness
    * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
+  --warning-hue: 58;
   --warning-lightness: 0.68;
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;

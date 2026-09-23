@@ -9,14 +9,14 @@ The shorthand utility classes below simplify our full color palette by providing
 
 Supabase green is not one token. Light mode in particular needs two greens with different jobs:
 
-| Job           | Token / utilities                                                                  | Use when                                                                                                                                                     |
-| ------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Readable ink  | `--primary`, `text-primary`, `border-primary`                                      | The color must be _read_ or recognized at a small size: links, labels, statuses, radio borders/dots, step dots                                               |
-| Bright chrome | `brand-default`, `--ring`, `bg-brand-default`, `border-brand-default`, `ring-ring` | The color should feel on-brand and obvious as chrome: focus rings, highlight rings, larger selected fills (choice cards, slider ranges), solid brand buttons |
+| Job           | Token / utilities                                                                  | Use when                                                                                                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Readable ink  | `--primary`, `text-primary`, `border-primary`, `bg-primary`                        | The color must be _read_ or recognized at a small size, or used as a solid primary fill: links, labels, statuses, radio borders/dots, step dots, primary Button            |
+| Bright chrome | `brand-default`, `--ring`, `bg-brand-default`, `border-brand-default`, `ring-ring` | The color should feel on-brand and obvious as chrome: focus rings, highlight rings, larger selected fills (choice cards, some slider ranges), status dots that stay bright |
 
-**Rule of thumb:** if thin 12px type in that green would fail WCAG AA on the surface, use accessible primary. If the green is identification, energy, or a ring around a control, use bright `brand-default`.
+**Rule of thumb:** if thin 12px type in that green would fail WCAG AA on the surface, or the fill is a primary Button, use accessible primary. If the green is identification, energy, or a focus ring, use bright `brand-default`.
 
-Do not point focus rings or other bright chrome at `--primary` just because text uses it. That was how light-mode focus rings went muddy after brand text was darkened for AA. Dark mode is largely the same green for both jobs; the split matters most on light surfaces.
+Do not point focus rings or other bright chrome at `--primary` just because text and primary buttons use it. That was how light-mode focus rings went muddy after brand text was darkened for AA. Primary Button now shares that darker green, which helps the accessible primary feel cohesive in light mode. Dark mode is largely the same green for both jobs; the split matters most on light surfaces.
 
 See also [Typography](../docs/typography) (`text-primary`) and [Accessibility](../docs/accessibility#focus-management) (shared focus ring).
 

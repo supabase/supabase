@@ -79,6 +79,33 @@ describe('matchRedirect query/hash preservation', () => {
     })
   })
 
+  it('redirects the legacy replication list route to Pipelines while preserving query and hash', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/database/replication',
+        search: { source: 'bookmark' },
+        isPlatform: true,
+        hash: 'destinations',
+      })
+    ).toEqual({
+      destination: '/project/abc/database/pipelines?source=bookmark#destinations',
+      permanent: true,
+    })
+  })
+
+  it('redirects legacy pipeline detail URLs to Pipelines', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/database/replication/pipeline-1',
+        search: {},
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/project/abc/database/pipelines/pipeline-1',
+      permanent: true,
+    })
+  })
+
   it('redirects the legacy compute billing panel to the CPU section', () => {
     expect(
       matchRedirect({

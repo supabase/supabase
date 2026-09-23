@@ -5,14 +5,14 @@ description: >-
   sandbox (runner container + local Supabase stack via `supabase start`). Use
   after Draft or during Self-review when asked to test the docs, fact-check
   CLI/SQL/code samples, or produce a verification report for a docs PR.
-  Complements review-the-docs lint/build checks; does not replace them.
+  Complements review-the-docs build and review checks; does not replace them.
 ---
 
 # Test the docs
 
 Runs procedural docs content **inside disposable containers**, not on the host shell and not against production. Produces a verification report for the PR body / self-review note.
 
-For lint, markdown rebuilds, example-app triage, and PR review, use [`review-the-docs`](../review-the-docs/SKILL.md). For Frame/Shape and cross-repo product lookup, use [`pm-the-docs`](../pm-the-docs/SKILL.md).
+For markdown rebuilds, example-app triage, and PR review, use [`review-the-docs`](../review-the-docs/SKILL.md). For Frame/Shape and cross-repo product lookup, use [`pm-the-docs`](../pm-the-docs/SKILL.md).
 
 ## When to invoke
 
@@ -92,5 +92,5 @@ Write a verification report per [reference/verification-report.md](reference/ver
 ## Related skills
 
 - [`write-the-docs`](../write-the-docs/SKILL.md) — Draft; hands off here before PR
-- [`review-the-docs`](../review-the-docs/SKILL.md) — lint/build/classify; consumes verification report
+- [`review-the-docs`](../review-the-docs/SKILL.md) — build/classify; consumes verification report
 - [`pm-the-docs`](../pm-the-docs/SKILL.md) — Frame/Shape; universe for cross-repo product lookup

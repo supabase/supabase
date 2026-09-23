@@ -147,7 +147,7 @@ describe('DestinationRow', () => {
 
   test('waits for asynchronous shutdown before deleting the pipeline', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
     let isStopping = false
     let completeShutdown: () => void = () => {}
     const shutdown = new Promise<void>((resolve) => {
@@ -214,7 +214,7 @@ describe('DestinationRow', () => {
 
   test('keeps deletion retryable when shutdown status cannot be verified', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
     let isStopping = false
     const deleted = vi.fn()
     addAPIMock({
@@ -275,7 +275,7 @@ describe('DestinationRow', () => {
 
   test('navigates to the pipeline when the row is clicked', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
@@ -283,19 +283,19 @@ describe('DestinationRow', () => {
     expect(row).not.toBeNull()
     await userEvent.click(row!)
 
-    expect(routerMock.asPath).toBe(`/project/default/database/replication/${PIPELINE_ID}`)
+    expect(routerMock.asPath).toBe(`/project/default/database/pipelines/${PIPELINE_ID}`)
   })
 
   test('does not navigate when the row overflow menu is opened', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
-    expect(routerMock.asPath).toBe('/project/default/database/replication')
+    expect(routerMock.asPath).toBe('/project/default/database/pipelines')
   })
 
   test('shows "Caught up" when confirmed_flush_lsn_bytes is 0', async () => {
