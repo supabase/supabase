@@ -60,7 +60,7 @@ At its most basic, a function has the following parts:
 2. `returns text`: The type of data the function returns. For a function that returns nothing, write `returns void`.
 3. `language sql`: The language used inside the function body. This can also be a procedural language: `plpgsql`, `plpython`, etc.
 4. `as $$`: The function wrapper. Anything inside the `$$` symbols is part of the function body.
-5. `select 'hello world';`: A basic function body. The function returns the result of the last `select` statement in its body.
+5. `select 'hello world';`: A basic function body. The function returns the result of its final query, which can be an `insert`, `update`, or `delete` with a `returning` clause.
 6. `$$;`: The closing symbols of the function wrapper.
 
 </details>
