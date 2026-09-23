@@ -157,7 +157,7 @@ export const CreatePipelineWizard = () => {
   const selectedType = isPipelineDestinationType(urlDestinationType) ? urlDestinationType : null
   const previousSelectedTypeRef = useRef<PipelineDestinationType | null>(null)
 
-  const listHref = `/project/${projectRef}/database/replication`
+  const listHref = `/project/${projectRef}/database/pipelines`
 
   const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
     projectRef,

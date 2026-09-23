@@ -268,7 +268,7 @@ export const BucketFilePickerHeader = () => {
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {view === option.key && (
-                          <Check size={16} className="text-brand" strokeWidth={2} />
+                          <Check size={16} className="text-primary" strokeWidth={2} />
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -282,7 +282,7 @@ export const BucketFilePickerHeader = () => {
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortBy === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
+                              <Check size={16} className="text-primary" strokeWidth={2} />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -300,7 +300,7 @@ export const BucketFilePickerHeader = () => {
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
+                              <Check size={16} className="text-primary" strokeWidth={2} />
                             )}
                           </div>
                         </DropdownMenuItem>

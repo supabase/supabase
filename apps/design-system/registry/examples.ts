@@ -200,6 +200,12 @@ export const examples: Registry = [
     files: ['example/button-default.tsx'],
   },
   {
+    name: 'button-floating-plate',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-floating-plate.tsx'],
+  },
+  {
     name: 'button-warning',
     type: 'components:example',
     registryDependencies: ['button'],

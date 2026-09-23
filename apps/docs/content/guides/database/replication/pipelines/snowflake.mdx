@@ -6,8 +6,6 @@ subtitle: 'Replicate Supabase Postgres changes to Snowflake.'
 sidebar_label: 'Snowflake'
 ---
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
-
 <$Partial path="pipelines-public-alpha.mdx" />
 
 The Snowflake destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
@@ -37,8 +35,6 @@ alter table public.your_table replica identity full;
 ```
 
 `REPLICA IDENTITY FULL` increases WAL volume, but lets Pipelines construct complete new rows when Postgres omits unchanged out-of-line TOAST values. The setting applies only to new WAL records. If retained WAL already contains an incompatible update, restart replication for the affected table after changing the setting.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Prepare Snowflake resources
 
@@ -123,8 +119,6 @@ select current_organization_name() || '-' || current_account_name();
 ```
 
 Enter the result as **Account ID**, for example `MYORG-MYACCOUNT`. Do not enter a full URL or dotted locator-and-region hostname. Account IDs can contain up to 63 characters. Legacy one-part account locators are also accepted. See [Snowflake account identifiers](https://docs.snowflake.com/en/user-guide/admin-account-identifier) for details.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Configure Snowflake as a destination
 

@@ -3938,7 +3938,12 @@ export interface WarehouseEnabledEvent {
  */
 export interface WarehouseDisabledEvent {
   action: 'warehouse_disabled'
-  properties: {}
+  properties: {
+    /** Number of schemas that were replicated in full. Omitted when the replicated tables have not resolved. */
+    schemaTargetCount?: number
+    /** Number of tables that were replicated individually. Omitted when the replicated tables have not resolved. */
+    tableTargetCount?: number
+  }
   groups: TelemetryGroups
 }
 

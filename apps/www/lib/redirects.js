@@ -2928,6 +2928,26 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/replication/bigquery',
+    destination: '/docs/guides/database/replication/pipelines/bigquery',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/clickhouse',
+    destination: '/docs/guides/database/replication/pipelines/clickhouse',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/ducklake',
+    destination: '/docs/guides/database/replication/pipelines/ducklake',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/snowflake',
+    destination: '/docs/guides/database/replication/pipelines/snowflake',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/replication/external-replication-setup',
     destination: '/docs/guides/database/replication/pipelines',
   },

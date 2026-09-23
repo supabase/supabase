@@ -15,6 +15,9 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -280,20 +283,36 @@ export const EditWrapperSheet = ({
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Button
-                            className="px-1"
-                            icon={<Edit />}
-                            onClick={() => {
-                              setSelectedTableToEdit(table)
-                            }}
-                          />
-                          <Button
-                            className="px-1"
-                            icon={<Trash />}
-                            onClick={() => {
-                              removeTable(tableIndex)
-                            }}
-                          />
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                className="px-1"
+                                icon={<Edit />}
+                                onClick={() => {
+                                  setSelectedTableToEdit(table)
+                                }}
+                                aria-label={`Edit ${table.table_name} foreign table`}
+                                // Tooltip repeats the label; screen readers would read it twice
+                                aria-describedby={undefined}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">{`Edit ${table.table_name} foreign table`}</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                className="px-1"
+                                icon={<Trash />}
+                                onClick={() => {
+                                  removeTable(tableIndex)
+                                }}
+                                aria-label={`Remove ${table.table_name} foreign table`}
+                                // Tooltip repeats the label; screen readers would read it twice
+                                aria-describedby={undefined}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">{`Remove ${table.table_name} foreign table`}</TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
                     )

@@ -269,7 +269,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
             <span
               className={cn(
                 'shrink-0 w-1.5 h-1.5 rounded-full flex',
-                status === 'positive' && 'bg-brand',
+                status === 'positive' && 'bg-brand-default',
                 status === 'negative' && 'bg-destructive',
                 status === 'warning' && 'bg-warning',
                 status === 'default' && 'bg-foreground-lighter'
@@ -528,7 +528,7 @@ const ChartValueDifferential = React.forwardRef<HTMLDivElement, ChartValueDiffer
         ref={ref}
         className={cn(
           variant === 'positive'
-            ? 'text-brand'
+            ? 'text-primary'
             : variant === 'negative'
               ? 'text-destructive'
               : 'text-foreground-light',

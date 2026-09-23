@@ -159,8 +159,8 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                         <TooltipContent side="bottom" className="w-72">
                           Assign this rule to a specific project member before toggling this option
                           off. This will then configure the rule to{' '}
-                          <span className="text-brand">only be visible</span> to that member in the
-                          advisor reports.
+                          <span className="text-primary">only be visible</span> to that member in
+                          the advisor reports.
                         </TooltipContent>
                       )}
                     </Tooltip>

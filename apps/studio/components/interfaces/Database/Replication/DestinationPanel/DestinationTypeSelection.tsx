@@ -27,7 +27,6 @@ import {
   DESTINATION_TYPE_STAGE_DESCRIPTIONS,
 } from './DestinationForm/DestinationFormFieldCopy'
 import { DestinationType } from './DestinationPanel.types'
-import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -245,7 +244,6 @@ export const DestinationTypeSelection = ({
           </SelectContent>
         </Select>
       </FormItemLayout>
-      {!editMode && <ReadReplicasMovedCallout className="px-5 pb-5" />}
     </>
   )
 }

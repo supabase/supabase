@@ -13,7 +13,7 @@ description: >-
 
 Improves **existing** Supabase docs pages: structure, order, connective text, and clarity.
 
-**Not this skill:** [`write-the-docs`](../write-the-docs/SKILL.md) drafts net-new content or product-grounded rewrites from intent and code. [`review-the-docs`](../review-the-docs/SKILL.md) covers lint, build, and PR triage.
+**Not this skill:** [`write-the-docs`](../write-the-docs/SKILL.md) drafts net-new content or product-grounded rewrites from intent and code. [`review-the-docs`](../review-the-docs/SKILL.md) covers build and PR triage.
 
 **Output is one pull request, with one change type per commit.** A reviewer reads the style diff apart from the structure diff without holding several PRs in their head. Split into a stack of PRs only when the requester asks for one, or approves the split you offer because the diff turned out large. Phase 0 covers when to raise it, and [reference/stacked-prs.md](reference/stacked-prs.md) covers the mechanics.
 
@@ -196,7 +196,7 @@ Run this per change type, before you submit the commit or branch that carries it
 
 **Frontmatter `title`.** It follows the same sentence-case rule as a heading. Renaming it moves a navigation label and a search entry, not just a line of prose, so it clears this same gate and lands in PR 2 rather than PR 1.
 
-**Lint and format.** Follow [`write-the-docs/reference/drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md). Then run the [`review-the-docs`](../review-the-docs/SKILL.md) local self-review: `pnpm lint:mdx`, plus `pnpm build:guides-markdown` when a guide, explainer, or tutorial changed.
+**Format and build.** Follow [`write-the-docs/reference/drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md). Then run the [`review-the-docs`](../review-the-docs/SKILL.md) local self-review, plus `pnpm build:guides-markdown` when a guide, explainer, or tutorial changed.
 
 `build:guides-markdown` writes `apps/docs/public/markdown/manifest.json`, which the repo tracks and commits as `[]`. Discard that file before committing. It's a build artifact, not part of the edit.
 

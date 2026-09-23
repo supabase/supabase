@@ -116,7 +116,7 @@ export const getCreatePipelineHref = (
   projectRef: string,
   destinationType?: PipelineDestinationType | null
 ) => {
-  const path = `/project/${projectRef}/database/replication/new`
+  const path = `/project/${projectRef}/database/pipelines/new`
   if (!destinationType) return path
   return `${path}?destinationType=${encodeURIComponent(destinationType)}`
 }

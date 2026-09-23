@@ -1,6 +1,6 @@
 import { usePathname } from 'next/navigation'
 
-const ISOLATED_STUDIO_FLOW_PATH = /\/project\/[^/]+\/database\/replication\/new\/?$/
+const ISOLATED_STUDIO_FLOW_PATH = /\/project\/[^/]+\/database\/pipelines\/new\/?$/
 
 export const isIsolatedStudioFlow = (pathname: string) =>
   ISOLATED_STUDIO_FLOW_PATH.test((pathname.split('?')[0] ?? '').replace(/\/$/, '') || '/')

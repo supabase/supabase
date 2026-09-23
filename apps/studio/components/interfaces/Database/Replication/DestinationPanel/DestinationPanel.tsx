@@ -20,7 +20,7 @@ export const DestinationPanel = () => {
     })
   )
 
-  // Create uses the full-page wizard at /database/replication/new; this sheet is edit-only.
+  // Create uses the full-page wizard at /database/pipelines/new; this sheet is edit-only.
   const visible = edit !== null
 
   const {

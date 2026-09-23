@@ -54,7 +54,7 @@ describe('isPipelineDestinationType', () => {
 describe('getCreatePipelineHref', () => {
   it('encodes the destination type in the query string', () => {
     expect(getCreatePipelineHref('abc', 'ClickHouse')).toBe(
-      '/project/abc/database/replication/new?destinationType=ClickHouse'
+      '/project/abc/database/pipelines/new?destinationType=ClickHouse'
     )
   })
 })
