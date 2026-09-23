@@ -443,6 +443,17 @@ Prefer `security invoker`, which is also the default. When you use `security def
 
 With an empty search path, `search_path = ''`, name the schema for every relation in the function body, such as `from public.table`. An empty search path limits the damage when the function can reach a schema you don't want the calling user to reach.
 
+<Admonition type="danger">
+
+A `security definer` function can return rows the caller isn't allowed to read. It runs as its creator, which on Supabase is `postgres`. That role bypasses Row Level Security. Any role can execute the function by default, including `anon`, the role that serves requests carrying no user session.
+
+Execute privileges decide who can call the function. Pinning the `search_path` doesn't change them. When a `security definer` function reads user data, protect it in one or both of these ways:
+
+- Check ownership in the function body.
+- Revoke execute from `public` and `anon`, then grant it to the roles that need it. See the [Function privileges](#function-privileges) section of this page.
+
+</Admonition>
+
 ### Function privileges
 
 By default, any role can run a database function. You can restrict execution in two ways:
