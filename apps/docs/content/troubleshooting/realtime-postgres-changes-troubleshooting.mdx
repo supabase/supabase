@@ -27,7 +27,7 @@ If the table's missing from the results:
 alter publication supabase_realtime add table your_table;
 ```
 
-Or toggle it on from **Database → Replication** in the dashboard.
+Or toggle it on from **Database → Publications** in the dashboard.
 
 This gets overlooked on a table created recently — creating the table and enabling Realtime on it are two separate steps:
 
@@ -203,7 +203,7 @@ channel.subscribe(async (status) => {
 Sometimes the answer is straightforward. Check:
 
 - **Project Settings → Realtime** — enabled at the project level?
-- **Database → Replication** — toggle on for this specific table?
+- **Database → Publications** — toggle on for this specific table?
 
 Check this again after a project's been paused and restarted — the replication slot can need to reconnect. If the project's under heavier load than usual, also check the Realtime "Concurrent Peak Connections" quota — hitting that limit can look a lot like a broken subscription.
 

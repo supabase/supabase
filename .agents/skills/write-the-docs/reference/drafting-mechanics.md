@@ -29,18 +29,15 @@ independent of its wording, pin it with a custom anchor, for example
 From `apps/docs`:
 
 ```bash
-pnpm lint:mdx
 pnpm build:guides-markdown
 ```
 
-`pnpm lint:mdx` covers all content under `apps/docs/content`, including
-troubleshooting entries. `pnpm build:guides-markdown` only applies to guides,
-explainers, and tutorials.
+`pnpm build:guides-markdown` only applies to guides, explainers, and tutorials.
 
 From the repository root, run `pnpm format` to apply Prettier to changed MDX
 files. This enforces repo-wide formatting rules, including lowercase SQL
 keyword casing in code samples.
 
-Treat `supa-mdx-lint` replacements as suggestions when context matters. Rewrite
-the sentence instead of applying a replacement that changes its technical
-meaning.
+Check terminology against [`apps/docs/WORD_LIST.md`](../../../../apps/docs/WORD_LIST.md)
+yourself. Treat its replacements as suggestions when context matters: rewrite the
+sentence instead of applying one that changes its technical meaning.

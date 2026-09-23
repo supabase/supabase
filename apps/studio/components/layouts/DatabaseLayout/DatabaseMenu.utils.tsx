@@ -123,9 +123,9 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
       items: [
         IS_PLATFORM &&
           showPgReplicate && {
-            name: 'Replication',
-            key: 'replication',
-            url: getDatabaseURL('replication'),
+            name: 'Pipelines',
+            key: 'pipelines',
+            url: getDatabaseURL('pipelines'),
             label: enablePgReplicate ? 'New' : undefined,
             shortcutId: SHORTCUT_IDS.NAV_DATABASE_REPLICATION,
           },

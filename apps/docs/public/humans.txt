@@ -18,6 +18,7 @@ Alex Hsu
 Alexander Alexandrov
 Alexander Korotkov
 Ali Waseem
+Alice Crosbie
 Allan S
 Amir Issaei
 Amogh Rao
@@ -50,6 +51,7 @@ Brent Schroeter
 Bruno Kilian
 Burhan A
 Carel de Waal
+Carson Adam
 Cameron Blackwood
 Cameron Michie
 Cemal Kılıç
@@ -220,6 +222,7 @@ Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
 Michelle Jubrey
+Mike Podobnik
 Miranda Limonczenko
 Mo Khan
 Monica Khoury
