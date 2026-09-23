@@ -5,18 +5,18 @@ description: Colors system breakdown with best practices.
 
 The shorthand utility classes below simplify our full color palette by providing sensible, contrast-checked defaults. Use them whenever possible to ensure accessible text colors and balanced background fills.
 
-## Brand green: two jobs
+## Brand green
 
-Supabase green is not one token. Light mode in particular needs two greens with different jobs:
+Light mode uses two greens. Pick by job, not by habit:
 
-| Job           | Token / utilities                                                                  | Use when                                                                                                                                                                   |
-| ------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Readable ink  | `--primary`, `text-primary`, `border-primary`, `bg-primary`                        | The color must be _read_ or recognized at a small size, or used as a solid primary fill: links, labels, statuses, radio borders/dots, step dots, primary Button            |
-| Bright chrome | `brand-default`, `--ring`, `bg-brand-default`, `border-brand-default`, `ring-ring` | The color should feel on-brand and obvious as chrome: focus rings, highlight rings, larger selected fills (choice cards, some slider ranges), status dots that stay bright |
+| Use for                                        | Tokens                                                                             | Examples                                                              |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Text, primary fills, small selected indicators | `--primary`, `text-primary`, `border-primary`, `bg-primary`                        | Links, labels, radios, step dots, primary Button                      |
+| Bright fills and focus                         | `brand-default`, `--ring`, `bg-brand-default`, `border-brand-default`, `ring-ring` | Focus rings, highlight rings, choice-card borders, bright status dots |
 
-**Rule of thumb:** if thin 12px type in that green would fail WCAG AA on the surface, or the fill is a primary Button, use accessible primary. If the green is identification, energy, or a focus ring, use bright `brand-default`.
+Use `--primary` when the green must meet WCAG AA as text, or when it is a solid primary fill. Use `brand-default` for focus rings and other bright chrome. Do not point `--ring` at `--primary`.
 
-Do not point focus rings or other bright chrome at `--primary` just because text and primary buttons use it. That was how light-mode focus rings went muddy after brand text was darkened for AA. Primary Button now shares that darker green, which helps the accessible primary feel cohesive in light mode. Dark mode is largely the same green for both jobs; the split matters most on light surfaces.
+Dark mode barely differs between the two. The split matters most on light surfaces.
 
 See also [Typography](../docs/typography) (`text-primary`) and [Accessibility](../docs/accessibility#focus-management) (shared focus ring).
 
@@ -26,7 +26,7 @@ Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid 
 
 Use `text-primary` for readable branded text such as links, labels, and statuses. On light-theme
 surfaces it meets the 4.5:1 WCAG AA requirement for normal text. For fills, borders, and focus
-chrome, see [Brand green: two jobs](#brand-green-two-jobs).
+chrome, see [Brand green](#brand-green).
 
 <Colors definition={'text'} />
 
@@ -35,7 +35,7 @@ chrome, see [Brand green: two jobs](#brand-green-two-jobs).
 Use `bg-brand-default` when the canonical Supabase green is required as a fill. The same
 `brand-default` suffix applies to borders and other non-text utilities, such as
 `border-brand-default`. Prefer accessible `--primary` / `border-primary` for small selected
-indicators (radios, step dots). Details in [Brand green: two jobs](#brand-green-two-jobs).
+indicators (radios, step dots). Details in [Brand green](#brand-green).
 
 <Colors definition={'background'} />
 
