@@ -217,14 +217,14 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   <GitHubButton />
                   {isLoggedIn ? (
                     <>
-                      <Button className="hidden lg:block" asChild>
+                      <Button className="hidden lg:inline-flex" asChild>
                         <Link href="/dashboard/projects">Dashboard</Link>
                       </Button>
                       <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
                     </>
                   ) : (
                     <>
-                      <Button className="hidden lg:block" asChild>
+                      <Button className="hidden lg:inline-flex" asChild>
                         <Link
                           href="https://supabase.com/dashboard"
                           onClick={() =>
@@ -237,7 +237,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           Sign in
                         </Link>
                       </Button>
-                      <Button variant="primary" className="hidden lg:block" asChild>
+                      <Button variant="primary" className="hidden lg:inline-flex" asChild>
                         <Link
                           href="https://supabase.com/dashboard/sign-up"
                           onClick={() =>

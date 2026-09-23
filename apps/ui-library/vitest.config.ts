@@ -19,12 +19,7 @@ export default defineConfig({
         test: {
           name: 'node',
           environment: 'node',
-          include: [
-            'middleware.test.ts',
-            './lib/registry-resolution.test.ts',
-            './lib/library-mdx-to-markdown.test.ts',
-            './lib/install-command.test.ts',
-          ],
+          include: ['middleware.test.ts', 'scripts/*.test.ts', './lib/*.test.ts'],
         },
       },
     ],

@@ -12,7 +12,7 @@ Use the Dashboard to check [replication progress](#viewing-detailed-pipeline-met
 
 ## Viewing pipeline status
 
-Open [**Database > Replication**](/dashboard/project/_/database/replication) to see each destination's pipeline status.
+Open [**Database > Pipelines**](/dashboard/project/_/database/pipelines) to see each destination's pipeline status.
 
 ### Pipeline states
 
@@ -163,7 +163,7 @@ When you restart table replication:
 
 The pipeline stops temporarily to apply the table restart. The Dashboard restarts it automatically, or starts it if it was stopped. Replication for other tables is paused during this process, and their unfinished initial syncs can restart from scratch.
 
-Before restarting, use **Edit pipeline** to check the **Initial sync** selection. Include any affected tables whose existing source rows you need to copy again, then apply your changes. Open the pipeline from the list on **Database > Replication**.
+Before restarting, use **Edit pipeline** to check the **Initial sync** selection. Include any affected tables whose existing source rows you need to copy again, then apply your changes. Open the pipeline from the list on **Database > Pipelines**.
 
 ### Restart a single table
 
