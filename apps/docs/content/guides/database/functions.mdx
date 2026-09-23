@@ -6,7 +6,7 @@ video: 'https://www.youtube.com/v/MJZCCpCYEqk'
 ---
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html).
-These functions live inside your database, and they can be [used with the API](../../reference/javascript/rpc).
+These functions live inside your database, and you can call them from your app with [`rpc()`](../../reference/javascript/rpc).
 
 ## Quick demo
 
@@ -14,14 +14,15 @@ These functions live inside your database, and they can be [used with the API](.
 
 ## Getting started
 
-Supabase provides several options for creating database functions. You can use the Dashboard or create them directly using SQL.
-We provide a SQL editor within the Dashboard, or you can [connect](../../guides/database/connecting-to-postgres) to your database
-and run the SQL queries yourself.
+Create a database function from the Dashboard, or write the SQL yourself against a
+[direct connection](../../guides/database/connecting-to-postgres).
 
-1. Go to the "SQL editor" section.
-2. Click "New Query".
-3. Enter the SQL to create or replace your Database function.
-4. Click "Run" or cmd+enter (ctrl+enter).
+To use the Dashboard:
+
+1. Go to the **SQL Editor** section.
+2. Click **New Query**.
+3. Enter the SQL that creates or replaces your database function.
+4. Click **Run**. You can also press `cmd+enter` or `ctrl+enter`.
 
 ## Basic functions [#simple-functions]
 
@@ -40,26 +41,24 @@ $$; --6
 <details>
 <summary>Show/Hide Details</summary>
 
-At it's most basic a function has the following parts:
+At its most basic, a function has the following parts:
 
-1. `create or replace function hello_world()`: The function declaration, where `hello_world` is the name of the function. You can use either `create` when creating a new function or `replace` when replacing an existing function. Or you can use `create or replace` together to handle either.
-2. `returns text`: The type of data that the function returns. If it returns nothing, you can `returns void`.
+1. `create or replace function hello_world()`: The function declaration, where `hello_world` is the name of the function. Use `create` for a new function, `replace` for one that exists, or `create or replace` when the function might not exist yet.
+2. `returns text`: The type of data the function returns. For a function that returns nothing, write `returns void`.
 3. `language sql`: The language used inside the function body. This can also be a procedural language: `plpgsql`, `plpython`, etc.
-4. `as $$`: The function wrapper. Anything enclosed inside the `$$` symbols will be part of the function body.
-5. `select 'hello world';`: A basic function body. The final `select` statement inside a function body will be returned if there are no statements following it.
+4. `as $$`: The function wrapper. Anything inside the `$$` symbols is part of the function body.
+5. `select 'hello world';`: A basic function body. The function returns the result of the last `select` statement in its body.
 6. `$$;`: The closing symbols of the function wrapper.
 
 </details>
 
-<br />
-
 <Admonition type="caution">
 
-When naming your functions, make the name of the function unique as overloaded functions are not supported.
+Overloaded functions aren't supported. Give every function a unique name.
 
 </Admonition>
 
-After the Function is created, we have several ways of "executing" the function - either directly inside the database using SQL, or with one of the client libraries.
+After you create the function, you can run it inside the database with SQL, or with one of the client libraries.
 
 <Tabs
   scrollable
@@ -144,9 +143,9 @@ Reference: [`Rpc()`](../../reference/csharp/rpc)
 
 ## Returning data sets
 
-Database Functions can also return data sets from [Tables](../../guides/database/tables) or Views.
+A database function can also return a data set from a [table](../../guides/database/tables) or a view.
 
-For example, if we had a database with some Star Wars data inside:
+For example, take a database holding some Star Wars data:
 
 <Tabs
   scrollable
@@ -212,7 +211,7 @@ values
 </TabPanel>
 </Tabs>
 
-We could create a function which returns all the planets:
+The following function returns all the planets:
 
 ```sql
 create or replace function get_planets()
@@ -223,7 +222,7 @@ as $$
 $$;
 ```
 
-Because this function returns a table set, we can also apply filters and selectors. For example, if we only wanted the first planet:
+Because this function returns a table set, you can apply filters and selectors to it. To get the first planet only:
 
 <Tabs
   scrollable
@@ -294,7 +293,7 @@ data = supabase.rpc('get_planets').eq('id', 1).execute()
 
 ## Passing parameters
 
-Create a function to insert a new planet into the `planets` table and return the new ID. Note that this time we're using the `plpgsql` language.
+Create a function that inserts a new planet into the `planets` table and returns the new ID. This function uses the `plpgsql` language.
 
 ```sql
 create or replace function add_planet(name text)
@@ -313,7 +312,7 @@ end;
 $$;
 ```
 
-Once again, you can execute this function either inside your database using a `select` query, or with the client libraries:
+You can run this function inside your database with a `select` query, or with the client libraries:
 
 <Tabs
   scrollable
@@ -413,14 +412,13 @@ await supabase.Rpc("add_planet", new Dictionary<string, object> { { "name", "Jak
 
 ### Database Functions vs Edge Functions
 
-For data-intensive operations, use Database Functions, which are executed within your database
-and can be called remotely using the [REST and GraphQL API](../api).
+For data-intensive operations, use database functions. They run inside your database, and you can call them remotely with the [REST and GraphQL API](../api).
 
-For use-cases which require low-latency, use [Edge Functions](../../guides/functions), which are globally-distributed and can be written in Typescript.
+For use cases that need low latency, use [Edge Functions](../../guides/functions). They're globally distributed and you write them in TypeScript.
 
 ### Security `definer` vs `invoker`
 
-Postgres allows you to specify whether you want the function to be executed as the user _calling_ the function (`invoker`), or as the _creator_ of the function (`definer`). For example:
+Postgres runs a function either as the user _calling_ it (`invoker`) or as its _creator_ (`definer`). For example:
 
 ```sql
 create function hello_world()
@@ -434,31 +432,31 @@ end;
 $$;
 ```
 
-It is best practice to use `security invoker` (which is also the default). If you ever use `security definer`, you _must_ set the `search_path`.
-If you use an empty search path (`search_path = ''`), you must explicitly state the schema for every relation in the function body (e.g. `from public.table`).
-This limits the potential damage if you allow access to schemas which the user executing the function should not have.
+Prefer `security invoker`, which is also the default. When you use `security definer`, you must set the `search_path`.
+
+With an empty search path, `search_path = ''`, name the schema for every relation in the function body, such as `from public.table`. An empty search path limits the damage when the function can reach a schema you don't want the calling user to reach.
 
 ### Function privileges
 
-By default, database functions can be executed by any role. There are two main ways to restrict this:
+By default, any role can run a database function. You can restrict execution in two ways:
 
-1.  On a case-by-case basis. Specifically revoke permissions for functions you want to protect. Execution needs to be revoked for both `public` and the role you're restricting:
+1.  Revoke on a case-by-case basis. Revoke execute for the functions you want to protect, from both `public` and the role you're restricting:
 
     ```sql
     revoke execute on function public.hello_world from public;
     revoke execute on function public.hello_world from anon;
     ```
 
-1.  Restrict function execution by default. Specifically _grant_ access when you want a function to be executable by a specific role.
+1.  Restrict execution by default, then grant access to the roles that need each function.
 
-    To restrict all existing functions, revoke execution permissions from both `public` _and_ the role you want to restrict:
+    To restrict every function that exists, revoke execute from both `public` and the role you want to restrict:
 
     ```sql
     revoke execute on all functions in schema public from public;
     revoke execute on all functions in schema public from anon, authenticated;
     ```
 
-    To restrict all new functions, change the default privileges for both `public` _and_ the role you want to restrict:
+    To restrict every function created later, change the default privileges for both `public` and the role you want to restrict:
 
     ```sql
     alter default privileges in schema public revoke execute on functions from public;
@@ -473,7 +471,7 @@ By default, database functions can be executed by any role. There are two main w
 
 ### Debugging functions
 
-You can add logs to help you debug functions. This is especially recommended for complex functions.
+Add logs to help you debug a function. Logs matter most in a complex function.
 
 Good targets to log include:
 
@@ -482,7 +480,7 @@ Good targets to log include:
 
 #### General logging
 
-To create custom logs in the [Dashboard's Postgres Logs](/dashboard/project/_/logs/postgres-logs), you can use the `raise` keyword. By default, there are 3 observed severity levels:
+Use the `raise` keyword to write custom logs to the [Postgres logs](/dashboard/project/_/logs/postgres-logs) in the Dashboard. Three severity levels appear by default:
 
 - `log`
 - `warning`
@@ -533,14 +531,14 @@ $$;
 select error_if_null(null);
 ```
 
-Value checking is common, so Postgres provides a shorthand: the `assert` keyword. It uses the following format:
+Value checking is common, so Postgres provides the `assert` keyword as a shorthand. It takes the following format:
 
 ```sql
 -- throw error when condition is false
 assert <some condition>, 'message';
 ```
 
-Below is an example
+For example:
 
 ```sql
 create function assert_example(name text)
@@ -567,7 +565,7 @@ $$;
 select assert_example('Harry Potter');
 ```
 
-Error messages can also be captured and modified with the `exception` keyword:
+You can also capture and modify an error message with the `exception` keyword:
 
 ```sql
 create function error_example()
@@ -587,7 +585,7 @@ $$;
 
 #### Advanced logging
 
-For more complex functions or complicated debugging, try logging:
+For a more complex function, or for harder debugging, log the following:
 
 - Formatted variables
 - Individual rows
