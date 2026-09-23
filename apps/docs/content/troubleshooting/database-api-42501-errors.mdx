@@ -13,24 +13,22 @@ http_status_code = 403
 code = "42501"
 ---
 
-[Postgres 42501 errors](https://www.postgresql.org/docs/current/errcodes-appendix.html), often reported by clients as 401 or 403 errors, imply the request lacked adequate privileges. They can be viewed in the [log explorer](/dashboard/project/_/logs/explorer?q=select%0A++++cast%28postgres_logs.timestamp+as+datetime%29+as+timestamp%2C%0A++++event_message%2C%0A++++parsed.error_severity%2C%0A++++parsed.user_name%2C%0A++++parsed.query%2C%0A++++parsed.detail%2C%0A++++parsed.hint%2C%0A++++parsed.sql_state_code%2C%0A++++parsed.backend_type%0Afrom%0A++++postgres_logs%0A++++cross+join+unnest%28metadata%29+as+metadata%0A++++cross+join+unnest%28metadata.parsed%29+as+parsed%0Awhere%0A++++parsed.sql_state_code+%3D+%2742501%27%0Aorder+by%0A++++timestamp+desc%0Alimit+100%3B%0A) by running:
+[Postgres 42501 errors](https://www.postgresql.org/docs/current/errcodes-appendix.html), often reported by clients as 401 or 403 errors, imply the request lacked adequate privileges. They can be viewed in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20timestamp%2C%0A%20%20event_message%2C%0A%20%20log_attributes%5B%27parsed.error_severity%27%5D%20as%20error_severity%2C%0A%20%20log_attributes%5B%27parsed.user_name%27%5D%20as%20user_name%2C%0A%20%20log_attributes%5B%27parsed.query%27%5D%20as%20query%2C%0A%20%20log_attributes%5B%27parsed.detail%27%5D%20as%20detail%2C%0A%20%20log_attributes%5B%27parsed.hint%27%5D%20as%20hint%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27postgres_logs%27%0A%20%20and%20log_attributes%5B%27parsed.error_severity%27%5D%20in%20%28%27ERROR%27%2C%20%27FATAL%27%2C%20%27PANIC%27%29%0A%20%20and%20log_attributes%5B%27parsed.sql_state_code%27%5D%20%3D%20%2742501%27%0Aorder%20by%20timestamp%20desc%0Alimit%20100%3B) by running:
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
+  timestamp,
   event_message,
-  parsed.error_severity,
-  parsed.user_name,
-  parsed.query,
-  parsed.detail,
-  parsed.hint
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.query'] as query,
+  log_attributes['parsed.detail'] as detail,
+  log_attributes['parsed.hint'] as hint
+from logs
 where
-  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
-  and parsed.sql_state_code = '42501'
+  source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+  and log_attributes['parsed.sql_state_code'] = '42501'
 order by timestamp desc
 limit 100;
 ```

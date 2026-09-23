@@ -47,7 +47,7 @@ const handleSocialLogin = async (e: Event) => {
           <div class="flex flex-col gap-6">
             <p v-if="error" class="text-sm text-destructive-500">{{ error }}</p>
             <Button type="submit" class="w-full" :disabled="isLoading">
-              {{ isLoading ? "Logging in..." : "Continue with GitHub" }}
+              {{ isLoading ? "Signing in..." : "Continue with GitHub" }}
             </Button>
           </div>
         </form>

@@ -1,6 +1,17 @@
 module.exports = [
   {
     permanent: true,
+    source: '/images/customers/logos/light/:path*',
+    destination: '/images/customers/logos/on-dark/:path*',
+  },
+  // Legacy root wordmarks moved to on-light/. Keep dreambase-mark.png at logos/ root.
+  {
+    permanent: true,
+    source: '/images/customers/logos/:slug((?!dreambase-mark\\.png)[^/.]+).png',
+    destination: '/images/customers/logos/on-light/:slug.png',
+  },
+  {
+    permanent: true,
     source: '/blog/pricing',
     destination: '/pricing',
   },
@@ -33,6 +44,16 @@ module.exports = [
     permanent: true,
     source: '/ui/docs/ai-editors-rules/skills',
     destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/ui',
+    destination: '/library',
+  },
+  {
+    permanent: true,
+    source: '/ui/:path*',
+    destination: '/library/:path*',
   },
   {
     permanent: true,
@@ -86,13 +107,63 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/security',
+    destination: '/docs/guides/storage/security/ownership',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/serving',
+    destination: '/docs/guides/storage/serving/downloads',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/management',
+    destination: '/docs/guides/storage/management/copy-move-objects',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/s3',
+    destination: '/docs/guides/storage/s3/authentication',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/debugging',
+    destination: '/docs/guides/storage/debugging/logs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/schema',
+    destination: '/docs/guides/storage/schema/design',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/production',
+    destination: '/docs/guides/storage/production/scaling',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/vector',
+    destination: '/docs/guides/storage/vector/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/analytics/examples',
+    destination: '/docs/guides/storage/analytics/examples/duckdb',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgrest',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/storage/image-transformations',
     destination: '/docs/guides/storage/serving/image-transformations',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/access-control',
-    destination: 'docs/guides/storage/security/access-control',
+    destination: '/docs/guides/storage/security/access-control',
   },
   {
     permanent: true,
@@ -116,13 +187,38 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/observability/access-data',
+    destination: '/docs/guides/observability',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/reports/:match*',
     destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: true,
     source: '/docs/guides/telemetry/:match*',
-    destination: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging',
+    destination: '/docs/guides/observability',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/resolve-issues',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/debugging',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: false,
@@ -2081,7 +2177,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
+  },
+  // 'start' was never a real API reference slug — it only ever worked because
+  // the old /reference/api/* routing collapsed every sub-path to the same
+  // monolith, and the bare /docs/reference/api redirect pointed here for years.
+  // Keep redirecting so external links and bookmarks don't 404 now that only
+  // real slugs resolve.
+  {
+    permanent: true,
+    source: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
   },
   {
     permanent: true,
@@ -2251,6 +2357,11 @@ module.exports = [
     permanent: true,
     source: '/customers/mendableai',
     destination: '/customers/firecrawl',
+  },
+  {
+    permanent: true,
+    source: '/customers/lingo-dev',
+    destination: '/customers/lingodotdev',
   },
 
   {
@@ -2722,8 +2833,18 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/inspect',
+    destination: '/docs/guides/observability/inspect',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/database-linter',
-    destination: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/observability/advisors',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/observability/advisors',
   },
   {
     permanent: true,
@@ -2804,6 +2925,26 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
     destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/bigquery',
+    destination: '/docs/guides/database/replication/pipelines/bigquery',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/clickhouse',
+    destination: '/docs/guides/database/replication/pipelines/clickhouse',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/ducklake',
+    destination: '/docs/guides/database/replication/pipelines/ducklake',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/snowflake',
+    destination: '/docs/guides/database/replication/pipelines/snowflake',
   },
   {
     permanent: true,
@@ -2905,6 +3046,31 @@ module.exports = [
     permanent: true,
     source: '/launchweek',
     destination: '/launch-week',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/6',
+    destination: '/blog/launch-week-6-wrap-up',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/x',
+    destination: '/blog/launch-week-x-best-launches',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/12',
+    destination: '/blog/launch-week-12-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/13',
+    destination: '/blog/launch-week-13-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/14',
+    destination: '/blog/launch-week-14-top-10',
   },
   {
     permanent: true,
@@ -3328,7 +3494,7 @@ module.exports = [
     permanent: false,
   },
   // Legacy product .txt URLs → new .md routes
-  { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
+  { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
   { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
   { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
@@ -3337,4 +3503,7 @@ module.exports = [
   { permanent: true, source: '/llms/vector.txt', destination: '/modules/vector.md' },
   { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
   { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
+  { permanent: true, source: '/homepage.md', destination: '/index.md' },
+  { permanent: true, source: '/.md', destination: '/index.md' },
+  { permanent: true, source: '/index', destination: '/' },
 ]

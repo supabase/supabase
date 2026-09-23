@@ -27,6 +27,7 @@ export const HOSTED_SUPPORTED_API_URLS = [
   '/api/integrations/stripe-sync',
   '/content/graphql',
   '/parse-query',
+  '/scoped-access-token-permissions',
 ]
 
 // `pathname` must be basePath-relative — Next's `nextUrl.pathname` already is,

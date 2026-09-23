@@ -23,7 +23,7 @@ export function MessageActions({
   alwaysShow = false,
 }: PropsWithChildren<{ alwaysShow?: boolean }>) {
   return (
-    <div className="flex items-center gap-4 mt-2 mb-1">
+    <div className="w-full max-w-3xl mx-auto flex items-center gap-4 mt-2 mb-1">
       <span className="h-0.5 w-5 bg-muted" />
       <div className={cn('group-hover:opacity-100 transition-opacity', !alwaysShow && 'opacity-0')}>
         {children}
@@ -120,7 +120,7 @@ function MessageActionsThumbsUp({
           strokeWidth={1.5}
           className={cn(
             isActive
-              ? 'text-brand hover:text-brand-700'
+              ? 'text-primary hover:text-brand-700'
               : 'text-foreground-light hover:text-foreground'
           )}
         />

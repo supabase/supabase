@@ -2,10 +2,20 @@
 
 import { ReferenceContentInitiallyScrolledContext } from '~/features/docs/Reference.navigation.client'
 import { safeHistoryReplaceState } from '~/lib/historyUtils'
+import { XCircle } from 'lucide-react'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { cn, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
+import {
+  cn,
+  CollapsibleTrigger,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
 
 import { type IApiEndPoint } from './Reference.api.utils'
 import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
@@ -104,5 +114,14 @@ export function ApiOperationBodySchemeSelector({
         </SelectContent>
       </Select>
     </div>
+  )
+}
+
+export function DetailsTrigger({ label, className }: { label: string; className?: string }) {
+  return (
+    <CollapsibleTrigger className={cn('group reference-details-trigger', className)}>
+      <XCircle size={14} aria-hidden="true" className="reference-details-trigger-icon" />
+      {label}
+    </CollapsibleTrigger>
   )
 }

@@ -26,7 +26,6 @@ describe('SkipToContent', () => {
     const wrapper = container.firstElementChild as HTMLElement
     expect(wrapper.className).toContain('-translate-y-full')
     expect(wrapper.className).toContain('focus-within:translate-y-[10px]')
-    expect(wrapper.className).toContain('bg-background')
     expect(wrapper.className).toContain('w-fit')
     expect(wrapper.className).toContain('left-[10px]')
   })
@@ -35,6 +34,8 @@ describe('SkipToContent', () => {
     render(<SkipToContent href="#main" />)
 
     const link = screen.getByRole('link', { name: 'Skip to content' })
+    expect(link.className).toContain('hover:bg-muted')
+    expect(link.className).toContain('dark:hover:bg-accent')
     expect(link.className).not.toContain('bg-surface-300')
     expect(link.className).not.toContain('hover:bg-secondary')
   })

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { RowIcon } from './FileExplorerRow'
+import { StorageRowIcon } from '../StorageRowIcon'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerRowEditingProps {
@@ -94,7 +94,7 @@ export const FileExplorerRowEditing = ({
     >
       <div className="flex h-full grow items-center px-2.5">
         <div>
-          <RowIcon
+          <StorageRowIcon
             view={view}
             status={item.status}
             fileType={item.type}

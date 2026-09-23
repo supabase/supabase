@@ -1,4 +1,4 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -6,8 +6,10 @@ import { useRouter } from 'next/router'
 import {
   forwardRef,
   Fragment,
+  isValidElement,
   useEffect,
   useLayoutEffect,
+  useRef,
   type PropsWithChildren,
   type ReactNode,
 } from 'react'
@@ -27,7 +29,7 @@ import {
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
-import ProductMenuBar from '../Navigation/ProductMenuBar'
+import { ProductMenuBar } from '../Navigation/ProductMenuBar'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { getSectionKeyFromPathname, MobileMenuContent } from './LayoutHeader/MobileMenuContent'
@@ -42,8 +44,8 @@ import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
-import { BannerUnifiedLogs } from '@/components/ui/BannerStack/Banners/BannerUnifiedLogs'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -106,6 +108,8 @@ export interface ProjectLayoutProps {
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
+  productMenuBadge?: ReactNode
+  productMenuHeader?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {
     entity?: string
@@ -124,6 +128,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isLoading = false,
       isBlocking = true,
       product = '',
+      productMenuBadge,
+      productMenuHeader,
       productMenu,
       browserTitle,
       children,
@@ -151,12 +157,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+
+    const isExplorerEnabled = useFlag('explorer')
+
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
-      false
-    )
-    const [isUnifiedLogsBannerDismissed] = useLocalStorageQuery(
-      LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
       false
     )
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
@@ -167,8 +172,17 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         }),
         false
       )
+    const [isExplorerBannerDismissed, , { isSuccess: isLocalStorageReady }] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.EXPLORER_BANNER_DISMISSED,
+      false
+    )
+
     const { showSidebar } = useAppStateSnapshot()
-    const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
+    const {
+      content: mobileSheetContent,
+      setContent: setMobileSheetContent,
+      registerOpenMenu,
+    } = useMobileSheet()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
@@ -237,32 +251,46 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ])
 
     useEffect(() => {
-      if (!selectedProject?.ref) return
-      if (IS_PLATFORM && !isUnifiedLogsBannerDismissed) {
-        addBanner({
-          id: BANNER_ID.UNIFIED_LOGS,
-          isDismissed: false,
-          content: <BannerUnifiedLogs />,
-          priority: 1,
-        })
-      } else {
-        dismissBanner(BANNER_ID.UNIFIED_LOGS)
-      }
-    }, [selectedProject?.ref, isUnifiedLogsBannerDismissed, addBanner, dismissBanner])
+      if (!isExplorerEnabled || !isLocalStorageReady || isExplorerBannerDismissed) return
+
+      addBanner({
+        id: 'explorer-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerExplorer />,
+      })
+    }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
+
+    const mobileSheetContentRef = useRef(mobileSheetContent)
+    useLayoutEffect(() => {
+      mobileSheetContentRef.current = mobileSheetContent
+    }, [mobileSheetContent])
 
     useLayoutEffect(() => {
-      const unregister = registerOpenMenu(() => {
-        setMobileSheetContent(
-          <MobileMenuContent
-            currentProductMenu={productMenu ?? null}
-            currentProduct={product}
-            currentSectionKey={currentSectionKey}
-            onCloseSheet={() => setMobileSheetContent(null)}
-          />
-        )
-      })
+      const menu = (
+        <MobileMenuContent
+          currentProductMenu={productMenu ?? null}
+          currentProductMenuHeader={productMenuHeader}
+          currentProduct={product}
+          currentSectionKey={currentSectionKey}
+          onCloseSheet={() => setMobileSheetContent(null)}
+        />
+      )
+      const unregister = registerOpenMenu(() => setMobileSheetContent(menu))
+      // Keep resource navigation in an already open sheet in sync with the layout.
+      const currentContent = mobileSheetContentRef.current
+      if (isValidElement(currentContent) && currentContent.type === MobileMenuContent) {
+        setMobileSheetContent(menu)
+      }
       return unregister
-    }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
+    }, [
+      registerOpenMenu,
+      productMenu,
+      productMenuHeader,
+      product,
+      currentSectionKey,
+      setMobileSheetContent,
+    ])
 
     useLayoutEffect(() => {
       mainScrollContainer?.scrollTo({ top: 0, left: 0 })
@@ -298,7 +326,12 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       isBlocking={isBlocking}
                       productMenu={productMenu}
                     >
-                      <ProductMenuBar title={product} className={productMenuClassName}>
+                      <ProductMenuBar
+                        title={product}
+                        titleBadge={productMenuBadge}
+                        header={productMenuHeader}
+                        className={productMenuClassName}
+                      >
                         {productMenu}
                       </ProductMenuBar>
                     </MenuBarWrapper>

@@ -17,13 +17,13 @@ export function EdgeFunctionsContent() {
       </section>
       <section id="quote" className="border-t border-border" aria-label="Customer quote">
         <QuoteSection
-          quote="Supabase gave us the flexibility and scalability needed at every growth stage."
-          highlight="It's rare to find a tool that works just as well for startups as it does for large-scale operations."
+          quote="The thing that makes everything possible, all of our rapid development now and AI-generated or assisted development, is Supabase."
+          highlight="That's the giant whose shoulders we can stand on."
           author={{
-            name: 'Zeno Rocha',
-            role: 'CEO at Resend',
-            image: '/images/blog/avatars/zeno-rocha.png',
-            link: '/customers/resend',
+            name: 'Seth Siegler',
+            role: 'Chief Innovation Officer at eXp Realty',
+            image: '/images/blog/avatars/seth-siegler.jpg',
+            link: '/customers/exprealty',
           }}
         />
       </section>

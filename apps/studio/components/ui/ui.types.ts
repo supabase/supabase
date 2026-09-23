@@ -10,6 +10,7 @@ export interface Route {
   disabled?: boolean
   linkElement?: ReactNode
   items?: any | Route[]
+  isNew?: boolean
   /**
    * Binds a registered keyboard shortcut to this route when set. The sidebar
    * entry shows the keybind on hover and jumps to `link` when the shortcut

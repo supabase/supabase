@@ -4,15 +4,11 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { Results } from './Results'
-import { getSqlErrorLines } from './UtilityTabResults.utils'
-import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
+import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { getSqlErrorLines } from '@/data/sql/utils'
 import { DOCS_URL } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
@@ -30,16 +26,10 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
   ({ id, isExecuting, isDisabled, isDebugging, onDebug, buildDebugPrompt }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
-    const { data: organization } = useSelectedOrganizationQuery()
     const sessionSnap = useSqlEditorSessionSnapshot()
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
     const result = sessionSnap.results[id]?.[0]
-    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-
-    // Customers on HIPAA plans should not have access to Supabase AI
-    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
-    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
     const isTimeout =
       result?.error?.message?.includes('canceling statement due to statement timeout') ||
@@ -136,7 +126,6 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {readReplicaError && (
                 <Button
                   className="py-2"
-                  variant="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
                     sessionSnap.resetResult(id)
@@ -155,16 +144,14 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
                   </TooltipContent>
                 </Tooltip>
               )}
-              {!hasHipaaAddon && (
-                <AiAssistantDropdown
-                  label="Debug with Assistant"
-                  buildPrompt={buildDebugPrompt}
-                  onOpenAssistant={onDebug}
-                  telemetrySource="sql_debug"
-                  disabled={!!isDisabled || isDebugging}
-                  loading={isDebugging}
-                />
-              )}
+              <AiAssistantDropdown
+                label="Debug with Assistant"
+                buildPrompt={buildDebugPrompt}
+                onOpenAssistant={onDebug}
+                telemetrySource="sql_debug"
+                disabled={!!isDisabled || isDebugging}
+                loading={isDebugging}
+              />
             </div>
           </div>
         </div>
@@ -185,7 +172,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       )
     }
 
-    return <Results rows={result.rows} />
+    return <DataGridResults rows={result.rows} />
   }
 )
 

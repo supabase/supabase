@@ -1,7 +1,7 @@
 'use client'
 
 import { useFeatureFlags } from 'common'
-import { Copy, EyeOff, Search, X } from 'lucide-react'
+import { Copy, Search, X } from 'lucide-react'
 import Image from 'next/image'
 import {
   useCallback,
@@ -85,13 +85,13 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
             <span
               className={cn(
                 'w-1.5 h-1.5 rounded-[2px] shrink-0',
-                event.source === 'client' ? 'bg-brand' : 'bg-foreground-lighter'
+                event.source === 'client' ? 'bg-brand-default' : 'bg-foreground-lighter'
               )}
             />
             <span
               className={cn(
                 'font-mono text-xs uppercase',
-                event.source === 'client' ? 'text-brand' : 'text-foreground-light'
+                event.source === 'client' ? 'text-primary' : 'text-foreground-light'
               )}
             >
               {event.source}
@@ -208,7 +208,7 @@ function FlagRow({
 }
 
 export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
-  const { isEnabled, isOpen, setIsOpen, events, setEvents, dismissToolbar } = useDevToolbar()
+  const { isEnabled, isOpen, setIsOpen, events, setEvents } = useDevToolbar()
   const [activeTab, setActiveTab] = useState<string>('events')
   const [flagsSubTab, setFlagsSubTab] = useState<'posthog' | 'configcat'>('posthog')
   const [eventFilter, setEventFilter] = useState<string>('')
@@ -423,17 +423,6 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
               <div className="ml-auto flex items-center gap-2">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="text"
-                      icon={<EyeOff className="w-4 h-4" />}
-                      onClick={dismissToolbar}
-                      className="text-foreground-light hover:text-foreground p-1"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Hide Dev Toolbar</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <SheetClose asChild>
                       <Button
                         variant="text"
@@ -464,7 +453,6 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                     </InputGroupAddon>
                   </InputGroup>
                   <Button
-                    variant="default"
                     onClick={() => setEvents([])}
                     className="text-foreground-lighter hover:text-foreground"
                   >

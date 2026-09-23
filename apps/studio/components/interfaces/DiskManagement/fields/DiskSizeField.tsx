@@ -38,7 +38,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
 
   const { error: diskAttributesError, isError: isDiskAttributesError } = useDiskAttributesQuery(
     { projectRef },
-    { enabled: project && project.cloud_provider !== 'FLY' }
+    { enabled: !!project }
   )
 
   const {
@@ -95,7 +95,6 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                 form={form}
                 actions={
                   <Button
-                    variant="default"
                     onClick={() => {
                       setValue('storageType', 'io2', { shouldDirty: true })
                       trigger('provisionedIOPS')

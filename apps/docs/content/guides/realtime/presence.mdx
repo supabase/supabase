@@ -127,6 +127,19 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var supabase = new Supabase.Client(
+    "https://<project>.supabase.co",
+    "<sb_publishable_... key>"
+);
+await supabase.InitializeAsync();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### Sync and track state
@@ -237,6 +250,36 @@ room_one
   .on_presence_join(lambda key, curr_presences, joined_presences: print('join', key, curr_presences, joined_presences))
   .on_presence_leave(lambda key, curr_presences, left_presences: print('leave', key, curr_presences, left_presences))
   .subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+Listen to the `Sync`, `Join`, and `Leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
+
+```c#
+class UserStatus : BasePresence
+{
+    [JsonProperty("user")]
+    public string User { get; set; }
+
+    [JsonProperty("online_at")]
+    public string OnlineAt { get; set; }
+}
+
+var roomOne = supabase.Realtime.Channel("room_01");
+var presence = roomOne.Register<UserStatus>(Guid.NewGuid().ToString());
+
+presence.AddPresenceEventHandler(EventType.Sync, (sender, type) =>
+{
+    Console.WriteLine($"sync: {presence.CurrentState}");
+});
+presence.AddPresenceEventHandler(EventType.Join, (sender, type) => Console.WriteLine("join"));
+presence.AddPresenceEventHandler(EventType.Leave, (sender, type) => Console.WriteLine("leave"));
+
+await roomOne.Subscribe();
 ```
 
 </TabPanel>
@@ -366,6 +409,24 @@ room_one.subscribe(on_subscribe)
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var roomOne = supabase.Realtime.Channel("room_01");
+var presence = roomOne.Register<UserStatus>(Guid.NewGuid().ToString());
+
+await roomOne.Subscribe();
+
+await presence.Track(new UserStatus
+{
+    User = "user-1",
+    OnlineAt = DateTime.UtcNow.ToString("o")
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 A client will receive state from any other client that is subscribed to the same topic (in this case `room_01`). It will also automatically trigger its own `sync` and `join` event handlers.
@@ -442,6 +503,15 @@ untrackPresence()
 
 ```python
 room_one.untrack()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await presence.Untrack();
 ```
 
 </TabPanel>
@@ -527,6 +597,16 @@ channel_c = supabase.channel('test', {
     },
   },
 })
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channelC = supabase.Realtime.Channel("test");
+var presence = channelC.Register<UserStatus>("userId-123");
 ```
 
 </TabPanel>

@@ -9,9 +9,14 @@ import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type SqlSnippet = Extract<Content, { type: 'sql' }>
 
+/** The snippet content types this query can list. Defaults to `'sql'`; the nav's
+ *  Logs section passes `'log_sql'` to list logs snippets through the same shape. */
+type SqlSnippetType = 'sql' | 'log_sql'
+
 interface GetSqlSnippetsVariables {
   projectRef?: string
   cursor?: string
+  type?: SqlSnippetType
   visibility?: SqlSnippet['visibility']
   favorite?: boolean
   name?: string
@@ -19,7 +24,7 @@ interface GetSqlSnippetsVariables {
 }
 
 export async function getSqlSnippets(
-  { projectRef, cursor, visibility, favorite, name, sort }: GetSqlSnippetsVariables,
+  { projectRef, cursor, type = 'sql', visibility, favorite, name, sort }: GetSqlSnippetsVariables,
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') {
@@ -32,10 +37,10 @@ export async function getSqlSnippets(
     params: {
       path: { ref: projectRef },
       query: {
-        type: 'sql',
+        type,
         cursor,
         visibility,
-        favorite,
+        favorite: favorite?.toString(),
         name,
         limit: SNIPPET_PAGE_LIMIT.toString(),
         sort_by: sort,
@@ -60,7 +65,14 @@ export type SqlSnippetsData = Awaited<ReturnType<typeof getSqlSnippets>>
 export type SqlSnippetsError = unknown
 
 export const useSqlSnippetsQuery = <TData = SqlSnippetsData>(
-  { projectRef, sort, name, visibility, favorite }: Omit<GetSqlSnippetsVariables, 'cursor'>,
+  {
+    projectRef,
+    type = 'sql',
+    sort,
+    name,
+    visibility,
+    favorite,
+  }: Omit<GetSqlSnippetsVariables, 'cursor'>,
   {
     enabled = true,
     ...options
@@ -73,9 +85,9 @@ export const useSqlSnippetsQuery = <TData = SqlSnippetsData>(
   > = {}
 ) =>
   useInfiniteQuery({
-    queryKey: contentKeys.sqlSnippets(projectRef, { sort, name, visibility, favorite }),
+    queryKey: contentKeys.sqlSnippets(projectRef, { type, sort, name, visibility, favorite }),
     queryFn: ({ signal, pageParam: cursor }) =>
-      getSqlSnippets({ projectRef, cursor, sort, name, visibility, favorite }, signal),
+      getSqlSnippets({ projectRef, cursor, type, sort, name, visibility, favorite }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     initialPageParam: undefined,
     getNextPageParam(lastPage) {

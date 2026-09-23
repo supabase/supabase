@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, FloatingPlate } from 'ui'
 
 export interface SkipToContentProps {
   /** Hash href to the main content landmark, e.g. `#main`. */
@@ -17,20 +17,18 @@ export interface SkipToContentProps {
  */
 function SkipToContent({ href, children = 'Skip to content', className }: SkipToContentProps) {
   return (
-    <div
+    <FloatingPlate
       className={cn(
-        // Opaque plate so default Button muted/selection fills composite like any other control.
-        // w-fit: plate is a block div by default and would otherwise span the full content column.
-        'fixed top-0 left-[10px] z-[100] w-fit rounded-md bg-background',
+        'fixed top-0 left-[10px] z-[100] w-fit',
         '-translate-y-full focus-within:translate-y-[10px]',
         'transition-transform duration-200 ease-out',
         className
       )}
     >
-      <Button size="tiny" variant="default" asChild>
+      <Button size="tiny" asChild>
         <a href={href}>{children}</a>
       </Button>
-    </div>
+    </FloatingPlate>
   )
 }
 

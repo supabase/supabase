@@ -195,25 +195,27 @@ export async function selectInitialOrgAndProject({
   if (projectRef) {
     try {
       const projectDetails = await getProjectDetail({ ref: projectRef })
-      if (projectDetails?.organization_id) {
-        const org = orgs.find((o) => o.id === projectDetails.organization_id)
-        if (org?.slug) {
-          return {
-            projectRef,
-            orgSlug: org.slug,
-          }
+      const projectOrg = orgs.find((o) => o.id === projectDetails?.organization_id)
+      if (projectOrg?.slug) {
+        return {
+          projectRef,
+          orgSlug: projectOrg.slug,
         }
       }
     } catch {
-      // Can safely ignore, consider provided project ref invalid
+      // Can safely ignore, fall through to the orgSlug fallback below
     }
   }
 
+  // Reached when there's no projectRef, or the project lookup above failed to
+  // resolve a known org (e.g. the Management API request errored). Returning
+  // `projectRef` here (rather than hardcoding `null`) preserves it when we
+  // still have one, instead of silently discarding it.
   if (orgSlug) {
     const org = orgs.find((o) => o.slug === orgSlug)
     if (org?.slug) {
       return {
-        projectRef: null,
+        projectRef,
         orgSlug: org.slug,
       }
     }
@@ -223,4 +225,35 @@ export async function selectInitialOrgAndProject({
     projectRef: null,
     orgSlug: orgs[0]?.slug ?? null,
   }
+}
+
+// Chrome blocks scrollIntoView (triggered by .focus()) when overflow-x: hidden and
+// overflow-y: auto are on the same element. Manually scroll the sidebar instead.
+export function scrollToRequiredField(formId: string, fieldName: string) {
+  const form = document.getElementById(formId)
+  if (!form) return
+
+  // Selects use data-support-field since they have no name attr; inputs/textareas use name.
+  const el =
+    form.querySelector(`[data-support-field="${fieldName}"]`) ??
+    form.querySelector(`[name="${fieldName}"]`)
+  if (!(el instanceof HTMLElement)) return
+
+  const scrollContainer = findScrollableParent(el)
+  if (scrollContainer) {
+    const offset = el.getBoundingClientRect().top - scrollContainer.getBoundingClientRect().top - 80
+    scrollContainer.scrollTo({ top: scrollContainer.scrollTop + offset, behavior: 'smooth' })
+  }
+
+  el.focus({ preventScroll: true })
+}
+
+function findScrollableParent(el: HTMLElement): HTMLElement | null {
+  let parent = el.parentElement
+  while (parent && parent !== document.body) {
+    const { overflowY } = window.getComputedStyle(parent)
+    if (overflowY === 'auto' || overflowY === 'scroll') return parent
+    parent = parent.parentElement
+  }
+  return null
 }

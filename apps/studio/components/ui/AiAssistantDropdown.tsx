@@ -133,7 +133,11 @@ export function AiAssistantDropdown({
         disabled={disabled}
         onClick={handleOpenAssistant}
         icon={<AiIconAnimation size={iconOnly ? 16 : 14} loading={loading} />}
-        className={cn('rounded-r-none border-r-0', iconOnly && 'px-1.5', className)}
+        className={cn(
+          'rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm',
+          iconOnly && 'px-1.5',
+          className
+        )}
       >
         {!iconOnly && label}
       </Button>
@@ -146,13 +150,13 @@ export function AiAssistantDropdown({
             variant={variant}
             size={size}
             disabled={disabled}
-            className={cn('rounded-l-none px-1', iconOnly && 'px-1')}
+            className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
             icon={<ChevronDown size={12} />}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem onClick={handleCopyPrompt} className="gap-2">
-            {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
+            {showCopied ? <Check size={14} className="text-primary" /> : <Copy size={14} />}
             {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
 

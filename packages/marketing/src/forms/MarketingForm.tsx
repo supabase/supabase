@@ -169,7 +169,10 @@ function Field({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm text-foreground font-medium">{field.label}</label>
+      <div className="flex flex-col gap-0.5">
+        <label className="text-sm text-foreground font-medium">{field.label}</label>
+        {field.hint && <p className="text-xs text-foreground-lighter italic">{field.hint}</p>}
+      </div>
       <FieldInput field={field} value={value} onChange={onChange} />
       {field.description && (
         <p className="text-xs text-foreground-lighter leading-relaxed">{field.description}</p>
@@ -447,7 +450,7 @@ export default function MarketingForm({
         </Button>
 
         {disclaimer && (
-          <div className="text-xs text-foreground-lighter leading-relaxed [&_a]:text-brand-link [&_a]:decoration-brand-link">
+          <div className="text-xs text-foreground-lighter leading-relaxed [&_a]:text-primary [&_a]:decoration-brand">
             <ReactMarkdown
               components={{
                 p: ({ children }) => <p>{children}</p>,

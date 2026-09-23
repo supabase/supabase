@@ -1,3 +1,5 @@
+const LIBRARY_URL = process.env.NEXT_PUBLIC_LIBRARY_URL ?? process.env.NEXT_PUBLIC_UI_LIBRARY_URL
+
 const rewrites = [
   {
     source: '/:path*',
@@ -22,12 +24,12 @@ const rewrites = [
       ]
     : []),
   {
-    source: '/ui',
-    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}`,
+    source: '/library',
+    destination: `${LIBRARY_URL}`,
   },
   {
-    source: '/ui/:path*',
-    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
+    source: '/library/:path*',
+    destination: `${LIBRARY_URL}/:path*`,
   },
   {
     source: '/design-system',
@@ -36,6 +38,14 @@ const rewrites = [
   {
     source: '/design-system/:path*',
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
+  },
+  {
+    source: '/kb',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}`,
+  },
+  {
+    source: '/kb/:path*',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}/:path*`,
   },
   {
     source: '/evals',
@@ -72,6 +82,15 @@ const rewrites = [
   {
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
+  },
+  {
+    // legacy AI Catalog path; /.well-known/ard.json is the canonical source
+    source: '/.well-known/ai-catalog.json',
+    destination: '/.well-known/ard.json',
+  },
+  {
+    source: '/openapi.json',
+    destination: 'https://api.supabase.com/api/v1-json',
   },
   { source: '/feed.xml', destination: `/rss.xml` },
 ]

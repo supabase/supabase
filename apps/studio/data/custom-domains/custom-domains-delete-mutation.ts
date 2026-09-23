@@ -18,7 +18,7 @@ export async function deleteCustomDomain({
   const { data, error } = await del(`/v1/projects/{ref}/custom-hostname`, {
     params: {
       path: { ref: projectRef },
-      query: { remove_addon: removeAddon },
+      query: { remove_addon: removeAddon ? 'true' : 'false' },
     },
   })
 

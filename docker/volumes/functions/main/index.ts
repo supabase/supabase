@@ -4,7 +4,21 @@ console.log('main function started')
 
 const JWT_SECRET = Deno.env.get('JWT_SECRET')
 const SUPABASE_JWKS = parseJwks(Deno.env.get('SUPABASE_JWKS'))
+const LOCAL_JWKS = SUPABASE_JWKS ? jose.createLocalJWKSet(SUPABASE_JWKS) : null
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
+
+type AuthFailure = {
+  code: RequestErrors
+  message?: string
+}
+
+export enum RequestErrors {
+  InvalidLegacyJWT = 'UNAUTHORIZED_LEGACY_JWT',
+  InvalidAsymmetricJWT = 'UNAUTHORIZED_ASYMMETRIC_JWT',
+  InvalidTokenFormat = 'UNAUTHORIZED_INVALID_JWT_FORMAT',
+  UnsupportedTokenAlgorithm = 'UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM',
+  MissingAuthHeader = 'UNAUTHORIZED_NO_AUTH_HEADER',
+}
 
 // NOTE:(kallebysantos) We don't check for valid keys but just the bare array parsing,
 // let this for 'jose' lib verification
@@ -28,25 +42,49 @@ export function parseJwks(raw: string | undefined): jose.JSONWebKeySet | null {
  * Expects format: "Bearer <token>"
  *
  * @param req - The HTTP request object
- * @returns The JWT token string
- * @throws Error if Authorization header is missing or malformed
+ * @returns The JWT token string or an authentication failure
  */
-function getAuthToken(req: Request) {
+function getAuthToken(req: Request): string | AuthFailure {
   const authHeader = req.headers.get('authorization')
   if (!authHeader) {
-    throw new Error('Missing authorization header')
+    return {
+      code: RequestErrors.MissingAuthHeader,
+      message: 'Missing authorization header',
+    }
   }
-  const [bearer, token] = authHeader.split(' ')
-  if (bearer !== 'Bearer') {
-    throw new Error(`Auth header is not 'Bearer {token}'`)
+  const tokenParts = authHeader.trim().split(/\s+/)
+  const [bearer, token] = tokenParts
+  if (bearer.toLowerCase() !== 'bearer' || tokenParts.length !== 2 || !token) {
+    return {
+      code: RequestErrors.InvalidTokenFormat,
+      message: 'Invalid JWT format',
+    }
   }
   return token
 }
 
-async function isValidLegacyJWT(jwt: string): Promise<boolean> {
+function getAuthErrorResponse({ code, message = 'Invalid JWT' }: AuthFailure) {
+  return Response.json(
+    {
+      code,
+      message,
+      // DEPRECATED: Retained for backward compatibility.
+      msg: message,
+    },
+    {
+      status: 401,
+      headers: {
+        'sb-error-code': code,
+        'Access-Control-Expose-Headers': 'sb-error-code',
+      },
+    }
+  )
+}
+
+async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
   if (!JWT_SECRET) {
     console.error('JWT_SECRET not available for HS256 token verification')
-    return false
+    return { code: RequestErrors.InvalidLegacyJWT }
   }
 
   const encoder = new TextEncoder();
@@ -56,26 +94,25 @@ async function isValidLegacyJWT(jwt: string): Promise<boolean> {
     await jose.jwtVerify(jwt, secretKey);
   } catch (e) {
     console.error('Symmetric Legacy JWT verification error', e);
-    return false;
+    return { code: RequestErrors.InvalidLegacyJWT }
   }
-  return true;
+  return null
 }
 
-async function isValidJWT(jwt: string): Promise<boolean> {
-  if (!SUPABASE_JWKS) {
+async function isValidJWT(jwt: string): Promise<AuthFailure | null> {
+  if (!LOCAL_JWKS) {
     console.error('JWKS not available for ES256/RS256 token verification')
-    return false
+    return { code: RequestErrors.InvalidAsymmetricJWT }
   }
 
   try {
-    const localJwks = jose.createLocalJWKSet(SUPABASE_JWKS);
-    await jose.jwtVerify(jwt, localJwks);
+    await jose.jwtVerify(jwt, LOCAL_JWKS);
   } catch (e) {
     console.error('Asymmetric JWT verification error', e);
-    return false
+    return { code: RequestErrors.InvalidAsymmetricJWT }
   }
 
-  return true;
+  return null
 }
 
 /**
@@ -90,10 +127,26 @@ async function isValidJWT(jwt: string): Promise<boolean> {
  * resolving the "Key for the ES256 algorithm must be of type CryptoKey" error.
  * 
  * @param jwt - The JWT token string to verify
- * @returns Promise resolving to true if verification succeeds, false otherwise
+ * @returns Authentication failure details, or null when verification succeeds
  */
-async function isValidHybridJWT(jwt: string): Promise<boolean> {
-  const { alg: jwtAlgorithm } = jose.decodeProtectedHeader(jwt)
+async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
+  let jwtAlgorithm: string | undefined
+  try {
+    jwtAlgorithm = jose.decodeProtectedHeader(jwt).alg
+  } catch (e) {
+    console.error('JWT format error', e)
+    return {
+      code: RequestErrors.InvalidTokenFormat,
+      message: 'Invalid JWT format',
+    }
+  }
+
+  if (!jwtAlgorithm) {
+    return {
+      code: RequestErrors.InvalidTokenFormat,
+      message: 'Invalid JWT format',
+    }
+  }
 
   if (jwtAlgorithm === 'HS256') {
     console.log(`Legacy token type detected, attempting ${jwtAlgorithm} verification.`)
@@ -105,26 +158,28 @@ async function isValidHybridJWT(jwt: string): Promise<boolean> {
     return await isValidJWT(jwt)
   }
 
-  return false;
+  return {
+    code: RequestErrors.UnsupportedTokenAlgorithm,
+    message: `Unsupported JWT algorithm ${jwtAlgorithm}`,
+  }
 }
 
 Deno.serve(async (req: Request) => {
   if (req.method !== 'OPTIONS' && VERIFY_JWT) {
     try {
       const token = getAuthToken(req)
-      const isValidJWT = await isValidHybridJWT(token);
-
-      if (!isValidJWT) {
-        return new Response(JSON.stringify({ msg: 'Invalid JWT' }), {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        })
+      if (typeof token !== 'string') {
+        return getAuthErrorResponse(token)
+      }
+      const authFailure = await isValidHybridJWT(token)
+      if (authFailure) {
+        return getAuthErrorResponse(authFailure)
       }
     } catch (e) {
       console.error(e)
-      return new Response(JSON.stringify({ msg: e.toString() }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
+      return getAuthErrorResponse({
+        code: RequestErrors.InvalidTokenFormat,
+        message: 'Invalid JWT format',
       })
     }
   }
@@ -148,8 +203,13 @@ Deno.serve(async (req: Request) => {
   const memoryLimitMb = 150
   const workerTimeoutMs = 1 * 60 * 1000
   const noModuleCache = false
-  const importMapPath = null
-  const envVarsObj = Deno.env.toObject()
+  // Using a common Import Map for all functions 
+  // to use a scope 'deno.json' it must be dinamically resolved base on the 'service_name'
+  const importMapPath = `/home/deno/functions/deno.jsonc`
+  // SUPABASE_FUNCTION_SLUG is listed after the container env snapshot so
+  // nothing in it can shadow the value, and it is per-request because only this
+  // worker knows which function the request resolved to.
+  const envVarsObj = { ...Deno.env.toObject(), SUPABASE_FUNCTION_SLUG: service_name }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
   try {

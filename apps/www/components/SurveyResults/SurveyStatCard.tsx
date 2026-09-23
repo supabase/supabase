@@ -92,7 +92,7 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
         >
           {/* Foreground pattern for the filled portion */}
           <div
-            className={`absolute inset-0 pointer-events-none bg-brand`}
+            className={`absolute inset-0 pointer-events-none bg-brand-default`}
             style={{
               maskImage: 'url("/images/state-of-startups/pattern-checker.svg")',
               maskSize: '4px',
@@ -105,7 +105,7 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
       {/* Text */}
       <div className="flex flex-col gap-2">
         <p
-          className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-brand' : 'text-foreground-muted'} transition-colors duration-1000`}
+          className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? 'text-primary' : 'text-foreground-muted'} transition-colors duration-1000`}
         >
           {displayValue}
           <span className="md:text-4xl">%</span>

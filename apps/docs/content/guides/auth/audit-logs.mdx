@@ -11,32 +11,26 @@ Auth audit logs provide comprehensive tracking of authentication events in your 
 
 Supabase auth audit logs automatically capture all authentication events including:
 
-- User signups and logins
+- User sign-ups and sign-ins
 - Password changes and resets
 - Email verification events
-- Token refresh and logout events
+- Token refresh and sign-out events
 
 ## Storage options
 
-By default, audit logs are stored in two places:
+Audit logs are stored in:
 
-1. **Your project's Postgres database** - Stored in the `auth.audit_log_entries` table, searchable via SQL but uses database storage
-2. **External log storage** - Cost-efficient storage accessible through the dashboard
+- **External log storage** - Cost-efficient storage accessible through the dashboard
+- **Postgres database** (optional) - Stored in the `auth.audit_log_entries` table, searchable via SQL, but uses additional database storage
 
-You can disable Postgres storage to reduce database storage costs while keeping the external log storage.
+You can enable or disable Postgres database storage to optimize your costs.
 
 ### Configuring audit log storage
 
 1. Navigate to your project’s dashboard
 2. Go to **Authentication**
-3. Find the **Audit Logs** under **Configuration** section
-4. Toggle on "Disable writing auth audit logs to project database" to disable database storage
-
-<Admonition type="note">
-
-Disabling Postgres storage reduces your database storage costs. Audit logs will still be available through the dashboard.
-
-</Admonition>
+3. Find the **Audit Logs** under the **Configuration** section
+4. Toggle "Write audit logs to the database" on to enable or off to disable database storage
 
 ## Log format
 
@@ -59,8 +53,8 @@ Audit logs contain detailed information about each authentication event:
 
 | Action                          | Description                             |
 | ------------------------------- | --------------------------------------- |
-| `login`                         | User login attempt                      |
-| `logout`                        | User logout                             |
+| `login`                         | User sign-in attempt                    |
+| `logout`                        | User sign-out                           |
 | `invite_accepted`               | Team invitation accepted                |
 | `user_signedup`                 | New user registration                   |
 | `user_invited`                  | User invitation sent                    |
@@ -81,7 +75,7 @@ Audit logs contain detailed information about each authentication event:
 | `factor_deleted`                | MFA factor deleted                      |
 | `recovery_codes_deleted`        | MFA recovery codes deleted              |
 | `factor_updated`                | MFA factor settings updated             |
-| `mfa_code_login`                | Login with MFA code                     |
+| `mfa_code_login`                | Sign in with MFA code                   |
 | `identity_unlinked`             | An identity unlinked from account       |
 
 ## Limitations

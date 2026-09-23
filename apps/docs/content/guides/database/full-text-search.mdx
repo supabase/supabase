@@ -21,8 +21,6 @@ For this guide we'll use the following example data:
 >
 <TabPanel id="data" label="Data">
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
-
 | id  | title                               | author                 | description                                                        |
 | --- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------ |
 | 1   | The Poky Little Puppy               | Janette Sebring Lowrey | Puppy is slower than other, bigger animals.                        |
@@ -30,8 +28,6 @@ For this guide we'll use the following example data:
 | 3   | Tootle                              | Gertrude Crampton      | Little toy train has big dreams.                                   |
 | 4   | Green Eggs and Ham                  | Dr. Seuss              | Sam has changing food preferences and eats unusually colored food. |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | Fourth year of school starts, big drama ensues.                    |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -173,6 +169,18 @@ data = supabase.from_('books').select().eq('title', 'Harry').execute()
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Where(x => x.Title == "Harry")
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 The equality symbol above (`=`) is very "strict" on what it matches. In a full text search context, we might want to find all "Harry Potter" books and so we can rewrite the
@@ -233,6 +241,18 @@ val data = supabase.from("books").select {
         textSearch("title", "'Harry'", TextSearchType.NONE)
     }
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("title", Operator.FTS, new FullTextSearchConfig("'Harry'", null))
+  .Get();
 ```
 
 </TabPanel>
@@ -318,17 +338,25 @@ data = supabase.from_('books').select().text_search('description', "'big'").exec
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("description", Operator.FTS, new FullTextSearchConfig("'big'", null))
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 
 <TabPanel id="data" label="Data">
-
-{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                               | author            | description                                     |
 | --- | ----------------------------------- | ----------------- | ----------------------------------------------- |
 | 3   | Tootle                              | Gertrude Crampton | Little toy train has big dreams.                |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues. |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -446,16 +474,30 @@ data = supabase.from_('books').select().text_search('title_description', "little
 
 </TabPanel>
 </$Show>
-<TabPanel id="data" label="Data">
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("title_description", Operator.FTS, new FullTextSearchConfig("little", null))
+  .Get();
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="data" label="Data">
 
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -541,15 +583,23 @@ data = supabase.from_('books').select().text_search('description', "'little' & '
 
 </TabPanel>
 </$Show>
-<TabPanel id="data" label="Data">
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("description", Operator.FTS, new FullTextSearchConfig("'little' & 'big'", null))
+  .Get();
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="data" label="Data">
 
 | id  | title  | author            | description                      |
 | --- | ------ | ----------------- | -------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -635,16 +685,24 @@ response = client.from_('books').select().text_search('description', "'little' |
 
 </TabPanel>
 </$Show>
-<TabPanel id="data" label="Data">
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("description", Operator.FTS, new FullTextSearchConfig("'little' | 'big'", null))
+  .Get();
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="data" label="Data">
 
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -737,6 +795,15 @@ data = client.rpc('search_books_by_title_prefix', { 'prefix': 'Lit' }).execute()
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Rpc("search_books_by_title_prefix", new Dictionary<string, object> { { "prefix", "Lit" } });
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 This function takes a prefix parameter and returns all books where the title contains a word starting with that prefix. The `:*` operator is used to denote a prefix match in the `to_tsquery()` function.
@@ -781,6 +848,18 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("description", Operator.WFTS, new FullTextSearchConfig("green eggs", null))
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### Quoted phrases
@@ -951,15 +1030,23 @@ data = client.from_('books').select().text_search('fts', "'little' & 'big'").exe
 
 </TabPanel>
 </$Show>
-<TabPanel id="data" label="Data">
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("fts", Operator.FTS, new FullTextSearchConfig("'little' & 'big'", null))
+  .Get();
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="data" label="Data">
 
 | id  | title  | author            | description                      | fts                                                     |
 | --- | ------ | ----------------- | -------------------------------- | ------------------------------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3 |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -1050,6 +1137,18 @@ data = client.from_('books').select().text_search('description', "'big' <-> 'dre
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("description", Operator.FTS, new FullTextSearchConfig("'big' <-> 'dreams'", null))
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 We can also use the `<->` to find words within a certain distance of each other. For example to find `year` and `school` within 2 words of each other:
@@ -1126,6 +1225,18 @@ val data = supabase.from("books").select {
 
 ```python
 data = client.from_('books').select().text_search('description', "'year' <2> 'school'").execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("description", Operator.FTS, new FullTextSearchConfig("'year' <2> 'school'", null))
+  .Get();
 ```
 
 </TabPanel>
@@ -1213,6 +1324,18 @@ data = client.from_('books').select().text_search('description', "'big' & !'litt
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Book>()
+  .Filter("description", Operator.FTS, new FullTextSearchConfig("'big' & !'little'", null))
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Ranking search results [#ranking]
@@ -1271,6 +1394,15 @@ final result = await client
 
 ```python
 data = client.rpc('search_books', { 'search_query': 'big' }).execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Rpc("search_books", new Dictionary<string, object> { { "search_query", "big" } });
 ```
 
 </TabPanel>
@@ -1400,6 +1532,19 @@ custom_data = client.rpc('search_books_custom_weights', { 'search_query': 'Harry
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Search with standard weighted ranking
+await supabase.Rpc("search_books_weighted", new Dictionary<string, object> { { "search_query", "Harry" } });
+
+// Search with custom weights
+await supabase.Rpc("search_books_custom_weights", new Dictionary<string, object> { { "search_query", "Harry" } });
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="sql" label="SQL">
 
 ```sql
@@ -1476,6 +1621,15 @@ data = client.rpc('search_books_fts', { 'search_query': 'little & big' }).execut
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Rpc("search_books_fts", new Dictionary<string, object> { { "search_query", "little & big" } });
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="sql" label="SQL">
 
 ```sql
@@ -1523,6 +1677,16 @@ const { data, error } = await supabase.rpc('websearch_books', {
 ```
 
 </TabPanel>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Support natural search syntax
+await supabase.Rpc("websearch_books", new Dictionary<string, object> { { "search_text", "\"little puppy\" or train -vegetables" } });
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="sql" label="SQL">
 
 ```sql

@@ -1,0 +1,15 @@
+---
+title = "Storage: Unexpectedly high usage or 'exceed_storage_size_quota' errors"
+topics = [ "cli", "database", "storage", "studio" ]
+keywords = []
+---
+
+If you're observing unexpectedly high storage usage or receiving 'exceed_storage_size_quota' errors, even after deleting files, it's often due to orphaned storage objects.
+
+**Why Does This Happen?**
+This issue arises when storage objects are deleted directly from `storage.objects` or `storage.buckets` tables using SQL queries, bypassing the Supabase Storage API. Deleting database rows in this manner does not remove the corresponding physical files, leading to orphaned objects that continue to consume storage space.
+
+**How to Avoid This Issue:**
+
+- Always delete storage objects using the official Supabase Storage API. This can be done via client libraries (e.g., `storage.from('example_bucket').remove(['example_folder/example_object.txt'])`) or through the [Supabase Studio Storage UI](/dashboard/project/_/storage/buckets).
+- Never manually remove rows directly from `storage.objects` or `storage.buckets` tables using SQL, as this will not delete the associated physical files and will result in orphaned objects.

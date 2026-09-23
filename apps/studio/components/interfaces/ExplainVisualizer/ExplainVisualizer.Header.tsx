@@ -98,7 +98,7 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
                       <span>Seq Scan (slow)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand" />
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-default" />
                       <span>Index Scan (fast)</span>
                     </div>
                   </div>
@@ -133,7 +133,6 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
             />
           )}
           <Button
-            variant="default"
             size="tiny"
             icon={isVisual ? <Code size={14} /> : <Eye size={14} />}
             onClick={onToggleMode}

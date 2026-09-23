@@ -33,6 +33,7 @@ const IconBackground = ({
       'shrink-0',
       showIconBg ? 'bg-surface-75 border w-8 h-8 flex items-center justify-center rounded-sm' : ''
     )}
+    aria-hidden="true"
   >
     {children}
   </div>
@@ -147,7 +148,7 @@ export const GlassPanel = ({
         </div>
 
         {children && <span className="text-sm text-foreground-light grow">{children}</span>}
-        {showLink && <span className="text-brand-link justify-end text-sm">Learn more</span>}
+        {showLink && <span className="text-primary justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

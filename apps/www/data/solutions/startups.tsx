@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { useBreakpoint } from 'common'
 import {
   Check,
@@ -85,7 +86,7 @@ const data: () => {
       ctas: [
         {
           label: 'Get started with Supabase',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({

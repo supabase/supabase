@@ -107,14 +107,14 @@ export const ServiceFlowPanelControls = ({
               <PanelBottom size={14} />
               <span>Dock to bottom</span>
             </div>
-            {dock === 'bottom' && <Check size={14} className="text-brand" />}
+            {dock === 'bottom' && <Check size={14} className="text-primary" />}
           </DropdownMenuItem>
           <DropdownMenuItem className="justify-between" onClick={() => setDock('right')}>
             <div className="flex items-center gap-x-2">
               <PanelRight size={14} />
               <span>Dock to right</span>
             </div>
-            {dock === 'right' && <Check size={14} className="text-brand" />}
+            {dock === 'right' && <Check size={14} className="text-primary" />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

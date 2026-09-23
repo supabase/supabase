@@ -14,11 +14,11 @@ const LOCAL_STORAGE_KEY = 'package-manager-tanstack-db'
 
 const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
-    return 'https://supabase.com/ui'
+    return 'https://supabase.com/library'
   } else if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'preview') {
     return `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
   } else {
-    return 'http://localhost:3004/ui'
+    return 'http://localhost:3004/library'
   }
 }
 

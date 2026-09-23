@@ -55,7 +55,7 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
-    params: { path: { ref: projectRef }, query: { reveal } },
+    params: { path: { ref: projectRef }, query: { reveal: reveal ? 'true' : 'false' } },
     signal,
   })
 

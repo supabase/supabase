@@ -90,8 +90,6 @@ describe('createTable', () => {
   }
 
   beforeEach(() => {
-    vi.clearAllMocks()
-
     // Default mock implementations
     mockExecuteSql.mockResolvedValue({ result: [] })
     mockGetTable.mockResolvedValue(mockTableResult)

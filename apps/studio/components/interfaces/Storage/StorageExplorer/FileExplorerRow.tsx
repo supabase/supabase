@@ -1,22 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FilesBucket as FilesBucketIcon } from 'icons'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
   Copy,
   Download,
   Edit,
-  File,
-  Film,
-  FolderOpen,
-  Image,
+  Link2,
   LoaderCircle,
   MoreVertical,
   Move,
-  Music,
   Trash2,
 } from 'lucide-react'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import {
   Checkbox,
   cn,
@@ -41,53 +36,15 @@ import {
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
+import { StorageRowIcon } from '../StorageRowIcon'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
-import { copyPathToFolder } from './StorageExplorer.utils'
+import { copyStorageExplorerUrl, copyStoragePath } from './StorageExplorer.utils'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
-
-export const RowIcon = ({
-  view,
-  status,
-  fileType,
-  isOpened = false,
-  mimeType,
-}: {
-  view: STORAGE_VIEWS
-  status: STORAGE_ROW_STATUS
-  fileType: string
-  isOpened?: boolean
-  mimeType: string | undefined
-}) => {
-  if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
-    return <LoaderCircle size={14} className="animate-spin text-foreground-lighter" />
-  }
-
-  if (fileType === STORAGE_ROW_TYPES.FOLDER) {
-    return isOpened ? (
-      <FolderOpen size={16} className="text-foreground-lighter" />
-    ) : (
-      <FilesBucketIcon size={16} className="text-foreground-lighter" />
-    )
-  }
-
-  if (mimeType?.includes('image')) {
-    return <Image size={16} className="text-foreground-lighter" />
-  }
-
-  if (mimeType?.includes('audio')) {
-    return <Music size={16} className="text-foreground-lighter" />
-  }
-
-  if (mimeType?.includes('video')) {
-    return <Film size={16} className="text-foreground-lighter" />
-  }
-
-  return <File size={16} className="text-foreground-lighter" />
-}
 
 interface FileExplorerRowProps {
   index: number
@@ -96,6 +53,13 @@ interface FileExplorerRowProps {
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
   style?: CSSProperties
+}
+
+type RowOption = {
+  name: string
+  icon?: ReactNode
+  onClick?: () => void
+  children?: { name: string; onClick: () => void }[]
 }
 
 export const FileExplorerRow = ({
@@ -107,23 +71,20 @@ export const FileExplorerRow = ({
   style,
 }: FileExplorerRowProps) => {
   const {
+    projectRef,
     selectedBucket,
     selectedFilePreview,
     openedFolders,
-    popColumnAtIndex,
-    popOpenedFoldersAtIndex,
-    clearSelectedItems,
-    setSelectedFilePreview,
     setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
     downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
-    openFolder,
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
+  const { openFolderAtIndex, setPreviewedFile, clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
   const ctx = useFileExplorerContextMenu()
 
@@ -134,13 +95,6 @@ export const FileExplorerRow = ({
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-
-  const onSelectFile = async (columnIndex: number) => {
-    popColumnAtIndex(columnIndex)
-    popOpenedFoldersAtIndex(columnIndex - 1)
-    setSelectedFilePreview(itemWithColumnIndex)
-    clearSelectedItems()
-  }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
     // Select a range if shift is held down
@@ -155,10 +109,29 @@ export const FileExplorerRow = ({
     } else {
       setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
-    setSelectedFilePreview(undefined)
+    clearPreviewedFile()
   }
 
-  const rowOptions =
+  const copyPathOptions: RowOption[] = [
+    {
+      name: 'Copy relative path',
+      icon: <Copy size={12} className="text-foreground-light" />,
+      onClick: () => copyStoragePath(openedFolders, itemWithColumnIndex),
+    },
+    {
+      name: 'Copy link',
+      icon: <Link2 size={12} className="text-foreground-light" />,
+      onClick: () =>
+        copyStorageExplorerUrl({
+          openedFolders,
+          item: itemWithColumnIndex,
+          projectRef,
+          bucketId: selectedBucket.id,
+        }),
+    },
+  ]
+
+  const rowOptions: RowOption[] =
     item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
           ...(canUpdateFiles
@@ -175,11 +148,7 @@ export const FileExplorerRow = ({
             icon: <Download size={12} className="text-foreground-light" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
-          {
-            name: 'Copy path to folder',
-            icon: <Copy size={12} className="text-foreground-light" />,
-            onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
-          },
+          ...copyPathOptions,
           ...(canUpdateFiles
             ? [
                 { name: 'Separator', icon: undefined, onClick: undefined },
@@ -236,6 +205,7 @@ export const FileExplorerRow = ({
                   icon: <Download size={12} className="text-foreground-light" />,
                   onClick: () => downloadFile(itemWithColumnIndex),
                 },
+                ...copyPathOptions,
                 ...(canUpdateFiles
                   ? [
                       {
@@ -308,8 +278,8 @@ export const FileExplorerRow = ({
           event.preventDefault()
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
             item.type === STORAGE_ROW_TYPES.FOLDER
-              ? openFolder(columnIndex, item)
-              : onSelectFile(columnIndex)
+              ? openFolderAtIndex(columnIndex, item)
+              : setPreviewedFile(itemWithColumnIndex)
           }
         }}
       >
@@ -329,7 +299,7 @@ export const FileExplorerRow = ({
                 )}
                 style={{ top: '2px' }}
               >
-                <RowIcon
+                <StorageRowIcon
                   view={view}
                   status={item.status}
                   fileType={item.type}

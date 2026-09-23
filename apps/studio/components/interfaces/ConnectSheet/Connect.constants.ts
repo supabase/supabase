@@ -369,7 +369,7 @@ export const ORMS: ConnectionType[] = [
     key: 'drizzle',
     label: 'Drizzle',
     icon: 'drizzle',
-    guideLink: `${DOCS_URL}/guides/database/connecting-to-postgres#connecting-with-drizzle`,
+    guideLink: `${DOCS_URL}/guides/database/drizzle`,
     children: [],
   },
 ]
@@ -385,6 +385,8 @@ export const CONNECTION_TYPES = [
 export const PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT =
   'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
 export const IPV4_ADDON_TEXT = 'Connections are IPv4 proxied with IPv4 add-on'
+
+export const CONNECTION_SOURCE_LOAD_BALANCER = 'load-balancer'
 
 export type ConnectionStringMethod = 'direct' | 'transaction' | 'session'
 

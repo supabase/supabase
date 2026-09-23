@@ -55,6 +55,11 @@ export const RealtimeInspector = () => {
   const hasChannel = realtimeConfig.channelName.length > 0
   const isListening = realtimeConfig.enabled
 
+  // Once a channel is set, MessagesTable renders its own empty states (including
+  // the "Broadcast a message" entry point), so sending doesn't depend on a
+  // message having arrived first. EmptyRealtime is only the pre-channel onboarding.
+  const showMessagesTable = hasChannel || (logData ?? []).length > 0
+
   const handleJoinChannel = useCallback(() => {
     if (!hasChannel) {
       setChannelPopoverOpen(true)
@@ -98,7 +103,7 @@ export const RealtimeInspector = () => {
       />
       <div className="relative flex flex-col grow">
         <div className="flex grow">
-          {(logData ?? []).length > 0 ? (
+          {showMessagesTable ? (
             <MessagesTable
               hasChannelSet={hasChannel}
               enabled={isListening}

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { getOrgUsage } from './org-usage-query'
 
@@ -10,10 +10,6 @@ vi.mock('@/data/fetchers', () => ({
 }))
 
 describe('org-usage-query', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('getOrgUsage', () => {
     it('throws error when orgSlug is not provided', async () => {
       await expect(getOrgUsage({ orgSlug: undefined })).rejects.toThrow('orgSlug is required')

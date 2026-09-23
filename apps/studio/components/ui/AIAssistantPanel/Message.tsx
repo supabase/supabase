@@ -8,11 +8,9 @@ import { MessageActions } from './Message.Actions'
 import type { AddToolApprovalResponse, MessageInfo } from './Message.Context'
 import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 import { MessageDisplay } from './Message.Display'
-import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 function AssistantMessage({ message }: { message: VercelMessage }) {
-  const snap = useAiAssistantStateSnapshot()
-  const { onCancelEdit, onRate } = useMessageActionsContext()
+  const { onBranch, onCancelEdit, onRate } = useMessageActionsContext()
   const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
 
   const handleRate = (newRating: 'positive' | 'negative', reason?: string) => {
@@ -51,7 +49,7 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
             isActive={rating === 'negative'}
             disabled={!!rating}
           />
-          <MessageActions.Branch onClick={() => snap.branchChat(id)} />
+          <MessageActions.Branch onClick={() => onBranch(id)} />
         </MessageActions>
       )}
     </MessageDisplay.Container>
@@ -73,7 +71,7 @@ function UserMessage({ message }: { message: VercelMessage }) {
         )}
         onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
       >
-        <MessageDisplay.MainArea>
+        <MessageDisplay.MainArea className="w-full max-w-3xl mx-auto">
           <MessageDisplay.ProfileImage />
           <MessageDisplay.Content message={message} />
         </MessageDisplay.MainArea>
@@ -107,6 +105,7 @@ interface MessageProps {
   addToolApprovalResponse?: AddToolApprovalResponse
   onDelete: (id: string) => void
   onEdit: (id: string) => void
+  onBranch: (id: string) => void
   isAfterEditedMessage: boolean
   isBeingEdited: boolean
   onCancelEdit: () => void
@@ -139,6 +138,7 @@ export function Message(props: MessageProps) {
     addToolApprovalResponse: props.addToolApprovalResponse,
     onDelete: props.onDelete,
     onEdit: props.onEdit,
+    onBranch: props.onBranch,
     onCancelEdit: props.onCancelEdit,
     onRate: props.onRate,
   }

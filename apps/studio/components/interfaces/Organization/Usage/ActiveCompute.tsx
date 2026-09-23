@@ -42,7 +42,7 @@ const ActiveCompute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) 
             ? [
                 {
                   name: 'Learn more',
-                  url: `${DOCS_URL}/guides/integrations/supabase-for-platforms#pico-compute-instance`,
+                  url: `${DOCS_URL}/guides/integrations/supabase-for-platforms#nano-compute-instance`,
                 },
               ]
             : [],

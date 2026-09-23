@@ -1,4 +1,3 @@
-import { parseAsInteger, useQueryState } from 'nuqs'
 import { cn } from 'ui'
 import {
   MetricCard,
@@ -9,6 +8,7 @@ import {
 } from 'ui-patterns/MetricCard'
 
 import { getConnectionMetrics } from './DatabaseConnections.utils'
+import { useSelectActivityPid } from './useSelectActivityPid'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery } from '@/data/database/activity-query'
@@ -23,7 +23,7 @@ interface OverviewProps {
 export const Overview = ({ live }: OverviewProps) => {
   const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
-  const [, setSelectedPid] = useQueryState('pid', parseAsInteger)
+  const { selectPid } = useSelectActivityPid()
 
   const { data, isPending: isLoadingActivity } = useDatabaseActivityQuery(
     {
@@ -68,27 +68,22 @@ export const Overview = ({ live }: OverviewProps) => {
     }
   )
 
-  const onSelectPid = (pid: number) => {
-    setSelectedPid(pid)
-    document.getElementById(pid.toString())?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }
-
   const onSelectLongestBlocked = () => {
     if (!longestBlockedQuery) return
     track('database_connections_overview_metric_card_clicked', { type: 'longest_blocked' })
-    onSelectPid(longestBlockedQuery.activity.pid)
+    selectPid(longestBlockedQuery.activity.pid)
   }
 
   const onSelectTopBlocker = () => {
     if (!queryBlockingTheMostQueries) return
     track('database_connections_overview_metric_card_clicked', { type: 'top_blocker' })
-    onSelectPid(queryBlockingTheMostQueries.activity.pid)
+    selectPid(queryBlockingTheMostQueries.activity.pid)
   }
 
   const onSelectLongestRunning = () => {
     if (!longestRunningQuery) return
     track('database_connections_overview_metric_card_clicked', { type: 'longest_running' })
-    onSelectPid(longestRunningQuery.activity.pid)
+    selectPid(longestRunningQuery.activity.pid)
   }
 
   return (

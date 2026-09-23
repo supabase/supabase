@@ -69,7 +69,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
                 </p>
               )}
               <div className="flex items-center gap-x-2">
-                <Button variant="default" disabled={isUpdating} onClick={onCancel}>
+                <Button disabled={isUpdating} onClick={onCancel}>
                   Cancel
                 </Button>
                 <Button

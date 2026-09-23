@@ -1,13 +1,11 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
 
+import { isLogsSource, resolveSnippetSource } from './querySource'
 import {
-  DEFAULT_LOG_DATE_RANGE,
-  getSnippetSource,
-  parseSqlSnippetSource,
-  type QuerySource,
-  type SqlSnippetSource,
-} from './querySource'
+  DEFAULT_LOG_TIME_RANGE,
+  type QuerySourceBinding,
+} from '@/data/query-sources/query-source-registry'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
@@ -23,20 +21,19 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state
  * param, so a "New logs query" tab shows the logs toolbar and range picker
  * immediately rather than flashing the database controls until the user types.
  */
-export function useRunSource(id: string): QuerySource {
+export function useRunSource(id: string): QuerySourceBinding {
   const { source: sourceParam } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
-  const source: SqlSnippetSource =
-    snippet !== undefined ? getSnippetSource(snippet) : parseSqlSnippetSource(sourceParam)
+  const source = resolveSnippetSource(snippet, sourceParam)
   const logRange = sessionSnap.logRange[id]
 
-  return useMemo<QuerySource>(() => {
-    if (source === 'logs') {
-      return { type: 'logs', dateRange: logRange ?? DEFAULT_LOG_DATE_RANGE }
+  return useMemo<QuerySourceBinding>(() => {
+    if (isLogsSource(source)) {
+      return { _tag: 'logs', time_range: logRange ?? DEFAULT_LOG_TIME_RANGE }
     }
-    return { type: 'database' }
+    return { _tag: 'database' }
   }, [source, logRange])
 }

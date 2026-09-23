@@ -1,8 +1,8 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { platformComponents as components } from 'api-types'
+import { platformComponents as components, operations } from 'api-types'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { InviteMemberButton } from '@/components/interfaces/Organization/TeamSettings/InviteMemberButton'
 import type { ProfileContextType } from '@/lib/profile'
@@ -10,12 +10,13 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type Member = components['schemas']['Member']
-type InvitationResponse = components['schemas']['InvitationResponse']
-type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse']
-type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse']
-type CreateInvitationResponse = components['schemas']['CreateInvitationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type Member = components['schemas']['Member_Output']
+type InvitationResponse = components['schemas']['InvitationResponse_Output']
+type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_Output']
+type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
+type CreateInvitationResponse =
+  operations['InvitationsController_createInvitation']['responses']['201']['content']['application/json']
 type AccessControlPermission = components['schemas']['AccessControlPermission']
 
 const ORG_SLUG = 'test-org'
@@ -67,6 +68,7 @@ const buildRole = (id: number, name: string): OrganizationRoleResponse['org_scop
 
 const buildMember = (overrides: Partial<Member>): Member => ({
   gotrue_id: 'gotrue-test',
+  avatar_url: null,
   is_sso_user: false,
   metadata: {},
   mfa_enabled: false,
@@ -177,10 +179,6 @@ async function openDialog() {
 }
 
 describe('InviteMemberButton (network)', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   test('renders each role with its permission description and a roles docs link', async () => {
     setupMocks()
     customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })
@@ -193,7 +191,7 @@ describe('InviteMemberButton (network)', () => {
     expect(screen.getByText('Read-only')).toBeInTheDocument()
 
     // The key safety message from the ticket: Administrator can delete projects
-    expect(screen.getByText(/including deleting projects/i)).toBeInTheDocument()
+    expect(screen.getByText('deleting projects')).toBeInTheDocument()
 
     // Roles documentation is one click away (the ticket's other complaint)
     const docsLink = screen.getByRole('link', { name: /roles and permissions/i })
@@ -233,6 +231,10 @@ describe('InviteMemberButton (network)', () => {
       target: { value: 'admin@example.com' },
     })
     fireEvent.click(screen.getByRole('button', { name: /send invitation/i }))
+
+    const confirmation = await screen.findByRole('dialog', { name: 'Invite as Administrator?' })
+    expect(invitePayloads).toHaveLength(0)
+    fireEvent.click(within(confirmation).getByRole('button', { name: /send invitation/i }))
 
     await waitFor(() => expect(invitePayloads).toHaveLength(1))
     expect(invitePayloads[0]).toEqual({

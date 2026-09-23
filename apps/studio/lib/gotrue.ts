@@ -5,6 +5,49 @@ import { gotrueClient } from 'common/gotrue'
 export const auth = gotrueClient
 
 export const DEFAULT_FALLBACK_PATH = '/organizations'
+export const DEFAULT_SIGNUP_RETURN_PATH = '/new'
+
+/**
+ * When unauthenticated users hit protected dashboard routes, withAuth sets
+ * returnTo to the current path. Marketing entry via /dashboard often ends up
+ * as returnTo=/org (or /organizations). New users who switch to sign-up should
+ * start org creation instead.
+ */
+export function getSignUpReturnTo(returnTo: string | string[] | undefined): string {
+  const value = Array.isArray(returnTo) ? returnTo[0] : returnTo
+
+  if (!value) {
+    return DEFAULT_SIGNUP_RETURN_PATH
+  }
+
+  const [pathname, query] = value.split('?', 2)
+  if (pathname === DEFAULT_FALLBACK_PATH || pathname === '/org') {
+    return query ? `${DEFAULT_SIGNUP_RETURN_PATH}?${query}` : DEFAULT_SIGNUP_RETURN_PATH
+  }
+
+  return value
+}
+
+/** Post-signup redirect path, normalising returnTo and excluding it from merged query params. */
+export function buildSignUpReturnPath(returnTo: string | string[] | undefined): string {
+  const basePath = validateReturnTo(getSignUpReturnTo(returnTo), DEFAULT_SIGNUP_RETURN_PATH)
+  const [pathOnly, pathQuery] = basePath.split('?', 2)
+  const pathnameSearchParams = new URLSearchParams(pathQuery || '')
+
+  if (typeof location === 'undefined') {
+    const queryString = pathnameSearchParams.toString()
+    return queryString ? `${pathOnly}?${queryString}` : pathOnly
+  }
+
+  const mergedParams = new URLSearchParams(location.search)
+  mergedParams.delete('returnTo')
+  for (const [key, val] of pathnameSearchParams.entries()) {
+    mergedParams.set(key, val)
+  }
+
+  const queryString = mergedParams.toString()
+  return queryString ? `${pathOnly}?${queryString}` : pathOnly
+}
 
 export const validateReturnTo = (
   returnTo: string,

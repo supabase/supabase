@@ -67,6 +67,12 @@ describe('parseCustomInput', () => {
     expect(parseCustomInput('0')).toEqual({ type: 'invalid' })
     expect(parseCustomInput('-5')).toEqual({ type: 'invalid' })
   })
+
+  test('returns invalid for amounts that fall outside the representable date range', () => {
+    expect(parseCustomInput('999999999')).toEqual({ type: 'invalid' })
+    expect(parseCustomInput('999999999d')).toEqual({ type: 'invalid' })
+    expect(parseCustomInput('99999999')).toEqual({ type: 'number', value: 99999999 })
+  })
 })
 
 describe('generateDynamicHelper', () => {
@@ -96,7 +102,7 @@ describe('generateDynamicHelper', () => {
 })
 
 describe('generateDynamicHelpers', () => {
-  test('generates 3 helpers for minutes, hours, days', () => {
+  test('generates helpers for every supported relative unit', () => {
     const helpers = generateDynamicHelpers(5)
     expect(helpers).toHaveLength(3)
     expect(helpers[0].text).toBe('Last 5 minutes')
@@ -112,7 +118,7 @@ describe('generateHelpersFromInput', () => {
     expect(generateHelpersFromInput('2yoie')).toBeNull()
   })
 
-  test('returns 3 helpers for number only input', () => {
+  test('returns a helper for every unit for number only input', () => {
     const helpers = generateHelpersFromInput('25')
     expect(helpers).toHaveLength(3)
     expect(helpers![0].text).toBe('Last 25 minutes')
@@ -124,6 +130,16 @@ describe('generateHelpersFromInput', () => {
     const helpers = generateHelpersFromInput('2h')
     expect(helpers).toHaveLength(1)
     expect(helpers![0].text).toBe('Last 2 hours')
+  })
+
+  test('never returns a helper whose calcFrom throws', () => {
+    expect(generateHelpersFromInput('999999999')).toBeNull()
+
+    const helpers = generateHelpersFromInput('99999999')
+    expect(helpers).not.toBeNull()
+    for (const helper of helpers!) {
+      expect(() => helper.calcFrom()).not.toThrow()
+    }
   })
 })
 

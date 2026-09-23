@@ -25,7 +25,7 @@ The guide covers:
 This Docker Compose configuration includes the following services:
 
 - **[Studio](https://github.com/supabase/supabase/tree/master/apps/studio)** - A dashboard for managing your self-hosted Supabase project
-- **[Kong](https://github.com/Kong/kong)** - Kong API gateway
+- **[Envoy](https://www.envoyproxy.io/)** - API gateway (default; Kong is available as an optional override via `sh run.sh config add kong`)
 - **[Auth](https://github.com/supabase/auth)** - JWT-based authentication API for user sign-ups, logins, and session management
 - **[PostgREST](https://github.com/PostgREST/postgrest)** - Web server that turns your PostgreSQL database directly into a RESTful API
 - **[Realtime](https://github.com/supabase/realtime)** - Elixir server that listens to PostgreSQL database changes and broadcasts them over websockets
@@ -45,19 +45,20 @@ This Docker Compose configuration includes the following services:
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 - **[Ask DeepWiki / Supabase](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)** - DeepWiki-generated description of self-hosted configuration
 - **[CONFIG.md](./CONFIG.md)** - Configuration reference for all environment variables
+- **[Update your deployment](https://supabase.com/docs/guides/self-hosting/updating)** - Update an existing deployment with `update.sh`
 
 ## Updates
 
-To update your self-hosted Supabase instance:
+Back up your database, then:
 
-1. Review [CHANGELOG.md](./CHANGELOG.md) for breaking changes
-2. Check [versions.md](./versions.md) for new image versions
-3. Update `docker-compose.yml` if there are configuration changes
-4. Pull the latest images: `docker compose pull`
-5. Stop services: `docker compose down`
-6. Start services with new configuration: `docker compose up -d`
+```sh
+sh update.sh --dry-run   # optional preview
+sh update.sh
+sh run.sh pull && sh run.sh recreate
+```
 
-**Note:** Consider to always backup your database before updating.
+See the **[update guide](https://supabase.com/docs/guides/self-hosting/updating)** for conflicts,
+breaking changes, pinning a release, and older installs without `.supabase-version`.
 
 ## Community & Support
 

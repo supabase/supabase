@@ -54,6 +54,34 @@ describe('ai/tools/studio-tools', () => {
       expect(toolNames).toContain('rename_chat')
     })
 
+    it('should include logs in the load_knowledge schema', () => {
+      const tools = getStudioTools()
+      const schema = tools.load_knowledge.inputSchema
+
+      if ('safeParse' in schema) {
+        expect(schema.safeParse({ name: 'logs' }).success).toBe(true)
+        expect(schema.safeParse({ name: 'pg_best_practices' }).success).toBe(true)
+        expect(schema.safeParse({ name: 'not_a_topic' }).success).toBe(false)
+      } else {
+        expect(schema).toBeDefined()
+      }
+    })
+
+    it('should return ClickHouse logs knowledge for load_knowledge logs', async () => {
+      const tools = getStudioTools()
+      if (!tools.load_knowledge.execute) throw new Error('execute is undefined')
+
+      const result = await tools.load_knowledge.execute(
+        { name: 'logs' },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      expect(result).toContain('query_logs')
+      expect(result).toContain('iso_timestamp_start')
+      expect(result).toContain('# Supabase logs SQL (ClickHouse)')
+      expect(result).toContain('interactive query cell')
+    })
+
     it('should have execute_sql with correct input schema fields', () => {
       const tools = getStudioTools()
       const executeSqlTool = tools.execute_sql
@@ -89,7 +117,7 @@ describe('ai/tools/studio-tools', () => {
       if (!renameTool.execute) throw new Error('execute is undefined')
       const result = await renameTool.execute(
         { newName: 'Test Chat' },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
       expect(result).toEqual({ status: 'Chat request sent to client' })
     })
@@ -154,7 +182,7 @@ describe('ai/tools/studio-tools', () => {
           chartConfig: { view: 'table' },
           isWriteQuery: false,
         },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(executeSql).toHaveBeenCalledWith(
@@ -191,7 +219,7 @@ describe('ai/tools/studio-tools', () => {
           chartConfig: { view: 'table' },
           isWriteQuery: false,
         },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(executeSql).toHaveBeenCalledWith(

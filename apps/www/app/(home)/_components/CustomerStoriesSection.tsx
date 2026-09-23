@@ -9,26 +9,73 @@ import SectionContainer from '@/components/Layouts/SectionContainer'
 
 const customerStories = [
   {
-    name: 'Firecrawl',
-    logo: '/images/customers/logos/firecrawl.png',
-    icon: '/images/customers/logos/firecrawl-icon.svg',
-    tagline: 'Switched from Pinecone to Supabase Vector to boost efficiency and accuracy.',
+    name: 'Lovable',
+    icon: '/images/customers/logos/lovable-homepage-icon.svg',
+    tagline: 'Powering millions of AI-generated apps with a complete Supabase backend.',
     quote:
-      "We looked at the alternatives and chose Supabase because it's open source, it's simpler, and for all the ways we need to use it, Supabase has been just as performant — if not more performant — than the other vector databases.",
-    author: 'Caleb Peffer, CEO, Firecrawl',
-    authorImg: '/images/blog/avatars/caleb-peffer.jpg',
-    slug: 'firecrawl',
+      'Lovable is about unlocking creativity for anyone. Only 1% of the population knows how to code. Lovable has unlocked that ability for the other 99%.',
+    author: 'Bryan Byrne, Product Manager, Lovable',
+    authorImg: '/images/blog/avatars/bryan-byrne-lovable.jpeg',
+    slug: 'lovable',
     rawIcon: true,
     iconFilter: 'brightness(0) invert(1)',
-    bgColor: 'color(display-p3 0.980392 0.364706 0.098039)',
+    bgColor: '#FD49A8',
     bgGradient:
-      'linear-gradient(to bottom left, color(display-p3 0.980392 0.364706 0.098039 / 1) 0%, color(display-p3 0.980392 0.364706 0.098039 / 0.9) 100%)',
-    dimBgColor: 'color(display-p3 0.980392 0.364706 0.098039 / 0.9)',
+      'linear-gradient(to bottom, #FD49A8 0%, #FD2980 10%, #FC1A58 20%, #FA1F41 30%, #FA2733 40%, #FB3D26 50%, #FC541F 60%, #FE6A1E 70%, #FE771D 80%, #FF861B 90%, #FF8F1B 100%)',
+    dimBgColor: '#FD2980',
+    textColor: 'light' as 'light' | 'dark',
+  },
+  {
+    name: 'eXp Realty',
+    icon: '/images/customers/logos/exprealty-homepage-icon.svg',
+    rawIcon: true,
+    iconFilter: 'brightness(0) invert(1)',
+    iconScale: 1.35,
+    tagline: 'Empowering 2,000+ employees to build production software with AI.',
+    quote:
+      "The thing that makes everything possible, all of our rapid development now and AI-generated or assisted development, is Supabase. That's the giant whose shoulders we can stand on.",
+    author: 'Seth Siegler, Chief Innovation Officer, eXp Realty',
+    authorImg: '/images/blog/avatars/seth-siegler.jpg',
+    slug: 'exprealty',
+    bgColor: '#0c0f24',
+    bgGradient: '#0c0f24',
+    dimBgColor: '#0c0f24',
+    textColor: 'light' as 'light' | 'dark',
+  },
+  {
+    name: 'Phoenix Energy',
+    icon: '/images/customers/logos/phoenix-energy-homepage-icon.svg',
+    rawIcon: true,
+    iconFilter: 'brightness(0) invert(1)',
+    tagline: 'Migrated critical infrastructure from MongoDB with zero downtime.',
+    quote:
+      'We needed a system that could handle serious performance and security requirements — without slowing down our developers. Supabase has given us both.',
+    author: 'Kris Woods, CTO, Phoenix Energy',
+    authorImg: '/images/blog/avatars/kris-woods-phoenix-energy.jpg',
+    slug: 'phoenix-energy',
+    bgColor: '#002533',
+    bgGradient: '#002533',
+    dimBgColor: '#002533',
+    textColor: 'light' as 'light' | 'dark',
+  },
+  {
+    name: 'Chatbase',
+    icon: '/images/customers/logos/chatbase-homepage-icon.svg',
+    tagline: 'Scaled from zero to $10M ARR on a single Postgres-backed platform.',
+    quote:
+      "Instead of splitting things out as we go, we try to consolidate things more as we do. The technology itself works better when you have things that are closely tied together. That's why we're on Supabase.",
+    author: 'Yasser Elsaid, Founder and CEO, Chatbase',
+    authorImg: '/images/blog/avatars/yasser-elsaid-chatbase.jpeg',
+    slug: 'chatbase',
+    rawIcon: true,
+    iconFilter: 'brightness(0) invert(1)',
+    bgColor: '#000000',
+    bgGradient: '#000000',
+    dimBgColor: '#000000',
     textColor: 'light' as 'light' | 'dark',
   },
   {
     name: 'Rally',
-    logo: '/images/customers/logos/rally.png',
     icon: '/images/customers/logos/rally-icon.svg',
     rawIcon: true,
     tagline: 'From first line of code to fully licensed fintech in three months.',
@@ -41,54 +88,6 @@ const customerStories = [
     bgGradient:
       'linear-gradient(to bottom left, color(display-p3 0.275 0.306 0.8 / 1) 0%, color(display-p3 0.118 0.176 0.769 / 1) 100%)',
     dimBgColor: 'color(display-p3 0.118 0.176 0.769 / 1)',
-    textColor: 'light' as 'light' | 'dark',
-  },
-  {
-    name: 'Hyper',
-    logo: '/images/customers/logos/hyper.png',
-    icon: '/images/customers/logos/hyper-icon.svg',
-    tagline: 'An AI-native marketing platform with agents that operate across the entire workflow.',
-    quote:
-      'I will get on a podcast and talk about how much I love Supabase. With Supabase we can move fast and build things that delight our customers without having to worry about infrastructure.',
-    author: 'Elliot Fleck, Co-founder, Hyper',
-    authorImg: '/images/blog/avatars/elliot-fleck-hyper.jpeg',
-    slug: 'hyper',
-    bgColor: '#222222',
-    bgGradient: 'linear-gradient(to bottom left, #2a2a2a 0%, #181818 100%)',
-    dimBgColor: '#1e1e1e',
-    textColor: 'light' as 'light' | 'dark',
-  },
-  {
-    name: 'E2B',
-    logo: '/images/customers/logos/e2b.png',
-    icon: '/images/customers/logos/e2b-icon.svg',
-    tagline: 'Secure, scalable execution of AI-generated code in the cloud.',
-    quote:
-      "Supabase empowers us to focus on innovation rather than infrastructure. It's the backbone of our platform, enabling scalability and seamless developer experiences.",
-    author: 'Vasek Mlejnsky, CEO, E2B',
-    authorImg: '/images/blog/avatars/vasek-mlejnsky.jpg',
-    slug: 'e2b',
-    rawIcon: true,
-    iconFilter: 'brightness(0) invert(1)',
-    bgColor: 'color(display-p3 1 0.533 0)',
-    bgGradient:
-      'linear-gradient(to bottom left, color(display-p3 1 0.533 0 / 1) 0%, color(display-p3 0.7 0.373 0 / 1) 100%)',
-    dimBgColor: 'color(display-p3 0.7 0.373 0 / 1)',
-    textColor: 'light' as 'light' | 'dark',
-  },
-  {
-    name: 'Mobbin',
-    logo: '/images/customers/logos/mobbin.png',
-    icon: '/images/customers/logos/mobbin-icon.svg',
-    tagline: 'Migrated 200,000 users from Firebase for a better authentication experience.',
-    quote:
-      'Migrating to Supabase meant that we could instantly fix our Auth problems and save money. Just being on Supabase alone gives us confidence we can deliver on whatever users need in the future.',
-    author: 'Jian Jie Liau, Co-founder & CTO, Mobbin',
-    authorImg: '/images/blog/avatars/jian-mobbin.jpg',
-    slug: 'mobbin',
-    bgColor: '#000000',
-    bgGradient: 'linear-gradient(to bottom left, #0a0a0a 0%, #000000 100%)',
-    dimBgColor: '#080808',
     textColor: 'light' as 'light' | 'dark',
   },
 ]
@@ -109,7 +108,10 @@ function IconChip({
       src={story.icon}
       alt={story.name}
       className={cn('object-contain shrink-0', size === 'md' ? 'h-8 w-8' : 'h-6 w-6')}
-      style={filter ? { filter } : undefined}
+      style={{
+        filter,
+        transform: s.iconScale ? `scale(${s.iconScale})` : undefined,
+      }}
     />
   )
 }
@@ -145,7 +147,7 @@ export function CustomerStoriesSection() {
       {/* Cards row */}
       <SectionContainer className="py-0!">
         {/* Mobile: stacked cards */}
-        <div className="flex flex-col gap-2 md:hidden">
+        <div className="flex flex-col gap-2 lg:hidden">
           {customerStories.map((story, index) => {
             const isActive = index === activeIdx
             const isDark = story.textColor === 'dark'
@@ -221,7 +223,7 @@ export function CustomerStoriesSection() {
 
         {/* Desktop: animated accordion grid */}
         <div
-          className="hidden md:grid min-h-[480px] gap-2"
+          className="hidden lg:grid min-h-[480px] gap-2"
           style={{
             gridTemplateColumns: customerStories
               .map((_, i) => (i === activeIdx ? '1fr' : `${INACTIVE_COL_WIDTH}px`))

@@ -157,23 +157,6 @@ export const EnableExtensionModal = ({
           </Admonition>
         )}
 
-        {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
-          <Admonition
-            type="warning"
-            title="The pg_cron extension is not fully supported for Fly projects"
-            className="border-x-0 border-t-0 rounded-none"
-          >
-            <p>
-              You can still enable the extension, but pg_cron jobs may not run due to the behavior
-              of Fly projects.
-            </p>
-            <DocsButton
-              className="mt-2"
-              href={`${DOCS_URL}/guides/platform/fly-postgres#limitations`}
-            />
-          </Admonition>
-        )}
-
         <DialogSection>
           <Form {...form}>
             <form id="enable-extensions-form" onSubmit={form.handleSubmit(onSubmit)}>
@@ -256,7 +239,7 @@ export const EnableExtensionModal = ({
                       name="name"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItemLayout name="name" label="Schema name">
+                        <FormItemLayout label="Schema name">
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -271,10 +254,11 @@ export const EnableExtensionModal = ({
         </DialogSection>
 
         <DialogFooter>
-          <Button variant="default" disabled={isEnabling} onClick={() => onCancel()}>
+          <Button disabled={isEnabling} onClick={() => onCancel()}>
             Cancel
           </Button>
           <Button
+            variant="primary"
             type="submit"
             form="enable-extensions-form"
             loading={isEnabling}
