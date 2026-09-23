@@ -16,24 +16,36 @@ interface DocsSearchV2Result {
   title: string
   heading: string
   excerpt: string
+  headingPath: string[]
+  score: number
 }
 
 type SearchState =
   | { status: 'initial'; key: number }
   | { status: 'loading'; key: number; staleResults: DocsSearchV2Result[] }
-  | { status: 'results'; key: number; results: DocsSearchV2Result[] }
-  | { status: 'noResults'; key: number }
+  | { status: 'results'; key: number; results: DocsSearchV2Result[]; query: string }
+  | { status: 'noResults'; key: number; query: string }
   | { status: 'error'; key: number; message: string }
 
 type Action =
-  | { type: 'resultsReturned'; key: number; results: DocsSearchV2Result[] }
+  | { type: 'resultsReturned'; key: number; results: DocsSearchV2Result[]; query: string }
   | { type: 'newSearchDispatched'; key: number }
   | { type: 'reset'; key: number }
   | { type: 'errored'; key: number; message: string }
 
 function reshapeResult(row: unknown): DocsSearchV2Result | null {
   if (typeof row !== 'object' || row === null) return null
-  if (!('slug' in row && 'page_title' in row && 'heading' in row && 'excerpt' in row)) return null
+  if (
+    !(
+      'slug' in row &&
+      'page_title' in row &&
+      'heading' in row &&
+      'excerpt' in row &&
+      'heading_path' in row &&
+      'score' in row
+    )
+  )
+    return null
 
   const slug = row.slug as string
   return {
@@ -43,6 +55,8 @@ function reshapeResult(row: unknown): DocsSearchV2Result | null {
     title: row.page_title as string,
     heading: row.heading as string,
     excerpt: row.excerpt as string,
+    headingPath: row.heading_path as string[],
+    score: row.score as number,
   }
 }
 
@@ -54,8 +68,8 @@ function reducer(state: SearchState, action: Action): SearchState {
   switch (action.type) {
     case 'resultsReturned':
       return action.results.length
-        ? { status: 'results', key: action.key, results: action.results }
-        : { status: 'noResults', key: action.key }
+        ? { status: 'results', key: action.key, results: action.results, query: action.query }
+        : { status: 'noResults', key: action.key, query: action.query }
     case 'newSearchDispatched':
       return {
         status: 'loading',
@@ -92,6 +106,7 @@ const useDocsSearchV2 = () => {
         type: 'resultsReturned',
         key: localKey,
         results: compact(data.map(reshapeResult)),
+        query: query.trim(),
       })
     } catch (error) {
       console.error(`[ERROR] Error fetching docs search v2 results: ${error}`)
