@@ -34,11 +34,15 @@ export const LogPricingAnnouncement = ({ org }: LogPricingAnnouncementProps) => 
         type="note"
         layout="responsive"
         title="Pricing for Supabase Logs"
-        description="Logs Ingest becomes metered usage items, with quotas that cover most organizations at no additional cost. This change is for any developer running production workloads on Supabase who relies on logs to debug, monitor, and understand their app. Grace period lasts until Dec 23, 2026."
+        description="Logs Ingest becomes metered usage items, with quotas that cover most organizations at no additional cost. This change is for any developer running production workloads on Supabase who relies on logs to debug, monitor, and understand their app. Grace period lasts until the start of 2027."
         actions={
           <>
             <Button asChild variant="default" onClick={(e) => e.stopPropagation()}>
-              <a target="_blank" rel="noopener noreferrer" href={'TODO LINK GITHUB/BLOG'}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={'https://supabase.com/changelog/logs-usage-based-pricing'}
+              >
                 Announcement
               </a>
             </Button>
