@@ -43,8 +43,6 @@ const ProjectsPage: NextPageWithLayout = () => {
           />
         ) : (
           <div className="space-y-5">
-            {/**display later <LogPricingAnnouncement org={org} /> */}
-
             <div className="flex flex-col gap-y-4 xl:flex-row xl:gap-x-6">
               <div className="flex flex-col gap-y-4 flex-1 min-w-0">
                 <HomePageActions />
