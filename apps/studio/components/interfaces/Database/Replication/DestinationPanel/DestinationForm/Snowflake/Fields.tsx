@@ -10,8 +10,13 @@ import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 
 const MAX_PRIVATE_KEY_LENGTH = 10000
 
-const isPrivateKey = (contents: string) =>
-  /-----BEGIN (?:ENCRYPTED |RSA )?PRIVATE KEY-----/.test(contents)
+const isPrivateKey = (contents: string) => {
+  const match = contents.match(
+    /^\s*-----BEGIN ((?:ENCRYPTED |RSA )?PRIVATE KEY)-----\r?\n([\s\S]*?)\r?\n-----END \1-----\s*$/
+  )
+
+  return match !== null && match[2].trim().length > 0
+}
 
 const readPrivateKeyFile = async (
   file: File,
