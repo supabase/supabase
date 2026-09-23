@@ -42,7 +42,7 @@ alter table public.your_table replica identity full;
 
 ## Prepare Snowflake resources
 
-Create a Snowflake database, schema, role, and service user for Pipelines. Keep the schema empty so Pipelines can own and manage every table it creates. Use unquoted identifiers for the service user and role because Pipelines converts account and user names to uppercase during authentication.
+Pipelines needs a dedicated Snowflake database and schema for replicated tables, together with a role and service user that can manage them. Start with an empty schema so Pipelines can own every table it creates. Create the role and service user with unquoted identifiers, because Pipelines converts account and user names to uppercase during authentication.
 
 Run this setup as a Snowflake administrator. Change the example names as needed:
 
@@ -63,24 +63,24 @@ grant usage on schema PIPELINES_DB.REPLICATED to role PIPELINES_ROLE;
 grant create table on schema PIPELINES_DB.REPLICATED to role PIPELINES_ROLE;
 ```
 
-The pipeline role must own destination tables so it can alter, truncate, or drop them. Don't pre-create destination tables under another role.
+The pipeline role must own the destination tables so it can alter, truncate, or drop them. Let Pipelines create these tables rather than creating them in advance under another role.
 
-Snowflake creates each table's managed default pipe, `<TABLE>-STREAMING`, automatically. No virtual warehouse, stage, or manually created pipe is required. See [Snowpipe Streaming access privileges](https://docs.snowflake.com/en/user-guide/snowpipe-streaming/snowpipe-streaming-access-control) for the ingestion requirements.
+Snowflake automatically creates a managed default pipe, `<TABLE>-STREAMING`, for each table. You don't need to provide a virtual warehouse, stage, or manually created pipe. See [Snowpipe Streaming access privileges](https://docs.snowflake.com/en/user-guide/snowpipe-streaming/snowpipe-streaming-access-control) for the ingestion requirements.
 
 Use a separate role and warehouse for downstream queries and transformations.
 
 ### Keep the SQL and streaming roles aligned
 
-Pipelines uses two Snowflake interfaces:
+Snowflake handles SQL requests and streaming separately, so both interfaces need to use the same role:
 
 - SQL requests use the optional **Role** under **Advanced settings** in the Dashboard. When **Role** is empty, they use the user's default role.
 - Snowpipe Streaming uses the user's `DEFAULT_ROLE`. It does not use the optional **Role** setting.
 
-Use a dedicated role such as `PIPELINES_ROLE`, grant it the permissions above, and set it as the service user's `DEFAULT_ROLE`. Leave **Role** empty in the Dashboard or enter the same role explicitly. This keeps SQL validation and streaming on the same role.
+To keep the interfaces aligned, grant the permissions above to a dedicated role such as `PIPELINES_ROLE` and set it as the service user's `DEFAULT_ROLE`. You can then leave **Role** empty in the Dashboard or enter the same role explicitly.
 
 ### Generate a key pair
 
-Pipelines authenticates with an RSA key pair. Snowflake requires at least 2048 bits and recommends PKCS #8. From the directory where you want to store the keys, create `rsa_key.p8` with one of these commands.
+Pipelines authenticates with an RSA key pair. Snowflake requires a key of at least 2048 bits and recommends the PKCS #8 format. Run one of the following commands from the directory where you want to store the keys. Each command creates a private key named `rsa_key.p8`.
 
 For an unencrypted private key:
 
@@ -96,7 +96,7 @@ openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 \
   -inform PEM -out rsa_key.p8
 ```
 
-Derive the matching public key. Snowflake uses it to verify connections signed with `rsa_key.p8`:
+Next, derive the matching public key. Snowflake uses this public key to verify connections signed with the private key in `rsa_key.p8`:
 
 ```bash
 openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
@@ -108,7 +108,7 @@ Open `rsa_key.pub` and copy the text between the `BEGIN PUBLIC KEY` and `END PUB
 alter user PIPELINES_USER set rsa_public_key = '<public-key-body>';
 ```
 
-Keep `rsa_key.p8` for the Dashboard configuration. Paste or upload the complete file, including its begin and end lines, into **Private key**. If you generated a passphrase-protected key, enter its passphrase into **Private key passphrase**.
+Use `rsa_key.p8` when you configure the destination in the Dashboard. Paste or upload the complete file, including its begin and end lines, into **Private key**. If you generated a passphrase-protected key, enter its passphrase into **Private key passphrase**.
 
 Keep `rsa_key.p8` and its passphrase secret. Don't commit them, paste them into logs, or send them to support. The Dashboard accepts unencrypted PKCS #1 or PKCS #8 keys, and encrypted PKCS #8 keys with a passphrase. It does not support encrypted PKCS #1 keys.
 
