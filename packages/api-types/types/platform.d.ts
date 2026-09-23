@@ -6827,6 +6827,7 @@ export interface components {
             | 'm8i.large'
             | 'm7a.large'
             | 'm8a.large'
+            | 'c6a.large'
             | 'm6g.xlarge'
             | 'm6a.xlarge'
             | 'm6i.xlarge'
