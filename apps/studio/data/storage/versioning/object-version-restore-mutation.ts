@@ -10,15 +10,10 @@ export type ObjectVersionRestoreVariables = {
   bucketId: string
   /** The object's full path within the bucket, not just its leaf name. */
   path: string
-  /** The noncurrent version to promote back to current. */
   versionId: string
 }
 
-/**
- * A move onto the object's own path. Storage consumes the source version, so the
- * restored one leaves the history rather than being duplicated within it, and
- * whatever was current becomes the newest noncurrent version.
- */
+/** A move onto the object's own path: Storage consumes the source rather than copying it. */
 async function restoreObjectVersion({
   projectRef,
   bucketId,

@@ -6,11 +6,8 @@ interface BroomSparklesIconProps extends Omit<SVGAttributes<SVGSVGElement>, 'chi
 }
 
 /**
- * Inline copy of Lucide's `broom-sparkles` icon. The version of `lucide-react`
- * pinned in Studio (`^0.436.0`) predates this icon, so we ship the SVG paths
- * directly rather than pull in a mixed-version import. Sized and colored the
- * same as a `lucide-react` icon (`size` prop, `currentColor` stroke) so it
- * drops in wherever an icon component would.
+ * Inline copy of Lucide's `broom-sparkles`, which the pinned `lucide-react` predates.
+ * Takes a `size` prop and strokes in `currentColor`, so it drops in like any Lucide icon.
  */
 export const BroomSparklesIcon = forwardRef<SVGSVGElement, BroomSparklesIconProps>(
   ({ size = 16, className, ...props }, ref) => (

@@ -14,10 +14,8 @@ export type ObjectPurgeVariables = {
 }
 
 /**
- * Permanently removes an object and every version of it. There is no single
- * endpoint for this: a bare path only hides whatever is current, so the history
- * is read first and each version deleted by id. Delete markers are included —
- * leaving one behind would keep the object listed as archived.
+ * No single endpoint does this: a bare path only hides what is current, so the history
+ * is read first and every version deleted by id, delete markers included.
  */
 export const useObjectPurgeMutation = ({
   onSuccess,
@@ -35,8 +33,7 @@ export const useObjectPurgeMutation = ({
       objectVersionsQueryOptions({ projectRef, bucketId, path })
     )
 
-    // A bucket that was never versioned has no version ids to address, so the
-    // bare path is the only way to name the object.
+    // A never-versioned bucket has no version ids, so the bare path is the only address.
     const paths =
       versions.length > 0
         ? versions.map((version) => ({ path, versionId: version.versionId }))
@@ -53,8 +50,7 @@ export const useObjectPurgeMutation = ({
   return useMutation<void, ResponseError, ObjectPurgeVariables>({
     mutationFn: purgeObject,
     async onSuccess(data, variables, context) {
-      // The object list lives in the explorer's own state, not React Query, so
-      // callers refresh it through their existing delete flow.
+      // The object list lives in the explorer's state, not React Query.
       await queryClient.invalidateQueries({
         queryKey: storageKeys.objectVersions(
           variables.projectRef,
