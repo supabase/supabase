@@ -1,16 +1,18 @@
+import { useTheme } from 'next-themes'
 import { cn, StatusIcon } from 'ui'
 
 import { DestinationIcon } from './DestinationIcon'
 import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { BASE_PATH } from '@/lib/constants'
+import { BRAND_ICONS, resolveThemedIconSrc, type ThemedIconSrc } from '@/lib/brand-icons'
+import { resolveThemeOverrideMode } from '@/lib/theme-overrides'
 
 // Destinations with a brand mark. Anything absent falls back to the line icon in the same frame,
 // so a new destination type never renders an empty square.
-const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, string>> = {
-  BigQuery: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
-  ClickHouse: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
-  DuckLake: `${BASE_PATH}/img/icons/ducklake-icon.svg`,
-  Snowflake: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
+const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, ThemedIconSrc>> = {
+  BigQuery: BRAND_ICONS.bigquery,
+  ClickHouse: BRAND_ICONS.clickhouse,
+  DuckLake: BRAND_ICONS.ducklake,
+  Snowflake: BRAND_ICONS.snowflake,
 }
 
 const SIZE_CLASS_NAME = {
@@ -36,16 +38,19 @@ export const DestinationLogo = ({
   className,
   hasErrors = false,
 }: DestinationLogoProps) => {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolveThemeOverrideMode(resolvedTheme) === 'dark'
   const sizing = SIZE_CLASS_NAME[size]
   const brandMark = BRAND_MARK_BY_TYPE[type]
+  const brandMarkSrc = brandMark === undefined ? undefined : resolveThemedIconSrc(brandMark, isDark)
 
   return (
     <span className={cn('relative inline-flex shrink-0', className)}>
       <span className={cn('flex items-center justify-center border bg-surface-100', sizing.frame)}>
-        {brandMark === undefined ? (
+        {brandMarkSrc === undefined ? (
           <DestinationIcon type={type} size={sizing.icon} className="text-foreground-light" />
         ) : (
-          <img src={brandMark} alt="" aria-hidden className={sizing.mark} />
+          <img src={brandMarkSrc} alt="" aria-hidden className={sizing.mark} />
         )}
       </span>
       {hasErrors && (
