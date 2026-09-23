@@ -140,6 +140,14 @@ an item that needs the visual separation.
      - Overly nested list item
 ```
 
+### Don't use these
+
+**Blockquotes.** Use an admonition when the content needs emphasis, or prose when it
+doesn't.
+
+**Footnotes.** Put the information in the sentence, or in a linked section when it's
+substantial enough to need one.
+
 ## Steps and code
 
 ### Procedures
@@ -390,11 +398,3 @@ item rather than wrapping the whole listing.
 
 For the data file, ID uniqueness rules, and the test command, see
 [CONTRIBUTING.md](../CONTRIBUTING.md).
-
-## Don't use these
-
-**Blockquotes.** Use an admonition when the content needs emphasis, or prose when it
-doesn't.
-
-**Footnotes.** Put the information in the sentence, or in a linked section when it's
-substantial enough to need one.

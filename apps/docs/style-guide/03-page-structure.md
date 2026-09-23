@@ -70,7 +70,7 @@ subsections and shares little with the rest of the page beyond the subject word.
 new page takes the second task or the second concept, and this page links to it.
 
 [Chunking](#chunking) limits how many items sit in one group. Topic size limits what
-those items are about. A procedure can have seven steps and still cover two tasks.
+those items are about. A procedure can have six steps and still cover two tasks.
 
 - **Recommended**: A passwordless email login guide with `Send a one-time password` and `Verify the code`.
 - **Not recommended**: An `Authentication` page that also covers passwords, OAuth, and session storage.
@@ -193,17 +193,21 @@ process, then structure and fact.
 ### Data types
 ```
 
-## Chunking
+### Chunking
 
 Apply the [Information Mapping chunking principle](https://informationmapping.com/blogs/news/writing-for-the-web-the-magical-number-seven-plus-or-minus-two):
-present 7 ± 2 related items at a time. That gives readers a manageable chunk of five
-to nine. Aim for the lower end when the task is complex or unfamiliar.
+present 5 ± 1 related items at a time. That gives readers a manageable chunk of four
+to six. Aim for the lower end when the task is complex or unfamiliar.
 
-If a procedure has more than nine steps, group related steps into named phases or
+Information Mapping gives 7 ± 2 as the general limit and 5 ± 1 for content read on a
+screen. Screen reading is less accurate than the same content on paper. Supabase docs
+are read on a screen, so 5 ± 1 applies.
+
+If a procedure has more than six steps, group related steps into named phases or
 smaller procedures. Don't add steps to reach a minimum. The range organizes
 information.
 
-The same limit applies to sections in a group. A page with fourteen top-level headings
+The same limit applies to sections in a group. A page with ten top-level headings
 needs grouping. Reordering them changes nothing.
 
 Headings and lists are the other half of chunking. A long stretch of prose with no
@@ -213,7 +217,7 @@ heading or a list usually serves better than a longer paragraph.
 
 A lookup surface is the exception. When a reader arrives to find one entry rather than
 to read the page, the entries carry their own order: alphabetical, or the order of an
-API. Grouping them into sevens would hide what they came for.
+API. Grouping them into fives would hide what they came for.
 
 For how to format the steps inside a procedure, see
 [`02-elements.md`](./02-elements.md).
@@ -260,6 +264,10 @@ and a reader can't tell whether `currently` was written last week or three years
 | currently          | future, in the future | old, older            |
 | does not yet       | latest                | presently, at present |
 | eventually         | new, newer            | soon                  |
+
+[`WORD_LIST.md`](./WORD_LIST.md) has entries for the two that come up most,
+[currently](./WORD_LIST.md#currently) and
+[latest, new, and soon](./WORD_LIST.md#latest-new-and-soon).
 
 - **Recommended**: `The emulator supports the following filters.`
 - **Not recommended**: `The emulator now supports the following filters.`

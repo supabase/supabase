@@ -231,7 +231,8 @@ Use _Supabase Dashboard_ for the Supabase product.
 ### currently
 
 Avoid _currently_ when the sentence describes the product's present behavior.
-State the behavior directly.
+State the behavior directly. See
+[Write timeless documentation](./03-page-structure.md#write-timeless-documentation).
 
 ## D
 
@@ -471,7 +472,9 @@ Use _later_ and _earlier_ for version ranges.
 ### latest, new, and soon
 
 Avoid time-relative descriptions that become stale. Provide a version, date, or
-specific product state instead.
+specific product state instead. See
+[Write timeless documentation](./03-page-structure.md#write-timeless-documentation)
+for the full list of words that fix a page to a moment.
 
 ### leverage
 
