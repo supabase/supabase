@@ -9,7 +9,7 @@ The [OrioleDB](https://www.orioledb.com/) Postgres extension provides a drop-in 
 OrioleDB addresses Postgres's scalability limitations by removing bottlenecks in the shared memory cache under high concurrency. It also optimizes write-ahead-log (WAL) insertion through row-level WAL logging. These changes lead to significant improvements in the industry standard TPC-C benchmark, which approximates a real-world transactional workload. The following benchmark was performed on a c7g.metal instance and shows OrioleDB's performance outperforming the default Postgres heap method with a 3.3x speedup.
 
 <Image
-  alt="TPC-C (warehouses = 500)"
+  alt="Line chart of TPC-C throughput at 500 warehouses, in transactions per minute (tpmC), from 0 to 320 connections. OrioleDB rises to about 350,000 tpmC by 20 connections and holds between about 400,000 and 490,000 from 80 connections onward. Heap stays between about 30,000 and 90,000 across the whole range."
   src="/docs/img/database/orioledb-tpc-c-500-warehouse.png"
   className="max-w-[550px] mx-auto! border rounded-md"
   width={1000}
