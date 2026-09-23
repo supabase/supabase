@@ -1,7 +1,4 @@
-/**
- * Separate from `Usage.constants` so modules that only need a color token don't
- * import the category tree — a cycle for anything `Usage.constants` renders.
- */
+// Separate from `Usage.constants` to keep a color import from pulling in the category tree.
 export const COLOR_MAP = {
   white: { bar: 'fill-foreground', marker: 'bg-foreground' },
   green: { bar: 'fill-green-800', marker: 'bg-green-800' },
