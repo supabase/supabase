@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ExternalLink, NotebookText } from 'lucide-react'
+import { Edit, NotebookText } from 'lucide-react'
 import Link from 'next/link'
 import { AiIconAnimation, Button, Card, CardContent } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -48,6 +48,9 @@ export const HomeNotebookSection = () => {
         <h3 className="heading-section">Pinned notebook</h3>
         {notebookHref && (
           <div className="flex items-center gap-x-2">
+            <Button asChild icon={<Edit />}>
+              <Link href={notebookHref}>Edit</Link>
+            </Button>
             <ButtonTooltip
               className="group"
               icon={
@@ -73,9 +76,6 @@ export const HomeNotebookSection = () => {
               disabled={!hasQueryCells}
               onClick={runNotebook}
             />
-            <Button asChild icon={<ExternalLink />}>
-              <Link href={notebookHref}>Open in Explorer</Link>
-            </Button>
           </div>
         )}
       </div>
