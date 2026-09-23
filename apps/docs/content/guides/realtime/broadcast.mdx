@@ -16,7 +16,7 @@ The way Broadcast works changes based on the channel you are using:
 
 <Admonition type="note">
 
-The public flag (the last argument in `realtime.send(payload, event, topic, is_private)`) only affects who can subscribe to the topic not who can read messages from the database.
+The `private` flag (the last argument in `realtime.send(payload, event, topic, private)`) only affects who can subscribe to the topic not who can read messages from the database.
 
 - Public (`false`) → Anyone can subscribe to that topic without authentication
 - Private (`true`) → Only authenticated clients can subscribe to that topic
@@ -506,10 +506,10 @@ You can send messages directly from your database using the `realtime.send()` fu
 ```sql
 select
   realtime.send(
-    jsonb_build_object('hello', 'world'), -- JSONB Payload
-    'event', -- Event name
-    'topic', -- Topic
-    false -- Public / Private flag
+    payload => jsonb_build_object('hello', 'world'), -- JSONB payload
+    event => 'event', -- Event name
+    topic => 'topic', -- Topic
+    private => true -- true = private channel (default), false = public channel
   );
 ```
 
@@ -527,10 +527,10 @@ To broadcast a binary payload from your database, use the `realtime.send_binary(
 ```sql
 select
   realtime.send_binary(
-    '\x012345'::bytea, -- bytea payload
-    'event',           -- Event name
-    'topic',           -- Topic
-    true               -- Private / Public flag (defaults to true)
+    payload => '\x012345'::bytea, -- bytea payload
+    event => 'event', -- Event name
+    topic => 'topic', -- Topic
+    private => true -- true = private channel (default), false = public channel
   );
 ```
 
@@ -1032,11 +1032,11 @@ Broadcast Changes provides two functions to help you send messages:
 The `realtime.send()` function provides the most flexibility by allowing you to broadcast messages from your database without a specific format. This allows you to use database broadcast for messages that aren't necessarily tied to the shape of a Postgres row change.
 
 ```sql
-SELECT realtime.send (
-	'{}'::jsonb, -- JSONB Payload
-	'event', -- Event name
-	'topic', -- Topic
-	FALSE -- Public / Private flag
+select realtime.send(
+  payload => '{}'::jsonb, -- JSONB payload
+  event => 'event', -- Event name
+  topic => 'topic', -- Topic
+  private => true -- true = private channel (default), false = public channel
 );
 ```
 
