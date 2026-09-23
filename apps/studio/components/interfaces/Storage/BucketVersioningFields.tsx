@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'framer-motion'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { DialogSection, DialogSectionSeparator, FormControl, FormField, Switch } from 'ui'
+import { Badge, DialogSection, DialogSectionSeparator, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -34,8 +34,7 @@ export const BucketVersioningFields = ({
   const maxVersions = useWatch({ control, name: 'max_noncurrent_versions' })
   const expirationMode = useWatch({ control, name: 'expiration_mode' })
 
-  // Turning the switch off suspends rather than disables,
-  // so this is a heads-up rather than a destructive confirmation.
+  // Turning the switch off suspends rather than disables, so this is a heads-up.
   const isSuspending = !isVersioningEnabled && initialVersioningState !== 'disabled'
 
   const tightening = getRetentionTightening({
@@ -66,7 +65,12 @@ export const BucketVersioningFields = ({
             <FormItemLayout
               hideMessage
               name="enable_versioning"
-              label="Object versioning"
+              label={
+                <span className="flex items-center gap-x-2">
+                  Object versioning
+                  <Badge variant="warning">Private Alpha</Badge>
+                </span>
+              }
               description="Retains previous versions of an object when it is overwritten or deleted"
               layout="flex"
             >

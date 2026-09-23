@@ -1,6 +1,5 @@
 import type { BucketVersioningState } from './StorageVersioning.constants'
 
-/** Which lifecycle conditions the user has just made stricter. */
 export type RetentionTightening = 'none' | 'days' | 'versions' | 'both'
 
 interface GetRetentionTighteningParams {
@@ -12,14 +11,7 @@ interface GetRetentionTighteningParams {
   nextMaxVersions: number | null
 }
 
-/**
- * Only a bucket that was already actively versioning can lose data to a
- * tightened policy: enabling for the first time has nothing retained to expire,
- * and suspending stops new versions without touching old ones.
- *
- * Raising or clearing a bound is never a tightening — clearing removes the
- * condition, which can only retain more.
- */
+/** Only an already-enabled bucket can lose data to a tightened policy. */
 export const getRetentionTightening = ({
   initialVersioningState,
   isVersioningEnabled,
@@ -57,6 +49,5 @@ export const RETENTION_TIGHTENING_DESCRIPTION: Record<
   versions: 'Saving permanently deletes noncurrent versions beyond the lower per-object cap.',
 }
 
-/** Converts the form's `'' | number` into a plain nullable number. */
 export const toNullableNumber = (value: '' | number): number | null =>
   typeof value === 'number' ? value : null
