@@ -2060,18 +2060,14 @@ export interface StorageBucketCreatedEvent {
      * The type of the bucket created. E.g. standard or analytics iceberg.
      */
     bucketType?: string
-    /**
-     * Whether object versioning was turned on for the bucket at creation time.
-     */
+    /** Whether object versioning was turned on at creation time. */
     hasVersioningEnabled?: boolean
   }
   groups: TelemetryGroups
 }
 
 /**
- * Triggered when object versioning is turned on for a storage bucket that has
- * never had it. Re-enabling a suspended bucket is not reported — the user
- * already opted in once.
+ * Triggered when object versioning is turned on for a bucket that has never had it.
  *
  * @group Events
  * @source studio
@@ -2080,10 +2076,7 @@ export interface StorageBucketCreatedEvent {
 export interface StorageBucketVersioningEnabledEvent {
   action: 'storage_bucket_versioning_enabled'
   properties: {
-    /**
-     * Whether a lifecycle policy was configured at the same time, rather than
-     * leaving noncurrent versions to accumulate indefinitely.
-     */
+    /** Whether a lifecycle policy was configured at the same time. */
     hasLifecyclePolicy?: boolean
   }
   groups: TelemetryGroups

@@ -3,19 +3,13 @@ import type { ExpirationMode } from './StorageVersioning.constants'
 import type { BucketLifecycle } from '@/data/storage/bucket-lifecycle-query'
 import type { BucketLifecycleRuleInput } from '@/data/storage/bucket-lifecycle-update-mutation'
 
-/**
- * Storage keys its rules by id, and replacing the configuration means sending
- * every rule we want to keep. Naming ours lets a round trip recognize what the
- * dashboard wrote, rather than guessing from the rule's shape.
- */
+/** Lets a round trip recognize the rules the dashboard wrote, rather than guess from shape. */
 export const AGE_RULE_ID = 'supabase-noncurrent-age'
 export const COUNT_RULE_ID = 'supabase-noncurrent-count'
 
 /**
- * S3 has no count-only condition: `newer_noncurrent_versions` is only honored
- * alongside `noncurrent_days`. "Either condition" is therefore two rules — one
- * expiring purely by age, one expiring beyond the cap at the shortest age the
- * API accepts. That floor is why the two modes aren't symmetrical.
+ * S3 honors `newer_noncurrent_versions` only alongside `noncurrent_days`, so "either
+ * condition" becomes two rules, the second pinned at the shortest age the API accepts.
  */
 const MIN_NONCURRENT_DAYS = 1
 
@@ -56,8 +50,7 @@ export const toLifecycleRules = (
     ]
   }
 
-  // The count condition is meaningless without an age, and the form's own
-  // validation already rejects that combination.
+  // The form's validation already rejects a count with no age.
   if (days === null) return []
 
   return [
@@ -73,11 +66,7 @@ export const toLifecycleRules = (
   ]
 }
 
-/**
- * Replacing the configuration sends every rule we want to keep, so a blind write
- * would drop anything `fromLifecycleRules` could not model. Only write when the
- * user actually moved one of the three fields the form owns.
- */
+/** A blind write would drop any rule `fromLifecycleRules` could not model. */
 export const hasLifecyclePolicyChanged = (
   stored: LifecycleFormPolicy,
   values: Pick<
@@ -94,11 +83,7 @@ export const hasLifecyclePolicyChanged = (
   return days !== null && versions !== null && stored.expirationMode !== values.expiration_mode
 }
 
-/**
- * Reads back whatever Storage has stored, including configurations the dashboard
- * did not write. Anything it can't model — extra rules, disabled rules, actions
- * other than noncurrent expiration — is ignored rather than guessed at.
- */
+/** Rules this can't model — extra, disabled, or non-expiration — are ignored, not guessed at. */
 export const fromLifecycleRules = (lifecycle?: BucketLifecycle | null): LifecycleFormPolicy => {
   const enabledRules = (lifecycle?.rules ?? []).filter(
     (rule) => rule.status === 'Enabled' && rule.noncurrent_version_expiration !== undefined

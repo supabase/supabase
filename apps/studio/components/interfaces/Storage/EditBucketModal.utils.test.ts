@@ -29,7 +29,6 @@ describe('getVersioningFormDefaults', () => {
   })
 
   it('ignores any stray stored policy on a never-versioned bucket', () => {
-    // A `disabled` bucket should not surface policy numbers the user never set, even if the API returns them.
     const defaults = getVersioningFormDefaults(
       settings({ versionExpiryDays: 1, maxNoncurrentVersions: 1 })
     )
@@ -56,8 +55,7 @@ describe('getVersioningFormDefaults', () => {
   })
 
   it('leaves an unset condition unset rather than filling in a default', () => {
-    // Prefilling here would silently add a bound the user never chose, which on
-    // save could expire versions they expected to keep.
+    // Prefilling here would silently add a bound the user never chose.
     const defaults = getVersioningFormDefaults(
       settings({ versioning: 'enabled', versionExpiryDays: 60, maxNoncurrentVersions: null })
     )
@@ -119,8 +117,7 @@ describe('isEnablingVersioning', () => {
   })
 
   it('is false when re-enabling a suspended bucket', () => {
-    // The user already opted in once and its versions never went away, so this
-    // is not a first-time enablement.
+    // The user already opted in once, so this is not a first-time enablement.
     expect(isEnablingVersioning('suspended', true)).toBe(false)
   })
 

@@ -6,11 +6,8 @@ import { storageKeys } from './keys'
 const PROJECT_REF = 'abcdefghijklmnopqrst'
 
 /**
- * The bucket list registers its key through `bucketsList`, which always writes all
- * four params — so a filter built from `bucketsList(ref)` carries `undefined` for
- * each of them. React Query compares the keys the filter supplies, and `undefined`
- * does not match `'name'`, so such a filter silently matches nothing. The bucket
- * mutations therefore invalidate on `buckets`, a plain array prefix.
+ * `bucketsList(ref)` spells out every param as `undefined`, which partial matching never
+ * matches, so the bucket mutations invalidate on `buckets` — a plain array prefix.
  */
 const registerBucketList = (queryClient: QueryClient) => {
   const key = storageKeys.bucketsList(PROJECT_REF, {
