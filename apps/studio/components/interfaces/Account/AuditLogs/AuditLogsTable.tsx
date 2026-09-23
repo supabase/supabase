@@ -36,8 +36,7 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
                 className={cn(
                   'sticky top-0 z-10 bg-surface-100',
                   '[border-bottom:none]! [box-shadow:inset_0_-1px_0_var(--border-default)]!',
-                  (header.column.columnDef.meta as AuditLogColumnMeta | undefined)
-                    ?.headerClassName,
+                  (header.column.columnDef.meta as AuditLogColumnMeta | undefined)?.headerClassName,
                   'px-2 first:pl-3'
                 )}
               >
