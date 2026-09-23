@@ -10,6 +10,18 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
+## Upcoming deprecations
+
+⚠️ The following optional Compose override files and their associated services will be removed in a future release:
+
+- `docker-compose.kong.yml` - Kong API gateway (superseded by Envoy)
+- `docker-compose.s3.yml` - S3-compatible storage via MinIO (use the RustFS override instead)
+- `docker-compose.pg15.yml` - Postgres 15 (Postgres 17 has been the default since v0.6.0)
+
+If you depend on any of these overrides, plan to migrate before they are removed.
+
+---
+
 ## [0.8.2](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.2) - 2026-09-23
 
 ### Documentation
