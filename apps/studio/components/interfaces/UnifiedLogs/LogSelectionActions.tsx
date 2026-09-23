@@ -39,7 +39,7 @@ export const LogSelectionActions = ({ rows }: { rows: unknown[] }) => {
     <div className="flex items-center gap-1">
       {!selectedLogs.success && (
         <span role="alert" className="text-xs text-destructive">
-          Selected logs contain invalid data. Refresh the logs and try again.
+          Selected logs contain invalid data.
         </span>
       )}
       <Shortcut
