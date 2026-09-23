@@ -60,12 +60,17 @@ twice reads as an editing mistake and trains readers to skip the box.
 
 Choose the `type` that matches the severity:
 
-| Type          | Use for                                                                                                                                                                     |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `danger`      | Data loss, exposed sensitive data, or another severe and difficult-to-reverse outcome. State the consequence first, then how to avoid it                                    |
-| `deprecation` | A deprecated feature or behavior. State how the change affects the reader, then the supported alternative or migration path                                                 |
-| `caution`     | Behavior that could cause bugs, failed operations, unexpected results, or serious inconvenience, but isn't as severe as `danger`                                            |
-| `note`        | An important prerequisite, constraint, clarification, or optional shortcut that carries no risk. If the information is essential to a step, put it in the procedure instead |
+| Type          | Use for                                                             |
+| ------------- | ------------------------------------------------------------------- |
+| `danger`      | Data loss, exposed data, or another severe, hard-to-reverse outcome |
+| `deprecation` | A deprecated feature or behavior                                    |
+| `caution`     | Bugs, failed operations, or unexpected results, short of `danger`   |
+| `note`        | A prerequisite, constraint, or clarification that carries no risk   |
+
+For `danger` and `caution`, state the consequence first, then how to avoid it. For
+`deprecation`, state how the change affects the reader, then the migration path. When a
+note is essential to completing a step, put it in the procedure instead of an
+admonition.
 
 Structure an admonition with these props:
 
@@ -91,11 +96,22 @@ Your content here
 
 Don't use them interchangeably or to add visual emphasis alone.
 
-| Format    | Use for                                                                                                                                                                                                                                                        |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Bold**  | UI labels the reader interacts with, such as buttons, menu items, and field names: `Click **Save**.` Also a term the reader must not miss: `**Never** commit your service role key.` Also an inline label opening a paragraph or list item: `**Recommended**:` |
-| _Italics_ | A new term the first time you define it, or a title such as a book or a third-party product written in italics by convention. Use sparingly. Never for UI labels or general emphasis                                                                           |
-| `Code`    | Anything the reader types or copies verbatim, or anything the system reads literally: filenames, paths, commands, flags, environment variables, function and parameter names, configuration keys, and literal values                                           |
+| Format    | Use for                                                         |
+| --------- | --------------------------------------------------------------- |
+| **Bold**  | A UI label, a term the reader must not miss, or an inline label |
+| _Italics_ | A new term on first definition, or a title                      |
+| `Code`    | Anything typed, copied, or read literally by the system         |
+
+Bold covers the controls a reader interacts with, such as buttons, menu items, and
+field names: `Click **Save**.` It also marks a term they can't afford to skip, as in
+`**Never** commit your service role key.` The third case is the label opening a
+paragraph or list item, as in `**Recommended**:`.
+
+Use italics sparingly, and never for a UI label or for general emphasis. A title set in
+italics by convention, such as a book or a third-party product, is the other case.
+
+Code covers filenames, paths, commands, flags, environment variables, function and
+parameter names, configuration keys, and literal values.
 
 A command name is `code`, not **bold**, even though the reader also interacts with it.
 
