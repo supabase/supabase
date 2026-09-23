@@ -38,7 +38,8 @@ function reshapeResult(row: unknown): DocsSearchV2Result | null {
   const slug = row.slug as string
   return {
     id: `${slug}#${row.heading as string}`,
-    path: slug ? `/docs/${slug}` : '/docs',
+    // Next's router already prepends the app's basePath ('/docs'), so don't add it here.
+    path: slug ? `/${slug}` : '/',
     title: row.page_title as string,
     heading: row.heading as string,
     excerpt: row.excerpt as string,
