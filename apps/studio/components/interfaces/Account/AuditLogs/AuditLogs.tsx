@@ -10,7 +10,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
 import { RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { Button, cn, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LogsDatePicker } from '../../Settings/Logs/Logs.DatePickers'
@@ -26,6 +26,8 @@ import { type AuditLog } from '@/data/organizations/organization-audit-logs-quer
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from '@/data/profile/profile-audit-logs-query'
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
+
+const CONTENT_PADDING = 'px-6 xl:px-10'
 
 export const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -123,7 +125,12 @@ export const AuditLogs = () => {
       <ScaffoldSection isFullWidth className="pt-6! pb-0! flex-1 min-h-0">
         <div className="space-y-4 flex flex-col h-full min-h-0">
           {/* [Joshen] Can consider replacing this with filter bar */}
-          <div className="px-6 xl:px-10 flex flex-col md:flex-row md:items-center justify-between">
+          <div
+            className={cn(
+              CONTENT_PADDING,
+              'flex flex-col md:flex-row md:items-center justify-between'
+            )}
+          >
             <div className="flex items-center space-x-2">
               <p className="text-xs prose">Filter by</p>
               <FilterPopover
@@ -185,23 +192,37 @@ export const AuditLogs = () => {
           </div>
 
           {isLoading && (
-            <div className="space-y-2">
+            <div className={cn(CONTENT_PADDING, 'space-y-2')}>
               <ShimmeringLoader />
               <ShimmeringLoader className="w-3/4" />
               <ShimmeringLoader className="w-1/2" />
             </div>
           )}
 
-          {isError && <AlertError error={error} subject="Failed to retrieve audit logs" />}
+          {isError && (
+            <div className={CONTENT_PADDING}>
+              <AlertError error={error} subject="Failed to retrieve audit logs" />
+            </div>
+          )}
 
           {isSuccess && (
             <>
               {logs.length === 0 ? (
-                <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                <div
+                  className={cn(
+                    CONTENT_PADDING,
+                    'bg-surface-100 border rounded-sm p-4 flex items-center justify-between'
+                  )}
+                >
                   <p className="prose text-sm">You do not have any audit logs available yet</p>
                 </div>
               ) : logs.length > 0 && filteredLogs.length === 0 ? (
-                <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                <div
+                  className={cn(
+                    CONTENT_PADDING,
+                    'bg-surface-100 border rounded-sm p-4 flex items-center justify-between'
+                  )}
+                >
                   <p className="prose text-sm">No audit logs found based on the filters applied</p>
                 </div>
               ) : (

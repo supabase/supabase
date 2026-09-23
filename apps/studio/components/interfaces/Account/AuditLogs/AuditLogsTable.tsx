@@ -65,11 +65,8 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
           <TableRow className="hover:bg-transparent">
             <TableCell colSpan={table.getAllLeafColumns().length} className="text-center py-2">
               <p className="text-xs text-foreground-lighter">
-                No more data to load (
-                <span className="font-mono font-medium">{formatCompactNumber(rows.length)}</span>{' '}
-                of{' '}
-                <span className="font-mono font-medium">{formatCompactNumber(rows.length)}</span>{' '}
-                rows)
+                Viewing <span className="font-mono font-medium">{formatCompactNumber(rows.length)}</span>{' '}
+                logs
               </p>
             </TableCell>
           </TableRow>

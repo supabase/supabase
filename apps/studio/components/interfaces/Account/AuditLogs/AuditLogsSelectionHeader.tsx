@@ -15,7 +15,7 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
   const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original)
   const hasSelection = selectedRows.length > 0
 
-  const onCopy = () => {
+  const handleCopy = () => {
     const text = JSON.stringify(selectedRows, null, 2)
     copyToClipboard(text, () => {
       toast.success(`Copied ${selectedRows.length} log${selectedRows.length !== 1 ? 's' : ''}`)
@@ -41,7 +41,7 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
               size="tiny"
               icon={<Copy size={12} />}
               className="w-7"
-              onClick={onCopy}
+              onClick={handleCopy}
               tooltip={{ content: { side: 'bottom', text: 'Copy selected logs' } }}
             />
             <ButtonTooltip

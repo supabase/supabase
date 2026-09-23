@@ -50,27 +50,27 @@ export function getAuditLogColumns({
             e.stopPropagation()
 
             const nextSelected = !row.getIsSelected()
+            const rows = table.getRowModel().rows
+            const lastIndex = lastSelectedRowId.current
+              ? rows.findIndex((r) => r.id === lastSelectedRowId.current)
+              : -1
+            const currentIndex = rows.findIndex((r) => r.id === row.id)
+            const canSelectRange = e.shiftKey && lastIndex !== -1 && currentIndex !== -1
 
-            if (e.shiftKey && lastSelectedRowId.current) {
-              const rows = table.getRowModel().rows
-              const lastIndex = rows.findIndex((r) => r.id === lastSelectedRowId.current)
-              const currentIndex = rows.findIndex((r) => r.id === row.id)
-
-              if (lastIndex !== -1 && currentIndex !== -1) {
-                const [start, end] =
-                  lastIndex < currentIndex ? [lastIndex, currentIndex] : [currentIndex, lastIndex]
-                table.setRowSelection((prev) => {
-                  const next = { ...prev }
-                  for (let i = start; i <= end; i++) {
-                    if (nextSelected) {
-                      next[rows[i].id] = true
-                    } else {
-                      delete next[rows[i].id]
-                    }
+            if (canSelectRange) {
+              const [start, end] =
+                lastIndex < currentIndex ? [lastIndex, currentIndex] : [currentIndex, lastIndex]
+              table.setRowSelection((prev) => {
+                const next = { ...prev }
+                for (let i = start; i <= end; i++) {
+                  if (nextSelected) {
+                    next[rows[i].id] = true
+                  } else {
+                    delete next[rows[i].id]
                   }
-                  return next
-                })
-              }
+                }
+                return next
+              })
             } else {
               row.toggleSelected(nextSelected)
             }
@@ -157,7 +157,10 @@ export function getAuditLogColumns({
         const name = project?.name ?? organization?.name
         const ref = log.project_ref ?? log.organization_slug
 
-        const targetScope = name ? (project?.name ? 'Project' : 'Organization') : null
+        let targetScope: 'Project' | 'Organization' | null = null
+        if (project?.name) targetScope = 'Project'
+        else if (organization?.name) targetScope = 'Organization'
+
         const target = name ? `${name} (${ref})` : ref
 
         return (
