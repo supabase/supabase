@@ -18,12 +18,13 @@
   --tertiary-foreground-level: 0.5;
   /* Accessible primary for text and small indicators on light surfaces (~4.5:1+).
      Solid button plates alias to the same green in light mode. Focus rings and
-     bright brand chrome stay on --brand-default. */
+     bright brand chrome use --brand-default. */
   --primary: oklch(0.525 0.12 var(--primary-hue));
   --primary-foreground: oklch(0.99 0.00275 var(--primary-hue));
   --primary-solid: var(--primary);
   --primary-solid-foreground: var(--primary-foreground);
   --primary-solid-hover: var(--primary-hover);
+  --ring: hsl(var(--brand-default) / 90%);
   /*
    * Expressive fills run darker than the dark-theme anchors so they hold contrast
    * against the near-white surface (a light amber on white disappears). Lightness

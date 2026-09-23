@@ -166,7 +166,7 @@
    *   --primary-solid        Deeper button plate (dark mode). Light theme
    *                          aliases these to --primary so ink and buttons
    *                          share one green there.
-   * Bright expressive chrome (focus rings, etc.) stays on brand-default.
+   * Bright expressive chrome, including focus rings, uses brand-default.
    *
    * Hover shifts lightness only (preserves hue/chroma). Mixing with --foreground
    * pulls light-mode surface-hue (warm) into the green and reads as yellow.
@@ -308,7 +308,6 @@
   --border-control-hover: oklch(
     from var(--foreground) l calc(c * 0.5) h / calc(12% + 58% * var(--contrast-border))
   );
-  /* Focus chrome stays on bright brand-default. Accessible --primary is for
-     readable text / solid primary fills, not rings. */
+  /* Focus chrome uses brand-default with theme-specific translucency. */
   --ring: oklch(from hsl(var(--brand-default)) l c h / 55%);
 }
