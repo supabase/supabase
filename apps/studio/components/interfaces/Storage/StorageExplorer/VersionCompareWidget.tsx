@@ -7,7 +7,6 @@ import type { ObjectVersion } from '@/data/storage/versioning/object-versions-qu
 import { formatBytes } from '@/lib/helpers'
 
 interface VersionCompareWidgetProps {
-  /** Full path within the bucket. */
   path: string
   mimeType?: string
   selectedVersion: ObjectVersion
@@ -60,8 +59,7 @@ export const VersionCompareWidget = ({
       <ArrowRight size={14} className="shrink-0 text-foreground-lighter" />
       <div className="flex-1 space-y-1.5">
         <div className="flex h-24 items-center justify-center overflow-hidden rounded-md border border-overlay bg-surface-200">
-          {/* No `versionId`: without one the endpoint resolves the current version,
-              which is exactly the right side of this comparison. */}
+          {/* No `versionId`, so the endpoint resolves the current version. */}
           <FilePreview path={path} mimeType={mimeType} size={currentVersion?.size} />
         </div>
         <p className="truncate text-center font-mono text-[11px] text-foreground-lighter">

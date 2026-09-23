@@ -20,28 +20,18 @@ const FileIcon = ({ className }: { className?: string }) => (
 )
 
 interface FilePreviewProps {
-  /** Full path within the bucket. */
   path: string
   mimeType?: string
-  /** Bytes. Anything larger than the limit renders a placeholder instead. */
+  /** Bytes. Anything over the limit renders a placeholder instead. */
   size?: number
-  /**
-   * Renders that specific version's bytes rather than the object's current ones.
-   * Without it the preview always shows the current version, which is what made
-   * every entry in a version history look identical.
-   */
+  /** Renders that version's bytes. Without it, the current ones. */
   versionId?: string
 }
 
-/**
- * Renders a file's actual content — the same component for the current version and
- * for any older one, so a version preview can never silently fall back to showing
- * the current bytes.
- */
 export const FilePreview = ({ path, mimeType, size, versionId }: FilePreviewProps) => {
   const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
 
-  // An unknown size is treated as too large, matching the pre-versioning behavior.
+  // An unknown size counts as too large, matching the pre-versioning behavior.
   const effectiveSize = size ?? PREVIEW_SIZE_LIMIT + 1
   const isSkipped = !!mimeType && effectiveSize > PREVIEW_SIZE_LIMIT
 

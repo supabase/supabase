@@ -74,7 +74,6 @@ interface CurrentFilePreviewProps {
   onPurge: () => void
 }
 
-/** The default top slot: the current file's thumbnail, metadata and actions. */
 const CurrentFilePreview = ({
   file,
   path,
@@ -252,8 +251,7 @@ export const PreviewPane = () => {
 
   const versioningState = getBucketVersioningState(selectedBucket)
 
-  // The version endpoints address an object by its full path in the bucket, not
-  // by the leaf name the explorer renders.
+  // The version endpoints address an object by full path, not the leaf name in the row.
   const folderPath = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
   const filePath = file ? [folderPath, file.name].filter(Boolean).join('/') : undefined
 

@@ -4,10 +4,7 @@ import { cn } from 'ui'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
-/**
- * The thumbnail is 28px, so the whole object is downloaded to be drawn into
- * almost nothing. Worth it for an ordinary image, not for a large one.
- */
+// The box is 28px, so the whole object is downloaded to draw almost nothing.
 const THUMBNAIL_SIZE_LIMIT = 5 * 1024 * 1024 // 5MB
 
 const MimeTypeIcon = ({ mimeType, size }: { mimeType?: string; size: number }) => {
@@ -58,15 +55,11 @@ interface VersionThumbnailProps {
   isCurrent: boolean
   isDeleteMarker?: boolean
   size?: number
-  /**
-   * Full path within the bucket. Given a path, an image version renders its own
-   * bytes rather than a generic icon — which is the only thing that tells two
-   * versions of the same file apart at a glance.
-   */
+  /** Full path within the bucket. Given one, an image renders its own bytes. */
   path?: string
   /** Omit to render the object's current version. */
   versionId?: string
-  /** Bytes, used to skip the fetch for a file too large to be worth thumbnailing. */
+  /** Bytes, used to skip the fetch for a file too large to thumbnail. */
   byteSize?: number
 }
 

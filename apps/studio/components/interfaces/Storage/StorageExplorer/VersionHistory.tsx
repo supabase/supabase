@@ -87,7 +87,6 @@ const VersionActionsMenu = ({
   const label = shortVersion(version.versionId)
   const isDeleteMarker = version.action === 'delete marker'
 
-  // Restoring and deleting only make sense for the versions behind the current one.
   if (version.isCurrent) return null
 
   return (
@@ -127,7 +126,6 @@ const VersionActionsMenu = ({
 interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
-  /** Leaf name, for copy. */
   objectName: string
   /** Full path within the bucket, which is what the version endpoints address. */
   path: string
