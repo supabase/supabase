@@ -71,13 +71,20 @@ export function NotebookPdfChart({ chart, rows }: NotebookPdfChartProps): ReactE
   // own rule (QueryResultChart resets `scale` to linear once a second Y column is added).
   const isLogScale = y_series.length === 1 && scale === 'log'
 
-  const allValues = plotRows.flatMap((row) => y_series.map((column) => Number(row[column]) || 0))
-  const dataMax = Math.max(0, ...allValues)
-  const dataMin = Math.min(0, ...allValues)
-  const positiveValues = allValues.filter((value) => value > 0)
+  let dataMax = 0
+  let dataMin = 0
+  let smallestPositive = Infinity
+  plotRows.forEach((row) => {
+    y_series.forEach((column) => {
+      const value = Number(row[column]) || 0
+      if (value > dataMax) dataMax = value
+      if (value < dataMin) dataMin = value
+      if (value > 0 && value < smallestPositive) smallestPositive = value
+    })
+  })
 
   const domainMin = isLogScale
-    ? Math.max(1, Math.min(...(positiveValues.length > 0 ? positiveValues : [1])))
+    ? Math.max(1, smallestPositive === Infinity ? 1 : smallestPositive)
     : dataMin
   const domainMax = isLogScale
     ? Math.max(domainMin * 10, dataMax)
