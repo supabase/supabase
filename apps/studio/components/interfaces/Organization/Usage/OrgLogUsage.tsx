@@ -56,8 +56,6 @@ const OrgLogUsage = ({
       : {}),
   }
 
-  console.log(JSON.stringify(chartMeta, null, 2))
-
   return (
     <UsageSection
       orgSlug={orgSlug}

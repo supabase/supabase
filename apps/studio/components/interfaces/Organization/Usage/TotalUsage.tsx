@@ -132,7 +132,7 @@ export const TotalUsage = ({
         usageRatioB - usageRatioA
       )
     })
-  }, [usage])
+  }, [usage, subscription])
 
   const computeMetrics = (usage?.usages || [])
     .filter((it) => it.metric.startsWith('COMPUTE'))

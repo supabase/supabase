@@ -5,7 +5,6 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from '@/components/interfaces/HomePageActions'
-import { LogPricingAnnouncement } from '@/components/interfaces/LogPricingAnnouncement'
 import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'

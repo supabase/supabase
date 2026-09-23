@@ -230,6 +230,23 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
     ],
   })
 
+  const logStorageAttributes: CategoryAttribute[] =
+    subscription?.plan.id === 'platform'
+      ? [
+          {
+            anchor: 'logStorage',
+            key: PricingMetric.LOG_STORAGE,
+            attributes: [{ key: PricingMetric.LOG_STORAGE.toLowerCase(), color: 'white' }],
+            name: 'Log Storage',
+            unit: 'absolute',
+            description:
+              'Total amount of logs stored on the platform. Log retention depends on your platform agreement.\nBilling is based on the total amount of logs stored and factors in the retention period.',
+            chartDescription: 'The data refreshes every hour.',
+            links: [],
+          },
+        ]
+      : []
+
   return [
     {
       key: 'egress',
@@ -377,7 +394,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           description:
             subscription?.plan.id === 'platform'
               ? "Total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle."
-              : "Total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle.\nBilling starts after the grace period ends at the start of 2026.",
+              : "Total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle.\nBilling starts after the grace period ends at the start of 2027.",
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
@@ -404,21 +421,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
             },
           ],
         },
-        ...(subscription?.plan.id === 'platform'
-          ? [
-              {
-                anchor: 'logStorage',
-                key: PricingMetric.LOG_STORAGE,
-                attributes: [{ key: PricingMetric.LOG_STORAGE.toLowerCase(), color: 'white' }],
-                name: 'Log Storage',
-                unit: 'absolute',
-                description:
-                  'Total amount of logs stored on the platform. Log retention depends on your platform agreement.\nBilling is based on the total amount of logs stored and factors in the retention period.',
-                chartDescription: 'The data refreshes every hour.',
-                links: [],
-              },
-            ]
-          : []),
+        ...logStorageAttributes,
       ],
     },
 
