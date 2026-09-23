@@ -16,7 +16,7 @@ See per-service updates below for details. Only the most important changes relev
 
 - `docker-compose.kong.yml` - Kong API gateway (superseded by Envoy)
 - `docker-compose.s3.yml` - S3-compatible storage via MinIO (use the RustFS override instead)
-- `docker-compose.pg15.yml` - Postgres 15 (Postgres 17 has been the default since v0.6.0)
+- `docker-compose.pg15.yml` - Postgres 15 (Postgres 17 has been the default since [0.6.0](#060---2026-06-17))
 
 If you depend on any of these overrides, plan to migrate before they are removed.
 
