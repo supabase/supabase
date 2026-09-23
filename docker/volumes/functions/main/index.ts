@@ -302,6 +302,7 @@ Deno.serve(async (req: Request) => {
   const memoryLimitMb = 150
   // Keep the wall clock above the 150s request idle timeout configured in Compose.
   const workerTimeoutMs = 400_000
+  const requestAbsentTimeoutMs = 60_000
   const noModuleCache = false
   // Using a common Import Map for all functions 
   // to use a scope 'deno.json' it must be dinamically resolved base on the 'service_name'
@@ -317,6 +318,7 @@ Deno.serve(async (req: Request) => {
       servicePath,
       memoryLimitMb,
       workerTimeoutMs,
+      context: { supervisor: { requestAbsentTimeoutMs } },
       noModuleCache,
       importMapPath,
       envVars,
