@@ -63,9 +63,10 @@ export const AuditLogDetailsPanel = ({ selectedLog, onClose }: AuditLogDetailsPa
                   className="px-1.5"
                   icon={copied ? <Check size={12} /> : <Copy size={12} />}
                   onClick={() => {
-                    copyToClipboard(json)
-                    setCopied(true)
-                    setTimeout(() => setCopied(false), 1000)
+                    copyToClipboard(json, () => {
+                      setCopied(true)
+                      setTimeout(() => setCopied(false), 1000)
+                    })
                   }}
                 >
                   {copied ? 'Copied' : ''}
