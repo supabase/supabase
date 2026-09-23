@@ -175,7 +175,7 @@ export const RowMenu = ({
 
         <DropdownMenuContent side="bottom" align="end" className="w-44">
           <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
-            <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+            <Link href={`/project/${projectRef}/database/pipelines/${pipeline?.id}`}>
               <Eye size={14} />
               <p>View details</p>
             </Link>

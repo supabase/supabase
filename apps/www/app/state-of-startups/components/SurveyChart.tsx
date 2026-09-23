@@ -26,7 +26,7 @@ interface SurveyChartProps {
 }
 
 const accentBarFg = 'bg-brand-default'
-const accentBarText = 'text-brand'
+const accentBarText = 'text-primary'
 
 export function SurveyChart({
   title,

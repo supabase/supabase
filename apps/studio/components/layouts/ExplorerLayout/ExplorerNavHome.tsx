@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { motion } from 'framer-motion'
 import { ChevronRight, Plus, Settings, SquareCode } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -12,10 +13,13 @@ import {
   rowClassName,
 } from './ExplorerLayout.constants'
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
-import { useCreateChat, useCreateQuery } from '@/components/interfaces/Explorer/hooks'
+import { ExplorerNavItem } from './ExplorerNavItem'
+import { useExplorerDeleteItem } from './ExplorerProvider'
+import { useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
+import { useAppStateSnapshot } from '@/state/app-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNavHome = ({
@@ -23,10 +27,13 @@ export const ExplorerNavHome = ({
 }: {
   onSelectSection: (section: ExplorerResourceType) => void
 }) => {
-  const { ref } = useParams()
-  const { openChat } = useCreateChat()
+  const router = useRouter()
+  const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
+  const appStateSnapshot = useAppStateSnapshot()
+
   const { createQuery } = useCreateQuery()
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const { data: notebooksData } = useNotebooksInfiniteQuery({ projectRef: ref, limit: 100 })
   const notebooks = notebooksData?.pages.flatMap((page) => page.content) ?? []
@@ -98,39 +105,34 @@ export const ExplorerNavHome = ({
             <p className="px-2 text-xs text-foreground-lighter">Nothing edited yet</p>
           ) : (
             recentItems.map((item) => {
-              const Icon = EXPLORER_SECTIONS.find((section) => section.type === item.type)?.icon
-              const content = (
-                <>
-                  {Icon && <Icon size={14} className="shrink-0" aria-hidden="true" />}
-                  <span className="flex-1 truncate text-left">{item.label}</span>
-                  <span className="shrink-0 text-xs text-foreground-lighter">
-                    {formatRelativeTimeShort(item.updatedAt)}
-                  </span>
-                </>
-              )
+              const isActive = id === item.id
 
-              return item.type === 'chat' ? (
-                <button
+              const href =
+                item.type === 'chat'
+                  ? `/project/${ref}/explorer/chat/${item.id}`
+                  : `/project/${ref}/explorer/notebook/${item.id}`
+
+              const onDoubleClick = () => {
+                if (item.type === 'chat') {
+                  tabs.makeTabPermanent(createTabId('chat', { id: item.id }))
+                } else {
+                  tabs.makeTabPermanent(createTabId('notebook', { id: item.id }))
+                }
+              }
+
+              return (
+                <ExplorerNavItem
                   key={item.id}
-                  type="button"
-                  tabIndex={0}
-                  className={rowClassName(false)}
-                  onClick={() => openChat(item.id)}
-                  onDoubleClick={() => tabs.makeTabPermanent(createTabId('chat', { id: item.id }))}
-                >
-                  {content}
-                </button>
-              ) : (
-                <Link
-                  key={item.id}
-                  href={`/project/${ref}/explorer/notebook/${item.id}`}
-                  className={rowClassName(false)}
-                  onDoubleClick={() =>
-                    tabs.makeTabPermanent(createTabId('notebook', { id: item.id }))
+                  type={item.type}
+                  href={href}
+                  name={item.label}
+                  isActive={isActive}
+                  onDoubleClick={onDoubleClick}
+                  onSelectDelete={() =>
+                    onSelectDelete({ id: item.id, type: item.type, name: item.label })
                   }
-                >
-                  {content}
-                </Link>
+                  description={formatRelativeTimeShort(item.updatedAt)}
+                />
               )
             })
           )}
@@ -138,7 +140,11 @@ export const ExplorerNavHome = ({
       </div>
 
       <div className="shrink-0 border-t border-default p-3">
-        <Link href="/account/me#dashboard" className={rowClassName(false)}>
+        <Link
+          href="/account/me#dashboard"
+          className={rowClassName(false)}
+          onClick={() => appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)}
+        >
           <Settings size={14} className="shrink-0" />
           <span className="flex-1 text-left">Preferences</span>
         </Link>

@@ -36,7 +36,7 @@ export function SurveyRankedAnswersPair({
             <ol className="flex flex-col gap-3">
               {item.answers.map((answer, answerIndex) => (
                 <li key={answerIndex} className="flex flex-col gap-2">
-                  <span className="text-sm font-mono text-brand">#{answerIndex + 1}</span>
+                  <span className="text-sm font-mono text-primary">#{answerIndex + 1}</span>
                   <span
                     className={`${['text-2xl', 'text-lg', 'text-sm'][answerIndex] || 'text-lg'} text-foreground`}
                   >

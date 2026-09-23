@@ -39,7 +39,7 @@ export default {
     'text-contrast',
     'text-destructive',
     'text-warning',
-    'text-brand',
+    'text-primary',
   ],
   colors: [
     'bg-destructive-200',

@@ -418,7 +418,7 @@ export const LogsDatePicker = ({
                 size="tiny"
                 onClick={handleCopy}
                 className={cn({
-                  'text-brand': copied || pasted,
+                  'text-primary': copied || pasted,
                 })}
               >
                 {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}

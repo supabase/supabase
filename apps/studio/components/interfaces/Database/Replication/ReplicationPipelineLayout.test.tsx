@@ -203,9 +203,9 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout(<div>Overview content</div>)
 
     expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
-    expect(screen.getByRole('link', { name: 'Replication' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute(
       'href',
-      '/project/default/database/replication'
+      '/project/default/database/pipelines'
     )
     expect(screen.getByRole('link', { name: 'View logs' }).getAttribute('href')).toContain(
       'pipeline_id'
