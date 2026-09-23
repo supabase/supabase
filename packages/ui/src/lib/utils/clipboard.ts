@@ -21,6 +21,8 @@ export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
 
   try {
     if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+      let richWriteSucceeded = false
+
       try {
         // NOTE: Safari locks down the clipboard API to only work when triggered
         // by a direct user interaction. You can't use it async in a promise.
@@ -34,11 +36,15 @@ export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
         })
 
         await navigator.clipboard.write([text])
-        callback()
-        return
+        richWriteSucceeded = true
       } catch {
         // Safari can expose clipboard.write() and still reject it. Fall back to
         // writeText() before reporting that copying failed.
+      }
+
+      if (richWriteSucceeded) {
+        callback()
+        return
       }
     }
 

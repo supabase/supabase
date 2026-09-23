@@ -236,6 +236,18 @@ describe('copyToClipboard', () => {
     expect(toast.error).not.toHaveBeenCalled()
   })
 
+  it('does not retry after a successful rich write when the callback throws', async () => {
+    const callback = vi.fn(() => {
+      throw new Error('Callback failed')
+    })
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(writeMock).toHaveBeenCalledOnce()
+    expect(writeTextMock).not.toHaveBeenCalled()
+    expect(callback).toHaveBeenCalledOnce()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
+
   it('reports when both clipboard methods are denied', async () => {
     writeMock.mockRejectedValue(new DOMException('Write permission denied.'))
     writeTextMock.mockRejectedValue(new DOMException('Write permission denied.'))
