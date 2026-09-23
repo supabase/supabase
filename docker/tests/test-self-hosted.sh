@@ -457,6 +457,14 @@ fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -d '{}')
 check "Call hello function" '{"message":"Hello from Edge Functions!"}' "$fn_resp"
 
+fn_headers=$(mktemp); cleanup_files="$cleanup_files $fn_headers"
+fn_missing_status=$(http_status "$BASE_URL/functions/v1/smoke-test-missing-$$" \
+    -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+    -D "$fn_headers")
+check "Unknown function returns 404" "404" "$fn_missing_status"
+fn_error_code=$(awk 'tolower($1) == "sb-error-code:" { sub(/^[^:]*:[[:space:]]*/, ""); sub(/[[:space:]]*$/, ""); print }' "$fn_headers")
+check "Unknown function returns sb-error-code header" "NOT_FOUND" "$fn_error_code"
+
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
 # ---------------------------------------------
