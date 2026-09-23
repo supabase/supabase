@@ -5,15 +5,19 @@ description: Colors system breakdown with best practices.
 
 The shorthand utility classes below simplify our full color palette by providing sensible, contrast-checked defaults. Use them whenever possible to ensure accessible text colors and balanced background fills.
 
-## Brand green
+## Supabase green
 
-In light mode, Supabase green has two shades.
+Supabase green has two shades: a darker green for readable UI and primary buttons, and a brighter green for brand chrome such as fills, borders, and focus rings.
 
-`--primary` is the darker green. It meets WCAG AA for normal text on light surfaces, and it is also used for primary buttons and small selected indicators. Utilities include `text-primary`, `bg-primary`, and `border-primary`.
+### Primary green
+
+`--primary` is the functional green. In light mode it meets WCAG AA for normal text on surfaces. In dark mode it is a deeper fill so primary buttons do not read as lime. It is also used for small selected indicators. Utilities include `text-primary`, `bg-primary`, and `border-primary`.
+
+### Brand green
 
 `brand-default` is the bright brand green. Use it for focus rings (`--ring` / `ring-ring`), highlight rings, and other bright fills or borders such as `bg-brand-default` and `border-brand-default`.
 
-Toggle to light mode to compare the two. Dark mode barely differs between them.
+Toggle the theme to compare the swatches below. Both themes keep `--primary` darker than `brand-default`; light mode shows the larger gap because of text contrast requirements:
 
 <Colors definition={'colors'} classes={['bg-primary', 'bg-brand-default']} />
 
@@ -25,7 +29,7 @@ Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid 
 
 Use `text-primary` for readable branded text such as links, labels, and statuses. On light-theme
 surfaces it meets the 4.5:1 WCAG AA requirement for normal text. For fills, borders, and focus
-chrome, see [Brand green](#brand-green).
+chrome, see [Supabase green](#supabase-green).
 
 <Colors definition={'text'} />
 
@@ -34,7 +38,7 @@ chrome, see [Brand green](#brand-green).
 Use `bg-brand-default` when the canonical Supabase green is required as a fill. The same
 `brand-default` suffix applies to borders and other non-text utilities, such as
 `border-brand-default`. Prefer accessible `--primary` / `border-primary` for small selected
-indicators (radios, step dots). Details in [Brand green](#brand-green).
+indicators (radios, step dots). Details in [Supabase green](#supabase-green).
 
 <Colors definition={'background'} />
 
@@ -55,7 +59,7 @@ We use backgrounds in 2 different ways. In the ./www and ./docs sites, we use a 
 <body className="bg-studio">{children}</body>
 ```
 
-### Backgrounds and Surfaces
+### Backgrounds and surfaces
 
 #### `./apps/www` + `./apps/docs`
 
@@ -87,7 +91,7 @@ This is not to be confused with `Dialogs`, they require to use the same app back
 
 <Colors definition={'border'} />
 
-## Other Colors
+## Other colors
 
 These can also be accessed with `foreground`. Like `text-foreground-light`.
 

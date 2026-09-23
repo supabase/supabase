@@ -159,16 +159,19 @@
   --popover-foreground: var(--foreground);
 
   /*
-   * Primary is the accessible functional green for text, solid primary fills
-   * (including primary Button), and small selected indicators. Bright expressive
-   * fills and focus chrome use brand-default. Light theme overrides --primary
-   * for AA text.
+   * Primary is the functional green for text, solid primary fills (including
+   * primary Button), and small selected indicators. Bright expressive fills and
+   * focus chrome use brand-default.
+   *
+   * Root values mirror dark theme: a darker plate so light labels hold contrast
+   * on primary buttons. Light theme overrides --primary / --primary-foreground
+   * for AA text on light surfaces.
    *
    * Hover shifts lightness only (preserves hue/chroma). Mixing with --foreground
    * pulls light-mode surface-hue (warm) into the green and reads as yellow.
    * Sign of --tone-span: darken in light, lighten in dark.
    */
-  --primary: oklch(0.76 0.15 var(--primary-hue));
+  --primary: oklch(0.43627 0.11 var(--primary-hue));
   --button-fill-hover-delta: 0.04;
   --primary-hover: oklch(
     from var(--primary)
@@ -178,9 +181,7 @@
       )
       c h
   );
-  --primary-foreground: oklch(
-    min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
-  );
+  --primary-foreground: oklch(0.95 0.00275 var(--primary-hue));
 
   --secondary: oklch(
     from var(--background) calc(l + var(--elevation-step) * var(--elevation-3)) c h
