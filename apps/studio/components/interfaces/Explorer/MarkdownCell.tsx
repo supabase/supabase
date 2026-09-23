@@ -2,6 +2,7 @@ import { cn } from 'ui'
 
 import { AddCellDropdown } from './AddCellDropdown'
 import { MoveCellDropdownContent } from './MoveCellDropdownContent'
+import { NOTEBOOK_CELL_WIDTH } from './Notebook/notebook.utils'
 import { MarkdownEditor } from '@/components/ui/MarkdownEditor/MarkdownEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { type MarkdownCell as MarkdownCellSchema } from '@/data/content/notebooks/notebook-schema'
@@ -29,7 +30,7 @@ export const MarkdownCell = ({ cell, onEdit }: MarkdownCellProps) => {
   return (
     <SortableSection
       id={cell._id}
-      sectionWidth="48rem"
+      sectionWidth={NOTEBOOK_CELL_WIDTH}
       actions={<AddCellDropdown cellId={cell._id} />}
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-1.5 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"

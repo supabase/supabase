@@ -1,31 +1,20 @@
 import { AlignLeft } from 'lucide-react'
-import { forwardRef, useState } from 'react'
+import { forwardRef } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { type Snapshot } from 'valtio'
 
 import { AddCellDropdown } from '../AddCellDropdown'
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
-import { QueryEditor, type QueryEditorHandle } from '../QueryEditor'
-import { type QueryDisplay, type QueryResult } from '../types'
-import {
-  changeCellSource,
-  cloneChartConfig,
-  cloneQueryCell,
-  getCellDisplay,
-  setCellRowLimit,
-  setCellSql,
-  shouldInvalidateResultOnSourceChange,
-  toQueryModel,
-} from './QueryCell.utils'
+import { NOTEBOOK_CELL_WIDTH } from '../Notebook/notebook.utils'
+import { QueryCellEditor, type QueryCellUpdater } from '../Notebook/QueryCellEditor'
+import { type QueryEditorHandle } from '../QueryEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import {
   isQueryCell,
   type QueryCell as QueryCellSchema,
 } from '@/data/content/notebooks/notebook-schema'
-import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
-import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -39,7 +28,7 @@ interface QueryCellProps {
   onPrettifyQuery?: () => void
 }
 
-/** Notebook adapter around the shared QueryEditor. */
+/** Explorer's notebook query cell: a QueryCellEditor backed by the notebook store. */
 export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
   { cell, onEdit, onPrettifyQuery },
   ref
@@ -47,11 +36,6 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
 
-  const [sql, setSql] = useState<string>(cell.unchecked_sql)
-  const [result, setResult] = useState<QueryResult>()
-  const roleImpersonationState = useLocalRoleImpersonationState()
-
-  const title = cell.title ?? 'Untitled query'
   const showQuery =
     snap.cellLocalState.get(cell._id)?.showQuery ?? currentNotebook?.status === 'new'
 
@@ -61,7 +45,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
    * clobbered; `isQueryCell` keeps the per-backend helpers off a markdown cell that
    * somehow shares the id.
    */
-  const updateQueryCell = (updater: (candidate: Snapshot<QueryCellSchema>) => QueryCellSchema) => {
+  const updateQueryCell = (updater: QueryCellUpdater) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
@@ -76,64 +60,20 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
     })
   }
 
-  const handleSourceChange = (source: QuerySourceBinding) => {
-    // The query text carries over (see `changeCellSource`), so the editor's buffer stays
-    // valid — but a result run against the old source (backend or time range) does not.
-    if (shouldInvalidateResultOnSourceChange(cell, source)) setResult(undefined)
-    updateQueryCell((candidate) => changeCellSource(candidate, source))
-  }
-
-  const handleTitleChange = (value: string) => {
-    const nextTitle = value.trim()
-    if (!nextTitle) return
-    updateQueryCell((candidate) => ({ ...cloneQueryCell(candidate), title: nextTitle }))
-  }
-
-  // Running a cell re-commits its current SQL (see QueryEditor's handleRunQuery) even when
-  // nothing changed — skip the store write so that doesn't spuriously mark the notebook
-  // unsaved.
-  const handleSqlCommit = (value: string) => {
-    if (value === cell.unchecked_sql) return
-    updateQueryCell((candidate) => setCellSql(candidate, value))
-  }
-
-  const handleDisplayChange = (display: QueryDisplay) =>
-    updateQueryCell((candidate) => ({
-      ...cloneQueryCell(candidate),
-      view: display.view,
-      chart: cloneChartConfig(display.chart),
-    }))
-
-  const handleRowLimitChange = (rowLimit: number) =>
-    updateQueryCell((candidate) => setCellRowLimit(candidate, rowLimit))
-
   return (
     <SortableSection
       id={cell._id}
-      sectionWidth="48rem"
+      sectionWidth={NOTEBOOK_CELL_WIDTH}
       actions={<AddCellDropdown cellId={cell._id} />}
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-2 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
-      <QueryEditor
+      <QueryCellEditor
         ref={ref}
-        id={cell._id}
-        variant="embedded"
-        className="min-h-0"
-        title={title}
-        query={toQueryModel(cell, sql)}
-        result={result}
+        cell={cell}
+        onCellChange={updateQueryCell}
         showQuery={showQuery}
         onShowQueryChange={(showQuery) => snap.setQueryVisibility({ cellId: cell._id, showQuery })}
-        roleImpersonationState={roleImpersonationState}
-        display={getCellDisplay(cell)}
-        onTitleChange={handleTitleChange}
-        onSqlChange={setSql}
-        onSqlCommit={handleSqlCommit}
-        onSourceChange={handleSourceChange}
-        onResultChange={setResult}
-        onRowLimitChange={handleRowLimitChange}
-        onDisplayChange={handleDisplayChange}
         toolbarActions={
           <ExplorerToolbarAction
             icon={<AlignLeft size={16} strokeWidth={2} />}
