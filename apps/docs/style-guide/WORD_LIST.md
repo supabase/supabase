@@ -1,19 +1,19 @@
 # Word list
 
-Preferred spelling, capitalization, and usage for terms in Supabase docs. Every rule
-here still requires judgment: rewrite the sentence instead of applying a replacement
-that changes its meaning.
+Preferred spelling, capitalization, and usage for terms in Supabase docs including Supabase
+product names. Use your best judgement when applying these rules. They are not intended
+to be strict, one-size-fits-all solutions and can evolve with your input. Feel free
+to contribute to this list as you write your documentation.
 
-Consult this list at both ends of every piece of writing. Before you draft, check the
-terms you plan to introduce. Before you open a pull request, read the list against
-what is actually on the page, including terms you didn't write.
+This list is part of the [style guide](./README.md). It is the source of truth for all
+documentation consistency.
 
-Match literal code, API names, UI labels, and third-party product names even when they
-differ from this guidance, and format them as code or UI text as appropriate.
+## Use with an AI agent
 
-This list is part of the [style guide](./README.md). If the two conflict, follow the
-list: it is the more specific source. The `/write-the-docs` and `/edit-the-docs` agent
-skills apply it as you draft.
+To apply this word list with an agent, you can use one of our skills. For more information, see [Write the docs skills](../CONTRIBUTING.md#write-the-docs-skills).
+
+**For agents:** Consult this list at both ends of every piece of writing. Before you draft, check the
+terms you plan to introduce. After you draft, check again in a fresh context to prevent drift.
 
 ## Numbers and symbols
 
@@ -60,10 +60,22 @@ _use_. Keep _access_ when it accurately describes authorization or connectivity.
 Use _administrator_ in prose. Use _admin_ when it is part of a product name, API,
 role, command, or UI label.
 
+### agent
+
+Use _agent_ for a system that uses a model and tools to take actions, such as
+following a procedure or drafting a page. Lowercase _agent_ unless it is a product
+name.
+
+Use _AI agent_ the first time _agent_ could mean a person or an HTTP user agent.
+After that, use _agent_.
+
+Use _LLM_ for the model itself. See [LLM](#llm).
+
 ### AI
 
 You can use _AI_ without spelling out _artificial intelligence_ when the audience
-is familiar with the term.
+is familiar with the term. For the model, see [LLM](#llm). For a system that uses
+a model and tools to act, see [agent](#agent).
 
 ### allowlist and denylist
 
@@ -468,6 +480,13 @@ Use _use_ or a more specific verb instead of _leverage_.
 ### lifecycle
 
 Write _lifecycle_, not _life cycle_ or _life-cycle_.
+
+### LLM
+
+Use _LLM_ for the model that reads or generates text. When a page introduces the
+term, spell it out once as _large language model (LLM)_, then use _LLM_.
+
+Use _agent_ for a system that takes actions with tools. See [agent](#agent).
 
 ### login and log in
 
