@@ -97,7 +97,7 @@ server {
         proxy_pass http://api_gw_upstream;
     }
 
-    location /api/mcp {
+    location = /api/mcp {
         proxy_pass http://api_gw_upstream;
     }
 
