@@ -63,7 +63,7 @@ grant usage on schema PIPELINES_DB.REPLICATED to role PIPELINES_ROLE;
 grant create table on schema PIPELINES_DB.REPLICATED to role PIPELINES_ROLE;
 ```
 
-Pipelines creates the destination tables using the pipeline role. That role must retain ownership so Pipelines can alter, truncate, or drop the tables when required. Do not create the tables in advance under another role.
+In this example, Pipelines creates the destination tables using `PIPELINES_ROLE`. Whatever name you choose, the role must retain ownership so Pipelines can alter, truncate, or drop the tables when required. Do not create the tables in advance under another role.
 
 Snowflake automatically creates a managed default pipe named `<TABLE>-STREAMING` for each table. You don't need to provide a virtual warehouse, stage, or pipe for ingestion. See [Snowpipe Streaming access privileges](https://docs.snowflake.com/en/user-guide/snowpipe-streaming/snowpipe-streaming-access-control) for the required permissions.
 
@@ -102,15 +102,15 @@ Create a public key from the private key. Snowflake uses the public key to verif
 openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
 ```
 
-Open `rsa_key.pub` and copy the text between the `BEGIN PUBLIC KEY` and `END PUBLIC KEY` lines. In the following statement, replace `<public-key-body>`, including the angle brackets, with the copied text:
+Open `rsa_key.pub` and copy the text between the `BEGIN PUBLIC KEY` and `END PUBLIC KEY` lines. In the following statement, replace the `<public-key-body>` placeholder with the copied text:
 
 ```sql
 alter user PIPELINES_USER set rsa_public_key = '<public-key-body>';
 ```
 
-When you configure the destination in the Dashboard, paste or upload the complete `rsa_key.p8` file into **Private key**. Include the `BEGIN PRIVATE KEY` and `END PRIVATE KEY` lines. If the key is passphrase-protected, enter the passphrase into **Private key passphrase**.
+When you configure the destination in the Dashboard, paste or upload the complete `rsa_key.p8` file into **Private key**. Preserve its original PEM header and footer. If the key is passphrase-protected, enter the passphrase into **Private key passphrase**.
 
-Keep `rsa_key.p8` and its passphrase secret. Don't commit them, include them in logs, or send them to support. The Dashboard accepts unencrypted PKCS #1 and PKCS #8 keys. It also accepts encrypted PKCS #8 keys with a passphrase, but not encrypted PKCS #1 keys.
+Keep `rsa_key.p8` and its passphrase secret. The Dashboard accepts unencrypted PKCS #1 and PKCS #8 keys. It also accepts encrypted PKCS #8 keys with a passphrase, but not encrypted PKCS #1 keys.
 
 See [Snowflake key-pair authentication](https://docs.snowflake.com/en/user-guide/key-pair-auth) to verify the public-key fingerprint and rotate keys with `RSA_PUBLIC_KEY_2`.
 
@@ -128,7 +128,7 @@ Use the result as the **Account ID**, for example `MYORG-MYACCOUNT`. The field a
 
 ## Configure Snowflake as a destination
 
-Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview), select **Snowflake**, and enter the following settings:
+Follow the steps in [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). When prompted to choose a destination, select **Snowflake** and enter the following settings:
 
 | Field                      | Value                                                                                  |
 | -------------------------- | -------------------------------------------------------------------------------------- |
