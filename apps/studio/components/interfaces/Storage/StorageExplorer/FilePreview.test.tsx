@@ -14,7 +14,6 @@ vi.mock('@/state/storage-explorer', () => ({
   }),
 }))
 
-/** Captures the request body so the test can assert which version was asked for. */
 const mockSignEndpoint = () => {
   const bodies: Array<Record<string, unknown>> = []
 

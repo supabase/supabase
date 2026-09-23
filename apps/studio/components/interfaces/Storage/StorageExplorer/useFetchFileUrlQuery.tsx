@@ -15,8 +15,7 @@ export const fetchFileUrl = async (
   expiresIn?: number,
   versionId?: string
 ) => {
-  // Omitted entirely rather than sent as `undefined`, so a request for the current
-  // version stays byte-identical to what the non-versioned callers send.
+  // Omitted rather than sent as `undefined`, so current-version requests are unchanged.
   const options = versionId === undefined ? undefined : { versionId }
 
   if (isBucketPublic) {

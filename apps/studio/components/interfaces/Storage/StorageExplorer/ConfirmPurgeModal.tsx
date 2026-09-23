@@ -6,11 +6,7 @@ import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useObjectPurgeMutation } from '@/data/storage/versioning/object-purge-mutation'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
-/**
- * Mounted once by the explorer. A permanent delete is the escape hatch from
- * versioning — an ordinary delete on a versioned bucket only archives — so it is
- * confirmed separately from `ConfirmDeleteModal` and always reads as destructive.
- */
+/** Mounted once by the explorer. Confirmed separately from `ConfirmDeleteModal`, which archives. */
 export const ConfirmPurgeModal = () => {
   const {
     projectRef,
@@ -26,8 +22,7 @@ export const ConfirmPurgeModal = () => {
   const { mutate: purgeObject, isPending: isPurging } = useObjectPurgeMutation({
     onSuccess: async () => {
       toast.success(`Permanently deleted ${itemToPurge?.name}`)
-      // Only when the pane is showing the file that just went; purging from a row
-      // menu shouldn't close a preview of something else.
+      // Purging from a row menu shouldn't close a preview of something else.
       if (selectedFilePreview?.id === itemToPurge?.id) clearPreviewedFile()
       setItemToPurge(undefined)
       await refetchAllOpenedFolders()
@@ -37,8 +32,7 @@ export const ConfirmPurgeModal = () => {
   const onConfirm = () => {
     if (!projectRef || !selectedBucket?.id || itemToPurge === undefined) return
 
-    // The delete endpoint addresses an object by its full path in the bucket, and a
-    // row only knows its own leaf name.
+    // The endpoint addresses an object by full path; a row only knows its leaf name.
     const folderPath = getPathAlongOpenedFolders(
       { openedFolders: openedFolders.slice(0, itemToPurge.columnIndex), selectedBucket },
       false
