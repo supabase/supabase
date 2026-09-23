@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
+import { ConfirmPurgeModal } from './ConfirmPurgeModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
 import { FileExplorer } from './FileExplorer'
 import { FileExplorerHeader } from './FileExplorerHeader'
@@ -116,6 +117,8 @@ export const StorageExplorerContent = ({
       </div>
 
       <ConfirmDeleteModal />
+
+      <ConfirmPurgeModal />
 
       <MoveItemsModal
         visible={selectedItemsToMove.length > 0}
