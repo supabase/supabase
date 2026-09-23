@@ -57,7 +57,7 @@ test('encrypted server options still resolve their value through Vault unchanged
 
 test('deleting a wrapper row drops its server and preserves shared wrapper dependencies', () => {
   const sql = getDeleteFDWSql({
-    wrapper: { name: 'bigquery_fdw', server_name: 'selected_bigquery_server' },
+    wrapper: { id: 42, name: 'bigquery_fdw', server_name: 'selected_bigquery_server' },
     wrapperMeta: {
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
@@ -65,6 +65,10 @@ test('deleting a wrapper row drops its server and preserves shared wrapper depen
     },
   })
 
+  expect(sql).toContain('where s.oid = 42')
+  expect(sql).toContain("and s.srvname = ''selected_bigquery_server''")
+  expect(sql).toContain("and w.fdwname = ''bigquery_fdw''")
+  expect(sql.indexOf('raise exception')).toBeLessThan(sql.indexOf('drop server'))
   expect(sql).toContain('drop server if exists selected_bigquery_server cascade')
   expect(sql).toContain("where w.fdwname = 'bigquery_fdw'")
   expect(sql).toContain("execute format('drop foreign data wrapper if exists %I cascade'")
@@ -74,7 +78,7 @@ test('deleting a wrapper row drops its server and preserves shared wrapper depen
 
 test('editing a shared wrapper fails before any server is dropped', () => {
   const sql = getUpdateFDWSql({
-    wrapper: { name: 'bigquery_fdw', server_name: 'selected_bigquery_server' },
+    wrapper: { id: 42, name: 'bigquery_fdw', server_name: 'selected_bigquery_server' },
     wrapperMeta: {
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',

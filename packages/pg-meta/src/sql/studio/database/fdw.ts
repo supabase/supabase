@@ -298,7 +298,7 @@ export const getDeleteFDWSql = ({
   wrapper,
   wrapperMeta,
 }: {
-  wrapper: { name: string; server_name: string }
+  wrapper: { id: number; name: string; server_name: string }
   wrapperMeta: SimplifiedWrapperMeta
 }): SafeSqlFragment => {
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
@@ -355,7 +355,24 @@ export const getDeleteFDWSql = ({
 
   const deleteEncryptedSecretsSql = joinSqlFragments(deleteEncryptedSecretsSqlArray, '\n')
 
+  const ensureSelectedServerSql = safeSql`
+    begin
+      if not exists (
+        select 1
+        from pg_catalog.pg_foreign_server s
+        join pg_catalog.pg_foreign_data_wrapper w on w.oid = s.srvfdw
+        where s.oid = ${literal(wrapper.id)}
+          and s.srvname = ${literal(wrapper.server_name)}
+          and w.fdwname = ${literal(wrapper.name)}
+      ) then
+        raise exception 'The selected foreign server no longer belongs to this wrapper.';
+      end if;
+    end
+  `
+
   const sql = safeSql`
+    do ${literal(ensureSelectedServerSql)};
+
     drop server if exists ${ident(wrapper.server_name)} cascade;
 
     do $$
@@ -382,7 +399,7 @@ export const getUpdateFDWSql = ({
   formState,
   tables,
 }: {
-  wrapper: { name: string; server_name: string }
+  wrapper: { id: number; name: string; server_name: string }
   wrapperMeta: SimplifiedWrapperMeta
   formState: { [k: string]: string }
   tables: any[]
