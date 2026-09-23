@@ -18,7 +18,7 @@ export interface Metric {
   }
 }
 
-export const BILLING_BREAKDOWN_METRICS = (_subscription?: OrgSubscription): Metric[] => {
+export const BILLING_BREAKDOWN_METRICS = (subscription?: OrgSubscription): Metric[] => {
   return [
     {
       key: PricingMetric.DATABASE_SIZE,
@@ -166,7 +166,7 @@ export const BILLING_BREAKDOWN_METRICS = (_subscription?: OrgSubscription): Metr
       category: 'Logs',
       anchor: 'logQuery',
       tip:
-        _subscription?.plan.id !== 'platform'
+        subscription?.plan.id !== 'platform'
           ? "Your organization gets a log query allowance that scales with how much log data you ingest. Once exceeded, your logs will be degraded. Exceeding your allowance doesn't rate limit queries, shorten retention, or cut off access yet — the grace period ends at the end of 2026."
           : undefined,
     },
