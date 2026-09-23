@@ -1,10 +1,10 @@
 'use client'
 
-import { useDocsSearch, type DocsSearchResult } from 'common'
+import { useDocsSearchV2, type DocsSearchV2Result } from 'common'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { VisuallyHidden } from 'radix-ui'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Command,
   CommandEmpty,
@@ -18,6 +18,8 @@ import {
   DialogTitle,
 } from 'ui'
 
+import { formatHeadingPath, highlightMatches } from './SearchV2.utils'
+
 interface SearchV2DialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -25,14 +27,25 @@ interface SearchV2DialogProps {
 
 export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
   const router = useRouter()
-  const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearch()
+  const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2()
+  const [highlightQuery, setHighlightQuery] = useState('')
 
   // Clear stale results once the dialog closes
   useEffect(() => {
     if (!open) resetSearch()
   }, [open, resetSearch])
 
-  const results: DocsSearchResult[] =
+  // Only update the highlighted query once a new result set actually lands, so highlights
+  // don't shift on every keystroke while the debounced search is still in flight.
+  useEffect(() => {
+    if (searchState.status === 'results' || searchState.status === 'noResults') {
+      setHighlightQuery(searchState.query)
+    } else if (searchState.status === 'initial') {
+      setHighlightQuery('')
+    }
+  }, [searchState])
+
+  const results: DocsSearchV2Result[] =
     'results' in searchState
       ? searchState.results
       : 'staleResults' in searchState
@@ -108,15 +121,17 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
                 {results.map((page) => (
                   <CommandItem
                     key={page.id}
-                    value={String(page.id)}
+                    value={page.id}
                     forceMount
                     onSelect={() => handleSelect(page.path)}
                   >
                     <div className="flex flex-col">
-                      <span className="text-sm">{page.title}</span>
-                      {(page.description || page.subtitle) && (
+                      <span className="text-sm">
+                        {highlightMatches(formatHeadingPath(page.headingPath), highlightQuery)}
+                      </span>
+                      {page.excerpt && (
                         <span className="text-xs text-foreground-muted">
-                          {page.description || page.subtitle}
+                          {highlightMatches(page.excerpt, highlightQuery)}
                         </span>
                       )}
                     </div>
