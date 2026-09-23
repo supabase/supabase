@@ -4,7 +4,7 @@ import type {
 } from '@/data/storage/versioning/archived-objects-query'
 
 export interface ArchivedVersionRow extends ArchivedObjectVersion {
-  /** Deleting this one promotes the next version behind it, so actions differ. */
+  /** Deleting this one promotes the version behind it, so its actions differ. */
   wasCurrentAtArchive: boolean
 }
 
