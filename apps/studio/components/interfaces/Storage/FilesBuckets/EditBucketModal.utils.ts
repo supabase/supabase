@@ -12,12 +12,7 @@ export interface BucketVersioningSettings {
   expirationMode: ExpirationMode
 }
 
-/**
- * A never-versioned bucket has no stored policy, so it prefills the project
- * defaults. A versioned or suspended one shows its own policy, and an unset
- * condition stays unset (`''`) — prefilling there would silently add a bound the
- * user never chose.
- */
+/** A never-versioned bucket prefills the project defaults; an unset condition stays unset. */
 export const getVersioningFormDefaults = (
   settings: BucketVersioningSettings
 ): BucketVersioningFormValues => {
@@ -40,9 +35,7 @@ export const getVersioningFormDefaults = (
   }
 }
 
-/**
- * Turning versioning off suspends rather than disables.
- */
+/** Turning versioning off suspends rather than disables. */
 export const getNextVersioningState = (
   currentState: BucketVersioningState,
   isVersioningEnabled: boolean
@@ -51,11 +44,7 @@ export const getNextVersioningState = (
   return currentState === 'disabled' ? 'disabled' : 'suspended'
 }
 
-/**
- * `DISABLED` is not an accepted update — the API has no way back once a bucket has
- * been versioned, and a bucket that never was simply stays that way. Both cases
- * mean sending no versioning field at all.
- */
+/** `DISABLED` is not an accepted update, so both cases send no versioning field at all. */
 export const toVersioningStatusUpdate = (
   nextState: BucketVersioningState
 ): 'ENABLED' | 'SUSPENDED' | undefined => {
@@ -69,11 +58,7 @@ export const isSuspendingVersioning = (
   isVersioningEnabled: boolean
 ) => currentState === 'enabled' && !isVersioningEnabled
 
-/**
- * True when saving would turn versioning on for a bucket that has never had it.
- * Re-enabling a suspended bucket doesn't count — the user already opted in once,
- * and its retained versions never went away.
- */
+/** Re-enabling a suspended bucket doesn't count — the user already opted in once. */
 export const isEnablingVersioning = (
   currentState: BucketVersioningState,
   isVersioningEnabled: boolean

@@ -16,10 +16,7 @@ export type BucketLifecycleVariables = {
 
 export type BucketLifecycleError = ResponseError
 
-/**
- * A bucket with no stored configuration answers 404 rather than an empty list, so
- * that is reported as "no policy" instead of surfacing as a query error.
- */
+/** No stored configuration answers 404, which is "no policy" rather than a query error. */
 async function getBucketLifecycle(
   { projectRef, bucketId }: BucketLifecycleVariables,
   signal?: AbortSignal
