@@ -32,7 +32,7 @@ describe('#Button', () => {
     const button = screen.getByRole('button', { name: 'Neutral' })
     expect(button.className).toContain('bg-card')
     expect(button.className).toContain('hover:bg-muted')
-    expect(button.className).not.toContain('bg-primary')
+    expect(button.className).not.toContain('bg-primary-solid')
   })
 
   it('should apply tiny size classes when buttonVariants omits size', () => {
@@ -45,7 +45,7 @@ describe('#Button', () => {
     render(<Button variant="primary">Primary</Button>)
 
     const button = screen.getByRole('button', { name: 'Primary' })
-    expect(button.className).toContain('bg-primary')
+    expect(button.className).toContain('bg-primary-solid')
   })
 
   it('should render different text', () => {
