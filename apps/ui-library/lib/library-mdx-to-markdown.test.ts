@@ -159,7 +159,7 @@ description: Vue dropzone
       new URL('../content/docs/headless/mcp-server.mdx', import.meta.url),
       'utf8'
     )
-    const output = transformLibraryMdx(source, { documentSlug: 'headless/mcp-server' })
+    const output = transformLibraryMdx(source, { documentBasePath: 'headless/mcp-server' })
     assert.match(output, /## What's added/)
     assert.match(output, /### Edge Functions/)
     assert.match(output, /\*\*mcp-server\*\*/)
@@ -229,7 +229,10 @@ description: Vue dropzone
       assert.doesNotMatch(raw, /^installation(?:Content)?:/m, source)
       const output = transformLibraryMdx(raw, {
         documentSlugs,
-        documentSlug: getDocSlug(path.relative(directory, source)),
+        documentBasePath: path
+          .relative(directory, source)
+          .replace(/\\/g, '/')
+          .replace(/\.mdx$/, ''),
       })
       for (const [, name] of raw.matchAll(/<BlockOverview\s+name="([^"]+)"\s+showFiles\b/g)) {
         fileTrees++
@@ -365,7 +368,7 @@ See the [React client](/library/docs/react/client) before installing.
 
   it('preserves URL queries and anchors while validating relative, JSX, and Markdown links', () => {
     const options = {
-      documentSlug: 'headless/mcp-server',
+      documentBasePath: 'headless/mcp-server',
       documentSlugs: new Set(['nextjs/oauth-consent']),
     }
     const output = transformLibraryMdx(
