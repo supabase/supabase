@@ -10,14 +10,10 @@ export type ObjectVersionDeleteVariables = {
   bucketId: string
   /** The object's full path within the bucket, not just its leaf name. */
   path: string
-  /** The single version to remove. Other versions of the object are untouched. */
   versionId: string
 }
 
-/**
- * Addressing a version explicitly is a hard delete even on a versioned bucket —
- * a bare path would only hide whatever is currently at it.
- */
+/** Addressing a version explicitly is a hard delete even on a versioned bucket. */
 async function deleteObjectVersion({
   projectRef,
   bucketId,

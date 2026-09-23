@@ -58,11 +58,7 @@ export const storageKeys = {
     ['projects', projectRef, 'buckets', bucketId, 'folders'] as const,
   bucketLifecycle: (projectRef: string | undefined, bucketId: string | undefined) =>
     ['projects', projectRef, 'buckets', bucketId, 'lifecycle'] as const,
-  /**
-   * The lifecycle policy is part of the key because the API applies it when
-   * deriving each version's expiry, so editing the policy must invalidate the
-   * cached version list rather than leave a stale one behind.
-   */
+  /** The policy is part of the key: the API derives each version's expiry from it. */
   objectVersions: (
     projectRef: string | undefined,
     bucketId: string | undefined,

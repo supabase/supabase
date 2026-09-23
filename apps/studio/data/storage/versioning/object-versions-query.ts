@@ -9,14 +9,8 @@ import type { ResponseError } from '@/types'
 type StorageObject = components['schemas']['StorageObject_Output']
 
 /**
- * What produced a version. A `delete marker` is the empty placeholder S3 writes
- * to the top of the version stack on a soft delete; it can outlive the delete
- * (delete → upload → delete → restore leaves one mid-history), so a live file's
- * history can contain them.
- *
- * A restore is a copy of an older version over the current one, which the list
- * endpoint reports exactly like any other overwrite — there is no provenance
- * field to tell them apart, so restores read as overwrites.
+ * A `delete marker` can outlive the delete, so a live file's history can contain them.
+ * Restores read as overwrites: the list endpoint carries no provenance field.
  */
 export type ObjectVersionAction = 'initial upload' | 'overwrite' | 'delete marker'
 
@@ -24,12 +18,10 @@ export interface ObjectVersion {
   versionId: string
   size: number
   createdAt: string
-  /** The version served when the object is fetched without a version ID. */
   isCurrent: boolean
   action: ObjectVersionAction
 }
 
-/** The bucket's lifecycle policy, which determines when each version expires. */
 export interface LifecyclePolicy {
   /** `null` when no age condition is set. */
   expiryDays: number | null
@@ -47,14 +39,10 @@ export type ObjectVersionsVariables = {
 
 export type ObjectVersionsError = ResponseError
 
-// One object's history. The ceiling the list endpoint accepts.
+// The ceiling the list endpoint accepts.
 const MAX_VERSIONS = 1000
 
-/**
- * Newest first. The oldest surviving upload is labelled as the initial one, which
- * is only true while it hasn't expired out of the history — there is no flag for
- * it, and calling the oldest row an overwrite would be wrong more often.
- */
+/** Newest first. The oldest surviving row is labelled the initial upload; there is no flag for it. */
 export const toObjectVersions = (objects: StorageObject[]): ObjectVersion[] => {
   const versions = objects
     .filter((object) => !!object.version)
@@ -95,8 +83,7 @@ async function getObjectVersions(
       path,
       options: {
         limit: MAX_VERSIONS,
-        // Without `exactMatch` the path is read as a folder prefix, which would
-        // return every sibling's versions alongside this object's.
+        // Without `exactMatch` the path reads as a folder prefix, returning every sibling.
         exactMatch: true,
         noncurrentVersions: 'include',
         deleteMarkers: 'include',
