@@ -16,7 +16,7 @@ Starting with `supabase-js` v2.102.0, PostgREST queries (`.from()`, `.rpc()`) in
 
 `supabase-js` retries only idempotent HTTP methods: GET, HEAD, and OPTIONS. It doesn't retry POST, PATCH, PUT, or DELETE, so a write is never sent twice. For the methods it does retry, it retries on HTTP status codes 503 Service Unavailable and 520 Unknown Error, and on network failures.
 
-Because `.rpc()` sends POST by default, RPC calls aren't retried. Call them with `{ get: true }` if you want the built-in retries to apply.
+Because `.rpc()` sends POST by default, RPC calls aren't retried. Pass `{ get: true }` or `{ head: true }` to send the call as GET or HEAD, which the built-in retries cover.
 
 ### Disable built-in retries
 
