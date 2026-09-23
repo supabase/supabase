@@ -16,6 +16,7 @@ import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { RowSelectionModifiers } from '@/components/ui/DataTable/rowSelection.utils'
 import { useTableRowSelection } from '@/components/ui/DataTable/useTableRowSelection'
+import { mapUnifiedLogRow } from '@/data/logs/unified-logs.utils'
 import { miscKeys } from '@/data/misc/keys'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -142,6 +143,38 @@ describe('log row selection', () => {
 })
 
 describe('selected log details', () => {
+  it.each([1788424716876000, '2026-09-03T09:58:36.876000'])(
+    'enables actions and copies mapped logs with timestamp %s',
+    async (timestamp) => {
+      const user = userEvent.setup()
+      const copy = vi.spyOn(navigator.clipboard, 'writeText')
+      const row = mapUnifiedLogRow({
+        id: 'mapped-log',
+        log_type: 'realtime',
+        timestamp,
+        event_message: 'Connection opened',
+        method: null,
+        pathname: null,
+        status: '200',
+        level: null,
+        log_count: null,
+        logs: null,
+      })
+      renderPanel(<LogSelectionActions rows={[row]} />)
+
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Copy selected logs' })).toBeEnabled()
+      expect(screen.getByRole('button', { name: 'Explain with AI' })).not.toHaveAttribute(
+        'aria-disabled',
+        'true'
+      )
+      await user.click(screen.getByRole('button', { name: 'Copy selected logs' }))
+      expect(JSON.parse(copy.mock.calls[0][0])).toEqual([
+        expect.objectContaining({ id: 'mapped-log', timestamp, log_count: null, status: '200' }),
+      ])
+    }
+  )
+
   it('disables copy and AI actions when a selected log is invalid', async () => {
     const user = userEvent.setup()
     const copy = vi.spyOn(navigator.clipboard, 'writeText')

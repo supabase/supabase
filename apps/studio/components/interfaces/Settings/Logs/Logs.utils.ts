@@ -859,7 +859,9 @@ export function role(metadata: any) {
   return payload.role
 }
 
-type LogExportData = Pick<LogData, 'id' | 'timestamp' | 'event_message'> & Record<string, unknown>
+type LogExportData = Pick<LogData, 'id' | 'event_message'> & {
+  timestamp: string | number
+} & Record<string, unknown>
 
 export function formatLogsAsJson(rows: LogExportData[]): string {
   return JSON.stringify(rows, null, 2)
