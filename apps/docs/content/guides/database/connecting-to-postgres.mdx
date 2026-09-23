@@ -174,7 +174,7 @@ For more on sizing an application-side pool, see the [Supavisor FAQ](/docs/guide
 
 ### Transaction mode limitations
 
-[Transaction mode](#pooler-transaction-mode) returns your connection to the pool after each transaction, so anything that depends on session state doesn't survive between transactions. Three things are affected.
+[Transaction mode](#pooler-transaction-mode) returns your connection to the pool after each transaction, so anything that depends on session state doesn't survive between transactions. Four things are affected.
 
 **Prepared statements** aren't supported, so turn them off. Each driver does this differently:
 
