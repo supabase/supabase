@@ -118,6 +118,8 @@ export type QueryEditorHandle = {
   prettify: () => Promise<void>
   /** The last result this cell produced in this session, or undefined if it hasn't been run. */
   getResult: () => QueryResult | undefined
+  /** The rendered chart's DOM node when the cell is in chart view, e.g. to rasterize for a PDF export. */
+  getChartElement: () => HTMLDivElement | null
 }
 
 type QueryEditorProps = {
@@ -198,6 +200,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const pendingProposalRef = useLatest(pendingProposal)
 
   const editorInstanceRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [promptState, setPromptState] = useState<(EditorSelection & { isOpen: boolean }) | null>(
     null
   )
@@ -383,6 +386,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     getSql: () => sqlRef.current,
     prettify: handlePrettify,
     getResult: () => result,
+    getChartElement: () => chartContainerRef.current,
   }))
 
   useEffect(() => {
@@ -402,6 +406,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         sql={result?.sql}
         source={result?.source}
         onDebug={onDebug}
+        chartRef={chartContainerRef}
       />
     </ExplorerQueryResults>
   )

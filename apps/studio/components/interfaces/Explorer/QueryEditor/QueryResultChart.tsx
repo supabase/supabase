@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, type Ref } from 'react'
 import { cn, type ChartConfig as ChartSeriesConfig } from 'ui'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
 
@@ -15,6 +15,8 @@ import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 interface QueryResultChartProps {
   chart?: ChartConfig
   result?: QueryResult
+  /** Exposes the rendered chart's DOM node, e.g. for rasterizing it into a PDF export. */
+  chartRef?: Ref<HTMLDivElement>
 }
 
 const Y_SERIES_COLORS = ['hsl(var(--brand-default))', 'var(--chart-2)', 'var(--chart-3)']
@@ -52,7 +54,7 @@ export function xKeyFor(xColumn: string, seriesKeys: string[]): string {
   return key
 }
 
-export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
+export const QueryResultChart = ({ chart, result, chartRef }: QueryResultChartProps) => {
   const { type, x_column, y_series = [], cumulative, show_labels, scale } = chart ?? {}
 
   const hasConfig = !!x_column && y_series.length > 0
@@ -127,7 +129,7 @@ export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   }
 
   return (
-    <Chart className="flex flex-grow min-h-0">
+    <Chart ref={chartRef} className="flex flex-grow min-h-0">
       <ChartCard className="flex flex-grow rounded-none border-0 min-h-0">
         <ChartContent className={cn('min-h-0 h-full w-full', show_labels && 'pl-2 pb-2')}>
           {type === 'bar' && (

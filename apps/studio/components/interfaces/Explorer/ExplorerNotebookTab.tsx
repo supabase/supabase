@@ -17,6 +17,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Check,
   Copy,
+  Download,
   FileText,
   Keyboard,
   Loader2,
@@ -81,6 +82,7 @@ import {
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import {
   getNotebooksStateSnapshot,
   useCurrentNotebook,
@@ -106,6 +108,7 @@ export const ExplorerNotebookTab = () => {
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
   const { isNotFound } = useLoadNotebook({ id, projectRef: ref })
+  const { data: project } = useSelectedProjectQuery()
   const cells = content?.cells ?? []
   const queryCellIds = cells.filter(isQueryCell).map((cell) => cell._id)
 
@@ -117,6 +120,7 @@ export const ExplorerNotebookTab = () => {
     mutatingQueries: QueryCellSummary[]
   } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
+  const [isExportingPdf, setIsExportingPdf] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -323,6 +327,25 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true)
+    try {
+      const { exportNotebookToPdf } = await import('./NotebookPdf/exportNotebookToPdf')
+      await exportNotebookToPdf({
+        name: name ?? 'Untitled notebook',
+        projectName: project?.name,
+        cells,
+        getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+        getChartElement: (cellId) => queryCellRefs.current.get(cellId)?.getChartElement(),
+      })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error('Failed to export notebook as PDF: ' + message)
+    } finally {
+      setIsExportingPdf(false)
+    }
+  }
+
   const handleDragEnd = (event: DragEndEvent) => {
     persistNotebookTab()
 
@@ -433,6 +456,18 @@ export const ExplorerNotebookTab = () => {
                 <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
                   <Copy size={14} />
                   <span>Copy as Markdown</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  disabled={isExportingPdf}
+                  onClick={handleExportPdf}
+                >
+                  {isExportingPdf ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  <span>Export as PDF</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
