@@ -4,7 +4,6 @@ import { cn, StatusIcon } from 'ui'
 import { DestinationIcon } from './DestinationIcon'
 import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { BRAND_ICONS, resolveThemedIconSrc, type ThemedIconSrc } from '@/lib/brand-icons'
-import { resolveThemeOverrideMode } from '@/lib/theme-overrides'
 
 // Destinations with a brand mark. Anything absent falls back to the line icon in the same frame,
 // so a new destination type never renders an empty square.
@@ -39,7 +38,7 @@ export const DestinationLogo = ({
   hasErrors = false,
 }: DestinationLogoProps) => {
   const { resolvedTheme } = useTheme()
-  const isDark = resolveThemeOverrideMode(resolvedTheme) === 'dark'
+  const isDark = resolvedTheme?.includes('dark') ?? false
   const sizing = SIZE_CLASS_NAME[size]
   const brandMark = BRAND_MARK_BY_TYPE[type]
   const brandMarkSrc = brandMark === undefined ? undefined : resolveThemedIconSrc(brandMark, isDark)
