@@ -24,7 +24,6 @@
   --primary-solid: var(--primary);
   --primary-solid-foreground: var(--primary-foreground);
   --primary-solid-hover: var(--primary-hover);
-  --ring: hsl(var(--brand-default) / 90%);
   /*
    * Expressive fills run darker than the dark-theme anchors so they hold contrast
    * against the near-white surface (a light amber on white disappears). Lightness

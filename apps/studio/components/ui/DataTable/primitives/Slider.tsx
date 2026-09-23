@@ -17,7 +17,7 @@ export const Slider = forwardRef<
       className={cn('relative flex w-full touch-none select-none items-center', className)}
       {...props}
     >
-      <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-muted">
+      <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-border-stronger">
         <SliderPrimitive.Range className="absolute h-full bg-brand-default" />
       </SliderPrimitive.Track>
       {initialValue.map((_, index) => (

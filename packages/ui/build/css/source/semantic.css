@@ -308,6 +308,6 @@
   --border-control-hover: oklch(
     from var(--foreground) l calc(c * 0.5) h / calc(12% + 58% * var(--contrast-border))
   );
-  /* Focus chrome uses brand-default with theme-specific translucency. */
+  /* Focus chrome uses translucent brand-default in both themes. */
   --ring: oklch(from hsl(var(--brand-default)) l c h / 55%);
 }
