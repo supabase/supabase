@@ -134,6 +134,8 @@ export const Column = ({
               className="p-1 opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
               icon={<GripVertical size={16} strokeWidth={1.5} />}
               aria-label={`Move column ${column.name}`}
+              // Tooltip repeats the label; screen readers would read it twice
+              aria-describedby={undefined}
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">Move</TooltipContent>
@@ -373,6 +375,8 @@ export const Column = ({
                     data-testid={`${column.name}-extra-options`}
                     variant="outline"
                     aria-label={`Options for ${column.name}`}
+                    // Tooltip repeats the label; screen readers would read it twice
+                    aria-describedby={undefined}
                     className="p-1 relative"
                     icon={
                       <>
@@ -478,6 +482,8 @@ export const Column = ({
                 variant="outline"
                 tabIndex={0}
                 aria-label={`Remove column ${column.name}`}
+                // Tooltip repeats the label; screen readers would read it twice
+                aria-describedby={undefined}
                 className="p-1 cursor-pointer"
                 onClick={() => onRemoveColumn()}
                 icon={<X size={16} strokeWidth={1} />}
