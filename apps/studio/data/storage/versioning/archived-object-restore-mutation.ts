@@ -10,15 +10,10 @@ export type ArchivedObjectRestoreVariables = {
   bucketId: string
   /** The delete marker's version id, which is what identifies an archived object. */
   archivedObjectId: string
-  /** The object's full path within the bucket. */
   path: string
 }
 
-/**
- * An archived object is one whose top version is a delete marker. Removing that
- * marker promotes the version underneath back to current, which brings the file
- * back into the live listing — nothing needs to be copied.
- */
+/** Removing the delete marker promotes the version underneath; nothing is copied. */
 async function restoreArchivedObject({
   projectRef,
   bucketId,
