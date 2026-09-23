@@ -42,7 +42,9 @@ linter and instead entrust you to use the word list.
 You can run `/review-the-docs` for a local self-review, and `/test-the-docs` if the page
 contains runnable snippets.
 
-**If you drafted with an agent.** Run a critic pass. Open a
+### If you drafted with an agent
+
+Run a critic pass. Open a
 subagent with a clean context, holding only the relevant guide files and the draft
 text, and give it this instruction:
 
