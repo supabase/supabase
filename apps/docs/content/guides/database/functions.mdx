@@ -470,11 +470,11 @@ By default, any role can run a database function. You can restrict execution in 
     alter default privileges in schema public revoke execute on functions from anon, authenticated;
     ```
 
-    You can then regrant permissions for a specific function to a specific role:
+You can then regrant permissions for a specific function to a specific role:
 
-    ```sql
-    grant execute on function public.hello_world to authenticated;
-    ```
+```sql
+grant execute on function public.hello_world to authenticated;
+```
 
 ## Resources
 
