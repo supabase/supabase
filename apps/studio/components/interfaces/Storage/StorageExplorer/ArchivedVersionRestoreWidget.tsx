@@ -14,8 +14,7 @@ interface ArchivedVersionRestoreWidgetProps {
   onDismiss: () => void
 }
 
-// No side-by-side comparison: the whole file is archived, so there's no current
-// version to sit beside.
+// No side-by-side comparison: the whole file is archived, so nothing is current.
 export const ArchivedVersionRestoreWidget = ({
   version,
   isRestoring,
