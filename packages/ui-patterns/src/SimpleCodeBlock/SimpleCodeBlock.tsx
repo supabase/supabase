@@ -9,7 +9,7 @@
 import { useTheme } from 'next-themes'
 import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
 import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
-import { Button, cn, copyToClipboard } from 'ui'
+import { Button, cn, copyToClipboard, FloatingPlate } from 'ui'
 
 import { dart } from './prism'
 
@@ -98,11 +98,11 @@ export const SimpleCodeBlock = ({
               })}
             </pre>
             {showCopy && (
-              <div className="invisible absolute right-0 top-0 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100">
+              <FloatingPlate className="invisible absolute right-0 top-0 bg-surface-100 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                 <Button size="tiny" onClick={() => handleCopyCode(children)}>
                   {showCopied ? 'Copied' : 'Copy'}
                 </Button>
-              </div>
+              </FloatingPlate>
             )}
           </div>
         )
