@@ -29,7 +29,6 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { useShowMicroUpgradeBadge } from './useShowMicroUpgradeBadge'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -112,8 +111,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
      */
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
-
-  const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
 
   const showSkeletons = isLoading
   const showLoadError = !isLoading && !!addonsError
