@@ -266,7 +266,7 @@ testRunner('table editor', () => {
     await page.getByText('Is Nullable').click()
     await page.getByTestId('created_at-extra-options').click()
     await page.getByRole('button', { name: 'Add column' }).click()
-    await page.getByLabel('Column name').nth(2).fill(columnNameEnum)
+    await page.getByLabel('Column name').nth(3).fill(columnNameEnum)
     await page.getByRole('combobox').filter({ hasText: 'Choose a column type...' }).click()
     await page.getByPlaceholder('Search types...').fill(enum_name)
     // wait for response, then click
@@ -357,7 +357,7 @@ testRunner('table editor', () => {
       .click()
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
     await page.getByTestId('table-name-input').fill(tableNameUpdated)
-    await page.getByLabel('Column name').nth(2).fill(columnNameUpdated)
+    await page.getByLabel('Column name').nth(3).fill(columnNameUpdated)
     const updateTablePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=column-update', {
       method: 'POST',
     })
@@ -948,7 +948,7 @@ testRunner('table editor', () => {
 
     // Add boolean column
     await page.getByRole('button', { name: 'Add column' }).click()
-    await page.getByLabel('Column name').nth(3).fill(boolColName)
+    await page.getByLabel('Column name').nth(4).fill(boolColName)
     await page.getByText('Choose a column type...').click()
     await page.getByPlaceholder('Search types...').fill('bool')
     await page.getByRole('option', { name: 'bool' }).first().click()
@@ -1064,7 +1064,7 @@ testRunner('table editor', () => {
 
     // Add nullable boolean column
     await page.getByRole('button', { name: 'Add column' }).click()
-    await page.getByLabel('Column name').nth(3).fill(boolColName)
+    await page.getByLabel('Column name').nth(4).fill(boolColName)
     await page.getByText('Choose a column type...').click()
     await page.getByPlaceholder('Search types...').fill('bool')
     await page.getByRole('option', { name: 'bool' }).first().click()
