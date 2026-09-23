@@ -134,8 +134,6 @@ export const Column = ({
               className="p-1 opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
               icon={<GripVertical size={16} strokeWidth={1.5} />}
               aria-label={`Move column ${column.name}`}
-              // Tooltip repeats the label; screen readers would read it twice
-              aria-describedby={undefined}
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">Move</TooltipContent>
