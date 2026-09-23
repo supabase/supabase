@@ -1,11 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag } from 'common'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
-import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { useRecoveryCodesUnenrollMutation } from '@/data/recovery-codes/recovery-codes-unenroll'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 
@@ -13,6 +11,7 @@ interface DeleteFactorModalProps {
   visible: boolean
   factorId: string | null
   lastFactorToBeDeleted: boolean
+  hasRecoveryCodes: boolean
   onClose: () => void
 }
 
@@ -20,17 +19,12 @@ export const DeleteFactorModal = ({
   visible,
   factorId,
   lastFactorToBeDeleted,
+  hasRecoveryCodes,
   onClose,
 }: DeleteFactorModalProps) => {
   const queryClient = useQueryClient()
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
-
-  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
-
-  const recoveryCodesStatusQuery = useRecoveryCodesStatusQuery({
-    enabled: enableAuthRecoveryCodes && lastFactorToBeDeleted,
-  })
 
   const unenrollMFAMutation = useMfaUnenrollMutation({
     onSuccess: async () => {
@@ -51,12 +45,7 @@ export const DeleteFactorModal = ({
     },
   })
 
-  const loading =
-    (enableAuthRecoveryCodes && lastFactorToBeDeleted && recoveryCodesStatusQuery.isPending) ||
-    unenrollMFAMutation.isPending ||
-    unenrollRecoveryCodesMutation.isPending
-  const hasRecoveryCodes =
-    enableAuthRecoveryCodes && recoveryCodesStatusQuery.data?.status === 'available'
+  const loading = unenrollMFAMutation.isPending || unenrollRecoveryCodesMutation.isPending
 
   return (
     <ConfirmationModal
