@@ -216,8 +216,17 @@ export function LogsManager({ projectRef }: { projectRef: string }) {
                   {Object.keys(logs.result?.[0] ?? []).map((key, idx, arr) => {
                     const value = log[key]
                     const formattedValue = (() => {
-                      if (key === 'timestamp' && typeof value === 'number') {
-                        return new Date(value / 1000).toLocaleString()
+                      if (key === 'timestamp') {
+                        if (typeof value === 'number') {
+                          return new Date(value / 1000).toLocaleString()
+                        }
+                        if (typeof value === 'string') {
+                          const timestamp = value.replace(' ', 'T')
+                          const parsed = new Date(timestamp.endsWith('Z') ? timestamp : `${timestamp}Z`)
+                          if (!Number.isNaN(parsed.getTime())) {
+                            return parsed.toLocaleString()
+                          }
+                        }
                       }
                       if (value === null) {
                         return 'NULL'

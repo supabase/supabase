@@ -1,10 +1,16 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import createClient from 'openapi-fetch'
 
-import { client } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api'
+import type { operations } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api-schema'
 
-// GET Logs
+const client = createClient<{
+  '/v1/projects/{ref}/analytics/endpoints/logs': {
+    get: operations['v1-get-project-logs']
+  }
+}>({ baseUrl: '/api/supabase-proxy' })
+
 const getLogs = async ({
   projectRef,
   iso_timestamp_start,
@@ -16,7 +22,7 @@ const getLogs = async ({
   iso_timestamp_end?: string
   sql?: string
 }) => {
-  const { data, error } = await client.GET('/v1/projects/{ref}/analytics/endpoints/logs.all', {
+  const { data, error } = await client.GET('/v1/projects/{ref}/analytics/endpoints/logs', {
     params: {
       path: {
         ref: projectRef,
