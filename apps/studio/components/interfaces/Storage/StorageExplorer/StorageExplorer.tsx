@@ -27,9 +27,7 @@ export const StorageExplorer = () => {
   return (
     <ArchivedFilesProvider>
       <div className="bg-studio flex h-full w-full flex-col">
-        {/* The skeleton swap is silent, and a live region must be mounted before it changes.
-          `aria-live` rather than `role="status"`: that role is how toasts announce
-          themselves here, and tests wait on it to tell when an upload has finished. */}
+        {/* `aria-live` rather than `role="status"`, which is how toasts announce here. */}
         <span aria-live="polite" aria-atomic="true" className="sr-only">
           {isBucketReady ? 'Bucket contents loaded' : 'Loading bucket contents'}
         </span>

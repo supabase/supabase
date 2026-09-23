@@ -39,10 +39,7 @@ const ArchivedFilesContext = createContext<ArchivedFilesContextValue>({
 
 export const useArchivedFilesContext = () => useContext(ArchivedFilesContext)
 
-/**
- * Fetched once here rather than per row. Not gated on the bucket's versioning
- * state — a suspended bucket can still be retaining files.
- */
+/** Not gated on the bucket's versioning state: a suspended bucket can still be retaining files. */
 export const ArchivedFilesProvider = ({ children }: PropsWithChildren) => {
   const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
   const { showArchivedInline } = useStoragePreference(projectRef)
