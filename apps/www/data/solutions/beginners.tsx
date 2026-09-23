@@ -56,7 +56,7 @@ const data: () => {
       h1: (
         <>
           <span className="block text-foreground">Build in a weekend</span>
-          <span className="text-brand block md:ml-0">Scale to millions</span>
+          <span className="text-primary block md:ml-0">Scale to millions</span>
         </>
       ),
       subheader: [

@@ -77,13 +77,6 @@ export const telemetryHireAgent: ContentListingGroup = {
   columns: 2,
   items: [
     {
-      title: 'Generalist',
-      href: '/guides/observability/automate-with-agents/all',
-      subtitle: getScheduleLabel(monitoringAgents.all),
-      description:
-        'Run all four checks — health, security, performance, and capacity — in one daily pass.',
-    },
-    {
       title: monitoringAgents.health.name,
       href: '/guides/observability/automate-with-agents/health',
       subtitle: getScheduleLabel(monitoringAgents.health),

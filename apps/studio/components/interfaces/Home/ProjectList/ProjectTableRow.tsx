@@ -100,7 +100,7 @@ export const ProjectTableRow = ({
                   >
                     {projectRef}
                     {isCopied ? (
-                      <Check size={12} strokeWidth={1.25} className="text-brand" />
+                      <Check size={12} strokeWidth={1.25} className="text-primary" />
                     ) : (
                       <Copy
                         size={12}
@@ -162,9 +162,7 @@ export const ProjectTableRow = ({
           </div>
         </TableCell>
         <TableCell>
-          <span className="lowercase text-sm text-foreground-light">
-            {project.cloud_provider} | {project.region || 'N/A'}
-          </span>
+          <span className="lowercase text-sm text-foreground-light">{project.region || 'N/A'}</span>
         </TableCell>
         <TableCell>
           {project.inserted_at ? (

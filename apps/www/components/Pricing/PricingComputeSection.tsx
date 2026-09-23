@@ -164,7 +164,7 @@ const PricingComputeSection = () => {
                   <Link
                     href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     usage-based billing for compute
                   </Link>{' '}
@@ -172,7 +172,7 @@ const PricingComputeSection = () => {
                   <Link
                     href="https://supabase.com/docs/guides/platform/compute-add-ons"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     Compute Add-ons
                   </Link>
