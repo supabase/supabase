@@ -30,9 +30,18 @@ export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
         'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
       })
 
-      await navigator.clipboard.write([text])
-      callback()
-      return
+      let writeSucceeded = false
+      try {
+        await navigator.clipboard.write([text])
+        writeSucceeded = true
+      } catch {
+        // Safari can expose clipboard.write() and still reject it. Fall through to writeText().
+      }
+
+      if (writeSucceeded) {
+        callback()
+        return
+      }
     }
 
     if (!navigator.clipboard) throw new Error('Clipboard API unavailable')

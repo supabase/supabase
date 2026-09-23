@@ -224,9 +224,34 @@ describe('copyToClipboard', () => {
     expect(writeTextMock).toHaveBeenCalledWith('hello')
   })
 
+  it('falls back to writeText if clipboard.write rejects', async () => {
+    writeMock.mockRejectedValue(new Error('NotAllowedError'))
+    const callback = vi.fn()
+    const promise = copyToClipboard('hello', callback)
+    vi.runAllTimers()
+    await promise
+    expect(writeMock).toHaveBeenCalled()
+    expect(writeTextMock).toHaveBeenCalledWith('hello')
+    expect(callback).toHaveBeenCalled()
+  })
+
+  it('falls back to writeText if clipboard.write rejects with a promised string', async () => {
+    writeMock.mockRejectedValue(new Error('NotAllowedError'))
+    const callback = vi.fn()
+    const promise = copyToClipboard(Promise.resolve('token-123'), callback)
+    vi.runAllTimers()
+    await promise
+    expect(writeMock).toHaveBeenCalled()
+    expect(writeTextMock).toHaveBeenCalledWith('token-123')
+    expect(callback).toHaveBeenCalled()
+  })
+
   it('resolves and reports when clipboard.write is denied', async () => {
     writeMock.mockRejectedValue(
       new DOMException("Failed to execute 'write' on 'Clipboard': Write permission denied.")
+    )
+    writeTextMock.mockRejectedValue(
+      new DOMException("Failed to execute 'writeText' on 'Clipboard': Write permission denied.")
     )
     const callback = vi.fn()
 
