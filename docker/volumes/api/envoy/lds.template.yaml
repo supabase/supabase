@@ -264,7 +264,10 @@ resources:
                         route:
                           cluster: functions
                           prefix_rewrite: /
-                          timeout: 160s
+                          # Allow the runtime's 400s wall clock to expire first.
+                          timeout: 410s
+                          # Limit inactivity, matching Kong's read_timeout.
+                          idle_timeout: 160s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
