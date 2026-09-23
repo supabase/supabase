@@ -8,6 +8,8 @@ import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 import utc from 'dayjs/plugin/utc.js'
 import matter from 'gray-matter'
 
+import { getGitHubStars } from './lib/githubStars.mjs'
+
 /**
  * Plain `node` does not read `.env` / `.env.local` (Next.js loads those when you run `next`).
  * Minimal parser: no extra dependency; `.env` first, then `.env.local` overrides.
@@ -232,26 +234,8 @@ const getLatestBlogPosts = async () => {
   return latestPosts
 }
 
-let stars = 0
-
 // GitHub Stars
-const fetchOctoData = async () => {
-  const { Octokit } = await import('@octokit/core')
-  const octokit = new Octokit(process.env.GITHUB_TOKEN ? { auth: process.env.GITHUB_TOKEN } : {})
-  const res = await octokit.request('GET /repos/{org}/{repo}', {
-    org: 'supabase',
-    repo: 'supabase',
-    type: 'public',
-  })
-
-  return res.data?.stargazers_count
-}
-
-try {
-  stars = await fetchOctoData()
-} catch (error) {
-  console.warn('Error fetching GitHub stars:', error)
-}
+const stars = await getGitHubStars(path.join(wwwRoot, '.generated/staticContent/_index.json'))
 
 // Careers Jobs count
 const getCareerCount = async () => {
@@ -397,9 +381,8 @@ async function generateChangelogContent() {
 
   const { getPublishedChangelogEntries, fetchChangelogEntryFilesFromTarball, CHANGE_TYPE_LABELS } =
     await import('../lib/changelog-entries-core.mjs')
-  const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } = await import(
-    '../lib/changelog-rss.mjs'
-  )
+  const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } =
+    await import('../lib/changelog-rss.mjs')
   const { createAppAuth } = await import('@octokit/auth-app')
   const { Octokit } = await import('@octokit/core')
   const octokit = new Octokit({
@@ -460,7 +443,8 @@ async function generateChangelogContent() {
   // LLM-friendly changelog markdown index (RSS remains canonical syndication format).
   const mdSections = entries.map((entry) => {
     const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
-    const changeType = CHANGE_TYPE_LABELS[entry.frontmatter.change_type] ?? entry.frontmatter.change_type
+    const changeType =
+      CHANGE_TYPE_LABELS[entry.frontmatter.change_type] ?? entry.frontmatter.change_type
     const products = (entry.frontmatter.affected_products ?? []).join(', ')
     const meta = [
       date,

@@ -29,7 +29,6 @@ import {
   SquareCode,
   Trash,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -67,8 +66,9 @@ import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { useExplorerDeleteItem } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import {
   evictNotebookFromCaches,
   hasDiscardableChanges,
@@ -86,15 +86,17 @@ import {
   useCurrentNotebook,
   useNotebooksStateSnapshot,
 } from '@/state/notebooks/notebooks-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNotebookTab = () => {
-  const router = useRouter()
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
   const queryClient = useQueryClient()
   const { createChat, isCreating } = useCreateChat()
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -108,7 +110,6 @@ export const ExplorerNotebookTab = () => {
   const queryCellIds = cells.filter(isQueryCell).map((cell) => cell._id)
 
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
   const [isSaveConflictOpen, setIsSaveConflictOpen] = useState(false)
   const [pendingQueryMatches, setPendingQueryMatches] = useState<{
@@ -131,19 +132,6 @@ export const ExplorerNotebookTab = () => {
         }
       }
     },
-  })
-
-  const { mutate: deleteNotebook, isPending: isDeleting } = useContentDeleteMutation({
-    onSuccess: () => {
-      toast.success('Successfully deleted notebook')
-      if (id) {
-        tabs.removeTab(createTabId('notebook', { id }))
-        snap.removeNotebook({ id })
-      }
-      setIsDeleteModalOpen(false)
-      router.push(`/project/${ref}/explorer`)
-    },
-    onError: (error) => toast.error(`Failed to delete notebook: ${error.message}`),
   })
 
   const sensors = useSensors(
@@ -284,6 +272,10 @@ export const ExplorerNotebookTab = () => {
     persistNotebook()
   }
 
+  useShortcut(SHORTCUT_IDS.EXPLORER_NOTEBOOK_SAVE, handleSaveNotebook, {
+    enabled: !!content && !isUpdating,
+  })
+
   const handleSaveAnyway = () => {
     setIsSaveConflictOpen(false)
     persistNotebook()
@@ -329,11 +321,6 @@ export const ExplorerNotebookTab = () => {
       const message = err instanceof Error ? err.message : String(err)
       toast.error('Failed to copy notebook as Markdown: ' + message)
     }
-  }
-
-  const handleConfirmDeleteNotebook = () => {
-    if (!ref || !id) return
-    deleteNotebook({ projectRef: ref, ids: [id] })
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -402,7 +389,7 @@ export const ExplorerNotebookTab = () => {
             icon={
               <AiIconAnimation
                 size={16}
-                className="text-tertiary-foreground group-hover:text-brand"
+                className="text-tertiary-foreground group-hover:text-primary"
               />
             }
             loading={isCreating}
@@ -412,13 +399,18 @@ export const ExplorerNotebookTab = () => {
           >
             Analyze
           </ExplorerToolbarAction>
-          <ExplorerToolbarAction
-            aria-label="Save changes"
-            icon={<Save size={16} strokeWidth={2} />}
-            tooltip="Save changes"
-            loading={isUpdating}
-            onClick={handleSaveNotebook}
-          />
+          <ShortcutTooltip
+            side="bottom"
+            shortcutId={SHORTCUT_IDS.EXPLORER_NOTEBOOK_SAVE}
+            label="Save changes"
+          >
+            <ExplorerToolbarAction
+              aria-label="Save changes"
+              icon={<Save size={16} strokeWidth={2} />}
+              loading={isUpdating}
+              onClick={handleSaveNotebook}
+            />
+          </ShortcutTooltip>
           <ExplorerToolbarActions>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -436,14 +428,17 @@ export const ExplorerNotebookTab = () => {
                     <Keyboard size={14} />
                     <span>Intellisense enabled</span>
                   </div>
-                  {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+                  {isIntellisenseEnabled && <Check className="text-primary" size={16} />}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
                   <Copy size={14} />
                   <span>Copy as Markdown</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onClick={() => id && onSelectDelete({ id, type: 'notebook', name: name ?? '' })}
+                >
                   <Trash size={14} />
                   <span>Delete notebook</span>
                 </DropdownMenuItem>
@@ -532,22 +527,6 @@ export const ExplorerNotebookTab = () => {
           )}
         </div>
       </div>
-
-      <ConfirmationModal
-        size="small"
-        visible={isDeleteModalOpen}
-        title={`Confirm to delete notebook '${name ?? ''}'`}
-        confirmLabel="Delete notebook"
-        confirmLabelLoading="Deleting notebook"
-        variant="destructive"
-        loading={isDeleting}
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleConfirmDeleteNotebook}
-      >
-        <p className="text-sm">
-          This action cannot be undone. Are you sure you want to delete '{name}'?
-        </p>
-      </ConfirmationModal>
 
       <ConfirmationModal
         size="small"

@@ -96,7 +96,7 @@ const BuildingState = () => {
                       Browse the Supabase{' '}
                       <Link
                         href={`${DOCS_URL}`}
-                        className="mb-0 text-brand transition-colors hover:text-brand-600"
+                        className="mb-0 text-primary transition-colors hover:text-brand-600"
                         target="_blank"
                         rel="noreferrer"
                       >

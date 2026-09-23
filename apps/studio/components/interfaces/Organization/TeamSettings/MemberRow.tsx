@@ -118,7 +118,7 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
           {member.mfa_enabled ? (
             <>
               <span className="text-foreground-lighter">Enabled</span>
-              <Check className="text-brand" strokeWidth={2} size={16} />
+              <Check className="text-primary" strokeWidth={2} size={16} />
             </>
           ) : (
             <>
