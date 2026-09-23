@@ -46,4 +46,15 @@ describe('QueryCellEditor', () => {
     expect(screen.getByText('Query source menu')).toBeInTheDocument()
     expect(queryDisplaySettingsButton()).toBeInTheDocument()
   })
+
+  it('makes a cell without onCellChange read-only, but still runnable', () => {
+    customRender(<QueryCellEditor cell={cell} showQuery onShowQueryChange={vi.fn()} />)
+
+    expect(screen.getByRole('textbox', { name: 'SQL editor' })).toHaveAttribute('readonly')
+    expect(screen.getByText('Signups')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Signups' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Query source menu')).not.toBeInTheDocument()
+    expect(queryDisplaySettingsButton()).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Run' })).toBeInTheDocument()
+  })
 })

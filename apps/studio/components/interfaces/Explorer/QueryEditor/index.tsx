@@ -135,7 +135,7 @@ type QueryEditorProps = {
   onShowQueryChange: (showQuery: boolean) => void
   /** Disables editor run actions and hides the toolbar run button (e.g. while an external confirm footer owns the run). */
   isRunDisabled?: boolean
-  onTitleChange: (title: string) => void
+  onTitleChange?: (title: string) => void
   onSqlChange: (sql: string) => void
   onSqlCommit?: (sql: string) => void
   onSourceChange?: (source: QuerySourceBinding) => void
