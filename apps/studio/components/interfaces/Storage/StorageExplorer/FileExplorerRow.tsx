@@ -233,8 +233,7 @@ export const FileExplorerRow = ({
           ...(canUpdateFiles
             ? [
                 {
-                  // On a versioned bucket this is a soft delete, so it reads as Archive
-                  // here just as it does in the file preview panel.
+                  // On a versioned bucket this is a soft delete, so it reads as Archive.
                   name: isVersionedBucket ? 'Archive' : 'Delete',
                   icon: isVersionedBucket ? (
                     <Archive size={12} className="text-foreground-light" />
