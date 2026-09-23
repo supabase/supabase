@@ -12,12 +12,11 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ReadReplicasMovedCallout } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicasMovedCallout'
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { PIPELINES_FEEDBACK_URL } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
-import { ReplicationLayout } from '@/components/layouts/DatabaseLayout/ReplicationLayout'
+import { PipelinesLayout } from '@/components/layouts/DatabaseLayout/PipelinesLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -27,7 +26,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
-const DatabaseReplicationPage: NextPageWithLayout = () => {
+const DatabasePipelinesPage: NextPageWithLayout = () => {
   const { data: selectedProject, isPending } = useSelectedProjectQuery()
   const { isHighAvailability } = useHighAvailability()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
@@ -42,7 +41,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         <PageHeader size="large">
           <PageHeaderMeta>
             <PageHeaderSummary>
-              <PageHeaderTitle>Replication</PageHeaderTitle>
+              <PageHeaderTitle>Pipelines</PageHeaderTitle>
               <PageHeaderDescription>High Availability cluster topology</PageHeaderDescription>
             </PageHeaderSummary>
           </PageHeaderMeta>
@@ -66,7 +65,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Replication</PageHeaderTitle>
+            <PageHeaderTitle>Pipelines</PageHeaderTitle>
             <PageHeaderDescription>Send data to external destinations</PageHeaderDescription>
           </PageHeaderSummary>
 
@@ -76,7 +75,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
                 Leave feedback
               </a>
             </Button>
-            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+            <DocsButton href={`${DOCS_URL}/guides/database/replication/pipelines`} />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
@@ -87,7 +86,6 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         ) : (
           <PageSection>
             <PageSectionContent className="flex flex-col gap-12">
-              <ReadReplicasMovedCallout />
               <ReplicationDiagram />
               <Destinations />
             </PageSectionContent>
@@ -98,10 +96,10 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   )
 }
 
-DatabaseReplicationPage.getLayout = (page) => (
+DatabasePipelinesPage.getLayout = (page) => (
   <DefaultLayout>
-    <ReplicationLayout>{page}</ReplicationLayout>
+    <PipelinesLayout>{page}</PipelinesLayout>
   </DefaultLayout>
 )
 
-export default DatabaseReplicationPage
+export default DatabasePipelinesPage

@@ -5,11 +5,11 @@ import { useContext, useEffect } from 'react'
 import { ReplicationPipelineLayout } from '@/components/interfaces/Database/Replication/ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from '@/components/interfaces/Database/Replication/ReplicationPipelineStatus/ReplicationPipelineStatus'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import { ReplicationLayout } from '@/components/layouts/DatabaseLayout/ReplicationLayout'
+import { PipelinesLayout } from '@/components/layouts/DatabaseLayout/PipelinesLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from '@/types'
 
-const DatabaseReplicationPage: NextPageWithLayout = () => {
+const DatabasePipelinesPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
@@ -17,7 +17,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (hasLoaded && !enablePgReplicate) {
-      router.replace(`/project/${projectRef}/database/replication`)
+      router.replace(`/project/${projectRef}/database/pipelines`)
     }
   }, [router, hasLoaded, projectRef, enablePgReplicate])
 
@@ -32,10 +32,10 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   )
 }
 
-DatabaseReplicationPage.getLayout = (page) => (
+DatabasePipelinesPage.getLayout = (page) => (
   <DefaultLayout>
-    <ReplicationLayout>{page}</ReplicationLayout>
+    <PipelinesLayout>{page}</PipelinesLayout>
   </DefaultLayout>
 )
 
-export default DatabaseReplicationPage
+export default DatabasePipelinesPage

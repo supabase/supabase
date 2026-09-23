@@ -39,8 +39,6 @@ Follow your destination guide to prepare its resources and credentials, and chec
 - [DuckLake](/docs/guides/database/replication/pipelines/ducklake)
 - [Snowflake](/docs/guides/database/replication/pipelines/snowflake)
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ### Step 2: Enable Pipelines
 
 <Admonition type="note">
@@ -49,7 +47,7 @@ Pipelines installs an `etl` schema and a database event trigger to track replica
 
 </Admonition>
 
-1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
+1. Navigate to the [**Database > Pipelines**](/dashboard/project/_/database/pipelines) section of the Dashboard
 2. Click **Add pipeline** to show the replication side panel
 3. Select a destination available to your organization
 4. If Pipelines is not yet enabled, click **Enable Pipelines**, review the dialog, and confirm **Enable Pipelines**.
@@ -175,11 +173,9 @@ A pipeline restart does not request a fresh copy of every table. Tables that com
 
 If the main replication slot is lost and **Recreate slot** is enabled, startup rebuilds all replicated tables. Review [lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) for its data-loss and billing effects. To deliberately rebuild specific tables, use [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ### Disabling Pipelines
 
-Delete all pipelines first. Then open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
+Delete all pipelines first. Then open the three-dot actions menu on the Pipelines page and click **Disable Pipelines**.
 
 For cleanup details, see [What happens when you disable Pipelines?](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines).
 
