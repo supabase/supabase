@@ -25,6 +25,7 @@ import {
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
+import { BucketVersioningPill } from '@/components/interfaces/Storage/BucketVersioningPill'
 import { DeleteBucketModal } from '@/components/interfaces/Storage/FilesBuckets/DeleteBucketModal'
 import { EditBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EditBucketModal'
 import { EmptyBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EmptyBucketModal'
@@ -157,6 +158,7 @@ const BucketPage: NextPageWithLayout = () => {
                     <TooltipContent side="bottom">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
                   </Tooltip>
                 )}
+                <BucketVersioningPill bucket={bucket} />
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
