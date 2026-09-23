@@ -112,10 +112,11 @@ explain select * from blog_post order by published_at desc limit 10;
    ->  Index Scan Backward using blog_post_published_at on blog_post  (cost=0.15..48.95 rows=320 width=120)
 
 explain select * from blog_post where id = 1;
-                                    QUERY PLAN
-──────────────────────────────────────────────────────────────────────────────────
- Index Scan using blog_post_pkey on blog_post  (cost=0.15..8.17 rows=1 width=120)
-   Index Cond: (id = 1)
+                              QUERY PLAN
+───────────────────────────────────────────────────────────────────────
+ Custom Scan (o_scan) on blog_post  (cost=0.15..8.17 rows=1 width=120)
+   Forward index scan of: blog_post_pkey
+   Conds: (id = 1)
 
 explain (analyze, buffers) select * from blog_post order by published_at desc limit 10;
                                                                       QUERY PLAN
