@@ -62,8 +62,7 @@ describe('getRetentionTightening', () => {
   })
 
   it('does not warn when versioning is being turned off', () => {
-    // Suspending stops new versions from being created but never expires the
-    // ones already retained, so there is nothing to lose.
+    // Suspending never expires what is already retained, so there is nothing to lose.
     expect(
       getRetentionTightening(params({ isVersioningEnabled: false, nextRetentionDays: 7 }))
     ).toBe('none')
@@ -83,8 +82,7 @@ describe('getRetentionTightening', () => {
   })
 
   it('does not warn when re-enabling a suspended bucket', () => {
-    // A suspended bucket can be retaining versions, but its stored bounds are
-    // cleared while suspended, so there is no previous value to tighten from.
+    // A suspended bucket's stored bounds are cleared, so there is nothing to tighten from.
     expect(
       getRetentionTightening(params({ initialVersioningState: 'suspended', nextRetentionDays: 7 }))
     ).toBe('none')

@@ -15,7 +15,6 @@ import {
 import type { BucketVersioningState } from './StorageVersioning.constants'
 import { customRender } from '@/tests/lib/custom-render'
 
-/** Mirrors how the bucket modals compose these fields into their own schema. */
 const FormSchema = z.object(bucketVersioningFormFields).superRefine(superRefineBucketVersioning)
 
 const DEFAULT_VALUES: BucketVersioningFormValues = {
@@ -25,7 +24,6 @@ const DEFAULT_VALUES: BucketVersioningFormValues = {
   expiration_mode: 'and',
 }
 
-/** The fields expect their parent modal's form provider, so supply a minimal one. */
 const Harness = ({
   defaultValues,
   ...props
@@ -98,8 +96,7 @@ describe('BucketVersioningFields', () => {
   })
 
   test('clears an orphaned version cap when the expiration age is removed', async () => {
-    // S3 rejects a noncurrent-count rule with no noncurrent-days condition, so
-    // the cap can't be left behind once the age is cleared.
+    // S3 rejects a noncurrent-count rule with no noncurrent-days condition.
     renderFields({
       defaultValues: {
         enable_versioning: true,
@@ -121,8 +118,7 @@ describe('BucketVersioningFields', () => {
 
     expect(screen.getByText('Expire a noncurrent version when')).toBeInTheDocument()
 
-    // One condition left means there is nothing to combine. The section animates
-    // out, so it lingers in the DOM until the exit transition finishes.
+    // The section animates out, so it lingers in the DOM until the exit transition finishes.
     await userEvent.clear(getVersionsInput())
 
     await waitForElementToBeRemoved(() => screen.queryByText('Expire a noncurrent version when'))

@@ -18,7 +18,6 @@ const values = (
   ...overrides,
 })
 
-/** Runs the refine in isolation and returns the issues it produced. */
 const refine = (formValues: BucketVersioningFormValues) => {
   const result = z
     .custom<BucketVersioningFormValues>()
@@ -38,8 +37,7 @@ describe('superRefineBucketVersioning', () => {
   })
 
   it('skips validation entirely when versioning is off', () => {
-    // Out-of-range values are irrelevant while the fields are hidden, so stale
-    // numbers must not block an unrelated bucket-settings save.
+    // Stale numbers must not block an unrelated bucket-settings save.
     expect(refine(values({ enable_versioning: false, version_expiry_days: -5 }))).toEqual([])
   })
 
@@ -104,8 +102,7 @@ describe('bucketVersioningFormFields', () => {
   })
 
   it('preserves the empty sentinel instead of coercing it to zero', () => {
-    // `Number('')` is 0, so a bare coercion would turn "no condition" into
-    // "expire immediately". The union literal has to win.
+    // `Number('')` is 0, so a bare coercion would turn "no condition" into "expire immediately".
     expect(schema.parse({ version_expiry_days: '' }).version_expiry_days).toBe('')
   })
 

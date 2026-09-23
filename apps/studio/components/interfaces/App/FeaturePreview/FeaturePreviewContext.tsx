@@ -161,14 +161,7 @@ export const useIsExplorerEnabled = () => {
   return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
 }
 
-/**
- * Three gates, each answering a different question. The `storageVersioningPrivateAlpha`
- * ConfigCat flag is our lever over the dashboard UI, so we can pull it without a
- * deploy. The project capability says whether Storage has turned object versioning
- * on for this project, which during the private alpha is granted per project by the
- * Storage team. The feature preview is the user's own opt-in, so an enabled project
- * doesn't change under people who never asked for it.
- */
+/** Three gates: the ConfigCat kill switch, the project's capability, and the user's opt-in. */
 export const useIsStorageVersioningEnabled = () => {
   const { ref } = useParams()
   const { flags } = useFeaturePreviewContext()

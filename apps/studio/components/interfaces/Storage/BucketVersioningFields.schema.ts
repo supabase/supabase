@@ -2,9 +2,7 @@ import { z } from 'zod'
 
 import type { ExpirationMode } from './StorageVersioning.constants'
 
-/**
- * Empty means the condition isn't part of the policy, which is distinct from zero.
- */
+/** Empty drops the condition from the policy, which is distinct from zero. */
 const versioningNumberField = z.union([z.literal(''), z.coerce.number().int()])
 
 export const S3_MAX_NONCURRENT_VERSIONS = 100
@@ -23,9 +21,6 @@ export interface BucketVersioningFormValues {
   expiration_mode: ExpirationMode
 }
 
-/**
- * Both number fields are optional — an empty value drops that condition from the policy.
- */
 export const superRefineBucketVersioning = (
   data: BucketVersioningFormValues,
   ctx: z.RefinementCtx

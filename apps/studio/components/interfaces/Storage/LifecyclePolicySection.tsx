@@ -41,11 +41,8 @@ export const LifecyclePolicySection = ({
   const hasNoPolicy = !hasDays && !hasVersions
   const hasBothConditions = hasDays && hasVersions
 
-  // S3 requires the noncurrent-days condition on any noncurrent-count rule, so
-  // clear an orphaned cap the moment the age field flips from set to unset. Only
-  // on the actual flip, not on mount — a bucket opened with a stale
-  // `{ days: null, versions: N }` shouldn't silently lose N, and the input stays
-  // disabled meanwhile so the value is visible.
+  // S3 requires a noncurrent-days condition on any noncurrent-count rule. Only on the
+  // actual flip, not on mount, so a bucket opened with a stale cap doesn't silently lose it.
   const prevHasDaysRef = useRef(hasDays)
   useEffect(() => {
     const wasSet = prevHasDaysRef.current
