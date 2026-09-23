@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import { buildLogsPrompt, formatLogsAsJson } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import { parseSelectedLogs } from '@/components/interfaces/UnifiedLogs/LogSelectionActions.utils'
 import type { ColumnSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
+import { mapUnifiedLogRow, parseUnifiedLogsQueryRows } from '@/data/logs/unified-logs.utils'
 
 const row: ColumnSchema = {
   id: 'log-id',
@@ -16,6 +18,41 @@ const row: ColumnSchema = {
 }
 
 describe('parseSelectedLogs', () => {
+  it.each(['edge', 'auth', 'compute', 'realtime'])(
+    'accepts mapped %s logs with numeric and OTEL timestamps',
+    (logType) => {
+      const timestamps = [
+        1788424716876000,
+        '1788424716876000',
+        '2026-09-03T09:58:36.876000',
+        '2026-09-03T09:58:36.876Z',
+      ]
+      const rows = parseUnifiedLogsQueryRows(
+        timestamps.map((timestamp) => ({
+          id: `${logType}-${timestamp}`,
+          log_type: logType,
+          timestamp,
+          event_message: 'Connection opened',
+          method: null,
+          pathname: null,
+          status: '200',
+          level: null,
+          log_count: null,
+          logs: null,
+        }))
+      ).map(mapUnifiedLogRow)
+
+      const result = parseSelectedLogs(rows, true)
+
+      expect(result.success).toBe(true)
+      if (!result.success) throw result.error
+      expect(result.data.map((log) => log.timestamp)).toEqual(timestamps)
+      expect(JSON.parse(formatLogsAsJson(result.data))).toHaveLength(timestamps.length)
+      expect(buildLogsPrompt(result.data)).toContain('Connection opened')
+      if (logType !== 'compute') expect(result.data[0].log_count).toBeNull()
+    }
+  )
+
   it.each([false, true])('preserves log fields with metadata visibility %s', (metadataVisible) => {
     const input = {
       ...row,
@@ -84,7 +121,9 @@ describe('parseSelectedLogs', () => {
     [{ ...row, event_message: 123 }],
     [{ ...row, log_type: 'unknown' }],
     [{ ...row, metadata: 'invalid' }],
-    [{ ...row, date: new Date(NaN) }],
+    [{ ...row, timestamp: true }],
+    [{ ...row, timestamp: 'invalid timestamp' }],
+    [{ ...row, timestamp: '' }],
   ])('returns a validation error for malformed input: %j', (input) => {
     expect(parseSelectedLogs(input, false).success).toBe(false)
   })

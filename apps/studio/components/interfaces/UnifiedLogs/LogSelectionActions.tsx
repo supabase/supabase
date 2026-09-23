@@ -3,7 +3,6 @@ import { AiIconAnimation } from 'ui'
 
 import { buildLogsPrompt, formatLogsAsJson } from '../Settings/Logs/Logs.utils'
 import { parseSelectedLogs } from './LogSelectionActions.utils'
-import { ColumnSchema } from './UnifiedLogs.schema'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import CopyButton from '@/components/ui/CopyButton'
@@ -14,7 +13,7 @@ import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-export const LogSelectionActions = ({ rows }: { rows: ColumnSchema[] }) => {
+export const LogSelectionActions = ({ rows }: { rows: unknown[] }) => {
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const track = useTrack()
