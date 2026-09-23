@@ -55,7 +55,7 @@ export const AdvancedSettings = ({
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Overrides for pipeline behavior.
+                Overrides for batching, initial sync, and replication slots.
               </span>
             </div>
           </AccordionTrigger>
