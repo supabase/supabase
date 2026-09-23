@@ -301,9 +301,13 @@
   }
 }
 
-::-moz-selection,
 ::selection {
-  background-color: oklch(from var(--primary-bright) l c h / 28%);
+  background-color: oklch(from var(--primary-bright) l c h / 40%);
+  color: var(--foreground) !important;
+}
+
+::-moz-selection {
+  background-color: oklch(from var(--primary-bright) l c h / 40%);
   color: var(--foreground) !important;
 }
 
