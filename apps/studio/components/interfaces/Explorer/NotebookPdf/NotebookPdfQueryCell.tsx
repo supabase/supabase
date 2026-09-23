@@ -86,7 +86,10 @@ export function NotebookPdfQueryCell({ cell, result }: NotebookPdfQueryCellProps
       <View style={pdfStyles.queryHeaderRow}>
         <Text style={pdfStyles.queryTitle}>{cell.title ?? 'Untitled query'}</Text>
         {cell._tag === 'log_cell' && (
-          <Text style={pdfStyles.footerText}>{formatTimeRange(cell.time_range)}</Text>
+          // react-pdf's default font (Helvetica) can't render the '→' from formatTimeRange
+          <Text style={pdfStyles.footerText}>
+            {formatTimeRange(cell.time_range).replace('→', '-')}
+          </Text>
         )}
       </View>
 
