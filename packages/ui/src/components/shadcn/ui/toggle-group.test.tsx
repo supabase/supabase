@@ -2,12 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { ToggleGroup, ToggleGroupIndicator, ToggleGroupItem } from './toggle-group'
+import { ToggleGroup, ToggleGroupItem } from './toggle-group'
 
 const renderSegmented = (props: {
   defaultValue?: string
   onValueChange?: (value: string) => void
   allowDeselect?: boolean
+  tone?: 'default' | 'outline' | 'text' | 'primary'
 }) => (
   <ToggleGroup variant="segmented" size="tiny" type="single" {...props}>
     <ToggleGroupItem value="data">Data</ToggleGroupItem>
@@ -16,23 +17,65 @@ const renderSegmented = (props: {
 )
 
 describe('ToggleGroup', () => {
-  it('draws the segmented container on the root rather than each item', () => {
+  it('leaves the segmented container naked — no border on the root or the items', () => {
     render(renderSegmented({ defaultValue: 'data' }))
 
-    expect(screen.getByRole('group')).toHaveClass('border-strong', 'p-px', 'gap-0', 'w-fit')
+    const root = screen.getByRole('group')
+
+    expect(root).toHaveClass('p-px', 'gap-0', 'w-fit')
+    expect(root).not.toHaveClass('border', 'border-strong')
+    expect(screen.getByRole('radio', { name: 'Data' })).not.toHaveClass('border')
   })
 
-  it('keeps the selected item styled when Radix marks it via aria-checked', () => {
+  it('leaves the selected item unpainted so only the indicator marks it', () => {
     render(renderSegmented({ defaultValue: 'data' }))
 
     const selected = screen.getByRole('radio', { name: 'Data' })
 
     expect(selected).toHaveAttribute('aria-checked', 'true')
-    expect(selected).toHaveClass(
+    // No background, border or shadow of its own — those would paint on click, ahead of
+    // the indicator's transition, which is what produced the flash.
+    expect(selected).toHaveClass('data-[state=on]:bg-transparent', 'aria-checked:bg-transparent')
+    expect(selected).not.toHaveClass(
+      'data-[state=on]:bg-accent',
+      'aria-checked:bg-accent',
       'data-[state=on]:bg-overlay-hover',
-      'aria-checked:bg-overlay-hover'
+      'data-[state=on]:border-strong',
+      'data-[state=on]:shadow-sm'
     )
-    expect(selected).not.toHaveClass('bg-accent', 'aria-checked:bg-accent')
+  })
+
+  it('adds a container border only for the outline tone', () => {
+    const { rerender } = render(renderSegmented({ defaultValue: 'data' }))
+    expect(screen.getByRole('group')).not.toHaveClass('border-strong')
+
+    rerender(renderSegmented({ defaultValue: 'data', tone: 'outline' }))
+    expect(screen.getByRole('group')).toHaveClass('border', 'border-strong')
+  })
+
+  it('tones the indicator rather than the items', () => {
+    const { container, rerender } = render(renderSegmented({ defaultValue: 'data' }))
+    // default borrows the default Button treatment, minus the container outline
+    expect(container.querySelector('[data-segment-indicator]')).toHaveClass(
+      'bg-background',
+      'border-strong'
+    )
+
+    rerender(renderSegmented({ defaultValue: 'data', tone: 'text' }))
+    expect(container.querySelector('[data-segment-indicator]')).toHaveClass('bg-accent')
+
+    rerender(renderSegmented({ defaultValue: 'data', tone: 'primary' }))
+    expect(container.querySelector('[data-segment-indicator]')).toHaveClass('bg-brand-400')
+    // the items stay neutral whatever the tone
+    expect(screen.getByRole('radio', { name: 'Data' })).toHaveClass(
+      'data-[state=on]:bg-transparent'
+    )
+  })
+
+  it('gives items a pointer cursor', () => {
+    render(renderSegmented({ defaultValue: 'data' }))
+
+    expect(screen.getByRole('radio', { name: 'Data' })).toHaveClass('cursor-pointer')
   })
 
   it('clears the selection on re-click by default', async () => {
@@ -89,17 +132,14 @@ describe('ToggleGroup', () => {
   })
 
   describe('with a sliding indicator', () => {
-    const renderWithIndicator = () =>
-      render(
-        <ToggleGroup variant="segmented" size="tiny" type="single" defaultValue="data">
-          <ToggleGroupIndicator />
-          <ToggleGroupItem value="data">Data</ToggleGroupItem>
-          <ToggleGroupItem value="definition">Definition</ToggleGroupItem>
-        </ToggleGroup>
-      )
+    it('renders one automatically for a single-select segmented group', () => {
+      const { container } = render(renderSegmented({ defaultValue: 'data' }))
+
+      expect(container.querySelectorAll('[data-segment-indicator]')).toHaveLength(1)
+    })
 
     it('measures the active item onto the root as custom properties', async () => {
-      renderWithIndicator()
+      render(renderSegmented({ defaultValue: 'data' }))
 
       const root = screen.getByRole('group')
 
@@ -108,24 +148,18 @@ describe('ToggleGroup', () => {
       expect(root.style.getPropertyValue('--active-segment-width')).not.toBe('')
     })
 
-    it('hands the selected treatment to the indicator instead of the item', () => {
-      renderWithIndicator()
-
-      expect(screen.getByRole('radio', { name: 'Data' })).toHaveClass(
-        'group-has-[[data-segment-indicator]]/segmented:bg-transparent',
-        'group-has-[[data-segment-indicator]]/segmented:shadow-none'
+    it('falls back to per-item paint for multi-select, which an indicator cannot track', () => {
+      const { container } = render(
+        <ToggleGroup variant="segmented" size="tiny" type="multiple" defaultValue={['a']}>
+          <ToggleGroupItem value="a">A</ToggleGroupItem>
+          <ToggleGroupItem value="b">B</ToggleGroupItem>
+        </ToggleGroup>
       )
-    })
 
-    it('leaves the item painting its own background when there is no indicator', async () => {
-      render(renderSegmented({ defaultValue: 'data' }))
-
-      const root = screen.getByRole('group')
-
-      await waitFor(() => {
-        expect(root).not.toHaveAttribute('data-segment-indicator-ready')
-      })
-      expect(root.style.getPropertyValue('--active-segment-width')).toBe('')
+      expect(container.querySelector('[data-segment-indicator]')).toBeNull()
+      expect(screen.getByRole('button', { name: 'A' })).toHaveClass(
+        'data-[state=on]:bg-overlay-hover'
+      )
     })
   })
 })

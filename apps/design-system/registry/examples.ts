@@ -1034,18 +1034,6 @@ export const examples: Registry = [
     files: ['example/textarea-with-text.tsx'],
   },
   {
-    name: 'segmented-control-filter',
-    type: 'components:example',
-    registryDependencies: ['toggle-group'],
-    files: ['example/segmented-control-filter.tsx'],
-  },
-  {
-    name: 'segmented-control-view-state',
-    type: 'components:example',
-    registryDependencies: ['toggle-group'],
-    files: ['example/segmented-control-view-state.tsx'],
-  },
-  {
     name: 'toggle-group-demo',
     type: 'components:example',
     registryDependencies: ['toggle-group'],
@@ -1074,6 +1062,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['toggle-group'],
     files: ['example/toggle-group-segmented.tsx'],
+  },
+  {
+    name: 'toggle-group-segmented-filter',
+    type: 'components:example',
+    registryDependencies: ['toggle-group'],
+    files: ['example/toggle-group-segmented-filter.tsx'],
   },
   {
     name: 'toggle-group-sm',
