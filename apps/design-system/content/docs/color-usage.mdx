@@ -7,16 +7,15 @@ The shorthand utility classes below simplify our full color palette by providing
 
 ## Brand green
 
-Light mode uses two greens. Pick by job, not by habit:
+In light mode, Supabase green has two shades.
 
-| Use for                                        | Tokens                                                                             | Examples                                                              |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Text, primary fills, small selected indicators | `--primary`, `text-primary`, `border-primary`, `bg-primary`                        | Links, labels, radios, step dots, primary Button                      |
-| Bright fills and focus                         | `brand-default`, `--ring`, `bg-brand-default`, `border-brand-default`, `ring-ring` | Focus rings, highlight rings, choice-card borders, bright status dots |
+`--primary` is the darker green. It meets WCAG AA for normal text on light surfaces, and it is also used for primary buttons and small selected indicators. Utilities include `text-primary`, `bg-primary`, and `border-primary`.
 
-Use `--primary` when the green must meet WCAG AA as text, or when it is a solid primary fill. Use `brand-default` for focus rings and other bright chrome. Do not point `--ring` at `--primary`.
+`brand-default` is the bright brand green. Use it for focus rings (`--ring` / `ring-ring`), highlight rings, and other bright fills or borders such as `bg-brand-default` and `border-brand-default`.
 
-Dark mode barely differs between the two. The split matters most on light surfaces.
+Toggle to light mode to compare the two. Dark mode barely differs between them.
+
+<Colors definition={'colors'} classes={['bg-primary', 'bg-brand-default']} />
 
 See also [Typography](../docs/typography) (`text-primary`) and [Accessibility](../docs/accessibility#focus-management) (shared focus ring).
 
