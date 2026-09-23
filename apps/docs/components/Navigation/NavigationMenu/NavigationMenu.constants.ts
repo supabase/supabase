@@ -3096,7 +3096,6 @@ export const telemetry: NavMenuConstant = {
       name: 'Hire an agent',
       items: [
         { name: 'Set up an agent', url: '/guides/observability/automate-with-agents' },
-        { name: 'Generalist', url: '/guides/observability/automate-with-agents/all' },
         { name: 'Health monitor', url: '/guides/observability/automate-with-agents/health' },
         { name: 'Security monitor', url: '/guides/observability/automate-with-agents/security' },
         {

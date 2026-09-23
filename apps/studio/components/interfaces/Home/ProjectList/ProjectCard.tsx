@@ -21,7 +21,6 @@ import { getManagedByFromOrganizationPartner } from '@/data/organizations/manage
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
-import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from '@/lib/constants'
 import type { Organization } from '@/types'
@@ -46,12 +45,6 @@ export const ProjectCard = ({
 }: ProjectCardProps) => {
   const router = useRouter()
   const { name, ref: projectRef } = project
-
-  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
-  const providerLabel =
-    project.cloud_provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : project.cloud_provider
-
-  const desc = `${providerLabel} | ${project.region}`
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
@@ -120,7 +113,7 @@ export const ProjectCard = ({
                     </DropdownMenu>
                   </div>
                 </div>
-                <p className="text-sm text-foreground-lighter">{desc}</p>
+                <p className="text-sm text-foreground-lighter">{project.region}</p>
               </div>
               <div className="flex items-center gap-x-1.5 relative overflow-hidden">
                 {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
