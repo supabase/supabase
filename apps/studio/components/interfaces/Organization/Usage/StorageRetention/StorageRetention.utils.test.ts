@@ -28,8 +28,7 @@ describe('toStorageSizeChartData', () => {
   })
 
   it('maps each retention total onto the chart series key the attribute list declares', () => {
-    // A mismatch here means a stacked bar silently renders as zero, so the keys
-    // must come from the same source the attributes do.
+    // A key mismatch here makes a stacked bar silently render as zero.
     const [point] = toStorageSizeChartData([day()])
     expect(point.current).toBe(100)
     expect(point.noncurrent).toBe(25)

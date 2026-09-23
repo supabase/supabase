@@ -9,10 +9,7 @@ import { storageRetentionUsageQueryOptions } from '@/data/storage/versioning/sto
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { formatBytes } from '@/lib/helpers'
 
-/**
- * What is driving Storage Size -
- * current objects versus data retained by noncurrent versions
- */
+/** What is driving Storage Size: current objects versus retained noncurrent versions. */
 export const StorageRetentionBreakdown = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { data, isPending, isSuccess } = useQuery(
@@ -76,12 +73,8 @@ export const StorageRetentionBreakdown = () => {
               <p className="w-16 text-right text-xs">{formatBytes(bucket.noncurrent)}</p>
             </div>
           ))}
-          {/*
-           * TODO(storage-versioning): link each row to its bucket once the
-           * endpoint returns a project ref alongside the bucket name. Buckets are
-           * per-project and this is an org-level page, so today two projects with
-           * an identically named bucket are indistinguishable here.
-           */}
+          {/* TODO(storage-versioning): link each row to its bucket once the endpoint
+              returns a project ref — bucket names collide across projects. */}
           <p className="pt-2 text-xs text-foreground-lighter">
             Retention is set per bucket, under Storage → bucket settings → Object versioning.
           </p>

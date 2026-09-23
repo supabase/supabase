@@ -4,14 +4,9 @@ import { storageKeys } from '../keys'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
 
-/** Storage bytes split by what is keeping them around */
 export interface StorageRetentionTotals {
-  /** The version served when an object is fetched without a version ID. */
   current: number
-  /**
-   * Everything still billable that isn't the current object: noncurrent versions
-   * plus the empty delete-marker placeholders behind archived files.
-   */
+  /** Noncurrent versions plus the delete markers behind archived files. */
   noncurrent: number
 }
 
@@ -47,8 +42,7 @@ async function getStorageRetentionUsage(
 ): Promise<StorageRetentionUsage> {
   if (!orgSlug) throw new Error('orgSlug is required')
 
-  // TODO(storage-versioning): replace with the real endpoint once the platform
-  // reports retention usage. The breakdown renders zeros until then.
+  // TODO(storage-versioning): call the real endpoint once the platform reports retention usage.
   return EMPTY_USAGE
 }
 

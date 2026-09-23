@@ -32,8 +32,7 @@ const SizeAndCounts = ({
 }: SizeAndCountsProps) => {
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  // The daily org stats don't break Storage Size into segments; that split comes
-  // from the retention endpoint.
+  // The daily org stats don't segment Storage Size; that split comes from the retention endpoint.
   const { data: retention, isPending: isLoadingRetention } = useQuery({
     ...storageRetentionUsageQueryOptions({ orgSlug }),
     enabled: isStorageVersioningEnabled,
