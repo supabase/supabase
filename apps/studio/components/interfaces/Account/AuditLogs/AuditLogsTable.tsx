@@ -4,6 +4,16 @@ import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } fro
 import { formatCompactNumber } from '@/components/ui/DataTable/DataTable.utils'
 import type { AuditLog } from '@/data/organizations/organization-audit-logs-query'
 
+// @tanstack/react-table's ColumnMeta is intentionally empty for consumers to augment via
+// declaration merging; we read our own convention fields off it with a cast instead of a
+// global `declare module` augmentation, since that would apply repo-wide and can silently
+// break excess-property checking for other tables' unrelated meta fields (e.g. Unified Logs'
+// `dataType`) the moment ColumnMeta stops being empty.
+interface AuditLogColumnMeta {
+  cellClassName?: string
+  headerClassName?: string
+}
+
 interface AuditLogsTableProps {
   table: TanStackTable<AuditLog>
   selectedLog?: AuditLog
@@ -26,7 +36,8 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
                 className={cn(
                   'sticky top-0 z-10 bg-surface-100',
                   '[border-bottom:none]! [box-shadow:inset_0_-1px_0_var(--border-default)]!',
-                  header.column.columnDef.meta?.headerClassName,
+                  (header.column.columnDef.meta as AuditLogColumnMeta | undefined)
+                    ?.headerClassName,
                   'px-2 first:pl-3'
                 )}
               >
@@ -53,7 +64,7 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
                 key={cell.id}
                 className={cn(
                   'py-2 px-2 text-xs first:pl-3',
-                  cell.column.columnDef.meta?.cellClassName
+                  (cell.column.columnDef.meta as AuditLogColumnMeta | undefined)?.cellClassName
                 )}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

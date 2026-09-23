@@ -12,13 +12,6 @@ import {
   type AuditLog,
 } from '@/data/organizations/organization-audit-logs-query'
 
-declare module '@tanstack/react-table' {
-  interface ColumnMeta<TData, TValue> {
-    cellClassName?: string
-    headerClassName?: string
-  }
-}
-
 interface AuditLogColumnsOptions {
   projects: { ref?: string; name: string }[]
   organizations: { slug?: string; name: string }[]
