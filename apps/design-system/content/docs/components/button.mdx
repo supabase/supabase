@@ -108,6 +108,12 @@ Displaying only an Icon in a button.
   We should update the button component to support this use case better.
 </Admonition>
 
+Ensure the button is accessible by:
+
+- wrapping it in a [`Tooltip`](./tooltip) for sighted users
+- adding an `aria-label` prop for screen readers
+- set its `aria-describedby` prop to `undefined` when the tooltip content repeats the label so screen readers don't read it twice
+
 <ComponentPreview name="button-icon" />
 
 ### As child
