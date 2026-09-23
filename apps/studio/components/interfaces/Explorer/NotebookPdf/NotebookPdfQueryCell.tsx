@@ -90,7 +90,7 @@ export function NotebookPdfQueryCell({ cell, result }: NotebookPdfQueryCellProps
         )}
       </View>
 
-      <SqlBlock sql={cell.unchecked_sql} />
+      <SqlBlock sql={result?.sql ?? cell.unchecked_sql} />
 
       <QueryResultsSection result={result} view={view} chart={cell.chart} />
 

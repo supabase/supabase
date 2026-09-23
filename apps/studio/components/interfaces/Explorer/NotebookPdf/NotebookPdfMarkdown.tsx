@@ -128,6 +128,33 @@ function mapBlock(
           <Text style={pdfStyles.sqlText}>{node.value}</Text>
         </View>
       )
+    case 'table': {
+      const [headerRow, ...bodyRows] = node.children
+      return (
+        <View key={key} style={pdfStyles.table}>
+          <View style={pdfStyles.tableHeaderRow}>
+            {headerRow.children.map((cell, cellIndex) => (
+              <Text key={`${key}-header-${cellIndex}`} style={pdfStyles.tableHeaderCell}>
+                {cell.children.map((child, childIndex) =>
+                  mapInline(child, `${key}-header-${cellIndex}-${childIndex}`)
+                )}
+              </Text>
+            ))}
+          </View>
+          {bodyRows.map((row, rowIndex) => (
+            <View key={`${key}-row-${rowIndex}`} style={pdfStyles.tableRow}>
+              {row.children.map((cell, cellIndex) => (
+                <Text key={`${key}-row-${rowIndex}-${cellIndex}`} style={pdfStyles.tableCell}>
+                  {cell.children.map((child, childIndex) =>
+                    mapInline(child, `${key}-row-${rowIndex}-${cellIndex}-${childIndex}`)
+                  )}
+                </Text>
+              ))}
+            </View>
+          ))}
+        </View>
+      )
+    }
     default:
       return null
   }
