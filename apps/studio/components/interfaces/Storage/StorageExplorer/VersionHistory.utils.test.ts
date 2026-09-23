@@ -17,8 +17,7 @@ describe('computeVersionFate', () => {
   })
 
   it('treats a zero bound as "condition not set" rather than "expire immediately"', () => {
-    // A 0 can only arrive from a partially-typed or cleared form field; reading
-    // it as an active bound would label every version as expiring.
+    // Reading a 0 as an active bound would label every version as expiring.
     expect(
       computeVersionFate({
         daysOld: 90,
@@ -51,8 +50,7 @@ describe('computeVersionFate', () => {
   })
 
   it('ignores a cap that has no expiration age alongside it', () => {
-    // Not a reachable policy: S3 requires NoncurrentDays
-    // on any NoncurrentVersionExpiration rule
+    // Not a reachable policy: S3 requires NoncurrentDays on any expiration rule.
     const base = { expiryDays: null, cap: 3, mode: 'and' as const }
 
     expect(computeVersionFate({ ...base, daysOld: 3, chronoIndex: 2, noncurrentCount: 3 })).toEqual(

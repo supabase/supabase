@@ -15,14 +15,9 @@ export interface ComputeVersionFateOptions {
   mode: ExpirationMode
 }
 
-/** Treats a missing or non-positive bound as "condition not set". */
 const toActiveBound = (value: number | null) => (value !== null && value > 0 ? value : null)
 
-/**
- * Never show a countdown unless removal is actually guaranteed under the current policy —
- * a row only gets a day count once every other condition is already satisfied. So
- * an `and` policy shows one only once the cap is already exceeded.
- */
+/** A row gets a countdown only once every other condition is already satisfied. */
 export const computeVersionFate = ({
   daysOld,
   chronoIndex,
@@ -34,7 +29,7 @@ export const computeVersionFate = ({
   const activeExpiryDays = toActiveBound(expiryDays)
   const activeCap = toActiveBound(cap)
 
-  // A cap with no age isn't expressible in S3 — NoncurrentDays is required
+  // S3 requires NoncurrentDays, so a cap with no age isn't expressible.
   if (activeExpiryDays === null) return { type: 'retained' }
 
   const isAgeExceeded = daysOld >= activeExpiryDays
