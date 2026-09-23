@@ -104,9 +104,15 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const prepaidCreditsItem =
     upcomingInvoice?.lines?.find((item) => item.item_name === 'Prepaid Credits') ?? null
 
-  const hasTax =
-    upcomingInvoice?.tax_status === 'calculated' && (upcomingInvoice?.tax?.tax_amount ?? 0) > 0
+  const taxCalculated = upcomingInvoice?.tax_status === 'calculated'
+  const hasTax = (upcomingInvoice?.tax?.tax_amount ?? 0) > 0
+
   const taxFailed = upcomingInvoice?.tax_status === 'failed'
+
+  const customerBalanceDirection =
+    !!upcomingInvoice?.customer_balance && upcomingInvoice.customer_balance < 0
+      ? 'addition'
+      : 'subtraction'
 
   const planFeePaidInAdvance =
     !planItem && upcomingInvoice?.fixed_fees_billing_mode === 'in_arrears'
@@ -317,6 +323,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     </TableCell>
                   </TableRow>
                 )}
+
                 <TableRow>
                   <TableCell className="font-medium py-2 px-0 flex items-center">
                     <span className="mr-2">Current Costs</span>
@@ -329,16 +336,28 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   </TableCell>
                 </TableRow>
 
-                {(!!upcomingInvoice.amount_projected || hasTax || taxFailed) && (
+                {upcomingInvoice.amount_projected_usage && (
                   <TableRow>
                     <TableCell className="font-medium py-2 px-0 flex items-center">
-                      <span className="mr-2">Projected Costs</span>
+                      <span className="mr-2">Projected Usage</span>
+                      <InfoTooltip>
+                        Costs accumulated from the beginning of the billing cycle up to now.
+                      </InfoTooltip>
+                    </TableCell>
+                    <TableCell className="text-right font-medium py-2 px-0" translate="no">
+                      {formatCurrency(upcomingInvoice?.amount_projected_usage) ?? '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {taxCalculated && (
+                  <TableRow>
+                    <TableCell className="font-medium py-2 px-0 flex items-center">
+                      <span className="mr-2">Projected Taxes</span>
                       <InfoTooltip className="max-w-sm">
                         <p className="mb-2">
-                          Projected costs at the end of the billing cycle. Includes predictable
-                          costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery,
-                          but no costs for metrics like MAU, storage or function invocations. Final
-                          amounts may vary depending on your usage.
+                          Taxes are estimated based on your organization's billing address. The
+                          final amount may be adjusted at the end of the billing cycle.
                         </p>
 
                         {hasTax && (
@@ -359,27 +378,57 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                                 {formatCurrency(upcomingInvoice.tax!.tax_amount)}
                               </span>
                             </div>
-                            <p className="text-foreground-lighter pt-1 text-xs">
-                              Estimated based on your organization's billing address. The final
-                              amount may be adjusted at the end of the billing cycle.
-                            </p>
                           </div>
                         )}
 
                         {taxFailed && (
-                          <p className="mt-3 border-t border-muted pt-2 text-warning">
-                            We were unable to estimate tax for your organization. Please verify your
-                            billing address in your organization settings.
-                          </p>
+                          <div className="mt-3 border-t border-muted pt-2 space-y-1">
+                            <p className="mt-3 border-t border-muted pt-2 text-warning">
+                              We were unable to estimate tax for your organization. Please verify
+                              your billing address in your organization settings.
+                            </p>
+                          </div>
                         )}
                       </InfoTooltip>
                     </TableCell>
                     <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                      {formatCurrency(
-                        hasTax
-                          ? upcomingInvoice.tax!.total_amount_including_tax
-                          : upcomingInvoice.amount_projected
-                      ) ?? '-'}
+                      {hasTax ? formatCurrency(upcomingInvoice.tax?.tax_amount) : '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {upcomingInvoice.customer_balance !== 0 && (
+                  <TableRow>
+                    <TableCell className="py-2 px-0 flex items-center">
+                      <span className="mr-2">Customer Balance</span>
+                      <InfoTooltip className="max-w-xs">
+                        {customerBalanceDirection === 'subtraction'
+                          ? 'Credits that you have received by cancelling a subscription, or by purchasing top-ups before March 2026.'
+                          : 'Credits that are still owed due to small invoices not having been charged.'}
+                      </InfoTooltip>
+                    </TableCell>
+                    <TableCell className="text-right py-2 px-0" translate="no">
+                      {customerBalanceDirection === 'subtraction' ? '-' : '+'}
+                      {formatCurrency(Math.abs(upcomingInvoice.customer_balance)) ?? '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {!!upcomingInvoice.amount_projected && (
+                  <TableRow>
+                    <TableCell className="font-medium py-2 px-0 flex items-center">
+                      <span className="mr-2">Projected Costs</span>
+                      <InfoTooltip className="max-w-sm">
+                        <p className="mb-2">
+                          Projected costs at the end of the billing cycle. Includes predictable
+                          costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery,
+                          but no costs for metrics like MAU, storage or function invocations. Final
+                          amounts may vary depending on your usage.
+                        </p>
+                      </InfoTooltip>
+                    </TableCell>
+                    <TableCell className="text-right font-medium py-2 px-0" translate="no">
+                      {formatCurrency(upcomingInvoice.amount_projected) ?? '-'}
                     </TableCell>
                   </TableRow>
                 )}
