@@ -160,10 +160,12 @@
 
   /*
    * Primary ink vs primary solid fill:
-   *   --primary              Bright enough for text / small indicators on dark
-   *                          plates. Light theme overrides for AA text.
-   *   --primary-solid        Deeper button plate (dark mode). Light theme aliases
-   *                          these to --primary so one green covers ink + buttons.
+   *   --primary              Readable branded text / small indicators. Root
+   *                          values mirror dark theme (bright). Light theme
+   *                          overrides for AA text on light surfaces.
+   *   --primary-solid        Deeper button plate (dark mode). Light theme
+   *                          aliases these to --primary so ink and buttons
+   *                          share one green there.
    * Bright expressive chrome (focus rings, etc.) stays on brand-default.
    *
    * Hover shifts lightness only (preserves hue/chroma). Mixing with --foreground
