@@ -1,18 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
-import {
-  AlertCircle,
-  Archive,
-  ChevronDown,
-  Copy,
-  Download,
-  LoaderCircle,
-  Trash2,
-  X,
-} from 'lucide-react'
+import { AlertCircle, Archive, ChevronDown, Copy, Download, Trash2, X } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
-import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -27,11 +17,11 @@ import { fromLifecycleRules } from '../BucketVersioningFields.lifecycle'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { getBucketVersioningState } from '../StorageVersioning.constants'
+import { FilePreview } from './FilePreview'
 import { PreviewSection } from './PreviewSection'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
-import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 import { VersionCompareWidget } from './VersionCompareWidget'
 import { VersionHistory } from './VersionHistory'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -44,105 +34,10 @@ import {
   type ObjectVersion,
 } from '@/data/storage/versioning/object-versions-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { BASE_PATH } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
-const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
-
 const PANEL_WIDTH = 450
-
-const PreviewFile = ({ item }: { item: StorageItem }) => {
-  const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
-  const folderPath = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
-  const path = [folderPath, item.name].filter(Boolean).join('/')
-
-  const { data: previewUrl, isPending: isLoading } = useFetchFileUrlQuery({
-    path,
-    projectRef: projectRef,
-    bucket: selectedBucket,
-  })
-
-  // if the size is not available, we set it to be greater than the max size
-  const size = +(item.metadata?.size ?? PREVIEW_SIZE_LIMIT + 1)
-  const mimeType = item.metadata?.mimetype
-
-  const isSkipped = !!mimeType && !!size && size > PREVIEW_SIZE_LIMIT
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
-        <LoaderCircle size={14} className="animate-spin text-foreground-lighter" />
-      </div>
-    )
-  }
-  if (isSkipped) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center">
-        <SVG
-          src={`${BASE_PATH}/img/file-filled.svg`}
-          preProcessor={(code) =>
-            code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
-          }
-        />
-        <p className="mt-2 w-2/5 text-center text-sm">
-          File size is too large to preview in the explorer
-        </p>
-      </div>
-    )
-  }
-  if (!mimeType || !previewUrl) {
-    return (
-      <SVG
-        src={`${BASE_PATH}/img/file-filled.svg`}
-        preProcessor={(code) =>
-          code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
-        }
-      />
-    )
-  }
-
-  if (mimeType.includes('image')) {
-    return (
-      <div
-        className="flex h-full w-full items-center justify-center bg-contain bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('${previewUrl}')` }}
-      />
-    )
-  }
-  if (mimeType.includes('audio')) {
-    return (
-      <div className="flex h-full w-full items-center justify-center px-10">
-        <audio key={previewUrl} controls style={{ width: 'inherit' }}>
-          <source src={previewUrl} type="audio/mpeg" />
-          <p className="text-sm text-foreground-light">
-            Your browser does not support the audio element.
-          </p>
-        </audio>
-      </div>
-    )
-  }
-  if (mimeType.includes('video')) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <video key={previewUrl} controls style={{ maxHeight: '100%' }}>
-          <source src={previewUrl} type="video/mp4" />
-          <p className="text-sm text-foreground-light">
-            Your browser does not support the video tag.
-          </p>
-        </video>
-      </div>
-    )
-  }
-  return (
-    <SVG
-      src={`${BASE_PATH}/img/file-filled.svg`}
-      preProcessor={(code) =>
-        code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
-      }
-    />
-  )
-}
 
 interface FileDetailsProps {
   createdAt: string
@@ -164,6 +59,8 @@ const FileDetails = ({ createdAt, updatedAt }: FileDetailsProps) => (
 
 interface CurrentFilePreviewProps {
   file: StorageItem
+  /** Full path within the bucket, which is what the URL endpoints address. */
+  path: string
   mimeType?: string
   size: string | null
   isPublicBucket: boolean
@@ -180,6 +77,7 @@ interface CurrentFilePreviewProps {
 /** The default top slot: the current file's thumbnail, metadata and actions. */
 const CurrentFilePreview = ({
   file,
+  path,
   mimeType,
   size,
   isPublicBucket,
@@ -197,7 +95,7 @@ const CurrentFilePreview = ({
       className="flex items-center justify-center overflow-hidden rounded-md border border-overlay"
       style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
     >
-      <PreviewFile item={file} />
+      <FilePreview path={path} mimeType={mimeType} size={file.metadata?.size} />
     </div>
 
     <div className="mt-2 flex flex-col">
@@ -434,6 +332,7 @@ export const PreviewPane = () => {
       <div ref={scrollContainerRef} className="min-h-0 flex-1 overflow-y-auto">
         {isComparing ? (
           <VersionCompareWidget
+            path={filePath ?? file.name}
             mimeType={mimeType}
             selectedVersion={previewedVersion}
             currentVersion={currentVersion}
@@ -444,6 +343,7 @@ export const PreviewPane = () => {
         ) : (
           <CurrentFilePreview
             file={file}
+            path={filePath ?? file.name}
             mimeType={mimeType}
             size={size}
             isPublicBucket={!!selectedBucket?.public}

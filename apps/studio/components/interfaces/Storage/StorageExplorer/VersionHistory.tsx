@@ -251,6 +251,9 @@ export const VersionHistory = ({
                   mimeType={mimeType}
                   isCurrent={version.isCurrent}
                   isDeleteMarker={isDeleteMarker}
+                  path={path}
+                  versionId={version.versionId}
+                  byteSize={version.size}
                 />
                 <span className="min-w-0 flex-1">
                   <span
