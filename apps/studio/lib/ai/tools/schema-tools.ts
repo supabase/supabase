@@ -32,6 +32,7 @@ export const getSchemaTools = ({
         .map(
           (policy) => `
               Policy Name: "${policy.name}"
+              Table: "${policy.table}"
               Action: ${policy.action}
               Roles: ${policy.roles.join(', ')}
               Command: ${policy.command}
