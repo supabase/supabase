@@ -107,7 +107,7 @@ const ProgressRing = ({
         transform="rotate(-90 9 9)"
         className={cn(
           'transition-[stroke-dashoffset] duration-500',
-          isOver ? 'text-warning-600' : isApproaching ? 'text-warning' : 'text-brand'
+          isOver ? 'text-warning-600' : isApproaching ? 'text-warning' : 'text-primary'
         )}
       />
     </svg>

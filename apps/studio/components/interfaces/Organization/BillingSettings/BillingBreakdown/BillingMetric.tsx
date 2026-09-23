@@ -202,7 +202,7 @@ export const BillingMetric = ({
                     <Link
                       href={metric.docLink.url}
                       target="_blank"
-                      className="transition text-brand hover:text-brand-600 underline"
+                      className="transition text-primary hover:text-brand-600 underline"
                     >
                       {metric.docLink.title}
                     </Link>

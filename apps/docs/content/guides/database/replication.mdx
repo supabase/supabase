@@ -8,14 +8,6 @@ sidebar_label: 'Overview'
 
 Replication keeps data synchronized with another location. Logical replication products such as Supabase Pipelines use change data capture (CDC) to read database changes and apply them to a destination.
 
-## Use cases
-
-You might use database replication for:
-
-- **Analytics and data warehousing**: Replicate your operational database to analytics platforms for complex analysis without impacting your application's performance.
-- **Data integration**: Keep your data synchronized across different systems and services in your tech stack.
-- **Operational reporting**: Maintain a copy of selected application data that you can query in another system.
-
 ## Replication methods
 
 Supabase supports three replication methods. Choose based on whether you need another Supabase Postgres database, a managed replication pipeline to a destination system, or full control over your own logical replication setup.
@@ -24,41 +16,44 @@ Supabase supports three replication methods. Choose based on whether you need an
 
 Read replicas are additional Supabase Postgres databases kept in sync with your primary database. Use them when you want read-only query capacity, lower latency in another region, or to isolate analytical reads from application writes while staying inside Supabase Postgres.
 
-- [Set up read replicas](/docs/guides/platform/read-replicas)
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+See [Set up read replicas](/docs/guides/platform/read-replicas).
 
 ### Pipelines
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-Supabase Pipelines is a managed CDC product for moving data from Supabase Postgres to supported destination systems. It uses Postgres logical replication with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; a pipeline first performs an initial sync of existing rows, then uses ongoing replication (CDC) to send subsequent database changes to that destination.
+Supabase Pipelines is a managed CDC product for moving data from Supabase Postgres to supported destination systems. It uses Postgres logical replication with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; a pipeline copies existing rows for the tables selected for initial sync, then uses ongoing replication (CDC) to send subsequent database changes to that destination.
 
-- [Set up Pipelines](/docs/guides/database/replication/pipelines)
-
-#### Supported destinations
-
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-BigQuery is currently available as a managed destination. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
-
-Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. Choose destination resources as close as possible to Frankfurt to reduce network latency and replication lag.
-
-| Destination                                                | Insert       | Update                  | Delete                       | Truncate     | Schema change          | Data model                                                                       |
-| ---------------------------------------------------------- | ------------ | ----------------------- | ---------------------------- | ------------ | ---------------------- | -------------------------------------------------------------------------------- |
-| [BigQuery](/docs/guides/database/replication/bigquery)     | ✅ Supported | ✅ Supported            | ✅ Supported                 | ✅ Supported | Beta (limited)         | Current-state tables.                                                            |
-| [ClickHouse](/docs/guides/database/replication/clickhouse) | ✅ Supported | `REPLICA IDENTITY FULL` | Primary-key or full identity | ✅ Supported | Early Access (limited) | Current-state tables (default) or append-only CDC history.                       |
-| [DuckLake](/docs/guides/database/replication/ducklake)     | ✅ Supported | Row identity required   | Row identity required        | ✅ Supported | Early Access (limited) | Current-state lakehouse tables backed by a SQL catalog and object storage.       |
-| [Snowflake](/docs/guides/database/replication/snowflake)   | ✅ Supported | `REPLICA IDENTITY FULL` | Row identity required        | ✅ Supported | Early Access (limited) | Append-only CDC history. Source `TRUNCATE` operations and table resets erase it. |
+See [Set up Pipelines](/docs/guides/database/replication/pipelines).
 
 ### Manual replication
 
 Manual replication uses the same underlying Postgres logical replication features as Pipelines, but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
 
-- [Set up manual replication](/docs/guides/database/replication/manual-replication-setup)
+See [Set up manual replication](/docs/guides/database/replication/manual-replication-setup).
+
+## Supported destinations
+
+| Destination                                                          | Status        |
+| -------------------------------------------------------------------- | ------------- |
+| [BigQuery](/docs/guides/database/replication/pipelines/bigquery)     | Public alpha  |
+| [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse) | Private alpha |
+| [DuckLake](/docs/guides/database/replication/pipelines/ducklake)     | Private alpha |
+| [Snowflake](/docs/guides/database/replication/pipelines/snowflake)   | Private alpha |
+
+[Request access](/go/supabase-pipelines-new-destinations) to destinations in private alpha.
+
+## Use cases
+
+You might use database replication for:
+
+- **Analytics and data warehousing**: Run analytical queries on replicated data in a separate platform. Initial sync and ongoing replication still use resources on the source database.
+- **Data integration**: Keep your data synchronized across different systems and services in your tech stack.
+- **Operational reporting**: Maintain a copy of selected application data that you can query in another system.
 
 ## Related features
 
-For realtime features and syncing data to clients (browsers, mobile apps), see [Realtime](/docs/guides/realtime).
+For realtime features and syncing data to browsers and mobile apps, see [Realtime](/docs/guides/realtime).
 
 Realtime also uses Postgres changes, but it is intended for broadcasting database updates to clients rather than maintaining a copy of your database in another system.
 
@@ -66,7 +61,7 @@ Realtime also uses Postgres changes, but it is intended for broadcasting databas
 
 ### Write-Ahead Log (WAL)
 
-Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL, which is a series of files (also called "segments") where the file size can be specified. Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
+Postgres records database changes in the Write-Ahead Log (WAL) before writing them to data files. WAL is stored in files called segments. A checkpoint writes modified data pages to disk so crash recovery can start from a recent position. Older WAL segments can be recycled or removed once they are no longer needed for recovery, archiving, or replication.
 
 ### Logical replication and WAL
 
@@ -78,11 +73,11 @@ LSN is a Log Sequence Number that identifies a position in the WAL. It is often 
 
 ## Logical replication architecture
 
-When setting up logical replication, three key components are involved:
+Logical replication uses these components:
 
-- `publication` - A set of tables on your primary database that will be `published`
-- `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
-- `subscription` - A subscription is created from an external system (that is, another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
+- **Publication**: Defines the source tables and change types to publish, with optional column lists and row filters.
+- **Replication slot**: Tracks a consumer's progress and retains WAL it still needs. A slot uses an output plugin to decode changes; it is not tied to a single publication.
+- **Consumer**: Reads decoded changes and applies them to a destination. Another Postgres database can use a subscription to manage this connection and its publications. Pipelines connects directly to the replication stream without creating a Postgres subscription.
 
 ## Logical replication output format
 
@@ -90,13 +85,13 @@ Logical replication is typically output in two forms, `pgoutput` and `wal2json`.
 
 ## Logical replication configuration
 
-When using logical replication, Postgres keeps WAL files around for longer than it otherwise needs them. If the files are removed too soon, then your `replication slot` can become inactive or lost if the database receives a large number of changes in a short time.
+Logical replication slots retain WAL until their consumers confirm that they no longer need it. If Postgres removes required WAL before a consumer catches up, the slot can become unusable and the consumer may need a new initial copy.
 
-In order to mitigate this, Postgres has many options and settings that can be [tweaked](/docs/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
+Postgres settings control replication capacity and WAL retention. Higher retention limits reduce the risk of losing required WAL, but can consume more database storage. Treat these settings as advanced configuration and check available disk before changing them. On Supabase, configure the supported settings with the [Supabase CLI](/docs/guides/database/custom-postgres-config#managing-postgres-configuration-with-the-cli).
 
-| Setting                                                                                  | Description                                            | User-facing | Default |
-| ---------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------- | ------- |
-| [`max_replication_slots`](https://postgresqlco.nf/doc/en/param/max_replication_slots/)   | Max count of replication slots allowed                 | No          |         |
-| [`wal_keep_size`](https://postgresqlco.nf/doc/en/param/wal_keep_size/)                   | Minimum size of WAL files to keep for replication      | No          |         |
-| [`max_slot_wal_keep_size`](https://postgresqlco.nf/doc/en/param/max_slot_wal_keep_size/) | Max WAL size that can be reserved by replication slots | No          |         |
-| [`checkpoint_timeout`](https://postgresqlco.nf/doc/en/param/checkpoint_timeout/)         | Max time between WAL checkpoints                       | No          |         |
+| Setting                                                                                                                        | Description                                                                                                                                                                          | Supabase configuration |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
+| [`max_replication_slots`](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-REPLICATION-SLOTS)   | Maximum number of replication slots. Pipelines needs one main slot and can temporarily use one additional slot per active table-sync worker.                                         | CLI only               |
+| [`wal_keep_size`](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-WAL-KEEP-SIZE)                   | Minimum amount of old WAL retained for standby servers. This setting is separate from the per-slot retention limit.                                                                  | CLI only               |
+| [`max_slot_wal_keep_size`](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-SLOT-WAL-KEEP-SIZE) | Maximum WAL that replication slots can retain at checkpoint time. `-1` lets slots retain unlimited WAL. A finite limit can invalidate a slot when its consumer falls too far behind. | CLI only               |
+| [`checkpoint_timeout`](https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-CHECKPOINT-TIMEOUT)                 | Maximum time between automatic WAL checkpoints. Slot WAL limits are enforced at checkpoint time.                                                                                     | CLI only               |

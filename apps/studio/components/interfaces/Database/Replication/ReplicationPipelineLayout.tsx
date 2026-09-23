@@ -196,7 +196,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       })
       setShowDeleteDestination(false)
       toast.success(`Deleted pipeline "${pipeline.destination_name}"`)
-      router.push(`/project/${projectRef}/database/replication`)
+      router.push(`/project/${projectRef}/database/pipelines`)
     } catch (error) {
       toast.error(`Failed to delete pipeline: ${(error as ResponseError).message}`)
     } finally {
@@ -215,7 +215,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           slotClassName="sticky top-0 z-20 bg-sidebar"
           actions={
             <PageBreadcrumbsActions>
-              <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+              <DocsButton href={`${DOCS_URL}/guides/database/replication/pipelines`} />
               <Button asChild variant="default">
                 <Link href={logsUrl}>View logs</Link>
               </Button>
@@ -225,7 +225,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href={`/project/${projectRef}/database/replication`}>Replication</Link>
+                <Link href={`/project/${projectRef}/database/pipelines`}>Pipelines</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

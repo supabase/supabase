@@ -4,7 +4,14 @@ Our docs help developers to get started and keep succeeding with Supabase. We we
 
 If you'd like to contribute, see our list of [recommended issues](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22). We also welcome you to open a PR or a new issue with your question.
 
-Here are some general guidelines on writing docs for Supabase.
+Here are some general guidelines on writing docs for Supabase. If you write with an AI coding agent, these skills apply the guidelines for you:
+
+- `/write-the-docs` to draft a new page.
+- `/edit-the-docs` to revise an existing page.
+- `/test-the-docs` to run the snippets you wrote.
+- `/review-the-docs` to check your work before you open a pull request.
+
+See [AI agent skills for docs authoring](#ai-agent-skills-for-docs-authoring) for the full set, including the skills that help you frame a page and place it in the information architecture.
 
 ## General principles
 
@@ -83,7 +90,9 @@ The `using` clause accepts any expression that returns a boolean.
 
 ## AI agent skills for docs authoring
 
-If you're using an AI coding agent that reads `.agents/skills/`, such as Claude Code, Cursor, or Codex, invoke skills with `/name`, for example `/write-the-docs`. The canonical files live in `.agents/skills/` (`.claude/skills` is a symlink).
+Use these skills for every docs change you make with an AI coding agent: `/write-the-docs` to draft, and `/edit-the-docs` to revise an existing page. They apply this guide and the [word list](./WORD_LIST.md), so you don't have to hold either one in your head.
+
+Skills work in any agent that reads `.agents/skills/`, such as Claude Code, Cursor, or Codex. Invoke a skill with `/name`, for example `/write-the-docs`. The canonical files live in `.agents/skills/` (`.claude/skills` is a symlink).
 
 ### Write the docs skills
 
@@ -99,7 +108,7 @@ Use the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-do
 
 ### Edit existing pages
 
-Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, structure, or brevity on an existing page when you are not changing the product story. 
+Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, structure, or brevity on an existing page when you are not changing the product story.
 
 ## Document types
 
@@ -550,7 +559,7 @@ That said, a few rules help keep the docs concise, consistent, and clear:
 
 Use American English. If in doubt, consult the [Merriam-Webster dictionary](https://www.merriam-webster.com/).
 
-Follow the [Supabase documentation word list](./WORD_LIST.md) for preferred spelling, capitalization, and usage. The word list includes the terminology rules checked by `supa-mdx-lint`. Run `pnpm lint:mdx` in `apps/docs` to check your changes.
+Follow the [Supabase documentation word list](./WORD_LIST.md) for preferred spelling, capitalization, and usage. No tool checks terminology, so check your own prose against the list, or let `/edit-the-docs` do it.
 
 ## Search
 

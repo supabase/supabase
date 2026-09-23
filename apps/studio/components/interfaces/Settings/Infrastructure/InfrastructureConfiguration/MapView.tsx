@@ -178,7 +178,7 @@ const MapView = () => {
                   <circle
                     r={4}
                     className={`animate-ping ${
-                      hasNoDatabases ? 'fill-border-stronger' : 'fill-brand'
+                      hasNoDatabases ? 'fill-border-stronger' : 'fill-brand-default'
                     }`}
                   />
                 )}
@@ -188,7 +188,7 @@ const MapView = () => {
                     hasNoDatabases
                       ? 'fill-background-surface-300 stroke-border-stronger'
                       : hasPrimary
-                        ? 'fill-brand stroke-brand-500'
+                        ? 'fill-brand-default stroke-brand-500'
                         : 'fill-brand-500 stroke-brand-400'
                   }`}
                 />

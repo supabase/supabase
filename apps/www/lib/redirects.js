@@ -192,11 +192,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/observability/access-data.md',
-    destination: '/docs/guides/observability.md',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/reports/:match*',
     destination: '/docs/guides/observability/:match*',
   },
@@ -207,8 +202,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/monitoring-and-debugging.md',
-    destination: '/docs/guides/observability.md',
+    source: '/docs/guides/monitoring-and-debugging',
+    destination: '/docs/guides/observability',
   },
   {
     permanent: true,
@@ -2930,6 +2925,26 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
     destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/bigquery',
+    destination: '/docs/guides/database/replication/pipelines/bigquery',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/clickhouse',
+    destination: '/docs/guides/database/replication/pipelines/clickhouse',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/ducklake',
+    destination: '/docs/guides/database/replication/pipelines/ducklake',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/snowflake',
+    destination: '/docs/guides/database/replication/pipelines/snowflake',
   },
   {
     permanent: true,

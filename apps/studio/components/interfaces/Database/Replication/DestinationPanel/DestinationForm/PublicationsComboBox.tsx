@@ -132,7 +132,7 @@ export const PublicationsComboBox = ({
                     >
                       <span>{pub.name}</span>
                       {selectedPublication === pub.name && (
-                        <Check className="text-brand" strokeWidth={2} size={13} />
+                        <Check className="text-primary" strokeWidth={2} size={13} />
                       )}
                     </CommandItem>
                   ))}
