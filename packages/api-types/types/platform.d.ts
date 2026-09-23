@@ -1279,6 +1279,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/burndown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Retrieves the burndown of prepaid credit blocks for an organization */
+    get: operations['OrgCreditsController_getBurndown']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/preview': {
     parameters: {
       query?: never
@@ -6326,6 +6343,10 @@ export interface components {
       branch_limit?: number
       installation_id: number
       new_branch_per_pr?: boolean
+      /**
+       * @description Project ref
+       * @example abcdefghijklmnopqrst
+       */
       project_ref: string
       repository_id: number
       supabase_changes_only?: boolean
@@ -6823,6 +6844,7 @@ export interface components {
             | 'm8i.large'
             | 'm7a.large'
             | 'm8a.large'
+            | 'c6a.large'
             | 'm6g.xlarge'
             | 'm6a.xlarge'
             | 'm6i.xlarge'
@@ -7851,6 +7873,10 @@ export interface components {
         metadata: {
           [key: string]: unknown
         }
+        /**
+         * @description Project ref
+         * @example abcdefghijklmnopqrst
+         */
         supabase_project_ref: string
       }
       organization_integration_id: string
@@ -7861,6 +7887,10 @@ export interface components {
       metadata: {
         [key: string]: unknown
       }
+      /**
+       * @description Organization slug
+       * @example tsrqponmlkjihgfedcba
+       */
       organization_slug: string
       source: string
       teamId?: string
@@ -8769,6 +8799,17 @@ export interface components {
       favorites: number
       private: number
       shared: number
+    }
+    GetCreditBurndownResponse_Output: {
+      data: {
+        amount_cents: number
+        breakdown: {
+          amount_cents: number
+          item: string
+        }[]
+        day: string
+        ending_balance_cents: number
+      }[]
     }
     GetGitHubConnectionConfigResponse_Output: {
       /** @description JSON representation of the parsed `supabase/config.toml`. Its shape is owned by the Supabase CLI and is passed through as-is. */
@@ -20414,6 +20455,59 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgCreditsController_getBurndown: {
+    parameters: {
+      query?: {
+        end_date?: string
+        start_date?: string
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetCreditBurndownResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve prepaid credit block burndown */
+      500: {
         headers: {
           [name: string]: unknown
         }

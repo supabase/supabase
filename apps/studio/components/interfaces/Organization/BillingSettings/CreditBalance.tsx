@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useInView } from 'react-intersection-observer'
 
+import { CreditBurndownChart } from './CreditBurndownChart'
 import { CreditCodeRedemption } from './CreditCodeRedemption'
 import { CreditTopUp } from './CreditTopUp'
 import {
@@ -93,6 +94,11 @@ const CreditBalance = () => {
               </FormSectionContent>
             </FormSection>
           </FormPanel>
+        )}
+        {isBalanceSuccess && (
+          <div className="mt-6">
+            <CreditBurndownChart orgSlug={slug} />
+          </div>
         )}
       </ScaffoldSectionContent>
     </ScaffoldSection>

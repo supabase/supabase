@@ -14,6 +14,7 @@ if (!IS_PLATFORM) {
 const SKIP_RETRY_PATHNAME_MATCHERS = [
   '/platform/projects/:ref/run-lints',
   '/platform/organizations/:slug/usage',
+  '/platform/organizations/:slug/billing/credits/burndown',
   '/platform/pg-meta/:ref/query',
   '/v1/projects/:ref/analytics/endpoints/logs.all',
 ].map((pathname) => match(pathname))

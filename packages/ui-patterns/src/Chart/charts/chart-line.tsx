@@ -88,6 +88,7 @@ export interface ChartLineProps {
   }
   strokeWidth?: number
   referenceLines?: ChartReferenceLine[]
+  curveType?: 'step' | 'monotone' | 'linear'
 }
 
 // [Joshen] JFYI - shouldn't rely on xKey's value to determine if its a time-based format
@@ -116,6 +117,7 @@ export const ChartLine = ({
   YAxisProps,
   strokeWidth = 1.5,
   referenceLines,
+  curveType = 'step',
 }: ChartLineProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const gradientPrefix = `chart-line-fill-${useId().replace(/:/g, '')}`
@@ -328,7 +330,7 @@ export const ChartLine = ({
           {keysToRender.map((key, index) => (
             <Area
               key={key}
-              type="step"
+              type={curveType}
               dataKey={key}
               fill={`url(#${gradientPrefix}-${index})`}
               fillOpacity={0.1}
