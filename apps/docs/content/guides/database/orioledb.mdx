@@ -44,20 +44,12 @@ OrioleDB implements copy-on-write checkpoints to persist data efficiently. This 
 
 ### Creating OrioleDB project
 
-You can get started with OrioleDB by enabling the extension in your Supabase dashboard.
-To get started with OrioleDB you need to [create a new Supabase project](/dashboard/new/_) and choose `OrioleDB Public Alpha` Postgres version.
+You choose OrioleDB when you create a project. You can't add OrioleDB to an existing project or remove it later.
 
-<Image
-  alt="Creating OrioleDB project"
-  src={{
-    light: '/docs/img/database/orioledb-creating-project--light.png',
-    dark: '/docs/img/database/orioledb-creating-project.png',
-  }}
-  className="max-w-[550px] mx-auto! border rounded-md"
-
-width={1376}
-height={2034}
-/>
+1. [Create a new Supabase project](/dashboard/new/_).
+1. Expand **Advanced Configuration**.
+1. Under **Postgres Type**, select **Postgres with OrioleDB**.
+1. Finish creating the project.
 
 ### Creating tables
 
@@ -167,7 +159,7 @@ A smaller set of OrioleDB settings has a `user` [context](/docs/guides/database/
 
 | Setting                             | Description                                                                                                                                                                                                          | Default      |
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| `orioledb.default_compress`         | Default compression level for OrioleDB tables. Set to `-1` to disable compression, or `0` or a positive integer to trade write speed for a smaller table on disk.                                                    | `-1`         |
+| `orioledb.default_compress`         | Default compression level for OrioleDB tables. Set to `-1` to disable compression, or `0` to `22` to trade write speed for a smaller table on disk.                                                                  | `-1`         |
 | `orioledb.default_primary_compress` | Default compression level for the primary index. Accepts the same values as `orioledb.default_compress`.                                                                                                             | `-1`         |
 | `orioledb.default_toast_compress`   | Default compression level for TOASTed values. Accepts the same values as `orioledb.default_compress`.                                                                                                                | `-1`         |
 | `orioledb.serializable`             | How OrioleDB handles `SERIALIZABLE` transactions. `table_lock` acquires a coarse lock per touched table, `repeatable_read` silently downgrades the isolation level, and `error` rejects `SERIALIZABLE` transactions. | `table_lock` |
