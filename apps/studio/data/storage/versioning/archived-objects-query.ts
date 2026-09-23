@@ -21,11 +21,7 @@ export interface ArchivedObject {
   /** Full path including the file name. Only `getArchivedSegments` splits it. */
   path: string
   archivedAt: string
-  /**
-   * The version that was live when the object was archived. S3 puts a delete
-   * marker on top of the stack; this UI hides that and surfaces the version
-   * underneath as an ordinary history entry.
-   */
+  /** The version live when the object was archived, i.e. the one under the delete marker. */
   currentVersion: ArchivedObjectVersion
   /** Newest first. */
   noncurrentVersions: ArchivedObjectVersion[]
@@ -39,7 +35,6 @@ export type ArchivedObjectsVariables = {
 export type ArchivedObjectsError = ResponseError
 
 const PAGE_SIZE = 1000
-// The overlay synthesizes folders from full paths, so it needs the whole bucket.
 // Bounded so a pathological bucket can't page forever.
 const MAX_PAGES = 20
 
@@ -50,12 +45,7 @@ const toVersion = (object: StorageObjectV2, action: ObjectVersionAction) => ({
   action,
 })
 
-/**
- * An object is archived when the row currently at its path is a delete marker:
- * the file is gone from the live listing, but its versions are still retained.
- * Objects whose current row is a real version are simply live, and objects with
- * no delete marker on top are skipped.
- */
+/** An object is archived when the row currently at its path is a delete marker. */
 export const toArchivedObjects = (objects: StorageObjectV2[]): ArchivedObject[] => {
   const byPath = new Map<string, StorageObjectV2[]>()
   for (const object of objects) {
@@ -106,8 +96,7 @@ async function getArchivedObjects(
       body: {
         limit: PAGE_SIZE,
         cursor,
-        // Flat listing: the overlay needs every archived object in the bucket,
-        // not one folder level at a time.
+        // Flat: the overlay synthesizes folders from full paths, so it needs the whole bucket.
         with_delimiter: false,
         noncurrentVersions: 'include',
         deleteMarkers: 'include',

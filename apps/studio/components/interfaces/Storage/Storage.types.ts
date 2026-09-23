@@ -38,10 +38,7 @@ export interface StorageItem {
   // UI specific properties, not from API
   isCorrupted: boolean
   path?: string
-  /**
-   * Set on a row synthesized from the archived list. `archivedObjectId` is absent
-   * on a folder that exists only because something archived sits inside it.
-   */
+  /** Set on a row synthesized from the archived list; absent on a synthesized folder. */
   archived?: { archivedObjectId?: string }
 }
 

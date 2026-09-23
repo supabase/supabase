@@ -10,7 +10,6 @@ export type ArchivedObjectPurgeVariables = {
   projectRef: string
   bucketId: string
   archivedObjectId: string
-  /** The object's full path within the bucket. */
   path: string
 }
 
@@ -24,10 +23,7 @@ export const useArchivedObjectPurgeMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  /**
-   * Every retained version goes, the delete marker included — leaving the marker
-   * behind would keep the object listed as archived with nothing under it.
-   */
+  /** Every retained version goes, the delete marker included. */
   const purgeArchivedObject = async ({
     projectRef,
     bucketId,
