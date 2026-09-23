@@ -150,7 +150,7 @@
   );
   /* Inverse of --foreground: canvas-coloured text for use on inverted fills
      (bg-foreground, bg-black / dark:bg-white, etc). Not the same as
-     --primary-foreground, which stays light for the dark primary fill. */
+     --primary-solid-foreground, which stays light on the deep button plate. */
   --foreground-contrast: oklch(var(--surface) calc(var(--chroma) * 0.55) var(--surface-hue));
 
   --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
@@ -159,19 +159,18 @@
   --popover-foreground: var(--foreground);
 
   /*
-   * Primary is the functional green for text, solid primary fills (including
-   * primary Button), and small selected indicators. Bright expressive fills and
-   * focus chrome use brand-default.
-   *
-   * Root values mirror dark theme: a darker plate so light labels hold contrast
-   * on primary buttons. Light theme overrides --primary / --primary-foreground
-   * for AA text on light surfaces.
+   * Primary ink vs primary solid fill:
+   *   --primary              Bright enough for text / small indicators on dark
+   *                          plates. Light theme overrides for AA text.
+   *   --primary-solid        Deeper button plate (dark mode). Light theme aliases
+   *                          these to --primary so one green covers ink + buttons.
+   * Bright expressive chrome (focus rings, etc.) stays on brand-default.
    *
    * Hover shifts lightness only (preserves hue/chroma). Mixing with --foreground
    * pulls light-mode surface-hue (warm) into the green and reads as yellow.
    * Sign of --tone-span: darken in light, lighten in dark.
    */
-  --primary: oklch(0.43627 0.11 var(--primary-hue));
+  --primary: oklch(0.76 0.15 var(--primary-hue));
   --button-fill-hover-delta: 0.04;
   --primary-hover: oklch(
     from var(--primary)
@@ -181,7 +180,20 @@
       )
       c h
   );
-  --primary-foreground: oklch(0.95 0.00275 var(--primary-hue));
+  --primary-foreground: oklch(
+    min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
+  );
+
+  --primary-solid: oklch(0.43627 0.11 var(--primary-hue));
+  --primary-solid-hover: oklch(
+    from var(--primary-solid)
+      calc(
+        l + var(--button-fill-hover-delta) * var(--tone-span) /
+          max(var(--tone-span), calc(var(--tone-span) * -1))
+      )
+      c h
+  );
+  --primary-solid-foreground: oklch(0.95 0.00275 var(--primary-hue));
 
   --secondary: oklch(
     from var(--background) calc(l + var(--elevation-step) * var(--elevation-3)) c h
