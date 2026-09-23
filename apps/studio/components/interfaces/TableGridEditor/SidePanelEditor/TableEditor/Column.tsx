@@ -12,7 +12,9 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  Input,
+  InputGroup,
+  InputGroupButton,
+  InputGroupInput,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -119,52 +121,76 @@ export const Column = ({
   }
 
   return (
-    <div className="flex w-full items-center" ref={setNodeRef} style={style}>
-      <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
-        <button
-          ref={setActivatorNodeRef}
-          {...attributes}
-          {...listeners}
-          tabIndex={0}
-          className="opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
-          type="button"
-        >
-          <GripVertical size={16} strokeWidth={1.5} />
-        </button>
+    <div className="flex w-full items-center gap-x-1" ref={setNodeRef} style={style}>
+      <div className={!isNewRecord ? 'hidden' : ''}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              ref={setActivatorNodeRef}
+              {...attributes}
+              {...listeners}
+              tabIndex={0}
+              className="p-1 opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
+              icon={<GripVertical size={16} strokeWidth={1.5} />}
+              aria-label={`Move column ${column.name}`}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Move</TooltipContent>
+        </Tooltip>
       </div>
       <div className="w-[30%]">
-        <div className="flex w-[95%] items-center justify-between">
+        <div className="flex w-[95%] items-center justify-between gap-x-1">
           <div className="h-4 w-px bg-border" />
-          <Input
-            autoFocus={shouldAutoFocusName}
-            aria-label="Column name"
-            size="small"
-            value={column.name}
-            title={column.name}
-            disabled={hasImportContent}
-            placeholder="column_name"
-            className={cn(
-              '[&>div>div>div>input]:py-1.5 [&>div>div>div>input]:border-r-transparent [&>div>div>div>input]:rounded-r-none',
-              hasImportContent ? 'opacity-50' : ''
-            )}
-            onChange={(event) => onUpdateColumn({ name: event.target.value })}
-          />
-
-          {relations.filter((r) => !r.toRemove).length === 0 ? (
-            <div className="flex items-center gap-x-1">
-              <Button
-                variant="dashed"
-                className="rounded-l-none h-[30px] py-0 px-2"
-                onClick={() => onEditForeignKey()}
-              >
-                <Link size={12} />
-              </Button>
-              <div className="h-4 w-px bg-border" />
-
+          <InputGroup>
+            <InputGroupInput
+              autoFocus={shouldAutoFocusName}
+              aria-label="Column name"
+              size="small"
+              value={column.name}
+              title={column.name}
+              disabled={hasImportContent}
+              placeholder="column_name"
+              className={cn(
+                '[&>div>div>div>input]:py-1.5 [&>div>div>div>input]:border-r-transparent [&>div>div>div>input]:rounded-r-none',
+                hasImportContent ? 'opacity-50' : ''
+              )}
+              onChange={(event) => onUpdateColumn({ name: event.target.value })}
+            />
+            {relations.filter((r) => !r.toRemove).length === 0 ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
-                    tabIndex={0}
+                  <InputGroupButton asChild>
+                    <Button
+                      variant="dashed"
+                      className="rounded-l-none h-[30px] py-0 px-2"
+                      onClick={() => onEditForeignKey()}
+                      aria-label={`Edit ${column.name} foreign key`}
+                      // Tooltip repeats the label; screen readers would read it twice
+                      aria-describedby={undefined}
+                    >
+                      <Link size={12} />
+                    </Button>
+                  </InputGroupButton>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Edit foreign key</TooltipContent>
+              </Tooltip>
+            ) : null}
+          </InputGroup>
+          {relations.filter((r) => !r.toRemove).length === 0 ? (
+            <>
+              <div className="h-4 w-px bg-border" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    icon={
+                      column.isSensitiveData ? (
+                        <EyeOff size={14} strokeWidth={1.5} />
+                      ) : (
+                        <Eye size={14} strokeWidth={1.5} />
+                      )
+                    }
                     onClick={() => {
                       const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
 
@@ -193,13 +219,7 @@ export const Column = ({
                     aria-label={
                       column.isSensitiveData ? 'Marked as sensitive' : 'Not marked as sensitive'
                     }
-                  >
-                    {column.isSensitiveData ? (
-                      <EyeOff size={14} strokeWidth={1.5} />
-                    ) : (
-                      <Eye size={14} strokeWidth={1.5} />
-                    )}
-                  </button>
+                  />
                 </TooltipTrigger>
 
                 <TooltipContent side="bottom">
@@ -208,7 +228,7 @@ export const Column = ({
                     : 'Mark as sensitive to mask in grid display'}
                 </TooltipContent>
               </Tooltip>
-            </div>
+            </>
           ) : (
             <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
@@ -346,19 +366,31 @@ export const Column = ({
       <div className="flex w-[5%] justify-end">
         {(!column.isPrimaryKey || column.format.includes('int')) && (
           <Popover>
-            <PopoverTrigger
-              data-testid={`${column.name}-extra-options`}
-              className="group flex items-center -space-x-1"
-            >
-              {settingsCount > 0 && (
-                <div className="rounded-full bg-foreground h-4 w-4 flex items-center justify-center text-xs text-background">
-                  {settingsCount}
-                </div>
-              )}
-              <div className="text-foreground-light transition-colors group-hover:text-foreground">
-                <Settings size={16} strokeWidth={1} />
-              </div>
-            </PopoverTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    data-testid={`${column.name}-extra-options`}
+                    variant="outline"
+                    aria-label={`Options for ${column.name}`}
+                    className="p-1 relative"
+                    icon={
+                      <>
+                        {settingsCount > 0 && (
+                          <div className="absolute -top-2 -left-2 rounded-full bg-foreground h-4 w-4 flex items-center justify-center text-xs text-background">
+                            {settingsCount}
+                          </div>
+                        )}
+                        <div className="text-foreground-light transition-colors group-hover:text-foreground">
+                          <Settings size={16} strokeWidth={1} />
+                        </div>
+                      </>
+                    }
+                  />
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Options</TooltipContent>
+            </Tooltip>
             <PopoverContent align="end" className="w-80 p-0">
               <div className="flex items-center justify-center bg-surface-200 gap-y-1 py-1.5 px-3 border-b border-overlay">
                 <h5 className="text-foreground">Extra options</h5>
@@ -440,15 +472,19 @@ export const Column = ({
       </div>
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
-          <button
-            type="button"
-            tabIndex={0}
-            aria-label="Remove column"
-            className="cursor-pointer"
-            onClick={() => onRemoveColumn()}
-          >
-            <X size={16} strokeWidth={1} />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                tabIndex={0}
+                aria-label={`Remove column ${column.name}`}
+                className="p-1 cursor-pointer"
+                onClick={() => onRemoveColumn()}
+                icon={<X size={16} strokeWidth={1} />}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Remove column</TooltipContent>
+          </Tooltip>
         </div>
       )}
     </div>
