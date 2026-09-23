@@ -483,6 +483,11 @@ export const SmtpForm = () => {
                                 <Input
                                   {...field}
                                   type="password"
+                                  autoComplete="new-password"
+                                  data-1p-ignore
+                                  data-lpignore="true"
+                                  data-form-type="other"
+                                  data-bwignore
                                   placeholder={
                                     isSmtpEnabled(authConfig)
                                       ? STORED_SECRET_PLACEHOLDER
