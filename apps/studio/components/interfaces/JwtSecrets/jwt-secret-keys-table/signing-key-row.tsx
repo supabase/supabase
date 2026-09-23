@@ -83,9 +83,7 @@ const LastUsedCell = ({
   if (isError) return <TableCell className={className}>Unable to load</TableCell>
   if (lastUsedAt === undefined) {
     return (
-      <TableCell className={cn(className, 'text-foreground-lighter')}>
-        No requests in 24h
-      </TableCell>
+      <TableCell className={cn(className, 'text-foreground-lighter')}>No requests in 24h</TableCell>
     )
   }
 
