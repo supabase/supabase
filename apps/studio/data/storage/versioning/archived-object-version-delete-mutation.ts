@@ -9,13 +9,9 @@ export type ArchivedObjectVersionDeleteVariables = {
   projectRef: string
   bucketId: string
   archivedObjectId: string
-  /** The object's full path within the bucket. */
   path: string
   versionId: string
-  /**
-   * Deleting the version that was live at archive time promotes the next one
-   * behind it, or removes the object when it was the last — hence the flag.
-   */
+  /** Deleting the version live at archive time promotes the next one, or removes the object. */
   wasCurrentAtArchive: boolean
 }
 
