@@ -200,11 +200,11 @@ create table planets (
 );
 
 insert into planets
-  (id, name)
+  (name)
 values
-  (1, 'Tattoine'),
-  (2, 'Alderaan'),
-  (3, 'Kashyyyk');
+  ('Tatooine'),
+  ('Alderaan'),
+  ('Kashyyyk');
 
 create table people (
   id serial primary key,
@@ -213,12 +213,12 @@ create table people (
 );
 
 insert into people
-  (id, name, planet_id)
+  (name, planet_id)
 values
-  (1, 'Anakin Skywalker', 1),
-  (2, 'Luke Skywalker', 1),
-  (3, 'Princess Leia', 2),
-  (4, 'Chewbacca', 3);
+  ('Anakin Skywalker', 1),
+  ('Luke Skywalker', 1),
+  ('Princess Leia', 2),
+  ('Chewbacca', 3);
 ```
 
 </TabPanel>
@@ -428,7 +428,7 @@ await supabase.Rpc("add_planet", new Dictionary<string, object> { { "name", "Jak
 Postgres runs a function either as the user _calling_ it (`invoker`) or as its _creator_ (`definer`). For example:
 
 ```sql
-create function hello_world()
+create or replace function hello_world()
 returns text
 language plpgsql
 security definer set search_path = ''
@@ -481,7 +481,7 @@ By default, any role can run a database function. You can restrict execution in 
 - Official Client libraries: [JavaScript](../../reference/javascript/rpc) and [Flutter](../../reference/dart/rpc)
 - Community client libraries: [github.com/supabase-community](https://github.com/supabase-community)
 - Postgres Official Docs: [Chapter 9. Functions and Operators](https://www.postgresql.org/docs/current/functions.html)
-- Postgres Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/9.1/sql-createfunction.html)
+- Postgres Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/current/sql-createfunction.html)
 
 ### Create a database function in the Dashboard
 
