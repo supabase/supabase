@@ -177,15 +177,6 @@ export const pdfStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: pdfColors.border,
   },
-  tableIndexCell: {
-    width: 24,
-    fontSize: 8,
-    color: pdfColors.textTertiary,
-    paddingVertical: 4,
-    paddingHorizontal: 4,
-    borderRightWidth: 1,
-    borderRightColor: pdfColors.border,
-  },
   tableCell: {
     flex: 1,
     fontSize: 8,

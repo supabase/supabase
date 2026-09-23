@@ -15,8 +15,6 @@ interface NotebookPdfDocumentProps {
   results: ReadonlyMap<string, QueryResult>
 }
 
-/** The Supabase bolt mark (packages/common/assets/images/supabase-logo-icon.svg), flattened to
- *  a single fill since react-pdf's gradient API doesn't map directly onto the source SVG's. */
 function SupabaseLogoMark() {
   return (
     <Svg viewBox="0 0 109 113" style={pdfStyles.headerLogoMark}>

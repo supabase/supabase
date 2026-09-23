@@ -13,9 +13,6 @@ const CHART_HEIGHT = 200
 const MAX_X_LABELS = 12
 const SERIES_COLORS = [pdfColors.brand, '#3b82f6', '#f59e0b']
 
-/** Mirrors `ChartConfig` (data/content/notebooks/notebook-schema.ts) but with a readonly
- *  `y_series`, so this also accepts the deep-readonly `Snapshot<ChartConfig>` the notebook
- *  store hands components — no need to import valtio's `Snapshot` here for that alone. */
 interface NotebookPdfChartConfig {
   type: 'bar' | 'line'
   x_column: string
@@ -30,9 +27,6 @@ interface NotebookPdfChartProps {
   rows: readonly Record<string, unknown>[]
 }
 
-/** Builds power-of-ten tick values within [min, max], falling back to the bounds themselves
- *  when the range doesn't span a full decade — matches the shape of `formatLogTick`'s inputs
- *  closely enough for a static report axis, without replicating d3's log-scale tick logic. */
 function buildLogTicks(min: number, max: number): number[] {
   const ticks: number[] = []
   let tick = 10 ** Math.floor(Math.log10(min))
@@ -43,14 +37,6 @@ function buildLogTicks(min: number, max: number): number[] {
   return ticks.length > 0 ? ticks : [min, max]
 }
 
-/**
- * Renders a bar or line chart natively with react-pdf's own Svg primitives, from the cell's
- * raw result rows and chart config — rather than rasterizing the live Recharts-rendered DOM
- * node. This avoids two problems with rasterization: the captured image always reflects
- * whatever theme (dark/light) the dashboard happened to be in, and the chart's DOM node has
- * to be currently mounted/visible to capture at all. A native render always uses the report's
- * own light palette and works regardless of the cell's on-screen state.
- */
 export function NotebookPdfChart({ chart, rows }: NotebookPdfChartProps): ReactElement {
   const {
     type = 'bar',

@@ -8,12 +8,6 @@ interface NotebookPdfTableProps {
   rows: readonly Record<string, unknown>[]
 }
 
-/**
- * Renders every row (no overflow/scroll truncation, unlike the live results grid).
- * The header only renders once — react-pdf's `fixed` prop pins an element to a page
- * position rather than repeating it wherever a table happens to restart on a new page,
- * so it isn't a good fit for a repeating table header nested mid-document.
- */
 export function NotebookPdfTable({ rows }: NotebookPdfTableProps): ReactElement | null {
   const columns = Object.keys(rows[0] ?? {})
   if (columns.length === 0) return null

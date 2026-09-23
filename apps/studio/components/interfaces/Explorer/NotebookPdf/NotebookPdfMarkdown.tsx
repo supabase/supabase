@@ -1,11 +1,6 @@
-import type {
-  Content as MdastContent,
-  ListItem,
-  PhrasingContent,
-  Root as MdastRoot,
-} from 'mdast'
-import type { ReactElement, ReactNode } from 'react'
 import { Link as PdfLink, Text, View } from '@react-pdf/renderer'
+import type { ListItem, Content as MdastContent, Root as MdastRoot, PhrasingContent } from 'mdast'
+import type { ReactElement, ReactNode } from 'react'
 import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import { unified } from 'unified'
@@ -87,8 +82,6 @@ function mapListItem(
   )
 }
 
-/** `tight` drops a block's own bottom margin — used for a list item's leading paragraph, which
- *  already gets its spacing from `listItem` rather than needing its own. */
 function mapBlock(
   node: MdastContent,
   key: string,
@@ -103,7 +96,10 @@ function mapBlock(
       )
     case 'paragraph':
       return (
-        <Text key={key} style={tight ? [pdfStyles.paragraph, { marginBottom: 0 }] : pdfStyles.paragraph}>
+        <Text
+          key={key}
+          style={tight ? [pdfStyles.paragraph, { marginBottom: 0 }] : pdfStyles.paragraph}
+        >
           {node.children.map((child, index) => mapInline(child, `${key}-${index}`))}
         </Text>
       )
@@ -137,8 +133,6 @@ function mapBlock(
   }
 }
 
-/** Parses `markdown` and maps it to react-pdf elements. Exported separately from the
- *  component so tests can assert on the element tree without a PDF render context. */
 export function markdownToPdfBlocks(markdown: string): ReactElement[] {
   const root = parseMarkdownToMdast(markdown)
   return root.children
