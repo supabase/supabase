@@ -85,7 +85,7 @@ const Panel = ({
         'group/panel relative rounded-lg md:rounded-xl p-px bg-surface-75 bg-linear-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
-            ? 'hover:bg-none hover:bg-brand!'
+            ? 'hover:bg-none hover:bg-brand-default!'
             : 'hover:bg-none hover:bg-border-stronger!'
           : '',
         outerClassName

@@ -101,7 +101,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
         <div
           className={cn(
             'h-[35px] relative border rounded-xs w-full transition overflow-visible',
-            showNewSize ? 'bg-selection border border-brand' : 'bg-surface-300'
+            showNewSize ? 'bg-selection border border-brand-default' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>

@@ -210,7 +210,7 @@ export const ActivityRow = ({
       >
         <TableCell className="relative w-[70px]">
           {selectedPid === activity.pid && (
-            <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter" />
+            <div className="absolute h-full bg-brand-default top-0 left-0 w-1" />
           )}
 
           {/* Absolute (not inline in the flex row) so top-0/bottom-0 ignore the cell's padding and touch the adjacent row */}

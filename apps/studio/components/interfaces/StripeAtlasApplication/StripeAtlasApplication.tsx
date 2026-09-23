@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { CardContent } from 'ui'
@@ -12,11 +13,12 @@ import {
   PartnerLogo,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
+import { stripeAtlasApplicationQueryOptions } from '@/data/stripe-atlas/stripe-atlas-application-query'
 import { BASE_PATH } from '@/lib/constants'
 
 function decodeBase64Param(base64encoded: string): Base64Data | null {
   try {
-    const bytes = Uint8Array.fromBase64(base64encoded)
+    const bytes = Uint8Array.from(atob(base64encoded), (char) => char.charCodeAt(0))
     const decoded = new TextDecoder().decode(bytes)
     return base64DataSchema.parse(JSON.parse(decoded))
   } catch {
@@ -36,10 +38,6 @@ const base64DataSchema = z.discriminatedUnion('type', [
 ])
 type Base64Data = z.infer<typeof base64DataSchema>
 
-/**
- * Mockup only — the form is deliberately unwired: no prefill query, no submit mutation and no
- * actions, so the page can be shared for live design feedback before the perk goes live.
- */
 export const StripeAtlasApplicationScreen = () => {
   const params = useParams()
 
@@ -93,11 +91,38 @@ export const StripeAtlasApplicationScreen = () => {
         </CardContent>
       )}
       {decoded?.type === 'success' && (
-        <CardContent className="border-none">
-          <StripeAtlasApplicationForm stripeAtlasToken={decoded.stripeAtlasToken} />
-        </CardContent>
+        <PrefilledApplication stripeAtlasToken={decoded.stripeAtlasToken} />
       )}
     </InterstitialLayout>
+  )
+}
+
+const PrefilledApplication = ({ stripeAtlasToken }: { stripeAtlasToken: string }) => {
+  const {
+    data: application,
+    error,
+    isPending,
+    isError,
+  } = useQuery(stripeAtlasApplicationQueryOptions({ stripeAtlasToken }))
+
+  if (isPending) return <LoadingCard />
+
+  if (isError) {
+    return (
+      <CardContent className="border-none pb-12">
+        <Admonition
+          type="danger"
+          title="We couldn't load your application"
+          description={<p>{error.message}</p>}
+        />
+      </CardContent>
+    )
+  }
+
+  return (
+    <CardContent className="border-none">
+      <StripeAtlasApplicationForm key={application.stripeAtlasToken} application={application} />
+    </CardContent>
   )
 }
 

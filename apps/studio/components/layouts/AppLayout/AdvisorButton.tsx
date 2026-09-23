@@ -86,7 +86,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
       ) : hasWarningIssues ? (
         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-warning" />
       ) : hasUnreadNotifications ? (
-        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand" />
+        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand-default" />
       ) : null}
     </div>
   )
