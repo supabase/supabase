@@ -121,8 +121,7 @@ export const FileExplorerRow = ({
 
   const onSelectFile = (columnIndex: number) => {
     if (isArchivedFile) {
-      // Archived rows have no live object to preview, so collapse to this column
-      // and let the archived pane take over.
+      // No live object to preview, so let the archived pane take over.
       truncateToColumn(columnIndex)
       selectArchivedObject(archivedObjectId)
       return
@@ -320,7 +319,6 @@ export const FileExplorerRow = ({
           isSelected && 'bg-selection',
           isPreviewed && 'bg-selection hover:bg-selection',
           item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
-          // Also drives the stripe color via `currentColor`.
           isArchived && 'text-foreground-lighter [&_p]:text-foreground-lighter',
           // Keyboard focus on the checkbox: ring the whole row
           'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
@@ -422,8 +420,7 @@ export const FileExplorerRow = ({
               size={14}
             />
           ) : isArchived ? (
-            // Archived rows have no checkbox or context menu, so without this
-            // button they'd have nothing keyboard-reachable.
+            // Archived rows drop the checkbox and menu, so this is their only focus target.
             isArchivedFile ? (
               <button
                 type="button"
