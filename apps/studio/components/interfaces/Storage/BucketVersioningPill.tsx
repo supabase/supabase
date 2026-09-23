@@ -1,0 +1,43 @@
+import { FileStack } from 'lucide-react'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { getBucketVersioningState } from './StorageVersioning.constants'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import type { Bucket } from '@/data/storage/buckets-query'
+
+const COPY = {
+  enabled: {
+    variant: 'success' as const,
+    tooltip: 'Versioning enabled. Overwriting or deleting a file keeps a recoverable copy.',
+  },
+  suspended: {
+    variant: 'warning' as const,
+    tooltip:
+      'Versioning suspended. Existing versions stay retained, but new writes no longer create one.',
+  },
+}
+
+/**
+ * Renders nothing for a bucket that has never been versioned — that is every bucket
+ * by default, and a badge on all of them says nothing.
+ */
+export const BucketVersioningPill = ({ bucket }: { bucket?: Bucket }) => {
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+  const versioningState = getBucketVersioningState(bucket)
+
+  if (!isStorageVersioningEnabled || versioningState === 'disabled') return null
+
+  const { variant, tooltip } = COPY[versioningState]
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Badge variant={variant} className="flex shrink-0 items-center gap-1">
+          <FileStack size={12} aria-hidden />
+          Versioning
+        </Badge>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">{tooltip}</TooltipContent>
+    </Tooltip>
+  )
+}
