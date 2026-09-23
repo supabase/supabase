@@ -4,10 +4,7 @@ import { STORAGE_SIZE_SEGMENTS } from './StorageRetention.constants'
 import type { DataPoint } from '@/data/analytics/constants'
 import type { StorageRetentionDayPoint } from '@/data/storage/versioning/storage-retention-usage-query'
 
-/**
- * The retention daily series as `DataPoint[]`, keyed by the same attribute keys
- * the Storage Size attribute list declares, so every bar has a series to draw.
- */
+/** Keyed by the same attribute keys the Storage Size list declares, so every bar has a series. */
 export const toStorageSizeChartData = (daily: StorageRetentionDayPoint[]): DataPoint[] =>
   daily.map((day) => {
     const segments = Object.fromEntries(
