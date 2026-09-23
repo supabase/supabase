@@ -76,6 +76,7 @@ assert <some condition>, 'message';
 For example:
 
 ```sql
+-- assumes an attendance_table with student and id columns
 create function assert_example(name text)
 returns uuid
 language plpgsql
@@ -127,6 +128,7 @@ For a more complex function, or for harder debugging, log the following:
 - Start and end of function calls
 
 ```sql
+-- assumes a some_table with col_1 and col_2 columns
 create or replace function advanced_example(num int default 10)
 returns text
 language plpgsql
