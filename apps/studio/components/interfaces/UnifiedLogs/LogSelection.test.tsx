@@ -142,6 +142,21 @@ describe('log row selection', () => {
 })
 
 describe('selected log details', () => {
+  it('disables copy and AI actions when a selected log is invalid', async () => {
+    const user = userEvent.setup()
+    const copy = vi.spyOn(navigator.clipboard, 'writeText')
+    renderPanel(<LogSelectionActions rows={[{ ...logs[0], timestamp: Infinity }]} />)
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Selected logs contain invalid data')
+    expect(screen.getByRole('button', { name: 'Copy selected logs' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Explain with AI' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+    await user.click(screen.getByRole('button', { name: 'Copy selected logs' }))
+    expect(copy).not.toHaveBeenCalled()
+  })
+
   it.each([false, true])(
     'copies selected logs with metadata visibility %s',
     async (metadataVisible) => {
