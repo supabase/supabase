@@ -2,11 +2,13 @@ import dayjs from 'dayjs'
 import { ArrowRight, RotateCcw, X } from 'lucide-react'
 import { Button } from 'ui'
 
-import { VersionThumbnail } from './VersionThumbnail'
+import { FilePreview } from './FilePreview'
 import type { ObjectVersion } from '@/data/storage/versioning/object-versions-query'
 import { formatBytes } from '@/lib/helpers'
 
 interface VersionCompareWidgetProps {
+  /** Full path within the bucket. */
+  path: string
   mimeType?: string
   selectedVersion: ObjectVersion
   currentVersion?: ObjectVersion
@@ -16,6 +18,7 @@ interface VersionCompareWidgetProps {
 }
 
 export const VersionCompareWidget = ({
+  path,
   mimeType,
   selectedVersion,
   currentVersion,
@@ -42,8 +45,13 @@ export const VersionCompareWidget = ({
 
     <div className="flex items-center gap-x-2">
       <div className="flex-1 space-y-1.5">
-        <div className="flex h-24 items-center justify-center rounded-md border border-brand-400 bg-surface-200">
-          <VersionThumbnail mimeType={mimeType} isCurrent={false} size={20} />
+        <div className="flex h-24 items-center justify-center overflow-hidden rounded-md border border-brand-400 bg-surface-200">
+          <FilePreview
+            path={path}
+            mimeType={mimeType}
+            size={selectedVersion.size}
+            versionId={selectedVersion.versionId}
+          />
         </div>
         <p className="truncate text-center font-mono text-[11px] text-brand">
           {dayjs(selectedVersion.createdAt).format('MMM D')} · {formatBytes(selectedVersion.size)}
@@ -51,8 +59,10 @@ export const VersionCompareWidget = ({
       </div>
       <ArrowRight size={14} className="shrink-0 text-foreground-lighter" />
       <div className="flex-1 space-y-1.5">
-        <div className="flex h-24 items-center justify-center rounded-md border border-overlay bg-surface-200">
-          <VersionThumbnail mimeType={mimeType} isCurrent size={20} />
+        <div className="flex h-24 items-center justify-center overflow-hidden rounded-md border border-overlay bg-surface-200">
+          {/* No `versionId`: without one the endpoint resolves the current version,
+              which is exactly the right side of this comparison. */}
+          <FilePreview path={path} mimeType={mimeType} size={currentVersion?.size} />
         </div>
         <p className="truncate text-center font-mono text-[11px] text-foreground-lighter">
           Current{currentVersion && <> · {formatBytes(currentVersion.size)}</>}
