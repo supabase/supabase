@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ToggleGroup, ToggleGroupItem } from './toggle-group'
@@ -87,17 +88,69 @@ describe('ToggleGroup', () => {
     expect(onValueChange).toHaveBeenCalledWith('')
   })
 
-  it('swallows the empty value when allowDeselect is false', async () => {
+  it('keeps the active item selected across repeated clicks when allowDeselect is false', async () => {
     const onValueChange = vi.fn()
     render(renderSegmented({ defaultValue: 'data', onValueChange, allowDeselect: false }))
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Data' }))
+    const active = screen.getByRole('radio', { name: 'Data' })
 
+    // Uncontrolled: Radix owns the value, so swallowing the callback is not enough on its
+    // own — the item has to stay checked too.
+    await userEvent.click(active)
+    expect(active).toHaveAttribute('aria-checked', 'true')
+    await userEvent.click(active)
+    expect(active).toHaveAttribute('aria-checked', 'true')
     expect(onValueChange).not.toHaveBeenCalled()
 
     await userEvent.click(screen.getByRole('radio', { name: 'Definition' }))
 
     expect(onValueChange).toHaveBeenCalledExactlyOnceWith('definition')
+    expect(screen.getByRole('radio', { name: 'Definition' })).toHaveAttribute(
+      'aria-checked',
+      'true'
+    )
+    expect(active).toHaveAttribute('aria-checked', 'false')
+  })
+
+  it('leaves a controlled group to its own value', async () => {
+    const onValueChange = vi.fn()
+    const Controlled = () => {
+      const [value, setValue] = React.useState('data')
+      return (
+        <ToggleGroup
+          variant="segmented"
+          type="single"
+          allowDeselect={false}
+          value={value}
+          onValueChange={(next) => {
+            onValueChange(next)
+            setValue(next)
+          }}
+        >
+          <ToggleGroupItem value="data">Data</ToggleGroupItem>
+          <ToggleGroupItem value="definition">Definition</ToggleGroupItem>
+        </ToggleGroup>
+      )
+    }
+    render(<Controlled />)
+
+    const active = screen.getByRole('radio', { name: 'Data' })
+    await userEvent.click(active)
+
+    expect(active).toHaveAttribute('aria-checked', 'true')
+    expect(onValueChange).not.toHaveBeenCalled()
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Definition' }))
+    expect(onValueChange).toHaveBeenCalledExactlyOnceWith('definition')
+  })
+
+  it('still deselects an uncontrolled group when allowDeselect is left alone', async () => {
+    render(renderSegmented({ defaultValue: 'data' }))
+
+    const active = screen.getByRole('radio', { name: 'Data' })
+    await userEvent.click(active)
+
+    expect(active).toHaveAttribute('aria-checked', 'false')
   })
 
   it('still reports every change for multi-select groups', async () => {

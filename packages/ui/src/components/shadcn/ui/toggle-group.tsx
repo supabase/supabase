@@ -104,10 +104,25 @@ const ToggleGroup = React.forwardRef<
     // renders one rather than leaving it to the callsite to remember.
     const hasIndicator = variant === 'segmented' && props.type === 'single'
 
+    // Swallowing the callback is enough when the caller owns `value`, but an uncontrolled
+    // group's state lives inside Radix, which has already cleared it by the time the change
+    // reaches us. Take ownership for that case so the active item actually stays put.
+    const ownsValue = !allowDeselect && props.type === 'single' && props.value === undefined
+    const [internalValue, setInternalValue] = React.useState(() =>
+      typeof props.defaultValue === 'string' ? props.defaultValue : ''
+    )
+
     const handleValueChange = (value: string | string[]) => {
       if (!allowDeselect && value === '') return
+      if (ownsValue && typeof value === 'string') setInternalValue(value)
       ;(onValueChange as ((value: string | string[]) => void) | undefined)?.(value)
     }
+
+    // Cast is contained: `ownsValue` has already narrowed `type` to 'single' at runtime,
+    // which the spread cannot carry through Radix's discriminated union.
+    const rootProps = (
+      ownsValue ? { ...props, value: internalValue, defaultValue: undefined } : props
+    ) as React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root>
 
     return (
       <ToggleGroupPrimitive.Root
@@ -121,7 +136,7 @@ const ToggleGroup = React.forwardRef<
           variant === 'segmented' && segmentedToneVariants({ tone }),
           className
         )}
-        {...props}
+        {...rootProps}
         onValueChange={handleValueChange}
       >
         {hasIndicator && <ToggleGroupIndicator tone={tone} />}
