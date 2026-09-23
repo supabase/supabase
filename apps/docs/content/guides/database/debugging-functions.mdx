@@ -68,8 +68,7 @@ select error_if_null(null);
 
 Value checking is common, so Postgres provides the `assert` keyword as a shorthand. It takes the following format:
 
-```sql
--- throw error when condition is false
+```text
 assert <some condition>, 'message';
 ```
 
