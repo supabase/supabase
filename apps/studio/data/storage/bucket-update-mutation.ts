@@ -77,7 +77,13 @@ export const useBucketUpdateMutation = ({
     },
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      // `refetchType: 'all'` because the edit modal lives on the bucket page, where the
+      // bucket list query is inactive. The default only refetches active queries, so the
+      // list would keep serving its cached row — and its versioning badge with it.
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.buckets(projectRef),
+        refetchType: 'all',
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
