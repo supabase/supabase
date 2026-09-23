@@ -24,3 +24,6 @@ export function mergeSectionOrder(stored: string[]): string[] {
   }
   return merged
 }
+
+/** The notebook shown on the project homepage is the one with this name, ignoring case. */
+export const HOME_NOTEBOOK_NAME = 'Home'
