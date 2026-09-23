@@ -2,11 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { pickFile } from './pickFile'
 
-/**
- * Captures the input `pickFile` creates so the test can drive its events, and
- * records whether `click()` happened synchronously — the property that keeps the
- * picker inside the user gesture.
- */
+/** Captures the input `pickFile` creates, and whether `click()` happened synchronously. */
 const interceptInput = () => {
   const created = { input: undefined as HTMLInputElement | undefined, clickedSync: false }
   const realCreateElement = document.createElement.bind(document)

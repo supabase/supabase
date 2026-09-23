@@ -1475,13 +1475,8 @@ export function createStorageExplorerState({
     },
 
     /**
-     * Writes a new file over an existing object, keeping its path. On a versioned
-     * bucket that overwrite is what produces a new version, so the old contents stay
-     * reachable through the version history rather than being lost.
-     *
-     * Deliberately not routed through `uploadFiles`: that one renames rather than
-     * overwrites when a name already exists in the column, which is the opposite of
-     * what this needs.
+     * Overwrites an object in place, which on a versioned bucket is what creates a new
+     * version. Not `uploadFiles`: that renames rather than overwrites on a name clash.
      */
     replaceFile: async ({ file, item }: { file: File; item: StorageItemWithColumn }) => {
       const path = getStorageItemPath(state, item)
@@ -1517,8 +1512,7 @@ export function createStorageExplorerState({
             onSuccess: () => resolve(),
           })
 
-          // No `findPreviousUploads` here: an interrupted upload to this same path
-          // would otherwise be resumed and write the wrong file's bytes.
+          // No `findPreviousUploads`: a resumed upload would write the wrong file's bytes.
           upload.start()
         })
 

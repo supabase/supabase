@@ -38,10 +38,7 @@ export function getPathAlongOpenedFolders(
  * Returns the path to the folder at the given index in the openedFolders array,
  * joining all folders from the root up to (but not including) the given index.
  */
-/**
- * The object's full path within the bucket. A row only knows its own leaf name and
- * which column it sits in, while the storage endpoints address objects by path.
- */
+/** The object's full path within the bucket; a row only knows its leaf name and column. */
 export function getStorageItemPath(
   state: Pick<StorageExplorerState, 'openedFolders'>,
   item: { name: string; columnIndex: number }
