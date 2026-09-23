@@ -77,6 +77,7 @@ export const AuditLogs = () => {
     },
     {
       retry: false,
+      placeholderData: keepPreviousData,
     }
   )
 

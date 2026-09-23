@@ -52,7 +52,18 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
         {rows.map((row) => (
           <TableRow
             key={row.id}
+            tabIndex={0}
+            aria-selected={selectedLog?.request_id === row.original.request_id}
             onClick={() => onSelectLog(row.original)}
+            onKeyDown={(e) => {
+              if (e.target !== e.currentTarget) return
+              if (e.key === 'Enter') {
+                onSelectLog(row.original)
+              } else if (e.key === ' ') {
+                e.preventDefault()
+                onSelectLog(row.original)
+              }
+            }}
             className={cn(
               'cursor-pointer hover:bg-selection!',
               selectedLog?.request_id === row.original.request_id && 'bg-selection!'
