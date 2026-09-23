@@ -25,7 +25,10 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
 
   return (
     <Table
-      containerProps={{ containerClassName: 'h-full', className: 'h-full w-full overflow-auto' }}
+      containerProps={{
+        containerClassName: 'h-full',
+        className: 'h-full w-full overflow-auto @container',
+      }}
     >
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
@@ -84,12 +87,14 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
         ))}
         {rows.length > 0 && (
           <TableRow className="hover:bg-transparent">
-            <TableCell colSpan={table.getAllLeafColumns().length} className="text-center py-2">
-              <p className="text-xs text-foreground-lighter">
-                Viewing{' '}
-                <span className="font-mono font-medium">{formatCompactNumber(rows.length)}</span>{' '}
-                logs
-              </p>
+            <TableCell colSpan={table.getAllLeafColumns().length} className="p-0! overflow-visible">
+              <div className="sticky left-0 w-[100cqw] py-2 text-center">
+                <p className="text-xs text-foreground-lighter">
+                  Viewing{' '}
+                  <span className="font-mono font-medium">{formatCompactNumber(rows.length)}</span>{' '}
+                  logs
+                </p>
+              </div>
             </TableCell>
           </TableRow>
         )}
