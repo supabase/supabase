@@ -46,6 +46,7 @@ describe('ThemeColorSettings', () => {
     resetOverrides.mockReset()
     setOverride.mockReset()
     document.documentElement.style.removeProperty('--chroma')
+    document.documentElement.style.removeProperty('--primary-hue')
     document.documentElement.dataset.theme = 'dark'
   })
 
@@ -67,6 +68,17 @@ describe('ThemeColorSettings', () => {
     fireEvent.keyUp(slider)
 
     expect(setOverride).toHaveBeenCalledWith('chroma', 0.04)
+  })
+
+  it('previews and saves the spot color hue', () => {
+    customRender(<ThemeColorSettings />)
+
+    const slider = screen.getByRole('slider', { name: 'Spot color' })
+    fireEvent.click(slider)
+    expect(document.documentElement.style.getPropertyValue('--primary-hue')).toBe('360')
+
+    fireEvent.keyUp(slider)
+    expect(setOverride).toHaveBeenCalledWith('primaryHue', 360)
   })
 
   it('resets the active mode', () => {

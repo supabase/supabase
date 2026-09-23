@@ -141,6 +141,18 @@ describe('theme override application', () => {
     expect(root.style.getPropertyValue('--contrast')).toBe('')
   })
 
+  it('applies a spot hue without changing the brand hue or surface hue', () => {
+    const root = document.createElement('html')
+    applyThemeOverrides(root, 'dark', { primaryHue: 48 })
+
+    expect(root.style.getPropertyValue('--primary-hue')).toBe('48')
+    expect(root.style.getPropertyValue('--surface-hue')).toBe('')
+    expect(root.style.getPropertyValue('--brand-default')).toBe('')
+
+    applyThemeOverrides(root, 'dark', {})
+    expect(root.style.getPropertyValue('--primary-hue')).toBe('')
+  })
+
   it('reports whether a mode has overrides', () => {
     expect(hasThemeOverrides({})).toBe(false)
     expect(hasThemeOverrides({ chroma: 0.02 })).toBe(true)
