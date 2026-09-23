@@ -214,7 +214,7 @@ const ConnectOrganizationButton = ({
       )}
     />
     {selected && (
-      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-primary-bright bg-primary-bright" />
+      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-primary-bright bg-primary-bright text-black dark:text-black" />
     )}
   </button>
 )
