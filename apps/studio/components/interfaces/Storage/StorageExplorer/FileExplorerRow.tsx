@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
+  Archive,
   Copy,
   Download,
   Edit,
@@ -37,11 +38,13 @@ import {
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { StorageRowIcon } from '../StorageRowIcon'
+import { getBucketVersioningState } from '../StorageVersioning.constants'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyStorageExplorerUrl, copyStoragePath } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -78,6 +81,7 @@ export const FileExplorerRow = ({
     setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
+    setItemToPurge,
     downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
@@ -95,6 +99,9 @@ export const FileExplorerRow = ({
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+  const isVersionedBucket =
+    isStorageVersioningEnabled && getBucketVersioningState(selectedBucket) !== 'disabled'
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
     // Select a range if shift is held down
@@ -226,10 +233,25 @@ export const FileExplorerRow = ({
           ...(canUpdateFiles
             ? [
                 {
-                  name: 'Delete',
-                  icon: <Trash2 size={12} className="text-foreground-light" />,
+                  // On a versioned bucket this is a soft delete, so it reads as Archive
+                  // here just as it does in the file preview panel.
+                  name: isVersionedBucket ? 'Archive' : 'Delete',
+                  icon: isVersionedBucket ? (
+                    <Archive size={12} className="text-foreground-light" />
+                  ) : (
+                    <Trash2 size={12} className="text-foreground-light" />
+                  ),
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
+                ...(isVersionedBucket
+                  ? [
+                      {
+                        name: 'Delete permanently',
+                        icon: <Trash2 size={12} className="text-destructive" />,
+                        onClick: () => setItemToPurge(itemWithColumnIndex),
+                      },
+                    ]
+                  : []),
               ]
             : []),
         ]
