@@ -275,7 +275,14 @@ Deno.serve(async (req: Request) => {
   console.error(`serving the request with ${servicePath}`)
 
   try {
-    await Deno.stat(servicePath)
+    const serviceInfo = await Deno.stat(servicePath)
+    if (!serviceInfo.isDirectory) {
+      return getFunctionErrorResponse({
+        code: RequestErrors.NotFound,
+        message: 'Requested function was not found',
+        status: 404,
+      })
+    }
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
       return getFunctionErrorResponse({
@@ -286,9 +293,9 @@ Deno.serve(async (req: Request) => {
     }
     console.error(e)
     return getFunctionErrorResponse({
-      code: RequestErrors.EdgeFunctionError,
-      message: 'Internal Server Error',
-      status: 500,
+      code: RequestErrors.BootError,
+      message: 'Function failed to start (please check logs)',
+      status: 503,
     })
   }
 
