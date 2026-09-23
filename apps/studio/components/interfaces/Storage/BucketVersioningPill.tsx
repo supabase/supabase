@@ -17,10 +17,7 @@ const COPY = {
   },
 }
 
-/**
- * Renders nothing for a bucket that has never been versioned — that is every bucket
- * by default, and a badge on all of them says nothing.
- */
+/** Renders nothing for a never-versioned bucket, which by default is every bucket. */
 export const BucketVersioningPill = ({ bucket }: { bucket?: Bucket }) => {
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
   const versioningState = getBucketVersioningState(bucket)
