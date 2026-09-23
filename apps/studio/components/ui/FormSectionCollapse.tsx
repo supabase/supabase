@@ -1,10 +1,7 @@
 import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
 
-/**
- * Provides enter/exit animation for a form section that appears in response to a toggle in the form.
- * Wrap the parent in `<AnimatePresence initial={false}>` to avoid animation on first paint.
- */
+/** Wrap the parent in `<AnimatePresence initial={false}>` to avoid animating on first paint. */
 export const FormSectionCollapse = ({ children }: { children: ReactNode }) => (
   <motion.div
     initial="collapsed"
