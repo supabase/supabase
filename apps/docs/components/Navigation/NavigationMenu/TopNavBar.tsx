@@ -93,9 +93,7 @@ const TopNavBar: FC = () => {
             )}
             {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
               <Button asChild>
-                <Link href="/dev-secret-auth" className="h-[30px]">
-                  Dev-only secret sign-in
-                </Link>
+                <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
               </Button>
             )}
             {isLoggedIn ? (
