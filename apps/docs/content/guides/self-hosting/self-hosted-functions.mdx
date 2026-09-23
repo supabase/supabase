@@ -250,4 +250,16 @@ sh run.sh recreate functions
 
 ### Memory or timeout errors
 
-The default limits are 150 MB memory and 60 seconds timeout per function invocation. These are set in `volumes/functions/main/index.ts`. To adjust them, edit the `memoryLimitMb` and `workerTimeoutMs` values and restart the functions service.
+The default limits in `volumes/functions/main/index.ts` apply to each worker:
+
+| Setting                  | Default    | Description                                                                                 |
+| ------------------------ | ---------- | ------------------------------------------------------------------------------------------- |
+| `memoryLimitMb`          | 150 MB     | Maximum memory usage.                                                                       |
+| `workerTimeoutMs`        | 400,000 ms | Maximum worker lifetime.                                                                    |
+| `requestAbsentTimeoutMs` | 60,000 ms  | Allows the worker to shut down after 60 seconds without requests when no tasks are pending. |
+
+To adjust these limits, edit the values in `volumes/functions/main/index.ts` and restart the functions service.
+
+Requests have a separate idle timeout of 150 seconds. This is set by `--user-worker-request-idle-timeout` in the functions service command in `docker-compose.yml`, with the value `150000` in milliseconds. Recreate the functions container after changing this value.
+
+The [Envoy gateway](/docs/guides/self-hosting/self-hosted-envoy#routes) has separate limits of 160 seconds of inactivity and 410 seconds of total request duration.
