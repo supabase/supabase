@@ -6,6 +6,7 @@ import {
   CircleArrowUp,
   Eye,
   Key,
+  Minus,
   MoreVertical,
   ShieldOff,
   Timer,
@@ -22,6 +23,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
@@ -63,17 +65,28 @@ const LastUsedCell = ({
   const className =
     'text-right py-2 text-sm text-foreground-light whitespace-nowrap data-[invisible=true]:invisible'
 
-  if (!isLastUsedSupported) return <TableCell />
+  if (!isLastUsedSupported)
+    return (
+      <TableCell>
+        <Minus size={14} className="text-foreground-lighter ml-auto" />
+      </TableCell>
+    )
 
   if (isLoading) {
     return (
-      <TableCell aria-label="Loading last used timestamp" className={className} data-invisible />
+      <TableCell aria-label="Loading last used timestamp" className={className}>
+        <ShimmeringLoader className="w-14 ml-auto" />
+      </TableCell>
     )
   }
 
   if (isError) return <TableCell className={className}>Unable to load</TableCell>
   if (lastUsedAt === undefined) {
-    return <TableCell className={className}>No requests in the past 24 hours</TableCell>
+    return (
+      <TableCell className={cn(className, 'text-foreground-lighter')}>
+        No requests in 24h
+      </TableCell>
+    )
   }
 
   return (
@@ -179,6 +192,7 @@ export const SigningKeyRow = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              aria-label="More options"
               variant="text"
               className="px-1.5"
               loading={isLoading}
