@@ -66,6 +66,8 @@ interface CurrentFilePreviewProps {
   size: string | null
   isPublicBucket: boolean
   isVersionedBucket: boolean
+  /** Pins the preview to the current version, so a new one busts the cached URL. */
+  currentVersionId?: string
   hasCurrentVersion: boolean
   canUpdateFiles: boolean
   onCopyUrl: (path: string, expiry?: number) => void
@@ -83,6 +85,7 @@ const CurrentFilePreview = ({
   size,
   isPublicBucket,
   isVersionedBucket,
+  currentVersionId,
   hasCurrentVersion,
   canUpdateFiles,
   onCopyUrl,
@@ -97,7 +100,12 @@ const CurrentFilePreview = ({
       className="flex items-center justify-center overflow-hidden rounded-md border border-overlay"
       style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
     >
-      <FilePreview path={path} mimeType={mimeType} size={file.metadata?.size} />
+      <FilePreview
+        path={path}
+        mimeType={mimeType}
+        size={file.metadata?.size}
+        versionId={currentVersionId}
+      />
     </div>
 
     <div className="mt-2 flex flex-col">
@@ -372,6 +380,7 @@ export const PreviewPane = () => {
             size={size}
             isPublicBucket={!!selectedBucket?.public}
             isVersionedBucket={isVersionedBucket}
+            currentVersionId={currentVersion?.versionId}
             hasCurrentVersion={currentVersion !== undefined}
             canUpdateFiles={canUpdateFiles}
             onCopyUrl={onCopyUrl}

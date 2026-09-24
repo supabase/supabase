@@ -325,3 +325,26 @@ const readEntriesPromise = async (directoryReader: FileSystemDirectoryReader) =>
     console.error('readEntriesPromise error:', err)
   }
 }
+
+/**
+ * Storage rejects a write that breaks the bucket's own rules with a bare status and no
+ * usable message, so turn the ones a replace can hit into something actionable.
+ */
+export const describeUploadFailure = ({
+  status,
+  fallback,
+  allowedMimeTypes,
+}: {
+  status?: number
+  fallback: string
+  allowedMimeTypes?: string[] | null
+}) => {
+  if (status === 415) {
+    const allowed = allowedMimeTypes?.length
+      ? ` Allowed MIME types: ${allowedMimeTypes.join(', ')}.`
+      : ''
+    return `that file type is not allowed in this bucket.${allowed}`
+  }
+  if (status === 413) return 'the file exceeds the bucket file size limit.'
+  return fallback
+}

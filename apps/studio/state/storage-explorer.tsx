@@ -21,6 +21,7 @@ import {
 } from '@/components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
+  describeUploadFailure,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
@@ -30,7 +31,10 @@ import {
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
-import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
+import {
+  fetchFileUrl,
+  fileUrlKey,
+} from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -1518,13 +1522,30 @@ export function createStorageExplorerState({
 
         toast.success(`Uploaded a new version of ${item.name}`, { id: toastId })
         await state.refetchAllOpenedFolders()
-        await getQueryClient().invalidateQueries({
-          queryKey: storageKeys.objectVersions(state.projectRef, state.selectedBucket.id, path),
-        })
+        await Promise.all([
+          getQueryClient().invalidateQueries({
+            queryKey: storageKeys.objectVersions(state.projectRef, state.selectedBucket.id, path),
+          }),
+          // The preview URL is cached for a week against the path, so without this the
+          // panel keeps rendering the bytes from before the replace.
+          getQueryClient().invalidateQueries({
+            queryKey: fileUrlKey({
+              projectRef: state.projectRef,
+              isBucketPublic: state.selectedBucket.public,
+              bucketId: state.selectedBucket.id,
+              path,
+            }),
+          }),
+        ])
       } catch (error: any) {
-        toast.error(`Failed to upload a new version of ${item.name}: ${error.message}`, {
-          id: toastId,
+        const status =
+          error instanceof tus.DetailedError ? error.originalResponse?.getStatus() : undefined
+        const reason = describeUploadFailure({
+          status,
+          fallback: error.message,
+          allowedMimeTypes: state.selectedBucket.allowed_mime_types,
         })
+        toast.error(`Failed to upload a new version of ${item.name}: ${reason}`, { id: toastId })
         state.updateRowStatus({
           name: item.name,
           status: STORAGE_ROW_STATUS.READY,

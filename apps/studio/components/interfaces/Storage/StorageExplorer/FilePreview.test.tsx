@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { FilePreview } from '@/components/interfaces/Storage/StorageExplorer/FilePreview'
+import { fileUrlKey } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { customRender as render } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -63,6 +64,36 @@ describe('FilePreview', () => {
     await waitFor(() =>
       expect(container.querySelector(`[style*="${SIGNED_URL}"]`)).toBeInTheDocument()
     )
+  })
+
+  it('keys each version separately, so a new one cannot reuse the cached URL', () => {
+    const current = fileUrlKey({
+      projectRef: 'abcdef',
+      isBucketPublic: false,
+      bucketId: 'my-bucket',
+      path: 'photo.png',
+    })
+
+    expect(
+      fileUrlKey({
+        projectRef: 'abcdef',
+        isBucketPublic: false,
+        bucketId: 'my-bucket',
+        path: 'photo.png',
+        versionId: 'v-new',
+      })
+    ).not.toEqual(current)
+
+    // The version-less key is a prefix of every version's, so one invalidation clears all.
+    expect(
+      fileUrlKey({
+        projectRef: 'abcdef',
+        isBucketPublic: false,
+        bucketId: 'my-bucket',
+        path: 'photo.png',
+        versionId: 'v-new',
+      }).slice(0, current.length)
+    ).toEqual(current)
   })
 
   it('skips the request for a file too large to preview', async () => {
