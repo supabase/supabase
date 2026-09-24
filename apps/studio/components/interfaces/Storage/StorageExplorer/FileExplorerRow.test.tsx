@@ -91,7 +91,7 @@ describe('FileExplorerRow', () => {
     expect(screen.queryByText('Copy path to folder')).not.toBeInTheDocument()
   })
 
-  it('labels an archived file with an icon rather than text, and keeps its icon on hover', async () => {
+  it('marks an archived file with an icon in the leading slot rather than a text badge', async () => {
     const { container } = render(
       <FileExplorerRow
         item={
@@ -110,9 +110,10 @@ describe('FileExplorerRow', () => {
       />
     )
 
-    // The badge reads as an icon button, not the word "Archived".
-    expect(screen.getByRole('button', { name: 'View archived file gone.png' })).toBeInTheDocument()
+    // The icon reads as a button, not the word "Archived", and sits where the file icon would.
+    const archivedIcon = screen.getByRole('button', { name: 'View archived file gone.png' })
     expect(screen.queryByText('Archived')).not.toBeInTheDocument()
+    expect(container.querySelector('.w-\\[30px\\]')).toContainElement(archivedIcon)
 
     // Only the actions an archived file can actually take.
     await userEvent.click(screen.getByRole('button', { name: 'gone.png actions' }))
@@ -123,10 +124,10 @@ describe('FileExplorerRow', () => {
     expect(screen.queryByText('Move')).not.toBeInTheDocument()
     await userEvent.keyboard('{Escape}')
 
-    // An archived row has no checkbox, so nothing may hide its icon on hover.
+    // The archive icon replaces the file icon outright, so there is nothing left to
+    // hide on hover and no checkbox to swap in.
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
-    const iconSlot = container.querySelector('.absolute')
-    expect(iconSlot?.className).not.toContain('group-hover:hidden')
+    expect(container.querySelector('.absolute')).toBeNull()
   })
 
   it('keeps hiding the icon on hover for a live file, which does swap in a checkbox', () => {
