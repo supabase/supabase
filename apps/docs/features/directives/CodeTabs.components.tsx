@@ -19,7 +19,9 @@ export function NamedCodeBlock({ name, children }: PropsWithChildren<{ name: str
         className={cn(
           'relative z-1 -mb-px flex w-fit items-center px-3 py-2',
           'rounded-t-lg border border-b-0 border-default bg-200',
-          'text-xs text-foreground'
+          'text-xs text-foreground',
+          'after:absolute after:bottom-0 after:-right-2 after:size-2',
+          'after:bg-(image:--tab-flare-right)'
         )}
       >
         {name}
@@ -52,7 +54,17 @@ export function CodeTabs({ children }: PropsWithChildren) {
             <span className="px-3">{tab.props.label ?? tab.props.id}</span>
           </TabsTrigger>
         ))}
-        <TabsIndicator className="top-0 h-auto rounded-t-lg border border-b-0 border-default bg-200" />
+        <TabsIndicator
+          className={cn(
+            'top-0 h-auto rounded-t-lg border border-b-0 border-default bg-200',
+            'before:absolute before:bottom-0 before:-left-2 before:size-2',
+            'before:transition-opacity before:duration-150 before:ease-move motion-reduce:before:transition-none',
+            'group-has-[[role=tab]:first-child[data-state=active]]/code-tabs:before:opacity-0',
+            'before:bg-(image:--tab-flare-left)',
+            'after:absolute after:bottom-0 after:-right-2 after:size-2',
+            'after:bg-(image:--tab-flare-right)'
+          )}
+        />
       </TabsList>
       <span aria-hidden className="relative z-1 block h-0">
         <span

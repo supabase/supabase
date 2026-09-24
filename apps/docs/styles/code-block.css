@@ -111,3 +111,16 @@
 .shadow-codeblock {
   box-shadow: var(--shadow-codeblock, none);
 }
+
+.shiki-wrapper {
+  --tab-flare-ring:
+    transparent 6.75px, var(--border-color-default) 7.25px, var(--border-color-default) 7.75px,
+    transparent 8.25px;
+  --tab-flare-fill: transparent 6.75px, var(--background-color-200) 7.25px;
+  --tab-flare-left:
+    radial-gradient(circle at 0 0, var(--tab-flare-ring)),
+    radial-gradient(circle at 0 0, var(--tab-flare-fill));
+  --tab-flare-right:
+    radial-gradient(circle at 100% 0, var(--tab-flare-ring)),
+    radial-gradient(circle at 100% 0, var(--tab-flare-fill));
+}
