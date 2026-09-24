@@ -265,7 +265,7 @@ export function FilterCondition({
       className={cn(
         'relative flex items-stretch px-0 bg-muted group shrink-0',
         variant === 'pill' ? 'h-[26px] rounded-sm border' : 'self-stretch border-r',
-        isHighlighted && 'ring-2 ring-primary-bright'
+        isHighlighted && 'ring-2 ring-ring'
       )}
       data-testid={`filter-condition-${property.name}`}
       data-highlighted={isHighlighted}
@@ -280,7 +280,7 @@ export function FilterCondition({
                 onChange={(e) => setPropertySearchText(e.target.value)}
                 onBlur={handlePropertyBlur}
                 onKeyDown={handlePropertyKeyDown}
-                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
+                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
                 placeholder={property.label}
                 autoFocus
                 aria-label={`Change property from ${property.label}`}
