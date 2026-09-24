@@ -1179,6 +1179,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/configuration' as `/${string}`,
         },
         {
+          name: 'Database Maintenance',
+          url: '/guides/database/database-maintenance' as `/${string}`,
+        },
+        {
           name: 'Query optimization',
           url: '/guides/database/query-optimization' as `/${string}`,
         },
