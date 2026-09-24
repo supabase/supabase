@@ -6,7 +6,7 @@
 // the component over to the UI library
 
 import { noop } from 'lodash'
-import { List } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   DropdownMenu,
@@ -112,7 +112,7 @@ const InputWithSuggestions = ({
                       content: { text: 'Choose a suggested value for this column', side: 'bottom' },
                     }}
                   >
-                    <List strokeWidth={1.5} size={14} />
+                    <ChevronDown className="text-foreground-lighter" strokeWidth={1.5} size={16} />
                   </ButtonTooltip>
                 </DropdownMenuTrigger>
 
