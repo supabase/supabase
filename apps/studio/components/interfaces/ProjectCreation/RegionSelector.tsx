@@ -1,6 +1,6 @@
-import { useFeatureFlags, useParams } from 'common'
-import { Loader2 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useFeatureFlags, useFlag, useParams } from 'common'
+import { Loader2, ThumbsUp } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -40,6 +40,7 @@ import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -87,6 +88,12 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
+  // [Joshen] Temp experiment - to clean up once completed
+  const showBestAvailableRegion = useFlag('showBestAvailableRegion')
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isFreePlan = organization?.plan.id === 'free'
+  const showBestAvailableRegionOption = showBestAvailableRegion && isFreePlan
+
   const { getRegionRestriction } = useRegionRestriction()
 
   const { data: statusData } = useIncidentStatusQuery()
@@ -116,6 +123,25 @@ export const RegionSelector = ({
   const recommendedSmartRegions = new Set(
     [availableRegionsData?.recommendations.smartGroup.code].filter(Boolean)
   )
+  const recommendedSmartRegion = smartRegions.find(
+    (x) => x.code === recommendedSmartRegions.values().next().value
+  )
+
+  // [Joshen] Tracks whether the user picked the "Best available region" shortcut, so the
+  // trigger can keep showing that label instead of the specific region it resolves to.
+  const [isBestAvailableSelected, setIsBestAvailableSelected] = useState(false)
+  const isBestAvailableActive =
+    isBestAvailableSelected && showBestAvailableRegionOption && !!recommendedSmartRegion
+
+  // Defaults free orgs to the "Best available region" shortcut once the recommendation loads,
+  // unless the user has already interacted with the region field themselves.
+  const hasUserSelectedRegionRef = useRef(false)
+  useEffect(() => {
+    if (hasUserSelectedRegionRef.current) return
+    if (showBestAvailableRegionOption && recommendedSmartRegion) {
+      setIsBestAvailableSelected(true)
+    }
+  }, [showBestAvailableRegionOption, recommendedSmartRegion])
   const recommendedSpecificRegions = new Set(
     availableRegionsData?.recommendations.specific.map((region) => region.code)
   )
@@ -196,7 +222,11 @@ export const RegionSelector = ({
             selectedRestriction !== undefined
               ? getRegionRestrictionCopy(selectedRestriction)
               : undefined
-          const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
+          const triggerLabel = isLoading
+            ? 'Loading available regions...'
+            : isBestAvailableActive
+              ? 'Best available region'
+              : selectedRegionLabel
 
           const affectingIncidents = incidents.filter((incident) => {
             const affectedRegions = incident.cache?.affected_regions ?? []
@@ -247,8 +277,19 @@ export const RegionSelector = ({
               >
                 <FormControl>
                   <Select
-                    value={dbRegion}
-                    onValueChange={(value) => value !== '' && field.onChange(value)}
+                    value={isBestAvailableActive ? 'best_available' : dbRegion}
+                    onValueChange={(value) => {
+                      if (value === '') return
+                      hasUserSelectedRegionRef.current = true
+                      if (value === 'best_available') {
+                        if (!recommendedSmartRegion) return
+                        setIsBestAvailableSelected(true)
+                        field.onChange(recommendedSmartRegion.name)
+                      } else {
+                        setIsBestAvailableSelected(false)
+                        field.onChange(value)
+                      }
+                    }}
                     disabled={isLoading}
                   >
                     <SelectTrigger
@@ -266,8 +307,14 @@ export const RegionSelector = ({
                         {dbRegion !== undefined && (
                           <div className="flex items-center gap-x-3">
                             {isLoading && <Loader2 size={14} className="animate-spin" />}
-                            {selectedRegion?.code && (
-                              <RegionFlag className="w-5" region={selectedRegion.code} />
+                            {isBestAvailableActive ? (
+                              <div className="w-5 border border-brand-500 h-4.5 rounded-[3px] bg-brand-300 flex items-center justify-center">
+                                <ThumbsUp size={10} className="text-brand" />
+                              </div>
+                            ) : (
+                              selectedRegion?.code && (
+                                <RegionFlag className="w-5" region={selectedRegion.code} />
+                              )
                             )}
                             <span className="text-foreground">{triggerLabel}</span>
                           </div>
@@ -275,6 +322,27 @@ export const RegionSelector = ({
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
+                      {showBestAvailableRegionOption && !!recommendedSmartRegion && (
+                        <>
+                          <SelectGroup>
+                            <SelectLabel>Recommendation</SelectLabel>
+                            <SelectItem
+                              value="best_available"
+                              className="w-full [&>:nth-child(2)]:w-full"
+                            >
+                              <div className="flex flex-row items-center justify-between w-full">
+                                <div className="flex items-center gap-x-3">
+                                  <div className="w-5 border border-brand-500 h-4.5 rounded-[3px] bg-brand-300 flex items-center justify-center">
+                                    <ThumbsUp size={10} className="text-brand" />
+                                  </div>
+                                  <span className="text-foreground">Best available region</span>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          </SelectGroup>
+                          <SelectSeparator />
+                        </>
+                      )}
                       {smartRegionEnabled && !highAvailability && (
                         <>
                           <SelectGroup>
@@ -295,11 +363,12 @@ export const RegionSelector = ({
                                     </div>
 
                                     <div>
-                                      {recommendedSmartRegions.has(value.code) && (
-                                        <Badge variant="success" className="mr-1">
-                                          Recommended
-                                        </Badge>
-                                      )}
+                                      {!showBestAvailableRegionOption &&
+                                        recommendedSmartRegions.has(value.code) && (
+                                          <Badge variant="success" className="mr-1">
+                                            Recommended
+                                          </Badge>
+                                        )}
                                     </div>
                                   </div>
                                 </SelectItem>
@@ -339,11 +408,13 @@ export const RegionSelector = ({
                                   </div>
                                 </div>
 
-                                {recommendedSpecificRegions.has(value.code) && (
-                                  <Badge variant="success" className="mr-1">
-                                    Recommended
-                                  </Badge>
-                                )}
+                                {!showBestAvailableRegionOption &&
+                                  recommendedSpecificRegions.has(value.code) && (
+                                    <Badge variant="success" className="mr-1">
+                                      Recommended
+                                    </Badge>
+                                  )}
+
                                 {restrictionCopy !== undefined && (
                                   <Tooltip>
                                     <TooltipTrigger>
