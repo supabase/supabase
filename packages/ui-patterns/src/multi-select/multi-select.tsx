@@ -13,10 +13,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  controlRadiusBySize,
+  controlSurfaceShadows,
   Popover,
   PopoverAnchor,
   PopoverContent,
   PopoverContentProps,
+  raisedControlSurface,
   SIZE,
   SIZE_VARIANTS,
   SIZE_VARIANTS_DEFAULT,
@@ -233,16 +236,14 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
 
 // The tiny control has no vertical padding to spare, so its children stretch to the
 // control height and drop their line-height; the larger sizes center normally.
-const asMinHeight = (height: string) => height.replace('h-', 'min-h-')
-
 const MultiSelectorTriggerVariants = cva('', {
   variants: {
     size: {
-      tiny: `${SIZE.text.tiny} ${SIZE.height.tiny} p-0.5 items-stretch`,
-      small: `${SIZE.text.small} ${asMinHeight(SIZE.height.small)} p-1.5 items-center`,
-      medium: `${SIZE.text.medium} ${asMinHeight(SIZE.height.medium)} ${SIZE.padding.medium} items-center`,
-      large: `${SIZE.text.large} ${asMinHeight(SIZE.height.large)} ${SIZE.padding.large} items-center`,
-      xlarge: `${SIZE.text.xlarge} ${asMinHeight(SIZE.height.xlarge)} ${SIZE.padding.xlarge} items-center`,
+      tiny: `${SIZE.text.tiny} ${SIZE.height.tiny} pl-0.5 pr-2.5 py-0.5 items-stretch ${controlRadiusBySize.tiny}`,
+      small: `${SIZE.text.small} ${SIZE.minHeight.small} pl-1.5 pr-3 py-1.5 items-center ${controlRadiusBySize.small}`,
+      medium: `${SIZE.text.medium} ${SIZE.minHeight.medium} ${SIZE.padding.medium} items-center ${controlRadiusBySize.medium}`,
+      large: `${SIZE.text.large} ${SIZE.minHeight.large} ${SIZE.padding.large} items-center ${controlRadiusBySize.large}`,
+      xlarge: `${SIZE.text.xlarge} ${SIZE.minHeight.xlarge} ${SIZE.padding.xlarge} items-center ${controlRadiusBySize.xlarge}`,
     },
   },
   defaultVariants: {
@@ -271,8 +272,8 @@ const MultiSelectorBadgeVariants = cva(
     variants: {
       size: {
         tiny: 'h-full py-0',
-        small: '',
-        medium: '',
+        small: 'py-px',
+        medium: 'py-px',
         large: '',
         xlarge: '',
       },
@@ -355,7 +356,6 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const SHOULD_WRAP_BADGES = wrapBadges || badgeLimit === 'wrap'
     const IS_NUMERIC_LIMIT = typeof badgeLimit === 'number'
     const IS_INLINE_MODE = mode === 'inline-combobox'
-    const HAS_TINY_PLACEHOLDER = size === 'tiny' && values.length === 0
 
     React.useEffect(() => {
       if (!inputRef?.current || !badgesRef.current) return
@@ -403,17 +403,21 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           disabled={disabled}
           type="button"
           role="combobox"
+          aria-expanded={open}
+          data-state={open ? 'open' : 'closed'}
           className={cn(
-            'flex w-full min-w-50 justify-between rounded-md border',
-            'border-strong',
+            'flex w-full min-w-50 justify-between',
             // Empty: raised plate. Filled: sunk well for chips.
-            values.length > 0 ? 'bg-field' : 'bg-control-raised',
+            values.length > 0
+              ? 'border border-strong bg-field hover:border-control-hover'
+              : `${controlSurfaceShadows} ${raisedControlSurface}`,
             'placeholder:text-muted-foreground',
             'ring-border-control focus-ring',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'hover:border-control-hover transition-colors duration-200',
-            open && 'border-control-hover',
+            'transition-colors duration-200',
+            open && values.length > 0 && 'border-control-hover',
             MultiSelectorTriggerVariants({ size }),
+            values.length === 0 && (size === 'tiny' ? 'pl-2.5' : size === 'small' && 'pl-3'),
             className
           )}
           {...props}
@@ -462,7 +466,6 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             <span
               className={cn(
                 MultiSelectorLabelVariants({ size }),
-                HAS_TINY_PLACEHOLDER && 'ml-2',
                 !IS_INLINE_MODE &&
                   (persistLabel || values.length === 0) &&
                   'opacity-100 visible inline'
@@ -481,7 +484,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                   MultiSelectorInlineInputWrapperVariants({ size }),
                   SHOULD_WRAP_BADGES && 'min-w-21.25'
                 )}
-                className={cn(INLINE_INPUT_CLASSES, HAS_TINY_PLACEHOLDER && 'pl-3')}
+                className={INLINE_INPUT_CLASSES}
               />
             )}
           </div>
@@ -491,7 +494,10 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
               aria-hidden="true"
               size={16}
               strokeWidth={1.5}
-              className="text-foreground-lighter shrink-0 ml-1.5 self-center"
+              className={cn(
+                'text-foreground-lighter shrink-0 ml-1.5 self-center',
+                values.length > 0 && 'translate-x-px'
+              )}
             />
           )}
         </button>
