@@ -266,7 +266,8 @@ export function FilterCondition({
       className={cn(
         'relative flex items-stretch px-0 bg-muted group shrink-0',
         variant === 'pill' ? 'h-[26px] rounded-sm border' : 'self-stretch border-r',
-        isHighlighted && 'ring-2 ring-ring'
+        isHighlighted &&
+          (variant === 'pill' ? 'ring-2 ring-ring' : 'rounded-sm ring-2 ring-inset ring-ring')
       )}
       onFocusCapture={() => setHighlightedConditionPath(null)}
       data-testid={`filter-condition-${property.name}`}
