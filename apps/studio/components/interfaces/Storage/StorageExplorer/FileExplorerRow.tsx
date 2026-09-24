@@ -10,9 +10,11 @@ import {
   LoaderCircle,
   MoreVertical,
   Move,
+  RotateCcw,
   Trash2,
 } from 'lucide-react'
 import type { CSSProperties, ReactNode } from 'react'
+import { toast } from 'sonner'
 import {
   Checkbox,
   cn,
@@ -46,6 +48,7 @@ import { copyStorageExplorerUrl, copyStoragePath } from './StorageExplorer.utils
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useArchivedObjectRestoreMutation } from '@/data/storage/versioning/archived-object-restore-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -87,6 +90,47 @@ const ArchivedBadge = ({ name, onOpen }: { name: string; onOpen?: () => void }) 
   </Tooltip>
 )
 
+const RowActionsMenu = ({ name, options }: { name: string; options: RowOption[] }) => (
+  <DropdownMenu>
+    <DropdownMenuTrigger className="focus-ring rounded-sm">
+      <div className="storage-row-menu opacity-0">
+        <MoreVertical size={16} />
+        <span className="sr-only">{name} actions</span>
+      </div>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent side="bottom" align="end">
+      {options.map((option) => {
+        if ((option?.children ?? []).length > 0) {
+          return (
+            <DropdownMenuSub key={option.name}>
+              <DropdownMenuSubTrigger className="space-x-2">
+                {option.icon || <></>}
+                <p>{option.name}</p>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  {(option?.children ?? [])?.map((child) => (
+                    <DropdownMenuItem key={child.name} onClick={child.onClick}>
+                      <p>{child.name}</p>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+          )
+        }
+        if (option.name === 'Separator') return <DropdownMenuSeparator key={option.name} />
+        return (
+          <DropdownMenuItem className="space-x-2" key={option.name} onClick={option.onClick}>
+            {option.icon || <></>}
+            <p>{option.name}</p>
+          </DropdownMenuItem>
+        )
+      })}
+    </DropdownMenuContent>
+  </DropdownMenu>
+)
+
 interface FileExplorerRowProps {
   index: number
   item: StorageItem
@@ -120,6 +164,7 @@ export const FileExplorerRow = ({
     setSelectedItems,
     setSelectedItemsToDelete,
     setItemToPurge,
+    refetchAllOpenedFolders,
     downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
@@ -313,6 +358,39 @@ export const FileExplorerRow = ({
             : []),
         ]
 
+  const { mutate: restoreArchivedObject } = useArchivedObjectRestoreMutation({
+    onSuccess: async () => {
+      toast.success(`Restored ${item.name}`)
+      await refetchAllOpenedFolders()
+    },
+  })
+
+  // An archived file has no live object, so downloading, copying a URL, renaming and
+  // moving all have nothing to act on. Only these two do.
+  const archivedRowOptions: RowOption[] = !canUpdateFiles
+    ? []
+    : [
+        {
+          name: 'Restore',
+          icon: <RotateCcw size={12} className="text-foreground-light" />,
+          onClick: () => {
+            if (!projectRef || !selectedBucket?.id || !archivedObjectId || !item.path) return
+            restoreArchivedObject({
+              projectRef,
+              bucketId: selectedBucket.id,
+              archivedObjectId,
+              path: item.path,
+            })
+          },
+        },
+        { name: 'Separator', icon: undefined, onClick: undefined },
+        {
+          name: 'Delete permanently',
+          icon: <Trash2 size={12} className="text-destructive" />,
+          onClick: () => setItemToPurge(itemWithColumnIndex),
+        },
+      ]
+
   const size = item.metadata ? formatBytes(item.metadata.size) : '-'
   const mimeType = item.metadata ? item.metadata.mimetype : '-'
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
@@ -339,7 +417,11 @@ export const FileExplorerRow = ({
     <div
       style={style}
       className="h-full border-b border-default"
-      onContextMenu={(e) => (isArchived ? undefined : ctx?.onRowContextMenu(e, rowOptions))}
+      onContextMenu={(e) => {
+        if (isArchivedFile) return ctx?.onRowContextMenu(e, archivedRowOptions)
+        if (isArchived) return undefined
+        return ctx?.onRowContextMenu(e, rowOptions)
+      }}
     >
       <div
         style={isArchived ? ARCHIVED_STRIPES_STYLE : undefined}
@@ -452,57 +534,17 @@ export const FileExplorerRow = ({
               size={14}
             />
           ) : isArchived ? (
-            <ArchivedBadge
-              name={item.name}
-              onOpen={isArchivedFile ? () => onSelectFile(columnIndex) : undefined}
-            />
+            <div className="flex items-center gap-x-1">
+              <ArchivedBadge
+                name={item.name}
+                onOpen={isArchivedFile ? () => onSelectFile(columnIndex) : undefined}
+              />
+              {isArchivedFile && archivedRowOptions.length > 0 && (
+                <RowActionsMenu name={item.name} options={archivedRowOptions} />
+              )}
+            </div>
           ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="focus-ring rounded-sm">
-                <div className="storage-row-menu opacity-0">
-                  <MoreVertical size={16} />
-                  <span className="sr-only">{item.name} actions</span>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="end">
-                {rowOptions.map((option) => {
-                  if ((option?.children ?? []).length > 0) {
-                    return (
-                      <DropdownMenuSub key={option.name}>
-                        <DropdownMenuSubTrigger className="space-x-2">
-                          {option.icon || <></>}
-                          <p>{option.name}</p>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                          <DropdownMenuSubContent>
-                            {(option?.children ?? [])?.map((child) => {
-                              return (
-                                <DropdownMenuItem key={child.name} onClick={child.onClick}>
-                                  <p>{child.name}</p>
-                                </DropdownMenuItem>
-                              )
-                            })}
-                          </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                      </DropdownMenuSub>
-                    )
-                  } else if (option.name === 'Separator') {
-                    return <DropdownMenuSeparator key={option.name} />
-                  } else {
-                    return (
-                      <DropdownMenuItem
-                        className="space-x-2"
-                        key={option.name}
-                        onClick={option.onClick}
-                      >
-                        {option.icon || <></>}
-                        <p>{option.name}</p>
-                      </DropdownMenuItem>
-                    )
-                  }
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <RowActionsMenu name={item.name} options={rowOptions} />
           )}
         </div>
       </div>
