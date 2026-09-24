@@ -13,10 +13,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  controlRadiusBySize,
+  controlSurfaceShadows,
   Popover,
   PopoverAnchor,
   PopoverContent,
   PopoverContentProps,
+  raisedControlSurface,
   SIZE,
   SIZE_VARIANTS,
   SIZE_VARIANTS_DEFAULT,
@@ -238,11 +241,11 @@ const asMinHeight = (height: string) => height.replace('h-', 'min-h-')
 const MultiSelectorTriggerVariants = cva('', {
   variants: {
     size: {
-      tiny: `${SIZE.text.tiny} ${SIZE.height.tiny} p-0.5 items-stretch`,
-      small: `${SIZE.text.small} ${asMinHeight(SIZE.height.small)} p-1.5 items-center`,
-      medium: `${SIZE.text.medium} ${asMinHeight(SIZE.height.medium)} ${SIZE.padding.medium} items-center`,
-      large: `${SIZE.text.large} ${asMinHeight(SIZE.height.large)} ${SIZE.padding.large} items-center`,
-      xlarge: `${SIZE.text.xlarge} ${asMinHeight(SIZE.height.xlarge)} ${SIZE.padding.xlarge} items-center`,
+      tiny: `${SIZE.text.tiny} ${SIZE.height.tiny} p-0.5 items-stretch ${controlRadiusBySize.tiny}`,
+      small: `${SIZE.text.small} ${asMinHeight(SIZE.height.small)} p-1.5 items-center ${controlRadiusBySize.small}`,
+      medium: `${SIZE.text.medium} ${asMinHeight(SIZE.height.medium)} ${SIZE.padding.medium} items-center ${controlRadiusBySize.medium}`,
+      large: `${SIZE.text.large} ${asMinHeight(SIZE.height.large)} ${SIZE.padding.large} items-center ${controlRadiusBySize.large}`,
+      xlarge: `${SIZE.text.xlarge} ${asMinHeight(SIZE.height.xlarge)} ${SIZE.padding.xlarge} items-center ${controlRadiusBySize.xlarge}`,
     },
   },
   defaultVariants: {
@@ -403,16 +406,19 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           disabled={disabled}
           type="button"
           role="combobox"
+          aria-expanded={open}
+          data-state={open ? 'open' : 'closed'}
           className={cn(
-            'flex w-full min-w-50 justify-between rounded-md border',
-            'border-strong',
+            'flex w-full min-w-50 justify-between',
             // Empty: raised plate. Filled: sunk well for chips.
-            values.length > 0 ? 'bg-field' : 'bg-control-raised',
+            values.length > 0
+              ? 'border border-strong bg-field hover:border-control-hover'
+              : `${controlSurfaceShadows} ${raisedControlSurface}`,
             'placeholder:text-muted-foreground',
             'ring-border-control focus-ring',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'hover:border-control-hover transition-colors duration-200',
-            open && 'border-control-hover',
+            'transition-colors duration-200',
+            open && values.length > 0 && 'border-control-hover',
             MultiSelectorTriggerVariants({ size }),
             className
           )}

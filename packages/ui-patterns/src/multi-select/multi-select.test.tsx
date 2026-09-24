@@ -48,6 +48,33 @@ function MultiSelectDemo() {
 }
 
 describe('multi-select', () => {
+  it('shares the raised trigger surface and radius when empty', () => {
+    render(
+      <MultiSelector size="small" values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveClass(
+      'shadow-[var(--button-shadow-default)]',
+      'rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]'
+    )
+  })
+
+  it('keeps the selected-chip field surface and shared radius', () => {
+    render(
+      <MultiSelector size="small" values={['Apple']} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveClass(
+      'bg-field',
+      'rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]'
+    )
+    expect(screen.getByRole('combobox')).not.toHaveClass('shadow-[var(--button-shadow-default)]')
+  })
+
   it('supports the tiny control size', () => {
     render(
       <MultiSelector size="tiny" values={['Apple']} onValuesChange={() => undefined}>
