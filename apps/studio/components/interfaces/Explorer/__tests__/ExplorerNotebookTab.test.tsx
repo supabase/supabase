@@ -93,10 +93,11 @@ const renderNotebookTab = (tabsState = createTabsState('default')) =>
 
 // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
 // fetches, and `QueryEditor` fires a background database-event-triggers fetch (for the
-// run-time RLS/event-trigger warning check), against this same generic pg-meta query
-// endpoint (differentiated by the `key` search param) as soon as a database cell's editor
-// mounts — those are expected and unrelated to an actual cell run.
-const BACKGROUND_QUERY_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
+// run-time RLS/event-trigger warning check), and a result table's protected-schema check
+// fires a background fdws fetch, against this same generic pg-meta query endpoint
+// (differentiated by the `key` search param) — those are expected and unrelated to an
+// actual cell run.
+const BACKGROUND_QUERY_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns', 'fdws']
 const isBackgroundQueryKey = (key: string) =>
   BACKGROUND_QUERY_KEYS.includes(key) || key.endsWith('database-event-triggers')
 
