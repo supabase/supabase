@@ -44,8 +44,8 @@ describe('computeVersionFate', () => {
       expect(computeVersionFate({ ...base, daysOld: 28 })).toEqual({ type: 'expires-in', days: 2 })
     })
 
-    it('flips to expiring-now once the window has passed', () => {
-      expect(computeVersionFate({ ...base, daysOld: 31 })).toEqual({ type: 'expiring-now' })
+    it('flips to expiry-due once the window has passed', () => {
+      expect(computeVersionFate({ ...base, daysOld: 31 })).toEqual({ type: 'expiry-due' })
     })
   })
 
@@ -82,10 +82,10 @@ describe('computeVersionFate', () => {
       ).toEqual({ type: 'expires-in', days: 18 })
     })
 
-    it('is expiring-now once both conditions are met', () => {
+    it('is expiry-due once both conditions are met', () => {
       expect(
         computeVersionFate({ ...base, daysOld: 34, chronoIndex: 0, noncurrentCount: 4 })
-      ).toEqual({ type: 'expiring-now' })
+      ).toEqual({ type: 'expiry-due' })
       // Still within the cap: retained even though very old — AND needs both.
       expect(
         computeVersionFate({ ...base, daysOld: 28, chronoIndex: 1, noncurrentCount: 4 })
@@ -102,10 +102,10 @@ describe('computeVersionFate', () => {
       ).toEqual({ type: 'expires-in', days: 18 })
       expect(
         computeVersionFate({ ...base, daysOld: 34, chronoIndex: 0, noncurrentCount: 2 })
-      ).toEqual({ type: 'expiring-now' })
+      ).toEqual({ type: 'expiry-due' })
     })
 
-    it('lets the cap alone trigger removal, even for a young version', () => {
+    it("lets the cap alone trigger removal, once past the cap rule's own day floor", () => {
       expect(
         computeVersionFate({ ...base, daysOld: 1, chronoIndex: 3, noncurrentCount: 4 })
       ).toEqual({ type: 'expires-in', days: 29 })
@@ -117,7 +117,19 @@ describe('computeVersionFate', () => {
       ).toEqual({ type: 'expires-on-next-upload', daysRemaining: 24 })
       expect(
         computeVersionFate({ ...base, daysOld: 9, chronoIndex: 0, noncurrentCount: 4 })
-      ).toEqual({ type: 'expiring-now' })
+      ).toEqual({ type: 'expiry-due' })
+    })
+
+    it("waits out the cap rule's day floor before calling a version due", () => {
+      // Beyond the cap but written today: the cap rule carries `noncurrent_days: 1`,
+      // so nothing removes it until tomorrow.
+      expect(
+        computeVersionFate({ ...base, daysOld: 0, chronoIndex: 0, noncurrentCount: 5 })
+      ).toEqual({ type: 'expires-in', days: 1 })
+
+      expect(
+        computeVersionFate({ ...base, daysOld: 1, chronoIndex: 0, noncurrentCount: 5 })
+      ).toEqual({ type: 'expiry-due' })
     })
   })
 })
