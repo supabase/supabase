@@ -153,7 +153,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
                 side: 'bottom',
                 text: !canManageWrappers
                   ? 'You need additional permissions to delete wrappers'
-                  : 'Delete wrapper',
+                  : 'Delete connection',
               },
             }}
           />
