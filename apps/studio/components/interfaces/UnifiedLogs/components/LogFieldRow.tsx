@@ -18,6 +18,8 @@ interface LogFieldRowProps<TData> {
   disabled?: boolean
   /** Truncate the label to one line instead of wrapping it. */
   truncateLabel?: boolean
+  /** Offers "Add filter" for a filter that isn't a table column (e.g. a URL param). */
+  onAddFilter?: () => void
   className?: string
 }
 
@@ -31,6 +33,7 @@ export function LogFieldRow<TData>({
   table,
   disabled,
   truncateLabel = false,
+  onAddFilter,
   className,
 }: LogFieldRowProps<TData>) {
   return (
@@ -42,6 +45,7 @@ export function LogFieldRow<TData>({
       label={label}
       disabled={disabled}
       className="rounded-none"
+      onAddFilter={onAddFilter}
     >
       <div
         role="button"

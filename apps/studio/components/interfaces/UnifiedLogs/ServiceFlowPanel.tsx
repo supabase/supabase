@@ -12,6 +12,7 @@ import {
 
 import { LogDetail } from './components/LogDetail'
 import { LogStepSummary } from './components/LogTimeline'
+import { LogUser } from './components/LogUser'
 import { LogTimestampHeader, RequestTimeline } from './components/RequestTimeline'
 import { LogSelectionActions } from './LogSelectionActions'
 import {
@@ -49,7 +50,13 @@ export function ServiceFlowPanel({
   const activeLog =
     (openedLog && openedLog.fromId === selectedRow?.id ? openedLog.log : undefined) ?? selectedRow
   const showTimeline = isRequestTimelineEnabled && selectedRow?.log_type !== 'compute'
-  const tabs = ['overview', 'raw-json', ...(showTimeline ? ['timeline'] : [])]
+  const showUser = selectedRow?.log_type !== 'compute'
+  const tabs = [
+    'overview',
+    'raw-json',
+    ...(showTimeline ? ['timeline'] : []),
+    ...(showUser ? ['user'] : []),
+  ]
   const currentTab = tabs.includes(activeTab) ? activeTab : 'overview'
   const title = hasMultiple
     ? `${selectedRows.length} logs selected`
@@ -107,6 +114,7 @@ export function ServiceFlowPanel({
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
                 {showTimeline && <TabsTrigger value="timeline">Timeline</TabsTrigger>}
+                {showUser && <TabsTrigger value="user">User</TabsTrigger>}
                 <TabsIndicator />
               </TabsList>
               {tabs.map((tab) => (
@@ -124,6 +132,7 @@ export function ServiceFlowPanel({
                       onSelectLog={handleSelectTimelineLog}
                     />
                   )}
+                  {tab === 'user' && selectedRow && <LogUser row={selectedRow} />}
                   {(tab === 'overview' || tab === 'raw-json') && activeLog && (
                     <LogDetail
                       row={activeLog}

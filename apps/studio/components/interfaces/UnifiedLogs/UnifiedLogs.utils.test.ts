@@ -59,6 +59,12 @@ describe('buildUnifiedLogsUrl', () => {
     )
     expect(params.has('date')).toBe(false)
   })
+
+  it('opens a log when given its id', () => {
+    const { params } = parse(buildUnifiedLogsUrl({ projectRef: 'abc', user: 'u', logId: 'log-1' }))
+    expect(params.get('id')).toBe('log-1')
+    expect(params.get('user')).toBe('u')
+  })
 })
 
 describe('parseMultigresEventMessage', () => {

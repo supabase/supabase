@@ -50,6 +50,10 @@ vi.mock('./UserOverview', () => ({
 vi.mock('./UserLogs', () => ({
   UserLogs: () => <div data-testid="user-logs" />,
 }))
+vi.mock('@/components/interfaces/UnifiedLogs/components/UserLogTimeline', () => ({
+  UserLogTimeline: () => <div data-testid="user-log-timeline" />,
+}))
+
 const renderPanel = (
   disabledFeatures: string[] = [],
   { otel = false, unifiedLogs = false } = {}
@@ -114,5 +118,20 @@ describe('UserPanel', () => {
     await userEvent.setup().click(screen.getByRole('tab', { name: 'Raw JSON' }))
     expect(await screen.findByRole('button', { name: 'Copy user as JSON' })).toBeInTheDocument()
     expect(screen.queryByPlaceholderText('Filter...')).not.toBeInTheDocument()
+  })
+
+  it('moves Logs last and shows the user timeline when unified logs can filter by user', async () => {
+    const user = userEvent.setup()
+    renderPanel([], { otel: true, unifiedLogs: true })
+
+    await screen.findByRole('tab', { name: 'Logs' })
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      'Overview',
+      'Raw JSON',
+      'Logs',
+    ])
+    await user.click(screen.getByRole('tab', { name: 'Logs' }))
+    expect(await screen.findByTestId('user-log-timeline')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
   })
 })

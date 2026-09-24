@@ -123,6 +123,7 @@ export const buildUnifiedLogsUrl = ({
   user,
   start,
   end,
+  logId,
 }: {
   projectRef: string
   logType?: UnifiedLogType
@@ -130,11 +131,14 @@ export const buildUnifiedLogsUrl = ({
   user?: string
   start?: string | Date
   end?: string | Date
+  /** Opens this log in the side panel */
+  logId?: string
 }) =>
   serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
     filter: logType ? [`log_type:eq:${logType}`] : null,
     user: user ?? null,
     date: start && end ? [new Date(start), new Date(end)] : null,
+    id: logId ?? null,
   })
 
 /** How many logs a count query found with one value of a facet, e.g. `level` `error` */
