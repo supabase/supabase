@@ -218,15 +218,14 @@ export const Column = ({
                     align="center"
                   >
                     <div className="text-xs px-2 pt-2">
-                      Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
+                      Involved in {activeRelations.length} foreign key
+                      {activeRelations.length > 1 ? 's' : ''}
                     </div>
                     <Command>
                       <CommandList>
                         <CommandGroup>
-                          {relations.map((relation, idx) => {
+                          {activeRelations.map((relation, idx) => {
                             const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
-                            const status = getRelationStatus(relation)
-                            if (status === 'REMOVE') return null
 
                             return (
                               <CommandItem
