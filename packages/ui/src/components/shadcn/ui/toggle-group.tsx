@@ -110,10 +110,10 @@ const ToggleGroup = React.forwardRef<
       typeof props.defaultValue === 'string' ? props.defaultValue : ''
     )
 
-    const handleValueChange = (value: string | string[]) => {
+    const handleValueChange = (value: string & string[]) => {
       if (!allowDeselect && value === '') return
       if (ownsValue && typeof value === 'string') setInternalValue(value)
-      ;(onValueChange as ((value: string | string[]) => void) | undefined)?.(value)
+      if (onValueChange) onValueChange(value)
     }
 
     // Cast is contained: `ownsValue` has already narrowed `type` to 'single' at runtime,
