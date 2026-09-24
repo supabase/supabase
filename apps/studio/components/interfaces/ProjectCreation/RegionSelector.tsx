@@ -40,6 +40,7 @@ import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface RegionSelectorProps {
@@ -89,10 +90,14 @@ export const RegionSelector = ({
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
   // [Joshen] Temp experiment - to clean up once completed
-  const showBestAvailableRegion = useFlag('showBestAvailableRegion')
+  const showBestAvailableRegionFeature = useIsFeatureEnabled(
+    'project_creation:show_best_available_region'
+  )
+  const showBestAvailableRegionFlag = useFlag('showBestAvailableRegion')
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan.id === 'free'
-  const showBestAvailableRegionOption = showBestAvailableRegion && isFreePlan
+  const showBestAvailableRegionOption =
+    showBestAvailableRegionFeature && showBestAvailableRegionFlag && isFreePlan
 
   const { getRegionRestriction } = useRegionRestriction()
 
