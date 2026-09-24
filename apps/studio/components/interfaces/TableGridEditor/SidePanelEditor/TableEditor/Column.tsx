@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Eye, EyeOff, GripVertical, Link, Plus, Settings, X } from 'lucide-react'
+import { GripVertical, Link, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
 import {
   Badge,
@@ -13,7 +13,7 @@ import {
   CommandList,
   CommandSeparator,
   InputGroup,
-  InputGroupButton,
+  InputGroupAddon,
   InputGroupInput,
   Popover,
   PopoverContent,
@@ -59,6 +59,7 @@ interface ColumnProps {
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
+  gridTemplateColumns: string
   shouldAutoFocusName?: boolean
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
@@ -72,6 +73,7 @@ export const Column = ({
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
+  gridTemplateColumns,
   shouldAutoFocusName = false,
   onUpdateColumn,
   onRemoveColumn,
@@ -85,6 +87,7 @@ export const Column = ({
     column.isIdentity ? 1 : 0,
     column.isUnique ? 1 : 0,
     column.isArray ? 1 : 0,
+    column.isSensitiveData ? 1 : 0,
   ].reduce((a, b) => a + b, 0)
 
   const { data } = useForeignKeyConstraintsQuery({
@@ -109,6 +112,21 @@ export const Column = ({
   const hasChangesInRelations = relations
     .map((r) => getRelationStatus(r))
     .some((x) => x !== undefined)
+  const activeRelations = relations.filter((relation) => !relation.toRemove)
+
+  const onToggleSensitiveData = () => {
+    const marker = '[SENSITIVE]'
+    const isSensitiveData = !column.isSensitiveData
+    let updatedComment = column.comment || ''
+
+    if (isSensitiveData && !updatedComment.includes(marker)) {
+      updatedComment = `${updatedComment} ${marker}`.trim()
+    } else if (!isSensitiveData) {
+      updatedComment = updatedComment.replace(marker, '').trim()
+    }
+
+    onUpdateColumn({ isSensitiveData, comment: updatedComment })
+  }
 
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
     useSortable({
@@ -121,28 +139,33 @@ export const Column = ({
   }
 
   return (
-    <div className="flex w-full items-center gap-x-1" ref={setNodeRef} style={style}>
-      <div className={!isNewRecord ? 'hidden' : ''}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              ref={setActivatorNodeRef}
-              {...attributes}
-              {...listeners}
-              tabIndex={0}
-              className="p-1 opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
-              icon={<GripVertical size={16} strokeWidth={1.5} />}
-              aria-label={`Move column ${column.name}`}
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Move</TooltipContent>
-        </Tooltip>
-      </div>
-      <div className="w-[30%]">
-        <div className="flex w-[95%] items-center justify-between gap-x-1">
-          <div className="h-4 w-px bg-border" />
-          <InputGroup>
+    <div
+      className="grid w-full items-center gap-x-1"
+      ref={setNodeRef}
+      style={{ ...style, gridTemplateColumns }}
+    >
+      {isNewRecord && (
+        <div className="flex items-center justify-center">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="text"
+                ref={setActivatorNodeRef}
+                {...attributes}
+                {...listeners}
+                tabIndex={0}
+                className="w-6.5 px-0 cursor-grab text-foreground"
+                icon={<GripVertical size={16} strokeWidth={2} />}
+                aria-label={`Move column ${column.name}`}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Drag to reorder columns</TooltipContent>
+          </Tooltip>
+        </div>
+      )}
+      <div className="min-w-0">
+        <div className="flex w-[95%] items-center">
+          <InputGroup className="min-w-0 flex-1">
             <InputGroupInput
               autoFocus={shouldAutoFocusName}
               aria-label="Column name"
@@ -151,171 +174,124 @@ export const Column = ({
               title={column.name}
               disabled={hasImportContent}
               placeholder="column_name"
-              className={cn(
-                '[&>div>div>div>input]:py-1.5 [&>div>div>div>input]:border-r-transparent [&>div>div>div>input]:rounded-r-none',
-                hasImportContent ? 'opacity-50' : ''
-              )}
+              className={hasImportContent ? 'opacity-50' : undefined}
               onChange={(event) => onUpdateColumn({ name: event.target.value })}
             />
-            {relations.filter((r) => !r.toRemove).length === 0 ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <InputGroupButton asChild>
+            <InputGroupAddon align="inline-end">
+              {activeRelations.length === 0 ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Button
-                      variant="dashed"
-                      className="rounded-l-none h-[30px] py-0 px-2"
+                      variant="text"
+                      size="tiny"
+                      className="w-6.5 px-0 mr-0.5"
                       onClick={() => onEditForeignKey()}
-                      aria-label={`Edit ${column.name} foreign key`}
-                      // Tooltip repeats the label; screen readers would read it twice
-                      aria-describedby={undefined}
+                      aria-label={`Add foreign key for ${column.name}`}
                     >
-                      <Link size={12} />
+                      <Link size={14} strokeWidth={1.5} />
                     </Button>
-                  </InputGroupButton>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Edit foreign key</TooltipContent>
-              </Tooltip>
-            ) : null}
-          </InputGroup>
-          {relations.filter((r) => !r.toRemove).length === 0 ? (
-            <>
-              <div className="h-4 w-px bg-border" />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    icon={
-                      column.isSensitiveData ? (
-                        <EyeOff size={14} strokeWidth={1.5} />
-                      ) : (
-                        <Eye size={14} strokeWidth={1.5} />
-                      )
-                    }
-                    onClick={() => {
-                      const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Reference a column in another table</TooltipContent>
+                </Tooltip>
+              ) : (
+                <Popover open={open} onOpenChange={setOpen} modal={false}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="text"
+                          size="tiny"
+                          className="w-6.5 px-0 mr-0.5"
+                          aria-label={`Edit ${column.name} foreign keys`}
+                        >
+                          <Link size={14} strokeWidth={1.5} />
+                        </Button>
+                      </PopoverTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      View and add foreign key relations
+                    </TooltipContent>
+                  </Tooltip>
+                  <PopoverContent
+                    className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
+                    side="bottom"
+                    align="center"
+                  >
+                    <div className="text-xs px-2 pt-2">
+                      Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
+                    </div>
+                    <Command>
+                      <CommandList>
+                        <CommandGroup>
+                          {relations.map((relation, idx) => {
+                            const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
+                            const status = getRelationStatus(relation)
+                            if (status === 'REMOVE') return null
 
-                      const isSensitive = !column.isSensitiveData
-
-                      let updatedComment = column.comment || ''
-
-                      if (isSensitive && !updatedComment.includes(SENSITIVE_DATA_MARKER)) {
-                        updatedComment = updatedComment
-                          ? `${updatedComment} ${SENSITIVE_DATA_MARKER}`
-                          : SENSITIVE_DATA_MARKER
-                      } else if (!isSensitive) {
-                        updatedComment = updatedComment.replace(SENSITIVE_DATA_MARKER, '').trim()
-                      }
-
-                      onUpdateColumn({ isSensitiveData: isSensitive, comment: updatedComment })
-                    }}
-                    className={cn(
-                      'transition cursor-pointer p-1 hover:bg-surface-100 rounded',
-
-                      column.isSensitiveData
-                        ? 'opacity-100 text-foreground'
-                        : 'opacity-50 hover:opacity-100 text-foreground-light'
-                    )}
-                    type="button"
-                    aria-label={
-                      column.isSensitiveData ? 'Marked as sensitive' : 'Not marked as sensitive'
-                    }
-                  />
-                </TooltipTrigger>
-
-                <TooltipContent side="bottom">
-                  {column.isSensitiveData
-                    ? 'Data is masked in grid display. Actual data unchanged in database.'
-                    : 'Mark as sensitive to mask in grid display'}
-                </TooltipContent>
-              </Tooltip>
-            </>
-          ) : (
-            <Popover open={open} onOpenChange={setOpen} modal={false}>
-              <PopoverTrigger asChild>
-                <Button className="rounded-l-none h-[30px] py-0 px-2">
-                  <Link size={12} />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
-                side="bottom"
-                align="center"
-              >
-                <div className="text-xs px-2 pt-2">
-                  Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
-                </div>
-                <Command>
-                  <CommandList>
-                    <CommandGroup>
-                      {relations.map((relation, idx) => {
-                        const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
-                        const status = getRelationStatus(relation)
-                        if (status === 'REMOVE') return null
-
-                        return (
-                          <CommandItem
-                            key={key}
-                            value={key}
-                            className="cursor-pointer w-full"
-                            onSelect={() => onEditForeignKey(relation)}
-                            onClick={() => onEditForeignKey(relation)}
-                          >
-                            {status === undefined ? (
-                              <div className="w-full flex items-center justify-between truncate">
-                                {relation.name}
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-x-2 truncate">
-                                <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
-                                  {status}
-                                </Badge>
-                                <p className="truncate">
-                                  {relation.name || (
-                                    <>
-                                      To{' '}
-                                      {relation.columns
-                                        .filter((c) => c.source === column.name)
-                                        .map((c) => {
-                                          return (
-                                            <code key={`${c.source}-${c.target}`}>
-                                              {relation.schema}.{relation.table}.{c.target}
-                                            </code>
-                                          )
-                                        })}
-                                      {relation.columns.length > 1 && (
+                            return (
+                              <CommandItem
+                                key={key}
+                                value={key}
+                                className="cursor-pointer w-full"
+                                onSelect={() => onEditForeignKey(relation)}
+                                onClick={() => onEditForeignKey(relation)}
+                              >
+                                {status === undefined ? (
+                                  <div className="w-full flex items-center justify-between truncate">
+                                    {relation.name}
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-x-2 truncate">
+                                    <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
+                                      {status}
+                                    </Badge>
+                                    <p className="truncate">
+                                      {relation.name || (
                                         <>
-                                          and {relation.columns.length - 1} other column
-                                          {relation.columns.length > 2 ? 's' : ''}
+                                          To{' '}
+                                          {relation.columns
+                                            .filter((c) => c.source === column.name)
+                                            .map((c) => (
+                                              <code key={`${c.source}-${c.target}`}>
+                                                {relation.schema}.{relation.table}.{c.target}
+                                              </code>
+                                            ))}
+                                          {relation.columns.length > 1 && (
+                                            <>
+                                              and {relation.columns.length - 1} other column
+                                              {relation.columns.length > 2 ? 's' : ''}
+                                            </>
+                                          )}
                                         </>
                                       )}
-                                    </>
-                                  )}
-                                </p>
-                              </div>
-                            )}
+                                    </p>
+                                  </div>
+                                )}
+                              </CommandItem>
+                            )
+                          })}
+                        </CommandGroup>
+                        <CommandSeparator />
+                        <CommandGroup>
+                          <CommandItem
+                            className="cursor-pointer w-full gap-x-2"
+                            onSelect={() => onEditForeignKey()}
+                            onClick={() => onEditForeignKey()}
+                          >
+                            <Plus size={14} strokeWidth={1.5} />
+                            <p>Add foreign key relation</p>
                           </CommandItem>
-                        )
-                      })}
-                    </CommandGroup>
-                    <CommandSeparator />
-                    <CommandGroup>
-                      <CommandItem
-                        className="cursor-pointer w-full gap-x-2"
-                        onSelect={() => onEditForeignKey()}
-                        onClick={() => onEditForeignKey()}
-                      >
-                        <Plus size={14} strokeWidth={1.5} />
-                        <p>Add foreign key relation</p>
-                      </CommandItem>
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          )}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </InputGroupAddon>
+          </InputGroup>
         </div>
       </div>
-      <div className="w-[25%]">
+      <div className="min-w-0">
         <div className="w-[95%]">
           <ColumnType
             value={{ format: column.format, formatSchema: column.formatSchema }}
@@ -333,7 +309,7 @@ export const Column = ({
           />
         </div>
       </div>
-      <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
+      <div className="min-w-0">
         <div className="w-[95%]">
           <ColumnDefaultValue
             columnFields={column}
@@ -349,7 +325,7 @@ export const Column = ({
           />
         </div>
       </div>
-      <div className="w-[10%]">
+      <div className="min-w-0">
         <Checkbox
           aria-label="Check to make this column a primary key"
           checked={column.isPrimaryKey}
@@ -362,132 +338,141 @@ export const Column = ({
           }}
         />
       </div>
-      <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
-      <div className="flex w-[5%] justify-end">
-        {(!column.isPrimaryKey || column.format.includes('int')) && (
-          <Popover>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <PopoverTrigger asChild>
-                  <Button
-                    data-testid={`${column.name}-extra-options`}
-                    variant="outline"
-                    aria-label={`Options for ${column.name}`}
-                    // Tooltip repeats the label; screen readers would read it twice
-                    aria-describedby={undefined}
-                    className="p-1 relative"
-                    icon={
-                      <>
-                        {settingsCount > 0 && (
-                          <div className="absolute -top-2 -left-2 rounded-full bg-foreground h-4 w-4 flex items-center justify-center text-xs text-background">
-                            {settingsCount}
-                          </div>
-                        )}
-                        <div className="text-foreground-light transition-colors group-hover:text-foreground">
-                          <Settings size={16} strokeWidth={1} />
+      {hasImportContent && <div />}
+      <div className="flex justify-end">
+        <Popover>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  data-testid={`${column.name}-extra-options`}
+                  variant="outline"
+                  aria-label={`Options for ${column.name}`}
+                  className="w-6.5 px-0 relative"
+                  icon={
+                    <>
+                      {settingsCount > 0 && (
+                        <div className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-medium leading-none tabular-nums text-background">
+                          {settingsCount}
                         </div>
-                      </>
-                    }
-                  />
-                </PopoverTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Options</TooltipContent>
-            </Tooltip>
-            <PopoverContent align="end" className="w-80 p-0">
-              <div className="flex items-center justify-center bg-surface-200 gap-y-1 py-1.5 px-3 border-b border-overlay">
-                <h5 className="text-foreground">Extra options</h5>
-              </div>
+                      )}
+                      <div className="text-foreground-light transition-colors group-hover:text-foreground">
+                        <Settings size={16} strokeWidth={1.75} />
+                      </div>
+                    </>
+                  }
+                />
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              Set column constraints, array, and masking options
+            </TooltipContent>
+          </Tooltip>
+          <PopoverContent align="end" className="w-80 p-0">
+            <div className="flex items-center justify-center bg-surface-200 gap-y-1 py-1.5 px-3 border-b border-overlay">
+              <h5 className="text-foreground">Extra options</h5>
+            </div>
 
-              <div className="flex flex-col gap-y-4 p-4" key={`${column.id}_configuration`}>
-                {!column.isPrimaryKey && (
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="flex"
+            <div className="flex flex-col gap-y-4 p-4" key={`${column.id}_configuration`}>
+              {!column.isPrimaryKey && (
+                <FormItemLayout
+                  isReactForm={false}
+                  layout="flex"
+                  id="isNullable"
+                  label="Is nullable"
+                  description="Specify if the column can assume a NULL value if no value is provided"
+                >
+                  <Checkbox
                     id="isNullable"
-                    label="Is Nullable"
-                    description="Specify if the column can assume a NULL value if no value is provided"
-                  >
-                    <Checkbox
-                      id="isNullable"
-                      checked={column.isNullable}
-                      onCheckedChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
-                    />
-                  </FormItemLayout>
-                )}
-                {!column.isPrimaryKey && (
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="flex"
+                    checked={column.isNullable}
+                    onCheckedChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
+                  />
+                </FormItemLayout>
+              )}
+              {!column.isPrimaryKey && (
+                <FormItemLayout
+                  isReactForm={false}
+                  layout="flex"
+                  id="isUnique"
+                  label="Is unique"
+                  description="Enforce if values in the column should be unique across rows"
+                >
+                  <Checkbox
                     id="isUnique"
-                    label="Is Unique"
-                    description="Enforce if values in the column should be unique across rows"
-                  >
-                    <Checkbox
-                      id="isUnique"
-                      checked={column.isUnique}
-                      onCheckedChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
-                    />
-                  </FormItemLayout>
-                )}
-                {column.format.includes('int') && (
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="flex"
+                    checked={column.isUnique}
+                    onCheckedChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
+                  />
+                </FormItemLayout>
+              )}
+              {column.format.includes('int') && (
+                <FormItemLayout
+                  isReactForm={false}
+                  layout="flex"
+                  id="isIdentity"
+                  label="Is Identity"
+                  description="Automatically assign a sequential unique number to the column"
+                >
+                  <Checkbox
                     id="isIdentity"
-                    label="Is Identity"
-                    description="Automatically assign a sequential unique number to the column"
-                  >
-                    <Checkbox
-                      id="isIdentity"
-                      checked={column.isIdentity}
-                      onCheckedChange={() => {
-                        const isIdentity = !column.isIdentity
-                        const isArray = isIdentity ? false : column.isArray
-                        onUpdateColumn({ isIdentity, isArray })
-                      }}
-                    />
-                  </FormItemLayout>
-                )}
-                {!column.isPrimaryKey && (
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="flex"
+                    checked={column.isIdentity}
+                    onCheckedChange={() => {
+                      const isIdentity = !column.isIdentity
+                      const isArray = isIdentity ? false : column.isArray
+                      onUpdateColumn({ isIdentity, isArray })
+                    }}
+                  />
+                </FormItemLayout>
+              )}
+              {!column.isPrimaryKey && (
+                <FormItemLayout
+                  isReactForm={false}
+                  layout="flex"
+                  id="defineAsArray"
+                  label="Define as array"
+                  description="Define your column as a variable-length multidimensional array"
+                >
+                  <Checkbox
                     id="defineAsArray"
-                    label="Define as Array"
-                    description="Define your column as a variable-length multidimensional array"
-                  >
-                    <Checkbox
-                      id="defineAsArray"
-                      checked={column.isArray}
-                      onCheckedChange={() => {
-                        const isArray = !column.isArray
-                        const isIdentity = isArray ? false : column.isIdentity
-                        onUpdateColumn({ isArray, isIdentity })
-                      }}
-                    />
-                  </FormItemLayout>
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
-        )}
+                    checked={column.isArray}
+                    onCheckedChange={() => {
+                      const isArray = !column.isArray
+                      const isIdentity = isArray ? false : column.isIdentity
+                      onUpdateColumn({ isArray, isIdentity })
+                    }}
+                  />
+                </FormItemLayout>
+              )}
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex"
+                id={`${column.id}-isSensitiveData`}
+                label="Mark as sensitive"
+                description="Mask values in the grid display. Database values are unchanged."
+              >
+                <Checkbox
+                  id={`${column.id}-isSensitiveData`}
+                  checked={column.isSensitiveData ?? false}
+                  onCheckedChange={onToggleSensitiveData}
+                />
+              </FormItemLayout>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
       {!hasImportContent && (
-        <div className="flex w-[5%] justify-end">
+        <div className="flex justify-end">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="outline"
                 tabIndex={0}
                 aria-label={`Remove column ${column.name}`}
-                // Tooltip repeats the label; screen readers would read it twice
-                aria-describedby={undefined}
-                className="p-1 cursor-pointer"
+                className="w-6.5 px-0 cursor-pointer"
                 onClick={() => onRemoveColumn()}
-                icon={<X size={16} strokeWidth={1} />}
+                icon={<X size={16} strokeWidth={1.75} />}
               />
             </TooltipTrigger>
-            <TooltipContent side="bottom">Remove column</TooltipContent>
+            <TooltipContent side="bottom">Remove this column from the table</TooltipContent>
           </Tooltip>
         </div>
       )}
