@@ -13,7 +13,7 @@ export const SELECT_26_MESSAGE = 'Supabase Select 2026 is coming October 2'
 export const SELECT_26_DESCRIPTION =
   'A curated day of talks by the industry’s best builders. Join us on October 2nd in San Francisco.'
 export const SELECT_26_CTA = 'Apply to attend'
-export const SELECT_26_EXPIRY = '2026-10-03T00:00:00-07:00'
+const SELECT_26_EXPIRY = '2026-10-03T00:00:00-07:00'
 export const SELECT_26_WWW_DISMISSAL_KEY = 'announcement_select_26_08'
 export const SELECT_26_STUDIO_DISMISSAL_KEY = 'select-2026-promotion-dismissed'
 
