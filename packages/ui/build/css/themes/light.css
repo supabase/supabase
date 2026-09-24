@@ -16,16 +16,22 @@
   --foreground-lightness: 0.1;
   --muted-foreground-level: 0.65;
   --tertiary-foreground-level: 0.5;
-  /* Accessible primary for text/controls (~4.5:1+ on light surfaces). */
+  /* Accessible primary for text and small indicators on light surfaces (~4.5:1+).
+     Solid button plates alias to the same green in light mode. Focus rings and
+     bright interactive chrome uses --primary-bright. */
   --primary: oklch(0.525 0.12 var(--primary-hue));
   --primary-foreground: oklch(0.99 0.00275 var(--primary-hue));
+  --primary-solid: var(--primary);
+  --primary-solid-foreground: var(--primary-foreground);
+  --primary-solid-hover: var(--primary-hover);
   /*
    * Expressive fills run darker than the dark-theme anchors so they hold contrast
    * against the near-white surface (a light amber on white disappears). Lightness
    * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
   --warning-hue: 58;
-  --warning-lightness: 0.68;
+  /* Below on-fill flip (~0.62) so ink is light and clears ~4.5:1 */
+  --warning-lightness: 0.55;
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;
 

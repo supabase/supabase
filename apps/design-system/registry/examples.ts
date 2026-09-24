@@ -1022,6 +1022,12 @@ export const examples: Registry = [
     files: ['example/textarea-form.tsx'],
   },
   {
+    name: 'textarea-with-addon',
+    type: 'components:example',
+    registryDependencies: ['textarea', 'input-group'],
+    files: ['example/textarea-with-addon.tsx'],
+  },
+  {
     name: 'textarea-with-button',
     type: 'components:example',
     registryDependencies: ['textarea', 'button'],

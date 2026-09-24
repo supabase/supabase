@@ -139,6 +139,53 @@ describe('fillTimeseries', () => {
     })
   })
 
+  test('should bound sparse microsecond timestamps when the end date is empty', () => {
+    const start = dayjs.utc('2026-09-24T06:00:00.000Z')
+    const data = [
+      { timestamp: start.valueOf() * 1000, value: 1 },
+      { timestamp: start.add(1, 'hour').valueOf() * 1000, value: 2 },
+    ]
+
+    const result = fillTimeseries(data, 'timestamp', 'value', 0, start.toISOString(), '')
+
+    expect(result).toHaveLength(2)
+    expect(result.map((point) => point.timestamp)).toEqual([
+      start.toISOString(),
+      start.add(1, 'hour').toISOString(),
+    ])
+    expect(result.map((point) => point.value)).toEqual([1, 2])
+  })
+
+  test('should preserve sparse microsecond points within explicit bounds', () => {
+    const start = dayjs.utc('2026-09-24T06:00:00.000Z')
+    const end = start.add(1, 'hour')
+    const data = [
+      { timestamp: start.valueOf() * 1000, value: 1 },
+      { timestamp: end.valueOf() * 1000, value: 2 },
+    ]
+
+    const result = fillTimeseries(
+      data,
+      'timestamp',
+      'value',
+      0,
+      start.toISOString(),
+      end.toISOString()
+    )
+
+    expect(result).toHaveLength(2)
+    expect(result.map((point) => point.value)).toEqual([1, 2])
+  })
+
+  test('should normalize a single microsecond point without an end date', () => {
+    const timestamp = dayjs.utc('2026-09-24T06:00:00.000Z')
+    const data = [{ timestamp: timestamp.valueOf() * 1000, value: 1 }]
+
+    expect(fillTimeseries(data, 'timestamp', 'value', 0, timestamp.toISOString(), '')).toEqual([
+      { timestamp: timestamp.toISOString(), value: 1 },
+    ])
+  })
+
   test('should handle mixed timestamp formats', () => {
     const data = [
       { timestamp: '2023-01-01T00:00:00.000Z', value: 1 },
