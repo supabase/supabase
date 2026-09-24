@@ -171,6 +171,33 @@ describe('FilterBar', () => {
     expect(input).toBeInTheDocument()
   })
 
+  it('lets keyboard users reenter and edit a selected filter', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'name', operator: '=', value: 'test' }],
+        }}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    await user.tab()
+    expect(screen.getByLabelText('Change property from Name')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByLabelText('Operator for Name')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByLabelText('Value for Name')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Remove Name filter' })).toHaveFocus()
+    await user.tab({ shift: true })
+    expect(screen.getByLabelText('Value for Name')).toHaveFocus()
+  })
+
   it('lets keyboard users remove a selected filter', async () => {
     const user = userEvent.setup()
     const onFilterChange = vi.fn()
@@ -187,6 +214,9 @@ describe('FilterBar', () => {
       />
     )
 
+    await user.tab()
+    await user.tab()
+    await user.tab()
     await user.tab()
     expect(screen.getByRole('button', { name: 'Remove Name filter' })).toHaveFocus()
     await user.keyboard('{Enter}')

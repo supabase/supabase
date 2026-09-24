@@ -292,15 +292,22 @@ export function FilterCondition({
                 data-form-type="other"
               />
             ) : null}
-            <span
-              className={cn(
-                'text-xs pl-2 pr-1 shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center cursor-pointer hover:text-foreground transition-colors',
-                isPropertyActive && 'invisible'
-              )}
-              onClick={() => handleLabelClick(path)}
-            >
-              {property.label}
-            </span>
+            {isPropertyActive ? (
+              <span className="invisible text-xs pl-2 pr-1 shrink-0 whitespace-nowrap h-full flex items-center">
+                {property.label}
+              </span>
+            ) : (
+              <button
+                type="button"
+                tabIndex={0}
+                className="text-xs pl-2 pr-1 shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center cursor-pointer hover:text-foreground transition-colors"
+                aria-label={`Change property from ${property.label}`}
+                onFocus={() => handleLabelClick(path)}
+                onClick={() => handleLabelClick(path)}
+              >
+                {property.label}
+              </button>
+            )}
           </div>
         </PopoverAnchor>
         <PopoverContent
@@ -341,7 +348,7 @@ export function FilterCondition({
               className="h-full border-none bg-transparent py-0 px-1 text-center text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
               aria-label={`Operator for ${property.label}`}
               data-testid={`filter-operator-${property.name}`}
-              tabIndex={-1}
+              tabIndex={0}
               autoComplete="off"
               data-1p-ignore
               data-lpignore="true"
@@ -393,7 +400,7 @@ export function FilterCondition({
               )}
               aria-label={`Value for ${property.label}`}
               data-testid={`filter-value-${property.name}`}
-              tabIndex={-1}
+              tabIndex={0}
               autoComplete="off"
               data-1p-ignore
               data-lpignore="true"
