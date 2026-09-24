@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export default function ButtonIcon() {
@@ -7,16 +7,17 @@ export default function ButtonIcon() {
       <TooltipTrigger asChild>
         <Button
           variant="outline"
-          icon={<ChevronRight className="h-4 w-4" />}
-          // Important for screen readers
-          aria-label="Actions"
-          // You can add the following comment so code rabbit knows why we do that
-          // Don't do that if the tooltip actually add more information
-          // Tooltip repeats the label; screen readers would read it twice
+          icon={<ExternalLink />}
+          // Match tooltip content for screen readers
+          aria-label="View logs"
+          // Tooltip repeats the label; clear describedby so screen readers don't hear it twice
+          // Skip this if the tooltip adds information beyond the label
           aria-describedby={undefined}
+          // Square off the tiny button (h-[26px]) and increase the tap target
+          className="hit-area-2 w-6.5"
         ></Button>
       </TooltipTrigger>
-      <TooltipContent>Actions</TooltipContent>
+      <TooltipContent>View logs</TooltipContent>
     </Tooltip>
   )
 }

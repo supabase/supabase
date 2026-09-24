@@ -100,19 +100,17 @@ Used for actions that are not as important as the primary action, or for actions
 
 <ComponentPreview name="button-link" />
 
-### Only an icon
+### Icon-only
 
-Displaying only an Icon in a button.
+Render an [icon](./icons) in a button without accompanying text. Ensure the button is accessible by:
 
-<Admonition type="note" title="This feature requires more support" className="mt-3">
-  We should update the button component to support this use case better.
-</Admonition>
+- Wrapping it in a [Tooltip](./tooltip) for sighted users.
+- Adding an `aria-label` prop for screen readers.
+- Setting its `aria-describedby` prop to `undefined` when the tooltip content repeats the label. Otherwise screen readers read the label twice.
 
-Ensure the button is accessible by:
+Consider also squaring off the button container as shown in the example below. For the default `tiny` size (`h-[26px]`), use `w-6.5` so the button is square. 
 
-- wrapping it in a [`Tooltip`](./tooltip) for sighted users
-- adding an `aria-label` prop for screen readers
-- set its `aria-describedby` prop to `undefined` when the tooltip content repeats the label so screen readers don't read it twice
+Compact icon-only buttons may also benefit from the `hit-area-2` utility. This increases their tap target by `8px` on each side without changing the visual layout. See the [Table](./table#actions) component for more information.
 
 <ComponentPreview name="button-icon" />
 
