@@ -15,12 +15,12 @@ import type { NextPageWithLayout } from '@/types'
 const Audit: NextPageWithLayout = () => {
   return (
     <div className="flex flex-col h-full">
-      <PageHeader size="default">
+      <PageHeader size="full">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Audit Logs</PageHeaderTitle>
             <PageHeaderDescription>
-              View a detailed history of your account activities and security events.
+              Detailed history of your account activities and security events.
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>

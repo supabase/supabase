@@ -4,11 +4,6 @@ import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } fro
 import { formatCompactNumber } from '@/components/ui/DataTable/DataTable.utils'
 import type { AuditLog } from '@/data/organizations/organization-audit-logs-query'
 
-// @tanstack/react-table's ColumnMeta is intentionally empty for consumers to augment via
-// declaration merging; we read our own convention fields off it with a cast instead of a
-// global `declare module` augmentation, since that would apply repo-wide and can silently
-// break excess-property checking for other tables' unrelated meta fields (e.g. Unified Logs'
-// `dataType`) the moment ColumnMeta stops being empty.
 interface AuditLogColumnMeta {
   cellClassName?: string
   headerClassName?: string
@@ -25,6 +20,7 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
 
   return (
     <Table
+      className="table-fixed"
       containerProps={{
         containerClassName: 'h-full',
         className: 'h-full w-full overflow-auto @container',

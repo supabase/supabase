@@ -1,7 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
+import { Box, Boxes } from 'lucide-react'
 import type { MutableRefObject } from 'react'
-import { Checkbox } from 'ui'
+import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TanStackTableHeadSort } from 'ui-patterns/Table'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -16,12 +18,16 @@ interface AuditLogColumnsOptions {
   projects: { ref?: string; name: string }[]
   organizations: { slug?: string; name: string }[]
   lastSelectedRowId: MutableRefObject<string | null>
+  isLoadingProjects: boolean
+  isLoadingOrganizations: boolean
 }
 
 export function getAuditLogColumns({
   projects,
   organizations,
   lastSelectedRowId,
+  isLoadingProjects,
+  isLoadingOrganizations,
 }: AuditLogColumnsOptions): ColumnDef<AuditLog>[] {
   return [
     {
@@ -100,6 +106,78 @@ export function getAuditLogColumns({
       },
     },
     {
+      id: 'target_type',
+      header: '',
+      accessorFn: (log) => log.action.status,
+      cell: ({ row }) => {
+        const log = row.original
+
+        if (log.project_ref || log.organization_slug) {
+          return (
+            <Tooltip>
+              <TooltipTrigger className="flex items-center">
+                {log.project_ref ? (
+                  <Box size={12} className="text-foreground-light" />
+                ) : (
+                  <Boxes size={12} className="text-foreground-light" />
+                )}
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {log.project_ref ? 'Project' : 'Organization'}
+              </TooltipContent>
+            </Tooltip>
+          )
+        } else {
+          return null
+        }
+      },
+      size: 20,
+      minSize: 20,
+      maxSize: 20,
+      meta: {
+        cellClassName: 'w-[20px] min-w-[20px] px-0',
+        headerClassName: 'w-[20px] min-w-[20px] px-0',
+      },
+    },
+    {
+      id: 'target',
+      header: 'Target',
+      accessorFn: (log) => log.project_ref ?? log.organization_slug,
+      cell: ({ row }) => {
+        const log = row.original
+
+        if (log.project_ref && isLoadingProjects)
+          return <ShimmeringLoader className="w-20 h-4 py-0" />
+        if (log.organization_slug && isLoadingOrganizations) {
+          return <ShimmeringLoader className="w-20 h-4 py-0" />
+        }
+
+        let target: string | undefined
+        if (log.project_ref) {
+          target = projects.find((p) => p.ref === log.project_ref)?.name ?? log.project_ref
+        } else if (log.organization_slug) {
+          target =
+            organizations.find((org) => org.slug === log.organization_slug)?.name ??
+            log.organization_slug
+        }
+
+        if (!target) return <span className="text-foreground-light text-xs">-</span>
+
+        return (
+          <p className="truncate text-foreground-light" title={target}>
+            {target}
+          </p>
+        )
+      },
+      size: 120,
+      minSize: 120,
+      maxSize: 120,
+      meta: {
+        cellClassName: 'w-[120px] min-w-[120px]',
+        headerClassName: 'w-[120px] min-w-[120px]',
+      },
+    },
+    {
       id: 'status',
       header: '',
       accessorFn: (log) => log.action.status,
@@ -144,24 +222,12 @@ export function getAuditLogColumns({
         headerClassName: 'min-w-[240px]',
       },
       cell: ({ row }) => {
-        const log = row.original
-        const project = projects.find((p) => p.ref === log.project_ref)
-        const organization = organizations.find((org) => org.slug === log.organization_slug)
-        const name = project?.name ?? organization?.name
-        const ref = log.project_ref ?? log.organization_slug
-
-        let targetScope: 'Project' | 'Organization' | null = null
-        if (project?.name) targetScope = 'Project'
-        else if (organization?.name) targetScope = 'Organization'
-
-        const target = name ? `${name} (${ref})` : ref
-
         return (
           <p
             className="truncate text-foreground-light font-mono tracking-tighter group-hover:text-foreground"
             title={row.original.action.name}
           >
-            {row.original.action.name} {targetScope ? `| ${targetScope}: ${target}` : ''}
+            {row.original.action.name}
           </p>
         )
       },

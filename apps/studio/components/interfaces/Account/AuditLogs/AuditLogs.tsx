@@ -10,7 +10,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
 import { RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, cn, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { cn, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LogsDatePicker } from '../../Settings/Logs/Logs.DatePickers'
@@ -21,13 +21,14 @@ import { AuditLogsSelectionHeader } from './AuditLogsSelectionHeader'
 import { AuditLogsTable } from './AuditLogsTable'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { type AuditLog } from '@/data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from '@/data/profile/profile-audit-logs-query'
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
-const CONTENT_PADDING = 'max-w-[1200px] mx-auto w-full px-6 xl:px-10'
+const CONTENT_PADDING = 'w-full px-6 xl:px-10'
 
 export const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -47,8 +48,8 @@ export const AuditLogs = () => {
 
   const {
     data: projectsData,
-    isLoading: isLoadingProjects,
-    isFetching,
+    isPending: isLoadingProjects,
+    isFetching: isFetchingProjects,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -61,7 +62,7 @@ export const AuditLogs = () => {
     [projectsData?.pages]
   )
 
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: organizations, isPending: isLoadingOrganizations } = useOrganizationsQuery()
   const {
     data,
     error,
@@ -86,8 +87,15 @@ export const AuditLogs = () => {
 
   const lastSelectedRowId = useRef<string | null>(null)
   const columns = useMemo(
-    () => getAuditLogColumns({ projects, organizations: organizations ?? [], lastSelectedRowId }),
-    [projects, organizations]
+    () =>
+      getAuditLogColumns({
+        projects,
+        organizations: organizations ?? [],
+        lastSelectedRowId,
+        isLoadingProjects,
+        isLoadingOrganizations,
+      }),
+    [projects, organizations, isLoadingProjects, isLoadingOrganizations]
   )
   const [sorting, setSorting] = useState<SortingState>([{ id: 'date', desc: true }])
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
@@ -122,7 +130,7 @@ export const AuditLogs = () => {
   }, [dateRange.from, dateRange.to])
 
   return (
-    <ScaffoldContainer className="max-w-auto px-0 h-full flex flex-col">
+    <ScaffoldContainer size="full" className="px-0 h-full flex flex-col">
       <ScaffoldSection isFullWidth className="pt-6! pb-0! flex-1 min-h-0">
         <div className="space-y-4 flex flex-col h-full min-h-0">
           {/* [Joshen] Can consider replacing this with filter bar */}
@@ -145,7 +153,7 @@ export const AuditLogs = () => {
                 setSearch={setSearch}
                 hasNextPage={hasNextPage}
                 isLoading={isLoadingProjects}
-                isFetching={isFetching}
+                isFetching={isFetchingProjects}
                 isFetchingNextPage={isFetchingNextPage}
                 fetchNextPage={fetchNextPage}
               />
@@ -183,13 +191,14 @@ export const AuditLogs = () => {
                 ]}
               />
             </div>
-            <Button
-              disabled={isLoading || isRefetching}
-              icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+            <ButtonTooltip
+              disabled={isLoading}
+              loading={isLoading || isRefetching}
+              className="w-7"
+              icon={<RefreshCw />}
               onClick={() => refetch()}
-            >
-              {isRefetching ? 'Refreshing' : 'Refresh'}
-            </Button>
+              tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
+            />
           </div>
 
           {isLoading && (
