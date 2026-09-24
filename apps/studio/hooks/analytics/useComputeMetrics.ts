@@ -66,6 +66,8 @@ export function useComputeMetrics({ projectRef }: { projectRef?: string }): Comp
     memory: availability.memory ? (metrics?.ram.current ?? null) : null,
     connections: availability.connections && !isConnectionsError ? connections : null,
     isLoading: infraLoading || connectionsLoading,
-    isError,
+    isError:
+      isError ||
+      !!(infraData && 'errors' in infraData && Object.keys(infraData.errors ?? {}).length),
   }
 }
