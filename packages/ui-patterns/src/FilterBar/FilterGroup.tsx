@@ -24,7 +24,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     supportsOperators,
     actions,
     variant,
-    isKeyboardInteraction,
     highlightedConditionPath,
     freeformDefaultProperty,
     handleInputBlur,
@@ -207,11 +206,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onFocus={() => handleGroupFreeformFocus(path)}
                 onBlur={handleFreeformBlur}
                 onKeyDown={handleFreeformKeyDown}
-                className={cn(
-                  'relative m-[3px] border-none bg-transparent text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1',
-                  isKeyboardInteraction &&
-                    'focus-visible:z-10 focus-visible:rounded-sm focus-visible:bg-surface-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring'
-                )}
+                className="relative m-[3px] border-none bg-transparent text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-auto flex-1 h-auto min-w-0 px-2 py-1"
                 placeholder={
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
@@ -231,11 +226,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   onFocus={() => handleGroupFreeformFocus(path)}
                   onBlur={handleFreeformBlur}
                   onKeyDown={handleFreeformKeyDown}
-                  className={cn(
-                    'h-full border-none bg-transparent py-0 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2',
-                    isKeyboardInteraction &&
-                      'focus-visible:rounded-sm focus-visible:bg-surface-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring'
-                  )}
+                  className="h-full border-none bg-transparent py-0 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
                   placeholder="+ Add filter"
                   autoComplete="off"
                   data-1p-ignore

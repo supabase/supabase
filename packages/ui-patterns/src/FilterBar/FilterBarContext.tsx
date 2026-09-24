@@ -41,7 +41,6 @@ export type FilterBarContextValue = {
   isLoading: boolean
   error: string | null
   highlightedConditionPath: number[] | null
-  isKeyboardInteraction: boolean
 
   onFilterChange: (filters: FilterGroup) => void
   commitFilters: (filters: FilterGroup) => void
@@ -129,19 +128,6 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
   ref: React.Ref<FilterBarHandle>
 ) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const [isKeyboardInteraction, setIsKeyboardInteraction] = useState(true)
-
-  useEffect(() => {
-    const handleKeyDown = () => setIsKeyboardInteraction(true)
-    const handlePointerDown = () => setIsKeyboardInteraction(false)
-
-    document.addEventListener('keydown', handleKeyDown, true)
-    document.addEventListener('pointerdown', handlePointerDown, true)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown, true)
-      document.removeEventListener('pointerdown', handlePointerDown, true)
-    }
-  }, [])
 
   // Keep latest onApply in a ref so commitFilters/handleInputBlur don't need to be re-created
   // (and downstream callbacks don't churn) when only the consumer's onApply identity changes.
@@ -385,7 +371,6 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     isLoading: loading,
     error,
     highlightedConditionPath,
-    isKeyboardInteraction,
 
     onFilterChange,
     commitFilters,

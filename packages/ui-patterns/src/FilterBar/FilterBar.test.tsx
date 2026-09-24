@@ -171,40 +171,6 @@ describe('FilterBar', () => {
     expect(input).toBeInTheDocument()
   })
 
-  it('shows local focus styling for keyboard interaction but not pointer focus', async () => {
-    const user = userEvent.setup()
-    render(
-      <FilterBar
-        filterProperties={mockFilterProperties}
-        filters={{
-          logicalOperator: 'AND',
-          conditions: [{ propertyName: 'name', operator: '=', value: 'test' }],
-        }}
-        onFilterChange={mockOnFilterChange}
-        freeformText=""
-        onFreeformTextChange={mockOnFreeformTextChange}
-      />
-    )
-
-    const freeformInput = screen.getByTestId('filter-bar-freeform-input')
-    const valueInput = screen.getByLabelText('Value for Name')
-    const condition = screen.getByTestId('filter-condition-name')
-
-    await user.click(freeformInput)
-    expect(freeformInput).not.toHaveClass('focus-visible:ring-2')
-    await user.keyboard('a')
-    expect(freeformInput).toHaveClass('focus-visible:ring-2', 'focus-visible:rounded-sm')
-
-    await user.click(valueInput)
-    expect(condition).not.toHaveClass('has-[input:focus-visible]:after:border-2')
-    await user.keyboard('{ArrowDown}')
-    expect(condition).toHaveClass(
-      'has-[input:focus-visible]:after:inset-[3px]',
-      'has-[input:focus-visible]:after:rounded-sm',
-      'has-[input:focus-visible]:after:border-2'
-    )
-  })
-
   it('lets keyboard users remove a selected filter', async () => {
     const user = userEvent.setup()
     const onFilterChange = vi.fn()

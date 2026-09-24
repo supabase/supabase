@@ -612,6 +612,12 @@ export const examples: Registry = [
     files: ['example/filter-bar-pill-demo.tsx'],
   },
   {
+    name: 'filter-bar-segmented-demo',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/filter-bar-segmented-demo.tsx'],
+  },
+  {
     name: 'hover-card-demo',
     type: 'components:example',
     registryDependencies: ['hover-card'],

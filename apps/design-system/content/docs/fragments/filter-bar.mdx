@@ -5,21 +5,9 @@ component: true
 fragment: true
 ---
 
-### Segmented
-
 <ComponentPreview
   name="filter-bar-demo"
   description="An advanced filtering component with support for multiple conditions and operators."
-  peekCode
-  showDottedGrid
-  wide
-/>
-
-### Pill
-
-<ComponentPreview
-  name="filter-bar-pill-demo"
-  description="Rounded chips for each filter, as used in Studio."
   peekCode
   showDottedGrid
   wide
@@ -65,6 +53,26 @@ export function FilterDemo() {
 ## Variants
 
 The default variant joins filters into a segmented bar. Use the pill variant to show each filter as a separate rounded chip:
+
+### Segmented
+
+<ComponentPreview
+  name="filter-bar-segmented-demo"
+  description="Filters joined into a segmented bar."
+  peekCode
+  showDottedGrid
+  wide
+/>
+
+### Pill
+
+<ComponentPreview
+  name="filter-bar-pill-demo"
+  description="Rounded chips for each filter, as used in Studio."
+  peekCode
+  showDottedGrid
+  wide
+/>
 
 ```tsx
 <FilterBar variant="pill" className="border-0 bg-transparent overflow-visible" {...props} />

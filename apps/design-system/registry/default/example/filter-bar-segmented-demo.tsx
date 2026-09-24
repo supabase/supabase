@@ -12,15 +12,13 @@ const filterProperties = [
   },
 ]
 
-export default function FilterBarPillDemo() {
+export default function FilterBarSegmentedDemo() {
   const [filters, setFilters] = useState<FilterGroup>({ logicalOperator: 'AND', conditions: [] })
   const [freeformText, setFreeformText] = useState('')
 
   return (
     <div className="w-full">
       <FilterBar
-        variant="pill"
-        className="border-0 bg-transparent overflow-visible"
         filterProperties={filterProperties}
         filters={filters}
         onFilterChange={setFilters}
