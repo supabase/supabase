@@ -450,7 +450,7 @@ A `security definer` function can return rows the caller isn't allowed to read. 
 Pinning the `search_path` doesn't change who can call the function. When a `security definer` function reads per-user data:
 
 - **Check ownership in the function body.** An execute grant controls which roles can call the function. It doesn't limit the rows a permitted role gets back, so granting to `authenticated` still returns any user's row to every signed-in caller.
-- **Narrow the execute privilege as well.** Revoke it from `public` and `anon`, then grant it to the roles that need it. See the [Function privileges](#function-privileges) section of this page.
+- **Narrow the execute privilege as well.** Revoke it from `public` and from each role holding a direct grant, such as `anon`. Then grant it to the roles that need it. See the [Function privileges](#function-privileges) section of this page.
 
 </Admonition>
 
