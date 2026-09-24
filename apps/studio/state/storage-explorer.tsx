@@ -445,6 +445,12 @@ export function createStorageExplorerState({
       } else {
         await state.fetchFoldersByPath({ paths })
       }
+
+      // The archived overlay is part of what the explorer shows, and an archive or a
+      // restore moves an object across that boundary, so both halves refresh together.
+      await getQueryClient().invalidateQueries({
+        queryKey: storageKeys.archivedObjects(state.projectRef, state.selectedBucket?.id),
+      })
     },
 
     refreshAll: async () => {
