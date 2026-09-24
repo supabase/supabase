@@ -1,14 +1,16 @@
 import { Table } from '@tanstack/react-table'
-import { Cable, ChevronDown, Clock, Database } from 'lucide-react'
+import { Cable, Database, Hash, type LucideIcon } from 'lucide-react'
 import { memo } from 'react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { ColumnSchema } from '../../UnifiedLogs.schema'
-import { getRowTimestampMs } from '../../UnifiedLogs.utils'
-import { postgresDetailsFields, postgresPrimaryFields } from '../config/serviceFlowFields'
+import {
+  postgresSessionFields,
+  postgresStatementFields,
+  postgresTransactionFields,
+} from '../config/serviceFlowFields'
 import { BlockFieldConfig } from '../types'
 import { DetailRow } from './shared/DetailRow'
-import { DetailSectionHeader } from './shared/DetailSection'
+import { CollapsibleDetailSection } from './shared/DetailSection'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 interface PostgresFlowDetailProps {
@@ -54,6 +56,16 @@ const FieldDetailRow = ({
   )
 }
 
+const POSTGRES_SECTIONS: {
+  title: string
+  icon: LucideIcon
+  fields: BlockFieldConfig[]
+}[] = [
+  { title: 'Statement', icon: Database, fields: postgresStatementFields },
+  { title: 'Session', icon: Cable, fields: postgresSessionFields },
+  { title: 'Transaction', icon: Hash, fields: postgresTransactionFields },
+]
+
 export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   data,
   enrichedData,
@@ -61,29 +73,17 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   filterFields,
   table,
 }: PostgresFlowDetailProps) {
-  const timestampMs = getRowTimestampMs(data)
-  const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
-
-  const severity: string | undefined =
-    enrichedData?.error_severity ??
-    ((data as Record<string, unknown>)?.error_severity as string | undefined)
-
   return (
     <div>
-      <DetailSectionHeader
-        title="Request started"
-        className="border-b"
-        icon={Clock}
-        summary={formattedTime ?? undefined}
-      />
-
-      <Collapsible defaultOpen className="border-b">
-        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
-          <DetailSectionHeader title="Postgres" icon={Database} />
-          <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          {postgresPrimaryFields.map((field) => (
+      {/* Only the first section starts open; the rest are a click away */}
+      {POSTGRES_SECTIONS.map((section, index) => (
+        <CollapsibleDetailSection
+          key={section.title}
+          title={section.title}
+          icon={section.icon}
+          defaultOpen={index === 0}
+        >
+          {section.fields.map((field) => (
             <FieldDetailRow
               key={field.id}
               config={field}
@@ -94,39 +94,8 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
               table={table}
             />
           ))}
-        </CollapsibleContent>
-      </Collapsible>
-
-      <Collapsible defaultOpen className="border-b">
-        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
-          <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
-          <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          {postgresDetailsFields.map((field) => (
-            <FieldDetailRow
-              key={field.id}
-              config={field}
-              data={data}
-              enrichedData={enrichedData}
-              isLoading={isLoading}
-              filterFields={filterFields}
-              table={table}
-            />
-          ))}
-        </CollapsibleContent>
-      </Collapsible>
-
-      <DetailSectionHeader
-        title="Operation result"
-        icon={Clock}
-        className="border-b"
-        summary={
-          severity ? (
-            <span className="font-mono text-sm uppercase text-foreground">{severity}</span>
-          ) : undefined
-        }
-      />
+        </CollapsibleDetailSection>
+      ))}
     </div>
   )
 })

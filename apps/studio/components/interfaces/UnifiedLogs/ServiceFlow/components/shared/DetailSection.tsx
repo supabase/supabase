@@ -1,6 +1,6 @@
-import { LucideIcon } from 'lucide-react'
+import { ChevronDown, LucideIcon } from 'lucide-react'
 import { ReactNode } from 'react'
-import { cn } from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 type IconComponent =
   | LucideIcon
@@ -32,4 +32,31 @@ export const DetailSectionHeader = ({
       <span className="truncate text-right font-mono text-xs text-foreground">{summary}</span>
     ) : null}
   </div>
+)
+
+interface CollapsibleDetailSectionProps {
+  title: string
+  icon?: IconComponent
+  summary?: ReactNode
+  defaultOpen?: boolean
+  className?: string
+  children: ReactNode
+}
+
+/** A titled group of detail rows that can be collapsed. */
+export const CollapsibleDetailSection = ({
+  title,
+  icon,
+  summary,
+  defaultOpen = true,
+  className,
+  children,
+}: CollapsibleDetailSectionProps) => (
+  <Collapsible defaultOpen={defaultOpen} className={cn('border-b', className)}>
+    <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
+      <DetailSectionHeader title={title} icon={icon} summary={summary} className="min-w-0 flex-1" />
+      <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
+    </CollapsibleTrigger>
+    <CollapsibleContent>{children}</CollapsibleContent>
+  </Collapsible>
 )
