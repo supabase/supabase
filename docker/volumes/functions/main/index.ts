@@ -87,7 +87,7 @@ function resolveRuntimeError(e: unknown): FunctionFailure {
   if (e instanceof Deno.errors.WorkerRequestIdleTimeout) {
     return {
       code: RequestErrors.IdleTimeout,
-      message: 'Request idle timeout limit reached',
+      message: 'Request idle timeout limit (150s) reached',
       status: 504,
     }
   }
