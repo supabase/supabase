@@ -461,9 +461,11 @@ By default, database functions can be executed by any role. There are two main w
     To restrict all new functions, change the default privileges for both `public` _and_ the role you want to restrict:
 
     ```sql
-    alter default privileges in schema public revoke execute on functions from public;
+    alter default privileges revoke execute on functions from public;
     alter default privileges in schema public revoke execute on functions from anon, authenticated;
     ```
+
+    The revoke from `public` has to leave out `in schema public`. A schema-scoped default privilege is merged with Postgres's built-in default instead of replacing it, and the built-in default grants `EXECUTE` to `public` on every new function — so a schema-scoped revoke would silently have no effect. Only the schema-less form replaces that default.
 
     You can then regrant permissions for a specific function to a specific role:
 
