@@ -20,6 +20,7 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { Filter, Sort, SupaTable } from '@/components/grid/types'
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { getAllTableRowsSql } from '@/data/table-rows/table-rows-query'
 import { pluckObjectFields } from '@/lib/helpers'
@@ -50,18 +51,26 @@ export const ExportDialog = ({
   const [selectedTab, setSelectedTab] = useState<string>('csv')
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
+  const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
+
   const primaryDatabase = (databases ?? []).find((db) => db.identifier === projectRef)
+  const sharedPoolerConfig = supavisorConfig?.find((x) => x.identifier === projectRef)
+
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
 
   const connectionInfo = pluckObjectFields(primaryDatabase || emptyState, DB_FIELDS)
-  const { db_host, db_port, db_user, db_name } = connectionInfo
 
   const connectionStrings = getConnectionStrings({
     connectionInfo,
     metadata: { projectRef },
-    // [Joshen] We don't need any pooler details for this context, we only want direct
-    poolingInfo: { connectionString: '', db_host: '', db_name: '', db_port: 0, db_user: '' },
+    poolingInfo: {
+      connectionString: sharedPoolerConfig?.connection_string ?? '',
+      db_host: sharedPoolerConfig?.db_host ?? '',
+      db_name: sharedPoolerConfig?.db_name ?? '',
+      db_port: sharedPoolerConfig?.db_port ?? 0,
+      db_user: sharedPoolerConfig?.db_user ?? '',
+    },
   })
 
   const outputName = `${table?.name}_rows`
@@ -77,11 +86,18 @@ export const ExportDialog = ({
 
   const query = queryWithSemicolon.replace(/;\s*$/, '')
 
+  // Use session pooler (port 5432) for IPv4 compatibility
+  const sessionPoolerPsql = connectionStrings.pooler.psql.replace('6543', '5432')
+
   const csvExportCommand = `
-${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()
+${sessionPoolerPsql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()
+
+  const poolerHost = sharedPoolerConfig?.db_host ?? ''
+  const poolerUser = sharedPoolerConfig?.db_user ?? ''
+  const poolerName = sharedPoolerConfig?.db_name ?? ''
 
   const sqlExportCommand = `
-pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
+pg_dump -h ${poolerHost} -p 5432 -d ${poolerName} -U ${poolerUser} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
   `.trim()
 
   return (
