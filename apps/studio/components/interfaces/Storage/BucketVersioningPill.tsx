@@ -8,7 +8,7 @@ import type { Bucket } from '@/data/storage/buckets-query'
 const COPY = {
   enabled: {
     variant: 'success' as const,
-    tooltip: 'Versioning enabled. Overwriting or deleting a file keeps a recoverable copy.',
+    tooltip: 'Versioning enabled. Overwriting or archiving a file keeps a recoverable copy.',
   },
   suspended: {
     variant: 'warning' as const,
