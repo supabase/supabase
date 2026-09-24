@@ -34,10 +34,10 @@ Prepare your destination, then enable and configure Pipelines in the Dashboard. 
 
 Follow your destination guide to prepare its resources and credentials, and check its source table requirements:
 
-- [BigQuery](/docs/guides/database/replication/bigquery)
-- [ClickHouse](/docs/guides/database/replication/clickhouse)
-- [DuckLake](/docs/guides/database/replication/ducklake)
-- [Snowflake](/docs/guides/database/replication/snowflake)
+- [BigQuery](/docs/guides/database/replication/pipelines/bigquery)
+- [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse)
+- [DuckLake](/docs/guides/database/replication/pipelines/ducklake)
+- [Snowflake](/docs/guides/database/replication/pipelines/snowflake)
 
 ### Step 2: Enable Pipelines
 
@@ -331,7 +331,7 @@ Wait for initial sync to finish before changing its filter; changing a filter do
 
 ## Schema change support
 
-Pipelines applies supported changes to replicated columns as replication progresses. It does not mirror every Postgres DDL operation. Check the supported changes and destination behavior for [BigQuery](/docs/guides/database/replication/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/snowflake#schema-change-support) before altering replicated tables.
+Pipelines applies supported changes to replicated columns as replication progresses. It does not mirror every Postgres DDL operation. Check the supported changes and destination behavior for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#schema-change-support) before altering replicated tables.
 
 Unsupported changes have different outcomes:
 

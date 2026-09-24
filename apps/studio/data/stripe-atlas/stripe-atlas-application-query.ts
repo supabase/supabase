@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { stripeAtlasKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type StripeAtlasApplicationVariables = {
@@ -38,7 +39,7 @@ export const stripeAtlasApplicationQueryOptions = ({
   queryOptions({
     queryKey: stripeAtlasKeys.application(stripeAtlasToken),
     queryFn: ({ signal }) => getStripeAtlasApplication({ stripeAtlasToken }, signal),
-    enabled: typeof stripeAtlasToken !== 'undefined',
+    enabled: IS_PLATFORM && typeof stripeAtlasToken !== 'undefined',
   })
 
 export type CompleteStripeAtlasApplicationVariables =
