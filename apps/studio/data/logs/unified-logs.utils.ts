@@ -12,7 +12,7 @@ type UnifiedLogMetadataRow = {
   event_message?: string | null
 }
 
-const unifiedLogsQueryRowSchema = z.object({
+export const unifiedLogsQueryRowSchema = z.object({
   id: z.string(),
   timestamp: z.union([z.string(), z.number()]),
   log_type: z.string(),
