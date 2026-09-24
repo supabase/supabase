@@ -19,6 +19,7 @@ import {
 } from 'ui'
 
 import { formatHeadingPath, highlightMatches } from './SearchV2.utils'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface SearchV2DialogProps {
   open: boolean
@@ -27,6 +28,7 @@ interface SearchV2DialogProps {
 
 export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
   const router = useRouter()
+  const sendTelemetryEvent = useSendTelemetryEvent()
   const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2()
   const [highlightQuery, setHighlightQuery] = useState('')
 
@@ -54,13 +56,22 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
 
   function handleValueChange(value: string) {
     if (value) {
-      handleDocsSearchDebounced(value)
+      handleDocsSearchDebounced(value, (query) => {
+        sendTelemetryEvent({
+          action: 'docs_search_v2_search_submitted',
+          properties: { query },
+        })
+      })
     } else {
       resetSearch()
     }
   }
 
   function handleSelect(path: string) {
+    sendTelemetryEvent({
+      action: 'docs_search_v2_result_clicked',
+      properties: { resultPath: path, query: highlightQuery },
+    })
     router.push(path)
     onOpenChange(false)
   }

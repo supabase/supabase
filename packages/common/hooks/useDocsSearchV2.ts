@@ -90,10 +90,11 @@ const useDocsSearchV2 = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const key = useRef(0)
 
-  const handleSearch = useCallback(async (query: string) => {
+  const handleSearch = useCallback(async (query: string, onSearch?: (query: string) => void) => {
     key.current += 1
     const localKey = key.current
     dispatch({ type: 'newSearchDispatched', key: localKey })
+    onSearch?.(query.trim())
 
     try {
       const params = new URLSearchParams({ q: query.trim() })
