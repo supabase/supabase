@@ -12,59 +12,7 @@ import {
   SNOWFLAKE_DATABASE_FIELD_COPY,
   SNOWFLAKE_SCHEMA_FIELD_COPY,
 } from '../DestinationFormFieldCopy'
-
-const MAX_PRIVATE_KEY_LENGTH = 10000
-
-const isPrivateKey = (contents: string) => {
-  const match = contents.match(
-    /^\s*-----BEGIN ((?:ENCRYPTED |RSA )?PRIVATE KEY)-----\r?\n([\s\S]*?)\r?\n-----END \1-----\s*$/
-  )
-
-  return match !== null && match[2].trim().length > 0
-}
-
-const readPrivateKeyFile = async (
-  file: File,
-  form: UseFormReturn<DestinationPanelSchemaType>,
-  isCurrentRequest: () => boolean
-) => {
-  if (file.size > MAX_PRIVATE_KEY_LENGTH) {
-    if (isCurrentRequest()) {
-      form.setError('snowflakePrivateKey', {
-        message: 'Private key must be 10,000 characters or fewer.',
-      })
-    }
-    return
-  }
-
-  try {
-    const contents = await file.text()
-    if (!isCurrentRequest()) return
-
-    if (contents.length > MAX_PRIVATE_KEY_LENGTH) {
-      form.setError('snowflakePrivateKey', {
-        message: 'Private key must be 10,000 characters or fewer.',
-      })
-      return
-    }
-
-    if (!isPrivateKey(contents)) {
-      form.setError('snowflakePrivateKey', { message: 'Select a P8 or PEM private key.' })
-      return
-    }
-
-    form.setValue('snowflakePrivateKey', contents, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true,
-    })
-    form.clearErrors('snowflakePrivateKey')
-  } catch {
-    if (isCurrentRequest()) {
-      form.setError('snowflakePrivateKey', { message: 'Could not read the selected private key.' })
-    }
-  }
-}
+import { MAX_PRIVATE_KEY_LENGTH, readPrivateKeyFile } from './Snowflake.utils'
 
 export const SnowflakeFields = ({
   form,
@@ -213,7 +161,7 @@ export const SnowflakeFields = ({
               description={
                 editMode
                   ? 'Stored private key is hidden. Enter a new private key to replace it.'
-                  : 'Paste or upload a complete RSA private key in PKCS #8 or PKCS #1 PEM format.'
+                  : 'Paste or upload a complete RSA private key (PKCS #8 or PKCS #1 PEM).'
               }
             >
               <div

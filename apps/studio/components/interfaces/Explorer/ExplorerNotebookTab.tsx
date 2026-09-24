@@ -68,6 +68,7 @@ import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useExplorerDeleteItem } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import {
   evictNotebookFromCaches,
   hasDiscardableChanges,
@@ -85,6 +86,8 @@ import {
   useCurrentNotebook,
   useNotebooksStateSnapshot,
 } from '@/state/notebooks/notebooks-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNotebookTab = () => {
@@ -269,6 +272,10 @@ export const ExplorerNotebookTab = () => {
     persistNotebook()
   }
 
+  useShortcut(SHORTCUT_IDS.EXPLORER_NOTEBOOK_SAVE, handleSaveNotebook, {
+    enabled: !!content && !isUpdating,
+  })
+
   const handleSaveAnyway = () => {
     setIsSaveConflictOpen(false)
     persistNotebook()
@@ -392,13 +399,18 @@ export const ExplorerNotebookTab = () => {
           >
             Analyze
           </ExplorerToolbarAction>
-          <ExplorerToolbarAction
-            aria-label="Save changes"
-            icon={<Save size={16} strokeWidth={2} />}
-            tooltip="Save changes"
-            loading={isUpdating}
-            onClick={handleSaveNotebook}
-          />
+          <ShortcutTooltip
+            side="bottom"
+            shortcutId={SHORTCUT_IDS.EXPLORER_NOTEBOOK_SAVE}
+            label="Save changes"
+          >
+            <ExplorerToolbarAction
+              aria-label="Save changes"
+              icon={<Save size={16} strokeWidth={2} />}
+              loading={isUpdating}
+              onClick={handleSaveNotebook}
+            />
+          </ShortcutTooltip>
           <ExplorerToolbarActions>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

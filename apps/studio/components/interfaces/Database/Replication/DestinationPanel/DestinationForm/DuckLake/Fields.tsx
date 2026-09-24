@@ -415,6 +415,7 @@ const DuckLakeCustomFields = ({
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
+                        aria-label="Toggle catalog URL"
                         className="w-7"
                         icon={showCatalogUrl ? <Eye /> : <EyeOff />}
                         onClick={() => setShowCatalogUrl(!showCatalogUrl)}
@@ -526,6 +527,7 @@ const DuckLakeCustomFields = ({
                 />
               </FormControl>
               <Button
+                aria-label="Toggle show secret access key"
                 icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
                 className="w-7 absolute right-6 top-[4px]"
                 onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
