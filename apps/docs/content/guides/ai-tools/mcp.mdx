@@ -133,11 +133,11 @@ There are some situations where you might want to manually authenticate the MCP 
 
 ### CI environment
 
-To authenticate the MCP server in a CI environment, you can create a personal access token (PAT) with the necessary scopes and pass it as a header to the MCP server.
+To authenticate the MCP server in a CI environment, create a scoped personal access token (PAT) and pass it as a header to the MCP server. A scoped token can only call the MCP tools its permissions unlock. See [MCP tools](/docs/guides/platform/personal-access-tokens#mcp-tools) for the permission each tool requires.
 
 1. Production projects can contain sensitive data. Before connecting one, scope the server to that project, enable [read-only mode](#configuration-options), restrict the available feature groups, and review the [security risks](#security-risks).
 
-1. Navigate to your Supabase [access tokens](/dashboard/account/tokens) and generate a new token. Name the token based on its purpose, e.g. "Example App MCP CI token".
+1. Navigate to your Supabase [access tokens](/dashboard/account/tokens) and generate a new token. Name the token based on its purpose, e.g. "Example App MCP CI token". Scope it to the project the server connects to and grant only the permissions the tools you enable require.
 
 1. Pass the token to the `Authorization` header in your MCP server configuration. For example if you are using [Claude Code](https://docs.claude.com/en/docs/claude-code/github-actions), your MCP server configuration might look like this:
 

@@ -3,12 +3,6 @@ title: 'Personal Access Tokens'
 description: 'Scope personal access tokens to specific organizations, projects, and permissions'
 ---
 
-<Admonition type="caution">
-
-Scoped personal access tokens are in **public alpha** and rolling out gradually. If you don't see the option to choose permissions when creating a token, your account doesn't have access yet. File a [support ticket](https://supabase.help) to get early access.
-
-</Admonition>
-
 Personal access tokens (PATs) authenticate you to the [Management API](/docs/reference/api/introduction) and the tools built on it, like the Supabase CLI and the [MCP server](/docs/guides/ai-tools/mcp). They come in two flavors:
 
 - **Classic tokens** carry your account's full access. That means every permission, on every organization and every project you belong to today, and on every one you create or join in the future. A classic token created a year ago can touch a project you created today.
@@ -47,6 +41,19 @@ curl -i "https://api.supabase.com/v1/projects/your-project-ref/types/typescript"
 ```
 
 The tables below list which permission unlocks which endpoints, and which permission each [MCP tool](#mcp-tools) requires, so you can grant exactly what a workflow needs.
+
+## Use a scoped personal access token with the Supabase CLI
+
+The browser flow of `supabase login` creates a classic token. To run the CLI with a scoped token instead, set it in the `SUPABASE_ACCESS_TOKEN` environment variable, or save it with `supabase login --token`. The environment variable takes precedence over any saved token, which also makes it the right choice for CI.
+
+```bash
+export SUPABASE_ACCESS_TOKEN="sbp_fc..."
+
+# Lists only the projects the token can reach
+supabase projects list
+```
+
+Commands that call the Management API fail with a permission error when the token lacks the permission. Database commands that connect with your database password, such as `supabase db push` with `SUPABASE_DB_PASSWORD` set, aren't limited by the token's permissions.
 
 ## Permission scopes
 
