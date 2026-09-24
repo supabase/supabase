@@ -1,6 +1,6 @@
-import { useFeatureFlags, useFlag, useParams } from 'common'
+import { useFeatureFlags, useParams } from 'common'
 import { Loader2, ThumbsUp } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -40,13 +40,14 @@ import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
   instanceSize?: DesiredInstanceSize
   layout?: 'vertical' | 'horizontal'
+  showBestAvailableRegionOption: boolean
+  isBestAvailableSelected: boolean
+  onBestAvailableSelectedChange: (value: boolean) => void
 }
 
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
@@ -79,6 +80,9 @@ export const RegionSelector = ({
   form,
   instanceSize,
   layout = 'horizontal',
+  showBestAvailableRegionOption,
+  isBestAvailableSelected,
+  onBestAvailableSelectedChange,
 }: RegionSelectorProps) => {
   const { slug } = useParams()
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
@@ -88,16 +92,6 @@ export const RegionSelector = ({
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
-
-  // [Joshen] Temp experiment - to clean up once completed
-  const showBestAvailableRegionFeature = useIsFeatureEnabled(
-    'project_creation:show_best_available_region'
-  )
-  const showBestAvailableRegionFlag = useFlag('showBestAvailableRegion')
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isFreePlan = organization?.plan.id === 'free'
-  const showBestAvailableRegionOption =
-    showBestAvailableRegionFeature && showBestAvailableRegionFlag && isFreePlan
 
   const { getRegionRestriction } = useRegionRestriction()
 
@@ -132,9 +126,6 @@ export const RegionSelector = ({
     (x) => x.code === recommendedSmartRegions.values().next().value
   )
 
-  // [Joshen] Tracks whether the user picked the "Best available region" shortcut, so the
-  // trigger can keep showing that label instead of the specific region it resolves to.
-  const [isBestAvailableSelected, setIsBestAvailableSelected] = useState(false)
   const isBestAvailableActive =
     isBestAvailableSelected && showBestAvailableRegionOption && !!recommendedSmartRegion
 
@@ -144,9 +135,9 @@ export const RegionSelector = ({
   useEffect(() => {
     if (hasUserSelectedRegionRef.current) return
     if (showBestAvailableRegionOption && recommendedSmartRegion) {
-      setIsBestAvailableSelected(true)
+      onBestAvailableSelectedChange(true)
     }
-  }, [showBestAvailableRegionOption, recommendedSmartRegion])
+  }, [showBestAvailableRegionOption, recommendedSmartRegion, onBestAvailableSelectedChange])
   const recommendedSpecificRegions = new Set(
     availableRegionsData?.recommendations.specific.map((region) => region.code)
   )
@@ -288,10 +279,10 @@ export const RegionSelector = ({
                       hasUserSelectedRegionRef.current = true
                       if (value === 'best_available') {
                         if (!recommendedSmartRegion) return
-                        setIsBestAvailableSelected(true)
+                        onBestAvailableSelectedChange(true)
                         field.onChange(recommendedSmartRegion.name)
                       } else {
-                        setIsBestAvailableSelected(false)
+                        onBestAvailableSelectedChange(false)
                         field.onChange(value)
                       }
                     }}
