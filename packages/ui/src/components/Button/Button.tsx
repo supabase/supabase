@@ -200,7 +200,7 @@ export interface ButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     // omit 'disabled' as it is included in HTMLButtonElement
-    Omit<ButtonVariantProps, 'disabled'>,
+    Omit<ButtonVariantProps, 'disabled' | 'iconOnly'>,
     LoadingVariantProps {
   asChild?: boolean
   variant?: ButtonVariantProps['variant']
@@ -284,7 +284,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             focusableWhenDisabled,
             block,
             rounded,
-            iconOnly: children == null,
+            iconOnly: children == null || children === false,
           }),
           className
         )}
