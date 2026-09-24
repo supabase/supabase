@@ -84,7 +84,7 @@ export const DeleteWrapperModal = () => {
     >
       <AlertDialogContent size="medium">
         <AlertDialogHeader>
-          <AlertDialogTitle>{`Delete ${selectedWrapper?.name} connection?`}</AlertDialogTitle>
+          <AlertDialogTitle>{`Delete connection ${selectedWrapper?.server_name}?`}</AlertDialogTitle>
           <AlertDialogDescription>
             This deletes this connection and its foreign tables. If this is the last connection
             using the wrapper, its Vault secret and wrapper are also removed.

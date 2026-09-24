@@ -49,6 +49,9 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
     <TableRow>
       <TableCell className="gap-2 align-top py-3! min-w-80">
         {wrapper.name}
+        <p className="text-sm text-foreground-light">
+          Connection: <code className="text-code-inline">{wrapper.server_name}</code>
+        </p>
         {isShared && (
           <p className="text-sm text-foreground-light">
             This wrapper is shared. To edit this connection, use <code>ALTER SERVER</code> on{' '}
