@@ -2,7 +2,7 @@ import { LucideIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { cn } from 'ui'
 
-type IconComponent =
+export type IconComponent =
   | LucideIcon
   | React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>
 
