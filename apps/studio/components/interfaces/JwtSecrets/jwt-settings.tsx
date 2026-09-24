@@ -196,7 +196,7 @@ export const JWTSettings = () => {
                       </p>
                     )}
 
-                    <Button asChild variant="default" icon={<ExternalLink />} className="mt-2">
+                    <Button asChild icon={<ExternalLink />} className="mt-2">
                       <Link href={`/project/${projectRef}/settings/api-keys`}>Go to API keys</Link>
                     </Button>
                   </Admonition>
@@ -364,7 +364,7 @@ export const JWTSettings = () => {
 
                   <div className="flex flex-row gap-x-2 mt-4">
                     {disableLegacyJwtSecretRotation ? (
-                      <Button variant="default" icon={<ExternalLink className="size-4" />} asChild>
+                      <Button icon={<ExternalLink className="size-4" />} asChild>
                         <Link
                           href={`${DOCS_URL}/guides/auth/signing-keys#getting-started`}
                           target="_blank"
@@ -378,7 +378,6 @@ export const JWTSettings = () => {
                         <DropdownMenuTrigger asChild>
                           <ButtonTooltip
                             disabled={!canGenerateNewJWTSecret}
-                            variant="default"
                             iconRight={<ChevronDown size={14} />}
                             loading={isUpdatingJwtSecret}
                             tooltip={{
@@ -437,14 +436,14 @@ export const JWTSettings = () => {
       >
         <ul className="space-y-4 text-sm">
           <li className="flex gap-2 bg border rounded-md p-4">
-            <Lightbulb size={24} className="shrink-0 text-brand" />
+            <Lightbulb size={24} className="shrink-0 text-primary" />
 
             <div className="flex flex-col gap-2">
               <p>Use new JWT Signing Keys and API Keys instead</p>
               <p className="text-foreground-light">
                 Consider using a combination of the JWT Signing Keys and API Keys features to
                 achieve the same effect.{' '}
-                <em className="text-brand not-italic">
+                <em className="text-primary not-italic">
                   Some or all of the warnings listed below might not apply when using these features
                 </em>
                 .
@@ -562,7 +561,6 @@ export const JWTSettings = () => {
           </DialogSection>
           <DialogFooter>
             <Button
-              variant="default"
               onClick={() => {
                 setIsCreatingKey(false)
                 setCustomToken('')

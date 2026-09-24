@@ -132,6 +132,16 @@ const nextConfig = {
    */
   async redirects() {
     return [
+      {
+        source: '/guides/observability/access-data',
+        destination: '/guides/observability',
+        permanent: true,
+      },
+      {
+        source: '/guides/observability/access-data.md',
+        destination: '/guides/observability.md',
+        permanent: true,
+      },
       // Redirect root to docs base path in dev/preview envs
       {
         source: '/',
@@ -157,6 +167,26 @@ const nextConfig = {
       },
 
       // Redirect old managed pipeline slugs in dev/preview envs
+      {
+        source: '/guides/database/replication/bigquery',
+        destination: '/guides/database/replication/pipelines/bigquery',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/clickhouse',
+        destination: '/guides/database/replication/pipelines/clickhouse',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/ducklake',
+        destination: '/guides/database/replication/pipelines/ducklake',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/snowflake',
+        destination: '/guides/database/replication/pipelines/snowflake',
+        permanent: true,
+      },
       {
         source: '/guides/database/replication/external-replication-setup',
         destination: '/guides/database/replication/pipelines',
@@ -187,6 +217,16 @@ const nextConfig = {
         destination: '/guides/database/replication/pipelines-faq',
         permanent: true,
       },
+      {
+        source: '/guides/database/inspect',
+        destination: '/guides/monitoring-and-debugging/inspect',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/database-advisors',
+        destination: '/guides/observability/advisors',
+        permanent: true,
+      },
     ]
   },
   typescript: {
@@ -213,6 +253,9 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'docs',
+  unstable_sentryWebpackPluginOptions: {
+    applicationKey: 'supabase-docs',
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

@@ -8,7 +8,7 @@ import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import {
   EDGE_FUNCTION_REGIONS,
   REPORT_DATERANGE_HELPER_LABELS,
@@ -162,7 +162,6 @@ const EdgeFunctionsUsage = () => {
                 side="bottom"
               >
                 <Button
-                  variant="default"
                   disabled={isRefreshing}
                   icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"

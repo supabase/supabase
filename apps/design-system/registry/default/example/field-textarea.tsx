@@ -1,11 +1,4 @@
-import { Textarea } from 'ui'
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-} from 'ui/src/components/shadcn/ui/field'
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet, Textarea } from 'ui'
 
 export default function FieldTextarea() {
   return (

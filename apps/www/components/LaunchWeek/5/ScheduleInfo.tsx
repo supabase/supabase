@@ -1,5 +1,5 @@
-import { Button } from 'ui'
 import Link from 'next/link'
+import { Button } from 'ui'
 
 export function ScheduleInfo() {
   return (
@@ -22,7 +22,7 @@ export function ScheduleInfo() {
           </p>
         </div>
         <div className="px-10">
-          <Button asChild variant="default">
+          <Button asChild>
             <Link href="/launch-week-register">Get a ticket</Link>
           </Button>
         </div>

@@ -1,9 +1,11 @@
-import { screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { describe, expect, test, vi } from 'vitest'
+import { HttpResponse } from 'msw'
+import { useState } from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { render } from '../../helpers'
 import { PREVIEWER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
@@ -13,11 +15,118 @@ import {
   generateHelpersFromInput,
   parseCustomInput,
 } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
-import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import {
+  LogsDatePicker,
+  type DatePickerValue,
+} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
+
+beforeEach(() => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: () =>
+      HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 }),
+  })
+})
+
+describe('inline and popover date-picker state', () => {
+  const initialRange = {
+    from: '2026-08-01T01:02:03.000Z',
+    to: '2026-08-02T04:05:06.000Z',
+  }
+  const selectedRange = {
+    from: '2026-09-10T07:08:09.000Z',
+    to: '2026-09-11T10:11:12.000Z',
+  }
+
+  test.each(['inline', 'popover'] as const)(
+    '%s applies the newly selected helper dates and times',
+    async (variant) => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+      function Picker() {
+        const [value, setValue] = useState<DatePickerValue>(initialRange)
+        return (
+          <LogsDatePicker
+            variant={variant}
+            value={value}
+            helpers={[
+              {
+                text: 'Selected range',
+                calcFrom: () => selectedRange.from,
+                calcTo: () => selectedRange.to,
+              },
+            ]}
+            onSubmit={(next) => {
+              setValue(next)
+              onSubmit(next)
+            }}
+          />
+        )
+      }
+      customRender(<Picker />)
+      if (variant === 'popover') await user.click(screen.getByRole('button'))
+      await user.click(screen.getByText('Selected range'))
+      expect(onSubmit).toHaveBeenLastCalledWith({
+        ...selectedRange,
+        isHelper: true,
+        text: 'Selected range',
+      })
+      if (variant === 'popover') {
+        await user.click(screen.getByRole('button', { name: 'Selected range' }))
+      }
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+      expect(onSubmit).toHaveBeenLastCalledWith({ ...selectedRange, isHelper: false })
+    }
+  )
+
+  test.each(['inline', 'popover'] as const)(
+    '%s only handles document clipboard events when it is a popover',
+    async (variant) => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+      customRender(
+        <LogsDatePicker
+          variant={variant}
+          open
+          value={initialRange}
+          helpers={[]}
+          onSubmit={onSubmit}
+        />
+      )
+      await navigator.clipboard.writeText('Unrelated text')
+      fireEvent.copy(document)
+      if (variant === 'popover') {
+        await waitFor(async () => {
+          expect(await navigator.clipboard.readText()).toBe(JSON.stringify(initialRange))
+        })
+      } else {
+        expect(await navigator.clipboard.readText()).toBe('Unrelated text')
+      }
+
+      await navigator.clipboard.writeText(JSON.stringify(selectedRange))
+      fireEvent.paste(document)
+      if (variant === 'popover') {
+        await waitFor(() => {
+          expect(screen.getAllByLabelText('Hours')[0]).toHaveValue(
+            new Date(selectedRange.from).getHours().toString()
+          )
+        })
+      }
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+      expect(onSubmit).toHaveBeenLastCalledWith({
+        ...(variant === 'popover' ? selectedRange : initialRange),
+        isHelper: false,
+      })
+    }
+  )
+})
 
 describe('parseCustomInput', () => {
   test('returns invalid for empty input', () => {
@@ -66,6 +175,12 @@ describe('parseCustomInput', () => {
   test('returns invalid for zero or negative', () => {
     expect(parseCustomInput('0')).toEqual({ type: 'invalid' })
     expect(parseCustomInput('-5')).toEqual({ type: 'invalid' })
+  })
+
+  test('returns invalid for amounts that fall outside the representable date range', () => {
+    expect(parseCustomInput('999999999')).toEqual({ type: 'invalid' })
+    expect(parseCustomInput('999999999d')).toEqual({ type: 'invalid' })
+    expect(parseCustomInput('99999999')).toEqual({ type: 'number', value: 99999999 })
   })
 })
 
@@ -124,6 +239,16 @@ describe('generateHelpersFromInput', () => {
     const helpers = generateHelpersFromInput('2h')
     expect(helpers).toHaveLength(1)
     expect(helpers![0].text).toBe('Last 2 hours')
+  })
+
+  test('never returns a helper whose calcFrom throws', () => {
+    expect(generateHelpersFromInput('999999999')).toBeNull()
+
+    const helpers = generateHelpersFromInput('99999999')
+    expect(helpers).not.toBeNull()
+    for (const helper of helpers!) {
+      expect(() => helper.calcFrom()).not.toThrow()
+    }
   })
 })
 

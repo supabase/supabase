@@ -132,7 +132,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               </div>
               <div
                 className={cn(
-                  'relative w-full bg-brand',
+                  'relative w-full bg-brand-default',
                   'border rounded-lg overflow-hidden',
                   'mx-auto max-w-3xl',
                   'flex items-center justify-center',
@@ -227,12 +227,12 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               {(feature.docsUrl || feature.blogUrl) && (
                 <div className="flex flex-wrap gap-2">
                   {feature.docsUrl && (
-                    <Button variant="default" iconRight={<ChevronRight />} asChild>
+                    <Button iconRight={<ChevronRight />} asChild>
                       <Link href={feature.docsUrl}>Read Documentation</Link>
                     </Button>
                   )}
                   {feature.blogUrl && (
-                    <Button variant="default" iconRight={<ChevronRight />} asChild>
+                    <Button iconRight={<ChevronRight />} asChild>
                       <Link href={feature.blogUrl}>Read Blog Post</Link>
                     </Button>
                   )}
