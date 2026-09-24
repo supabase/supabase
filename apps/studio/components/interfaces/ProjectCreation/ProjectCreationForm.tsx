@@ -35,6 +35,7 @@ import {
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
+  resolveSelectedRegionOptionType,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
@@ -354,13 +355,12 @@ export const ProjectCreationForm = ({
       const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
       const submittedDbRegion = form.getValues('dbRegion')
       const selectedRegionOption = isBestAvailableSelected ? 'best_available' : submittedDbRegion
-      const selectedRegionOptionType: 'general' | 'specific' | undefined = isBestAvailableSelected
-        ? 'general'
-        : smartGroup.some((region) => region.name === submittedDbRegion)
-          ? 'general'
-          : specific.some((region) => region.name === submittedDbRegion)
-            ? 'specific'
-            : undefined
+      const selectedRegionOptionType = resolveSelectedRegionOptionType({
+        isBestAvailableSelected,
+        dbRegion: submittedDbRegion,
+        smartGroupRegions: smartGroup,
+        specificRegions: specific,
+      })
       track(
         'project_creation_simple_version_submitted',
         {

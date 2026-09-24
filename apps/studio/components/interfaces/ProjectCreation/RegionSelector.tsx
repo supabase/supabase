@@ -76,6 +76,12 @@ const getDisplayNameForSmartRegion = (name: string): string => {
 
 const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 
+const BestAvailableRegionIcon = () => (
+  <div className="w-5 border border-brand-500 h-4.5 rounded-[3px] bg-brand-300 flex items-center justify-center">
+    <ThumbsUp size={10} className="text-brand" />
+  </div>
+)
+
 export const RegionSelector = ({
   form,
   instanceSize,
@@ -126,18 +132,29 @@ export const RegionSelector = ({
     (x) => x.code === recommendedSmartRegions.values().next().value
   )
 
-  const isBestAvailableActive =
-    isBestAvailableSelected && showBestAvailableRegionOption && !!recommendedSmartRegion
+  const isBestAvailableOptionShown = showBestAvailableRegionOption && !!recommendedSmartRegion
+  const isBestAvailableActive = isBestAvailableSelected && isBestAvailableOptionShown
 
   // Defaults free orgs to the "Best available region" shortcut once the recommendation loads,
   // unless the user has already interacted with the region field themselves.
   const hasUserSelectedRegionRef = useRef(false)
   useEffect(() => {
     if (hasUserSelectedRegionRef.current) return
-    if (showBestAvailableRegionOption && recommendedSmartRegion) {
+    if (isBestAvailableOptionShown) {
       onBestAvailableSelectedChange(true)
     }
-  }, [showBestAvailableRegionOption, recommendedSmartRegion, onBestAvailableSelectedChange])
+  }, [isBestAvailableOptionShown, onBestAvailableSelectedChange])
+
+  // Keeps dbRegion following the recommendation while "Best available" is active, so a
+  // recommendation change (e.g. after a refetch) doesn't leave the form submitting a stale
+  // region behind a label that still reads "Best available region".
+  useEffect(() => {
+    if (!isBestAvailableSelected || !recommendedSmartRegion) return
+    if (dbRegion !== recommendedSmartRegion.name) {
+      form.setValue('dbRegion', recommendedSmartRegion.name)
+    }
+  }, [isBestAvailableSelected, recommendedSmartRegion, dbRegion, form])
+
   const recommendedSpecificRegions = new Set(
     availableRegionsData?.recommendations.specific.map((region) => region.code)
   )
@@ -304,9 +321,7 @@ export const RegionSelector = ({
                           <div className="flex items-center gap-x-3">
                             {isLoading && <Loader2 size={14} className="animate-spin" />}
                             {isBestAvailableActive ? (
-                              <div className="w-5 border border-brand-500 h-4.5 rounded-[3px] bg-brand-300 flex items-center justify-center">
-                                <ThumbsUp size={10} className="text-brand" />
-                              </div>
+                              <BestAvailableRegionIcon />
                             ) : (
                               selectedRegion?.code && (
                                 <RegionFlag className="w-5" region={selectedRegion.code} />
@@ -318,7 +333,7 @@ export const RegionSelector = ({
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      {showBestAvailableRegionOption && !!recommendedSmartRegion && (
+                      {isBestAvailableOptionShown && (
                         <>
                           <SelectGroup>
                             <SelectLabel>Recommendation</SelectLabel>
@@ -328,9 +343,7 @@ export const RegionSelector = ({
                             >
                               <div className="flex flex-row items-center justify-between w-full">
                                 <div className="flex items-center gap-x-3">
-                                  <div className="w-5 border border-brand-500 h-4.5 rounded-[3px] bg-brand-300 flex items-center justify-center">
-                                    <ThumbsUp size={10} className="text-brand" />
-                                  </div>
+                                  <BestAvailableRegionIcon />
                                   <span className="text-foreground">Best available region</span>
                                 </div>
                               </div>
@@ -359,7 +372,7 @@ export const RegionSelector = ({
                                     </div>
 
                                     <div>
-                                      {!showBestAvailableRegionOption &&
+                                      {!isBestAvailableOptionShown &&
                                         recommendedSmartRegions.has(value.code) && (
                                           <Badge variant="success" className="mr-1">
                                             Recommended
@@ -404,7 +417,7 @@ export const RegionSelector = ({
                                   </div>
                                 </div>
 
-                                {!showBestAvailableRegionOption &&
+                                {!isBestAvailableOptionShown &&
                                   recommendedSpecificRegions.has(value.code) && (
                                     <Badge variant="success" className="mr-1">
                                       Recommended
