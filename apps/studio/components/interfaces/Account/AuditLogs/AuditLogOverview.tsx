@@ -13,6 +13,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 import {
   TIMESTAMP_MICROS_PER_MS,
   type AuditLog,
@@ -23,26 +24,6 @@ interface AuditLogOverviewProps {
 }
 
 type IconComponent = typeof Clock
-
-const DetailSectionHeader = ({
-  title,
-  icon: Icon,
-  summary,
-}: {
-  title: string
-  icon: IconComponent
-  summary?: ReactNode
-}) => (
-  <div className="flex h-9 items-center justify-between gap-3 px-4">
-    <div className="flex min-w-0 items-center gap-2">
-      <Icon size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-      <span className="truncate text-xs uppercase tracking-wider text-foreground-light font-mono">
-        {title}
-      </span>
-    </div>
-    {summary}
-  </div>
-)
 
 const DetailRow = ({
   label,

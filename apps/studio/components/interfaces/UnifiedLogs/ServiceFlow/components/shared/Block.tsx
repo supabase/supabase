@@ -5,7 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { BlockFieldConfig, BlockFieldProps, ServiceFlowBlockProps } from '../../types'
 import { DetailRow } from './DetailRow'
-import { DetailSectionHeader } from './DetailSection'
+import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 
 interface BlockSection {
   title: string
