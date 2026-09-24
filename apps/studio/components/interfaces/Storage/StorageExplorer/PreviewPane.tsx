@@ -232,6 +232,7 @@ export const PreviewPane = () => {
     openedFolders,
     setSelectedItemsToDelete,
     setItemToPurge,
+    refetchAllOpenedFolders,
     setSelectedFileCustomExpiry,
     downloadFile,
   } = useStorageExplorerStateSnapshot()
@@ -276,9 +277,10 @@ export const PreviewPane = () => {
   })
 
   const { mutate: restoreVersion, isPending: isRestoring } = useObjectVersionRestoreMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Version restored as the current version')
       setPreviewedVersion(undefined)
+      await refetchAllOpenedFolders()
     },
   })
 
