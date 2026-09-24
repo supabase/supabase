@@ -10,6 +10,7 @@ import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
+  describeUploadFailure,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
   getStorageExplorerUrlForItem,
@@ -474,5 +475,36 @@ describe('getStorageItemPath', () => {
     expect(getStorageItemPath({ openedFolders }, { name: 'notes.txt', columnIndex: 1 })).toBe(
       'images/notes.txt'
     )
+  })
+})
+
+describe('describeUploadFailure', () => {
+  it('names the allowed types when the bucket rejects the mime type', () => {
+    expect(
+      describeUploadFailure({
+        status: 415,
+        fallback: 'tus: unexpected response',
+        allowedMimeTypes: ['image/png', 'image/jpeg'],
+      })
+    ).toBe(
+      'that file type is not allowed in this bucket. Allowed MIME types: image/png, image/jpeg.'
+    )
+  })
+
+  it('omits the list when the bucket allows everything', () => {
+    expect(describeUploadFailure({ status: 415, fallback: 'tus: unexpected response' })).toBe(
+      'that file type is not allowed in this bucket.'
+    )
+  })
+
+  it('explains a size rejection', () => {
+    expect(describeUploadFailure({ status: 413, fallback: 'tus: unexpected response' })).toBe(
+      'the file exceeds the bucket file size limit.'
+    )
+  })
+
+  it('falls back to the raw message for anything else', () => {
+    expect(describeUploadFailure({ status: 500, fallback: 'network down' })).toBe('network down')
+    expect(describeUploadFailure({ fallback: 'network down' })).toBe('network down')
   })
 })
