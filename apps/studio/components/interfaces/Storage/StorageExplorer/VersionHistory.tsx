@@ -30,6 +30,7 @@ import {
   type ObjectVersion,
 } from '@/data/storage/versioning/object-versions-query'
 import { formatBytes } from '@/lib/helpers'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 /** Version IDs are long opaque strings; show enough to tell two rows apart. */
 export const shortVersion = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
@@ -161,10 +162,17 @@ export const VersionHistory = ({
     isSuccess,
   } = useQuery(objectVersionsQueryOptions({ projectRef, bucketId, path, lifecyclePolicy }))
 
+  const { refetchAllOpenedFolders } = useStorageExplorerStateSnapshot()
+
   const [versionToDelete, setVersionToDelete] = useState<ObjectVersion>()
 
   const { mutate: restoreVersion, isPending: isRestoring } = useObjectVersionRestoreMutation({
-    onSuccess: () => toast.success('Version restored as the current version'),
+    onSuccess: async () => {
+      toast.success('Version restored as the current version')
+      // The object's size, type and modified date all change with it, and the row
+      // showing them is the explorer's own state.
+      await refetchAllOpenedFolders()
+    },
   })
 
   const { mutate: deleteVersion, isPending: isDeleting } = useObjectVersionDeleteMutation({
