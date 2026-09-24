@@ -4,6 +4,8 @@ import {
   getFacetCountQuery,
   getLogsChartQuery,
   getLogsCountQuery,
+  getRequestCorrelationIds,
+  getRequestTimelineQuery,
   getUnifiedLogsQuery,
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
@@ -580,5 +582,57 @@ describe('pathname ILIKE prefix matching (cross-builder)', () => {
     // "contains" pattern.
     expect(clickhouseSql).not.toContain(`'%foo%%'`)
     expect(bqSql).not.toContain("LOWER('%foo%%')")
+  })
+})
+
+describe('request timeline', () => {
+  it('reads request and execution IDs from the keys each source sets', () => {
+    expect(
+      getRequestCorrelationIds([
+        { source: 'edge_logs', attributes: { 'request.headers.cf_ray': '8f00aa-IAD' } },
+        { source: 'auth_logs', attributes: { request_id: '8f00aa-IAD' } },
+        {
+          source: 'function_edge_logs',
+          attributes: { execution_id: 'exec-1', 'request.headers.cf_ray': '8f00bb-IAD' },
+        },
+        // Keys are only read for the sources that set them
+        { source: 'postgres_logs', attributes: { request_id: 'ignored' } },
+      ])
+    ).toEqual({ requestIds: ['8f00aa-IAD', '8f00bb-IAD'], executionIds: ['exec-1'] })
+  })
+
+  it('ignores IDs that are not plain identifiers', () => {
+    expect(
+      getRequestCorrelationIds([
+        { source: 'edge_logs', attributes: { 'request.headers.cf_ray': "x' OR 1=1 --" } },
+        { source: 'auth_logs', attributes: { request_id: 42 } },
+        { source: 'storage_logs', attributes: null },
+      ])
+    ).toEqual({ requestIds: [], executionIds: [] })
+  })
+
+  it('matches each source on its own key and orders oldest first', () => {
+    const sql = getRequestTimelineQuery({ requestIds: ['8f00aa-IAD'], executionIds: ['exec-1'] })
+    expect(sql).toContain(
+      `(source = 'edge_logs' AND (log_attributes['request.headers.cf_ray'] IN ('8f00aa-IAD') OR log_attributes['response.headers.cf_ray'] IN ('8f00aa-IAD')))`
+    )
+    expect(sql).toContain(
+      `(source = 'auth_logs' AND (log_attributes['request_id'] IN ('8f00aa-IAD')))`
+    )
+    expect(sql).toContain(
+      `(source = 'function_logs' AND (log_attributes['execution_id'] IN ('exec-1')))`
+    )
+    expect(sql).toContain('log_attributes AS metadata')
+    expect(sql).toContain('ORDER BY timestamp ASC')
+    expect(sql).toMatch(/LIMIT 200\s*$/)
+  })
+
+  it('skips execution ID conditions when there are none', () => {
+    const sql = getRequestTimelineQuery({ requestIds: ['8f00aa-IAD'], executionIds: [] })
+    expect(sql).not.toContain('execution_id')
+  })
+
+  it('refuses to build an unbounded query', () => {
+    expect(() => getRequestTimelineQuery({ requestIds: [], executionIds: [] })).toThrow()
   })
 })

@@ -65,6 +65,20 @@ export const logsKeys = {
       logId,
       { source, logTimestampMs },
     ] as const,
+  requestTimeline: (
+    projectRef: string | undefined,
+    logId: string | undefined,
+    source: string | undefined,
+    logTimestampMs: number | null | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'request-timeline',
+      logId,
+      { source, logTimestampMs },
+    ] as const,
   serviceFlow: (
     projectRef: string | undefined,
     searchParams: QuerySearchParamsType | undefined,
