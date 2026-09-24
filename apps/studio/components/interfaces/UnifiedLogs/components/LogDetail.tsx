@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
+import type { ReactNode } from 'react'
 import { Skeleton } from 'ui'
 
 import { hasLogOverviewRenderer, LogOverview } from '../ServiceFlow/LogOverview'
@@ -21,10 +22,13 @@ export function LogDetail({
   row,
   tab,
   searchParameters,
+  overviewHeader,
 }: {
   row: ColumnSchema
   tab: string
   searchParameters: QuerySearchParamsType
+  /** Leads the overview, e.g. the request the log belongs to. */
+  overviewHeader?: ReactNode
 }) {
   const { ref: projectRef } = useParams()
   const { table, filterFields } = useDataTable<ColumnSchema, unknown>()
@@ -89,6 +93,7 @@ export function LogDetail({
         />
       )}
       <LogOverview
+        header={overviewHeader}
         attributes={attributes}
         data={row}
         enrichedData={enrichedData}

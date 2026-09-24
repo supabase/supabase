@@ -38,6 +38,8 @@ interface DataTableSheetRowActionProps<
   table?: Table<TData>
   label?: string
   alignOffset?: number
+  /** Offers "Add filter" for a filter that isn't a table column (e.g. a URL param). */
+  onAddFilter?: () => void
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
@@ -49,6 +51,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   table,
   label,
   alignOffset = 8,
+  onAddFilter,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
@@ -205,6 +208,15 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         {!!field && !!column && (
           <>
             {renderOptions()}
+            <DropdownMenuSeparator />
+          </>
+        )}
+        {!column && !!onAddFilter && (
+          <>
+            <DropdownMenuItem onClick={onAddFilter} className="flex items-center gap-2">
+              <Filter size={12} />
+              Add filter
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}

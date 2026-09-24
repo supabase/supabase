@@ -13,15 +13,13 @@ import { Shortcut } from '@/components/ui/Shortcut'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-interface ServiceFlowPanelControlsProps {
+interface LogPanelNavigationProps {
   dock: 'bottom' | 'right'
   setDock: (value: 'bottom' | 'right') => void
 }
 
-export const ServiceFlowPanelControls = ({
-  dock = 'bottom',
-  setDock,
-}: ServiceFlowPanelControlsProps) => {
+/** Previous/next log and dock position, for the side panel footer. */
+export const LogPanelNavigation = ({ dock = 'bottom', setDock }: LogPanelNavigationProps) => {
   const { table, openRowId, setOpenRowId, onSelectRow } = useDataTable()
   const rows = table.getRowModel().rows
   const index = rows.findIndex((row) => row.id === openRowId)
@@ -38,7 +36,6 @@ export const ServiceFlowPanelControls = ({
   }
   const onPrev = () => handleNavigate(prevId)
   const onNext = () => handleNavigate(nextId)
-  const onClose = () => setOpenRowId(undefined)
 
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW, () => handleNavigate(prevId, true), {
     enabled: !!prevId,
@@ -109,22 +106,30 @@ export const ServiceFlowPanelControls = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <Shortcut
-        id={SHORTCUT_IDS.UNIFIED_LOGS_CLOSE_PANEL}
-        onTrigger={onClose}
-        options={{ conflictBehavior: 'allow' }}
-        side="top"
-      >
-        <Button
-          aria-label="Clear selection"
-          size="tiny"
-          variant="text"
-          onClick={onClose}
-          className="px-1"
-          icon={<X />}
-        />
-      </Shortcut>
     </div>
+  )
+}
+
+/** Clears the selection, closing the side panel. */
+export const LogPanelCloseButton = () => {
+  const { setOpenRowId } = useDataTable()
+  const onClose = () => setOpenRowId(undefined)
+
+  return (
+    <Shortcut
+      id={SHORTCUT_IDS.UNIFIED_LOGS_CLOSE_PANEL}
+      onTrigger={onClose}
+      options={{ conflictBehavior: 'allow' }}
+      side="bottom"
+    >
+      <Button
+        aria-label="Clear selection"
+        size="tiny"
+        variant="text"
+        onClick={onClose}
+        className="px-1"
+        icon={<X />}
+      />
+    </Shortcut>
   )
 }
