@@ -316,7 +316,7 @@ export const Column = ({
             enumTypes={enumTypes}
             showLabel={false}
             size="small"
-            className={`rounded-sm lg:gap-0 ${
+            className={`lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             data-testid={`${column.name}-default-value`}
