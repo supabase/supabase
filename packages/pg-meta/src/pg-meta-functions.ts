@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { filterByList } from './helpers'
+import { filterByList, getDoBlockDelimiter } from './helpers'
 import {
   ident,
   joinSqlFragments,
@@ -354,8 +354,17 @@ export function update(
       ? safeSql`ALTER ${routineKeyword} ${ident(currentFunc.schema)}.${ident(name || currentFunc.name)}(${identityArgs}) SET SCHEMA ${ident(schema)};`
       : safeSql``
 
+  // The function definition, names and identity args flow into the DO block
+  // body, so the delimiter must not appear in any of them (e.g. a body
+  // containing `$$` would otherwise terminate a `$$`-quoted block early).
+  const doBlockDelimiter = getDoBlockDelimiter(
+    [definition, currentFunc.schema, currentFunc.name, name, schema, identityArgs].filter(
+      (v): v is string => typeof v === 'string'
+    )
+  )
+
   const sql = safeSql`
-    DO LANGUAGE plpgsql $$
+    DO LANGUAGE plpgsql ${doBlockDelimiter}
     BEGIN
       IF ${typeof definition === 'string' ? safeSql`TRUE` : safeSql`FALSE`} THEN
         ${updateDefinitionSql}
@@ -375,7 +384,7 @@ export function update(
 
       ${updateSchemaSql}
     END;
-    $$;
+    ${doBlockDelimiter};
   `
 
   return {
