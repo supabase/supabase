@@ -62,7 +62,7 @@ const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
             Queued to expire
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-64">
-            Cleanup runs periodically, so this version stays listed until the next pass.
+            Cleanup has no fixed schedule, so this version can stay listed for up to 24 hours.
           </TooltipContent>
         </Tooltip>
       )
