@@ -1,15 +1,24 @@
 // Demo route for the CLI device-auth interstitial. Everything is client-side: no API calls,
 // no token creation. Context: https://supabase.slack.com/archives/C088MLLE0KU/p1789542796124239
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { ArrowRightLeft, LogOut, Terminal } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   Badge,
   Button,
   cn,
+  Form,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select,
@@ -22,6 +31,8 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 
 import {
   InterstitialLayout,
@@ -205,6 +216,13 @@ const CliAuthPage: NextPageWithLayout = () => {
   )
 }
 
+const formSchema = z.object({
+  projectRef: z.string(),
+  accessMode: z.enum(['full', 'readonly']),
+})
+
+type FormValues = z.infer<typeof formSchema>
+
 const CliAuthScreen = ({
   code,
   redirectUri,
@@ -229,12 +247,22 @@ const CliAuthScreen = ({
   const requestedScopes = (scopesParam ?? '').split(',').filter(Boolean)
   const readScopes = requestedScopes.filter((scope) => scope.startsWith('read:'))
 
-  const [accessMode, setAccessMode] = useState<'full' | 'readonly'>('full')
-  const [selectedProjectRef, setSelectedProjectRef] = useState<string | undefined>(undefined)
-
   const email = profile?.primary_email ?? FALLBACK_EMAIL
   const hasValidRedirect = redirectUri !== undefined && isAllowedRedirectUri(redirectUri)
-  const grantedScopes = accessMode === 'full' ? requestedScopes : readScopes
+
+  const form = useForm<FormValues>({
+    defaultValues: {
+      projectRef,
+      accessMode: 'full',
+    },
+    resolver: zodResolver(formSchema),
+  })
+
+  const grantedScopes = useWatch({
+    name: 'accessMode',
+    control: form.control,
+    compute: (accessMode) => (accessMode === 'full' ? requestedScopes : readScopes),
+  })
   const scopeGroups = toScopeGroups(grantedScopes)
 
   if (!code || !redirectUri) {
@@ -251,11 +279,7 @@ const CliAuthScreen = ({
     )
   }
 
-  const handleAccessModeChange = (mode: string) => {
-    if (mode === 'full' || mode === 'readonly') setAccessMode(mode)
-  }
-
-  const handleAuthorize = () => {
+  const handleAuthorize = (_values: FormValues) => {
     window.location.assign(
       `${redirectUri}?token=${generateDemoToken()}&scopes=${grantedScopes.join(',')}`
     )
@@ -272,123 +296,146 @@ const CliAuthScreen = ({
     window.location.assign(`${redirectUri}?error=access_denied`)
   }
 
-  const effectiveProjectRef = selectedProjectRef ?? projects[0]?.ref
-
   return (
     <CliAuthInterstitial
       title="Authorize Supabase CLI"
       description="Your terminal is requesting a scoped access token"
     >
-      {!hasValidRedirect && (
-        <Admonition
-          type="destructive"
-          title="Unrecognized redirect address"
-          description={`Supabase CLI can only receive tokens at http://127.0.0.1 or http://localhost. The request asked for ${redirectUri}.`}
-        />
-      )}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleAuthorize)} className="flex flex-col gap-6 px-0">
+          {!hasValidRedirect && (
+            <Admonition
+              type="destructive"
+              title="Unrecognized redirect address"
+              description={`Supabase CLI can only receive tokens at http://127.0.0.1 or http://localhost. The request asked for ${redirectUri}.`}
+            />
+          )}
 
-      <section className="flex flex-col gap-2">
-        <div className="divide-y rounded-md border bg-surface-75 px-4">
-          <DetailRow
-            label="Authorizing as"
-            action={
-              <DetailRowAction
-                label="Sign out"
-                icon={<LogOut size={14} />}
-                onClick={handleSignOut}
-              />
-            }
-          >
-            <span className="min-w-0 truncate">{email}</span>
-          </DetailRow>
-          <DetailRow
-            label="Organization"
-            action={
-              <DetailRowAction
-                label="Switch organization"
-                icon={<ArrowRightLeft size={14} />}
-                onClick={handleSwitchOrg}
-              />
-            }
-          >
-            <span className="min-w-0 truncate">{organizationName}</span>
-          </DetailRow>
-          <DetailRow label="Expires">
-            <span>Never</span>
-          </DetailRow>
-          <DetailRow label="Device">
-            <span className="font-mono">{code}</span>
-          </DetailRow>
-        </div>
-        <p className="text-xs text-foreground-lighter">
-          Check that this code matches the one shown in your terminal. This token can never do more
-          than your role in this organization allows.
-        </p>
-      </section>
+          <section className="flex flex-col gap-2">
+            <div className="divide-y rounded-md border bg-surface-75 px-4">
+              <DetailRow
+                label="Authorizing as"
+                action={
+                  <DetailRowAction
+                    label="Sign out"
+                    icon={<LogOut size={14} />}
+                    onClick={handleSignOut}
+                  />
+                }
+              >
+                <span className="min-w-0 truncate">{email}</span>
+              </DetailRow>
+              <DetailRow
+                label="Organization"
+                action={
+                  <DetailRowAction
+                    label="Switch organization"
+                    icon={<ArrowRightLeft size={14} />}
+                    onClick={handleSwitchOrg}
+                  />
+                }
+              >
+                <span className="min-w-0 truncate">{organizationName}</span>
+              </DetailRow>
+              <DetailRow label="Expires">
+                <span>Never</span>
+              </DetailRow>
+              <DetailRow label="Device">
+                <span className="font-mono">{code}</span>
+              </DetailRow>
+            </div>
+            <p className="text-xs text-foreground-lighter">
+              Check that this code matches the one shown in your terminal. This token can never do
+              more than your role in this organization allows.
+            </p>
+          </section>
 
-      <section className="flex flex-col gap-2">
-        <p className="text-xs text-foreground">Project</p>
-        {projectRef ? (
-          <div className="flex items-center justify-between gap-4 rounded-md border bg-surface-75 px-4 py-2.5 text-xs">
-            <span className="min-w-0 truncate font-mono text-foreground">{projectRef}</span>
-            <Badge variant="default" className="shrink-0">
-              from config.toml
-            </Badge>
+          <FormField
+            control={form.control}
+            name="projectRef"
+            render={({ field }) => (
+              <FormItemLayout
+                layout="vertical"
+                label="Project"
+                description="Access covers this project and all of its preview branches."
+              >
+                {projectRef ? (
+                  <FormControl>
+                    <InputGroup>
+                      <FormInputGroupInput {...field} readOnly />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>
+                          <Badge variant="default" className="shrink-0">
+                            from config.toml
+                          </Badge>
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </FormControl>
+                ) : (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger size="small">
+                        <SelectValue placeholder="Select a project" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {projects.map((project) => (
+                        <SelectItem key={project.ref} value={project.ref}>
+                          {project.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </FormItemLayout>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="accessMode"
+            render={({ field }) => (
+              <FormItemLayout layout="vertical" label="Access">
+                <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                  <RadioGroupStackedItem
+                    value="full"
+                    label="Full CLI access"
+                    description="Every scope the CLI requested, including writes"
+                  />
+                  <RadioGroupStackedItem
+                    value="readonly"
+                    label="Read-only"
+                    description="Only the read scopes. Deploys and migrations will fail"
+                  />
+                </RadioGroupStacked>
+              </FormItemLayout>
+            )}
+          />
+
+          {scopeGroups.length > 0 && (
+            <ScopeGroupCard appName="Supabase CLI" scopeGroups={scopeGroups} />
+          )}
+          {scopeGroups.length === 0 && (
+            <p className="text-xs text-foreground-lighter">No permissions requested.</p>
+          )}
+
+          <div className="flex flex-col gap-2">
+            <Button block variant="primary" type="submit">
+              Authorize CLI
+            </Button>
+            <Button block variant="text" onClick={handleCancel}>
+              Cancel
+            </Button>
           </div>
-        ) : (
-          <Select value={effectiveProjectRef} onValueChange={setSelectedProjectRef}>
-            <SelectTrigger size="small">
-              <SelectValue placeholder="Select a project" />
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((project) => (
-                <SelectItem key={project.ref} value={project.ref}>
-                  {project.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-        <p className="text-xs text-foreground-lighter">
-          Access covers this project and all of its preview branches.
-        </p>
-      </section>
 
-      <section className="flex flex-col gap-3">
-        <p className="text-xs text-foreground">Access</p>
-        <RadioGroupStacked value={accessMode} onValueChange={handleAccessModeChange}>
-          <RadioGroupStackedItem
-            value="full"
-            label="Full CLI access"
-            description="Every scope the CLI requested, including writes"
-          />
-          <RadioGroupStackedItem
-            value="readonly"
-            label="Read-only"
-            description="Only the read scopes. Deploys and migrations will fail"
-          />
-        </RadioGroupStacked>
-      </section>
-
-      {scopeGroups.length > 0 && (
-        <ScopeGroupCard appName="Supabase CLI" scopeGroups={scopeGroups} />
-      )}
-      {scopeGroups.length === 0 && (
-        <p className="text-xs text-foreground-lighter">No permissions requested.</p>
-      )}
-
-      <div className="flex flex-col gap-2">
-        <Button block variant="primary" disabled={!hasValidRedirect} onClick={handleAuthorize}>
-          Authorize CLI
-        </Button>
-        <Button block variant="text" onClick={handleCancel}>
-          Cancel
-        </Button>
-      </div>
-
-      <div className="border-t pt-6 text-xs text-foreground-lighter">
-        <p>Authorizing returns you to your terminal. The token will appear under Access tokens.</p>
-      </div>
+          <div className="border-t pt-6 text-xs text-foreground-lighter">
+            <p>
+              Authorizing returns you to your terminal. The token will appear under Access tokens.
+            </p>
+          </div>
+        </form>
+      </Form>
     </CliAuthInterstitial>
   )
 }
