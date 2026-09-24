@@ -54,7 +54,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
     <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
       <div className="flex flex-col md:flex-row md:items-center gap-3">
         <div className="flex flex-row items-center gap-3">
-          <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-brand-600 bg-brand-300 text-brand">
+          <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-brand-600 bg-brand-300 text-primary">
             <List size={14} strokeWidth={3} />
           </div>
 
@@ -106,7 +106,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                     href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-brand"
+                    className="text-primary"
                   >
                     unnesting joins
                     <ExternalLink
@@ -218,7 +218,7 @@ const Field = ({
         {isCopied ? (
           <Tooltip>
             <TooltipTrigger>
-              <Check size={14} strokeWidth={3} className="text-brand" />
+              <Check size={14} strokeWidth={3} className="text-primary" />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="font-sans">
               Copied

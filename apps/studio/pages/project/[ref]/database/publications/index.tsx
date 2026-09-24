@@ -4,7 +4,7 @@ import { PageSection } from 'ui-patterns/PageSection'
 
 import { PublicationsAvailability } from '@/components/interfaces/Database/Publications/PublicationsAvailability'
 import { PublicationsList } from '@/components/interfaces/Database/Publications/PublicationsList'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { NoPermission } from '@/components/ui/NoPermission'

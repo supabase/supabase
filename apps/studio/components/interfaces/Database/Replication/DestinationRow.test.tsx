@@ -1,11 +1,13 @@
-import { screen } from '@testing-library/react'
+import { QueryClient } from '@tanstack/react-query'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
-import { DestinationRow } from './DestinationRow'
+import { DestinationRow as DestinationRowComponent } from './DestinationRow'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
@@ -21,27 +23,11 @@ type ReplicationPipelineVersionResponse = components['schemas']['PipelineVersion
 // Tooltip/Popover descendants use Web Animations
 mockAnimationsApi()
 
-// Prevent retries on mocked error responses — replication queries override the
-// QueryClient default with checkReplicationFeatureFlagRetry, which retries up to
-// 3 times. Without this mock error tests would time-out.
-vi.mock('@/data/replication/utils', () => ({
-  checkReplicationFeatureFlagRetry: () => false,
-}))
-
-// DestinationRow requires a PipelineRequestStatusContext provider.
-// Mock the module so tests don't need to wrap with the provider.
-vi.mock('@/state/replication-pipeline-request-status', () => ({
-  PipelineStatusRequestStatus: {
-    None: 'None',
-    StartRequested: 'StartRequested',
-    StopRequested: 'StopRequested',
-    RestartRequested: 'RestartRequested',
-  },
-  usePipelineRequestStatus: () => ({
-    getRequestStatus: () => 'None',
-    updatePipelineStatus: () => {},
-  }),
-}))
+const DestinationRow = (props: { destinationId: number }) => (
+  <PipelineRequestStatusProvider>
+    <DestinationRowComponent {...props} />
+  </PipelineRequestStatusProvider>
+)
 
 const DESTINATION_ID = 1
 const PIPELINE_ID = 42
@@ -159,9 +145,137 @@ describe('DestinationRow', () => {
     addVersionMock()
   }
 
+  test('waits for asynchronous shutdown before deleting the pipeline', async () => {
+    addAllMocks()
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
+    let isStopping = false
+    let completeShutdown: () => void = () => {}
+    const shutdown = new Promise<void>((resolve) => {
+      completeShutdown = resolve
+    })
+    const shutdownStatusRequested = vi.fn()
+    const deleted = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
+      response: () => {
+        isStopping = true
+        return HttpResponse.json<Record<string, never>>({}, { status: 202 })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: async () => {
+        if (isStopping) {
+          shutdownStatusRequested()
+          await shutdown
+        }
+        return HttpResponse.json<ReplicationPipelineStatusResponse>({
+          pipeline_id: PIPELINE_ID,
+          status: { name: isStopping ? 'stopped' : 'started' },
+        })
+      },
+    })
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/replication/:ref/destinations-pipelines/:destination_id/:pipeline_id',
+      response: () => {
+        deleted()
+        return HttpResponse.json<components['schemas']['DeleteDestinationPipelineResponse_Output']>(
+          { destination_deleted: true, destination_id: DESTINATION_ID, pipeline_id: PIPELINE_ID }
+        )
+      },
+    })
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+    await screen.findByText('supabase_realtime')
+    await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
+    await userEvent.type(
+      screen.getByPlaceholderText('Type the pipeline name'),
+      'My BigQuery Destination'
+    )
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
+    )
+    // jsdom does not reliably submit portalled forms through button activation.
+    fireEvent.submit(screen.getByRole('dialog').querySelector('form')!)
+    await waitFor(() => expect(shutdownStatusRequested).toHaveBeenCalledOnce())
+    expect(deleted).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Deleting…' })).toBeDisabled()
+    await act(async () => {
+      completeShutdown()
+    })
+    await waitFor(() => expect(deleted).toHaveBeenCalledOnce())
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Deleting…' })).not.toBeInTheDocument()
+    )
+  })
+
+  test('keeps deletion retryable when shutdown status cannot be verified', async () => {
+    addAllMocks()
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
+    let isStopping = false
+    const deleted = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
+      response: () => {
+        isStopping = true
+        return HttpResponse.json<Record<string, never>>({}, { status: 202 })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: () => {
+        if (isStopping)
+          return HttpResponse.json<APIErrorBody>({ message: 'Status unavailable' }, { status: 503 })
+        return HttpResponse.json<ReplicationPipelineStatusResponse>({
+          pipeline_id: PIPELINE_ID,
+          status: { name: 'started' },
+        })
+      },
+    })
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/replication/:ref/destinations-pipelines/:destination_id/:pipeline_id',
+      response: () => {
+        deleted()
+        return HttpResponse.json<components['schemas']['DeleteDestinationPipelineResponse_Output']>(
+          { destination_deleted: true, destination_id: DESTINATION_ID, pipeline_id: PIPELINE_ID }
+        )
+      },
+    })
+    const queryClient = new QueryClient()
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />, { queryClient })
+    await screen.findByText('supabase_realtime')
+    await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
+    await userEvent.type(
+      screen.getByPlaceholderText('Type the pipeline name'),
+      'My BigQuery Destination'
+    )
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
+    )
+    // jsdom does not reliably submit portalled forms through button activation.
+    fireEvent.submit(screen.getByRole('dialog').querySelector('form')!)
+    await waitFor(() =>
+      expect(
+        queryClient
+          .getMutationCache()
+          .getAll()
+          .some((mutation) => mutation.state.status === 'error')
+      ).toBe(true)
+    )
+    expect(deleted).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
+  })
+
   test('navigates to the pipeline when the row is clicked', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
@@ -169,19 +283,19 @@ describe('DestinationRow', () => {
     expect(row).not.toBeNull()
     await userEvent.click(row!)
 
-    expect(routerMock.asPath).toBe(`/project/default/database/replication/${PIPELINE_ID}`)
+    expect(routerMock.asPath).toBe(`/project/default/database/pipelines/${PIPELINE_ID}`)
   })
 
   test('does not navigate when the row overflow menu is opened', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
-    expect(routerMock.asPath).toBe('/project/default/database/replication')
+    expect(routerMock.asPath).toBe('/project/default/database/pipelines')
   })
 
   test('shows "Caught up" when confirmed_flush_lsn_bytes is 0', async () => {
@@ -442,7 +556,9 @@ describe('DestinationRow', () => {
         HttpResponse.json<APIErrorBody>({ message: 'Internal server error' }, { status: 500 }),
     })
 
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />, {
+      queryClient: new QueryClient({ defaultOptions: { queries: { retryDelay: 0 } } }),
+    })
 
     expect(await screen.findByText('Failed to retrieve pipeline information')).toBeInTheDocument()
   })

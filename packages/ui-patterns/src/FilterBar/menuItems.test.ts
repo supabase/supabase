@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildOperatorItems, buildPropertyItems, buildValueItems } from './menuItems'
+import {
+  buildOperatorItems,
+  buildPropertyChangeItems,
+  buildPropertyItems,
+  buildValueItems,
+} from './menuItems'
 import { FilterGroup, FilterProperty } from './types'
 
 const stringProperty: FilterProperty = {
@@ -47,6 +52,32 @@ const pathProperty: FilterProperty = {
 }
 
 const filterProperties: FilterProperty[] = [stringProperty, booleanProperty, pathProperty]
+
+describe('consumer-controlled property availability', () => {
+  it.each([true, false, undefined])(
+    'respects isAvailable=%s in add and change menus',
+    (isAvailable) => {
+      const timeRange: FilterProperty = {
+        label: 'Time range',
+        name: 'date',
+        type: 'date',
+        isAvailable,
+      }
+      const params = { filterProperties: [...filterProperties, timeRange], inputValue: '' }
+      const addItems = buildPropertyItems(params)
+      const changeItems = buildPropertyChangeItems({ ...params, currentPropertyName: 'name' })
+      expect(addItems.some((item) => item.value === 'date')).toBe(isAvailable !== false)
+      expect(changeItems.some((item) => item.value === 'date')).toBe(isAvailable !== false)
+      expect(addItems.some((item) => item.value === 'name')).toBe(true)
+      const searchItems = buildPropertyItems({
+        ...params,
+        inputValue: 'range',
+        freeformDefaultProperty: timeRange,
+      })
+      expect(searchItems.some((item) => item.isFreeformSearch)).toBe(isAvailable !== false)
+    }
+  )
+})
 
 describe('buildOperatorItems', () => {
   it('returns matching operators for operator draft text', () => {
@@ -157,6 +188,31 @@ describe('buildValueItems', () => {
 
     expect(items).toEqual([
       { value: 'alice', label: 'Alice' },
+      { value: 'bob', label: 'Bob' },
+    ])
+  })
+
+  it('disables options already used by another condition on the same property', () => {
+    const filters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [
+        { propertyName: 'name', operator: '=', value: 'alice' },
+        { propertyName: 'name', operator: '=', value: '' },
+      ],
+    }
+
+    const items = buildValueItems(
+      { type: 'value', path: [1] },
+      filters,
+      filterProperties,
+      {},
+      {},
+      '',
+      false
+    )
+
+    expect(items).toEqual([
+      { value: 'alice', label: 'Alice', disabled: true },
       { value: 'bob', label: 'Bob' },
     ])
   })

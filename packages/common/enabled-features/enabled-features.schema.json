@@ -358,6 +358,10 @@
       "type": "boolean",
       "description": "Show the high availability toggle in the project creation flow"
     },
+    "project_creation:show_best_available_region": {
+      "type": "boolean",
+      "description": "Show the best available region option in the project creation region selector"
+    },
 
     "project_homepage:show_instance_size": {
       "type": "boolean",

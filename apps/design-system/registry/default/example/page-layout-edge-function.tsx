@@ -154,21 +154,21 @@ const EXECUTION_TIME_CHART_CONFIG = {
   },
   max_execution_time: {
     label: 'Max Execution Time',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 
 const CPU_TIME_CHART_CONFIG = {
   max_cpu_time_used: {
     label: 'Max CPU Time',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 
 const MEMORY_CHART_CONFIG = {
   avg_memory_used: {
     label: 'Memory Usage',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 
@@ -435,7 +435,7 @@ function OverviewPage() {
                 <Check
                   size={16}
                   strokeWidth={1.5}
-                  className="mt-0.5 shrink-0 text-brand"
+                  className="mt-0.5 shrink-0 text-primary"
                   aria-hidden="true"
                 />
                 <div>
