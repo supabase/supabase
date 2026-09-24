@@ -56,6 +56,37 @@ const ARCHIVED_STRIPES_STYLE: CSSProperties = {
     'repeating-linear-gradient(-45deg, color-mix(in srgb, currentColor 8%, transparent) 0 1px, transparent 1px 7px)',
 }
 
+/**
+ * Solid rather than transparent: the row's stripes and the file name both run
+ * underneath it.
+ */
+const ARCHIVED_BADGE_CLASS =
+  'flex items-center rounded-sm border border-strong bg-surface-200 p-1 text-foreground-lighter'
+
+/** Archived rows drop the checkbox and context menu, so this is their only focus target. */
+const ArchivedBadge = ({ name, onOpen }: { name: string; onOpen?: () => void }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      {onOpen ? (
+        <button
+          type="button"
+          aria-label={`View archived file ${name}`}
+          onClick={onOpen}
+          className={cn(ARCHIVED_BADGE_CLASS, 'focus-ring')}
+        >
+          <Archive size={12} aria-hidden />
+        </button>
+      ) : (
+        <span className={ARCHIVED_BADGE_CLASS}>
+          <Archive size={12} aria-hidden />
+          <span className="sr-only">Archived</span>
+        </span>
+      )}
+    </TooltipTrigger>
+    <TooltipContent side="bottom">Archived</TooltipContent>
+  </Tooltip>
+)
+
 interface FileExplorerRowProps {
   index: number
   item: StorageItem
@@ -347,8 +378,9 @@ export const FileExplorerRow = ({
               <div
                 className={cn(
                   'absolute',
-                  // Swap icon → checkbox on hover / keyboard focus (files only)
-                  isFile && 'group-hover:hidden group-focus-within:hidden'
+                  // Only where a checkbox swaps in: an archived row has none, so hiding
+                  // the icon on hover would leave the slot empty.
+                  isFile && !isArchived && 'group-hover:hidden group-focus-within:hidden'
                 )}
                 style={{ top: '2px' }}
               >
@@ -420,22 +452,10 @@ export const FileExplorerRow = ({
               size={14}
             />
           ) : isArchived ? (
-            // Archived rows drop the checkbox and menu, so this is their only focus target.
-            isArchivedFile ? (
-              <button
-                type="button"
-                tabIndex={0}
-                aria-label={`View archived file ${item.name}`}
-                onClick={() => onSelectFile(columnIndex)}
-                className="focus-ring rounded-sm border border-strong px-1 font-mono text-[10px] uppercase text-foreground-lighter"
-              >
-                Archived
-              </button>
-            ) : (
-              <span className="rounded-sm border border-strong px-1 font-mono text-[10px] uppercase text-foreground-lighter">
-                Archived
-              </span>
-            )
+            <ArchivedBadge
+              name={item.name}
+              onOpen={isArchivedFile ? () => onSelectFile(columnIndex) : undefined}
+            />
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger className="focus-ring rounded-sm">

@@ -90,4 +90,48 @@ describe('FileExplorerRow', () => {
     expect(screen.getByText('Copy link')).toBeInTheDocument()
     expect(screen.queryByText('Copy path to folder')).not.toBeInTheDocument()
   })
+
+  it('labels an archived file with an icon rather than text, and keeps its icon on hover', async () => {
+    const { container } = render(
+      <FileExplorerRow
+        item={
+          {
+            ...base,
+            id: 'f2',
+            name: 'gone.png',
+            type: STORAGE_ROW_TYPES.FILE,
+            archived: { archivedObjectId: 'a1' },
+          } as any
+        }
+        index={0}
+        view={STORAGE_VIEWS.COLUMNS}
+        columnIndex={0}
+        selectedItems={[]}
+      />
+    )
+
+    // The badge reads as an icon button, not the word "Archived".
+    expect(screen.getByRole('button', { name: 'View archived file gone.png' })).toBeInTheDocument()
+    expect(screen.queryByText('Archived')).not.toBeInTheDocument()
+
+    // An archived row has no checkbox, so nothing may hide its icon on hover.
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    const iconSlot = container.querySelector('.absolute')
+    expect(iconSlot?.className).not.toContain('group-hover:hidden')
+  })
+
+  it('keeps hiding the icon on hover for a live file, which does swap in a checkbox', () => {
+    const { container } = render(
+      <FileExplorerRow
+        item={{ ...base, id: 'f3', name: 'live.png', type: STORAGE_ROW_TYPES.FILE } as any}
+        index={0}
+        view={STORAGE_VIEWS.COLUMNS}
+        columnIndex={0}
+        selectedItems={[]}
+      />
+    )
+
+    expect(screen.getByRole('checkbox')).toBeInTheDocument()
+    expect(container.querySelector('.absolute')?.className).toContain('group-hover:hidden')
+  })
 })
