@@ -31,7 +31,7 @@ const ArchivedFileDetail = ({ label, value }: { label: string; value: string }) 
 
 /** Replaces `PreviewPane` while an archived row is selected. */
 export const ArchivedFilePreviewPane = () => {
-  const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
+  const { projectRef, selectedBucket, refetchAllOpenedFolders } = useStorageExplorerStateSnapshot()
   const {
     selectedArchivedObject: object,
     selectedArchivedVersion: previewedVersion,
@@ -72,13 +72,15 @@ export const ArchivedFilePreviewPane = () => {
     restoreObject(
       { projectRef, bucketId: selectedBucket.id, archivedObjectId: object.id, path: object.path },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           toast.success(
             version && !version.wasCurrentAtArchive
               ? `File restored — version ${shortVersion(version.versionId)} is now current`
               : 'File restored'
           )
           clearArchivedSelection()
+          // The file is live again, and the live listing is the explorer's own state.
+          await refetchAllOpenedFolders()
         },
       }
     )
