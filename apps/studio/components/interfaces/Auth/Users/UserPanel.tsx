@@ -4,36 +4,35 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Input,
   ResizableHandle,
   ResizablePanel,
   Tabs,
   TabsContent,
+  TabsIndicator,
   TabsList,
   TabsTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
+import { UserCard } from './UserCard'
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
-import { PANEL_PADDING } from './Users.constants'
+import { RawJsonView } from '@/components/ui/RawJsonView'
 import { useUserQuery } from '@/data/auth/user-query'
-import { User } from '@/data/auth/users-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+type UserPanelView = 'overview' | 'raw' | 'logs'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
-
   const [selectedId, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [view, setView] = useState<'overview' | 'raw' | 'logs'>('overview')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [view, setView] = useState<UserPanelView>('overview')
 
   const { data: selectedUser, isPending } = useUserQuery({
     projectRef: project?.ref,
@@ -41,66 +40,51 @@ export const UserPanel = () => {
     userId: selectedId,
   })
 
-  const filteredProperties = selectedUser
-    ? Object.entries(selectedUser)
-        .filter(
-          ([key, value]) =>
-            key.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (typeof value === 'string' && value.toLowerCase().includes(searchQuery.toLowerCase()))
-        )
-        .reduce((obj, [key, value]) => {
-          if (value !== undefined) {
-            obj[key as keyof User] = value as any
-          }
-          return obj
-        }, {} as Partial<User>)
-    : {}
-
   return (
     <>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
-        <Button
-          variant="text"
-          className="absolute top-3 right-3 px-1"
-          icon={<X />}
-          onClick={() => setSelectedId(null)}
-        />
+        {!selectedUser && (
+          <Button
+            variant="text"
+            className="absolute top-3 right-3 px-1"
+            icon={<X />}
+            aria-label="Close"
+            onClick={() => setSelectedId(null)}
+          />
+        )}
         <Tabs
           value={view}
           className="flex flex-col h-full"
-          onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs')}
+          onValueChange={(value) => setView(value as UserPanelView)}
         >
           {isPending ? (
             <div>
               <div className="min-h-[46px] border-b" />
-              <div className="p-5">
+              <div className="p-4">
                 <GenericSkeletonLoader />
               </div>
             </div>
           ) : !!selectedUser ? (
             <>
-              <TabsList className="px-5 flex gap-x-4 min-h-[46px]">
-                <TabsTrigger
-                  value="overview"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
-                >
-                  Overview
-                </TabsTrigger>
-                {showLogs && (
-                  <TabsTrigger
-                    value="logs"
-                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
-                  >
-                    Logs
-                  </TabsTrigger>
-                )}
-                <TabsTrigger
-                  value="raw"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
-                >
-                  Raw JSON
-                </TabsTrigger>
+              <UserCard
+                user={selectedUser}
+                className="pb-3"
+                actions={
+                  <Button
+                    variant="text"
+                    className="px-1"
+                    icon={<X />}
+                    aria-label="Close"
+                    onClick={() => setSelectedId(null)}
+                  />
+                }
+              />
+              <TabsList className="shrink-0 gap-x-4 px-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                {showLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
+                <TabsTrigger value="raw">Raw JSON</TabsTrigger>
+                <TabsIndicator />
               </TabsList>
 
               <TabsContent value="overview" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
@@ -113,31 +97,8 @@ export const UserPanel = () => {
                   {selectedUser && <UserLogs user={selectedUser} />}
                 </TabsContent>
               )}
-              <TabsContent
-                value="raw"
-                className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}
-              >
-                <div className="flex items-center mb-2">
-                  <Input
-                    autoFocus
-                    type="text"
-                    placeholder="Filter..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="mr-2"
-                  />
-                  <Button
-                    variant="text"
-                    disabled={!searchQuery}
-                    onClick={() => setSearchQuery('')}
-                    className="text-xs"
-                  >
-                    Clear
-                  </Button>
-                </div>
-                <SimpleCodeBlock className="javascript" parentClassName="[&>*>span]:text-xs">
-                  {JSON.stringify(filteredProperties, null, 2)}
-                </SimpleCodeBlock>
+              <TabsContent value="raw" className="mt-0 grow min-h-0 overflow-y-auto">
+                <RawJsonView data={selectedUser} copyLabel="Copy user as JSON" />
               </TabsContent>
             </>
           ) : (

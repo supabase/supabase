@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { ResizablePanelGroup } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
@@ -10,12 +11,26 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-const { mockUser } = vi.hoisted(() => ({
+const { mockUser, timelineAvailability } = vi.hoisted(() => ({
   mockUser: {
     id: '11111111-1111-1111-1111-111111111111',
     email: 'user@example.com',
     providers: ['email'],
   } as unknown as User,
+  timelineAvailability: { otel: false, unifiedLogs: false },
+}))
+
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return {
+    ...actual,
+    useParams: () => ({ ref: 'project-ref' }),
+    useFlag: (name: string) => name === 'otelUnifiedLogs' && timelineAvailability.otel,
+  }
+})
+
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useUnifiedLogsPreview: () => ({ isEnabled: timelineAvailability.unifiedLogs, isLoading: false }),
 }))
 
 // Project resolution is pure scaffolding here (it only supplies `ref` to the
@@ -35,8 +50,12 @@ vi.mock('./UserOverview', () => ({
 vi.mock('./UserLogs', () => ({
   UserLogs: () => <div data-testid="user-logs" />,
 }))
-
-const renderPanel = (disabledFeatures: string[] = []) => {
+const renderPanel = (
+  disabledFeatures: string[] = [],
+  { otel = false, unifiedLogs = false } = {}
+) => {
+  timelineAvailability.otel = otel
+  timelineAvailability.unifiedLogs = unifiedLogs
   // The user query flows through pg-meta SQL; mock it at the network boundary.
   addAPIMock({
     method: 'post',
@@ -83,5 +102,17 @@ describe('UserPanel', () => {
     expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
     expect(screen.queryByRole('tab', { name: 'Logs' })).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
+  })
+
+  it('shows the user card above the tabs', async () => {
+    renderPanel([])
+
+    expect(await screen.findByText('user@example.com')).toBeInTheDocument()
+    expect(screen.getByText('U')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
+    // Raw JSON matches the logs panel: the whole user with a copy button, no filter
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Raw JSON' }))
+    expect(await screen.findByRole('button', { name: 'Copy user as JSON' })).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('Filter...')).not.toBeInTheDocument()
   })
 })
