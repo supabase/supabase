@@ -33,7 +33,7 @@ export const ExplorerNavDatabase = ({
       setSearch={setSearch}
       searchPlaceholder="Search schemas"
     >
-      <nav className="flex min-h-0 flex-col gap-px overflow-y-auto px-3 pb-3">
+      <nav className="flex flex-1 min-h-0 flex-col gap-px overflow-y-auto p-3">
         {isPending && <GenericSkeletonLoader />}
         {isError && <AlertError error={error} subject="Failed to retrieve schemas" />}
         {isSuccess && schemas.length === 0 && (

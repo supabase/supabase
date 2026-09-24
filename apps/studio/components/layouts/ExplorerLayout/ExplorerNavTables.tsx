@@ -90,7 +90,7 @@ export const ExplorerNavTables = ({ schema }: { schema: string }) => {
       setSearch={setSearch}
       searchPlaceholder="Search tables"
     >
-      <div className="flex flex-1 min-h-0 flex-col px-3 pb-3">
+      <div className="flex flex-1 min-h-0 flex-col p-3">
         {isPending && <GenericSkeletonLoader />}
         {!isPending && tables.length === 0 && (
           <p className="px-2 py-2 text-xs text-foreground-lighter">

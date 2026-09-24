@@ -18,7 +18,7 @@ export const ExplorerNavSchema = ({
 
   return (
     <ExplorerNavPanel label={schema}>
-      <nav className="flex flex-col gap-px px-3 pb-3">
+      <nav className="flex flex-col gap-px p-3">
         <button
           type="button"
           tabIndex={0}

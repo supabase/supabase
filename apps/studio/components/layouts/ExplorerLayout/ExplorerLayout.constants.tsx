@@ -76,7 +76,7 @@ export const ExplorerNavPanel = ({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: LEVEL_OFFSET }}
       transition={LEVEL_TRANSITION}
-      className={cn('absolute inset-0 flex flex-col', setSearch === undefined && 'pt-3', className)}
+      className={cn('absolute inset-0 flex flex-col', className)}
     >
       {setSearch !== undefined && (
         <div className="px-3 pt-3">
