@@ -33,17 +33,34 @@ export function getDatabaseTriggerUpdateSQL({
   updatedTrigger: Omit<PGTriggerCreate, 'events'> &
     Pick<PGTrigger, 'enabled_mode'> & { events: Array<SafeSqlFragment> }
 }): SafeSqlFragment {
-  const { name, activation, events, schema, table, function_schema, function_name, function_args } =
-    updatedTrigger
+  const {
+    name,
+    activation,
+    events,
+    schema,
+    table,
+    function_schema,
+    function_name,
+    function_args,
+    orientation,
+    condition,
+  } = updatedTrigger
   const eventsList = joinSqlFragments(events, ' OR ')
   const argsList =
     function_args && function_args.length > 0
       ? joinSqlFragments(function_args.map(literal), ',')
       : safeSql``
+  // The update recreates the trigger via DROP + CREATE, so the recreated
+  // trigger must keep the original trigger's orientation and WHEN condition
+  // unless the update overrides them. Dropping them silently converts
+  // FOR EACH STATEMENT triggers to FOR EACH ROW and strips conditional
+  // triggers of their condition.
+  const triggerOrientation = orientation ?? originalTrigger.orientation
+  const triggerCondition = condition ? safeSql` WHEN (${condition})` : safeSql``
   return safeSql`BEGIN;
 DROP TRIGGER ${ident(originalTrigger.name)} ON ${ident(originalTrigger.schema)}.${ident(originalTrigger.table)};
 CREATE TRIGGER ${ident(name)} ${keyword(activation)} ${eventsList} ON ${ident(schema)}.${ident(table)}
-  FOR EACH ROW EXECUTE FUNCTION
+  FOR EACH ${keyword(triggerOrientation)}${triggerCondition} EXECUTE FUNCTION
   ${ident(function_schema)}.${ident(function_name)}(${argsList});
 COMMIT;`
 }
