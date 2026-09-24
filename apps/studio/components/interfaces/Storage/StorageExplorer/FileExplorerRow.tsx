@@ -39,7 +39,7 @@ import {
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
-import { StorageRowIcon } from '../StorageRowIcon'
+import { ICON_STROKE_WIDTH, StorageRowIcon } from '../StorageRowIcon'
 import { getBucketVersioningState } from '../StorageVersioning.constants'
 import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
@@ -59,29 +59,27 @@ const ARCHIVED_STRIPES_STYLE: CSSProperties = {
     'repeating-linear-gradient(-45deg, color-mix(in srgb, currentColor 8%, transparent) 0 1px, transparent 1px 7px)',
 }
 
-/**
- * Solid rather than transparent: the row's stripes and the file name both run
- * underneath it.
- */
-const ARCHIVED_BADGE_CLASS =
-  'flex items-center rounded-sm border border-strong bg-surface-200 p-1 text-foreground-lighter'
+const ARCHIVED_ICON_CLASS = 'flex h-4 w-4 items-center justify-center text-foreground-lighter'
 
-/** Archived rows drop the checkbox and context menu, so this is their only focus target. */
-const ArchivedBadge = ({ name, onOpen }: { name: string; onOpen?: () => void }) => (
+/** Takes the file icon's slot, and is an archived row's only keyboard focus target. */
+const ArchivedRowIcon = ({ name, onOpen }: { name: string; onOpen?: () => void }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       {onOpen ? (
         <button
           type="button"
           aria-label={`View archived file ${name}`}
-          onClick={onOpen}
-          className={cn(ARCHIVED_BADGE_CLASS, 'focus-ring')}
+          onClick={(event) => {
+            event.stopPropagation()
+            onOpen()
+          }}
+          className={cn(ARCHIVED_ICON_CLASS, 'focus-ring rounded-sm')}
         >
-          <Archive size={12} aria-hidden />
+          <Archive size={16} strokeWidth={ICON_STROKE_WIDTH} aria-hidden />
         </button>
       ) : (
-        <span className={ARCHIVED_BADGE_CLASS}>
-          <Archive size={12} aria-hidden />
+        <span className={ARCHIVED_ICON_CLASS}>
+          <Archive size={16} strokeWidth={ICON_STROKE_WIDTH} aria-hidden />
           <span className="sr-only">Archived</span>
         </span>
       )}
@@ -456,43 +454,50 @@ export const FileExplorerRow = ({
           )}
         >
           <div className="relative flex h-4 w-[30px] shrink-0 items-center">
-            {showRowIcon && (
-              <div
-                className={cn(
-                  'absolute',
-                  // Only where a checkbox swaps in: an archived row has none, so hiding
-                  // the icon on hover would leave the slot empty.
-                  isFile && !isArchived && 'group-hover:hidden group-focus-within:hidden'
-                )}
-                style={{ top: '2px' }}
-              >
-                <StorageRowIcon
-                  view={view}
-                  status={item.status}
-                  fileType={item.type}
-                  isOpened={isOpened}
-                  mimeType={item.metadata?.mimetype}
-                />
-              </div>
-            )}
-            {isFile && !isArchived ? (
-              <Checkbox
-                className={
-                  isSelected
-                    ? 'opacity-100'
-                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100'
-                }
-                checked={isSelected}
-                // use onClick instead of onCheckedChange to handle shift-key selection
-                onClick={(event) => {
-                  event.stopPropagation()
-                  onCheckItem(event.nativeEvent.shiftKey)
-                }}
-                aria-label="Check to select this item"
+            {isArchived ? (
+              <ArchivedRowIcon
+                name={item.name}
+                onOpen={isArchivedFile ? () => onSelectFile(columnIndex) : undefined}
               />
             ) : (
-              // Reserve the same slot as the file checkbox without a focusable control
-              <span aria-hidden className="h-4 w-4 shrink-0" />
+              <>
+                {showRowIcon && (
+                  <div
+                    className={cn(
+                      'absolute',
+                      isFile && 'group-hover:hidden group-focus-within:hidden'
+                    )}
+                    style={{ top: '2px' }}
+                  >
+                    <StorageRowIcon
+                      view={view}
+                      status={item.status}
+                      fileType={item.type}
+                      isOpened={isOpened}
+                      mimeType={item.metadata?.mimetype}
+                    />
+                  </div>
+                )}
+                {isFile ? (
+                  <Checkbox
+                    className={
+                      isSelected
+                        ? 'opacity-100'
+                        : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100'
+                    }
+                    checked={isSelected}
+                    // use onClick instead of onCheckedChange to handle shift-key selection
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onCheckItem(event.nativeEvent.shiftKey)
+                    }}
+                    aria-label="Check to select this item"
+                  />
+                ) : (
+                  // Reserve the same slot as the file checkbox without a focusable control
+                  <span aria-hidden className="h-4 w-4 shrink-0" />
+                )}
+              </>
             )}
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
@@ -534,15 +539,10 @@ export const FileExplorerRow = ({
               size={14}
             />
           ) : isArchived ? (
-            <div className="flex items-center gap-x-1">
-              <ArchivedBadge
-                name={item.name}
-                onOpen={isArchivedFile ? () => onSelectFile(columnIndex) : undefined}
-              />
-              {isArchivedFile && archivedRowOptions.length > 0 && (
-                <RowActionsMenu name={item.name} options={archivedRowOptions} />
-              )}
-            </div>
+            isArchivedFile &&
+            archivedRowOptions.length > 0 && (
+              <RowActionsMenu name={item.name} options={archivedRowOptions} />
+            )
           ) : (
             <RowActionsMenu name={item.name} options={rowOptions} />
           )}
