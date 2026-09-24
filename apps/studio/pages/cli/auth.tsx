@@ -362,7 +362,7 @@ const CliAuthScreen = ({
                 {projectRef ? (
                   <FormControl>
                     <InputGroup>
-                      <FormInputGroupInput {...field} readOnly />
+                      <FormInputGroupInput {...field} readOnly className="font-mono" />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>
                           <Badge variant="default" className="shrink-0">
