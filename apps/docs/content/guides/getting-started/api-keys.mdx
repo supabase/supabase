@@ -176,7 +176,7 @@ Pass the branch's own project ref to read the keys for a preview branch. A branc
 
 Use the Management API to fetch keys from your own tooling, such as a deploy script or an internal provisioning service.
 
-Authenticate with a [personal access token](/dashboard/account/tokens). An OAuth application needs the `secrets:read` scope, and a [scoped personal access token](/docs/guides/platform/personal-access-tokens) needs the **API Keys** permission with **Read** access. To reveal key values with `reveal=true`, as the example below does, the scoped token also needs **API Key Secrets** with **Read** access. Without either, the request returns 403 Forbidden.
+Authenticate with a [personal access token](/dashboard/account/tokens). An OAuth application needs the `secrets:read` scope, and a [scoped personal access token](/docs/guides/platform/personal-access-tokens) needs the **API Keys** permission with **Read** access. To reveal key values with `reveal=true`, as the example below does, the scoped token also needs **API Key Secrets** with **Read** access. Without the required scope or permissions, the request returns 403 Forbidden.
 
 ```bash
 export PROJECT_REF="your-project-ref"

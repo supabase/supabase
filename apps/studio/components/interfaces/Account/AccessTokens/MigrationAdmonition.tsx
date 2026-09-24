@@ -38,12 +38,12 @@ export const MigrationAdmonition = () => {
     >
       <div className="flex flex-col gap-y-1.5">
         <p className="text-sm text-foreground-light">
-          Choose the organizations, projects, and permissions each new token can reach. Grant only
-          what its integration needs.
+          Choose which organizations and projects each new token can reach, and what it can do
+          there. Grant only what its integration needs.
         </p>
         <span className="text-sm text-foreground-light">
-          Pre-existing tokens are marked with a <Badge>Legacy</Badge> badge and will continue to
-          work until expiry or deletion.
+          Tokens with full account access show a <Badge>Legacy</Badge> badge and keep working until
+          they expire or you delete them.
         </span>
       </div>
     </Admonition>

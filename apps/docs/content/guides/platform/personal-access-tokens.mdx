@@ -5,7 +5,7 @@ description: 'Scope personal access tokens to specific organizations, projects, 
 
 Personal access tokens (PATs) authenticate you to the [Management API](/docs/reference/api/introduction) and the tools built on it, like the Supabase CLI and the [MCP server](/docs/guides/ai-tools/mcp). They come in two flavors:
 
-- **Classic tokens** carry your account's full access. That means every permission, on every organization and every project you belong to today, and on every one you create or join in the future. A classic token created a year ago can touch a project you created today.
+- **Classic tokens**, shown with a **Legacy** badge in the dashboard, carry your account's full access. That means every permission, on every organization and every project you belong to today, and on every one you create or join in the future. A classic token created a year ago can touch a project you created today.
 - **Scoped tokens** carry only the organizations, projects, and permissions you choose. For example: read one project's database and view its logs, with no access to billing or organization settings.
 
 <Admonition type="note">
@@ -40,20 +40,22 @@ curl -i "https://api.supabase.com/v1/projects/your-project-ref/types/typescript"
 # Returns HTTP 403
 ```
 
-The tables below list which permission unlocks which endpoints, and which permission each [MCP tool](#mcp-tools) requires, so you can grant exactly what a workflow needs.
+To grant exactly what a workflow needs, see [Permission scopes](#permission-scopes) for the permission each endpoint requires and [MCP tools](#mcp-tools) for the permission each MCP tool requires.
 
 ## Use a scoped personal access token with the Supabase CLI
 
 The browser flow of `supabase login` creates a classic token. To run the CLI with a scoped token instead, set it in the `SUPABASE_ACCESS_TOKEN` environment variable, or save it with `supabase login --token`. The environment variable takes precedence over any saved token, which also makes it the right choice for CI.
 
+For example, with a token granted **Projects (account-wide)** with **Read** access, `supabase projects list` lists the projects the token can reach:
+
 ```bash
 export SUPABASE_ACCESS_TOKEN="sbp_fc..."
-
-# Lists only the projects the token can reach
 supabase projects list
 ```
 
-Commands that call the Management API fail with a permission error when the token lacks the permission. Database commands that connect with your database password, such as `supabase db push` with `SUPABASE_DB_PASSWORD` set, aren't limited by the token's permissions.
+Commands that call the Management API fail with a permission error when the token lacks the required permission. `supabase link`, for instance, needs **Project Settings**, **API Keys**, and **API Key Secrets**, all with **Read** access.
+
+Database commands that connect with your database password, such as `supabase db push` with `SUPABASE_DB_PASSWORD` set, aren't limited by the token's permissions. A workflow that runs `supabase link` before `supabase db push` still needs the permissions `supabase link` requires.
 
 ## Permission scopes
 
