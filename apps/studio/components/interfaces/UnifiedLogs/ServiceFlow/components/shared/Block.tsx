@@ -57,6 +57,7 @@ export function createBlock(config: BlockConfig) {
     isLoading,
     filterFields,
     table,
+    defaultOpen = false,
   }: ServiceFlowBlockProps) {
     const [seeMoreFieldsSections, otherSections] = partition(
       config.sections,
@@ -72,7 +73,7 @@ export function createBlock(config: BlockConfig) {
     return (
       <>
         <CollapsibleDetailSection
-          defaultOpen
+          defaultOpen={defaultOpen}
           className="border-b"
           title={config.title}
           icon={config.icon}

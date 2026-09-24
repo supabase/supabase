@@ -2,7 +2,12 @@ import { type Table as TTable } from '@tanstack/react-table'
 import { createLoader, createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
-import { LOG_TYPES, LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import {
+  LOG_TYPE_TO_SOURCE,
+  LOG_TYPES,
+  LOG_TYPES_LABELS,
+  SEARCH_PARAMS_PARSER,
+} from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
 import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
@@ -154,6 +159,13 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
     if (typeof max === 'number') return [max, max]
     return undefined
   }
+}
+
+/** The logs table `source` a list log type reads from, when it maps to exactly one. */
+export function getLogTypeSource(logType: string) {
+  return logType in LOG_TYPE_TO_SOURCE
+    ? LOG_TYPE_TO_SOURCE[logType as keyof typeof LOG_TYPE_TO_SOURCE]
+    : undefined
 }
 
 /**

@@ -1,9 +1,7 @@
-import { ClockIcon } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 
-import { LogFields } from '../components/LogFields'
 import type { ColumnSchema } from '../UnifiedLogs.schema'
-import { getRowTimestampMs } from '../UnifiedLogs.utils'
+import { GenericLogOverview } from './components/GenericLogOverview'
 import { PostgresFlowDetail } from './components/PostgresFlowDetail'
 import {
   MemoizedEdgeFunctionBlock,
@@ -15,7 +13,6 @@ import {
   MemoizedSupavisorBlock,
 } from './components/ServiceBlocks'
 import type { ServiceFlowBlockProps } from './types'
-import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 
 type LogOverviewProps = Omit<ServiceFlowBlockProps, 'data'> & {
   data: ColumnSchema
@@ -23,34 +20,17 @@ type LogOverviewProps = Omit<ServiceFlowBlockProps, 'data'> & {
 }
 
 function RequestOverview({ children, ...props }: LogOverviewProps & { children: ReactNode }) {
-  const timestamp = getRowTimestampMs(props.data)
   return (
     <>
-      <DetailSectionHeader
-        title="Request started"
-        className="border-b"
-        icon={ClockIcon}
-        summary={timestamp === null ? undefined : new Date(timestamp).toLocaleString()}
-      />
-      <MemoizedNetworkBlock {...props} />
+      {/* Only the first section starts open; the rest are a click away */}
+      <MemoizedNetworkBlock {...props} defaultOpen />
       {children}
     </>
   )
 }
 
 function SupavisorOverview(props: LogOverviewProps) {
-  const timestamp = getRowTimestampMs(props.data)
-  return (
-    <>
-      <DetailSectionHeader
-        title="Event time"
-        className="border-b"
-        icon={ClockIcon}
-        summary={timestamp === null ? undefined : new Date(timestamp).toLocaleString()}
-      />
-      <MemoizedSupavisorBlock {...props} />
-    </>
-  )
+  return <MemoizedSupavisorBlock {...props} defaultOpen />
 }
 
 function PostgrestOverview(props: LogOverviewProps) {
@@ -98,9 +78,30 @@ const LOG_OVERVIEW_RENDERERS: Partial<
   supavisor: SupavisorOverview,
 }
 
-export function LogOverview(props: LogOverviewProps) {
-  const Renderer = LOG_OVERVIEW_RENDERERS[props.data.log_type]
-  if (Renderer) return <Renderer {...props} />
+export const hasLogOverviewRenderer = (logType: string) => logType in LOG_OVERVIEW_RENDERERS
 
-  return <LogFields data={props.rawData} table={props.table} filterFields={props.filterFields} />
+/**
+ * Everything known about a log, grouped into collapsible sections.
+ * Sources without a hand-written layout group their `attributes` generically.
+ */
+export function LogOverview({
+  attributes,
+  ...props
+}: LogOverviewProps & { attributes?: Record<string, unknown> | null }) {
+  const Renderer = LOG_OVERVIEW_RENDERERS[props.data.log_type]
+
+  return (
+    <>
+      {Renderer ? (
+        <Renderer {...props} />
+      ) : (
+        <GenericLogOverview
+          data={props.data}
+          attributes={attributes}
+          filterFields={props.filterFields}
+          table={props.table}
+        />
+      )}
+    </>
+  )
 }

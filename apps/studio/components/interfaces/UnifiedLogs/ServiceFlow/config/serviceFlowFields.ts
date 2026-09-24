@@ -657,8 +657,8 @@ export const storageDetailsFields: BlockFieldConfig[] = [
 // POSTGRES FIELDS
 // =============================================================================
 
-// Primary Postgres Fields (Always Visible)
-export const postgresPrimaryFields: BlockFieldConfig[] = [
+// What ran and how it ended
+export const postgresStatementFields: BlockFieldConfig[] = [
   {
     id: 'event_message',
     label: 'Message',
@@ -666,26 +666,20 @@ export const postgresPrimaryFields: BlockFieldConfig[] = [
     wrap: true,
   },
   {
+    id: 'error_severity',
+    label: 'Severity',
+    getValue: (data, enrichedData) => enrichedData?.error_severity || data?.error_severity,
+    requiresEnrichedData: true,
+  },
+  {
     id: 'status',
-    label: 'Status',
+    label: 'SQLSTATE',
     getValue: (data, enrichedData) => enrichedData?.status || data?.status,
   },
   {
     id: 'command_tag',
     label: 'Command',
     getValue: (data, enrichedData) => enrichedData?.command_tag || data?.command_tag,
-    requiresEnrichedData: true,
-  },
-  {
-    id: 'database_name',
-    label: 'Database',
-    getValue: (data, enrichedData) => enrichedData?.database_name || data?.database_name,
-    requiresEnrichedData: true,
-  },
-  {
-    id: 'database_user',
-    label: 'User',
-    getValue: (data, enrichedData) => enrichedData?.database_user || data?.database_user,
     requiresEnrichedData: true,
   },
   {
@@ -697,19 +691,32 @@ export const postgresPrimaryFields: BlockFieldConfig[] = [
   },
   {
     id: 'detail',
-    label: 'Details',
+    label: 'Detail',
     getValue: (data, enrichedData) => enrichedData?.detail || data?.detail,
+    requiresEnrichedData: true,
+    wrap: true,
+  },
+  {
+    id: 'hint',
+    label: 'Hint',
+    getValue: (data, enrichedData) => enrichedData?.['parsed.hint'] || data?.hint,
     requiresEnrichedData: true,
     wrap: true,
   },
 ]
 
-// Postgres Details (Collapsible)
-export const postgresDetailsFields: BlockFieldConfig[] = [
+// Who ran it and from where
+export const postgresSessionFields: BlockFieldConfig[] = [
   {
-    id: 'backend_type',
-    label: 'Backend Type',
-    getValue: (data, enrichedData) => enrichedData?.backend_type || data?.backend_type,
+    id: 'database_user',
+    label: 'User',
+    getValue: (data, enrichedData) => enrichedData?.database_user || data?.database_user,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'database_name',
+    label: 'Database',
+    getValue: (data, enrichedData) => enrichedData?.database_name || data?.database_name,
     requiresEnrichedData: true,
   },
   {
@@ -719,9 +726,24 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
     requiresEnrichedData: true,
   },
   {
+    id: 'backend_type',
+    label: 'Backend Type',
+    getValue: (data, enrichedData) => enrichedData?.backend_type || data?.backend_type,
+    requiresEnrichedData: true,
+  },
+  {
     id: 'session_id',
     label: 'Session ID',
     getValue: (data, enrichedData) => enrichedData?.session_id || data?.session_id,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'session_start_time',
+    label: 'Session Started',
+    getValue: (data, enrichedData) => {
+      const startTime = enrichedData?.session_start_time || data?.session_start_time
+      return startTime ? new Date(startTime).toLocaleString() : null
+    },
     requiresEnrichedData: true,
   },
   {
@@ -730,15 +752,10 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
     getValue: (data, enrichedData) => enrichedData?.process_id || data?.process_id,
     requiresEnrichedData: true,
   },
-  {
-    id: 'query_id',
-    label: 'Query ID',
-    getValue: (data, enrichedData) => {
-      const queryId = enrichedData?.query_id || data?.query_id
-      return queryId ? String(queryId) : null
-    },
-    requiresEnrichedData: true,
-  },
+]
+
+// Internal identifiers, mostly useful for correlating with other Postgres logs
+export const postgresTransactionFields: BlockFieldConfig[] = [
   {
     id: 'transaction_id',
     label: 'Transaction ID',
@@ -750,17 +767,17 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
   },
   {
     id: 'virtual_transaction_id',
-    label: 'Virtual TX ID',
+    label: 'Virtual Transaction ID',
     getValue: (data, enrichedData) =>
       enrichedData?.virtual_transaction_id || data?.virtual_transaction_id,
     requiresEnrichedData: true,
   },
   {
-    id: 'session_start_time',
-    label: 'Session Started',
+    id: 'query_id',
+    label: 'Query ID',
     getValue: (data, enrichedData) => {
-      const startTime = enrichedData?.session_start_time || data?.session_start_time
-      return startTime ? new Date(startTime).toLocaleString() : null
+      const queryId = enrichedData?.query_id || data?.query_id
+      return queryId ? String(queryId) : null
     },
     requiresEnrichedData: true,
   },

@@ -51,6 +51,20 @@ export const logsKeys = {
       facetSearch,
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
+  logAttributes: (
+    projectRef: string | undefined,
+    logId: string | undefined,
+    source: string | undefined,
+    logTimestampMs: number | null | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'log-attributes',
+      logId,
+      { source, logTimestampMs },
+    ] as const,
   serviceFlow: (
     projectRef: string | undefined,
     searchParams: QuerySearchParamsType | undefined,

@@ -275,12 +275,12 @@ describe('selected log details', () => {
     renderPanel()
     await user.click(row('first'))
     expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByText('event_message')).toBeVisible()
+    expect(screen.getByText('Message')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Copy selected logs' })).toBeVisible()
     await user.click(screen.getByRole('tab', { name: 'Raw JSON' }))
     expect(screen.getByRole('button', { name: 'Copy log as JSON' })).toBeVisible()
     await user.click(screen.getByRole('tab', { name: 'Overview' }))
-    expect(screen.getByText('event_message')).toBeVisible()
+    expect(screen.getByText('Message')).toBeVisible()
   })
 
   it('shows and copies JSON directly for multiple logs and restores single-log tabs', async () => {
