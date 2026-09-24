@@ -30,11 +30,7 @@
    * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
   --warning-hue: 58;
-  /*
-   * Sit below the shared on-fill flip (L≈0.62) so --warning-foreground resolves
-   * to light ink, same path as destructive/info. L≈0.55 is about the lightest
-   * amber that still clears ~4.5:1 with white (WCAG AA for normal text).
-   */
+  /* Below on-fill flip (~0.62) so ink is light and clears ~4.5:1 */
   --warning-lightness: 0.55;
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;
