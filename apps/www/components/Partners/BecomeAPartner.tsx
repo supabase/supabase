@@ -21,7 +21,7 @@ export default function BecomeAPartner() {
             </>
           }
           description="Tell us about your company, what you’re building and the program you're interested in.
-            We review every application and follow up within a week."
+            We review every application and will reach out if there’s a good fit."
         />
         <Suspense>
           <PartnerIntakeForm />

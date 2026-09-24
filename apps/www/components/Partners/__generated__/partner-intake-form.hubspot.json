@@ -53,6 +53,10 @@
           "value": "6-10"
         },
         {
+          "label": "11-20",
+          "value": "11-20"
+        },
+        {
           "label": "21-50",
           "value": "21-50"
         },
@@ -382,13 +386,6 @@
       "name": "any_other_details_youd_like_us_to_know",
       "label": "Any other details you'd like us to know?",
       "fieldType": "textarea",
-      "required": false,
-      "options": []
-    },
-    {
-      "name": "how_many_people_work_at_your_company",
-      "label": "How many people work at your company?\"",
-      "fieldType": "text",
       "required": false,
       "options": []
     }

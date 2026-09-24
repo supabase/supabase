@@ -5,8 +5,10 @@ import { parseAsString, useQueryState } from 'nuqs'
 
 import { fields } from './PartnerIntakeForm.fields'
 
-const successMessage =
-  'We’ve received your submission. Our team reviews every application — if there’s a good fit with the program you selected, we’ll be in touch to discuss next steps.'
+// Keep in sync with the thank-you message on the HubSpot form.
+const successMessage = `We appreciate your interest in partnering with Supabase. Our team reviews every submission, and if there’s a good fit with the program you’ve expressed interest in, we’ll be in touch to discuss next steps.
+
+If you’re a technology partner looking to get a head start, you can begin building your OAuth integration today using our [integration guide](/docs/guides/integrations/build-a-supabase-oauth-integration).`
 
 interface PartnerIntakeFormProps {
   className?: string

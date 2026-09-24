@@ -102,6 +102,7 @@ export const fields: MarketingFormField[] = [
     options: [
       { value: '1-5', label: '1-5' },
       { value: '6-10', label: '6-10' },
+      { value: '11-20', label: '11-20' },
       { value: '21-50', label: '21-50' },
       { value: '51-100', label: '51-100' },
       { value: '100+', label: '100+' },
