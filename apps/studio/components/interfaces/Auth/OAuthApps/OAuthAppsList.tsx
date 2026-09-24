@@ -407,7 +407,7 @@ export const OAuthAppsList = () => {
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button className="px-1" aria-label="More options" title="More options" icon={<MoreVertical />} />
+                              <Button className="px-1" aria-label={`More options for ${app.client_name}`} title={`More options for ${app.client_name}`} icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-48">
                               <DropdownMenuItem
