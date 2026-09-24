@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { ToggleGroup, ToggleGroupItem } from 'ui'
 
-const TONES = ['default', 'outline', 'text', 'primary'] as const
+const TONES = ['text', 'outline', 'primary'] as const
 
 export default function ToggleGroupSegmented() {
   const [view, setView] = React.useState('data')

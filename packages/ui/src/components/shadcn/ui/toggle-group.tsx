@@ -26,32 +26,30 @@ const segmentedSelfPaint = 'data-[state=on]:bg-overlay-hover aria-checked:bg-ove
 
 /**
  * `tone` restyles a segmented group using the Button variant vocabulary. It is a second
- * axis on purpose: `variant` is shadcn's, and its `default`/`outline` values are already
- * in use, so they cannot be redefined to mean Button's.
+ * axis on purpose: `variant` is shadcn's, and its `outline` value is already in use, so
+ * it cannot be redefined to mean Button's.
  */
 const segmentedToneVariants = cva('', {
   variants: {
     tone: {
-      default: '',
       outline: 'border border-strong',
       text: '',
       primary: '',
     },
   },
-  defaultVariants: { tone: 'default' },
+  defaultVariants: { tone: 'text' },
 })
 
 const segmentedIndicatorToneVariants = cva('', {
   variants: {
     tone: {
-      default: 'bg-background dark:bg-card border border-strong',
       outline: 'bg-overlay-hover border border-strong shadow-sm',
       text: 'bg-accent',
       primary:
         'bg-brand-400 dark:bg-brand-500 border border-brand-500/75 dark:border-brand-default/30',
     },
   },
-  defaultVariants: { tone: 'default' },
+  defaultVariants: { tone: 'text' },
 })
 
 const toggleGroupVariants = cva('flex items-center justify-center', {

@@ -120,17 +120,16 @@ does not apply to you.
 ### Tones
 
 `tone` restyles a segmented group using the Button variant vocabulary. It is a second axis rather
-than more `variant` values because `variant` is shadcn's, and its `default` and `outline` values
-are already in use elsewhere — redefining them would restyle existing callsites.
+than more `variant` values because `variant` is shadcn's, and its `outline` value is already in
+use elsewhere — redefining it would restyle existing callsites.
 
-| `tone`    | Container       | Selected indicator                                |
-| --------- | --------------- | ------------------------------------------------- |
-| `default` | None — naked    | Matches a default Button — surface fill, bordered |
-| `outline` | `border-strong` | `bg-overlay-hover` fill, bordered, `shadow-sm`    |
-| `text`    | None — naked    | `bg-accent` fill                                  |
-| `primary` | None — naked    | Brand fill, matching a primary Button             |
+| `tone`    | Container       | Selected indicator                             |
+| --------- | --------------- | ---------------------------------------------- |
+| `text`    | None — naked    | `bg-accent` fill                               |
+| `outline` | `border-strong` | `bg-overlay-hover` fill, bordered, `shadow-sm` |
+| `primary` | None — naked    | Brand fill, matching a primary Button          |
 
-Resting items are identical across all four; only the container and the indicator move.
+Resting items are identical across all three; only the container and the indicator move.
 
 ### Sanctioned uses
 
@@ -234,12 +233,12 @@ name the options, not the axis.
 [Radix Toggle Group](https://www.radix-ui.com/docs/primitives/components/toggle-group#api-reference),
 and adds the following.
 
-| Prop            | Type                                            | Default     | Description                                                                |
-| --------------- | ----------------------------------------------- | ----------- | -------------------------------------------------------------------------- |
-| `variant`       | `'default' \| 'outline' \| 'segmented'`         | `'default'` | Styles the root and every item. Items inherit it through context.          |
-| `size`          | `'tiny' \| 'sm' \| 'default' \| 'lg'`           | `'default'` | Item height and padding. Items inherit it through context.                 |
-| `allowDeselect` | `boolean`                                       | `true`      | Whether clicking the active item in a `type="single"` group clears it.     |
-| `tone`          | `'default' \| 'outline' \| 'text' \| 'primary'` | `'default'` | Button-flavoured styling for a segmented group. Ignored by other variants. |
+| Prop            | Type                                    | Default     | Description                                                                |
+| --------------- | --------------------------------------- | ----------- | -------------------------------------------------------------------------- |
+| `variant`       | `'default' \| 'outline' \| 'segmented'` | `'default'` | Styles the root and every item. Items inherit it through context.          |
+| `size`          | `'tiny' \| 'sm' \| 'default' \| 'lg'`   | `'default'` | Item height and padding. Items inherit it through context.                 |
+| `allowDeselect` | `boolean`                               | `true`      | Whether clicking the active item in a `type="single"` group clears it.     |
+| `tone`          | `'outline' \| 'text' \| 'primary'`      | `'text'`    | Button-flavoured styling for a segmented group. Ignored by other variants. |
 
 `variant` and `size` are the shadcn variant axes; `segmented` and `allowDeselect` are the Supabase
 additions. `default` and `outline` are unchanged from shadcn.

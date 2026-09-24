@@ -9,7 +9,7 @@ const renderSegmented = (props: {
   defaultValue?: string
   onValueChange?: (value: string) => void
   allowDeselect?: boolean
-  tone?: 'default' | 'outline' | 'text' | 'primary'
+  tone?: 'outline' | 'text' | 'primary'
 }) => (
   <ToggleGroup variant="segmented" size="tiny" type="single" {...props}>
     <ToggleGroupItem value="data">Data</ToggleGroupItem>
@@ -56,14 +56,13 @@ describe('ToggleGroup', () => {
 
   it('tones the indicator rather than the items', () => {
     const { container, rerender } = render(renderSegmented({ defaultValue: 'data' }))
-    // default borrows the default Button treatment, minus the container outline
+    expect(container.querySelector('[data-segment-indicator]')).toHaveClass('bg-accent')
+
+    rerender(renderSegmented({ defaultValue: 'data', tone: 'outline' }))
     expect(container.querySelector('[data-segment-indicator]')).toHaveClass(
-      'bg-background',
+      'bg-overlay-hover',
       'border-strong'
     )
-
-    rerender(renderSegmented({ defaultValue: 'data', tone: 'text' }))
-    expect(container.querySelector('[data-segment-indicator]')).toHaveClass('bg-accent')
 
     rerender(renderSegmented({ defaultValue: 'data', tone: 'primary' }))
     expect(container.querySelector('[data-segment-indicator]')).toHaveClass('bg-brand-400')
