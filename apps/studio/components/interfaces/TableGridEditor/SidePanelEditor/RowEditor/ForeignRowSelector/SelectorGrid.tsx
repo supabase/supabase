@@ -10,7 +10,7 @@ import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
 } from '@/components/grid/utils/gridColumns'
-import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
+import { useOptionalTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface SelectorGridProps {
   rows: SupaRow[]
@@ -59,7 +59,9 @@ const formatter = ({ column, format, row }: { column: string; format: string; ro
 }
 
 const SelectorGrid = ({ rows, onRowSelect }: SelectorGridProps) => {
-  const snap = useTableEditorTableStateSnapshot()
+  const snap = useOptionalTableEditorTableStateSnapshot()
+  if (!snap) return null
+
 
   const columns: Column<SupaRow>[] = snap.table.columns.map((column) => {
     const columnDefaultWidth = getColumnDefaultWidth(column)
