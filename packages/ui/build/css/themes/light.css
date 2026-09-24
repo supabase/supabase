@@ -31,6 +31,12 @@
    */
   --warning-hue: 58;
   --warning-lightness: 0.68;
+  /*
+   * Light warning sits above the shared on-fill flip (L≈0.62), which would pick
+   * dark ink — but amber at this lightness still needs light text on solid fills
+   * (e.g. Button warning). Force light ink; dark mode keeps the relative formula.
+   */
+  --warning-foreground: oklch(from var(--warning) 0.99 calc(c * 0.08) h);
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;
 
