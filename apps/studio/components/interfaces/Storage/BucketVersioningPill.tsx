@@ -7,13 +7,14 @@ import type { Bucket } from '@/data/storage/buckets-query'
 
 const COPY = {
   enabled: {
-    variant: 'success' as const,
-    tooltip: 'Versioning enabled. Overwriting or archiving a file keeps a recoverable copy.',
+    variant: 'default' as const,
+    label: 'Versioning enabled',
+    tooltip: 'Overwriting or archiving a file keeps a recoverable copy.',
   },
   suspended: {
     variant: 'warning' as const,
-    tooltip:
-      'Versioning suspended. Existing versions stay retained, but new writes no longer create one.',
+    label: 'Versioning suspended',
+    tooltip: 'Existing versions stay retained, but new writes no longer create one.',
   },
 }
 
@@ -24,14 +25,14 @@ export const BucketVersioningPill = ({ bucket }: { bucket?: Bucket }) => {
 
   if (!isStorageVersioningEnabled || versioningState === 'disabled') return null
 
-  const { variant, tooltip } = COPY[versioningState]
+  const { variant, label, tooltip } = COPY[versioningState]
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Badge variant={variant} className="flex shrink-0 items-center gap-1">
           <FileStack size={12} aria-hidden />
-          Versioning
+          {label}
         </Badge>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-64">
