@@ -35,7 +35,7 @@ interface FunctionDiffProps {
 const getStatusColor = (status: FileStatus): string => {
   switch (status) {
     case 'added':
-      return 'text-brand'
+      return 'text-primary'
     case 'removed':
       return 'text-destructive'
     case 'modified':

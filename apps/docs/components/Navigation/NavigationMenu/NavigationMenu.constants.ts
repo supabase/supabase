@@ -1140,20 +1140,6 @@ export const database: NavMenuConstant = {
       ],
     },
     {
-      name: 'Multigres',
-      url: undefined,
-      items: [
-        {
-          name: 'Overview',
-          url: '/guides/database/multigres' as `/${string}`,
-        },
-        {
-          name: 'Compatibility',
-          url: '/guides/database/multigres/compatibility' as `/${string}`,
-        },
-      ],
-    },
-    {
       name: 'Access and security',
       url: undefined,
       items: [
@@ -1254,19 +1240,19 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'BigQuery',
-              url: '/guides/database/replication/bigquery' as `/${string}`,
+              url: '/guides/database/replication/pipelines/bigquery' as `/${string}`,
             },
             {
               name: 'ClickHouse',
-              url: '/guides/database/replication/clickhouse' as `/${string}`,
+              url: '/guides/database/replication/pipelines/clickhouse' as `/${string}`,
             },
             {
               name: 'DuckLake',
-              url: '/guides/database/replication/ducklake' as `/${string}`,
+              url: '/guides/database/replication/pipelines/ducklake' as `/${string}`,
             },
             {
               name: 'Snowflake',
-              url: '/guides/database/replication/snowflake' as `/${string}`,
+              url: '/guides/database/replication/pipelines/snowflake' as `/${string}`,
             },
             {
               name: 'Monitoring',
@@ -3110,7 +3096,6 @@ export const telemetry: NavMenuConstant = {
       name: 'Hire an agent',
       items: [
         { name: 'Set up an agent', url: '/guides/observability/automate-with-agents' },
-        { name: 'Generalist', url: '/guides/observability/automate-with-agents/all' },
         { name: 'Health monitor', url: '/guides/observability/automate-with-agents/health' },
         { name: 'Security monitor', url: '/guides/observability/automate-with-agents/security' },
         {

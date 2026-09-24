@@ -37,6 +37,111 @@ describe('FilterBar', () => {
   const mockOnFilterChange = vi.fn()
   const mockOnFreeformTextChange = vi.fn()
 
+  it('formats a value for display without changing its stored or editable value', async () => {
+    const user = userEvent.setup()
+    const onApply = vi.fn()
+    const onFilterChange = vi.fn()
+    render(
+      <FilterBar
+        filterProperties={[
+          {
+            label: 'Time range',
+            name: 'date',
+            type: 'date',
+            operators: ['='],
+            formatValue: () => 'Last 60 minutes',
+          },
+        ]}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'date', operator: '=', value: 'precise-range' }],
+        }}
+        onFilterChange={onFilterChange}
+        onApply={onApply}
+        freeformText=""
+        onFreeformTextChange={vi.fn()}
+      />
+    )
+    const valueInput = screen.getByLabelText('Value for Time range')
+    expect(valueInput).toHaveValue('Last 60 minutes')
+    await user.click(valueInput)
+    expect(valueInput).toHaveValue('precise-range')
+    await user.click(document.body)
+    await waitFor(() => expect(valueInput).toHaveValue('Last 60 minutes'))
+    expect(onFilterChange).not.toHaveBeenCalled()
+    expect(onApply).toHaveBeenLastCalledWith({
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'date', operator: '=', value: 'precise-range' }],
+    })
+  })
+
+  it('keeps a custom picker value formatted while active and stores the selected raw value', async () => {
+    const user = userEvent.setup()
+    const onFilterChange = vi.fn()
+    const properties: FilterProperty[] = [
+      {
+        label: 'Time range',
+        name: 'date',
+        type: 'date',
+        operators: ['='],
+        formatValue: (value) => (value === 'range-30m' ? 'Last 30 minutes' : 'Last 60 minutes'),
+        options: {
+          component: ({ onChange, search }) => (
+            <button onClick={() => onChange('range-30m')} data-current-range={search}>
+              Last 30 minutes
+            </button>
+          ),
+        },
+      },
+    ]
+    function PickerFilterBar() {
+      const [filters, setFilters] = useState<FilterGroup>({
+        logicalOperator: 'AND',
+        conditions: [{ propertyName: 'date', operator: '=', value: 'range-60m' }],
+      })
+      return (
+        <FilterBar
+          filterProperties={properties.map((property) => ({
+            ...property,
+            isAvailable: filters.conditions.length === 0,
+          }))}
+          filters={filters}
+          onFilterChange={(next) => {
+            setFilters(next)
+            onFilterChange(next)
+          }}
+          freeformText=""
+          onFreeformTextChange={vi.fn()}
+        />
+      )
+    }
+    render(<PickerFilterBar />)
+    const valueInput = screen.getByLabelText('Value for Time range')
+    expect(valueInput).toHaveValue('Last 60 minutes')
+    await user.click(valueInput)
+    const preset = await screen.findByRole('button', { name: 'Last 30 minutes' })
+    expect(valueInput).toHaveValue('Last 60 minutes')
+    expect(valueInput).toHaveAttribute('readonly')
+    expect(preset).toHaveAttribute('data-current-range', 'range-60m')
+    await user.keyboard('x')
+    expect(valueInput).toHaveValue('Last 60 minutes')
+    expect(onFilterChange).not.toHaveBeenCalled()
+    await user.click(preset)
+    await waitFor(() => expect(valueInput).toHaveValue('Last 30 minutes'))
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'date', operator: '=', value: 'range-30m' }],
+    })
+    const freeform = screen.getByTestId('filter-bar-freeform-input')
+    await user.click(freeform)
+    expect(screen.queryByRole('option', { name: 'Time range' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Remove Time range filter' }))
+    await user.click(freeform)
+    await user.click(await screen.findByRole('option', { name: 'Time range' }))
+    await user.click(await screen.findByRole('button', { name: 'Last 30 minutes' }))
+    expect(screen.getAllByLabelText('Value for Time range')).toHaveLength(1)
+  })
+
   it('renders with empty state', () => {
     render(
       <FilterBar

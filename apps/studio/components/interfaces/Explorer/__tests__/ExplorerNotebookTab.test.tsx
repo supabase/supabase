@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
 import { setCellSql } from '../QueryCell/QueryCell.utils'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
+import { ExplorerProvider } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
@@ -84,7 +85,9 @@ const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved'
 const renderNotebookTab = (tabsState = createTabsState('default')) =>
   customRender(
     <TabsStateContext.Provider value={tabsState}>
-      <ExplorerNotebookTab />
+      <ExplorerProvider>
+        <ExplorerNotebookTab />
+      </ExplorerProvider>
     </TabsStateContext.Provider>
   )
 
