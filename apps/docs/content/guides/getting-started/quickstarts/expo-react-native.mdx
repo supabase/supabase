@@ -97,19 +97,19 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    getInstruments()
-  }, [])
+    async function getInstruments() {
+      const { data, error } = await supabase.from('instruments').select()
 
-  async function getInstruments() {
-    const { data, error } = await supabase.from('instruments').select()
+      if (error) {
+        setError(error.message)
+        return
+      }
 
-    if (error) {
-      setError(error.message)
-      return
+      setInstruments(data ?? [])
     }
 
-    setInstruments(data ?? [])
-  }
+    getInstruments()
+  }, [])
 
   if (error) {
     return (
