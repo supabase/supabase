@@ -164,7 +164,14 @@ describe('fillTimeseries', () => {
       { timestamp: end.valueOf() * 1000, value: 2 },
     ]
 
-    const result = fillTimeseries(data, 'timestamp', 'value', 0, start.toISOString(), end.toISOString())
+    const result = fillTimeseries(
+      data,
+      'timestamp',
+      'value',
+      0,
+      start.toISOString(),
+      end.toISOString()
+    )
 
     expect(result).toHaveLength(2)
     expect(result.map((point) => point.value)).toEqual([1, 2])
