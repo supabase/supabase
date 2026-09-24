@@ -12,7 +12,8 @@ export const UUIDV4_LEFT_PREFIX_REGEX =
 
 export const PHONE_NUMBER_LEFT_PREFIX_REGEX = /^[+]?[0-9]{0,15}$/
 
-export const PANEL_PADDING = 'px-5 py-5'
+// Matches the key/value rows so panel content shares one left edge
+export const PANEL_PADDING = 'px-4 py-5'
 
 // [Joshen] Temporary fix as bulk delete will fire n requests since Auth + API do not have a bulk delete endpoint yet
 export const MAX_BULK_DELETE = 20
