@@ -4446,7 +4446,7 @@ export interface components {
          * @description Deprecated: Rely on root-level favorite property instead.
          */
         favorite?: boolean
-        schema_version: string
+        schema_version?: string
         sql: string
       }
       description: string | null

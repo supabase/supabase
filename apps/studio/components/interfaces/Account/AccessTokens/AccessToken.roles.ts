@@ -146,6 +146,8 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   infra_disk_config_write: 'administrator',
   infra_read_replicas_read: 'readonly',
   infra_read_replicas_write: 'administrator',
+  project_notebooks_read: 'readonly',
+  project_notebooks_write: 'developer',
   project_snippets_read: 'readonly',
   project_snippets_write: 'readonly',
   realtime_config_read: 'readonly',
