@@ -59,7 +59,7 @@ function FilterBarContent({ className }: { className?: string }) {
     <div className="w-full space-y-2 relative">
       <div
         className={cn(
-          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 pr-2 overflow-auto has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-ring has-[input:focus-visible]:ring-offset-2 has-[input:focus-visible]:ring-offset-background',
+          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 pr-2 overflow-auto',
           className
         )}
       >

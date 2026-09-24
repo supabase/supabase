@@ -263,8 +263,9 @@ export function FilterCondition({
     <div
       ref={wrapperRef}
       className={cn(
-        'flex items-stretch px-0 h-[26px] bg-muted group shrink-0',
-        variant === 'pill' ? 'rounded-sm border' : 'border-r',
+        'flex items-stretch px-0 bg-muted group shrink-0',
+        variant === 'pill' ? 'h-[26px] rounded-sm border' : 'self-stretch border-r',
+        (isActive || isOperatorActive || isPropertyActive) && 'ring-1 ring-inset ring-ring',
         isHighlighted && 'ring-2 ring-primary-bright'
       )}
       data-testid={`filter-condition-${property.name}`}
