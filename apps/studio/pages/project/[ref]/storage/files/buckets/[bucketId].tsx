@@ -79,6 +79,7 @@ const BucketPage: NextPageWithLayout = () => {
         <PageBreadcrumbs
           actions={
             <PageBreadcrumbsActions>
+              <BucketVersioningPill bucket={bucket} />
               <Button
                 asChild
                 variant="outline"
@@ -158,7 +159,6 @@ const BucketPage: NextPageWithLayout = () => {
                     <TooltipContent side="bottom">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
                   </Tooltip>
                 )}
-                <BucketVersioningPill bucket={bucket} />
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
