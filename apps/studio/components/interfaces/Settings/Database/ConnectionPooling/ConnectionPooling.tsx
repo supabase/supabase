@@ -129,7 +129,7 @@ export const ConnectionPooling = () => {
     updatePoolerConfig(
       {
         ref: projectRef,
-        default_pool_size: default_pool_size === undefined ? defaultPoolSize : default_pool_size,
+        default_pool_size: default_pool_size === undefined ? null : default_pool_size,
         ignore_startup_parameters: ignoreStartupParameters ?? '',
       },
       {
