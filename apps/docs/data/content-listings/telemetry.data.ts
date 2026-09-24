@@ -8,10 +8,19 @@ export const telemetryAccessWhat: ContentListingGroup = {
   columns: 2,
   items: [
     {
-      title: 'Logs',
+      title: 'Query logs with SQL',
       href: '/guides/observability/advanced-log-filtering',
-      description:
-        'Query ClickHouse logs from Studio, MCP, or the API. Filter events in the Logs UI.',
+      description: 'Query ClickHouse events through MCP, the API, or Explorer.',
+    },
+    {
+      title: 'Logs in Studio',
+      href: '/guides/observability/logs',
+      description: 'Filter, inspect, and export events in the unified Logs view.',
+    },
+    {
+      title: 'Log sources and fields',
+      href: '/guides/observability/log-field-reference',
+      description: 'Look up sources, ClickHouse query fields, and capture limits.',
     },
     {
       title: 'Metrics API',
@@ -19,9 +28,9 @@ export const telemetryAccessWhat: ContentListingGroup = {
       description: 'Scrape Prometheus-compatible database metrics, or chart a subset in Reports.',
     },
     {
-      title: 'Database',
+      title: 'Inspect the database',
       href: '/guides/observability/inspect',
-      description: 'Inspect live Postgres stats from the CLI, the SQL Editor, or MCP.',
+      description: 'Inspect live Postgres stats from the CLI, Explorer, or MCP.',
     },
     {
       title: 'Advisors',
@@ -44,7 +53,7 @@ export const telemetryDetect: ContentListingGroup = {
       title: 'Detect issues',
       href: '/guides/observability/detecting',
       description:
-        'Run health, security, performance, and usage checks against logs and database statistics to pick up a signal.',
+        'Run health, security, performance, and capacity checks against logs and database statistics to pick up a signal.',
     },
   ],
 }
@@ -68,17 +77,10 @@ export const telemetryHireAgent: ContentListingGroup = {
   columns: 2,
   items: [
     {
-      title: 'Generalist',
-      href: '/guides/observability/automate-with-agents/all',
-      subtitle: getScheduleLabel(monitoringAgents.all),
-      description:
-        'Run all four checks — health, security, performance, and usage — in one daily pass.',
-    },
-    {
       title: monitoringAgents.health.name,
       href: '/guides/observability/automate-with-agents/health',
       subtitle: getScheduleLabel(monitoringAgents.health),
-      description: 'Watch logs for 5xx spikes and Auth failures.',
+      description: 'Check API and Auth server errors and connection pressure.',
     },
     {
       title: monitoringAgents.security.name,
@@ -90,13 +92,13 @@ export const telemetryHireAgent: ContentListingGroup = {
       title: monitoringAgents.performance.name,
       href: '/guides/observability/automate-with-agents/performance',
       subtitle: getScheduleLabel(monitoringAgents.performance),
-      description: 'Find slow queries, lock waits, and missing indexes.',
+      description: 'Review sessions, query regressions, and performance advisors.',
     },
     {
       title: monitoringAgents.usage.name,
       href: '/guides/observability/automate-with-agents/usage',
       subtitle: getScheduleLabel(monitoringAgents.usage),
-      description: 'Track request growth, error rates, and approaching limits.',
+      description: 'Track sizes, connections, request growth, and supported forecasts.',
     },
   ],
 }
@@ -106,6 +108,11 @@ export const telemetryExport: ContentListingGroup = {
   type: 'grid',
   columns: 3,
   items: [
+    {
+      title: 'Configure logging',
+      href: '/guides/observability/configure-logging',
+      description: 'Record additional Postgres and Realtime events.',
+    },
     {
       title: 'Log drains',
       href: '/guides/observability/log-drains',

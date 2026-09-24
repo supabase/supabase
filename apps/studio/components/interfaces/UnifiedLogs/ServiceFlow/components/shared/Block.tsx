@@ -72,7 +72,7 @@ export function createBlock(config: BlockConfig) {
 
     return (
       <>
-        <Collapsible defaultOpen>
+        <Collapsible defaultOpen className="border-b">
           <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
             <DetailSectionHeader title={config.title} icon={config.icon} />
             <ChevronDown
@@ -81,7 +81,7 @@ export function createBlock(config: BlockConfig) {
               size={14}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
+          <CollapsibleContent>
             {config.primaryFields?.map((field) => (
               <FieldRow
                 key={field.id}
@@ -113,8 +113,8 @@ export function createBlock(config: BlockConfig) {
         {data.log_type !== 'auth' &&
           otherSections.map((section) => {
             return (
-              <Collapsible key={section.title}>
-                <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+              <Collapsible key={section.title} className="border-b">
+                <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
                   <DetailSectionHeader title={section.title} icon={section.icon} />
                   <ChevronDown
                     className="transition-transform duration-200"
@@ -122,7 +122,7 @@ export function createBlock(config: BlockConfig) {
                     size={14}
                   />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
+                <CollapsibleContent>
                   {section.fields.map((field) => (
                     <FieldRow
                       key={field.id}

@@ -1013,7 +1013,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get oauth app authorization request */
+    /**
+     * Get oauth app authorization request
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['OAuthAuthorizationsController_getAuthorizationRequest']
     put?: never
     post?: never
@@ -1858,9 +1863,19 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Approve oauth app authorization request */
+    /**
+     * Approve oauth app authorization request
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['OrganizationOAuthAuthorizationsController_approveAuthorizationRequest']
-    /** [Beta] Decline oauth app authorization request */
+    /**
+     * Decline oauth app authorization request
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['OrganizationOAuthAuthorizationsController_declineAuthorizationRequest']
     options?: never
     head?: never
@@ -3930,7 +3945,7 @@ export interface paths {
     put?: never
     /**
      * Rollback pipeline tables
-     * @description Rollback the replication state of tables in the pipeline. Supports rolling back a single table, all errored tables or all tables. Requires bearer auth and an active, healthy project.
+     * @description Reset tables to their initial replication state. Supports resetting a single table, all errored tables or all tables. Waits for shutdown before resetting state, then recreates an active pipeline. Stopped pipelines remain stopped. Requires bearer auth and an active, healthy project.
      */
     post: operations['PipelinesController_rollbackTables']
     delete?: never
@@ -4511,6 +4526,34 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/storage/{ref}/buckets/{id}/lifecycle': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets bucket lifecycle configuration
+     * @description Standard buckets only. Returns 404 when no lifecycle configuration is stored.
+     */
+    get: operations['StorageBucketLifecycleController_getBucketLifecycle']
+    /**
+     * Replaces bucket lifecycle configuration
+     * @description Replaces the full policy on a Standard bucket. Only whole-bucket noncurrent version expiration is supported. Use DELETE to remove the policy.
+     */
+    put: operations['StorageBucketLifecycleController_updateBucketLifecycle']
+    post?: never
+    /**
+     * Deletes bucket lifecycle configuration
+     * @description Standard buckets only. Succeeds even when no lifecycle configuration is stored.
+     */
+    delete: operations['StorageBucketLifecycleController_deleteBucketLifecycle']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/storage/{ref}/buckets/{id}/objects': {
     parameters: {
       query?: never
@@ -4716,6 +4759,74 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/storage/{ref}/jwks': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists project storage jwks */
+    get: operations['StorageJwksController_listJwks']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/jwks/{kid}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Activates or deactivates a jwk */
+    put: operations['StorageJwksController_toggleJwk']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/jwks/url-signing/standby': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a standby url signing jwk */
+    post: operations['StorageJwksController_createStandbyJwk']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/jwks/url-signing/standby/{kid}/swap': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Swaps a standby url signing jwk into the active url signing jwk */
+    post: operations['StorageJwksController_swapStandbyJwk']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/storage/{ref}/vector-buckets': {
     parameters: {
       query?: never
@@ -4782,6 +4893,43 @@ export interface paths {
     post?: never
     /** Deletes bucket index */
     delete: operations['StorageVectorBucketIdIndexesController_deleteBucketIndex']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/atlas/application': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Will return the user data for the matching stripe application. */
+    post: operations['StripeAtlasPerkApplicationController_fetchAtlasApplication']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/atlas/application/complete': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Will verify that the stripe atlas token exists and create a credit code.
+     * @description If an unused credit code already exists for the stripe company, we will resend that code.
+     */
+    post: operations['StripeAtlasPerkApplicationController_completeStripeAtlasFlow']
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -5100,7 +5248,7 @@ export interface paths {
     put?: never
     /**
      * Set up Warehouse
-     * @description Ensure the project Warehouse pipeline exists, add the requested schemas and tables to its publication, and start syncing. Schema targets include the currently eligible tables in that schema. Warehouse FDW installation is opt-in.
+     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. An empty targets array stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection.
      */
     post: operations['WarehouseController_setup']
     delete?: never
@@ -5247,7 +5395,7 @@ export interface components {
       resources: string[] | null
       restrictive: boolean | null
     }
-    AccessToken: {
+    AccessToken_Output: {
       created_at: string
       expires_at: string | null
       id: number
@@ -5358,7 +5506,7 @@ export interface components {
       'connected?': boolean
       reason: string
     }
-    BackupsResponse: {
+    BackupsResponse_Output: {
       backups: {
         id: number
         inserted_at: string
@@ -5399,6 +5547,18 @@ export interface components {
         value: string
       }
     }
+    BucketLifecycleResponse_Output: {
+      rules: {
+        filter: Record<string, never>
+        id?: string
+        /** @description Present for rules that expire noncurrent versions. Newer Storage versions may return other actions. */
+        noncurrent_version_expiration?: {
+          newer_noncurrent_versions?: number
+          noncurrent_days: number
+        }
+        status: string
+      }[]
+    }
     Buffer: Record<string, never>
     BulkDeleteUserContentResponse_Output: {
       id: string
@@ -5406,7 +5566,7 @@ export interface components {
     ChangeMFAEnforcementStateRequest: {
       enforced: boolean
     }
-    CloneBackupsResponse: {
+    CloneBackupsResponse_Output: {
       backups: {
         id: number
         inserted_at: string
@@ -5431,7 +5591,7 @@ export interface components {
       newProjectName: string
       recoveryTimeTarget?: number
     }
-    CloudMarketplaceContractLinkingEligibilityResponse: {
+    CloudMarketplaceContractLinkingEligibilityResponse_Output: {
       eligibility: {
         aws_agreement_id?: string
         is_eligible: boolean
@@ -5445,7 +5605,7 @@ export interface components {
         )[]
       }
     }
-    CloudMarketplaceOnboardingInfoResponse: {
+    CloudMarketplaceOnboardingInfoResponse_Output: {
       aws_contract_auto_renewal: boolean
       aws_contract_end_date: string
       aws_contract_is_private_offer: boolean
@@ -5567,7 +5727,7 @@ export interface components {
       /** @enum {string} */
       scope?: 'V0'
     }
-    CreateAccessTokenResponse: {
+    CreateAccessTokenResponse_Output: {
       created_at: string
       expires_at: string | null
       id: number
@@ -6166,12 +6326,16 @@ export interface components {
       branch_limit?: number
       installation_id: number
       new_branch_per_pr?: boolean
+      /**
+       * @description Project ref
+       * @example abcdefghijklmnopqrst
+       */
       project_ref: string
       repository_id: number
       supabase_changes_only?: boolean
       workdir?: string
     }
-    CreateGitHubConnectionResponse: {
+    CreateGitHubConnectionResponse_Output: {
       branch_limit: number
       id: number
       inserted_at: string
@@ -6345,13 +6509,6 @@ export interface components {
       last_used_at: string | null
       /** Format: uuid */
       oauth_app_id: string
-    }
-    CreateOAuthAppResponse: {
-      client_id: string
-      client_secret: string
-      client_secret_expires_at: number
-      id: string
-      redirect_uris: string[]
     }
     CreateOAuthAppResponse_Output: {
       client_id: string
@@ -6608,6 +6765,8 @@ export interface components {
         | 'platform_webhooks_projects_write'
         | 'workers_read'
         | 'workers_write'
+        | 'project_notebooks_read'
+        | 'project_notebooks_write'
       )[]
     }
     CreatePlatformAppResponse_Output: {
@@ -6727,6 +6886,10 @@ export interface components {
             [key: string]: string
           }
         }
+        /** @description Allows a CORDONED kubernetes_cluster_id for an explicit operator-directed deployment. PENDING and REMOVED clusters remain ineligible. Has no effect without kubernetes_cluster_id also set. */
+        kubernetes_cluster_force?: boolean
+        /** @description Override the Kubernetes cluster this project is created on, bypassing load-balancing, for this creation only. Only for internal use; rejected for user-facing requests in production. */
+        kubernetes_cluster_id?: string
         warehouse_fdw?: {
           /** @description AWS ACM Private CA ARN used by the worker to issue per-project warehouse FDW client certificates. Defaults to the worker environment configuration when omitted. */
           client_certificate_authority_arn?: string
@@ -7559,10 +7722,12 @@ export interface components {
         | 'platform_webhooks_projects_write'
         | 'workers_read'
         | 'workers_write'
+        | 'project_notebooks_read'
+        | 'project_notebooks_write'
       )[]
       project_refs?: string[]
     }
-    CreateScopedAccessTokenResponse: {
+    CreateScopedAccessTokenResponse_Output: {
       created_at: string
       expires_at: string | null
       id: string
@@ -7577,6 +7742,13 @@ export interface components {
     CreateSourceResponse_Output: {
       /** @description Source ID */
       id: number
+    }
+    CreateStandbyJwkBody: {
+      /** @enum {string} */
+      type: 'HS512' | 'ES256'
+    }
+    CreateStandbyJwkResponse_Output: {
+      kid: string
     }
     CreateStorageAnalyticsBucketBody: {
       bucketName: string
@@ -7628,7 +7800,7 @@ export interface components {
       parent_id?: string | null
       project_id: number
     }
-    CreateUserResponse: {
+    CreateUserResponse_Output: {
       aud?: string
       banned_until?: string
       confirmation_sent_at?: string
@@ -7671,7 +7843,7 @@ export interface components {
       role?: string
       updated_at?: string
     }
-    CreateVercelConnectionResponse: {
+    CreateVercelConnectionResponse_Output: {
       env_sync_error?: {
         message: string
       }
@@ -7683,6 +7855,10 @@ export interface components {
         metadata: {
           [key: string]: unknown
         }
+        /**
+         * @description Project ref
+         * @example abcdefghijklmnopqrst
+         */
         supabase_project_ref: string
       }
       organization_integration_id: string
@@ -7693,6 +7869,10 @@ export interface components {
       metadata: {
         [key: string]: unknown
       }
+      /**
+       * @description Organization slug
+       * @example tsrqponmlkjihgfedcba
+       */
       organization_slug: string
       source: string
       teamId?: string
@@ -7880,7 +8060,7 @@ export interface components {
           }
       )[]
     }
-    DeleteVercelConnectionResponse: {
+    DeleteVercelConnectionResponse_Output: {
       id: string
     }
     DestinationResponse_Output: {
@@ -8555,7 +8735,7 @@ export interface components {
       }
       timestamp: string
     }
-    DownloadableBackupsResponse: {
+    DownloadableBackupsResponse_Output: {
       backups: {
         id: number
         inserted_at: string
@@ -8570,7 +8750,7 @@ export interface components {
     DownloadBackupBody: {
       id: number
     }
-    DownloadBackupResponse: {
+    DownloadBackupResponse_Output: {
       fileUrl: string
     }
     DynamicRegisterOAuthAppBody: {
@@ -8602,7 +8782,7 @@ export interface components {
       private: number
       shared: number
     }
-    GetGitHubConnectionConfigResponse: {
+    GetGitHubConnectionConfigResponse_Output: {
       /** @description JSON representation of the parsed `supabase/config.toml`. Its shape is owned by the Supabase CLI and is passed through as-is. */
       config: {
         [key: string]: unknown
@@ -8622,7 +8802,7 @@ export interface components {
         status: 0 | 1 | 2
       } | null
     }
-    GetOAuthAuthorizationResponse: {
+    GetOAuthAuthorizationResponse_Output: {
       approved_at?: string
       approved_organization_slug?: string
       domain: string
@@ -8888,7 +9068,7 @@ export interface components {
       lql?: string
       sql?: string
     }
-    GetProjectVercelConnectionsResponse: {
+    GetProjectVercelConnectionsResponse_Output: {
       integrations: {
         added_by: {
           primary_email: string
@@ -8968,7 +9148,7 @@ export interface components {
       }
       path: string
     }
-    GetScopedAccessTokenResponse: {
+    GetScopedAccessTokenResponse_Output: {
       created_at: string
       expires_at: string | null
       id: string
@@ -8981,7 +9161,7 @@ export interface components {
       scope: 'user' | 'organization' | 'project'
       token_alias: string
     }
-    GetScopedAccessTokensResponse: {
+    GetScopedAccessTokensResponse_Output: {
       tokens: {
         created_at: string
         expires_at: string | null
@@ -9209,7 +9389,7 @@ export interface components {
       | {
           [key: string]: components['schemas']['GetUserOrganizationIntegrationResponseJsonValue']
         }
-    GetVercelProjectsResponse: {
+    GetVercelProjectsResponse_Output: {
       pagination: {
         count: number
         next: number | null
@@ -9233,12 +9413,12 @@ export interface components {
         name: string
       }[]
     }
-    GitHubAuthorizationResponse: {
+    GitHubAuthorizationResponse_Output: {
       id: number
       sender_id: number
       user_id: number
     }
-    GitHubBranchResponse: {
+    GitHubBranchResponse_Output: {
       name: string
     }
     GoTrueConfigResponse: {
@@ -9754,7 +9934,7 @@ export interface components {
         type: 'boolean' | 'numeric' | 'set'
       }[]
     }
-    ListGitHubConnectionsResponse: {
+    ListGitHubConnectionsResponse_Output: {
       connections: {
         branch_limit: number
         id: number
@@ -9780,7 +9960,7 @@ export interface components {
         workdir: string
       }[]
     }
-    ListGitHubRepositoriesResponse: {
+    ListGitHubRepositoriesResponse_Output: {
       /** @description The authorized user may not have access to all GitHub repositories in case they haven't gone through the authorization process with SSO yet. This field will be `true` if this is the case. The calling user must reauthorize their GitHub account with SSO to see all repositories. */
       partial_response_due_to_sso: boolean
       repositories: {
@@ -9788,6 +9968,14 @@ export interface components {
         id: number
         installation_id: number
         name: string
+      }[]
+    }
+    ListJwksResponse_Output: {
+      data: {
+        active: boolean
+        kid: string
+        kind: string
+        type: string
       }[]
     }
     ListNotificationExceptionsResponse_Output: {
@@ -9917,7 +10105,7 @@ export interface components {
         subscription_id: string | null
       }[]
     }
-    ListRepositoryBranchesResponse: {
+    ListRepositoryBranchesResponse_Output: {
       branches: {
         name: string
       }[]
@@ -9998,25 +10186,18 @@ export interface components {
       'sort-orders': unknown[]
       'table-uuid'?: string
     }
-    NotificationResponse: {
-      data: components['schemas']['NotificationResponseJsonValue']
+    NotificationResponse_Output: {
+      data: components['schemas']['JsonValue_Output']
       id: string
       inserted_at: string
-      meta: components['schemas']['NotificationResponseJsonValue']
+      meta: components['schemas']['JsonValue_Output']
       name: string
       /** @enum {string} */
       priority: 'Critical' | 'Warning' | 'Info'
       /** @enum {string} */
       status: 'new' | 'seen' | 'archived'
     }
-    /** @description Any JSON-serializable value */
-    NotificationResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['NotificationResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['NotificationResponseJsonValue']
-        }
-    NotificationsSummary: {
+    NotificationsSummary_Output: {
       has_critical: boolean
       has_warning: boolean
       unread_count: number
@@ -10486,7 +10667,7 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
-    PartnerIntegrationListResponse: {
+    PartnerIntegrationListResponse_Output: {
       integrations: {
         listing_slug: string
         partner_links?: {
@@ -10501,14 +10682,14 @@ export interface components {
         version?: string
       }[]
     }
-    PartnerIntegrationsResponse: {
+    PartnerIntegrationsResponse_Output: {
       /**
        * Format: uri
        * @description URL to redirect the user's browser to
        */
       redirectUrl: string
     }
-    PartnerIntegrationStatusResponse: {
+    PartnerIntegrationStatusResponse_Output: {
       install_state?: {
         partner_links?: {
           dashboard?: string
@@ -10554,6 +10735,15 @@ export interface components {
     PendingConfirmationResponse: {
       message: string
     }
+    PerkApplicationDataResponse_Output: {
+      companyName?: string
+      firstname?: string
+      lastname?: string
+      stripeAtlasToken: string
+    }
+    PerkApplicationLookupBody: {
+      stripeAtlasToken: string
+    }
     PgbouncerConfigResponse_Output: {
       connection_string: string
       db_dns_name: string
@@ -10561,17 +10751,17 @@ export interface components {
       db_name: string
       db_port: number
       db_user: string
-      default_pool_size?: number
+      default_pool_size?: number | null
       ignore_startup_parameters?: string
       inserted_at: string
-      max_client_conn?: number
+      max_client_conn?: number | null
       pgbouncer_enabled: boolean
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
-      query_wait_timeout?: number
-      reserve_pool_size?: number
-      server_idle_timeout?: number
-      server_lifetime?: number
+      query_wait_timeout?: number | null
+      reserve_pool_size?: number | null
+      server_idle_timeout?: number | null
+      server_lifetime?: number | null
       ssl_enforced: boolean
     }
     PgbouncerStatusResponse_Output: {
@@ -11090,7 +11280,7 @@ export interface components {
         name: string
       }
     }
-    PlanFeaturesResponse: {
+    PlanFeaturesResponse_Output: {
       [key: string]: {
         [key: string]: {
           config:
@@ -11561,21 +11751,21 @@ export interface components {
         total: number
       } | null
     }
-    PrivateLinkResponse: {
+    PrivateLinkResponse_Output: {
       appliedSuccessfully: boolean
       currentConfig: {
         enabled: boolean
       }
     }
-    ProfileResponse: {
+    ProfileResponse_Output: {
       auth0_id: string
-      disabled_features: string[]
+      disabled_features?: string[]
       first_name: string | null
       free_project_limit: number | null
       gotrue_id: string
       id: number
       is_alpha_user: boolean
-      is_sso_user: boolean
+      is_sso_user?: boolean
       last_name: string | null
       mobile: string | null
       primary_email: string
@@ -11687,13 +11877,13 @@ export interface components {
         }
       }[]
     }
-    ProjectClonedResponse: {
+    ProjectClonedResponse_Output: {
       source_project_ref: string
       target_disk_size_gb: number
       target_instance_size: string
       target_project_ref: string
     }
-    ProjectClonedStatusResponse: {
+    ProjectClonedStatusResponse_Output: {
       cloned_from?: {
         project_id: number
         source_project: {
@@ -12275,12 +12465,6 @@ export interface components {
       website: string
     }
     RollbackTablesBody: {
-      /**
-       * @description Rollback type
-       * @example individual
-       * @enum {string}
-       */
-      rollback_type: 'individual' | 'full'
       /** @description Rollback target */
       target:
         | {
@@ -12393,7 +12577,7 @@ export interface components {
       urlToAirTable?: string
       verified?: boolean
     }
-    SendFeedbackResponse: {
+    SendFeedbackResponse_Output: {
       conversationId?: string
       result: string
     }
@@ -12411,10 +12595,6 @@ export interface components {
     }
     SetupIntentRequest: {
       hcaptchaToken?: string
-    }
-    SetupIntentResponse: {
-      client_secret: string
-      pending_subscription_flow_enabled_for_creation: boolean
     }
     SetupIntentResponse_Output: {
       client_secret: string
@@ -12617,7 +12797,7 @@ export interface components {
         indexName: string
         metadataConfiguration?: {
           nonFilterableMetadataKeys?: string[]
-        }
+        } | null
         vectorBucketName: string
       }[]
       nextToken?: string
@@ -12630,6 +12810,12 @@ export interface components {
       vectorBuckets: {
         vectorBucketName: string
       }[]
+    }
+    StripeAtlasCompleteApplicationRequestBody: {
+      companyName: string
+      firstname: string
+      lastname: string
+      stripeAtlasToken: string
     }
     SupavisorConfigResponse_Output: {
       connection_string: string
@@ -12669,7 +12855,7 @@ export interface components {
       severity?: string
       subject: string
     }
-    SyncConversationMessagesResponse: {
+    SyncConversationMessagesResponse_Output: {
       conversationId?: string
       /** @enum {string} */
       result: 'success'
@@ -12701,7 +12887,7 @@ export interface components {
         value: string
       } | null
     }
-    TelemetryCallFeatureFlagsResponse: {
+    TelemetryCallFeatureFlagsResponse_Output: {
       [key: string]: unknown
     }
     TelemetryEventBodyV2: {
@@ -12745,6 +12931,12 @@ export interface components {
     }
     TemporaryApiKeyResponse_Output: {
       api_key: string
+    }
+    ToggleJwkBody: {
+      active: boolean
+    }
+    ToggleJwkResponse_Output: {
+      result: boolean
     }
     TransferProjectBody: {
       target_organization_slug: string
@@ -13042,6 +13234,20 @@ export interface components {
         | 'otlp'
         | 'syslog'
     }
+    UpdateBucketLifecycleBody: {
+      rules: {
+        /** @description Must be {} to apply to the whole bucket. Empty strings and prefix selectors are not accepted. */
+        filter: Record<string, never>
+        /** @description Omit to let Storage generate a rule ID. Supplied IDs must be nonempty. */
+        id?: string
+        noncurrent_version_expiration: {
+          newer_noncurrent_versions?: number
+          noncurrent_days: number
+        }
+        /** @enum {string} */
+        status: 'Enabled' | 'Disabled'
+      }[]
+    }
     UpdateContentFolderBody: {
       name: string
     }
@@ -13053,11 +13259,11 @@ export interface components {
       org_id: number
       project_ref?: string
     }
-    UpdateConversationCustomFieldsResponse: {
+    UpdateConversationCustomFieldsResponse_Output: {
       /** @enum {string} */
       result: 'success'
     }
-    UpdateConversationLifecycleResponse: {
+    UpdateConversationLifecycleResponse_Output: {
       /** @enum {string} */
       aiSupportStatus: 'bot_active' | 'escalated' | 'user_resolved' | 'bot_resolved'
       conversationId: string
@@ -13871,7 +14077,7 @@ export interface components {
       message: string
     }
     UpdatePgbouncerConfigBody: {
-      default_pool_size?: number
+      default_pool_size?: number | null
       /**
        * @deprecated
        * @default options,extra_float_digits
@@ -14110,6 +14316,8 @@ export interface components {
         | 'platform_webhooks_projects_write'
         | 'workers_read'
         | 'workers_write'
+        | 'project_notebooks_read'
+        | 'project_notebooks_write'
       )[]
     }
     UpdatePlatformAppInstallationResponse_Output: {
@@ -14855,7 +15063,7 @@ export interface components {
     UpdateUserBody: {
       ban_duration?: string
     }
-    UpdateUserResponse: {
+    UpdateUserResponse_Output: {
       aud?: string
       banned_until?: string
       confirmation_sent_at?: string
@@ -14993,7 +15201,7 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
-    UserAuditLogsResponse: {
+    UserAuditLogsResponse_Output: {
       result: {
         action: {
           metadata?: {
@@ -15816,24 +16024,24 @@ export interface components {
       content: string
       subject: string
     }
-    ValidateSpamResponse: {
+    ValidateSpamResponse_Output: {
       rules: {
         desc: string
         name: string
         score: number
       }[]
     }
-    VercelRedirectResponse: {
+    VercelRedirectResponse_Output: {
       url: string
     }
     VerifyEmailBody: {
       token: string
     }
-    VerifyEmailResponse: {
+    VerifyEmailResponse_Output: {
       /** @enum {string} */
       result: 'success'
     }
-    WarehouseCatalogResponse: {
+    WarehouseCatalogResponse_Output: {
       /** @description External catalog credentials. Present only when enabled. */
       credentials?: {
         /**
@@ -15843,7 +16051,7 @@ export interface components {
         catalog_url: string
         /**
          * @description DuckLake object storage path
-         * @example s3://warehouse/
+         * @example s3://warehouse-abcjuqabhgwjjutfvtpa/
          */
         data_path: string
         /**
@@ -15871,11 +16079,16 @@ export interface components {
     }
     WarehouseSetupBody: {
       /**
-       * @description Whether to configure and install the Warehouse FDW in the project database. Defaults to false.
+       * @description Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.
+       * @example zyxwvutsrqponmlkjihg
+       */
+      destination_project_ref?: string
+      /**
+       * @description Whether to configure and install the Warehouse FDW in the project database. Defaults to false. Ignored when targets is empty.
        * @example false
        */
       install_fdw?: boolean
-      /** @description Schemas and individual tables to copy. Schema targets expand to the eligible tables present when the request is processed. */
+      /** @description Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array disables Warehouse replication and external catalog access and uninstalls the Warehouse FDW. */
       targets: (
         | {
             /**
@@ -15902,12 +16115,12 @@ export interface components {
           }
       )[]
     }
-    WarehouseSetupResponse: {
+    WarehouseSetupResponse_Output: {
       /**
-       * @description Warehouse replication pipeline id
+       * @description Warehouse replication pipeline id, or null when Warehouse is disabled
        * @example 101
        */
-      pipeline_id: number
+      pipeline_id: number | null
       /** @description Tables with Warehouse copies */
       tables: {
         /**
@@ -15949,7 +16162,7 @@ export interface components {
         warehouse_size_bytes?: number
       }[]
     }
-    WarehouseSetupStatusResponse: {
+    WarehouseSetupStatusResponse_Output: {
       /** @description Project database FDW setup markers used to derive the Warehouse FDW phase */
       fdw_status: {
         /**
@@ -16055,7 +16268,7 @@ export interface components {
         warehouse_size_bytes?: number
       }[]
     }
-    WarehouseTableSnapshotsResponse: {
+    WarehouseTableSnapshotsResponse_Output: {
       /** @description Available Warehouse snapshots for the project catalog. */
       snapshots: {
         /**
@@ -16086,7 +16299,7 @@ export interface components {
         snapshot_time: string | null
       }[]
     }
-    WarehouseTablesResponse: {
+    WarehouseTablesResponse_Output: {
       /** @description Tables with Warehouse copies */
       tables: {
         /**
@@ -16644,7 +16857,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateUserResponse']
+          'application/json': components['schemas']['CreateUserResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -16755,7 +16968,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateUserResponse']
+          'application/json': components['schemas']['UpdateUserResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -16855,7 +17068,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ValidateSpamResponse']
+          'application/json': components['schemas']['ValidateSpamResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -16960,7 +17173,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CloudMarketplaceContractLinkingEligibilityResponse']
+          'application/json': components['schemas']['CloudMarketplaceContractLinkingEligibilityResponse_Output']
         }
       }
       /** @description Failed to get info about contract linking eligibility */
@@ -16988,7 +17201,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CloudMarketplaceOnboardingInfoResponse']
+          'application/json': components['schemas']['CloudMarketplaceOnboardingInfoResponse_Output']
         }
       }
       /** @description Failed to get info for AWS Marketplace onboarding */
@@ -17017,7 +17230,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BackupsResponse']
+          'application/json': components['schemas']['BackupsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -17071,7 +17284,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DownloadBackupResponse']
+          'application/json': components['schemas']['DownloadBackupResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -17121,7 +17334,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DownloadableBackupsResponse']
+          'application/json': components['schemas']['DownloadableBackupsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -17375,7 +17588,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CloneBackupsResponse']
+          'application/json': components['schemas']['CloneBackupsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -17429,7 +17642,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectClonedResponse']
+          'application/json': components['schemas']['ProjectClonedResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -17488,7 +17701,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectClonedStatusResponse']
+          'application/json': components['schemas']['ProjectClonedStatusResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -17589,7 +17802,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateConversationCustomFieldsResponse']
+          'application/json': components['schemas']['UpdateConversationCustomFieldsResponse_Output']
         }
       }
       /** @description Failed to update conversation custom fields */
@@ -17619,7 +17832,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateConversationLifecycleResponse']
+          'application/json': components['schemas']['UpdateConversationLifecycleResponse_Output']
         }
       }
       /** @description User is not a participant in the conversation */
@@ -17656,7 +17869,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SyncConversationMessagesResponse']
+          'application/json': components['schemas']['SyncConversationMessagesResponse_Output']
         }
       }
       /** @description Supplied conversationId does not match the imported messages */
@@ -17693,7 +17906,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UpdateConversationLifecycleResponse']
+          'application/json': components['schemas']['UpdateConversationLifecycleResponse_Output']
         }
       }
       /** @description User is not a participant in the conversation */
@@ -17730,7 +17943,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SendFeedbackResponse']
+          'application/json': components['schemas']['SendFeedbackResponse_Output']
         }
       }
       /** @description Failed to send exit survey */
@@ -17760,7 +17973,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SendFeedbackResponse']
+          'application/json': components['schemas']['SendFeedbackResponse_Output']
         }
       }
       /** @description Failed to send feedback */
@@ -17790,7 +18003,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SendFeedbackResponse']
+          'application/json': components['schemas']['SendFeedbackResponse_Output']
         }
       }
       /** @description Failed to send upgrade survey */
@@ -17891,7 +18104,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GitHubAuthorizationResponse']
+          'application/json': components['schemas']['GitHubAuthorizationResponse_Output']
         }
       }
       /** @description Failed to get GitHub authorization */
@@ -17979,7 +18192,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListGitHubConnectionsResponse']
+          'application/json': components['schemas']['ListGitHubConnectionsResponse_Output']
         }
       }
       /** @description Failed to list organization GitHub connections */
@@ -18009,7 +18222,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateGitHubConnectionResponse']
+          'application/json': components['schemas']['CreateGitHubConnectionResponse_Output']
         }
       }
       /** @description Failed to create project connections */
@@ -18096,7 +18309,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetGitHubConnectionConfigResponse']
+          'application/json': components['schemas']['GetGitHubConnectionConfigResponse_Output']
         }
       }
       /** @description Not allowed to read the config of this connection */
@@ -18143,7 +18356,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListGitHubRepositoriesResponse']
+          'application/json': components['schemas']['ListGitHubRepositoriesResponse_Output']
         }
       }
       /** @description Failed to get GitHub repositories for user */
@@ -18171,7 +18384,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListRepositoryBranchesResponse']
+          'application/json': components['schemas']['ListRepositoryBranchesResponse_Output']
         }
       }
       /** @description Failed to list GitHub repository branches */
@@ -18200,7 +18413,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GitHubBranchResponse']
+          'application/json': components['schemas']['GitHubBranchResponse_Output']
         }
       }
       /** @description Failed to get GitHub repository branch */
@@ -18229,7 +18442,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PartnerIntegrationListResponse']
+          'application/json': components['schemas']['PartnerIntegrationListResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -18281,7 +18494,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PartnerIntegrationStatusResponse']
+          'application/json': components['schemas']['PartnerIntegrationStatusResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -18333,7 +18546,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PartnerIntegrationsResponse']
+          'application/json': components['schemas']['PartnerIntegrationsResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -18389,7 +18602,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PrivateLinkResponse']
+          'application/json': components['schemas']['PrivateLinkResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -18451,7 +18664,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PrivateLinkResponse']
+          'application/json': components['schemas']['PrivateLinkResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -18539,7 +18752,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateVercelConnectionResponse']
+          'application/json': components['schemas']['CreateVercelConnectionResponse_Output']
         }
       }
       /** @description Failed to create project connection */
@@ -18567,7 +18780,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['DeleteVercelConnectionResponse']
+          'application/json': components['schemas']['DeleteVercelConnectionResponse_Output']
         }
       }
       /** @description Failed to delete vercel integration project connection */
@@ -18677,7 +18890,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetProjectVercelConnectionsResponse']
+          'application/json': components['schemas']['GetProjectVercelConnectionsResponse_Output']
         }
       }
       /** @description Failed to get Vercel integrations for the given project */
@@ -18709,7 +18922,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetVercelProjectsResponse']
+          'application/json': components['schemas']['GetVercelProjectsResponse_Output']
         }
       }
       /** @description Failed to get vercel projects with the given organization integration id */
@@ -18764,7 +18977,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NotificationResponse'][]
+          'application/json': components['schemas']['NotificationResponse_Output'][]
         }
       }
       /** @description Failed to retrieve notifications */
@@ -18794,7 +19007,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NotificationResponse'][]
+          'application/json': components['schemas']['NotificationResponse_Output'][]
         }
       }
       /** @description Failed to update notifications */
@@ -18844,7 +19057,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NotificationsSummary']
+          'application/json': components['schemas']['NotificationsSummary_Output']
         }
       }
     }
@@ -18867,7 +19080,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateOAuthAppResponse']
+          'application/json': components['schemas']['CreateOAuthAppResponse_Output']
         }
       }
     }
@@ -18889,7 +19102,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetOAuthAuthorizationResponse']
+          'application/json': components['schemas']['GetOAuthAuthorizationResponse_Output']
         }
       }
     }
@@ -24187,7 +24400,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PlanFeaturesResponse']
+          'application/json': components['schemas']['PlanFeaturesResponse_Output']
         }
       }
     }
@@ -24206,7 +24419,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProfileResponse']
+          'application/json': components['schemas']['ProfileResponse_Output']
         }
       }
       /** @description Failed to retrieve user's profile */
@@ -24232,7 +24445,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProfileResponse']
+          'application/json': components['schemas']['ProfileResponse_Output']
         }
       }
       /** @description Failed to create user's profile */
@@ -24262,7 +24475,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProfileResponse']
+          'application/json': components['schemas']['ProfileResponse_Output']
         }
       }
       /** @description Failed to update user's profile */
@@ -24288,7 +24501,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AccessToken'][]
+          'application/json': components['schemas']['AccessToken_Output'][]
         }
       }
       /** @description Failed to get user's access tokens */
@@ -24318,7 +24531,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateAccessTokenResponse']
+          'application/json': components['schemas']['CreateAccessTokenResponse_Output']
         }
       }
       /** @description Failed to create access token */
@@ -24346,7 +24559,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AccessToken']
+          'application/json': components['schemas']['AccessToken_Output']
         }
       }
       /** @description Failed to get access token */
@@ -24374,7 +24587,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AccessToken']
+          'application/json': components['schemas']['AccessToken_Output']
         }
       }
       /** @description Failed to delete access token */
@@ -24405,7 +24618,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['UserAuditLogsResponse']
+          'application/json': components['schemas']['UserAuditLogsResponse_Output']
         }
       }
       /** @description Failed to get a user's audit logs */
@@ -24474,7 +24687,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetScopedAccessTokensResponse']
+          'application/json': components['schemas']['GetScopedAccessTokensResponse_Output']
         }
       }
       /** @description Failed to get user's scoped access tokens */
@@ -24504,7 +24717,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateScopedAccessTokenResponse']
+          'application/json': components['schemas']['CreateScopedAccessTokenResponse_Output']
         }
       }
       /** @description Failed to create scoped access token */
@@ -24532,7 +24745,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetScopedAccessTokenResponse']
+          'application/json': components['schemas']['GetScopedAccessTokenResponse_Output']
         }
       }
       /** @description Failed to get scoped access token */
@@ -30515,7 +30728,7 @@ export interface operations {
     }
     responses: {
       /** @description New table states after rollback. */
-      201: {
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -30689,8 +30902,8 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Pipeline stopped. */
-      200: {
+      /** @description Pipeline shutdown accepted. Resources may still be terminating. */
+      202: {
         headers: {
           [name: string]: unknown
         }
@@ -32860,6 +33073,171 @@ export interface operations {
       }
     }
   }
+  StorageBucketLifecycleController_getBucketLifecycle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage bucket id */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BucketLifecycleResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description No lifecycle configuration is stored */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get bucket lifecycle configuration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageBucketLifecycleController_updateBucketLifecycle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage bucket id */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateBucketLifecycleBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BucketLifecycleResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update bucket lifecycle configuration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageBucketLifecycleController_deleteBucketLifecycle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage bucket id */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete bucket lifecycle configuration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   StorageObjectsController_deleteObjects: {
     parameters: {
       query?: never
@@ -33580,6 +33958,237 @@ export interface operations {
       }
     }
   }
+  StorageJwksController_listJwks: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListJwksResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list project storage jwks */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageJwksController_toggleJwk: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage jwk id */
+        kid: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToggleJwkBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ToggleJwkResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Jwk not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description The active url signing jwk cannot be toggled. Swap it with a standby jwk first. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to toggle project storage jwk */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageJwksController_createStandbyJwk: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStandbyJwkBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateStandbyJwkResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create project storage url signing standby jwk */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageJwksController_swapStandbyJwk: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage jwk id */
+        kid: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Standby jwk not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to swap project storage url signing standby jwk */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   StorageVectorBucketsController_getBuckets: {
     parameters: {
       query?: {
@@ -33940,6 +34549,71 @@ export interface operations {
       }
     }
   }
+  StripeAtlasPerkApplicationController_fetchAtlasApplication: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PerkApplicationLookupBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PerkApplicationDataResponse_Output']
+        }
+      }
+      /** @description Will send a 400 when matching application is considered stale or when we have an invalid schema in our db. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Will send a 404 when no matching application was found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StripeAtlasPerkApplicationController_completeStripeAtlasFlow: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StripeAtlasCompleteApplicationRequestBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Will send a 400 when the matching stripe company id already has a redeemed credit code. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   InvoicesController_getOverdueInvoices: {
     parameters: {
       query?: never
@@ -34019,7 +34693,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SetupIntentResponse']
+          'application/json': components['schemas']['SetupIntentResponse_Output']
         }
       }
       /** @description Failed to initiate a payment method setup */
@@ -34050,7 +34724,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['VerifyEmailResponse']
+          'application/json': components['schemas']['VerifyEmailResponse_Output']
         }
       }
     }
@@ -34094,7 +34768,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['TelemetryCallFeatureFlagsResponse']
+          'application/json': components['schemas']['TelemetryCallFeatureFlagsResponse_Output']
         }
       }
       /** @description Failed to call feature flags */
@@ -34306,7 +34980,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['VercelRedirectResponse']
+          'application/json': components['schemas']['VercelRedirectResponse_Output']
         }
       }
       /** @description Failed to get Vercel redirect url */
@@ -34336,7 +35010,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['WarehouseCatalogResponse']
+          'application/json': components['schemas']['WarehouseCatalogResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -34391,7 +35065,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['WarehouseCatalogResponse']
+          'application/json': components['schemas']['WarehouseCatalogResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -34513,10 +35187,10 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['WarehouseSetupResponse']
+          'application/json': components['schemas']['WarehouseSetupResponse_Output']
         }
       }
-      /** @description A requested table or schema is not eligible for Warehouse replication. */
+      /** @description A requested table or schema is not eligible for Warehouse replication, or the destination project cannot be used or changed. */
       400: {
         headers: {
           [name: string]: unknown
@@ -34580,7 +35254,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['WarehouseSetupStatusResponse']
+          'application/json': components['schemas']['WarehouseSetupStatusResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -34631,7 +35305,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['WarehouseTablesResponse']
+          'application/json': components['schemas']['WarehouseTablesResponse_Output']
         }
       }
       /** @description Unauthorized */
@@ -34751,7 +35425,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['WarehouseTableSnapshotsResponse']
+          'application/json': components['schemas']['WarehouseTableSnapshotsResponse_Output']
         }
       }
       /** @description Unauthorized */

@@ -67,6 +67,7 @@ export const useProjectPostgrestConfigUpdateMutation = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) }),
         queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },

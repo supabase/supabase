@@ -12,7 +12,9 @@ import {
 } from './AssistantQueryCell.utils'
 import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { QueryEditor } from '@/components/interfaces/Explorer/QueryEditor'
+import { SaveQueryDropdown } from '@/components/interfaces/Explorer/SaveQueryDropdown'
 import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
 import {
   type QuerySourceBinding,
@@ -74,6 +76,7 @@ export const AssistantQueryCell = ({
   const track = useTrack()
   const roleImpersonationState = useLocalRoleImpersonationState()
   const aiAssistantState = useAiAssistantState()
+  const isExplorerEnabled = useIsExplorerEnabled()
 
   const fallbackTitle =
     initialTitle?.trim() ||
@@ -150,7 +153,7 @@ export const AssistantQueryCell = ({
   return (
     <Confirm
       fill
-      className="w-full max-w-6xl mx-auto"
+      className="w-full max-w-3xl mx-auto"
       state={confirmState}
       message="Assistant wants to run this query"
       cancelLabel="Skip"
@@ -185,6 +188,11 @@ export const AssistantQueryCell = ({
         onDisplayChange={handleDisplayChange}
         onRun={handleRun}
         onDebug={aiAssistantState.setInitialInput}
+        toolbarActions={
+          isExplorerEnabled && !isStreaming ? (
+            <SaveQueryDropdown query={{ title, sql: query.uncheckedSql }} source={query} />
+          ) : undefined
+        }
       />
     </Confirm>
   )

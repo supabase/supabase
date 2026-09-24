@@ -1,8 +1,10 @@
+import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Card, CardContent } from 'ui'
+import { Button, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { ErrorDisplay } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
 import {
   PageSection,
   PageSectionAside,
@@ -15,24 +17,81 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
-import DeleteFactorModal from './DeleteFactorModal'
+import { DeleteFactorModal } from './DeleteFactorModal'
+import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
+import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
+import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
   const totpFactors = data?.totp ?? []
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
+  const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length > 0
+
+  const recoveryCodesStatusQuery = useRecoveryCodesStatusQuery({
+    enabled: shouldVerifyRecoveryCodes,
+  })
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
+  // If recovery codes are enabled, we can't allow to remove an MFA until we know their status
+  const disableDeleteFactor = shouldVerifyRecoveryCodes && recoveryCodesStatusQuery.isPending
+
   return (
     <>
+      {shouldVerifyRecoveryCodes && (
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Recovery codes</PageSectionTitle>
+              <PageSectionDescription>
+                Recovery codes allow you to recover your account in case you lost access to your MFA
+                apps.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent aria-live="polite">
+            {recoveryCodesStatusQuery.isError && (
+              <ErrorDisplay
+                title="Failed to load recovery codes"
+                errorMessage="An error occurred while loading recovery codes."
+              />
+            )}
+            {recoveryCodesStatusQuery.data?.status === 'unenrolled' && (
+              <GenerateRecoveryCodesModal />
+            )}
+            {recoveryCodesStatusQuery.data?.status === 'available' &&
+              recoveryCodesStatusQuery.data?.data && (
+                <Card>
+                  <CardContent className="flex flex-col gap-2">
+                    <p
+                      className={cn(
+                        'text-sm',
+                        recoveryCodesStatusQuery.data.data.remaining < 2 ? 'text-warning' : ''
+                      )}
+                    >
+                      {recoveryCodesStatusQuery.data.data.remaining}/
+                      {recoveryCodesStatusQuery.data.data.total} recovery codes available
+                    </p>
+                    <div className="flex gap-2 ml-auto">
+                      <RegenerateRecoveryCodesModal />
+                      <UnenrollRecoveryCodesModal />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+          </PageSectionContent>
+        </PageSection>
+      )}
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
@@ -90,8 +149,12 @@ export const TOTPFactors = () => {
                           Added on {dayjs(factor.created_at).format(DATETIME_FORMAT)}
                         </p>
                       </div>
-                      <Button size="tiny" onClick={() => setFactorToBeDeleted(factor.id)}>
-                        Delete{' '}
+                      <Button
+                        size="tiny"
+                        onClick={() => setFactorToBeDeleted(factor.id)}
+                        disabled={disableDeleteFactor}
+                      >
+                        Delete
                       </Button>
                     </CardContent>
                   ))}
@@ -110,6 +173,7 @@ export const TOTPFactors = () => {
         factorId={factorToBeDeleted}
         lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
+        hasRecoveryCodes={recoveryCodesStatusQuery.data?.status === 'available'}
       />
     </>
   )

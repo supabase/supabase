@@ -1,11 +1,21 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
-import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
+import {
+  AiIconAnimation,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Row } from 'ui-patterns/Row'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Markdown } from '../Markdown'
+import { HomeCard } from './HomeCard'
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
 import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -21,7 +31,8 @@ import {
   sortAdvisorItems,
 } from '@/components/ui/AdvisorPanel/AdvisorPanel.utils'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
-import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
 import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -31,6 +42,9 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
+  const isHealthAdvisorInHomepageEnabled = useFlag('healthAdvisorInHomepage')
+  const canShowHealthAdvisor = isHealthAdvisorEnabled && isHealthAdvisorInHomepageEnabled
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -43,7 +57,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   const { data: healthLints } = useProjectHealthLintsQuery(
     { projectRef },
-    { enabled: !showEmptyState }
+    { enabled: !showEmptyState && canShowHealthAdvisor }
   )
 
   const { data: signalItems } = useAdvisorSignals({ projectRef, enabled: !showEmptyState })
@@ -51,11 +65,11 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const advisorItems = useMemo<AdvisorItem[]>(() => {
     const criticalLintItems = createAdvisorLintItems([
       ...(lints ?? []),
-      ...(healthLints ?? []),
+      ...(canShowHealthAdvisor ? (healthLints ?? []) : []),
     ]).filter((item) => item.source === 'lint' && item.original.level === LINTER_LEVELS.ERROR)
 
     return sortAdvisorItems([...criticalLintItems, ...signalItems])
-  }, [lints, healthLints, signalItems])
+  }, [lints, healthLints, signalItems, canShowHealthAdvisor])
 
   const visibleAdvisorItems = useMemo(
     () => advisorItems.slice(0, MAX_HOMEPAGE_ADVISOR_ITEMS),
@@ -110,7 +124,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   )
 
   if (showEmptyState) {
-    return <EmptyState />
+    return <EmptyState canShowHealthAdvisor={canShowHealthAdvisor} />
   }
 
   // [Joshen] Note that we're intentionally (for now) not waiting for advisor signals to load
@@ -154,42 +168,36 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                     : ''
 
               return (
-                <Card
+                <HomeCard
                   key={`${item.source}-${item.id}`}
-                  className={cn(
-                    'min-h-full flex flex-col items-stretch cursor-pointer h-64',
-                    cardClasses
-                  )}
-                  onClick={() => {
-                    handleCardClick(item)
-                  }}
-                >
-                  <CardHeader className="border-b-0 shrink-0 flex flex-row gap-2 space-y-0 justify-between items-center">
-                    <div className="flex flex-row items-center gap-3">
-                      <CategoryIcon
-                        size={16}
-                        strokeWidth={1.5}
-                        className={severityColorClasses[item.severity]}
-                      />
-                      <CardTitle className="text-foreground-light">{categoryLabel}</CardTitle>
-                    </div>
-                    <div className="flex items-center gap-2">
+                  className={cardClasses}
+                  onClick={() => handleCardClick(item)}
+                  icon={
+                    <CategoryIcon
+                      size={16}
+                      strokeWidth={1.5}
+                      className={severityColorClasses[item.severity]}
+                    />
+                  }
+                  label={categoryLabel}
+                  title={title}
+                  description={
+                    description && <Markdown>{description.replace(/\\`/g, '`')}</Markdown>
+                  }
+                  actions={
+                    <>
                       <Badge variant={severityBadgeVariants[item.severity]} className="w-fit">
                         {item.severity.toUpperCase()}
                       </Badge>
                       {isLint && (
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            e.preventDefault()
-                          }}
-                        >
-                          <AiAssistantDropdown
-                            label="Ask Assistant"
-                            iconOnly
-                            tooltip="Help me fix this issue"
-                            buildPrompt={() => createLintSummaryPrompt(item.original)}
-                            onOpenAssistant={() => {
+                        <>
+                          <ButtonTooltip
+                            variant="text"
+                            className="w-7 h-7 px-1.5"
+                            icon={<AiIconAnimation size={16} />}
+                            aria-label="Ask Assistant"
+                            tooltip={{ content: { text: 'Ask Assistant to fix this issue' } }}
+                            onClick={() => {
                               openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                               snap.newChat({
                                 name: 'Summarise lint',
@@ -202,21 +210,27 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                                 advisorLevel: item.original.level,
                               })
                             }}
-                            telemetrySource="advisor_section"
-                            variant="text"
-                            className="w-7 h-7"
                           />
-                        </div>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <CopyButton
+                                iconOnly
+                                variant="text"
+                                className="w-7 h-7"
+                                aria-label="Copy prompt"
+                                asyncText={() => createLintSummaryPrompt(item.original)}
+                                onClick={() =>
+                                  track('ai_prompt_copied', { source: 'advisor_section' })
+                                }
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>Copy prompt</TooltipContent>
+                          </Tooltip>
+                        </>
                       )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6 pt-16 flex flex-col justify-end flex-1 overflow-auto">
-                    <h3 className="mb-1">{title}</h3>
-                    <Markdown className="leading-6 text-sm text-foreground-light">
-                      {description && description.replace(/\\`/g, '`')}
-                    </Markdown>
-                  </CardContent>
-                </Card>
+                    </>
+                  }
+                />
               )
             })}
           </Row>
@@ -229,19 +243,21 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           )}
         </>
       ) : (
-        <EmptyState />
+        <EmptyState canShowHealthAdvisor={canShowHealthAdvisor} />
       )}
     </div>
   )
 }
 
-function EmptyState() {
+function EmptyState({ canShowHealthAdvisor }: { canShowHealthAdvisor: boolean }) {
   return (
     <Card className="bg-transparent h-64">
       <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
-          No security, performance or health issues found
+          {canShowHealthAdvisor
+            ? 'No security, performance or health issues found'
+            : 'No security or performance issues found'}
         </p>
       </CardContent>
     </Card>
