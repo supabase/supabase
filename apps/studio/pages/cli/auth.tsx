@@ -217,7 +217,7 @@ const CliAuthPage: NextPageWithLayout = () => {
 }
 
 const formSchema = z.object({
-  projectRef: z.string(),
+  projectRef: z.string({ message: 'Please select a project' }),
   accessMode: z.enum(['full', 'readonly']),
 })
 
