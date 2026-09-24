@@ -90,6 +90,8 @@ const DetailRowAction = ({
         icon={icon}
         className="shrink-0 size-6 px-0 text-foreground-light hover:text-foreground"
         aria-label={label}
+        // Tooltip repeats the label; screen readers would read it twice
+        aria-describedby={undefined}
         onClick={onClick}
       />
     </TooltipTrigger>
