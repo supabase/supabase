@@ -26,9 +26,6 @@ vi.mock('common', async (importOriginal) => {
 
 const page: RenderPageInput = {
   title: 'Auth debugging console',
-  design: 'studio',
-  layout: 'dashboard',
-  design_plan: 'Lead with the most recent rows, with nothing else on the page.',
   html: '<h1 id="page-heading">Auth console</h1>',
   database_queries: [
     { id: 'recent_users', title: 'Recent users', sql: 'select id from auth.users', row_limit: 25 },

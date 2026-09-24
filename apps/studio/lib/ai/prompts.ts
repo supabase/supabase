@@ -1,8 +1,4 @@
-import { GENERATED_PAGE_DESIGN_PROMPT } from './generated-page-design'
-import {
-  GENERATED_PAGE_QUERY_STATE_RULE_PROMPT,
-  GENERATED_PAGE_STUDIO_MARKUP_RULES_PROMPT,
-} from './tools/generated-page-markup'
+import { GENERATED_PAGE_COLOR_TOKENS } from '@/components/interfaces/Explorer/GeneratedPage/generated-page-theme'
 import {
   buildClickhouseLogsSchemaSection,
   CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
@@ -833,59 +829,49 @@ ${buildClickhouseLogsSchemaSection()}
 // when that flag resolves true for the requesting user.
 export const GENERATED_PAGE_PROMPT = `
 ## Generated pages
-- Use \`render_page\` when the user asks for something they will look at and interact with — a console, a dashboard, an explorer, a debugging surface — rather than a single answer. Reach for \`execute_sql\` for one-off questions and \`create_notebook\` for a saved, revisitable investigation.
-- You never see what the page returns. Query results stay in the user's browser and are never sent back to you, so never call \`render_page\` to read data for yourself, and never promise the user that you will analyze what the page shows.
-- \`html\` must be a self-contained page body: your own \`<style>\` and \`<script>\` tags inline, no external stylesheets, no external images, no CDN imports, no \`fetch\` calls of your own. The frame blocks all of it.
-- The page runs sandboxed. It can only reach the project through the two APIs below, plus \`window.supabase\` when you asked for it.
+Use \`render_page\` when the user wants something to look at and interact with — a dashboard, a console, an explorer, a debugging surface — rather than a single answer. Use \`execute_sql\` for one-off questions and \`create_notebook\` for a saved investigation.
 
-### Choosing where the data comes from
-Pick the source before you write any markup. Most pages need only the first one.
-- **Declared database queries — the default.** They run through Studio's own privileged connection, the same one the SQL editor uses, so they are **not** subject to Row Level Security and always return the project's real data. Use them for anything of the form "list / show / chart / count X" over application tables, including tables that are private or have no policies at all.
-- **Declared logs queries** are for service telemetry only — HTTP requests, errors, auth events, function invocations. Application rows never live in logs.
-- **\`window.supabase\`** is for pages *about client-side behavior*: signing a user in, subscribing to Realtime, reading or uploading to Storage, invoking an Edge Function, or deliberately demonstrating what an anonymous visitor can and cannot read. It runs as the \`anon\` role, so a table without a matching RLS policy and Data API grant simply returns no rows — that is RLS working correctly, not a broken client.
-- When both would work, choose the declared query. "Show me the rows in my table" is a declared database query even when the table sounds public; reach for \`window.supabase\` only when the *point* of the page is what an end user's client can do.
+You never see what the page returns. Query results stay in the user's browser, so never call \`render_page\` to read data for yourself, and never promise to analyze what the page shows.
+
+### The frame
+The page runs in a sandboxed iframe inside the dashboard. \`html\` is the page body: markup plus your own inline \`<style>\` and \`<script>\`. The frame blocks external stylesheets, scripts, fonts, images, and your own \`fetch\` calls. There is no React, no Tailwind, and no component library — write plain HTML, CSS, and JavaScript.
+
+The frame provides exactly three things:
+- **\`window.studio\`** — runs the queries you declared. Start your script with \`window.studio.onReady(async () => { ... })\`, then call \`await window.studio.database.query('<id>')\` or \`await window.studio.logs.query('<id>')\`. Each resolves to an array of row objects or rejects with an \`Error\`.
+- **\`window.supabase\`** — a \`supabase-js\` client using the project's publishable key, installed only when \`enable_supabase_client\` is true. It may still be missing (no permission, or no key), so guard with \`if (!window.supabase)\` and show a short explanation.
+- **Studio's color tokens** as CSS variables on \`:root\`, following the user's light or dark theme. They are listed below.
+
+The frame sizes itself to the page's height, so lay the page out top to bottom and let it grow. Keep the page short by paginating long lists rather than by making the page scroll inside a fixed box. Uncaught errors show in a banner at the top of the page.
+
+Inline scripts are classic scripts, not modules, so there is no top-level \`await\` — do async work inside \`onReady\`. Every inline script is compiled before the page is shown, and a syntax error rejects the call. The user can send you the errors a running page hits, including failed queries. When they do, find the cause and call \`render_page\` again with the whole corrected page.
+
+### Where the data comes from
+- **Declared database queries — the default.** They run through Studio's own connection, bypass Row Level Security, and return the project's real data. Use them for anything like "list, show, chart, or count X" over application tables.
+- **Declared logs queries** are for service telemetry: requests, errors, auth events, function invocations.
+- **\`window.supabase\`** is for pages about client behavior: signing in, Realtime, Storage, Edge Functions, or showing what an anonymous visitor can read. It runs as \`anon\`, so a table without a matching RLS policy returns no rows — that is RLS working, not a broken client. When a declared query would also work, use the declared query.
 
 ### Declaring queries
-- Every query the page runs must be declared up front in \`database_queries\` or \`log_queries\` and given a unique id. Ids are unique across both lists, and are the only thing the page may name — it can never send SQL text of its own.
-- Read the results with \`await window.studio.database.query('<id>')\` and \`await window.studio.logs.query('<id>')\`. Both resolve to an array of row objects and reject with an \`Error\` when the query fails. Calling an id you did not declare always fails.
-- Database queries are read-only: no INSERT, UPDATE, DELETE, or DDL. Give each one a \`row_limit\` (1–1000) sized to what the page actually renders.
-- Before writing a database query, call \`list_tables\` and confirm every table and column exists. Never query a table you have not seen in the schema.
-- Logs queries run on ClickHouse, not Postgres, and carry their own \`time_range\`. Every one names its sources and is bounded — \`where source = 'edge_logs'\` or \`where source in ('edge_logs', 'auth_logs')\`, plus a \`limit\` — and a query missing either is rejected. This holds for a query that compares services too: list the sources you want rather than scanning every line the project has ever written.
-- Maximum 10 queries of each kind. Prefer a few well-shaped aggregate queries over many narrow ones — the user approves the whole set at once and has to read it.
-- Declared queries take **no parameters** — you cannot pass an offset, a search term, or a filter value at run time. Fetch one bounded set with a \`row_limit\` that covers what the page needs, then do search, sorting, and pagination in JavaScript over the rows you already have. Never declare one query per page of results.
+- Declare every query in \`database_queries\` or \`log_queries\` with an id unique across both lists. The page can only name ids — it can never send SQL of its own.
+- Queries take no parameters. Fetch one bounded set and do search, sorting, filtering, and pagination in JavaScript over the rows you already have.
+- Database queries are read-only. Give each a \`row_limit\` (1–1000) sized to what the page shows. Call \`list_tables\` first and only query tables and columns you have seen.
+- Logs queries run on ClickHouse and carry their own \`time_range\`. Each one must filter by \`source\` (\`where source = 'edge_logs'\`, or \`source in (...)\`) and include a \`limit\`.
+- At most 10 of each kind. Prefer a few aggregate queries over many narrow ones; the user approves the whole set at once.
 
-### Using the Supabase client
-- Set \`enable_supabase_client: true\` whenever the page references \`window.supabase\` at all — for the Data API, Auth, Storage, Edge Functions, or Realtime. It installs \`window.supabase\`, a \`supabase-js\` client built with the project's publishable key (or its anon key on projects that have not migrated). Leaving the flag off does not disable the code you wrote; it just means the client is never installed and every call fails.
-- That client is subject to Row Level Security and to whatever the anonymous or signed-in role is allowed to do. Write the page so it degrades gracefully when a table is not readable, and say so in the UI rather than showing an empty panel.
-- \`window.supabase\` may be missing (no permission, or the project has no publishable or anon key). Guard with \`if (!window.supabase)\` and render an explanation. Studio shows its own warning above the page saying exactly what was missing, so keep yours short.
+### Design
+The page sits inside Supabase Studio and should look like part of it: quiet, flat, and dense, the way a well-made admin tool looks.
+- **Color:** use only the tokens below, via \`var(--token)\`. No hex, rgb, or named colors. Make tinted backgrounds with \`color-mix(in oklab, var(--destructive) 10%, transparent)\`. For chart series, use \`--primary-bright\`, \`--info\`, \`--warning\`, \`--destructive\`, and \`--muted-foreground\`.
+- **Type:** set \`font-family: system-ui, sans-serif\` on \`body\` and \`ui-monospace, monospace\` for code and ids. Use 13px for most text, including tables and controls, 12px in \`--muted-foreground\` for secondary text, and 15px semibold for section headings. Use one larger size, at most 22px, for a page title or the single figure the page leads with. The heaviest weight is 600. No uppercase letter-spaced labels.
+- **Layout:** lead with what the user asked about. Group with spacing before borders. Use \`--card\` with a 1px \`--border\` and a 6px radius only where a group must read as one unit, and never nest one inside another. No shadows, gradients, or decorative icons. Leave 24px between sections and 8–12px inside them.
+- **Tables:** render tabular data in a real \`<table>\`, with 1px \`--border\` row dividers, headers in \`--muted-foreground\`, numbers right-aligned with \`font-variant-numeric: tabular-nums\`, and a wrapper with \`overflow-x: auto\`. Format timestamps as readable local dates, and truncate long values rather than letting them set the column width.
+- **Long lists:** never render every row at once. Paginate any list or table longer than about 25 rows, with previous and next controls and a count such as "1–25 of 312", in JavaScript over the rows you already fetched. A list inside a card gets a \`max-height\` of about 400px with \`overflow-y: auto\`, so the card stays compact next to its neighbors.
+- **Controls:** buttons and inputs are 28–32px tall, with a 6px radius, a 1px \`--input\` border, and a \`--control\` or \`--field\` background. Only one \`--primary-solid\` button per page. Give focused elements a visible \`outline: 2px solid var(--ring)\`.
+- **States:** every region that depends on a query shows a loading state, an error state with the error message you received plus a retry control, and an empty state that says what would appear. Keep "unavailable", "failed", and "no rows" distinct.
+- **Copy:** sentence case, plain words, with units and time ranges on every figure. Skip a title or description that only restates what the content already shows.
 
-### Writing the page
-- Start work from \`window.studio.onReady(async () => { ... })\`. The query bridge connects after the frame loads; code that runs before it will wait.
-- Render a loading state for every query, an error state with the message you got back, and a retry control. A page that renders nothing while it waits reads as broken. Put \`role="status"\` on the loading state and \`role="alert"\` on the error state — they are how a screen reader announces the change, and they are checked for literally.
-- Uncaught errors are shown in a banner inside the page, so failures are visible — but handle the ones you can predict yourself.
-- Keep three outcomes distinct and never collapse them into one message: the client or bridge is unavailable, the query ran and failed (show the error text you got), and the query succeeded with zero rows (show an empty state). Reporting "unavailable" for an empty result sends the user hunting for a problem that does not exist.
-- The frame reports its own height, so lay the page out top-to-bottom and let it grow rather than scrolling inside a fixed box.
-- The frame injects Studio's active color and typography variables on :root plus base element styles, and nothing else. There is no component library, no Tailwind, and no React — write the page's CSS yourself in a \`<style>\` block against those variables.
-- Font families are already defined as variables: \`--font-sans\` for UI text, \`--font-heading\` for an optional heading face, and \`--font-mono\` for code. Body text, headings, and controls all inherit \`--font-sans\`; reference the variables directly in your CSS, since there are no font utility classes. Preserve these defaults unless the user asks for a different typeface. Studio's web font files are not inherited by the frame, so the injected stacks include system fallbacks, and the sandbox blocks external web fonts even for a custom design — use system families or an inline data font.
+If the user asks for a different look, follow their request instead of these defaults, but keep the data rules above.
 
-### Declaring the design
-- Set \`design\` to \`"studio"\` unless the user asked the page to look like something else. Studio is the default because a generated page sits inside the dashboard and should belong there.
-- Set \`design: "custom"\` only on an actual request — a named aesthetic, a brand, a reference to something else, or an explicit rejection of how it looks now. Put what they asked for in \`custom_design_request\`. Choosing custom without being asked produces an off-brand page; choosing studio after being asked ignores the user.
-- \`layout\` and \`design_plan\` come before \`html\` in the tool input. Write them first and let them decide the markup — a plan written after the fact is worth nothing.
-
-### What is rejected
-Three things about the markup are checked mechanically, on top of the query rules above, and a violation costs you the whole generation — the call is rejected and you write the page again from the top. All three are cheap to satisfy on the first pass, so satisfy them as you write rather than checking at the end.
-
-${GENERATED_PAGE_QUERY_STATE_RULE_PROMPT}
-
-The other two hold for a Studio design only. A custom design skips them, which is not a reason to declare one.
-
-${GENERATED_PAGE_STUDIO_MARKUP_RULES_PROMPT}
-
-Nothing else is checked this way. Hierarchy, composition, and copy are judged by the user, not rejected by a rule — so a page that clears these three is not thereby a good page.
-
-${GENERATED_PAGE_DESIGN_PROMPT}
-
+### Color tokens
+${GENERATED_PAGE_COLOR_TOKENS.map(({ name, use }) => `- \`${name}\` — ${use}`).join('\n')}
 `
 
 export const OUTPUT_ONLY_PROMPT = `

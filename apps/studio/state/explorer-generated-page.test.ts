@@ -12,9 +12,6 @@ import type { RenderPageInput } from '@/lib/ai/tools/generated-page-schema'
 
 const page: RenderPageInput = {
   title: 'Auth console',
-  design: 'studio',
-  layout: 'dashboard',
-  design_plan: 'Lead with the most recent rows, with nothing else on the page.',
   html: '<h1>Auth</h1>',
   database_queries: [
     { id: 'recent_users', title: 'Recent users', sql: 'select id from auth.users', row_limit: 25 },

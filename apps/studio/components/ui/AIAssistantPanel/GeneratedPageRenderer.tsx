@@ -14,7 +14,10 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from '@/components/interfaces/Explorer/ExplorerToolbar'
-import { summarizeGeneratedPageCapabilities } from '@/components/interfaces/Explorer/GeneratedPage/generated-page.utils'
+import {
+  buildGeneratedPageErrorReport,
+  summarizeGeneratedPageCapabilities,
+} from '@/components/interfaces/Explorer/GeneratedPage/generated-page.utils'
 import { GeneratedPageFrame } from '@/components/interfaces/Explorer/GeneratedPage/GeneratedPageFrame'
 import { useGeneratedPageRuntime } from '@/components/interfaces/Explorer/GeneratedPage/useGeneratedPageRuntime'
 import { renderPageInputSchema } from '@/lib/ai/tools/generated-page-schema'
@@ -35,6 +38,67 @@ export interface GeneratedPageRendererProps {
   confirmState?: ConfirmFooterApprovalState
   onApprove?: () => void
   onDeny?: () => void
+  /** Sends a message to the chat this page belongs to. Omitted where there is no chat. */
+  onSendMessage?: (text: string) => void
+  /** True while the assistant is responding, when a new message can't be sent. */
+  isChatBusy?: boolean
+}
+
+/**
+ * Lists what went wrong in the current run and offers to send it to the assistant. Sending
+ * is always the user's click: the report is page output, which the assistant never
+ * receives otherwise.
+ */
+function GeneratedPageErrors({
+  title,
+  errors,
+  isChatBusy,
+  onSendMessage,
+}: {
+  title: string
+  errors: readonly string[]
+  isChatBusy: boolean
+  onSendMessage?: (text: string) => void
+}) {
+  const [sentReport, setSentReport] = useState<string | null>(null)
+
+  if (errors.length === 0) return null
+
+  const report = buildGeneratedPageErrorReport(title, errors)
+  const hasSentReport = sentReport === report
+
+  return (
+    <div className="border-t p-3">
+      <Admonition
+        type="destructive"
+        title={
+          errors.length === 1 ? 'This page hit an error' : `This page hit ${errors.length} errors`
+        }
+        description={
+          <ul className="flex flex-col gap-1 font-mono text-xs break-words">
+            {errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        }
+        actions={
+          onSendMessage !== undefined && (
+            <Button
+              size="tiny"
+              variant="default"
+              disabled={isChatBusy || hasSentReport}
+              onClick={() => {
+                setSentReport(report)
+                onSendMessage(report)
+              }}
+            >
+              {hasSentReport ? 'Sent to Assistant' : 'Fix with Assistant'}
+            </Button>
+          )
+        }
+      />
+    </div>
+  )
 }
 
 function QueryPreviewList({
@@ -93,6 +157,8 @@ export const GeneratedPageRenderer = ({
   confirmState,
   onApprove,
   onDeny,
+  onSendMessage,
+  isChatBusy = false,
 }: GeneratedPageRendererProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -250,6 +316,13 @@ export const GeneratedPageRenderer = ({
           onLoad={runtime.handleIframeLoad}
         />
       )}
+
+      <GeneratedPageErrors
+        title={page.title}
+        errors={runtime.errors}
+        isChatBusy={isChatBusy}
+        onSendMessage={onSendMessage}
+      />
     </Confirm>
   )
 }

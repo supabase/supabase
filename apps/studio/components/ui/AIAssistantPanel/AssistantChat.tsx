@@ -282,6 +282,11 @@ export const AssistantChat = ({
     (error.message?.includes('context_length_exceeded') ||
       error.message?.includes('exceeds the context window'))
 
+  // Message parts send through this, so the memoized message list below doesn't re-render
+  // every message whenever `sendMessageToAssistant` is recreated.
+  const sendMessageRef = useRef<(text: string) => void>(() => {})
+  const handleSendMessageFromPart = useCallback((text: string) => sendMessageRef.current(text), [])
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message, index) => {
@@ -308,6 +313,7 @@ export const AssistantChat = ({
               onRate={handleRateMessage}
               rating={messageRatings[message.id] ?? null}
               onBranch={onBranchChat}
+              onSendMessage={handleSendMessageFromPart}
             />
             {branchedConversation && branchedFrom?.messageId === message.id && (
               <div className="flex items-center gap-2 mt-6">
@@ -342,6 +348,7 @@ export const AssistantChat = ({
       branchedFrom,
       onSelectChat,
       onBranchChat,
+      handleSendMessageFromPart,
     ]
   )
 
@@ -395,6 +402,8 @@ export const AssistantChat = ({
       track('assistant_prompt_submitted', { chatId })
     }
   }
+
+  sendMessageRef.current = sendMessageToAssistant
 
   const handleClearMessages = () => {
     if (isChatLoading) stop()

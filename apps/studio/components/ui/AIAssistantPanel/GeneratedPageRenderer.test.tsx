@@ -21,9 +21,6 @@ const PROJECT_REF = 'default'
 
 const input = {
   title: 'Auth debugging console',
-  design: 'studio',
-  layout: 'detail',
-  design_plan: 'Lead with the most recent sign-ins, then the auth errors behind them.',
   html: '<h1 id="page-heading">Auth console</h1><p role="status">Loading…</p><p role="alert" hidden></p>',
   database_queries: [
     { id: 'recent_users', title: 'Recent users', sql: 'select id from auth.users', row_limit: 25 },
@@ -84,7 +81,64 @@ afterEach(() => {
   for (const id of Object.keys(explorerGeneratedPageState.pages)) removeExplorerGeneratedPage(id)
 })
 
+/**
+ * Plays the frame's side of the handshake: jsdom does not run the srcdoc's bootstrap, so
+ * this captures the port the parent hands over and returns it for the test to talk on.
+ */
+const connectToFrame = async (): Promise<MessagePort> => {
+  await waitFor(() => expect(getFrame()).not.toBeNull())
+  const frame = getFrame() as HTMLIFrameElement
+  const postMessage = vi.spyOn(frame.contentWindow!, 'postMessage')
+  frame.dispatchEvent(new Event('load'))
+  // Read through `unknown[]`: the mock is typed by the overload that has no transfer list.
+  const call: unknown[] | undefined = postMessage.mock.calls[0]
+  const transfer = call?.[2] as MessagePort[] | undefined
+  const port = transfer?.[0]
+  if (port === undefined) throw new Error('The parent did not hand the frame a port')
+  return port
+}
+
 describe('GeneratedPageRenderer', () => {
+  it('lists errors the page reports and sends them to the assistant on request', async () => {
+    const user = userEvent.setup()
+    const onSendMessage = vi.fn()
+
+    customRender(
+      <GeneratedPageRenderer
+        state="approval-requested"
+        input={input}
+        confirmState="approval-requested"
+        onSendMessage={onSendMessage}
+      />
+    )
+
+    await user.click(await screen.findByRole('button', { name: 'Run page' }))
+    const port = await connectToFrame()
+    port.postMessage({
+      type: 'error',
+      message: 'Uncaught SyntaxError: missing ) after argument list',
+    })
+    port.postMessage({
+      type: 'error',
+      message: 'Uncaught SyntaxError: missing ) after argument list',
+    })
+
+    expect(await screen.findByText('This page hit an error')).toBeInTheDocument()
+    expect(onSendMessage).not.toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: 'Fix with Assistant' }))
+
+    expect(onSendMessage).toHaveBeenCalledTimes(1)
+    expect(onSendMessage.mock.calls[0][0]).toContain(
+      'The page "Auth debugging console" hit an error'
+    )
+    expect(onSendMessage.mock.calls[0][0]).toContain(
+      '- Uncaught SyntaxError: missing ) after argument list'
+    )
+    expect(screen.getByRole('button', { name: 'Sent to Assistant' })).toBeDisabled()
+    port.close()
+  })
+
   it('copies the current Studio colors into the frame when the user runs the page', async () => {
     const user = userEvent.setup()
     const root = document.documentElement

@@ -208,3 +208,30 @@ export function getGeneratedPageErrorMessage(error: unknown): string {
   }
   return 'Query failed'
 }
+
+/** Most errors kept per run. A page that fails in a loop would otherwise grow without bound. */
+export const MAX_GENERATED_PAGE_ERRORS = 10
+
+/**
+ * Adds an error to a run's list, skipping one already recorded. A failing script or query
+ * usually fails the same way on every retry, and one copy says everything the rest would.
+ */
+export function addGeneratedPageError(errors: string[], message: string): string[] {
+  if (errors.includes(message) || errors.length >= MAX_GENERATED_PAGE_ERRORS) return errors
+  return [...errors, message]
+}
+
+/**
+ * The message sent to the assistant when the user asks it to fix a page. Only ever sent
+ * from the user's click: the errors come from the page, which can put query results in
+ * them, and results reach the assistant only when the user chooses to send them.
+ */
+export function buildGeneratedPageErrorReport(title: string, errors: readonly string[]): string {
+  return [
+    `The page "${title}" hit ${errors.length === 1 ? 'an error' : 'errors'} when it ran:`,
+    '',
+    ...errors.map((error) => `- ${error}`),
+    '',
+    'Fix the page and render it again.',
+  ].join('\n')
+}

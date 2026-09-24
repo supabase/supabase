@@ -29,6 +29,8 @@ export interface MessageActions {
   onBranch: (id: string) => void
   onCancelEdit: () => void
   onRate?: (id: string, rating: 'positive' | 'negative', reason?: string) => void
+  /** Sends a new user message to this chat, for message parts that act on the user's behalf. */
+  onSendMessage?: (text: string) => void
 }
 
 const MessageInfoContext = createContext<MessageInfo | null>(null)

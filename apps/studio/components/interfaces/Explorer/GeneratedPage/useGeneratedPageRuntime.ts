@@ -14,6 +14,7 @@ import {
 } from './generated-page-document'
 import { buildGeneratedPageThemeStyles } from './generated-page-theme'
 import {
+  addGeneratedPageError,
   describeSupabaseClientWarning,
   getGeneratedPageErrorMessage,
   getSupabaseClientStatus,
@@ -85,6 +86,12 @@ export function useGeneratedPageRuntime({
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const [run, setRun] = useState<GeneratedPageRun | null>(null)
   const [height, setHeight] = useState(GENERATED_PAGE_INITIAL_HEIGHT)
+  // What went wrong in the current run: uncaught errors the frame reported and queries that
+  // failed. Held for the user to send back to the assistant; never sent automatically.
+  const [errors, setErrors] = useState<string[]>([])
+
+  const recordError = (message: string) =>
+    setErrors((current) => addGeneratedPageError(current, message))
 
   const teardown = () => {
     for (const port of portsRef.current) port.close()
@@ -109,8 +116,13 @@ export function useGeneratedPageRuntime({
       supabase: buildSupabaseConfig(),
     })
 
-  // Unmounting destroys the frame with the DOM; the channels and the approved fragments
-  // have to be dropped explicitly so nothing outlives the surface that hosted them.
+  // Unmounting destroys the frame with the DOM; its channels have to be closed explicitly
+  // so nothing outlives the surface that hosted them. A closed port delivers no messages,
+  // so the approved fragments are unreachable once this runs and go with the component.
+  //
+  // The approval itself is deliberately not cleared here. StrictMode runs this cleanup once
+  // after mount and keeps the instance, and a handed-over approval is seeded only once, so
+  // clearing it would leave the page running with nothing approved.
   useEffect(() => {
     // The Set instance is created once and only ever mutated, so capturing it here is the
     // same live collection the cleanup needs.
@@ -118,7 +130,6 @@ export function useGeneratedPageRuntime({
     return () => {
       for (const port of ports) port.close()
       ports.clear()
-      approvedRef.current = null
     }
   }, [])
 
@@ -133,6 +144,7 @@ export function useGeneratedPageRuntime({
       teardown()
       if (run !== null) setRun(null)
       setHeight(GENERATED_PAGE_INITIAL_HEIGHT)
+      setErrors([])
     }
   }
 
@@ -195,11 +207,17 @@ export function useGeneratedPageRuntime({
       return
     }
 
+    if (parsedMessage.data.type === 'error') {
+      if (portsRef.current.has(port)) recordError(parsedMessage.data.message)
+      return
+    }
+
     const message = parsedMessage.data
     void runQuery(message).then((response) => {
       // A port that is no longer open belongs to a stopped or replaced run.
       if (!portsRef.current.has(port)) return
       port.postMessage(response)
+      if (!response.ok) recordError(`Query "${message.queryId}" failed: ${response.error.message}`)
     })
   }
 
@@ -258,6 +276,7 @@ export function useGeneratedPageRuntime({
     }
 
     setHeight(GENERATED_PAGE_INITIAL_HEIGHT)
+    setErrors([])
     // The document is built once per run and held in state so a later query settling — API
     // keys arriving, say — can't swap `srcDoc` underneath a page already in use.
     setRun((current) => ({ id: (current?.id ?? 0) + 1, document: buildDocument() }))
@@ -267,6 +286,7 @@ export function useGeneratedPageRuntime({
     teardown()
     setRun(null)
     setHeight(GENERATED_PAGE_INITIAL_HEIGHT)
+    setErrors([])
   }
 
   const reload = () => {
@@ -287,6 +307,8 @@ export function useGeneratedPageRuntime({
     run,
     isRunning: run !== null,
     height,
+    /** Errors from the current run, oldest first. Cleared when the page starts or stops. */
+    errors,
     iframeRef,
     clientStatus,
     clientWarning: describeSupabaseClientWarning(clientStatus),

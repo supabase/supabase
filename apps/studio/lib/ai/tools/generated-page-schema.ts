@@ -12,7 +12,6 @@
  */
 import { z } from 'zod'
 
-import { findGeneratedPageMarkupIssues, findGeneratedPageStateIssue } from './generated-page-markup'
 import { timeRangeSchema } from '@/data/content/notebooks/notebook-schema'
 
 /** Per-kind cap on declared queries. Keeps one page's approval surface reviewable. */
@@ -88,48 +87,12 @@ export function findGeneratedLogsSqlIssue(sql: string): string | null {
 }
 
 /**
- * Field order is load-bearing. The model emits tool input in schema order, so `design`,
- * `layout`, and `design_plan` are declared before `html` to make it commit to an approach
- * and write it down before it writes markup — the cheap, single-round-trip version of a
- * plan-then-build pass. Reordering these to put `html` first removes that effect.
+ * The model emits tool input in schema order, so `html` comes last: the queries the page
+ * calls by id are declared before the markup that calls them.
  */
 export const renderPageInputSchema = z
   .object({
     title: z.string().trim().min(1).max(120).describe('Title shown above the page in chat.'),
-    design: z
-      .enum(['studio', 'custom'])
-      .describe(
-        "'studio' — the default, matching the surrounding dashboard. 'custom' only when the user asked for a different look; it relaxes the Studio design checks, so choosing it without being asked produces an off-brand page."
-      ),
-    custom_design_request: z
-      .string()
-      .trim()
-      .min(1)
-      .max(400)
-      .optional()
-      .describe(
-        "Required when design is 'custom': what the user actually asked for, in their words where possible. Omit entirely for 'studio'."
-      ),
-    layout: z
-      .enum(['dashboard', 'table', 'detail', 'form', 'custom'])
-      .describe(
-        'The page\'s dominant shape: "dashboard" for metrics and charts, "table" for browsing records, "detail" for one record or issue, "form" for inputs and actions, "custom" when none fit.'
-      ),
-    design_plan: z
-      .string()
-      .trim()
-      .min(1)
-      .max(600)
-      .describe(
-        'Two or three sentences, written before the markup: the one thing this page leads with, the order of everything else, and what you are deliberately leaving out. Name the real subject, not the page type.'
-      ),
-    html: z
-      .string()
-      .min(1)
-      .max(MAX_GENERATED_PAGE_HTML_LENGTH)
-      .describe(
-        'Self-contained HTML for the page body, including inline <style> and <script> tags, written to carry out design_plan. Studio theme variables and base element styles are injected; there is no component library and no Tailwind, so write your own CSS against the tokens. Rejected on submission, so get them right the first time: (1) if this page declares any query, the markup must contain the literal attributes role="status" on its loading state and role="alert" on its error state; (2) for design "studio", any hex or rgb()/hsl() literal — use var(--background), var(--foreground), var(--card), var(--border) etc., and declare an unavoidable chart color once as a --chart-* custom property; (3) for design "studio", word-break: break-all or overflow-wrap: anywhere on a bare table/td/th selector — scope it to the one prose column instead. For design "custom", use whatever palette the request calls for; only the role attributes still apply.'
-      ),
     database_queries: z
       .array(generatedPageDatabaseQuerySchema)
       .max(MAX_GENERATED_PAGE_QUERIES)
@@ -143,38 +106,16 @@ export const renderPageInputSchema = z
       .describe(
         'Whether the page needs window.supabase, a supabase-js client using the project publishable key.'
       ),
+    html: z
+      .string()
+      .min(1)
+      .max(MAX_GENERATED_PAGE_HTML_LENGTH)
+      .describe(
+        "Self-contained HTML for the page body, including inline <style> and <script> tags. Studio's color tokens are injected as CSS variables on :root; nothing else is provided."
+      ),
   })
   .strict()
   .superRefine((value, ctx) => {
-    if (value.design === 'custom' && value.custom_design_request === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['custom_design_request'],
-        message:
-          "design is 'custom' but custom_design_request is missing. Quote what the user asked for, or use design: 'studio'.",
-      })
-    }
-
-    // Studio-design pages are held to the dashboard's own conventions. A custom design is
-    // an explicit instruction to depart from them, so these checks would be wrong there.
-    if (value.design === 'studio') {
-      for (const issue of findGeneratedPageMarkupIssues(value.html)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['html'],
-          message: `Studio design check (${issue.rule}): ${issue.message}`,
-        })
-      }
-    }
-
-    const stateIssue = findGeneratedPageStateIssue(
-      value.html,
-      value.database_queries.length + value.log_queries.length
-    )
-    if (stateIssue !== null) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['html'], message: stateIssue })
-    }
-
     const seen = new Set<string>()
     for (const query of [...value.database_queries, ...value.log_queries]) {
       if (seen.has(query.id)) {

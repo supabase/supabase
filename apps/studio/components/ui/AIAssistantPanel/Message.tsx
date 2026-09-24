@@ -112,6 +112,7 @@ interface MessageProps {
   isLastMessage?: boolean
   onRate?: (id: string, rating: 'positive' | 'negative', reason?: string) => void
   rating?: 'positive' | 'negative' | null
+  onSendMessage?: (text: string) => void
 }
 
 export function Message(props: MessageProps) {
@@ -141,6 +142,7 @@ export function Message(props: MessageProps) {
     onBranch: props.onBranch,
     onCancelEdit: props.onCancelEdit,
     onRate: props.onRate,
+    onSendMessage: props.onSendMessage,
   }
 
   return (

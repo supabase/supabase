@@ -26,8 +26,6 @@
  */
 import { z } from 'zod'
 
-import { GENERATED_PAGE_TYPOGRAPHY_STYLES } from './generated-page-typography'
-
 /**
  * Pinned to the workspace catalog version of `@supabase/supabase-js` so the client running
  * inside the frame matches the one Studio itself builds against. Bump both together.
@@ -39,6 +37,9 @@ const SUPABASE_JS_CDN_ORIGIN = 'https://cdn.jsdelivr.net'
 export const GENERATED_PAGE_MIN_HEIGHT = 160
 export const GENERATED_PAGE_MAX_HEIGHT = 2400
 export const GENERATED_PAGE_INITIAL_HEIGHT = 420
+
+/** Longest error message the parent keeps from the frame. */
+export const GENERATED_PAGE_ERROR_MAX_LENGTH = 500
 
 /** Handshake the parent posts into the frame, carrying the `MessageChannel` port. */
 export const GENERATED_PAGE_INIT_MESSAGE = 'studio:generated-page:init'
@@ -67,6 +68,11 @@ export const generatedPageFrameMessageSchema = z.discriminatedUnion('type', [
     type: z.literal('resize'),
     height: z.number().finite(),
   }),
+  z.object({
+    type: z.literal('error'),
+    // Truncated rather than rejected: an oversized message is still worth reporting.
+    message: z.string().transform((message) => message.slice(0, GENERATED_PAGE_ERROR_MAX_LENGTH)),
+  }),
 ])
 
 export type GeneratedPageFrameMessage = z.infer<typeof generatedPageFrameMessageSchema>
@@ -84,7 +90,7 @@ export type GeneratedPageSupabaseConfig = {
 
 export type BuildGeneratedPageDocumentOptions = {
   html: string
-  /** Allowlisted, resolved Studio color and typography variables captured when this run starts. */
+  /** Studio's semantic color tokens, captured when this run starts. */
   themeStyles?: string
   databaseQueryIds: readonly string[]
   logQueryIds: readonly string[]
@@ -161,6 +167,10 @@ function buildBootstrapScript(options: BuildGeneratedPageDocumentOptions): strin
   var readyResolvers = [];
   var isReady = false;
 
+  // Errors raised before the parent connects (a script that fails as the document parses)
+  // are held here and reported once the port arrives.
+  var pendingErrors = [];
+
   function showError(message) {
     var banner = document.getElementById('studio-error-banner');
     if (!banner) {
@@ -169,19 +179,22 @@ function buildBootstrapScript(options: BuildGeneratedPageDocumentOptions): strin
       banner.setAttribute('role', 'alert');
       document.body.insertBefore(banner, document.body.firstChild);
     }
-    banner.textContent = message;
+    banner.textContent = 'This page hit an error: ' + message;
     banner.hidden = false;
+
+    if (port) port.postMessage({ type: 'error', message: message });
+    else pendingErrors.push(message);
+  }
+
+  function describeError(error) {
+    return (error && error.message) || String(error) || 'unknown error';
   }
 
   window.addEventListener('error', function (event) {
-    showError('This page hit an error: ' + (event.message || 'unknown error'));
+    showError(event.message || 'unknown error');
   });
   window.addEventListener('unhandledrejection', function (event) {
-    var reason = event.reason;
-    showError(
-      'This page hit an error: ' +
-        ((reason && reason.message) || String(reason) || 'unknown error')
-    );
+    showError(describeError(event.reason));
   });
 
   function send(message) {
@@ -241,11 +254,11 @@ function buildBootstrapScript(options: BuildGeneratedPageDocumentOptions): strin
           var result = callback();
           if (result && typeof result.catch === 'function') {
             result.catch(function (error) {
-              showError('This page hit an error: ' + ((error && error.message) || 'unknown error'));
+              showError(describeError(error));
             });
           }
         } catch (error) {
-          showError('This page hit an error: ' + ((error && error.message) || 'unknown error'));
+          showError(describeError(error));
         }
       });
     },
@@ -269,6 +282,9 @@ function buildBootstrapScript(options: BuildGeneratedPageDocumentOptions): strin
     port = event.ports[0];
     port.onmessage = handlePortMessage;
     port.start();
+    pendingErrors.splice(0).forEach(function (message) {
+      port.postMessage({ type: 'error', message: message });
+    });
 
     isReady = true;
     var resolvers = readyResolvers.slice();
@@ -348,7 +364,6 @@ export function buildGeneratedPageDocument(options: BuildGeneratedPageDocumentOp
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="Content-Security-Policy" content="${csp}" />
     <style>${BASE_STYLES}</style>
-    <style>${GENERATED_PAGE_TYPOGRAPHY_STYLES}</style>
     <style>${options.themeStyles ?? ''}</style>
     ${supabaseScript}
     <script>${buildBootstrapScript(options)}</script>

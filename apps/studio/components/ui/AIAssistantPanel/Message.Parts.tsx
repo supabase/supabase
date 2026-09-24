@@ -288,7 +288,8 @@ function MessagePartNotebookRun({ toolPart }: { toolPart: ToolUIPart }) {
 function MessagePartGeneratedPage({ toolPart }: { toolPart: ToolUIPart }) {
   const { state, input: submittedInput } = toolPart
   const input = state === 'output-error' ? (submittedInput ?? toolPart.rawInput) : submittedInput
-  const { addToolApprovalResponse } = useMessageActionsContext()
+  const { addToolApprovalResponse, onSendMessage } = useMessageActionsContext()
+  const { isLoading } = useMessageInfoContext()
 
   if (state === 'input-streaming') return <ToolDisplayExecuteSqlLoading label="Writing page..." />
 
@@ -307,6 +308,8 @@ function MessagePartGeneratedPage({ toolPart }: { toolPart: ToolUIPart }) {
       confirmState={confirmState}
       onApprove={onApprove}
       onDeny={onDeny}
+      onSendMessage={onSendMessage}
+      isChatBusy={isLoading}
     />
   )
 }
@@ -324,35 +327,22 @@ const MessagePart = {
   GeneratedPage: MessagePartGeneratedPage,
 } as const
 
-// Wide parts share the default width for now; the split stays so a part can diverge again.
 const MESSAGE_PART_WIDTH = 'max-w-3xl'
-const WIDE_MESSAGE_PART_WIDTH = 'max-w-3xl'
+// Generated pages lay out dashboards and tables, so they get more room than the conversation.
+const GENERATED_PAGE_PART_WIDTH = 'max-w-6xl'
 
 function MessagePartContainer({
   children,
-  isWide = false,
+  className,
 }: {
   children: ReactNode
-  isWide?: boolean
+  className?: string
 }) {
-  return (
-    <div className={cn('w-full mx-auto', isWide ? WIDE_MESSAGE_PART_WIDTH : MESSAGE_PART_WIDTH)}>
-      {children}
-    </div>
-  )
+  return <div className={cn('w-full mx-auto', className)}>{children}</div>
 }
 
-const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
-  part.type === 'tool-execute_sql' ||
-  part.type === 'tool-query_logs' ||
-  part.type === 'tool-create_notebook' ||
-  part.type === 'tool-update_notebook' ||
-  part.type === 'tool-delete_notebook' ||
-  part.type === 'tool-run_notebook' ||
-  part.type === 'tool-render_page' ||
-  (part.type === 'dynamic-tool' && part.toolName === 'query_logs') ||
-  // Unlabelled code fences resolve to SQL in MessageMarkdown, too.
-  (part.type === 'text' && /```(?:sql)?(?:\s|$)/i.test(part.text))
+const getMessagePartWidth = (part: NonNullable<VercelMessage['parts']>[number]) =>
+  part.type === 'tool-render_page' ? GENERATED_PAGE_PART_WIDTH : MESSAGE_PART_WIDTH
 
 const isCompactToolPart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'reasoning' ||
@@ -423,5 +413,7 @@ export function MessagePartSwitcher({
   // Tool rows depend on being direct siblings to share their compact spacing and dividers.
   if (isCompactToolPart(part)) return content
 
-  return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
+  return (
+    <MessagePartContainer className={getMessagePartWidth(part)}>{content}</MessagePartContainer>
+  )
 }

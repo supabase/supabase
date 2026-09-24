@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   buildGeneratedPageDocument,
   clampGeneratedPageHeight,
+  GENERATED_PAGE_ERROR_MAX_LENGTH,
   GENERATED_PAGE_MAX_HEIGHT,
   GENERATED_PAGE_MIN_HEIGHT,
   generatedPageFrameMessageSchema,
   getProjectConnectOrigins,
   SUPABASE_JS_CDN_URL,
 } from './generated-page-document'
-import { GENERATED_PAGE_TYPOGRAPHY_STYLES } from './generated-page-typography'
 
 const baseOptions = {
   html: '<h1>Hello</h1>',
@@ -18,7 +18,7 @@ const baseOptions = {
 }
 
 describe('buildGeneratedPageDocument', () => {
-  it('provides the optional UI kit before custom markup without adding a wrapper or dependencies', () => {
+  it('inserts the markup directly into the body without a wrapper or dependencies', () => {
     const html = '<style>button { border-radius: 0; }</style><button>Custom interface</button>'
     const doc = buildGeneratedPageDocument({ ...baseOptions, html })
 
@@ -30,16 +30,6 @@ describe('buildGeneratedPageDocument', () => {
     expect(doc).not.toContain('<script src=')
   })
 
-  it('provides typography without Tailwind and lets generated CSS override it', () => {
-    const html = '<style>h1 { font-size: 48px; }</style><h1>Custom title</h1>'
-    const doc = buildGeneratedPageDocument({ ...baseOptions, html })
-
-    expect(doc).toContain(`<style>${GENERATED_PAGE_TYPOGRAPHY_STYLES}</style>`)
-    expect(doc).not.toContain('@apply')
-    expect(doc).not.toContain('@utility')
-    expect(doc.indexOf(GENERATED_PAGE_TYPOGRAPHY_STYLES)).toBeLessThan(doc.indexOf(html))
-  })
-
   it('injects theme colors before generated CSS so the page can override the defaults', () => {
     const themeStyles = ':root { --background: oklch(0.19 0 0); color-scheme: dark; }'
     const html = '<style>:root { --background: rebeccapurple; }</style><h1>Custom design</h1>'
@@ -49,7 +39,6 @@ describe('buildGeneratedPageDocument', () => {
     expect(doc).toContain('background: var(--background, Canvas)')
     expect(doc).toContain('color: var(--foreground, CanvasText)')
     expect(doc.indexOf(themeStyles)).toBeLessThan(doc.indexOf(html))
-    expect(doc.indexOf(GENERATED_PAGE_TYPOGRAPHY_STYLES)).toBeLessThan(doc.indexOf(themeStyles))
   })
 
   it('denies everything by default and allows no network egress without a client', () => {
@@ -135,6 +124,19 @@ describe('generatedPageFrameMessageSchema', () => {
     expect(generatedPageFrameMessageSchema.safeParse({ type: 'resize', height: 320 }).success).toBe(
       true
     )
+  })
+
+  it('accepts error reports and truncates long ones', () => {
+    const parsed = generatedPageFrameMessageSchema.safeParse({
+      type: 'error',
+      message: 'x'.repeat(GENERATED_PAGE_ERROR_MAX_LENGTH + 100),
+    })
+
+    expect(parsed.success).toBe(true)
+    expect(parsed.data).toEqual({
+      type: 'error',
+      message: 'x'.repeat(GENERATED_PAGE_ERROR_MAX_LENGTH),
+    })
   })
 
   it('rejects malformed payloads, including a frame trying to smuggle SQL', () => {

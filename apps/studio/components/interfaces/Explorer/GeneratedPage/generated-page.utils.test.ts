@@ -2,7 +2,10 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
 import {
+  addGeneratedPageError,
+  buildGeneratedPageErrorReport,
   lookupApprovedQuery,
+  MAX_GENERATED_PAGE_ERRORS,
   selectPublicClientKey,
   summarizeGeneratedPageCapabilities,
   type ApprovedGeneratedPageQueries,
@@ -164,9 +167,6 @@ describe('selectPublicClientKey', () => {
 describe('summarizeGeneratedPageCapabilities', () => {
   const base: RenderPageInput = {
     title: 'Auth console',
-    design: 'studio',
-    layout: 'dashboard',
-    design_plan: 'Lead with the most recent rows, with nothing else on the page.',
     html: '<div></div>',
     database_queries: [],
     log_queries: [],
@@ -197,6 +197,33 @@ describe('summarizeGeneratedPageCapabilities', () => {
   it('says so when the page gets nothing', () => {
     expect(summarizeGeneratedPageCapabilities(base)).toBe(
       'Runs in a sandbox with no access to your project'
+    )
+  })
+})
+
+describe('addGeneratedPageError', () => {
+  it('keeps one copy of a repeated error', () => {
+    const errors = addGeneratedPageError(addGeneratedPageError([], 'boom'), 'boom')
+    expect(errors).toEqual(['boom'])
+  })
+
+  it('stops at the cap', () => {
+    const full = Array.from({ length: MAX_GENERATED_PAGE_ERRORS }, (_, index) => `error ${index}`)
+    expect(addGeneratedPageError(full, 'one more')).toBe(full)
+  })
+})
+
+describe('buildGeneratedPageErrorReport', () => {
+  it('names the page and lists each error', () => {
+    expect(buildGeneratedPageErrorReport('Service health', ['a', 'b'])).toBe(
+      [
+        'The page "Service health" hit errors when it ran:',
+        '',
+        '- a',
+        '- b',
+        '',
+        'Fix the page and render it again.',
+      ].join('\n')
     )
   })
 })
