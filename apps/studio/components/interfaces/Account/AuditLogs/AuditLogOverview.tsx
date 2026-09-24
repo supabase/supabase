@@ -93,10 +93,8 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
         <DetailRow label="Name" value={selectedLog.action.name} />
         <DetailRow label="Method" value={selectedLog.action.method} />
         <DetailRow label="Route" value={selectedLog.action.route} />
-        <div className="flex h-9 items-center justify-between gap-x-10 px-4 pl-[22px]">
-          <span className="shrink-0 text-xs uppercase tracking-wide text-foreground-lighter font-mono">
-            Status
-          </span>
+        <div className="flex h-9 items-center justify-between gap-x-10 px-4 pl-[38px]">
+          <span className="shrink-0 text-sm text-foreground-lighter">Status</span>
           <DataTableColumnStatusCode
             value={selectedLog.action.status}
             level={getStatusLevel(selectedLog.action.status)}
