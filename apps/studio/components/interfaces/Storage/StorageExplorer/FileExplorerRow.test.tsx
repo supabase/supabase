@@ -114,6 +114,15 @@ describe('FileExplorerRow', () => {
     expect(screen.getByRole('button', { name: 'View archived file gone.png' })).toBeInTheDocument()
     expect(screen.queryByText('Archived')).not.toBeInTheDocument()
 
+    // Only the actions an archived file can actually take.
+    await userEvent.click(screen.getByRole('button', { name: 'gone.png actions' }))
+    expect(await screen.findByText('Restore')).toBeInTheDocument()
+    expect(screen.getByText('Delete permanently')).toBeInTheDocument()
+    expect(screen.queryByText('Download')).not.toBeInTheDocument()
+    expect(screen.queryByText('Rename')).not.toBeInTheDocument()
+    expect(screen.queryByText('Move')).not.toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+
     // An archived row has no checkbox, so nothing may hide its icon on hover.
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
     const iconSlot = container.querySelector('.absolute')
