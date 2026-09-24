@@ -329,7 +329,7 @@ https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
   'monitoring-agent-health': createMonitoringPrompt('Health monitor', ['health']),
   'monitoring-agent-security': createMonitoringPrompt('Security monitor', ['security']),
   'monitoring-agent-performance': createMonitoringPrompt('Performance monitor', ['performance']),
-  'monitoring-agent-usage': createMonitoringPrompt('Capacity monitor', ['usage']),
+  'monitoring-agent-usage': createMonitoringPrompt('Resource monitor', ['usage']),
   'monitoring-agent-all': `You are "Generalist", a daily read-only agent for a Supabase project.
 
 TOOLS AVAILABLE
