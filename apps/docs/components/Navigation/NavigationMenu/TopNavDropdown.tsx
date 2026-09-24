@@ -71,7 +71,7 @@ const TopNavDropdown = () => {
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ variant: 'default' }),
-            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-open:bg-overlay-hover/30 hover:border-strong data-open:border-stronger hover:bg-overlay-hover/50! bg-transparent'
+            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] px-0 data-open:bg-overlay-hover/30 hover:border-strong data-open:border-stronger hover:bg-overlay-hover/50! bg-transparent'
           )}
         >
           <Menu size={18} strokeWidth={1} />

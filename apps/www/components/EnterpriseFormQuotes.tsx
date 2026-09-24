@@ -104,7 +104,7 @@ const EnterpriseFormQuotes = ({
       <div className="relative w-full h-px bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
         <motion.div
           className={cn(
-            'absolute motion-reduce:hidden inset-0 w-full right-full bg-brand h-full transition-all',
+            'absolute motion-reduce:hidden inset-0 w-full right-full bg-brand-default h-full transition-all',
             progress! > 99.7 ? 'opacity-0' : 'opacity-100'
           )}
           style={{ x: `${progress! - 100}%` }}
