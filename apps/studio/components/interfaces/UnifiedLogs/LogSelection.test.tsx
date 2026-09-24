@@ -8,7 +8,10 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { generateDynamicColumns } from './components/Columns'
 import { LogSelectionActions } from './LogSelectionActions'
-import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPanelControls'
+import {
+  LogPanelCloseButton,
+  LogPanelNavigation,
+} from './ServiceFlow/components/ServiceFlowPanelControls'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
@@ -79,7 +82,12 @@ function SelectionHarness({
         setColumnOrder={vi.fn()}
         setColumnVisibility={vi.fn()}
       />
-      {activeId && !showPanel && <ServiceFlowPanelControls dock="right" setDock={vi.fn()} />}
+      {activeId && !showPanel && (
+        <>
+          <LogPanelNavigation dock="right" setDock={vi.fn()} />
+          <LogPanelCloseButton />
+        </>
+      )}
       {activeId && showPanel && (
         <ResizablePanelGroup orientation="horizontal">
           <ServiceFlowPanel
@@ -276,6 +284,10 @@ describe('selected log details', () => {
     await user.click(row('first'))
     expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('Message')).toBeVisible()
+    // The header reads like the log's timeline step; the time stays above the sections
+    expect(screen.getByRole('status')).toHaveTextContent('Realtime')
+    expect(screen.getByText('Logged')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Previous log' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Copy selected logs' })).toBeVisible()
     await user.click(screen.getByRole('tab', { name: 'Raw JSON' }))
     expect(screen.getByRole('button', { name: 'Copy log as JSON' })).toBeVisible()
