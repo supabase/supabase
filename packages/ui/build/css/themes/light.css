@@ -30,13 +30,12 @@
    * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
   --warning-hue: 58;
-  --warning-lightness: 0.68;
   /*
-   * Light warning sits above the shared on-fill flip (L≈0.62), which would pick
-   * dark ink — but amber at this lightness still needs light text on solid fills
-   * (e.g. Button warning). Force light ink; dark mode keeps the relative formula.
+   * Sit below the shared on-fill flip (L≈0.62) so --warning-foreground resolves
+   * to light ink, same path as destructive/info. L≈0.55 is about the lightest
+   * amber that still clears ~4.5:1 with white (WCAG AA for normal text).
    */
-  --warning-foreground: oklch(from var(--warning) 0.99 calc(c * 0.08) h);
+  --warning-lightness: 0.55;
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;
 
