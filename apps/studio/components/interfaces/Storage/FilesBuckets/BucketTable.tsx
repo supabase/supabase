@@ -13,6 +13,7 @@ import {
 } from 'ui'
 
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { BucketVersioningPill } from '@/components/interfaces/Storage/BucketVersioningPill'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import { getBucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
@@ -31,11 +32,10 @@ type BucketTableMode = 'standard' | 'virtualized'
 
 export const useVersioningColumnSpan = () => (useIsStorageVersioningEnabled() ? 1 : 0)
 
-const BucketVersioningBadge = ({ bucket }: { bucket: Bucket }) => {
-  const versioningState = getBucketVersioningState(bucket)
-  if (versioningState === 'enabled') return <Badge variant="success">Enabled</Badge>
-  if (versioningState === 'suspended') return <Badge variant="warning">Suspended</Badge>
-  return <span className="text-foreground-muted">-</span>
+const BucketVersioningCell = ({ bucket }: { bucket: Bucket }) => {
+  if (getBucketVersioningState(bucket) === 'disabled')
+    return <span className="text-foreground-muted">-</span>
+  return <BucketVersioningPill bucket={bucket} showPrefix={false} />
 }
 
 type BucketTableHeaderProps = {
@@ -182,7 +182,7 @@ export const BucketTableRow = ({
 
       {isStorageVersioningEnabled && (
         <BucketTableCell>
-          <BucketVersioningBadge bucket={bucket} />
+          <BucketVersioningCell bucket={bucket} />
         </BucketTableCell>
       )}
 
