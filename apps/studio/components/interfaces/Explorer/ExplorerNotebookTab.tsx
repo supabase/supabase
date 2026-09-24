@@ -60,7 +60,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
-import { useCreateChat, useLoadNotebook } from './hooks'
+import { useAnalyzeNotebook, useLoadNotebook } from './hooks'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
@@ -95,7 +95,7 @@ export const ExplorerNotebookTab = () => {
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
   const queryClient = useQueryClient()
-  const { createChat, isCreating } = useCreateChat()
+  const { analyzeNotebook, isCreating } = useAnalyzeNotebook()
   const { onSelectDelete } = useExplorerDeleteItem()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
@@ -292,12 +292,7 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const handleAnalyze = () => {
-    createChat({
-      name: `Analyze ${name} notebook`,
-      initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
-    })
-  }
+  const handleAnalyze = () => analyzeNotebook({ id, name })
 
   const handleClickAnalyze = () => {
     if (hasDiscardableChanges(currentNotebook)) {
