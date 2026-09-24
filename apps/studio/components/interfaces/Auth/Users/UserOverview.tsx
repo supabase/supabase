@@ -12,7 +12,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
-import { UserHeader } from './UserHeader'
+import { UserFields } from './UserFields'
 import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -176,44 +176,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   return (
     <>
       <div>
-        <UserHeader user={user} />
-
-        {isBanned ? (
+        {isBanned && (
           <Admonition
             type="warning"
             description={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
-            className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5"
+            className="border-r-0 border-l-0 border-t-0 rounded-none [&_svg]:ml-0.5"
           />
-        ) : (
-          <Separator />
         )}
 
-        <div className={cn('flex flex-col gap-y-1', PANEL_PADDING)}>
-          <RowData property="User UID" value={user.id} />
-          <RowData
-            property="Created at"
-            value={user.created_at ? dayjs(user.created_at).format(DATE_FORMAT) : undefined}
-          />
-          <RowData
-            property="Updated at"
-            value={user.updated_at ? dayjs(user.updated_at).format(DATE_FORMAT) : undefined}
-          />
-          <RowData property="Invited at" value={user.invited_at} />
-          <RowData property="Confirmation sent at" value={user.confirmation_sent_at} />
-          <RowData
-            property="Confirmed at"
-            value={user.confirmed_at ? dayjs(user.confirmed_at).format(DATE_FORMAT) : undefined}
-          />
-          <RowData
-            property="Last signed in"
-            value={
-              user.last_sign_in_at ? dayjs(user.last_sign_in_at).format(DATE_FORMAT) : undefined
-            }
-          />
-          <RowData property="SSO" value={user.is_sso_user} />
-        </div>
+        <UserFields user={user} className="pt-3" />
 
-        <div className={cn('flex flex-col pt-0!', PANEL_PADDING)}>
+        <Separator />
+
+        <div className={cn('flex flex-col', PANEL_PADDING)}>
           <p>Provider Information</p>
           <p className="text-sm text-foreground-light">The user has the following providers</p>
         </div>
