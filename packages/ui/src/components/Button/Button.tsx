@@ -6,11 +6,11 @@ import { Slot } from 'radix-ui'
 import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
 import { SIZE_VARIANTS } from '../../lib/constants'
+import { controlSurfaceShadows, raisedControlSurface } from '../../lib/raised-control-surface'
 import { cn } from '../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
-// Normalize the shared border curve at contrast 0.5: (0.05 + 0.95 * 0.5)² = 0.275625.
 const buttonVariants = cva(
   `relative
   inline-flex items-center justify-center
@@ -25,13 +25,7 @@ const buttonVariants = cva(
   [&:not([aria-haspopup])]:motion-safe:active:scale-[0.97]
   focus-ring
   border
-  [--button-shadow-opacity:0.04] dark:[--button-shadow-opacity:0.2]
-  [--button-edge-strength:calc(var(--contrast-border,0.275625)/0.275625*0.6)]
-  dark:[--button-edge-strength:calc(var(--contrast-border,0.275625)/0.275625)]
-  [--button-edge-color:var(--colors-black)] dark:[--button-edge-color:var(--colors-white)]
-  [--button-shadow-drop:0_1px_3px_0_hsl(var(--colors-black)/var(--button-shadow-opacity))]
-  [--button-shadow-raised:var(--button-shadow-drop),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
-  [--button-shadow-default:var(--button-shadow-drop),inset_0_1px_0_0_hsl(var(--button-edge-color)/calc(0.04*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_-1px_0_0_hsl(var(--colors-black)/calc(0.06*var(--button-edge-strength))),inset_0_0_0_1px_hsl(var(--button-edge-color)/calc(0.1*var(--button-edge-strength)))]
+  ${controlSurfaceShadows}
   `,
   {
     variants: {
@@ -45,14 +39,7 @@ const buttonVariants = cva(
           hover:bg-[var(--primary-solid-hover)]
           data-[state=open]:bg-[var(--primary-solid-hover)]
           `,
-        default: `
-          text-foreground
-          border-0
-          bg-card hover:bg-muted dark:bg-muted dark:hover:bg-accent
-          dark:bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
-          shadow-[var(--button-shadow-default)]
-          data-[state=open]:bg-muted dark:data-[state=open]:bg-accent
-          `,
+        default: raisedControlSurface,
         secondary: `
           bg-foreground
           text-background

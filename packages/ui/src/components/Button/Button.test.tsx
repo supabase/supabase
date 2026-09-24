@@ -32,6 +32,7 @@ describe('#Button', () => {
     const button = screen.getByRole('button', { name: 'Neutral' })
     expect(button.className).toContain('bg-card')
     expect(button.className).toContain('hover:bg-muted')
+    expect(button.className).toContain('shadow-[var(--button-shadow-default)]')
     expect(button.className).not.toContain('bg-primary-solid')
   })
 
