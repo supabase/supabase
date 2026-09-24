@@ -191,7 +191,7 @@ For node-postgres, Psycopg, and Rust drivers, see [Disabling prepared statements
 
 **Session-level state** is lost between transactions. This covers `set` and `reset`, session-level advisory locks, `listen` and `notify`, and temporary tables. Run them inside the transaction that needs them, or use session mode or a direct connection instead.
 
-**Query pipelining** isn't supported yet either: transaction mode returns a connection to the pool as soon as it sees one reply finish, even if the client already queued more queries on it. An upcoming Supavisor release will add pipelining support.
+**Query pipelining** isn't supported: transaction mode returns a connection to the pool as soon as it sees one reply finish, even if the client already queued more queries on it.
 
 Direct connections and session mode support all four, so none of this applies to either.
 
