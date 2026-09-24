@@ -20,8 +20,10 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { Filter, Sort, SupaTable } from '@/components/grid/types'
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { getAllTableRowsSql } from '@/data/table-rows/table-rows-query'
+import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
@@ -57,12 +59,35 @@ export const ExportDialog = ({
   const connectionInfo = pluckObjectFields(primaryDatabase || emptyState, DB_FIELDS)
   const { db_host, db_port, db_user, db_name } = connectionInfo
 
+  const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
+  const sharedPoolerConfig = (supavisorConfig ?? []).find((x) => x.identifier === projectRef)
+
   const connectionStrings = getConnectionStrings({
     connectionInfo,
     metadata: { projectRef },
-    // [Joshen] We don't need any pooler details for this context, we only want direct
-    poolingInfo: { connectionString: '', db_host: '', db_name: '', db_port: 0, db_user: '' },
+    poolingInfo: {
+      connectionString: sharedPoolerConfig?.connection_string ?? '',
+      db_host: sharedPoolerConfig?.db_host ?? '',
+      db_name: sharedPoolerConfig?.db_name ?? '',
+      db_port: sharedPoolerConfig?.db_port ?? 0,
+      db_user: sharedPoolerConfig?.db_user ?? '',
+    },
   })
+
+  // The direct connection (db.<ref>.supabase.co) is only reachable over IPv6, so the snippets
+  // hang on IPv4-only machines. The shared pooler's session mode (port 5432) is IPv4 proxied, so
+  // prefer it for the CLI snippets when it's available (hosted platform). The shared pooler
+  // reports the transaction-mode port (6543); session mode swaps it to 5432, mirroring how the
+  // Connect dialog builds its session pooler strings. Self-hosted has no shared pooler, so it
+  // falls back to the direct connection.
+  const usePooler = IS_PLATFORM && sharedPoolerConfig !== undefined
+  const sessionPoolerPsql = connectionStrings.pooler.psql.replace('6543', '5432')
+  const psqlCommand = usePooler ? sessionPoolerPsql : connectionStrings.direct.psql
+
+  const dumpHost = usePooler ? (sharedPoolerConfig?.db_host ?? '') : db_host
+  const dumpPort = usePooler ? '5432' : db_port
+  const dumpName = usePooler ? (sharedPoolerConfig?.db_name ?? '') : db_name
+  const dumpUser = usePooler ? (sharedPoolerConfig?.db_user ?? '') : db_user
 
   const outputName = `${table?.name}_rows`
   const queryChains = !table ? undefined : getAllTableRowsSql({ table, sorts, filters })
@@ -78,10 +103,10 @@ export const ExportDialog = ({
   const query = queryWithSemicolon.replace(/;\s*$/, '')
 
   const csvExportCommand = `
-${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()
+${psqlCommand} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()
 
   const sqlExportCommand = `
-pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
+pg_dump -h ${dumpHost} -p ${dumpPort} -d ${dumpName} -U ${dumpUser} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
   `.trim()
 
   return (
