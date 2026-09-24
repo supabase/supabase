@@ -68,8 +68,7 @@ export async function addFilterWithDropdownValue(
 export async function switchProperty(page: Page, currentColumnName: string, newColumnName: string) {
   const conditionEl = page.getByTestId(`filter-condition-${currentColumnName}`)
   await conditionEl
-    .locator(`span`, { hasText: new RegExp(`^${currentColumnName}$`, 'i') })
-    .first()
+    .getByRole('button', { name: `Change property from ${currentColumnName}` })
     .click()
 
   const searchInput = page.getByTestId(`filter-property-search-${currentColumnName}`)

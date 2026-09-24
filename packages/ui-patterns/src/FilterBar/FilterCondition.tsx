@@ -41,6 +41,7 @@ export function FilterCondition({
     handlePropertyChange,
     handleKeyDown,
     handleRemoveCondition,
+    rootRef,
     handleSelectMenuItem,
     setActiveInput,
     setHighlightedConditionPath,
@@ -254,9 +255,19 @@ export function FilterCondition({
     [handleInputChange, path]
   )
 
-  const onRemove = useCallback(() => {
-    handleRemoveCondition(path)
-  }, [handleRemoveCondition, path])
+  const onRemove = useCallback(
+    (event?: React.MouseEvent<HTMLButtonElement>) => {
+      handleRemoveCondition(path)
+      if (event?.detail === 0) {
+        window.setTimeout(() => {
+          rootRef.current
+            ?.querySelector<HTMLInputElement>('[data-testid="filter-bar-freeform-input"]')
+            ?.focus()
+        }, 0)
+      }
+    },
+    [handleRemoveCondition, path, rootRef]
+  )
 
   if (!property) return null
 

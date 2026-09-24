@@ -246,6 +246,7 @@ describe('FilterBar', () => {
     expect(screen.getByRole('button', { name: 'Remove Name filter' })).toHaveFocus()
     await user.keyboard('{Enter}')
     expect(onFilterChange).toHaveBeenCalledWith(initialFilters)
+    await waitFor(() => expect(screen.getByTestId('filter-bar-freeform-input')).toHaveFocus())
   })
 
   it('opens group popover and allows selecting a property', async () => {
