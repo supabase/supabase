@@ -8,7 +8,6 @@ import React, {
   useEffect,
   useImperativeHandle,
   useRef,
-  useState,
 } from 'react'
 
 import { useFilterBarState, useOptionsCache } from './hooks'
