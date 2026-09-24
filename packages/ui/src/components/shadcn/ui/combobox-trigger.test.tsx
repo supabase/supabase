@@ -36,4 +36,23 @@ describe('ComboboxTrigger', () => {
       'shadow-[var(--button-shadow-default)]'
     )
   })
+
+  it('matches Button radius at the same size', () => {
+    render(
+      <>
+        <ComboboxTrigger size="small" aria-label="Type">
+          Type
+        </ComboboxTrigger>
+        <Select defaultValue="first">
+          <SelectTrigger size="small" aria-label="Default value">
+            <SelectValue />
+          </SelectTrigger>
+        </Select>
+      </>
+    )
+
+    const radius = 'rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]'
+    expect(screen.getByRole('combobox', { name: 'Type' })).toHaveClass(radius)
+    expect(screen.getByRole('combobox', { name: 'Default value' })).toHaveClass(radius)
+  })
 })

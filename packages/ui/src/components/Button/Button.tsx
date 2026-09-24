@@ -6,7 +6,11 @@ import { Slot } from 'radix-ui'
 import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
 import { SIZE_VARIANTS } from '../../lib/constants'
-import { controlSurfaceShadows, raisedControlSurface } from '../../lib/raised-control-surface'
+import {
+  controlRadiusBySize,
+  controlSurfaceShadows,
+  raisedControlSurface,
+} from '../../lib/raised-control-surface'
 import { cn } from '../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
 
@@ -100,13 +104,11 @@ const buttonVariants = cva(
         true: 'w-full flex items-center justify-center',
       },
       size: {
-        // Larger sizes soften the curve; cn() merges these over base rounded-md.
-        // Radius stays on Button (not SIZE_VARIANTS) because that map is shared with Input/Select.
-        tiny: `${SIZE_VARIANTS.tiny} rounded-md`,
-        small: `${SIZE_VARIANTS.small} rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]`,
-        medium: `${SIZE_VARIANTS.medium} rounded-[calc(var(--radius-md)*(1+(38/26-1)*0.35))]`,
-        large: `${SIZE_VARIANTS.large} rounded-[calc(var(--radius-md)*(1+(42/26-1)*0.35))]`,
-        xlarge: `${SIZE_VARIANTS.xlarge} rounded-[calc(var(--radius-md)*(1+(50/26-1)*0.35))]`,
+        tiny: `${SIZE_VARIANTS.tiny} ${controlRadiusBySize.tiny}`,
+        small: `${SIZE_VARIANTS.small} ${controlRadiusBySize.small}`,
+        medium: `${SIZE_VARIANTS.medium} ${controlRadiusBySize.medium}`,
+        large: `${SIZE_VARIANTS.large} ${controlRadiusBySize.large}`,
+        xlarge: `${SIZE_VARIANTS.xlarge} ${controlRadiusBySize.xlarge}`,
       },
       overlay: {
         base: `absolute inset-0 bg-background opacity-50`,
