@@ -51,7 +51,29 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
         {wrapper.name}
         {isShared && (
           <p className="text-sm text-foreground-light">
-            This wrapper is shared with another connection and cannot be edited in the dashboard.
+            This wrapper is shared. To edit this connection, use <code>ALTER SERVER</code> on{' '}
+            <code className="text-code-inline">{wrapper.server_name}</code> or{' '}
+            <code>ALTER FOREIGN TABLE</code> in the{' '}
+            <Link
+              href={`/project/${ref}/sql/new?skip=true`}
+              className="underline underline-offset-2"
+            >
+              SQL Editor
+            </Link>
+            .
+            {encryptedMetadata.length > 0 && (
+              <>
+                {' '}
+                Edit this server&apos;s credentials in{' '}
+                <Link
+                  href={`/project/${ref}/settings/vault/secrets`}
+                  className="underline underline-offset-2"
+                >
+                  Vault
+                </Link>
+                . Changes to a secret used by other connections affect them too.
+              </>
+            )}
           </p>
         )}
 
