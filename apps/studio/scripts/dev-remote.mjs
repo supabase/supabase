@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Launch Studio against a hosted backend, à la Sentry dev-ui.
-// See scripts/dev-tools-extension/README.md.
+// See https://github.com/supabase/supabase-chrome-tools.
 //   pnpm dev:studio:remote[:staging]   (--print to dry-run)
 
 import { spawn } from 'node:child_process'
@@ -11,16 +11,16 @@ const STUDIO_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.
 const PORT = process.env.STUDIO_PORT ?? '8082'
 const ORIGIN = `http://localhost:${PORT}`
 
-// Hosted backends the proxy forwards to. null = not wired yet (override via env).
+// Hosted backends the proxy forwards to. Override either via env (REMOTE_API_URL / REMOTE_GOTRUE_URL).
 const TARGETS = {
   production: {
     REMOTE_API_URL: 'https://api.supabase.com',
     REMOTE_GOTRUE_URL: 'https://alt.supabase.io/auth/v1',
   },
   staging: {
-    // supabase.green — TODO: fill in staging hosts.
-    REMOTE_API_URL: null,
-    REMOTE_GOTRUE_URL: null,
+    // supabase.green
+    REMOTE_API_URL: 'https://api.supabase.green',
+    REMOTE_GOTRUE_URL: 'https://auth.supabase.green/auth/v1',
   },
 }
 

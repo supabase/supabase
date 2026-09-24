@@ -50,7 +50,7 @@ const marketplaceApiProtocol: 'http' | 'https' | null =
 
 // Remote-dev proxy: forward hosted control-plane + auth paths server-side so
 // local Studio can run against a hosted backend.
-// See scripts/dev-tools-extension/README.md.
+// See https://github.com/supabase/supabase-chrome-tools.
 function getRemoteDevRewrites() {
   if (process.env.REMOTE_DEV !== 'true') return []
   const apiOrigin = (process.env.REMOTE_API_URL ?? 'https://api.supabase.com').replace(/\/$/, '')
