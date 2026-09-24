@@ -386,7 +386,11 @@ export function FilterCondition({
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
               onKeyDown={handleValueKeyDown}
-              className="h-full border-none bg-transparent py-0 px-1 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
+              className={cn(
+                'h-full border-none bg-transparent py-0 px-1 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0',
+                hasFormattedCustomValue &&
+                  'focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring'
+              )}
               aria-label={`Value for ${property.label}`}
               data-testid={`filter-value-${property.name}`}
               tabIndex={-1}
@@ -453,7 +457,7 @@ export function FilterCondition({
           />
         }
         onClick={onRemove}
-        className="group relative size-[18px] shrink-0 m-[3px] rounded-sm p-0 hover:text-foreground hover:!bg-surface-600 focus-visible:z-20 focus-visible:!bg-transparent focus-visible:ring-2 focus-visible:ring-offset-0"
+        className="group relative !h-[18px] !w-[18px] shrink-0 self-center m-[3px] rounded-sm !p-0 hover:text-foreground hover:!bg-surface-600 focus-visible:z-20 focus-visible:!bg-transparent focus-visible:ring-2 focus-visible:ring-offset-0"
         aria-label={`Remove ${property.label} filter`}
         data-testid={`filter-remove-${property.name}`}
       />
