@@ -29,7 +29,6 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { useShowMicroUpgradeBadge } from './useShowMicroUpgradeBadge'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -113,8 +112,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
 
-  const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
-
   const showSkeletons = isLoading
   const showLoadError = !isLoading && !!addonsError
   const showComputeOptions = !isLoading && !addonsError
@@ -152,8 +149,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             {showComputeOptions && (
               <>
                 {availableOptions.map((compute) => {
-                  const lockedMicroDueToPITR =
-                    compute.identifier === 'ci_micro' && !!subscriptionPitr
                   const lockedNanoDueToPlan =
                     org?.plan.id !== 'free' &&
                     project?.infra_compute_size !== 'nano' &&
@@ -161,8 +156,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   const lockedDueToHighAvailability =
                     isHighAvailability && compute.identifier !== currentComputeVariantId
 
-                  const lockedOption =
-                    lockedNanoDueToPlan || lockedMicroDueToPITR || lockedDueToHighAvailability
+                  const lockedOption = lockedNanoDueToPlan || lockedDueToHighAvailability
 
                   // Nano on a paid plan is billed at the Micro rate
                   const isNanoBilledAsMicro =
@@ -280,16 +274,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                             <TooltipContent side="bottom" className="w-64 text-center">
                               Compute size can't be changed on High Availability projects during
                               Alpha
-                            </TooltipContent>
-                          )}
-                          {!lockedDueToHighAvailability && lockedMicroDueToPITR && (
-                            <TooltipContent side="bottom" className="w-64 text-center">
-                              Project has PITR enabled which requires a minimum of Small compute.
-                              Please{' '}
-                              <InlineLink href="/project/_/settings/addons?panel=pitr">
-                                disable PITR
-                              </InlineLink>{' '}
-                              first before selecting Micro
                             </TooltipContent>
                           )}
                         </Tooltip>

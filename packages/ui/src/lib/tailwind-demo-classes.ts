@@ -60,6 +60,7 @@ export default {
     'bg-brand-500',
     'bg-brand-600',
     'bg-brand-default',
+    'bg-primary-bright',
     'bg-_secondary-200',
     'bg-_secondary-400',
     'bg-_secondary',

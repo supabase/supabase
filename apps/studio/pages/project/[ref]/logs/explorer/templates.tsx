@@ -62,9 +62,9 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
           className={cn(
             'duration-400 flex h-6 w-6 items-center justify-center rounded-sm transition-colors',
             'border bg-background-200',
-            'group-hover:bg-brand-300 group-hover:text-brand-600 group-hover:border-brand-500',
+            'group-hover:bg-primary-bright/15 group-hover:text-primary group-hover:border-primary-bright',
             'dark:border-background-selection dark:bg-background-200 dark:text-foreground',
-            'dark:group-hover:border-brand-600 dark:group-hover:bg-brand-300 dark:group-hover:text-brand-600'
+            'dark:group-hover:border-primary-bright dark:group-hover:bg-primary-bright/15 dark:group-hover:text-primary'
           )}
         >
           <div className="scale-100 group-hover:scale-110">

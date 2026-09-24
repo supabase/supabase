@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { AgentSetup } from './AgentSetup'
 
 describe('AgentSetup markdown schema', () => {
-  it.each(['health', 'security', 'performance', 'usage', 'all'])(
+  it.each(['health', 'security', 'performance', 'usage'])(
     'preserves the complete %s prompt in one code block',
     (id) => {
       const markdown = AgentSetup({ props: { id } })

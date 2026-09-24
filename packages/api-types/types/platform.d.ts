@@ -6326,6 +6326,10 @@ export interface components {
       branch_limit?: number
       installation_id: number
       new_branch_per_pr?: boolean
+      /**
+       * @description Project ref
+       * @example abcdefghijklmnopqrst
+       */
       project_ref: string
       repository_id: number
       supabase_changes_only?: boolean
@@ -7851,6 +7855,10 @@ export interface components {
         metadata: {
           [key: string]: unknown
         }
+        /**
+         * @description Project ref
+         * @example abcdefghijklmnopqrst
+         */
         supabase_project_ref: string
       }
       organization_integration_id: string
@@ -7861,6 +7869,10 @@ export interface components {
       metadata: {
         [key: string]: unknown
       }
+      /**
+       * @description Organization slug
+       * @example tsrqponmlkjihgfedcba
+       */
       organization_slug: string
       source: string
       teamId?: string

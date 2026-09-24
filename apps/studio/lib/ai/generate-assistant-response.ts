@@ -41,6 +41,7 @@ export async function generateAssistantResponse({
   orgId,
   orgSlug,
   planId,
+  isHighComplianceProject,
   includesLogsSnippets,
   isExplorerEnabled,
   systemProviderOptions,
@@ -63,6 +64,7 @@ export async function generateAssistantResponse({
   orgId?: number
   orgSlug?: string
   planId?: string
+  isHighComplianceProject?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
   isExplorerEnabled?: boolean
@@ -175,6 +177,7 @@ export async function generateAssistantResponse({
         orgId,
         orgSlug,
         planId,
+        isHighComplianceProject,
         requestedModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,

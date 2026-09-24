@@ -1,3 +1,5 @@
+export const STORED_SECRET_PLACEHOLDER = '••••••••••••••••'
+
 export const defaultDisabledSmtpFormValues = {
   SMTP_ADMIN_EMAIL: null,
   SMTP_SENDER_NAME: null,

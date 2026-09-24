@@ -18,8 +18,8 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } fr
 const CHART_COLORS = {
   TICK: 'var(--background-overlay-hover)',
   AXIS: 'var(--background-overlay-hover)',
-  BRAND: 'hsl(var(--brand-default))',
-  BRAND_HOVER: 'hsl(var(--brand-500))',
+  PRIMARY: 'var(--primary-bright)',
+  PRIMARY_HOVER: 'var(--primary-bright-hover)',
 }
 
 export type ChartLineTick =
@@ -104,7 +104,7 @@ export const ChartLine = ({
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
   isFullHeight = false,
   className,
-  color = CHART_COLORS.BRAND,
+  color = CHART_COLORS.PRIMARY,
   chartHighlight,
   syncId,
   showHighlightArea = true,

@@ -10,6 +10,7 @@ import type {
 import { createContext, ReactNode, useContext, useMemo } from 'react'
 
 import { DataTableFilterField } from '../DataTable.types'
+import { RowSelectionModifiers } from '../rowSelection.utils'
 import { ResponseError } from '@/types'
 
 // REMINDER: read about how to move controlled state out of the useReactTable hook
@@ -26,6 +27,7 @@ interface DataTableStateContextType<TSearchParams = unknown> {
   searchParameters: TSearchParams
   openRowId: string | undefined
   setOpenRowId: (id: string | undefined) => void
+  onSelectRow?: (id: string, modifiers?: RowSelectionModifiers) => void
 }
 
 interface DataTableBaseContextType<TData = unknown, TValue = unknown> {

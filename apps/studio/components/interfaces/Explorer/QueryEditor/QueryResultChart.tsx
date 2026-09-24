@@ -17,7 +17,7 @@ interface QueryResultChartProps {
   result?: QueryResult
 }
 
-const Y_SERIES_COLORS = ['hsl(var(--brand-default))', 'var(--chart-2)', 'var(--chart-3)']
+const Y_SERIES_COLORS = ['var(--primary-bright)', 'var(--chart-2)', 'var(--chart-3)']
 
 const toChartValue = (value: unknown): string | number => {
   if (typeof value === 'number' || typeof value === 'string') return value

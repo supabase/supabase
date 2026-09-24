@@ -17,7 +17,7 @@ const serviceRoleKey = { tags: 'service_role', api_key: 'header.payload.services
 describe('getLastUsedAPIKeys', () => {
   it('returns an empty object when there are no api keys', () => {
     expect(
-      getLastUsedAPIKeys([], [{ timestamp: 1, role: 'anon', signature_prefix: 'anon' }])
+      getLastUsedAPIKeys([], [{ timestamp: 1, role: 'anon', signaturePrefix: 'anon' }])
     ).toEqual({})
   })
 
@@ -34,7 +34,7 @@ describe('getLastUsedAPIKeys', () => {
         {
           timestamp: dayjs().subtract(2, 'hour').valueOf(),
           role: 'anon',
-          signature_prefix: 'anonsig',
+          signaturePrefix: 'anonsig',
         },
       ]
     )
@@ -50,7 +50,7 @@ describe('getLastUsedAPIKeys', () => {
         {
           timestamp: dayjs().subtract(1, 'day').valueOf(),
           role: 'service_role',
-          signature_prefix: 'servicesig',
+          signaturePrefix: 'servicesig',
         },
       ]
     )
@@ -64,7 +64,7 @@ describe('getLastUsedAPIKeys', () => {
       [anonKey],
       [
         { timestamp: 1, role: 'anon' },
-        { timestamp: 2, signature_prefix: 'anonsig' },
+        { timestamp: 2, signaturePrefix: 'anonsig' },
       ]
     )
 

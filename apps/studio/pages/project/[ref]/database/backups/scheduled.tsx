@@ -122,7 +122,7 @@ const ScheduledBackups = () => {
                   restore to a specific time (down to the second) within your selected PITR
                   retention period.{' '}
                   <a
-                    className="text-primary transition-colors hover:text-brand-600"
+                    className="text-primary transition-colors hover:text-primary-hover"
                     href={`${DOCS_URL}/guides/platform/backups`}
                   >
                     Learn more

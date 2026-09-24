@@ -84,7 +84,7 @@ export const EDGE_FUNCTION_CHART_INTERVALS: ChartIntervals[] = [
 export const INVOCATION_CHART_CONFIG = {
   ok_count: {
     label: 'Ok',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
   warning_count: {
     label: 'Warnings',
@@ -99,7 +99,7 @@ export const INVOCATION_CHART_CONFIG = {
 export const CPU_TIME_CHART_CONFIG = {
   max_cpu_time_used: {
     label: 'Max CPU Time',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 
@@ -110,14 +110,14 @@ export const EXECUTION_TIME_CHART_CONFIG = {
   },
   max_execution_time: {
     label: 'Max Execution Time',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 
 export const MEMORY_CHART_CONFIG = {
   avg_memory_used: {
     label: 'Memory Usage',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 

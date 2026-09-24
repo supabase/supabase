@@ -298,9 +298,6 @@ export const SchemaGraph = () => {
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_SVG, () => downloadImage('svg'), {
     enabled: shortcutsEnabled,
   })
-  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_FIND_TABLE, () => setFindTableOpen(true), {
-    enabled: shortcutsEnabled,
-  })
 
   const isFirstLoad = useRef(true)
   const fitViewOnNextLayout = useRef(false)

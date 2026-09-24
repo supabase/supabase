@@ -14,8 +14,8 @@ export function Hero() {
             <span className="text-foreground-lighter block">without the hassle</span>
           </h1>
           <p className="text-foreground-lighter text-sm lg:text-base">
-            Every Supabase project is a dedicated Postgres database. 100% portable with no vendor
-            lock-in.
+            Every Supabase project is a dedicated Postgres database. Use it on its own, or with the
+            rest of the Supabase platform. 100% portable with no vendor lock-in.
           </p>
         </div>
         <div className="flex items-center gap-2">

@@ -6,6 +6,7 @@ import {
   CircleArrowUp,
   Eye,
   Key,
+  Minus,
   MoreVertical,
   ShieldOff,
   Timer,
@@ -22,6 +23,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
@@ -38,9 +40,63 @@ interface SigningKeyRowProps {
   legacyKey?: JWTSigningKey | null
   standbyKey?: JWTSigningKey | null
   isLoading?: boolean
+  lastUsedAt?: number
+  isLoadingLastUsed?: boolean
+  isLastUsedError?: boolean
+  isLastUsedVisible?: boolean
 }
 
 const MotionTableRow = motion.create(TableRow)
+
+const hasRotationTimestamp = (status: JWTSigningKey['status']) =>
+  status === 'previously_used' || status === 'revoked'
+
+const LastUsedCell = ({
+  lastUsedAt,
+  isLoading,
+  isError,
+  isLastUsedSupported,
+}: {
+  lastUsedAt?: number
+  isLoading: boolean
+  isError: boolean
+  isLastUsedSupported: boolean
+}) => {
+  const className =
+    'text-right py-2 text-sm text-foreground-light whitespace-nowrap data-[invisible=true]:invisible'
+
+  if (!isLastUsedSupported)
+    return (
+      <TableCell>
+        <Minus size={14} className="text-foreground-lighter ml-auto" />
+      </TableCell>
+    )
+
+  if (isLoading) {
+    return (
+      <TableCell aria-label="Loading last used timestamp" className={className}>
+        <ShimmeringLoader className="w-14 ml-auto" />
+      </TableCell>
+    )
+  }
+
+  if (isError) return <TableCell className={className}>Unable to load</TableCell>
+  if (lastUsedAt === undefined) {
+    return (
+      <TableCell className={cn(className, 'text-foreground-lighter')}>No requests in 24h</TableCell>
+    )
+  }
+
+  return (
+    <TableCell className={className}>
+      <TimestampInfo
+        className="text-sm"
+        utcTimestamp={new Date(lastUsedAt).toISOString()}
+        label={dayjs(lastUsedAt).fromNow()}
+      />
+    </TableCell>
+  )
+}
 
 export const SigningKeyRow = ({
   signingKey,
@@ -51,6 +107,10 @@ export const SigningKeyRow = ({
   legacyKey,
   standbyKey,
   isLoading = false,
+  lastUsedAt,
+  isLoadingLastUsed = false,
+  isLastUsedError = false,
+  isLastUsedVisible = false,
 }: SigningKeyRowProps) => (
   <MotionTableRow
     key={signingKey.id}
@@ -107,7 +167,16 @@ export const SigningKeyRow = ({
         legacy={signingKey.id === legacyKey?.id}
       />
     </TableCell>
-    {signingKey.status === 'previously_used' || signingKey.status === 'revoked' ? (
+    {isLastUsedVisible && (
+      <LastUsedCell
+        lastUsedAt={lastUsedAt}
+        isLoading={isLoadingLastUsed}
+        isError={isLastUsedError}
+        isLastUsedSupported={signingKey.id !== legacyKey?.id}
+      />
+    )}
+    {!isLastUsedVisible && !hasRotationTimestamp(signingKey.status) && <TableCell />}
+    {hasRotationTimestamp(signingKey.status) && (
       <TableCell className="max-w-[100px] text-right py-2 text-sm text-foreground-light whitespace-nowrap hidden lg:table-cell">
         <TimestampInfo
           className="text-sm"
@@ -115,14 +184,13 @@ export const SigningKeyRow = ({
           label={dayjs(signingKey.updated_at).fromNow()}
         />
       </TableCell>
-    ) : (
-      <TableCell />
     )}
     <TableCell className="text-right py-2">
       {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              aria-label="More options"
               variant="text"
               className="px-1.5"
               loading={isLoading}

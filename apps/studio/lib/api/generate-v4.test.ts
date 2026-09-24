@@ -14,9 +14,7 @@ vi.mock('@/lib/ai/ai-details', () => ({
   getAIDetails: vi.fn().mockResolvedValue({
     aiOptInLevel: 'schema_and_log_and_data',
     hasAccessToAdvanceModel: true,
-    hasHipaaAddon: false,
     region: 'us-east-1',
-    isSensitive: false,
   }),
 }))
 

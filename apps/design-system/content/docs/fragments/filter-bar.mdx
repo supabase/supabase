@@ -60,6 +60,7 @@ interface FilterProperty {
   name: string
   type: 'string' | 'number' | 'date' | 'boolean'
   operators: string[]
+  formatValue?: (value: FilterCondition['value']) => string
   options?: string[] | ((search?: string) => Promise<string[]> | string[])
 }
 ```

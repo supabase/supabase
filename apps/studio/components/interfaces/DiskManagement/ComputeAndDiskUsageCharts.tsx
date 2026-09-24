@@ -56,7 +56,7 @@ const getRollingWindow = () => {
 const COMPUTE_CHART_CONFIG = {
   maxCpuUsage: {
     label: 'CPU',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
   ramUsage: {
     label: 'Memory',
@@ -71,7 +71,7 @@ const COMPUTE_CHART_CONFIG = {
 const DISK_CHART_CONFIG = {
   databaseUsagePercent: {
     label: 'Database',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
   walUsagePercent: {
     label: 'WAL',
