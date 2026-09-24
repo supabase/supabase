@@ -118,34 +118,17 @@ const initialFilters: FilterGroup = {
   conditions: [],
 }
 
-function FilterBarExample({ variant }: { variant: 'default' | 'pill' }) {
+export default function FilterBarDemo() {
   const [filters, setFilters] = useState<FilterGroup>(initialFilters)
   const [freeformText, setFreeformText] = useState('')
 
   return (
     <FilterBar
-      variant={variant}
-      className={variant === 'pill' ? 'border-0 bg-transparent overflow-visible' : undefined}
       filterProperties={filterProperties}
       freeformText={freeformText}
       onFreeformTextChange={setFreeformText}
       filters={filters}
       onFilterChange={setFilters}
     />
-  )
-}
-
-export default function FilterBarDemo() {
-  return (
-    <div className="w-full space-y-6">
-      <div className="space-y-2">
-        <p className="text-xs text-foreground-muted">Segmented</p>
-        <FilterBarExample variant="default" />
-      </div>
-      <div className="space-y-2">
-        <p className="text-xs text-foreground-muted">Pill</p>
-        <FilterBarExample variant="pill" />
-      </div>
-    </div>
   )
 }

@@ -264,11 +264,10 @@ export function FilterCondition({
     <div
       ref={wrapperRef}
       className={cn(
-        'flex items-stretch px-0 bg-muted group shrink-0',
+        'relative flex items-stretch px-0 bg-muted group shrink-0',
         variant === 'pill' ? 'h-[26px] rounded-sm border' : 'self-stretch border-r',
         isKeyboardInteraction &&
-          (isActive || isOperatorActive || isPropertyActive) &&
-          'rounded-md ring-2 ring-inset ring-ring',
+          "has-[input:focus-visible]:z-10 has-[input:focus-visible]:after:content-[''] has-[input:focus-visible]:after:pointer-events-none has-[input:focus-visible]:after:absolute has-[input:focus-visible]:after:inset-[3px] has-[input:focus-visible]:after:rounded-sm has-[input:focus-visible]:after:border-2 has-[input:focus-visible]:after:border-ring",
         isHighlighted && 'ring-2 ring-primary-bright'
       )}
       data-testid={`filter-condition-${property.name}`}
@@ -457,7 +456,7 @@ export function FilterCondition({
           />
         }
         onClick={onRemove}
-        className="group hover:text-foreground hover:!bg-surface-600 rounded-none px-1 h-auto py-0"
+        className="group relative mx-[3px] my-[3px] hover:text-foreground hover:!bg-surface-600 rounded-sm px-1 h-auto py-0 focus-visible:z-20 focus-visible:bg-surface-100 focus-visible:ring-offset-0"
         aria-label={`Remove ${property.label} filter`}
         data-testid={`filter-remove-${property.name}`}
       />

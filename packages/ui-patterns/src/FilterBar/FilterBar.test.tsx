@@ -193,12 +193,16 @@ describe('FilterBar', () => {
     await user.click(freeformInput)
     expect(freeformInput).not.toHaveClass('focus-visible:ring-2')
     await user.keyboard('a')
-    expect(freeformInput).toHaveClass('focus-visible:ring-2', 'focus-visible:rounded-md')
+    expect(freeformInput).toHaveClass('focus-visible:ring-2', 'focus-visible:rounded-sm')
 
     await user.click(valueInput)
-    expect(condition).not.toHaveClass('ring-2')
+    expect(condition).not.toHaveClass('has-[input:focus-visible]:after:border-2')
     await user.keyboard('{ArrowDown}')
-    expect(condition).toHaveClass('rounded-md', 'ring-2', 'ring-inset', 'ring-ring')
+    expect(condition).toHaveClass(
+      'has-[input:focus-visible]:after:inset-[3px]',
+      'has-[input:focus-visible]:after:rounded-sm',
+      'has-[input:focus-visible]:after:border-2'
+    )
   })
 
   it('lets keyboard users remove a selected filter', async () => {
