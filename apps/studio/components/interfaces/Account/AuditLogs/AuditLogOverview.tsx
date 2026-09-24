@@ -1,17 +1,10 @@
 import dayjs from 'dayjs'
-import { Activity, ChevronDown, Clock, Copy, Globe, Hash, User } from 'lucide-react'
-import type { ReactNode } from 'react'
-import {
-  Button,
-  cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  copyToClipboard,
-} from 'ui'
+import { Activity, Clock, Copy, Globe, Hash, User } from 'lucide-react'
+import { Button, cn, copyToClipboard } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { CollapsibleDetailSection } from '@/components/ui/DataTable/CollapsibleDetailSection'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 import {
@@ -22,8 +15,6 @@ import {
 interface AuditLogOverviewProps {
   selectedLog: AuditLog
 }
-
-type IconComponent = typeof Clock
 
 const DetailRow = ({
   label,
@@ -61,26 +52,6 @@ const DetailRow = ({
   )
 }
 
-const DetailSection = ({
-  title,
-  icon,
-  children,
-}: {
-  title: string
-  icon: IconComponent
-  children: ReactNode
-}) => (
-  <Collapsible defaultOpen>
-    <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
-      <DetailSectionHeader title={title} icon={icon} />
-      <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
-    </CollapsibleTrigger>
-    <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
-      {children}
-    </CollapsibleContent>
-  </Collapsible>
-)
-
 export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
   const hasMetadata = Object.keys(selectedLog.action.metadata ?? {}).length > 0
 
@@ -106,19 +77,19 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
         }
       />
 
-      <DetailSection title="Target" icon={Globe}>
+      <CollapsibleDetailSection defaultOpen alternateRowColors title="Target" icon={Globe}>
         <DetailRow label="Organization slug" value={selectedLog.organization_slug} />
         <DetailRow label="Project ref" value={selectedLog.project_ref} />
-      </DetailSection>
+      </CollapsibleDetailSection>
 
-      <DetailSection title="Actor" icon={User}>
+      <CollapsibleDetailSection defaultOpen alternateRowColors title="Actor" icon={User}>
         <DetailRow label="Token type" value={selectedLog.actor.token_type} />
         <DetailRow label="Email" value={selectedLog.actor.email} />
         <DetailRow label="User ID" value={selectedLog.actor.user_id} />
         <DetailRow label="IP address" value={selectedLog.actor.ip} />
-      </DetailSection>
+      </CollapsibleDetailSection>
 
-      <DetailSection title="Action" icon={Activity}>
+      <CollapsibleDetailSection defaultOpen alternateRowColors title="Action" icon={Activity}>
         <DetailRow label="Name" value={selectedLog.action.name} />
         <DetailRow label="Method" value={selectedLog.action.method} />
         <DetailRow label="Route" value={selectedLog.action.route} />
@@ -136,7 +107,7 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
           label="Metadata"
           value={hasMetadata ? JSON.stringify(selectedLog.action.metadata) : undefined}
         />
-      </DetailSection>
+      </CollapsibleDetailSection>
     </div>
   )
 }

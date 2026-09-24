@@ -1,11 +1,10 @@
 import { partition } from 'lodash'
-import { ChevronDown, LucideIcon } from 'lucide-react'
+import { LucideIcon } from 'lucide-react'
 import { memo } from 'react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { BlockFieldConfig, BlockFieldProps, ServiceFlowBlockProps } from '../../types'
 import { DetailRow } from './DetailRow'
-import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
+import { CollapsibleDetailSection } from '@/components/ui/DataTable/CollapsibleDetailSection'
 
 interface BlockSection {
   title: string
@@ -72,72 +71,60 @@ export function createBlock(config: BlockConfig) {
 
     return (
       <>
-        <Collapsible defaultOpen className="border-b">
-          <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
-            <DetailSectionHeader title={config.title} icon={config.icon} />
-            <ChevronDown
-              className="transition-transform duration-200"
-              strokeWidth={1.5}
-              size={14}
+        <CollapsibleDetailSection
+          defaultOpen
+          className="border-b"
+          title={config.title}
+          icon={config.icon}
+        >
+          {config.primaryFields?.map((field) => (
+            <FieldRow
+              key={field.id}
+              config={field}
+              data={data}
+              enrichedData={enrichedData}
+              isLoading={isLoading}
+              filterFields={filterFields}
+              table={table}
             />
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            {config.primaryFields?.map((field) => (
-              <FieldRow
-                key={field.id}
-                config={field}
-                data={data}
-                enrichedData={enrichedData}
-                isLoading={isLoading}
-                filterFields={filterFields}
-                table={table}
-              />
-            ))}
-            {data.log_type !== 'auth' &&
-              seeMoreFieldsSections.map((section) => {
-                return [section.primaryField, ...section.additionalFields].map((field) => (
-                  <FieldRow
-                    key={field.id}
-                    config={field}
-                    data={data}
-                    enrichedData={enrichedData}
-                    isLoading={isLoading}
-                    filterFields={filterFields}
-                    table={table}
-                  />
-                ))
-              })}
-          </CollapsibleContent>
-        </Collapsible>
+          ))}
+          {data.log_type !== 'auth' &&
+            seeMoreFieldsSections.map((section) => {
+              return [section.primaryField, ...section.additionalFields].map((field) => (
+                <FieldRow
+                  key={field.id}
+                  config={field}
+                  data={data}
+                  enrichedData={enrichedData}
+                  isLoading={isLoading}
+                  filterFields={filterFields}
+                  table={table}
+                />
+              ))
+            })}
+        </CollapsibleDetailSection>
 
         {data.log_type !== 'auth' &&
-          otherSections.map((section) => {
-            return (
-              <Collapsible key={section.title} className="border-b">
-                <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
-                  <DetailSectionHeader title={section.title} icon={section.icon} />
-                  <ChevronDown
-                    className="transition-transform duration-200"
-                    strokeWidth={1.5}
-                    size={14}
-                  />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  {section.fields.map((field) => (
-                    <FieldRow
-                      key={field.id}
-                      config={field}
-                      data={data}
-                      enrichedData={enrichedData}
-                      isLoading={isLoading}
-                      filterFields={filterFields}
-                      table={table}
-                    />
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
-            )
-          })}
+          otherSections.map((section) => (
+            <CollapsibleDetailSection
+              key={section.title}
+              className="border-b"
+              title={section.title}
+              icon={section.icon}
+            >
+              {section.fields.map((field) => (
+                <FieldRow
+                  key={field.id}
+                  config={field}
+                  data={data}
+                  enrichedData={enrichedData}
+                  isLoading={isLoading}
+                  filterFields={filterFields}
+                  table={table}
+                />
+              ))}
+            </CollapsibleDetailSection>
+          ))}
       </>
     )
   })
