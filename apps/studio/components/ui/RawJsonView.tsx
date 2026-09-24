@@ -1,6 +1,6 @@
 import { FloatingPlate } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
 
+import { JsonCodeBlock } from './JsonCodeBlock'
 import CopyButton from '@/components/ui/CopyButton'
 
 interface RawJsonViewProps {
@@ -20,14 +20,7 @@ export function RawJsonView({ data, copyLabel }: RawJsonViewProps) {
           <CopyButton iconOnly aria-label={copyLabel} variant="default" text={json} />
         </FloatingPlate>
       </div>
-      <CodeBlock
-        language="json"
-        hideCopy
-        wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-        className="rounded-none border-none !overflow-x-visible [&_code]:!leading-tight [&_pre]:!leading-tight"
-      >
-        {json}
-      </CodeBlock>
+      <JsonCodeBlock>{json}</JsonCodeBlock>
     </>
   )
 }
