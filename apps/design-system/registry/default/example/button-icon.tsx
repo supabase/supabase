@@ -13,8 +13,6 @@ export default function ButtonIcon() {
           // Tooltip repeats the label; clear describedby so screen readers don't hear it twice
           // Skip this if the tooltip adds information beyond the label
           aria-describedby={undefined}
-          // Square off the tiny button (h-[26px]) and increase the tap target
-          className="hit-area-2 w-6.5"
         ></Button>
       </TooltipTrigger>
       <TooltipContent>View logs</TooltipContent>
