@@ -31,6 +31,14 @@ import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
 
+const DESTINATION_DOCS_PATHS: Partial<Record<DestinationType, string>> = {
+  BigQuery: '/guides/database/replication/pipelines/bigquery#configure-bigquery-as-a-destination',
+  ClickHouse:
+    '/guides/database/replication/pipelines/clickhouse#configure-clickhouse-as-a-destination',
+  DuckLake: '/guides/database/replication/pipelines/ducklake#choose-a-configuration-mode',
+  Snowflake: '/guides/database/replication/pipelines/snowflake#prepare-snowflake-resources',
+}
+
 export const DestinationPanel = () => {
   const { ref: projectRef } = useParams()
   const enablePgReplicate = useIsETLPrivateAlpha()
@@ -97,10 +105,10 @@ export const DestinationPanel = () => {
     onClose,
   })
 
-  const docsUrl =
-    destinationType === 'BigQuery'
-      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
-      : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
+  const docsUrl = `${DOCS_URL}${
+    (destinationType && DESTINATION_DOCS_PATHS[destinationType]) ??
+    '/guides/database/replication/pipelines#step-3-configure-a-destination'
+  }`
 
   useEffect(() => {
     if (edit !== null && invalidExistingDestination) {

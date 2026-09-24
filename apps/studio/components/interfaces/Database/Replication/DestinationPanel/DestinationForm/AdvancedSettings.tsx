@@ -55,7 +55,7 @@ export const AdvancedSettings = ({
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional settings to control the pipeline in more depth
+                Customize how the pipeline syncs and replicates data.
               </span>
             </div>
           </AccordionTrigger>
@@ -67,7 +67,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description="How long the pipeline waits before sending a partially filled batch."
+                  description="Maximum time before sending a partially filled batch. Default: 10,000 milliseconds."
                 >
                   <FormControl>
                     <InputGroup>
@@ -78,7 +78,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
+                        placeholder={String(DEFAULT_MAX_FILL_MS)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>

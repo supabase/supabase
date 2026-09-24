@@ -287,10 +287,10 @@ export const DestinationForm = ({
       return existingDestination?.enabled ? 'Apply and restart pipeline' : 'Apply changes'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Create and start pipeline anyway'
+        return 'Start pipeline anyway'
       }
 
-      return 'Create and start pipeline'
+      return 'Start pipeline'
     }
   }
 
@@ -474,7 +474,7 @@ export const DestinationForm = ({
                   <p className="text-sm font-medium text-foreground">Destination details</p>
 
                   <div className="flex flex-col gap-y-4">
-                    <DestinationNameInput form={form} />
+                    <DestinationNameInput form={form} destinationType={selectedType} />
                     <PublicationSelection
                       form={form}
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}

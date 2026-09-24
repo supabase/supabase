@@ -7,6 +7,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  SNOWFLAKE_ACCOUNT_ID_FIELD_COPY,
+  SNOWFLAKE_DATABASE_FIELD_COPY,
+  SNOWFLAKE_SCHEMA_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 import { MAX_PRIVATE_KEY_LENGTH, readPrivateKeyFile } from './Snowflake.utils'
 
 export const SnowflakeFields = ({
@@ -70,8 +75,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Account ID"
-              description="Snowflake organization and account identifiers joined with a hyphen."
+              label={SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.label}
+              description={SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="MYORG-MYACCOUNT" value={field.value ?? ''} />
@@ -111,8 +116,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Database"
-              description="Snowflake database where replicated tables are created."
+              label={SNOWFLAKE_DATABASE_FIELD_COPY.label}
+              description={SNOWFLAKE_DATABASE_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="PIPELINES_DB" value={field.value ?? ''} />
@@ -127,8 +132,8 @@ export const SnowflakeFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Schema"
-              description="An empty Snowflake schema where replicated tables are created."
+              label={SNOWFLAKE_SCHEMA_FIELD_COPY.label}
+              description={SNOWFLAKE_SCHEMA_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="REPLICATED" value={field.value ?? ''} />
