@@ -28,11 +28,27 @@ function getUserFields(user: User): { label: string; value: string }[] {
 }
 
 /** A user's details as key/value rows; click a row to copy its value. */
-export function UserFields({ user, className }: { user: User; className?: string }) {
+export function UserFields({
+  user,
+  onFilterByUser,
+  className,
+}: {
+  user: User
+  /** Adds "Add filter" to the User ID row, e.g. to filter logs to this user. */
+  onFilterByUser?: () => void
+  className?: string
+}) {
   return (
     <div className={cn('flex flex-col py-1', className)}>
       {getUserFields(user).map(({ label, value }) => (
-        <LogFieldRow key={label} label={label} value={value} filterFields={[]} disabled={!value}>
+        <LogFieldRow
+          key={label}
+          label={label}
+          value={value}
+          filterFields={[]}
+          disabled={!value}
+          onAddFilter={label === 'User ID' ? onFilterByUser : undefined}
+        >
           {value ? (
             <span className="min-w-0 truncate text-right font-mono text-sm leading-5">{value}</span>
           ) : (

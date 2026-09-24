@@ -28,7 +28,8 @@ export async function getUser(
   )
 
   const user = result[0] as User | undefined
-  return user
+  // React Query rejects `undefined`, so a missing user must resolve to null
+  return user ?? null
 }
 
 export type UserData = Awaited<ReturnType<typeof getUser>>
