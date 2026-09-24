@@ -3,6 +3,7 @@ import type { platformComponents } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
+import { unifiedLogAttributesQueryOptions } from './unified-log-attributes-query'
 import { unifiedLogRequestTimelineQueryOptions } from './unified-log-request-timeline-query'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -34,6 +35,86 @@ const step = (id: string, source: string, metadata: Record<string, string>) => (
 })
 
 describe('request timeline query', () => {
+  it.each(['attributes first', 'timeline first', 'concurrently'])(
+    'shares the attribute lookup with the overview: %s',
+    async (order) => {
+      const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      const root = { source: 'edge_logs', log_attributes: { 'request.headers.cf_ray': 'ray-1' } }
+      const related = step('invocation', 'function_edge_logs', {})
+      const requests: string[] = []
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+        response: async ({ request }) => {
+          const { sql } = (await request.json()) as { sql: string }
+          requests.push(sql)
+          return HttpResponse.json<LogsResponse>({
+            result: sql.includes('log attributes') ? [root] : [related],
+          })
+        },
+      })
+      const attributes = () => client.fetchQuery(unifiedLogAttributesQueryOptions(variables))
+      const timeline = () => client.fetchQuery(unifiedLogRequestTimelineQueryOptions(variables))
+
+      if (order === 'attributes first') {
+        await attributes()
+        await timeline()
+      } else if (order === 'timeline first') {
+        await timeline()
+        await attributes()
+      } else {
+        await Promise.all([attributes(), timeline()])
+      }
+
+      expect(client.getQueryData(unifiedLogAttributesQueryOptions(variables).queryKey)).toEqual(
+        root
+      )
+      expect(
+        client
+          .getQueryData(unifiedLogRequestTimelineQueryOptions(variables).queryKey)
+          ?.logs.map((log) => log.id)
+      ).toEqual(['invocation'])
+      // Request count is the contract here: consumers share both cached and in-flight data.
+      expect(requests.filter((sql) => sql.includes('log attributes'))).toHaveLength(1)
+      expect(requests).toHaveLength(2)
+    }
+  )
+
+  it('cancels a timeline without cancelling the shared overview lookup', async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    let releaseResponse = () => {}
+    const responseReady = new Promise<void>((resolve) => {
+      releaseResponse = resolve
+    })
+    let markStarted = () => {}
+    const started = new Promise<void>((resolve) => {
+      markStarted = resolve
+    })
+    const root = { source: 'edge_logs', log_attributes: { 'request.headers.cf_ray': 'ray-1' } }
+    const requests: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = (await request.json()) as { sql: string }
+        requests.push(sql)
+        markStarted()
+        await responseReady
+        return HttpResponse.json<LogsResponse>({ result: [root] })
+      },
+    })
+    const timelineOptions = unifiedLogRequestTimelineQueryOptions(variables)
+    const cancelled = expect(client.fetchQuery(timelineOptions)).rejects.toThrow()
+    const attributes = client.fetchQuery(unifiedLogAttributesQueryOptions(variables))
+    await started
+    await client.cancelQueries({ queryKey: timelineOptions.queryKey, exact: true })
+    releaseResponse()
+
+    await cancelled
+    await expect(attributes).resolves.toEqual(root)
+    expect(requests).toHaveLength(1)
+  })
+
   it('follows an execution ID from a request and stops after two lookups', async () => {
     const requests: { sql: string; iso_timestamp_start: string; iso_timestamp_end: string }[] = []
     const invocation = step('invocation', 'function_edge_logs', { execution_id: 'exec-1' })

@@ -42,8 +42,8 @@ export async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariable
   return data?.result ?? []
 }
 
-/** One log's source and attributes, or undefined when it can't be found. */
-export async function getLogAttributesRow(
+/** One log's source and attributes, or null when it can't be found. */
+async function getUnifiedLogAttributes(
   { projectRef, logId, source, logTimestampMs }: UnifiedLogAttributesVariables,
   signal?: AbortSignal
 ) {
@@ -60,15 +60,7 @@ export async function getLogAttributesRow(
     ...getLogTimeWindow(logTimestampMs, LOG_WINDOW_MS),
     signal,
   })
-  return z.array(logAttributesRowSchema).parse(result)[0]
-}
-
-async function getUnifiedLogAttributes(
-  variables: UnifiedLogAttributesVariables,
-  signal?: AbortSignal
-) {
-  const row = await getLogAttributesRow(variables, signal)
-  return row?.log_attributes ?? null
+  return z.array(logAttributesRowSchema).parse(result)[0] ?? null
 }
 
 export type UnifiedLogAttributesData = Awaited<ReturnType<typeof getUnifiedLogAttributes>>

@@ -1,11 +1,12 @@
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, type QueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { logsKeys } from './keys'
 import {
-  getLogAttributesRow,
   getLogTimeWindow,
   runOtelLogsSql,
+  unifiedLogAttributesQueryOptions,
+  type UnifiedLogAttributesVariables,
 } from './unified-log-attributes-query'
 import { UNIFIED_LOGS_QUERY_OPTIONS } from './unified-logs-infinite-query'
 import { mapUnifiedLogRow, unifiedLogsQueryRowSchema } from './unified-logs.utils'
@@ -28,13 +29,7 @@ const MAX_LOOKUPS = 2
 
 const timelineRowSchema = unifiedLogsQueryRowSchema.extend({ source: z.string() })
 
-export type UnifiedLogRequestTimelineVariables = {
-  projectRef?: string
-  logId?: string
-  /** Source of the selected log, e.g. `edge_logs`. */
-  source?: string
-  logTimestampMs?: number | null
-}
+export type UnifiedLogRequestTimelineVariables = UnifiedLogAttributesVariables
 
 export type UnifiedLogRequestTimelineError = ResponseError
 
@@ -44,6 +39,7 @@ const hasNewIds = (next: RequestCorrelationIds, prev: RequestCorrelationIds) =>
 
 async function getUnifiedLogRequestTimeline(
   { projectRef, logId, source, logTimestampMs }: UnifiedLogRequestTimelineVariables,
+  queryClient: QueryClient,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -53,7 +49,11 @@ async function getUnifiedLogRequestTimeline(
     throw new Error('logTimestampMs is required')
   }
 
-  const root = await getLogAttributesRow({ projectRef, logId, source, logTimestampMs }, signal)
+  const root = await queryClient.fetchQuery(
+    unifiedLogAttributesQueryOptions({ projectRef, logId, source, logTimestampMs })
+  )
+  // A shared attribute lookup may outlive this timeline request.
+  signal?.throwIfAborted()
 
   let ids = getRequestCorrelationIds(
     root ? [{ source: root.source, attributes: root.log_attributes }] : []
@@ -100,8 +100,8 @@ export const unifiedLogRequestTimelineQueryOptions = ({
 }: UnifiedLogRequestTimelineVariables) =>
   queryOptions<UnifiedLogRequestTimelineData, UnifiedLogRequestTimelineError>({
     queryKey: logsKeys.requestTimeline(projectRef, logId, source, logTimestampMs),
-    queryFn: ({ signal }) =>
-      getUnifiedLogRequestTimeline({ projectRef, logId, source, logTimestampMs }, signal),
+    queryFn: ({ client, signal }) =>
+      getUnifiedLogRequestTimeline({ projectRef, logId, source, logTimestampMs }, client, signal),
     enabled:
       IS_PLATFORM &&
       typeof projectRef !== 'undefined' &&
