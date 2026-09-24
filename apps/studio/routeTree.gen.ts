@@ -330,6 +330,7 @@ import { Route as ApiPlatformStorageRefBucketsIdObjectsSignMultiRouteImport } fr
 import { Route as ApiPlatformStorageRefBucketsIdObjectsSignRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/sign'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsPublicUrlRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/public-url'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsMoveRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/move'
+import { Route as ApiPlatformStorageRefBucketsIdObjectsListV2RouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/list-v2'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsListRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/list'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsDownloadRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/download'
 
@@ -2126,6 +2127,12 @@ const ApiPlatformStorageRefBucketsIdObjectsMoveRoute =
     path: '/api/platform/storage/$ref/buckets/$id/objects/move',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPlatformStorageRefBucketsIdObjectsListV2Route =
+  ApiPlatformStorageRefBucketsIdObjectsListV2RouteImport.update({
+    id: '/api/platform/storage/$ref/buckets/$id/objects/list-v2',
+    path: '/api/platform/storage/$ref/buckets/$id/objects/list-v2',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformStorageRefBucketsIdObjectsListRoute =
   ApiPlatformStorageRefBucketsIdObjectsListRouteImport.update({
     id: '/api/platform/storage/$ref/buckets/$id/objects/list',
@@ -2452,6 +2459,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/integrations/$id/$pageId/$childId/': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
+  '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
   '/api/platform/storage/$ref/buckets/$id/objects/move': typeof ApiPlatformStorageRefBucketsIdObjectsMoveRoute
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
@@ -2760,6 +2768,7 @@ export interface FileRoutesByTo {
   '/project/$ref/integrations/$id/$pageId/$childId': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
+  '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
   '/api/platform/storage/$ref/buckets/$id/objects/move': typeof ApiPlatformStorageRefBucketsIdObjectsMoveRoute
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
@@ -3086,6 +3095,7 @@ export interface FileRoutesById {
   '/project/$ref/integrations/$id/$pageId/$childId/': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
+  '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
   '/api/platform/storage/$ref/buckets/$id/objects/move': typeof ApiPlatformStorageRefBucketsIdObjectsMoveRoute
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
@@ -3411,6 +3421,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id/$pageId/$childId/'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
+    | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
     | '/api/platform/storage/$ref/buckets/$id/objects/move'
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
@@ -3719,6 +3730,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id/$pageId/$childId'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
+    | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
     | '/api/platform/storage/$ref/buckets/$id/objects/move'
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
@@ -4044,6 +4056,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id/$pageId/$childId/'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
+    | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
     | '/api/platform/storage/$ref/buckets/$id/objects/move'
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
@@ -4169,6 +4182,7 @@ export interface RootRouteChildren {
   ApiV1ProjectsRefFunctionsSlugIndexRoute: typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   ApiPlatformStorageRefBucketsIdObjectsDownloadRoute: typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   ApiPlatformStorageRefBucketsIdObjectsListRoute: typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
+  ApiPlatformStorageRefBucketsIdObjectsListV2Route: typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
   ApiPlatformStorageRefBucketsIdObjectsMoveRoute: typeof ApiPlatformStorageRefBucketsIdObjectsMoveRoute
   ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute: typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   ApiPlatformStorageRefBucketsIdObjectsSignRoute: typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
@@ -6429,6 +6443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformStorageRefBucketsIdObjectsMoveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/platform/storage/$ref/buckets/$id/objects/list-v2': {
+      id: '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
+      path: '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
+      fullPath: '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
+      preLoaderRoute: typeof ApiPlatformStorageRefBucketsIdObjectsListV2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/storage/$ref/buckets/$id/objects/list': {
       id: '/api/platform/storage/$ref/buckets/$id/objects/list'
       path: '/api/platform/storage/$ref/buckets/$id/objects/list'
@@ -7327,6 +7348,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformStorageRefBucketsIdObjectsDownloadRoute,
   ApiPlatformStorageRefBucketsIdObjectsListRoute:
     ApiPlatformStorageRefBucketsIdObjectsListRoute,
+  ApiPlatformStorageRefBucketsIdObjectsListV2Route:
+    ApiPlatformStorageRefBucketsIdObjectsListV2Route,
   ApiPlatformStorageRefBucketsIdObjectsMoveRoute:
     ApiPlatformStorageRefBucketsIdObjectsMoveRoute,
   ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute:

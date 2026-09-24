@@ -1,4 +1,5 @@
 import type { components } from 'api-types'
+
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from './Storage.constants'
 import { PolicyFormField } from './StoragePolicies/StoragePolicies.types'
 
@@ -54,4 +55,5 @@ export interface StorageItemMetadata {
 }
 
 /** A folder entry as returned by the storage list-v2 endpoint's `folders` array */
-export type StorageObjectV2Folder = components['schemas']['StorageListResponseV2_Output']['folders'][number]
+export type StorageObjectV2Folder =
+  components['schemas']['StorageListResponseV2_Output']['folders'][number]
