@@ -50,8 +50,9 @@ export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
       await Promise.resolve(str).then((text) => navigator.clipboard.writeText(text))
       success = true
     }
-  } catch {
+  } catch (error) {
     toast.error('Unable to copy to clipboard')
+    throw error
   }
 
   if (success) {
