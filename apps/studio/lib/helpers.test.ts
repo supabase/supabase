@@ -272,6 +272,16 @@ describe('copyToClipboard', () => {
     expect(callback).not.toHaveBeenCalled()
     expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
   })
+
+  it('propagates callback error without showing toast when copy succeeds', async () => {
+    const error = new Error('Callback failed')
+    const callback = vi.fn().mockImplementation(() => {
+      throw error
+    })
+
+    await expect(copyToClipboard('hello', callback)).rejects.toThrow('Callback failed')
+    expect(toast.error).not.toHaveBeenCalled()
+  })
 })
 
 describe('detectBrowser', () => {

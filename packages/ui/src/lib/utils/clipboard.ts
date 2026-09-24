@@ -19,6 +19,8 @@ export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
     return
   }
 
+  let success = false
+
   try {
     if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
       // NOTE: Safari locks down the clipboard API to only work when triggered
@@ -30,29 +32,29 @@ export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
         'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
       })
 
-      let writeSucceeded = false
       try {
         await navigator.clipboard.write([text])
-        writeSucceeded = true
+        success = true
       } catch {
         // Safari can expose clipboard.write() and still reject it. Fall through to writeText().
       }
-
-      if (writeSucceeded) {
-        callback()
-        return
-      }
     }
 
-    if (!navigator.clipboard) throw new Error('Clipboard API unavailable')
+    if (!success) {
+      if (!navigator.clipboard) throw new Error('Clipboard API unavailable')
 
-    // NOTE: Firefox has support for ClipboardItem and navigator.clipboard.write,
-    // but those are behind `dom.events.asyncClipboard.clipboardItem` preference.
-    // Good news is that other than Safari, Firefox does not care about
-    // Clipboard API being used async in a Promise.
-    await Promise.resolve(str).then((text) => navigator.clipboard.writeText(text))
-    callback()
+      // NOTE: Firefox has support for ClipboardItem and navigator.clipboard.write,
+      // but those are behind `dom.events.asyncClipboard.clipboardItem` preference.
+      // Good news is that other than Safari, Firefox does not care about
+      // Clipboard API being used async in a Promise.
+      await Promise.resolve(str).then((text) => navigator.clipboard.writeText(text))
+      success = true
+    }
   } catch {
     toast.error('Unable to copy to clipboard')
+  }
+
+  if (success) {
+    callback()
   }
 }
