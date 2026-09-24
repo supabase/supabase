@@ -27,9 +27,7 @@ const DetailRow = ({
 
   return (
     <div className="flex h-9 items-center justify-between gap-x-10 px-4 pl-[38px]">
-      <span className="shrink-0 text-xs uppercase tracking-wide text-foreground-lighter font-mono">
-        {label}
-      </span>
+      <span className="shrink-0 text-sm text-foreground-lighter">{label}</span>
       <div
         className={cn('flex items-center gap-x-2 min-w-0 flex-1 justify-end', isEmpty && 'pr-2')}
       >
@@ -60,6 +58,7 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
       <DetailSectionHeader
         title="Request started"
         icon={Clock}
+        className="border-b"
         summary={
           <TimestampInfo
             className="text-xs font-mono"
@@ -70,6 +69,7 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
       <DetailSectionHeader
         title="Request ID"
         icon={Hash}
+        className="border-b"
         summary={
           <span className="truncate text-right font-mono text-xs text-foreground">
             {selectedLog.request_id}
@@ -77,19 +77,19 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
         }
       />
 
-      <CollapsibleDetailSection defaultOpen alternateRowColors title="Target" icon={Globe}>
+      <CollapsibleDetailSection defaultOpen className="border-b" title="Target" icon={Globe}>
         <DetailRow label="Organization slug" value={selectedLog.organization_slug} />
         <DetailRow label="Project ref" value={selectedLog.project_ref} />
       </CollapsibleDetailSection>
 
-      <CollapsibleDetailSection defaultOpen alternateRowColors title="Actor" icon={User}>
+      <CollapsibleDetailSection defaultOpen className="border-b" title="Actor" icon={User}>
         <DetailRow label="Token type" value={selectedLog.actor.token_type} />
         <DetailRow label="Email" value={selectedLog.actor.email} />
         <DetailRow label="User ID" value={selectedLog.actor.user_id} />
         <DetailRow label="IP address" value={selectedLog.actor.ip} />
       </CollapsibleDetailSection>
 
-      <CollapsibleDetailSection defaultOpen alternateRowColors title="Action" icon={Activity}>
+      <CollapsibleDetailSection defaultOpen className="border-b" title="Action" icon={Activity}>
         <DetailRow label="Name" value={selectedLog.action.name} />
         <DetailRow label="Method" value={selectedLog.action.method} />
         <DetailRow label="Route" value={selectedLog.action.route} />
