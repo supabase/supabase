@@ -115,12 +115,7 @@ To use private npm packages, create a `.npmrc` file within your function’s own
 
 <Admonition type="note">This feature requires Supabase CLI version 1.207.9 or higher.</Admonition>
 
-<Admonition type="caution">
-
 Your function's directory must also contain a `deno.json` or `package.json` file. The file can be empty. If neither file is present, the `.npmrc` file is ignored. This matches the Deno CLI behavior.
-
-</Admonition>
-
 ```bash
 └── supabase
     └── functions
