@@ -43,6 +43,7 @@ export function FilterCondition({
     handleRemoveCondition,
     handleSelectMenuItem,
     setActiveInput,
+    setHighlightedConditionPath,
     variant,
   } = useFilterBar()
 
@@ -267,6 +268,7 @@ export function FilterCondition({
         variant === 'pill' ? 'h-[26px] rounded-sm border' : 'self-stretch border-r',
         isHighlighted && 'ring-2 ring-ring'
       )}
+      onFocusCapture={() => setHighlightedConditionPath(null)}
       data-testid={`filter-condition-${property.name}`}
       data-highlighted={isHighlighted}
     >
@@ -280,7 +282,7 @@ export function FilterCondition({
                 onChange={(e) => setPropertySearchText(e.target.value)}
                 onBlur={handlePropertyBlur}
                 onKeyDown={handlePropertyKeyDown}
-                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
+                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs md:text-xs leading-4 hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
                 placeholder={property.label}
                 autoFocus
                 aria-label={`Change property from ${property.label}`}
@@ -293,14 +295,14 @@ export function FilterCondition({
               />
             ) : null}
             {isPropertyActive ? (
-              <span className="invisible text-xs pl-2 pr-1 shrink-0 whitespace-nowrap h-full flex items-center">
+              <span className="invisible text-xs leading-4 pl-2 pr-1 shrink-0 whitespace-nowrap h-full flex items-center">
                 {property.label}
               </span>
             ) : (
               <button
                 type="button"
                 tabIndex={0}
-                className="text-xs pl-2 pr-1 shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center cursor-pointer hover:text-foreground transition-colors"
+                className="text-xs leading-4 pl-2 pr-1 shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center cursor-pointer hover:text-foreground transition-colors"
                 aria-label={`Change property from ${property.label}`}
                 onFocus={() => handleLabelClick(path)}
                 onClick={() => handleLabelClick(path)}
