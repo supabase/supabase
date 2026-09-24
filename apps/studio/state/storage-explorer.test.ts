@@ -2,8 +2,10 @@ import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { createStorageExplorerState } from './storage-explorer'
+import { getQueryClient } from '@/data/query-client'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
+import { storageKeys } from '@/data/storage/keys'
 import { addAPIMock } from '@/tests/lib/msw'
 
 function makeBucket(id: string): Bucket {
@@ -105,5 +107,25 @@ describe('fetchFoldersByPath', () => {
     expect(missingPaths).toEqual([])
     expect(state.columns[0]?.items.map((item) => item.name)).toEqual(['shared'])
     expect(state.openedFolders.map((folder) => folder.name)).toEqual(['shared'])
+  })
+})
+
+describe('refetchAllOpenedFolders', () => {
+  it('marks the archived list stale, so an archive or restore shows without a refresh', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: BUCKET_A_LISTING,
+    })
+
+    const queryClient = getQueryClient()
+    const key = storageKeys.archivedObjects('test-ref', 'bucket-a')
+    queryClient.setQueryData(key, [])
+    expect(queryClient.getQueryState(key)?.isInvalidated).toBe(false)
+
+    const state = createState(makeBucket('bucket-a'))
+    await state.refetchAllOpenedFolders()
+
+    expect(queryClient.getQueryState(key)?.isInvalidated).toBe(true)
   })
 })
