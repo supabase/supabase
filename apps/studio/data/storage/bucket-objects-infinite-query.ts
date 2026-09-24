@@ -26,7 +26,11 @@ export const bucketObjectsInfiniteQueryOptions = (
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   const { search, ...v2Options } = options ?? {}
-  const prefix = search ? `${path}${path ? '/' : ''}${search}` : path
+  // A trailing slash is required to browse a folder's contents with with_delimiter: true —
+  // without it, v2 treats e.g. "docs" as a partial name match against siblings like "docs-old"
+  // rather than descending into the folder.
+  const browsePrefix = path ? `${path}/` : ''
+  const prefix = search ? `${browsePrefix}${search}` : browsePrefix
   const limit = v2Options.limit ?? DEFAULT_LIMIT
 
   return infiniteQueryOptions({

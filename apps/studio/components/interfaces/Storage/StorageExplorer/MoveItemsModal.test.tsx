@@ -62,7 +62,10 @@ const mockObjectsList = () => {
     path: '/platform/storage/:ref/buckets/:id/objects/list-v2',
     response: async ({ request }) => {
       const body = (await request.json()) as { prefix: string }
-      const contents = BUCKET_CONTENTS[body.prefix] ?? []
+      // The real API expects a trailing slash to browse a folder's contents; strip it to match
+      // the BUCKET_CONTENTS keys, which mirror path segments without one.
+      const path = body.prefix.replace(/\/$/, '')
+      const contents = BUCKET_CONTENTS[path] ?? []
       return HttpResponse.json({
         folders: contents
           .filter((object) => object.id === null)
