@@ -46,7 +46,7 @@ export const LEVEL_TRANSITION = { duration: 0.09, ease: 'easeOut' } as const
 
 export const rowClassName = (isActive: boolean) =>
   cn(
-    'group relative flex h-7 w-full items-center gap-2 rounded-md pl-3 pr-2 text-sm',
+    'group relative flex h-7 w-full items-center gap-2 rounded-md pl-2 pr-2 text-sm',
     isActive
       ? 'bg-selection text-foreground'
       : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
@@ -79,7 +79,7 @@ export const ExplorerNavPanel = ({
       className={cn('absolute inset-0 flex flex-col', setSearch === undefined && 'pt-3', className)}
     >
       {setSearch !== undefined && (
-        <div className="p-3 pb-2">
+        <div className="px-3 pt-3">
           <span id="explorer-sidebar-search-label" className="sr-only">
             {searchPlaceholder}
           </span>

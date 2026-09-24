@@ -137,6 +137,10 @@ const levelsData = {
     icon: 'reference-csharp',
     name: 'C# Reference v1.0',
   },
+  reference_csharp_v8: {
+    icon: 'reference-csharp',
+    name: 'C# Reference v8.0',
+  },
   reference_python_v2: {
     icon: 'reference-python',
     name: 'Python Reference v2.0',

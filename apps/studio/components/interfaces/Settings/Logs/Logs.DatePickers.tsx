@@ -18,7 +18,7 @@ import {
 } from 'ui'
 
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
-import { generateHelpersFromInput } from './Logs.datePickerHelpers'
+import { formatDateRange, generateHelpersFromInput } from './Logs.datePickerHelpers'
 import type { DatetimeHelper } from './Logs.types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
@@ -55,6 +55,7 @@ interface LogsDatePickerProps {
    * top of the picker. Leave undefined to render no tooltip.
    */
   shortcutId?: ShortcutId
+  variant?: 'popover' | 'inline'
 }
 
 export const LogsDatePicker = ({
@@ -68,10 +69,11 @@ export const LogsDatePicker = ({
   open: openProp,
   onOpenChange,
   shortcutId,
+  variant = 'popover',
 }: PropsWithChildren<LogsDatePickerProps>) => {
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = openProp !== undefined
-  const open = isControlled ? openProp : internalOpen
+  const open = variant === 'inline' || (isControlled ? openProp : internalOpen)
   const setOpen = (next: boolean) => {
     if (!isControlled) setInternalOpen(next)
     onOpenChange?.(next)
@@ -84,9 +86,9 @@ export const LogsDatePicker = ({
     return generated ?? []
   }, [customValue, helpers])
 
-  // Reset the state when the popover closes
+  // Reset when the popover closes, or sync an inline picker with the committed range.
   useEffect(() => {
-    if (!open) {
+    if (!open || variant === 'inline') {
       setCustomValue('')
       setStartDate(toValidDate(value.from))
       const defaultEndDate = toValidDate(value.to) ?? new Date()
@@ -113,7 +115,7 @@ export const LogsDatePicker = ({
         ss: toDate?.getSeconds().toString().padStart(2, '0') || nowSS,
       })
     }
-  }, [open, value])
+  }, [open, value.from, value.to, variant])
 
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = displayedHelpers.find((h) => h.text === newValue)
@@ -256,7 +258,7 @@ export const LogsDatePicker = ({
   }, [pasted])
 
   useEffect(() => {
-    if (open) {
+    if (open && variant === 'popover') {
       document.addEventListener('paste', handlePaste)
       document.addEventListener('copy', handleCopy)
     }
@@ -264,7 +266,7 @@ export const LogsDatePicker = ({
       document.removeEventListener('paste', handlePaste)
       document.removeEventListener('copy', handleCopy)
     }
-  }, [open, startDate, endDate, handleCopy])
+  }, [open, variant, startDate, endDate, handleCopy])
 
   const isLargeRange =
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
@@ -285,12 +287,148 @@ export const LogsDatePicker = ({
   const triggerButton = (
     <PopoverTrigger asChild>
       <Button icon={<Clock size={12} />} {...buttonTriggerProps}>
-        {value.isHelper
-          ? value.text
-          : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
+        {value.isHelper ? value.text : formatDateRange(value.from, value.to)}
       </Button>
     </PopoverTrigger>
   )
+
+  const content = (
+    <div className="flex">
+      <div className="border-r p-2 flex flex-col gap-px">
+        <Input
+          type="text"
+          placeholder="e.g. 2h, 30m, 7d"
+          value={customValue}
+          onChange={(e) => setCustomValue(e.target.value)}
+          className="mb-2 text-xs h-7 rounded-xs"
+        />
+        <RadioGroup
+          onValueChange={handleHelperChange}
+          value={value.isHelper ? value.text : ''}
+          className="flex flex-col gap-px"
+        >
+          {displayedHelpers.map((helper) => (
+            <Label
+              key={helper.text}
+              className={cn(
+                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-xs text-xs w-full',
+                {
+                  'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
+                }
+              )}
+            >
+              <RadioGroupItem
+                hidden
+                key={helper.text}
+                value={helper.text}
+                disabled={helper.disabled}
+                aria-disabled={helper.disabled}
+              />
+              {helper.text}
+              {showHelperBadge(helper) ? (
+                <Lock size={12} className="text-foreground-muted" />
+              ) : null}
+            </Label>
+          ))}
+          {displayedHelpers.length === 0 && (
+            <p className="px-2 py-1.5 text-xs text-foreground-light w-full">
+              Invalid format. Try 2h, 30m, or 7d.
+            </p>
+          )}
+        </RadioGroup>
+      </div>
+
+      <div className="w-fit max-w-full">
+        <div className="flex p-2 gap-2 items-center">
+          <div className="flex grow *:grow gap-2 font-mono">
+            <TimeSplitInput
+              type="start"
+              startTime={startTime}
+              endTime={endTime}
+              time={startTime}
+              setTime={setStartTime}
+              setStartTime={setStartTime}
+              setEndTime={setEndTime}
+              startDate={startDate}
+              endDate={endDate}
+            />
+            <TimeSplitInput
+              type="end"
+              startTime={startTime}
+              endTime={endTime}
+              time={endTime}
+              setTime={setEndTime}
+              setStartTime={setStartTime}
+              setEndTime={setEndTime}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          </div>
+          <div className="shrink">
+            <ButtonTooltip
+              tooltip={{
+                content: {
+                  text: 'Clear time range',
+                },
+              }}
+              icon={<HistoryIcon size={14} />}
+              variant="text"
+              size="tiny"
+              className="px-1.5"
+              onClick={() => {
+                setStartTime({ HH: '00', mm: '00', ss: '00' })
+                setEndTime({ HH: '00', mm: '00', ss: '00' })
+              }}
+            ></ButtonTooltip>
+          </div>
+        </div>
+        <div className="border-t">
+          <Calendar
+            mode="range"
+            month={currentMonth}
+            onMonthChange={(month) => setCurrentMonth(new Date(month))}
+            selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
+            onSelect={(range) => {
+              handleDatePickerChange([range?.from ?? null, range?.to ?? null])
+            }}
+          />
+        </div>
+        {isLargeRange && !hideWarnings && (
+          <p className="w-0 min-w-full px-3 pt-1 pb-4 text-xs text-warning">
+            Large ranges may result in memory errors for big projects.
+          </p>
+        )}
+        <div className="flex items-center justify-end gap-2 p-2 border-t">
+          {startDate && endDate ? (
+            <Button
+              variant="text"
+              size="tiny"
+              onClick={handleCopy}
+              className={cn({ 'text-brand-link': copied || pasted })}
+            >
+              {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}
+            </Button>
+          ) : null}
+
+          <Button
+            onClick={() => {
+              const today = new Date()
+              setCurrentMonth(today)
+              setStartDate(new Date(today))
+              setEndDate(new Date(today))
+            }}
+          >
+            Today
+          </Button>
+          <Button variant="primary" onClick={handleApply}>
+            Apply
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+
+  if (variant === 'inline') return content
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -307,134 +445,7 @@ export const LogsDatePicker = ({
         align={align}
         {...popoverContentProps}
       >
-        <div className="border-r p-2 flex flex-col gap-px">
-          <Input
-            type="text"
-            placeholder="e.g. 2h, 30m, 7d"
-            value={customValue}
-            onChange={(e) => setCustomValue(e.target.value)}
-            className="mb-2 text-xs h-7 rounded-xs"
-          />
-          <RadioGroup
-            onValueChange={handleHelperChange}
-            value={value.isHelper ? value.text : ''}
-            className="flex flex-col gap-px"
-          >
-            {displayedHelpers.map((helper) => (
-              <Label
-                key={helper.text}
-                className={cn(
-                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-xs text-xs w-full',
-                  {
-                    'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
-                  }
-                )}
-              >
-                <RadioGroupItem
-                  hidden
-                  key={helper.text}
-                  value={helper.text}
-                  disabled={helper.disabled}
-                  aria-disabled={helper.disabled}
-                ></RadioGroupItem>
-                {helper.text}
-                {showHelperBadge(helper) ? (
-                  <Lock size={12} className="text-foreground-muted" />
-                ) : null}
-              </Label>
-            ))}
-          </RadioGroup>
-        </div>
-
-        <div className="w-fit max-w-full">
-          <div className="flex p-2 gap-2 items-center">
-            <div className="flex grow *:grow gap-2 font-mono">
-              <TimeSplitInput
-                type="start"
-                startTime={startTime}
-                endTime={endTime}
-                time={startTime}
-                setTime={setStartTime}
-                setStartTime={setStartTime}
-                setEndTime={setEndTime}
-                startDate={startDate}
-                endDate={endDate}
-              />
-              <TimeSplitInput
-                type="end"
-                startTime={startTime}
-                endTime={endTime}
-                time={endTime}
-                setTime={setEndTime}
-                setStartTime={setStartTime}
-                setEndTime={setEndTime}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            </div>
-            <div className="shrink">
-              <ButtonTooltip
-                tooltip={{
-                  content: {
-                    text: 'Clear time range',
-                  },
-                }}
-                icon={<HistoryIcon size={14} />}
-                variant="text"
-                size="tiny"
-                className="px-1.5"
-                onClick={() => {
-                  setStartTime({ HH: '00', mm: '00', ss: '00' })
-                  setEndTime({ HH: '00', mm: '00', ss: '00' })
-                }}
-              ></ButtonTooltip>
-            </div>
-          </div>
-          <div className="border-t">
-            <Calendar
-              mode="range"
-              month={currentMonth}
-              onMonthChange={(month) => setCurrentMonth(new Date(month))}
-              selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
-              onSelect={(range) => {
-                handleDatePickerChange([range?.from ?? null, range?.to ?? null])
-              }}
-            />
-          </div>
-          {isLargeRange && !hideWarnings && (
-            <p className="w-0 min-w-full px-3 pt-1 pb-4 text-xs text-warning">
-              Large ranges may result in memory errors for big projects.
-            </p>
-          )}
-          <div className="flex items-center justify-end gap-2 p-2 border-t">
-            {startDate && endDate ? (
-              <Button
-                variant="text"
-                size="tiny"
-                onClick={handleCopy}
-                className={cn({
-                  'text-brand-link': copied || pasted,
-                })}
-              >
-                {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}
-              </Button>
-            ) : null}
-
-            <Button
-              onClick={() => {
-                const today = new Date()
-                setCurrentMonth(today)
-                setStartDate(new Date(today))
-                setEndDate(new Date(today))
-              }}
-            >
-              Today
-            </Button>
-            <Button variant="primary" onClick={handleApply}>
-              Apply
-            </Button>
-          </div>
-        </div>
+        {content}
       </PopoverContent>
     </Popover>
   )

@@ -362,6 +362,100 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/projects/{ref}/compute': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all compute instances
+     * @description Returns all compute instances you've previously deployed to the specified project.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-list-all-compute-instances']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Retrieve a compute instance
+     * @description Returns a compute instance along with the counts of its running instances. Poll this after a deploy until `build_state` leaves `building`.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-a-compute-instance']
+    put?: never
+    post?: never
+    /**
+     * Delete a compute instance
+     * @description Tombstones the compute instance. Its running instances and image are torn down asynchronously.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    delete: operations['v2-delete-a-compute-instance']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}/deploy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Deploy a compute instance
+     * @description Creates the compute instance if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the compute instance reaches `build_state` `active` or `failed` later.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-deploy-a-compute-instance']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}/uploads': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mint a presigned slot for a build-context upload
+     * @description PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-create-compute-instance-upload']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/projects/{ref}/config': {
     parameters: {
       query?: never
@@ -370,8 +464,10 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Alpha] Get a project's service configuration
+     * Get a project's service configuration
      * @description Returns the project's database, pooler, Auth, Data API, Realtime and Storage configuration — the same configuration a branch inherits from its base project. Each is the effective config, so a setting the project has never overridden is reported at its platform default rather than as null. Auth secrets are returned as an HMAC of their value. `storage` is read live from the storage service; the rest come from this platform's own records.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
      */
     get: operations['v2-get-project-config']
     put?: never
@@ -380,6 +476,52 @@ export interface paths {
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/notebooks': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List notebooks of a project
+     * @description Returns a cursor-paginated list of the project notebooks. Notebook bodies are omitted — read a single notebook to get its cells.
+     */
+    get: operations['v2-list-notebooks']
+    put?: never
+    /**
+     * Create a notebook
+     * @description Creates a notebook shared with everyone who has access to the project. Cell ids are assigned by the server and returned in the response.
+     */
+    post: operations['v2-create-notebook']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/notebooks/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a notebook */
+    get: operations['v2-get-notebook']
+    put?: never
+    post?: never
+    /** Delete a notebook */
+    delete: operations['v2-delete-notebook']
+    options?: never
+    head?: never
+    /**
+     * Update a notebook
+     * @description Updates the attributes provided and leaves the rest untouched. Sending `content` replaces the whole notebook body.
+     */
+    patch: operations['v2-update-notebook']
     trace?: never
   }
   '/v2/projects/{ref}/private-link/associations': {
@@ -624,90 +766,6 @@ export interface paths {
      *     This endpoint is heavy rate-limited to allow for 10 request within 60 seconds.
      */
     post: operations['v2-projects-ref-webhooks-endpoints-id-test-post']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * [Alpha] List all workers
-     * @description Returns all workers you've previously deployed to the specified project.
-     */
-    get: operations['v2-list-all-workers']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * [Alpha] Retrieve a worker
-     * @description Returns a worker along with its instance tally. Poll this after a deploy until `build_state` leaves `building`.
-     */
-    get: operations['v2-get-a-worker']
-    put?: never
-    post?: never
-    /**
-     * [Alpha] Delete a worker
-     * @description Tombstones the worker. Its instances and image are torn down asynchronously.
-     */
-    delete: operations['v2-delete-a-worker']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}/deploy': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * [Alpha] Deploy a worker
-     * @description Creates the worker if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the worker reaches `build_state` `active` or `failed` later.
-     */
-    post: operations['v2-deploy-a-worker']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}/uploads': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * [Alpha] Mint a presigned slot for a build-context upload
-     * @description PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.
-     */
-    post: operations['v2-create-worker-upload']
     delete?: never
     options?: never
     head?: never
@@ -1231,6 +1289,67 @@ export interface components {
         type: 'branch'
       }
     }
+    V2ComputeInstanceResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          build_state: 'building' | 'active' | 'failed'
+          deleting?: boolean
+          image_version?: string
+          instances?: {
+            declared: number
+            live: number
+            ready: number
+            stale: number
+          }
+          instances_error?: string
+          secret_generation: string
+          spec: {
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+          state_reason?: string
+        }
+        /**
+         * @description Compute instance name.
+         * @example hello-world
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance'
+      }
+    }
+    V2ComputeInstanceUploadResponse_Output: {
+      data: {
+        attributes: {
+          /** @description When the slot stops accepting the upload. */
+          expires_at: string
+          /** @example PUT */
+          method: string
+          /** @description Presigned destination for the `.tar.gz` build context. */
+          url: string
+        }
+        /**
+         * @description Upload id to pass to the deploy endpoint as `context_upload_id`.
+         * @example cafe0000000000000000000000000000
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance_upload'
+      }
+    }
     V2CreateBranchRequest: {
       data: {
         attributes: {
@@ -1386,6 +1505,118 @@ export interface components {
         }
       }
     }
+    V2CreateNotebookRequest: {
+      data: {
+        attributes: {
+          content: {
+            cells: (
+              | ({
+                  id?: string
+                  text: string
+                  /** @enum {string} */
+                  type: 'markdown'
+                } & {
+                  [key: string]: unknown
+                })
+              | ({
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: ({
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    } & {
+                      [key: string]: unknown
+                    })[]
+                  } & {
+                    [key: string]: unknown
+                  }
+                  /** @description Read replica to run against. Omit to use the primary database. */
+                  database_identifier?: string
+                  id?: string
+                  /** @default 100 */
+                  row_limit?: number
+                  /** @description SQL run against the project database. */
+                  sql: string
+                  title?: string
+                  /** @enum {string} */
+                  type: 'database'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                } & {
+                  [key: string]: unknown
+                })
+              | ({
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: ({
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    } & {
+                      [key: string]: unknown
+                    })[]
+                  } & {
+                    [key: string]: unknown
+                  }
+                  id?: string
+                  /** @description SQL run against the project logs. */
+                  sql: string
+                  time_range:
+                    | ({
+                        /** @description ISO 8601 end of the range. */
+                        end: string
+                        /** @description ISO 8601 start of the range. */
+                        start: string
+                        /** @enum {string} */
+                        type: 'absolute'
+                      } & {
+                        [key: string]: unknown
+                      })
+                    | ({
+                        amount: number
+                        /** @enum {string} */
+                        type: 'relative'
+                        /** @enum {string} */
+                        unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+                      } & {
+                        [key: string]: unknown
+                      })
+                  title?: string
+                  /** @enum {string} */
+                  type: 'log'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                } & {
+                  [key: string]: unknown
+                })
+            )[]
+          }
+          description?: string
+          favorite?: boolean
+          name: string
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'notebook'
+      }
+    }
     V2CreatePrivateLinkAssociationRequest: {
       data: {
         attributes: {
@@ -1437,7 +1668,7 @@ export interface components {
         type: 'organization_invitation'
       }[]
     }
-    V2DeployWorkerRequest: {
+    V2DeployComputeInstanceRequest: {
       data: {
         attributes: {
           /** @description Id of a build context staged through the uploads endpoint. Required unless `runtime` is set. */
@@ -1457,8 +1688,47 @@ export interface components {
          * @description Resource type.
          * @enum {string}
          */
-        type: 'project_worker'
+        type: 'project_compute_instance'
       }
+    }
+    V2ListComputeInstancesResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          build_state: 'building' | 'active' | 'failed'
+          deleting?: boolean
+          image_version?: string
+          instances?: {
+            declared: number
+            live: number
+            ready: number
+            stale: number
+          }
+          instances_error?: string
+          secret_generation: string
+          spec: {
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+          state_reason?: string
+        }
+        /**
+         * @description Compute instance name.
+         * @example hello-world
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance'
+      }[]
     }
     V2ListGitHubConnectionsResponse_Output: {
       data: {
@@ -1592,6 +1862,55 @@ export interface components {
         /**
          * @description URL path to the previous page.
          * @example /v2/organizations/my-org/members?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+         */
+        prev: string | null
+      }
+    }
+    V2ListNotebooksResponse_Output: {
+      data: {
+        attributes: {
+          description: string | null
+          favorite: boolean
+          inserted_at: string
+          name: string
+          /** @description User who created the notebook. */
+          owner: {
+            id: number
+            username: string
+          } | null
+          updated_at: string
+          /** @description User who last wrote to the notebook. */
+          updated_by: {
+            id: number
+            username: string
+          } | null
+        }
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'notebook'
+      }[]
+      links: {
+        /**
+         * @description URL path to the first page if available.
+         * @example /v2/projects/{ref}/notebooks?page[size]=10
+         */
+        first?: string | null
+        /**
+         * @description URL path to the last page if available.
+         * @example /v2/projects/{ref}/notebooks?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+         */
+        last?: string | null
+        /**
+         * @description URL path to the next page.
+         * @example /v2/projects/{ref}/notebooks?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+         */
+        next: string | null
+        /**
+         * @description URL path to the previous page.
+         * @example /v2/projects/{ref}/notebooks?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
          */
         prev: string | null
       }
@@ -1779,44 +2098,113 @@ export interface components {
         type: 'organization_role'
       }[]
     }
-    V2ListWorkersResponse_Output: {
+    V2NotebookResponse_Output: {
       data: {
         attributes: {
-          /** @enum {string} */
-          build_state: 'building' | 'active' | 'failed'
-          deleting?: boolean
-          image_version?: string
-          instances?: {
-            declared: number
-            live: number
-            ready: number
-            stale: number
+          content: {
+            cells: (
+              | {
+                  id: string
+                  text: string
+                  /** @enum {string} */
+                  type: 'markdown'
+                }
+              | {
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: {
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    }[]
+                  }
+                  /** @description Read replica to run against. Omit to use the primary database. */
+                  database_identifier?: string
+                  id: string
+                  /** @default 100 */
+                  row_limit: number
+                  /** @description SQL run against the project database. */
+                  sql: string
+                  title?: string
+                  /** @enum {string} */
+                  type: 'database'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                }
+              | {
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: {
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    }[]
+                  }
+                  id: string
+                  /** @description SQL run against the project logs. */
+                  sql: string
+                  time_range:
+                    | {
+                        /** @description ISO 8601 end of the range. */
+                        end: string
+                        /** @description ISO 8601 start of the range. */
+                        start: string
+                        /** @enum {string} */
+                        type: 'absolute'
+                      }
+                    | {
+                        amount: number
+                        /** @enum {string} */
+                        type: 'relative'
+                        /** @enum {string} */
+                        unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+                      }
+                  title?: string
+                  /** @enum {string} */
+                  type: 'log'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                }
+            )[]
+            schema_version: number
           }
-          instances_error?: string
-          secret_generation: string
-          spec: {
-            /** @example public */
-            exposure: string
-            /** @example 1 */
-            instances: number
-            /** @example node */
-            runtime?: string
-            /** @example 2gb-1vcpu */
-            size: string
-          }
-          state_reason?: string
+          description: string | null
+          favorite: boolean
+          inserted_at: string
+          name: string
+          /** @description User who created the notebook. */
+          owner: {
+            id: number
+            username: string
+          } | null
+          updated_at: string
+          /** @description User who last wrote to the notebook. */
+          updated_by: {
+            id: number
+            username: string
+          } | null
         }
-        /**
-         * @description Worker name.
-         * @example hello-world
-         */
         id: string
         /**
          * @description Resource type.
          * @enum {string}
          */
-        type: 'project_worker'
-      }[]
+        type: 'notebook'
+      }
     }
     V2PreviewProjectTransferResponse_Output: {
       data: {
@@ -2209,65 +2597,117 @@ export interface components {
         type: 'project_transfer_input'
       }
     }
-    V2WorkerResponse_Output: {
+    V2UpdateNotebookRequest: {
       data: {
         attributes: {
-          /** @enum {string} */
-          build_state: 'building' | 'active' | 'failed'
-          deleting?: boolean
-          image_version?: string
-          instances?: {
-            declared: number
-            live: number
-            ready: number
-            stale: number
+          /** @description Replaces the notebook body. A cell keeps its identity by echoing back its `id`; a cell sent without an `id` is added as a new one. */
+          content?: {
+            cells: (
+              | ({
+                  id?: string
+                  text: string
+                  /** @enum {string} */
+                  type: 'markdown'
+                } & {
+                  [key: string]: unknown
+                })
+              | ({
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: ({
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    } & {
+                      [key: string]: unknown
+                    })[]
+                  } & {
+                    [key: string]: unknown
+                  }
+                  /** @description Read replica to run against. Omit to use the primary database. */
+                  database_identifier?: string
+                  id?: string
+                  /** @default 100 */
+                  row_limit?: number
+                  /** @description SQL run against the project database. */
+                  sql: string
+                  title?: string
+                  /** @enum {string} */
+                  type: 'database'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                } & {
+                  [key: string]: unknown
+                })
+              | ({
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: ({
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    } & {
+                      [key: string]: unknown
+                    })[]
+                  } & {
+                    [key: string]: unknown
+                  }
+                  id?: string
+                  /** @description SQL run against the project logs. */
+                  sql: string
+                  time_range:
+                    | ({
+                        /** @description ISO 8601 end of the range. */
+                        end: string
+                        /** @description ISO 8601 start of the range. */
+                        start: string
+                        /** @enum {string} */
+                        type: 'absolute'
+                      } & {
+                        [key: string]: unknown
+                      })
+                    | ({
+                        amount: number
+                        /** @enum {string} */
+                        type: 'relative'
+                        /** @enum {string} */
+                        unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+                      } & {
+                        [key: string]: unknown
+                      })
+                  title?: string
+                  /** @enum {string} */
+                  type: 'log'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                } & {
+                  [key: string]: unknown
+                })
+            )[]
           }
-          instances_error?: string
-          secret_generation: string
-          spec: {
-            /** @example public */
-            exposure: string
-            /** @example 1 */
-            instances: number
-            /** @example node */
-            runtime?: string
-            /** @example 2gb-1vcpu */
-            size: string
-          }
-          state_reason?: string
+          description?: string
+          favorite?: boolean
+          name?: string
         }
-        /**
-         * @description Worker name.
-         * @example hello-world
-         */
-        id: string
         /**
          * @description Resource type.
          * @enum {string}
          */
-        type: 'project_worker'
-      }
-    }
-    V2WorkerUploadResponse_Output: {
-      data: {
-        attributes: {
-          /** @description When the slot stops accepting the upload. */
-          expires_at: string
-          /** @example PUT */
-          method: string
-          /** @description Presigned destination for the `.tar.gz` build context. */
-          url: string
-        }
-        /**
-         * @description Upload id to pass to the deploy endpoint as `context_upload_id`.
-         * @example cafe0000000000000000000000000000
-         */
-        id: string
-        /**
-         * @description Resource type.
-         * @enum {string}
-         */
-        type: 'project_worker_upload'
+        type: 'notebook'
       }
     }
   }
@@ -2849,68 +3289,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -3188,68 +3566,6 @@ export interface operations {
                * @constant
                */
               type: 'ingress'
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -3634,68 +3950,6 @@ export interface operations {
                * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=0
                */
               prev: string | null
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -4092,68 +4346,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -4469,68 +4661,6 @@ export interface operations {
                */
               type: 'endpoint'
             }[]
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
           }
         }
       }
@@ -4850,68 +4980,6 @@ export interface operations {
                * @constant
                */
               type: 'endpoint'
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -5269,68 +5337,6 @@ export interface operations {
                * @constant
                */
               type: 'endpoint'
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -5763,68 +5769,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -6171,68 +6115,6 @@ export interface operations {
                * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
                */
               prev: string | null
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -6630,54 +6512,6 @@ export interface operations {
                   }
                   /** @constant */
                   message: 'Bad Request: Provided event type is not subscribed to by the endpoint'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -7321,6 +7155,257 @@ export interface operations {
       }
     }
   }
+  'v2-list-all-compute-instances': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ListComputeInstancesResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-delete-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-deploy-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2DeployComputeInstanceRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-create-compute-instance-upload': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceUploadResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
   'v2-get-project-config': {
     parameters: {
       query?: never
@@ -7361,6 +7446,360 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-list-notebooks': {
+    parameters: {
+      query?: {
+        filter?: {
+          name?: string
+        }
+        page?: {
+          after?: string
+          before?: string
+          size?: number
+        }
+        sort?: 'name' | '-name' | 'inserted_at' | '-inserted_at'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ListNotebooksResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to retrieve project's notebooks */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-create-notebook': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2CreateNotebookRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2NotebookResponse_Output']
+        }
+      }
+      /** @description The request repeats a cell id */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to create notebook */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-notebook': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2NotebookResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Notebook not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to retrieve notebook */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-delete-notebook': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Notebook not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to delete notebook */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-update-notebook': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2UpdateNotebookRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2NotebookResponse_Output']
+        }
+      }
+      /** @description The request references a cell that does not exist on this notebook, or repeats a cell id */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Notebook not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to update notebook */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -7855,68 +8294,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -8194,68 +8571,6 @@ export interface operations {
                * @constant
                */
               type: 'ingress'
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -8640,68 +8955,6 @@ export interface operations {
                * @example /v2/organization/slug/webhooks/endpoints?page[limit]=10&page[offset]=0
                */
               prev: string | null
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -9098,68 +9351,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -9475,68 +9666,6 @@ export interface operations {
                */
               type: 'endpoint'
             }[]
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
           }
         }
       }
@@ -9856,68 +9985,6 @@ export interface operations {
                * @constant
                */
               type: 'endpoint'
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -10275,68 +10342,6 @@ export interface operations {
                * @constant
                */
               type: 'endpoint'
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -10769,68 +10774,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -11177,68 +11120,6 @@ export interface operations {
                * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
                */
               prev: string | null
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -11640,54 +11521,6 @@ export interface operations {
                     [key: string]: unknown
                   }
                 }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
             $defs: {
               APIErrorObject: components['schemas']['APIErrorObject']
             }
@@ -11939,257 +11772,6 @@ export interface operations {
               APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
-        }
-      }
-    }
-  }
-  'v2-list-all-workers': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2ListWorkersResponse_Output']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-get-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerResponse_Output']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-delete-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-deploy-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V2DeployWorkerRequest']
-      }
-    }
-    responses: {
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerResponse_Output']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-create-worker-upload': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerUploadResponse_Output']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
         }
       }
     }

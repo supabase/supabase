@@ -23,6 +23,8 @@ import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
 import { ExplorerNavSchema } from './ExplorerNavSchema'
 import { ExplorerNavTables } from './ExplorerNavTables'
+import { ExplorerProvider } from './ExplorerProvider'
+import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ExplorerGeneratedPageTabCoordinator } from '@/components/interfaces/Explorer/ExplorerGeneratedPageTabCoordinator'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
@@ -31,6 +33,7 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import { useTrack } from '@/lib/telemetry/track'
 import {
@@ -49,6 +52,9 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
+  const { setLastVisitedExplorerTab } = useDashboardHistory()
+  const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
+  const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
   // A stack rather than a single value, so drilling in is a push and going back is a pop —
   // so each database level keeps its schema when returning from a deeper panel.
@@ -78,60 +84,67 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     entity: browserTitle?.entity ?? activeTabLabel,
   }
 
+  const handleTabChange = (id: string) => {
+    if (id === EXPLORER_HOME_TAB_ID) setLastVisitedExplorerTab(undefined)
+  }
+
   return (
-    <ProjectLayoutWithAuth
-      product="Explorer"
-      browserTitle={mergedBrowserTitle}
-      productMenuHeader={
-        <ExplorerNavHeader
-          navStack={navStack}
-          onBack={popLevel}
-          rootAction={<BackToSqlEditorButton />}
-        />
-      }
-      productMenu={
-        <div className="relative h-full overflow-hidden">
-          <AnimatePresence mode="wait">
-            {level === undefined && <ExplorerNavHome key="home" onSelectLevel={pushLevel} />}
-            {level === 'database' && (
-              <ExplorerNavDatabase
-                key="database"
-                onSelectSchema={(schema) => pushSchemaLevel('database-schema', schema)}
-              />
-            )}
-            {entry?.level === 'database-schema' && (
-              <ExplorerNavSchema
-                key={`schema-${entry.schema}`}
-                schema={entry.schema}
-                onSelectTables={() => pushSchemaLevel('database-tables', entry.schema)}
-              />
-            )}
-            {entry?.level === 'database-tables' && (
-              <ExplorerNavTables key={`tables-${entry.schema}`} schema={entry.schema} />
-            )}
-            {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
-            {level === 'chat' && <ExplorerNavChats key="chats" />}
-          </AnimatePresence>
-        </div>
-      }
-    >
-      <ExplorerQueryTabCoordinator />
-
-      <ExplorerNotebookTabCoordinator />
-
-      <ExplorerGeneratedPageTabCoordinator />
-
-      <div className="flex flex-col h-full">
-        <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
-          <EditorTabs
-            isCollapseButtonHidden
-            customTabs={<HomeTabButton />}
-            newTabButton={<NewTabButton />}
+    <ExplorerProvider>
+      <ProjectLayoutWithAuth
+        product="Explorer"
+        browserTitle={mergedBrowserTitle}
+        productMenuHeader={
+          <ExplorerNavHeader
+            navStack={navStack}
+            onBack={popLevel}
+            rootAction={<BackToSqlEditorButton />}
           />
+        }
+        productMenu={
+          <div className="relative h-full overflow-hidden">
+            <AnimatePresence mode="wait">
+              {level === undefined && <ExplorerNavHome key="home" onSelectLevel={pushLevel} />}
+              {level === 'database' && (
+                <ExplorerNavDatabase
+                  key="database"
+                  onSelectSchema={(schema) => pushSchemaLevel('database-schema', schema)}
+                />
+              )}
+              {entry?.level === 'database-schema' && (
+                <ExplorerNavSchema
+                  key={`schema-${entry.schema}`}
+                  schema={entry.schema}
+                  onSelectTables={() => pushSchemaLevel('database-tables', entry.schema)}
+                />
+              )}
+              {entry?.level === 'database-tables' && (
+                <ExplorerNavTables key={`tables-${entry.schema}`} schema={entry.schema} />
+              )}
+              {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
+              {level === 'chat' && <ExplorerNavChats key="chats" />}
+            </AnimatePresence>
+          </div>
+        }
+      >
+        <ExplorerQueryTabCoordinator />
+
+        <ExplorerNotebookTabCoordinator />
+
+        <ExplorerGeneratedPageTabCoordinator />
+
+        <div className="flex flex-col h-full">
+          <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
+            <EditorTabs
+              isCollapseButtonHidden
+              customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}
+              newTabButton={<NewTabButton />}
+              onTabChange={handleTabChange}
+            />
+          </div>
+          <div className="flex-grow min-h-0">{children}</div>
         </div>
-        <div className="flex-grow min-h-0">{children}</div>
-      </div>
-    </ProjectLayoutWithAuth>
+      </ProjectLayoutWithAuth>
+    </ExplorerProvider>
   )
 }
 

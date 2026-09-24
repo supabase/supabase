@@ -72,7 +72,7 @@ const TableNodeComponent = ({
         <header
           className={cn(
             'text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center',
-            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+            hasEdgesSelected ? 'outline outline-1 outline-primary-bright' : undefined
           )}
         >
           {data.name}
@@ -89,7 +89,7 @@ const TableNodeComponent = ({
         <div
           className={cn(
             'border-[0.5px] overflow-hidden rounded-[4px] shadow-xs',
-            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+            hasEdgesSelected ? 'outline outline-1 outline-primary-bright' : undefined
           )}
           style={{ width: TABLE_NODE_WIDTH / 2 }}
         >
@@ -275,7 +275,7 @@ const TableNodeComponent = ({
                     'text-ellipsis overflow-hidden whitespace-nowrap min-w-0 max-w-[80%]',
                     schemaGraphContext.selectedEdge?.sourceHandle === column.id ||
                       schemaGraphContext.selectedEdge?.targetHandle === column.id
-                      ? 'text-brand'
+                      ? 'text-primary'
                       : undefined
                   )}
                   title={column.name}

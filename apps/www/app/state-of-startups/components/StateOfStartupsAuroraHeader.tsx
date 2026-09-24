@@ -56,7 +56,7 @@ export function StateOfStartupsAuroraHeader() {
         <h1 className="text-5xl md:text-6xl xl:text-8xl font-light text-foreground leading-[0.92] tracking-tight">
           The State
           <br />
-          of Startups <span className="text-brand-500 dark:text-brand font-medium">2026</span>
+          of Startups <span className="text-brand-500 dark:text-primary font-medium">2026</span>
         </h1>
       </div>
     </header>

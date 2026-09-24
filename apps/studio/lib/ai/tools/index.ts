@@ -76,6 +76,7 @@ export const getTools = async ({
       ...getSchemaTools({
         projectRef,
         connectionString,
+        authorization,
       }),
       ...getReportTools({ projectRef, authorization }),
       ...(isExplorerEnabled

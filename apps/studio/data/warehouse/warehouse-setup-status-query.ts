@@ -5,7 +5,8 @@ import { warehouseKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse']
+export type WarehouseSetupStatusResponse =
+  components['schemas']['WarehouseSetupStatusResponse_Output']
 
 type WarehouseSetupStatusVariables = { projectRef?: string }
 
@@ -39,5 +40,6 @@ export const useWarehouseSetupStatusQuery = <TData = WarehouseSetupStatusData>(
     queryKey: warehouseKeys.setupStatus(projectRef),
     queryFn: ({ signal }) => getWarehouseSetupStatus({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
+    retry: false,
     ...options,
   })

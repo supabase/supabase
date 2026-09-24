@@ -1,6 +1,7 @@
 // GENERAL
 
 export * from './src/components/Button'
+export * from './src/components/FloatingPlate'
 export * from './src/components/Icon/IconBackground'
 
 // NAV
@@ -113,6 +114,7 @@ export * from './src/components/ShadowScrollArea'
 export * from './src/components/shadcn/ui/collapsible'
 
 export * from './src/components/shadcn/ui/tabs'
+export * from './src/components/shadcn/ui/useTabIndicator'
 
 export * from './src/components/shadcn/ui/tooltip'
 

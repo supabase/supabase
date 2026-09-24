@@ -239,7 +239,7 @@ const ColumnType = ({
                           <span className="text-foreground-lighter">{option.description}</span>
                         </div>
                         <span className="absolute right-3 top-2">
-                          {isSelected ? <Check className="text-brand" size={14} /> : ''}
+                          {isSelected ? <Check className="text-primary" size={14} /> : ''}
                         </span>
                       </CommandItem>
                     )
@@ -283,7 +283,7 @@ const ColumnType = ({
                               )}
                               {isSelected && (
                                 <span className="absolute right-3 top-2">
-                                  <Check className="text-brand" size={14} />
+                                  <Check className="text-primary" size={14} />
                                 </span>
                               )}
                             </div>

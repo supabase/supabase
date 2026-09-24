@@ -18,7 +18,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
-type GetOAuthAuthorizationResponse = components['schemas']['GetOAuthAuthorizationResponse']
+type GetOAuthAuthorizationResponse = components['schemas']['GetOAuthAuthorizationResponse_Output']
 type ApproveAuthorizationResponse = components['schemas']['ApproveAuthorizationResponse_Output']
 type DeclineAuthorizationResponse = components['schemas']['DeclineAuthorizationResponse_Output']
 
