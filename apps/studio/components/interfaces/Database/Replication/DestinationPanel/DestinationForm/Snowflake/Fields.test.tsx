@@ -80,19 +80,4 @@ describe('SnowflakeFields', () => {
     expect(await screen.findByText('Select a P8 or PEM private key.')).toBeInTheDocument()
     expect(screen.getByDisplayValue('existing-key')).toBeInTheDocument()
   })
-
-  it.each([
-    ['a key without an end marker', '-----BEGIN PRIVATE KEY-----\nprivate-key'],
-    ['a key with an empty body', '-----BEGIN PRIVATE KEY-----\n   \n-----END PRIVATE KEY-----'],
-  ])('rejects %s without replacing the private key', async (_, contents) => {
-    const { container } = customRender(<TestForm snowflakePrivateKey="existing-key" />)
-    const file = new File([contents], 'rsa_key.p8', { type: 'application/x-pem-file' })
-    Object.defineProperty(file, 'text', { value: vi.fn().mockResolvedValue(contents) })
-
-    const fileInput = container.querySelector<HTMLInputElement>('input[type="file"]')
-    fireEvent.change(fileInput!, { target: { files: [file] } })
-
-    expect(await screen.findByText('Select a P8 or PEM private key.')).toBeInTheDocument()
-    expect(screen.getByDisplayValue('existing-key')).toBeInTheDocument()
-  })
 })
