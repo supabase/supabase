@@ -12,6 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -52,8 +55,17 @@ const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
           <span className="shrink-0 text-xs text-warning-600">or in {fate.daysRemaining}d</span>
         </div>
       )
-    case 'expiring-now':
-      return <span className="shrink-0 text-xs text-destructive">Expiring now</span>
+    case 'expiry-due':
+      return (
+        <Tooltip>
+          <TooltipTrigger className="shrink-0 text-xs text-destructive">
+            Queued to expire
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-64">
+            Cleanup runs periodically, so this version stays listed until the next pass.
+          </TooltipContent>
+        </Tooltip>
+      )
   }
 }
 
