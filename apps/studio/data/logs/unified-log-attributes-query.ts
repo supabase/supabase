@@ -27,13 +27,13 @@ export type UnifiedLogAttributesVariables = {
 
 export type UnifiedLogAttributesError = ResponseError
 
-const getLogTimeWindow = (timestampMs: number, windowMs: number) => ({
+export const getLogTimeWindow = (timestampMs: number, windowMs: number) => ({
   iso_timestamp_start: new Date(timestampMs - windowMs).toISOString(),
   iso_timestamp_end: new Date(timestampMs + windowMs).toISOString(),
 })
 
 /** Runs SQL against the ClickHouse logs endpoint, which can answer 200 with an `error` body. */
-async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariables, 'endpoint'>) {
+export async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariables, 'endpoint'>) {
   const data = await executeAnalyticsSql({
     ...variables,
     endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
@@ -43,7 +43,7 @@ async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariables, 'end
 }
 
 /** One log's source and attributes, or undefined when it can't be found. */
-async function getLogAttributesRow(
+export async function getLogAttributesRow(
   { projectRef, logId, source, logTimestampMs }: UnifiedLogAttributesVariables,
   signal?: AbortSignal
 ) {
