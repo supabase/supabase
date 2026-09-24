@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { NotebookText, Plus } from 'lucide-react'
-import Link from 'next/link'
 import { AiIconAnimation, Badge, Button } from 'ui'
 import { Row } from 'ui-patterns/Row'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -20,15 +19,13 @@ export const NotebooksSection = () => {
   const { ref: projectRef } = useParams()
   const { createNotebook } = useCreateNotebook()
 
-  const { data, isPending, isSuccess, hasNextPage } = useNotebooksInfiniteQuery({
+  const { data, isPending, isSuccess } = useNotebooksInfiniteQuery({
     projectRef,
     limit: MAX_HOMEPAGE_NOTEBOOKS,
     sort: 'inserted_at',
   })
   // The content endpoint can return more rows than `limit`, so cap the row here too
-  const fetchedNotebooks = data?.pages[0]?.content ?? []
-  const notebooks = fetchedNotebooks.slice(0, MAX_HOMEPAGE_NOTEBOOKS)
-  const hasMoreNotebooks = hasNextPage || fetchedNotebooks.length > notebooks.length
+  const notebooks = (data?.pages[0]?.content ?? []).slice(0, MAX_HOMEPAGE_NOTEBOOKS)
 
   return (
     <div>
@@ -62,14 +59,6 @@ export const NotebooksSection = () => {
             <NotebookCard key={notebook.id} notebook={notebook} projectRef={projectRef} />
           ))}
         </Row>
-      )}
-
-      {hasMoreNotebooks && (
-        <div className="mt-4 flex justify-end">
-          <Button asChild variant="text">
-            <Link href={`/project/${projectRef}/explorer`}>View all notebooks in Explorer</Link>
-          </Button>
-        </div>
       )}
     </div>
   )
