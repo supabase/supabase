@@ -35,7 +35,8 @@ export async function getOrganizationMembers(
   if (orgMembersError) handleError(orgMembersError)
   // Project-scoped members are not permitted to read org invitations (403)
   // Treat that as "no invitations visible" instead of failing to load the list of members
-  if (orgInvitesError && (orgInvitesError as ResponseError).code !== 403) handleError(orgInvitesError)
+  if (orgInvitesError && (orgInvitesError as ResponseError).code !== 403)
+    handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
   const invitedMembers = (orgInvites?.invitations ?? []).map((invite) => {

@@ -2,9 +2,13 @@ import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import { getOrganizationMembers } from './organization-members-query'
-import { addAPIMock } from '@/tests/lib/msw'
+import type { components } from '@/data/api'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-const member = {
+type Member = components['schemas']['Member_Output']
+type InvitationResponse = components['schemas']['InvitationResponse_Output']
+
+const member: Member = {
   avatar_url: null,
   gotrue_id: 'gotrue-id',
   is_sso_user: false,
@@ -20,17 +24,21 @@ describe('getOrganizationMembers', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/members',
-      response: () => HttpResponse.json([member]),
+      response: [member],
     })
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/members/invitations',
-      response: () =>
-        HttpResponse.json({
-          invitations: [
-            { id: 1, invited_at: '2026-01-01T00:00:00Z', invited_email: 'invitee@example.com', role_id: 2 },
-          ],
-        }),
+      response: {
+        invitations: [
+          {
+            id: 1,
+            invited_at: '2026-01-01T00:00:00Z',
+            invited_email: 'invitee@example.com',
+            role_id: 2,
+          },
+        ],
+      } satisfies InvitationResponse,
     })
 
     const result = await getOrganizationMembers({ slug: 'org-slug' })
@@ -54,12 +62,12 @@ describe('getOrganizationMembers', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/members',
-      response: () => HttpResponse.json([member]),
+      response: [member],
     })
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/members/invitations',
-      response: () => HttpResponse.json({ message: 'Forbidden' }, { status: 403 }),
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Forbidden' }, { status: 403 }),
     })
 
     const result = await getOrganizationMembers({ slug: 'org-slug' })
@@ -71,12 +79,13 @@ describe('getOrganizationMembers', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/members',
-      response: () => HttpResponse.json([member]),
+      response: [member],
     })
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/members/invitations',
-      response: () => HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 }),
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Internal Server Error' }, { status: 500 }),
     })
 
     await expect(getOrganizationMembers({ slug: 'org-slug' })).rejects.toThrowError(
@@ -88,12 +97,12 @@ describe('getOrganizationMembers', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/members',
-      response: () => HttpResponse.json({ message: 'Forbidden' }, { status: 403 }),
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Forbidden' }, { status: 403 }),
     })
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/members/invitations',
-      response: () => HttpResponse.json({ invitations: [] }),
+      response: { invitations: [] } satisfies InvitationResponse,
     })
 
     await expect(getOrganizationMembers({ slug: 'org-slug' })).rejects.toThrowError('Forbidden')
