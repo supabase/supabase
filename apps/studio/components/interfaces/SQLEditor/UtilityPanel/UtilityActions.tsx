@@ -129,7 +129,7 @@ export const UtilityActions = ({
               <Keyboard size={14} className="text-foreground-light" />
               Intellisense enabled
             </span>
-            {intellisenseEnabled && <Check className="text-brand" size={16} />}
+            {intellisenseEnabled && <Check className="text-primary" size={16} />}
           </DropdownMenuItem>
           {IS_PLATFORM && (
             <>
@@ -140,7 +140,7 @@ export const UtilityActions = ({
                   strokeWidth={2}
                   className={
                     isFavorite
-                      ? 'fill-brand-default stroke-none'
+                      ? 'fill-primary-bright stroke-none'
                       : 'fill-none stroke-foreground-light'
                   }
                 />
@@ -186,7 +186,7 @@ export const UtilityActions = ({
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
               Intellisense enabled
-              {intellisenseEnabled && <Check className="text-brand" size={16} />}
+              {intellisenseEnabled && <Check className="text-primary" size={16} />}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -200,7 +200,7 @@ export const UtilityActions = ({
                   size="tiny"
                   onClick={() => saveFavorite(id, false)}
                   className="px-1"
-                  icon={<Heart className="fill-brand-default stroke-none" />}
+                  icon={<Heart className="fill-primary-bright stroke-none" />}
                   aria-label="Remove from favorites"
                 />
               ) : (

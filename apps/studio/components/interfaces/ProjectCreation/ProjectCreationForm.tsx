@@ -35,6 +35,7 @@ import {
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
+  resolveSelectedRegionOptionType,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
@@ -140,6 +141,15 @@ export const ProjectCreationForm = ({
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
   const { getRegionRestriction } = useRegionRestriction()
+
+  // [Joshen] Temp experiment - to clean up once completed
+  const showBestAvailableRegionFeature = useIsFeatureEnabled(
+    'project_creation:show_best_available_region'
+  )
+  const showBestAvailableRegionFlag = useFlag('showBestAvailableRegion')
+  const showBestAvailableRegionOption =
+    showBestAvailableRegionFeature && showBestAvailableRegionFlag && isFreePlan
+  const [isBestAvailableSelected, setIsBestAvailableSelected] = useState(false)
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -342,6 +352,15 @@ export const ProjectCreationForm = ({
   } = useProjectCreateMutation({
     onSuccess: (res) => {
       setProjectCreationError(undefined)
+      const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+      const submittedDbRegion = form.getValues('dbRegion')
+      const selectedRegionOption = isBestAvailableSelected ? 'best_available' : submittedDbRegion
+      const selectedRegionOptionType = resolveSelectedRegionOptionType({
+        isBestAvailableSelected,
+        dbRegion: submittedDbRegion,
+        smartGroupRegions: smartGroup,
+        specificRegions: specific,
+      })
       track(
         'project_creation_simple_version_submitted',
         {
@@ -354,6 +373,7 @@ export const ProjectCreationForm = ({
           ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
             dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
           }),
+          ...(showBestAvailableRegionOption && { selectedRegionOption, selectedRegionOptionType }),
         },
         {
           project: res.ref,
@@ -773,6 +793,9 @@ export const ProjectCreationForm = ({
                     <RegionSelector
                       form={form}
                       instanceSize={instanceSize as DesiredInstanceSize}
+                      showBestAvailableRegionOption={showBestAvailableRegionOption}
+                      isBestAvailableSelected={isBestAvailableSelected}
+                      onBestAvailableSelectedChange={setIsBestAvailableSelected}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}

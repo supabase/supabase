@@ -450,7 +450,7 @@ export default function MarketingForm({
         </Button>
 
         {disclaimer && (
-          <div className="text-xs text-foreground-lighter leading-relaxed [&_a]:text-brand [&_a]:decoration-brand">
+          <div className="text-xs text-foreground-lighter leading-relaxed [&_a]:text-primary [&_a]:decoration-brand">
             <ReactMarkdown
               components={{
                 p: ({ children }) => <p>{children}</p>,

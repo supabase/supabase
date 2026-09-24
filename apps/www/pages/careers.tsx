@@ -134,7 +134,7 @@ const CareerPage = ({
       <DefaultLayout>
         <header>
           <SectionContainer className="pt-12 pb-8! lg:pt-24 py-0 text-center space-y-4">
-            <h1 className="text-sm text-brand md:text-base">
+            <h1 className="text-sm text-primary md:text-base">
               <span className="sr-only">Supabase </span>Careers
             </h1>
             <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">

@@ -91,7 +91,7 @@ const Index = () => {
                     <p className="text-foreground-lighter text-sm">
                       When building a{' '}
                       <Link
-                        className="text-brand underline"
+                        className="text-primary underline"
                         href="/docs/guides/platform/oauth-apps/build-a-supabase-integration"
                       >
                         Supabase Integration

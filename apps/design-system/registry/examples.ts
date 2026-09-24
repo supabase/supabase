@@ -200,6 +200,12 @@ export const examples: Registry = [
     files: ['example/button-default.tsx'],
   },
   {
+    name: 'button-floating-plate',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-floating-plate.tsx'],
+  },
+  {
     name: 'button-warning',
     type: 'components:example',
     registryDependencies: ['button'],
@@ -1014,6 +1020,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['textarea', 'form'],
     files: ['example/textarea-form.tsx'],
+  },
+  {
+    name: 'textarea-with-addon',
+    type: 'components:example',
+    registryDependencies: ['textarea', 'input-group'],
+    files: ['example/textarea-with-addon.tsx'],
   },
   {
     name: 'textarea-with-button',
