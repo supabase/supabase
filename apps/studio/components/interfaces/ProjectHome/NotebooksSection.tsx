@@ -25,7 +25,10 @@ export const NotebooksSection = () => {
     limit: MAX_HOMEPAGE_NOTEBOOKS,
     sort: 'inserted_at',
   })
-  const notebooks = data?.pages[0]?.content ?? []
+  // The content endpoint can return more rows than `limit`, so cap the row here too
+  const fetchedNotebooks = data?.pages[0]?.content ?? []
+  const notebooks = fetchedNotebooks.slice(0, MAX_HOMEPAGE_NOTEBOOKS)
+  const hasMoreNotebooks = hasNextPage || fetchedNotebooks.length > notebooks.length
 
   return (
     <div>
@@ -61,7 +64,7 @@ export const NotebooksSection = () => {
         </Row>
       )}
 
-      {hasNextPage && (
+      {hasMoreNotebooks && (
         <div className="mt-4 flex justify-end">
           <Button asChild variant="text">
             <Link href={`/project/${projectRef}/explorer`}>View all notebooks in Explorer</Link>
