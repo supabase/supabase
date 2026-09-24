@@ -33,8 +33,8 @@ export const bucketObjectsInfiniteQueryOptions = (
     // prefix and search are incorporated into the path.
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: storageKeys.objects(projectRef, bucketId, path, options),
-    queryFn: ({ signal, pageParam }) =>
-      listBucketObjectsV2(
+    queryFn: async ({ signal, pageParam }) => {
+      const page = (await listBucketObjectsV2(
         {
           projectRef: projectRef!,
           bucketId,
@@ -43,7 +43,16 @@ export const bucketObjectsInfiniteQueryOptions = (
           options: { ...v2Options, limit },
         },
         signal
-      ) as Promise<StorageObjectsPage>,
+      )) as StorageObjectsPage
+
+      // A backend that says there's more but doesn't advance the cursor would otherwise
+      // send fetchNextPage into an infinite loop re-fetching the same page forever.
+      if (page.hasNext && (!page.nextCursor || page.nextCursor === pageParam)) {
+        throw new Error('Storage list-v2 response has hasNext=true without a new cursor')
+      }
+
+      return page
+    },
     enabled: enabled && !!projectRef && !!bucketId,
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => (lastPage.hasNext ? lastPage.nextCursor : undefined),
