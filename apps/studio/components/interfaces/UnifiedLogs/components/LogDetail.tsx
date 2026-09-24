@@ -54,6 +54,7 @@ export function LogDetail({
   })
   const { data: fetchedAttributes } = useQuery({
     ...attributesQuery,
+    select: (row) => row?.log_attributes ?? null,
     enabled: canFetchAttributes && attributesQuery.enabled,
   })
   const attributes = logsMetadata ? (row.metadata ?? fetchedAttributes) : undefined
