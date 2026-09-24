@@ -19,6 +19,8 @@ interface LogFieldRowProps<TData> {
   /** Truncate the label to one line instead of wrapping it. */
   truncateLabel?: boolean
   alignOffset?: number
+  /** Offers "Add filter" for a filter that isn't a table column (e.g. a URL param). */
+  onAddFilter?: () => void
   className?: string
 }
 
@@ -33,6 +35,7 @@ export function LogFieldRow<TData>({
   disabled,
   truncateLabel = false,
   alignOffset = 16,
+  onAddFilter,
   className,
 }: LogFieldRowProps<TData>) {
   return (
@@ -45,6 +48,7 @@ export function LogFieldRow<TData>({
       disabled={disabled}
       className="rounded-none"
       alignOffset={alignOffset}
+      onAddFilter={onAddFilter}
     >
       <div
         role="button"

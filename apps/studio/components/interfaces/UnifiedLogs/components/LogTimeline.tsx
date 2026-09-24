@@ -22,7 +22,7 @@ interface LogTimelineProps {
   getLogHref?: (log: ColumnSchema) => string
   /** Shows this many leading steps, plus the open log in its original position. */
   collapsedStepCount?: number
-  /** A final step to see more logs. */
+  /** A final step, e.g. `TimelineLinkStep` to see more. */
   footer?: ReactNode
 }
 
@@ -157,6 +157,17 @@ function TimelineMoreStep({ hasPrev, hasNext = false, onClick, children }: Timel
           {children}
         </MoreStepContent>
       </button>
+    </li>
+  )
+}
+
+/** A last step that links to more logs, drawn like the fold step. */
+export function TimelineLinkStep({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <li>
+      <a href={href} className={MORE_STEP_CLASS_NAME}>
+        <MoreStepContent hasNext={false}>{children}</MoreStepContent>
+      </a>
     </li>
   )
 }
