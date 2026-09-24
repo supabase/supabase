@@ -191,7 +191,7 @@ const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       ref={ref}
       data-slot="input-group-control"
       className={cn(
-        'flex-1 resize-none rounded-none border border-transparent bg-transparent py-0 shadow-none',
+        'flex-1 resize-none rounded-none border border-transparent bg-transparent pt-2 pb-0 shadow-none',
         'hover:border-transparent focus:border-transparent focus-visible:border-transparent',
         'focus-visible:ring-0 focus-visible:ring-offset-0',
         'aria-[invalid=true]:border-transparent aria-[invalid=true]:bg-transparent',
