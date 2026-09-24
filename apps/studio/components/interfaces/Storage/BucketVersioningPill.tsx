@@ -34,7 +34,9 @@ export const BucketVersioningPill = ({ bucket }: { bucket?: Bucket }) => {
           Versioning
         </Badge>
       </TooltipTrigger>
-      <TooltipContent side="bottom">{tooltip}</TooltipContent>
+      <TooltipContent side="bottom" className="max-w-64">
+        {tooltip}
+      </TooltipContent>
     </Tooltip>
   )
 }
