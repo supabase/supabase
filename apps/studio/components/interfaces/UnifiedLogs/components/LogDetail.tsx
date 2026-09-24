@@ -1,15 +1,16 @@
-import { useParams } from 'common'
+import { useQuery } from '@tanstack/react-query'
+import { useFlag, useParams } from 'common'
 import { Skeleton } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { LogOverview } from '../ServiceFlow/LogOverview'
+import { hasLogOverviewRenderer, LogOverview } from '../ServiceFlow/LogOverview'
 import { getLogDataForMetadataVisibility } from '../ServiceFlowPanel.utils'
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { QuerySearchParamsType } from '../UnifiedLogs.types'
-import { getRawLogData, getRowTimestampMs } from '../UnifiedLogs.utils'
+import { getLogTypeSource, getRawLogData, getRowTimestampMs } from '../UnifiedLogs.utils'
 import { AlertError } from '@/components/ui/AlertError'
-import CopyButton from '@/components/ui/CopyButton'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { RawJsonView } from '@/components/ui/RawJsonView'
+import { unifiedLogAttributesQueryOptions } from '@/data/logs/unified-log-attributes-query'
 import {
   SERVICE_FLOW_TYPES,
   useUnifiedLogInspectionQuery,
@@ -40,9 +41,27 @@ export function LogDetail({
     },
     { enabled: !!serviceFlowType }
   )
+  // Logs without a hand-written overview are grouped from their attributes. Timeline
+  // and compute logs already carry them; the rest are looked up.
+  const isOtel = !!useFlag('otelUnifiedLogs')
+  const canFetchAttributes =
+    isOtel && logsMetadata && !row.metadata && !hasLogOverviewRenderer(row.log_type)
+  const attributesQuery = unifiedLogAttributesQueryOptions({
+    projectRef,
+    logId: row.id,
+    source: getLogTypeSource(row.log_type),
+    logTimestampMs: getRowTimestampMs(row),
+  })
+  const { data: fetchedAttributes } = useQuery({
+    ...attributesQuery,
+    enabled: canFetchAttributes && attributesQuery.enabled,
+  })
+  const attributes = logsMetadata ? (row.metadata ?? fetchedAttributes) : undefined
+
   const isLoading = !!serviceFlowType && isPending
   const enrichedData = data?.result?.[0]
-  const rawData = getLogDataForMetadataVisibility(getRawLogData(enrichedData ?? row), logsMetadata)
+  const baseData = enrichedData ?? (attributes ? { ...row, metadata: attributes } : row)
+  const rawData = getLogDataForMetadataVisibility(getRawLogData(baseData), logsMetadata)
 
   if (tab === 'raw-json') {
     return (
@@ -53,23 +72,7 @@ export function LogDetail({
             <span className="text-sm">Enriching log...</span>
           </div>
         )}
-        <div className="sticky top-2 z-10 -mb-9 flex justify-end px-2 pointer-events-none">
-          <CopyButton
-            iconOnly
-            aria-label="Copy log as JSON"
-            variant="default"
-            text={JSON.stringify(rawData, null, 2)}
-            className="pointer-events-auto"
-          />
-        </div>
-        <CodeBlock
-          language="json"
-          hideCopy
-          wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-          className="rounded-none border-none !overflow-x-visible [&_code]:!leading-tight [&_pre]:!leading-tight"
-        >
-          {JSON.stringify(rawData, null, 2)}
-        </CodeBlock>
+        <RawJsonView data={rawData} copyLabel="Copy log as JSON" />
       </>
     )
   }
@@ -85,6 +88,7 @@ export function LogDetail({
         />
       )}
       <LogOverview
+        attributes={attributes}
         data={row}
         enrichedData={enrichedData}
         rawData={rawData}

@@ -590,3 +590,17 @@ GROUP BY time_bucket
 ORDER BY time_bucket ASC
 `
 }
+
+/** One log's `log_attributes`, looked up by id within its source. */
+export const getLogAttributesQuery = ({
+  logId,
+  source,
+}: {
+  logId: string
+  source: string
+}): SafeLogSqlFragment => safeSql`-- unified logs: log attributes
+SELECT source, log_attributes
+FROM logs
+WHERE id = ${lit(logId)} AND source = ${lit(source)}
+LIMIT 1
+`

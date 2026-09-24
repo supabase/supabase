@@ -1,7 +1,7 @@
 import { type Table as TTable } from '@tanstack/react-table'
 import { cn } from 'ui'
 
-import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
+import { LOG_TYPE_TO_SOURCE, LOG_TYPES_LABELS } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
@@ -74,6 +74,13 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
  * microsecond timestamps and OTEL ISO strings); fall back to the raw
  * `timestamp` value when it's a number (older BQ-style microseconds).
  */
+/** The logs table `source` a list log type reads from, when it maps to exactly one. */
+export function getLogTypeSource(logType: string) {
+  return logType in LOG_TYPE_TO_SOURCE
+    ? LOG_TYPE_TO_SOURCE[logType as keyof typeof LOG_TYPE_TO_SOURCE]
+    : undefined
+}
+
 export function getRowTimestampMs(
   row: { date?: Date | null; timestamp?: number | string | null } | null | undefined
 ): number | null {
