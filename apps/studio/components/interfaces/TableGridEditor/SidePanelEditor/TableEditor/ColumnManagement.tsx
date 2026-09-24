@@ -263,12 +263,12 @@ export const ColumnManagement = ({
               <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className="min-w-0 flex items-center space-x-2">
-              <h5 className="text-xs text-foreground-lighter">Default Value</h5>
+              <h5 className="text-xs text-foreground-lighter">Default value</h5>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="text"
-                    aria-label="Show help for column Default Value"
+                    aria-label="Show help for column Default value"
                     className="w-6.5 px-0"
                     icon={
                       <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />

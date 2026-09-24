@@ -263,7 +263,7 @@ testRunner('table editor', () => {
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await page.getByTestId('table-name-input').fill(tableNameEnum)
     await page.getByTestId('created_at-extra-options').click()
-    await page.getByText('Is Nullable').click()
+    await page.getByText('Is nullable').click()
     await page.getByTestId('created_at-extra-options').click()
     await page.getByRole('button', { name: 'Add column' }).click()
     await page.getByLabel('Column name').nth(3).fill(columnNameEnum)
