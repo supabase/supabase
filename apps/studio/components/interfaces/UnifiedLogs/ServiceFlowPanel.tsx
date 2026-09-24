@@ -8,7 +8,6 @@ import {
   TabsList,
   TabsTrigger,
 } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { LogDetail } from './components/LogDetail'
 import { LogLevelDot } from './components/LogLevelDot'
@@ -18,6 +17,7 @@ import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getEventMessageDisplay, getRawLogData } from './UnifiedLogs.utils'
+import { JsonCodeBlock } from '@/components/ui/JsonCodeBlock'
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -83,14 +83,7 @@ export function ServiceFlowPanel({
               role="region"
               aria-label="Selected logs JSON"
             >
-              <CodeBlock
-                language="json"
-                hideCopy
-                wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-                className="rounded-none border-none !overflow-x-visible [&_code]:!leading-tight [&_pre]:!leading-tight"
-              >
-                {JSON.stringify(selectedJson, null, 2)}
-              </CodeBlock>
+              <JsonCodeBlock>{JSON.stringify(selectedJson, null, 2)}</JsonCodeBlock>
             </div>
           ) : (
             <Tabs

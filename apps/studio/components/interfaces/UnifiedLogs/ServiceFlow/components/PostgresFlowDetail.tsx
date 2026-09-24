@@ -9,7 +9,7 @@ import {
   postgresTransactionFields,
 } from '../config/serviceFlowFields'
 import { BlockFieldConfig } from '../types'
-import { DetailRow } from './shared/DetailRow'
+import { ConfiguredDetailRow } from './shared/ConfiguredDetailRow'
 import { CollapsibleDetailSection } from './shared/DetailSection'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
@@ -21,39 +21,6 @@ interface PostgresFlowDetailProps {
   filterFields: DataTableFilterField<any>[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
   table: Table<any>
-}
-
-const FieldDetailRow = ({
-  config,
-  data,
-  enrichedData,
-  isLoading,
-  filterFields,
-  table,
-}: {
-  config: BlockFieldConfig
-  data: ColumnSchema
-  enrichedData?: Record<string, any>
-  isLoading?: boolean
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
-  filterFields: DataTableFilterField<any>[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
-  table: Table<any>
-}) => {
-  const value = config.getValue(data, enrichedData)
-  const showSkeleton = !!config.requiresEnrichedData && !!isLoading && !value
-
-  return (
-    <DetailRow
-      config={config}
-      level={data.level}
-      value={value}
-      filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
-      filterFields={filterFields}
-      table={table}
-      isLoading={showSkeleton}
-    />
-  )
 }
 
 const POSTGRES_SECTIONS: {
@@ -84,7 +51,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
           defaultOpen={index === 0}
         >
           {section.fields.map((field) => (
-            <FieldDetailRow
+            <ConfiguredDetailRow
               key={field.id}
               config={field}
               data={data}

@@ -2,8 +2,8 @@ import { partition } from 'lodash'
 import { LucideIcon } from 'lucide-react'
 import { memo } from 'react'
 
-import { BlockFieldConfig, BlockFieldProps, ServiceFlowBlockProps } from '../../types'
-import { DetailRow } from './DetailRow'
+import { BlockFieldConfig, ServiceFlowBlockProps } from '../../types'
+import { ConfiguredDetailRow } from './ConfiguredDetailRow'
 import { CollapsibleDetailSection } from './DetailSection'
 
 interface BlockSection {
@@ -25,29 +25,6 @@ export interface BlockConfig {
   icon?: LucideIcon
   primaryFields?: BlockFieldConfig[]
   sections?: (BlockSection | FieldWithSeeMoreSection)[]
-}
-
-const FieldRow = ({
-  config,
-  data,
-  enrichedData,
-  isLoading,
-  filterFields,
-  table,
-}: BlockFieldProps) => {
-  const value = config.getValue(data, enrichedData)
-  const showSkeleton = !!config.requiresEnrichedData && !!isLoading && !value
-  return (
-    <DetailRow
-      config={config}
-      level={data.level}
-      value={value}
-      filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
-      filterFields={filterFields}
-      table={table}
-      isLoading={showSkeleton}
-    />
-  )
 }
 
 export function createBlock(config: BlockConfig) {
@@ -74,7 +51,7 @@ export function createBlock(config: BlockConfig) {
       <>
         <CollapsibleDetailSection title={config.title} icon={config.icon} defaultOpen={defaultOpen}>
           {config.primaryFields?.map((field) => (
-            <FieldRow
+            <ConfiguredDetailRow
               key={field.id}
               config={field}
               data={data}
@@ -87,7 +64,7 @@ export function createBlock(config: BlockConfig) {
           {data.log_type !== 'auth' &&
             seeMoreFieldsSections.map((section) => {
               return [section.primaryField, ...section.additionalFields].map((field) => (
-                <FieldRow
+                <ConfiguredDetailRow
                   key={field.id}
                   config={field}
                   data={data}
@@ -110,7 +87,7 @@ export function createBlock(config: BlockConfig) {
                 defaultOpen={false}
               >
                 {section.fields.map((field) => (
-                  <FieldRow
+                  <ConfiguredDetailRow
                     key={field.id}
                     config={field}
                     data={data}
