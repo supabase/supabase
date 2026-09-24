@@ -171,6 +171,28 @@ describe('FilterBar', () => {
     expect(input).toBeInTheDocument()
   })
 
+  it('lets keyboard users remove a selected filter', async () => {
+    const user = userEvent.setup()
+    const onFilterChange = vi.fn()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'name', operator: '=', value: 'test' }],
+        }}
+        onFilterChange={onFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Remove Name filter' })).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(onFilterChange).toHaveBeenCalledWith(initialFilters)
+  })
+
   it('opens group popover and allows selecting a property', async () => {
     const user = userEvent.setup()
     let currentFilters = initialFilters
