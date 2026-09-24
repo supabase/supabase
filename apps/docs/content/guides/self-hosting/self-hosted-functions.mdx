@@ -209,11 +209,13 @@ For more details, see:
 
 ## Troubleshooting
 
-### 400 "missing function name in request"
+### 404 `NOT_FOUND`
 
-The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello`.
+The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello`. Check that the corresponding directory exists at `volumes/functions/hello/`.
 
-### 500 error on invocation
+### Function invocation errors
+
+Inspect the `sb-error-code` response header and see [Edge Functions error codes](/docs/guides/functions/error-codes) for details about the error.
 
 Check the functions service logs:
 
@@ -221,7 +223,7 @@ Check the functions service logs:
 docker compose logs functions
 ```
 
-Common causes: syntax errors in your function code, invalid imports, or missing dependencies.
+For 503 `BOOT_ERROR`, check for syntax errors, invalid imports, or missing dependencies that prevent the function from starting.
 
 ### 401 "invalid JWT"
 
@@ -263,3 +265,5 @@ To adjust these limits, edit the values in `volumes/functions/main/index.ts` and
 Requests have a separate idle timeout of 150 seconds. This is set by `--user-worker-request-idle-timeout` in the functions service command in `docker-compose.yml`, with the value `150000` in milliseconds. Recreate the functions container after changing this value.
 
 The [Envoy gateway](/docs/guides/self-hosting/self-hosted-envoy#routes) has separate limits of 160 seconds of inactivity and 410 seconds of total request duration.
+
+If you use the optional Kong gateway, `read_timeout` in `volumes/api/kong.yml` is set to `160000` milliseconds, allowing 160 seconds of inactivity between reads from the functions service.
