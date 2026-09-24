@@ -54,7 +54,7 @@ export const ProjectMultiSelect = ({
       <div className="flex items-center justify-between gap-2">
         <p
           id={labelId}
-          className={cn('text-xs', hasFlagged ? 'text-destructive' : 'text-foreground')}
+          className={cn('text-sm', hasFlagged ? 'text-destructive' : 'text-foreground')}
         >
           Projects
         </p>
