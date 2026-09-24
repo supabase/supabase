@@ -43,6 +43,7 @@ import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
 import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
+import { storageKeys } from '@/data/storage/keys'
 import { moveStorageObject } from '@/data/storage/object-move-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -407,6 +408,11 @@ export function createStorageExplorerState({
     refetchAllOpenedFolders: async () => {
       const paths = state.openedFolders.map((folder) => folder.name)
       await state.fetchFoldersByPath({ paths })
+      // The archived overlay is part of what the explorer shows, and an archive or a
+      // restore moves an object across that boundary, so both halves refresh together.
+      await getQueryClient().invalidateQueries({
+        queryKey: storageKeys.archivedObjects(state.projectRef, state.selectedBucket?.id),
+      })
     },
 
     refreshAll: async () => {
