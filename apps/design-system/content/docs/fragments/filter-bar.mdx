@@ -50,6 +50,14 @@ export function FilterDemo() {
 }
 ```
 
+## Variants
+
+The default variant joins filters into a segmented bar. Use the pill variant to show each filter as a separate rounded chip:
+
+```tsx
+<FilterBar variant="pill" className="border-0 bg-transparent overflow-visible" {...props} />
+```
+
 ## API Reference
 
 ### FilterProperty
@@ -95,6 +103,7 @@ interface FilterCondition {
 | onFreeformTextChange | (text: string) => void         | Callback when free-form text changes            |
 | actions              | FilterBarAction[]?             | Optional custom actions to show in the menu     |
 | isLoading            | boolean?                       | If true, dims the bar while work is in progress |
+| variant              | 'default' \| 'pill'?           | Filter appearance. Defaults to 'default'        |
 
 ## Custom actions (e.g. AI)
 
