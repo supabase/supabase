@@ -7,6 +7,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { HomeCard } from './HomeCard'
 import { useAnalyzeNotebook, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import {
   useNotebooksInfiniteQuery,
@@ -19,7 +20,7 @@ export const NotebooksSection = () => {
   const { ref: projectRef } = useParams()
   const { createNotebook } = useCreateNotebook()
 
-  const { data, isPending, isSuccess } = useNotebooksInfiniteQuery({
+  const { data, error, isPending, isError, isSuccess, refetch } = useNotebooksInfiniteQuery({
     projectRef,
     limit: MAX_HOMEPAGE_NOTEBOOKS,
     sort: 'inserted_at',
@@ -49,6 +50,19 @@ export const NotebooksSection = () => {
         </div>
       )}
 
+      {isError && (
+        <AlertError
+          error={error instanceof Error ? error : null}
+          subject="Failed to retrieve notebooks"
+          projectRef={projectRef}
+          additionalActions={
+            <Button variant="default" onClick={() => refetch()}>
+              Retry
+            </Button>
+          }
+        />
+      )}
+
       {isSuccess && notebooks.length === 0 && (
         <EmptyState onCreateNotebook={() => createNotebook()} />
       )}
@@ -74,7 +88,8 @@ function NotebookCard({
   const { analyzeNotebook, isCreating } = useAnalyzeNotebook()
 
   const cellCount = notebook.content?.cells?.length
-  const isEmpty = cellCount === 0
+  // Treat an unknown cell count as empty so Analyze is never offered on a notebook with no cells
+  const isEmpty = !cellCount
 
   return (
     <HomeCard
