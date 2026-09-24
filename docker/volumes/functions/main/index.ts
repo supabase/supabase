@@ -46,6 +46,28 @@ function getFunctionErrorResponse({ code, message, status }: FunctionFailure): R
   )
 }
 
+function handleWorkerResponse(response: Response): Response {
+  if (response.status < 500) return response
+
+  const headers = new Headers(response.headers)
+  headers.set('sb-error-code', RequestErrors.EdgeFunctionError)
+
+  const exposedHeaders = (headers.get('Access-Control-Expose-Headers') ?? '')
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean)
+  if (!exposedHeaders.some((name) => name.toLowerCase() === 'sb-error-code')) {
+    exposedHeaders.push('sb-error-code')
+  }
+  headers.set('Access-Control-Expose-Headers', exposedHeaders.join(', '))
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 function resolveRuntimeError(e: unknown): FunctionFailure {
   // These error classes are supplied by Edge Runtime, rather than stock Deno.
   if (e instanceof Deno.errors.InvalidWorkerCreation) {
@@ -323,7 +345,7 @@ Deno.serve(async (req: Request) => {
       importMapPath,
       envVars,
     })
-    return await worker.fetch(req)
+    return handleWorkerResponse(await worker.fetch(req))
   } catch (e) {
     console.error(e)
     return getFunctionErrorResponse(resolveRuntimeError(e))
