@@ -1596,8 +1596,8 @@ export interface ExplorerBannerCtaButtonClickedEvent {
 }
 
 /**
- * User clicked the button in the Explorer sidebar title bar to temporarily switch to the SQL
- * Editor for snippet access.
+ * User clicked the SQL Editor button in the Explorer sidebar footer to temporarily switch
+ * to the SQL Editor for snippet access.
  *
  * @group Events
  * @source studio
@@ -1610,7 +1610,7 @@ export interface ExplorerTempAccessSqlEditorClickedEvent {
 
 /**
  * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
- * visit originated from the Explorer's temporary switch button.
+ * visit originated from the Explorer sidebar footer.
  *
  * @group Events
  * @source studio
