@@ -5,6 +5,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { cn, KeyboardShortcut } from 'ui'
 
 import { SearchV2Dialog } from './SearchV2Dialog'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface SearchV2TriggerProps {
   className?: string
@@ -13,6 +14,7 @@ interface SearchV2TriggerProps {
 
 export function SearchV2Trigger({ className, placeholder = 'Search...' }: SearchV2TriggerProps) {
   const [open, setOpen] = useState(false)
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   useEffect(() => {
     function openOnKeyDown(event: globalThis.KeyboardEvent) {
@@ -25,6 +27,10 @@ export function SearchV2Trigger({ className, placeholder = 'Search...' }: Search
         event.preventDefault()
 
         setOpen(true)
+        sendTelemetryEvent({
+          action: 'docs_search_v2_opened',
+          properties: { triggerType: 'keyboard_shortcut' },
+        })
       }
     }
 
@@ -33,7 +39,22 @@ export function SearchV2Trigger({ className, placeholder = 'Search...' }: Search
     return () => {
       window.removeEventListener('keydown', openOnKeyDown, { capture: true })
     }
-  }, [])
+  }, [sendTelemetryEvent])
+
+  function handleOpenChange(nextOpen: boolean) {
+    setOpen(nextOpen)
+    if (!nextOpen) {
+      sendTelemetryEvent({ action: 'docs_search_v2_closed' })
+    }
+  }
+
+  function handleTriggerClick() {
+    setOpen(true)
+    sendTelemetryEvent({
+      action: 'docs_search_v2_opened',
+      properties: { triggerType: 'search_input' },
+    })
+  }
 
   return (
     <>
@@ -42,7 +63,7 @@ export function SearchV2Trigger({ className, placeholder = 'Search...' }: Search
         tabIndex={0}
         aria-haspopup="dialog"
         aria-expanded={open}
-        onClick={() => setOpen(true)}
+        onClick={handleTriggerClick}
         className={cn(
           'group cursor-pointer',
           'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
@@ -69,7 +90,7 @@ export function SearchV2Trigger({ className, placeholder = 'Search...' }: Search
           className="hidden md:inline-flex border border-default bg-surface-300 text-foreground-lighter shadow-xs shadow-background-surface-100"
         />
       </button>
-      <SearchV2Dialog open={open} onOpenChange={setOpen} />
+      <SearchV2Dialog open={open} onOpenChange={handleOpenChange} />
     </>
   )
 }
