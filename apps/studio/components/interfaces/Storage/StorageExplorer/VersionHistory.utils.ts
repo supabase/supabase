@@ -1,10 +1,11 @@
+import { MIN_NONCURRENT_DAYS } from '../BucketVersioningFields.lifecycle'
 import type { ExpirationMode } from '../StorageVersioning.constants'
 
 export type VersionFate =
   | { type: 'retained' }
   | { type: 'expires-in'; days: number }
   | { type: 'expires-on-next-upload'; daysRemaining: number }
-  | { type: 'expiring-now' }
+  | { type: 'expiry-due' }
 
 export interface ComputeVersionFateOptions {
   daysOld: number
@@ -36,7 +37,7 @@ export const computeVersionFate = ({
   const daysRemaining = activeExpiryDays - daysOld
 
   if (activeCap === null) {
-    return isAgeExceeded ? { type: 'expiring-now' } : { type: 'expires-in', days: daysRemaining }
+    return isAgeExceeded ? { type: 'expiry-due' } : { type: 'expires-in', days: daysRemaining }
   }
 
   const isCapExceeded = chronoIndex < noncurrentCount - activeCap
@@ -44,10 +45,17 @@ export const computeVersionFate = ({
 
   if (mode === 'and') {
     if (!isCapExceeded) return { type: 'retained' }
-    return isAgeExceeded ? { type: 'expiring-now' } : { type: 'expires-in', days: daysRemaining }
+    return isAgeExceeded ? { type: 'expiry-due' } : { type: 'expires-in', days: daysRemaining }
   }
 
-  if (isAgeExceeded || isCapExceeded) return { type: 'expiring-now' }
+  if (isAgeExceeded) return { type: 'expiry-due' }
+  // The cap rule carries its own `noncurrent_days` floor, so exceeding the cap is not
+  // enough on its own — the version has to be old enough for that rule to touch it.
+  if (isCapExceeded) {
+    return daysOld >= MIN_NONCURRENT_DAYS
+      ? { type: 'expiry-due' }
+      : { type: 'expires-in', days: MIN_NONCURRENT_DAYS - daysOld }
+  }
   if (isAtCapBoundary) return { type: 'expires-on-next-upload', daysRemaining }
   return { type: 'expires-in', days: daysRemaining }
 }
