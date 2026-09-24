@@ -57,13 +57,13 @@ const RESOURCE_WARNING_MESSAGE_CONFIG = {
       warning: {
         title: 'Your project is about to deplete its Disk IO Budget',
         description:
-          'Once exhausted, disk throughput will return to its baseline of {baseline} until the budget resets. Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
+          'Once exhausted, disk throughput will return to its baseline of {baseline}. The budget refills whenever disk IO demand is at or below baseline. Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
       },
       critical: {
         title:
           'Your project has depleted its Disk IO Budget. Disk throughput is at its baseline of {baseline}',
         description:
-          'Throughput will stay at baseline until the budget resets. Upgrade your compute to sustain higher throughput, or use the AI Assistant to identify and optimize disk-intensive queries.',
+          'Throughput stays at baseline until the budget refills. It refills whenever disk IO demand is at or below baseline. Upgrade your compute to sustain higher throughput, or use the AI Assistant to identify and optimize disk-intensive queries.',
       },
     },
     cardContent: {
