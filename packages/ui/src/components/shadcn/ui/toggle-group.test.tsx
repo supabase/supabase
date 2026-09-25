@@ -34,8 +34,6 @@ describe('ToggleGroup', () => {
     const selected = screen.getByRole('radio', { name: 'Data' })
 
     expect(selected).toHaveAttribute('aria-checked', 'true')
-    // No background, border or shadow of its own — those would paint on click, ahead of
-    // the indicator's transition, which is what produced the flash.
     expect(selected).toHaveClass('data-[state=on]:bg-transparent', 'aria-checked:bg-transparent')
     expect(selected).not.toHaveClass(
       'data-[state=on]:bg-accent',
@@ -66,7 +64,6 @@ describe('ToggleGroup', () => {
 
     rerender(renderSegmented({ defaultValue: 'data', tone: 'primary' }))
     expect(container.querySelector('[data-segment-indicator]')).toHaveClass('bg-brand-400')
-    // the items stay neutral whatever the tone
     expect(screen.getByRole('radio', { name: 'Data' })).toHaveClass(
       'data-[state=on]:bg-transparent'
     )
@@ -93,8 +90,6 @@ describe('ToggleGroup', () => {
 
     const active = screen.getByRole('radio', { name: 'Data' })
 
-    // Uncontrolled: Radix owns the value, so swallowing the callback is not enough on its
-    // own — the item has to stay checked too.
     await userEvent.click(active)
     expect(active).toHaveAttribute('aria-checked', 'true')
     await userEvent.click(active)

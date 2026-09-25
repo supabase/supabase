@@ -106,29 +106,20 @@ selected. Give a filter an explicit **All** segment rather than letting deselect
 
 <ComponentPreview name="toggle-group-segmented-filter" peekCode />
 
-### Segmented props
-
-| Prop            | Values                                | Default     | Notes                                                                                                                                                                                                     |
-| --------------- | ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variant`       | `'segmented'`                         | `'default'` | Opts into the segmented treatment: no gaps, no per-item borders, `cursor-pointer`, and an indicator that slides between segments and respects `prefers-reduced-motion`. The other variants are untouched. |
-| `type`          | `'single'`                            |             | Only a single-select group gets the indicator. A `'multiple'` group falls back to items painting their own selected background.                                                                           |
-| `allowDeselect` | `boolean`                             | `true`      | Radix clears the selection when you click the active item, emitting `''`. Set `false`, since a segmented control has no empty state.                                                                      |
-| `tone`          | `'text' \| 'outline' \| 'primary'`    | `'text'`    | `text` is a flat `bg-accent` fill, `outline` adds a container border and a raised bordered indicator, `primary` fills the indicator with brand.                                                           |
-| `size`          | `'tiny' \| 'sm' \| 'default' \| 'lg'` | `'default'` | `tiny` suits a dense toolbar or table footer. Segments hug their labels, so add `className="flex-1"` to each item, plus a width on the root, if you need them equal.                                      |
-| `aria-label`    | `string`                              |             | Required. Describes what is being switched or filtered; the segments name the options, not the axis.                                                                                                      |
-
 ## Props
 
 `ToggleGroup` forwards every prop to the underlying
-[Radix Toggle Group](https://www.radix-ui.com/docs/primitives/components/toggle-group#api-reference),
-and adds the following.
+[Radix Toggle Group](https://www.radix-ui.com/docs/primitives/components/toggle-group#api-reference).
+These are the ones worth knowing about.
 
-| Prop            | Type                                    | Default     | Description                                                               |
-| --------------- | --------------------------------------- | ----------- | ------------------------------------------------------------------------- |
-| `variant`       | `'default' \| 'outline' \| 'segmented'` | `'default'` | Styles the root and every item. Items inherit it through context.         |
-| `size`          | `'tiny' \| 'sm' \| 'default' \| 'lg'`   | `'default'` | Item height and padding. Items inherit it through context.                |
-| `allowDeselect` | `boolean`                               | `true`      | Whether clicking the active item in a `type="single"` group clears it.    |
-| `tone`          | `'outline' \| 'text' \| 'primary'`      | `'text'`    | Button-flavored styling for a segmented group. Ignored by other variants. |
+| Prop            | Type                                    | Default     | Description                                                                                                                                                                                                              |
+| --------------- | --------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `type`          | `'single' \| 'multiple'`                |             | Required by Radix. Only a `'single'` group gets the segmented indicator; a `'multiple'` group falls back to items painting their own background.                                                                         |
+| `variant`       | `'default' \| 'outline' \| 'segmented'` | `'default'` | Styles the root and every item, which inherit it through context. `segmented` drops the gaps and per-item borders in favor of an indicator that slides between segments, respecting `prefers-reduced-motion`.            |
+| `size`          | `'tiny' \| 'sm' \| 'default' \| 'lg'`   | `'default'` | Item height and padding, inherited through context. `tiny` suits a dense toolbar or table footer. Segments hug their labels, so add `className="flex-1"` to each item, plus a width on the root, if you need them equal. |
+| `tone`          | `'text' \| 'outline' \| 'primary'`      | `'text'`    | Segmented only. `text` is a flat `bg-accent` fill, `outline` adds a container border and a raised bordered indicator, `primary` fills the indicator with brand.                                                          |
+| `allowDeselect` | `boolean`                               | `true`      | Whether clicking the active item in a `type="single"` group clears it, emitting `''`. Set `false` for a segmented control, which has no empty state.                                                                     |
+| `aria-label`    | `string`                                |             | Names what is being switched or filtered. The segments name the options, not the axis.                                                                                                                                   |
 
-`variant` and `size` are the shadcn variant axes; `segmented` and `allowDeselect` are the Supabase
-additions. `default` and `outline` are unchanged from shadcn.
+`variant` and `size` are the shadcn variant axes; `segmented`, `tone` and `allowDeselect` are the
+Supabase additions. `default` and `outline` are unchanged from shadcn.

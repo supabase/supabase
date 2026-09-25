@@ -3,19 +3,11 @@
 import { useLayoutEffect, type RefObject } from 'react'
 
 type IndicatorOptions = {
-  /** Selector for the active item, matched against direct children of the list. */
   activeItemSelector?: string
-  /** Selector for the indicator element. The hook is a no-op when it is absent. */
   indicatorSelector?: string
-  /** `dataset` key set on the list once a first measurement has landed. */
   readyFlag?: string
-  /** Custom properties written on the list. */
   leftProperty?: string
   widthProperty?: string
-  /**
-   * Whether to shrink the measurement to the item's text box. True for an underline that
-   * should span the label only, false for a fill that should cover the whole item.
-   */
   insetByPadding?: boolean
 }
 
