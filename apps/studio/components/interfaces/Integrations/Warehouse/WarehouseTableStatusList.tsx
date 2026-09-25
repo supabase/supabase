@@ -1,5 +1,17 @@
 import dayjs from 'dayjs'
-import { Badge, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
@@ -11,15 +23,15 @@ import {
 } from 'ui-patterns/PageSection'
 
 import type { WarehouseSetupTable } from './Warehouse.utils'
+import { StateDot, type StateDotVariant } from '@/components/ui/StateDot'
 import type { WarehouseSetupStatusResponse } from '@/data/warehouse/warehouse-setup-status-query'
-import { formatBytes } from '@/lib/helpers'
 
-const TABLE_STATE_BADGE: Record<
+const TABLE_STATE: Record<
   WarehouseSetupTable['state'],
-  { label: string; variant: 'warning' | 'success' | 'destructive' }
+  { label: string; variant: StateDotVariant; isPulsing?: boolean }
 > = {
-  syncing: { label: 'Backfilling', variant: 'warning' },
-  live: { label: 'Synced', variant: 'success' },
+  syncing: { label: 'Backfilling', variant: 'warning', isPulsing: true },
+  live: { label: 'Live', variant: 'success' },
   error: { label: 'Error', variant: 'destructive' },
 }
 
@@ -35,7 +47,7 @@ const getLagLabel = (lagMs: number) => {
 }
 
 const TableLag = ({ table }: { table: WarehouseSetupTable }) => {
-  if (table.lag_ms === undefined) return null
+  if (table.state !== 'live' || table.lag_ms === undefined) return null
 
   const label = getLagLabel(table.lag_ms)
   if (!table.last_synced_at) {
@@ -61,40 +73,51 @@ interface WarehouseTableStatusListProps {
 const WarehouseTableStatusList = ({ tables }: WarehouseTableStatusListProps) => {
   return (
     <Card>
-      <CardContent className="p-0 divide-y">
-        {tables.map((table) => {
-          const badge = TABLE_STATE_BADGE[table.state]
-          return (
-            <div
-              key={`${table.schema}.${table.name}`}
-              className="flex items-center gap-4 px-3 py-2.5"
-            >
-              <span className="flex-1 truncate text-sm">
-                <span className="text-foreground-lighter">{table.schema}.</span>
-                <span className="text-foreground">{table.name}</span>
-              </span>
-              <TableLag table={table} />
-              {table.warehouse_size_bytes !== undefined && (
-                <span className="text-sm text-foreground-light tabular-nums">
-                  {formatBytes(table.warehouse_size_bytes)}
-                </span>
-              )}
-              <Badge variant={badge.variant}>{badge.label}</Badge>
-            </div>
-          )
-        })}
-        {tables.length === 0 && (
-          <p className="px-3 py-2.5 text-sm text-foreground-lighter">
-            No tables are being copied yet.
-          </p>
-        )}
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Table</TableHead>
+              <TableHead className="w-48">Lag</TableHead>
+              <TableHead className="w-36">Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tables.map((table) => {
+              const state = TABLE_STATE[table.state]
+              return (
+                <TableRow key={`${table.schema}.${table.name}`}>
+                  <TableCell>
+                    <span className="text-foreground-lighter">{table.schema}.</span>
+                    <span className="text-foreground">{table.name}</span>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <TableLag table={table} />
+                  </TableCell>
+                  <TableCell>
+                    <StateDot variant={state.variant} isPulsing={state.isPulsing}>
+                      {state.label}
+                    </StateDot>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+            {tables.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} className="text-foreground-lighter">
+                  No tables are being copied yet.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   )
 }
 
 export const WarehouseReplicatedTablesSection = ({ tables }: WarehouseTableStatusListProps) => (
-  <PageSection className="pt-0!">
+  <PageSection className="pt-5!">
     <PageSectionMeta>
       <PageSectionSummary>
         <PageSectionTitle>Status</PageSectionTitle>
@@ -119,7 +142,7 @@ export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressP
       : `Backfilling selected tables. ${syncedTableCount} of ${status.tables.length} tables synced.`
 
   return (
-    <PageSection className="pt-0!">
+    <PageSection className="pt-5!">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Status</PageSectionTitle>

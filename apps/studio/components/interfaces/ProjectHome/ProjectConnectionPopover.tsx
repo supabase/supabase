@@ -225,7 +225,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                   <div
                     className={cn(
                       'absolute right-2 top-1/2 -translate-y-1/2 text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100',
-                      copiedItem === item.label && 'opacity-100 text-brand'
+                      copiedItem === item.label && 'opacity-100 text-primary'
                     )}
                   >
                     {copiedItem === item.label ? <Check size={14} /> : <Copy size={14} />}

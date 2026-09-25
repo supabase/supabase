@@ -343,7 +343,7 @@ const RENDER_CRITICAL_ATTRIBUTES = new Set([
  * from the SQL editor and the data grid. Gated on the value so the attribute cannot
  * carry anything else.
  */
-const THEME_VALUES = new Set(['dark', 'light', 'classic-dark', 'system'])
+const THEME_VALUES = new Set(['dark', 'light', 'system'])
 
 /**
  * SVG presentation attributes that take either a plain value (`fill="#fff"`) or a

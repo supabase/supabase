@@ -33,6 +33,7 @@ import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -51,7 +52,6 @@ export interface AssistantChatHeaderProps {
   isChatLoading: boolean
   showMetadataWarning: boolean
   updatedOptInSinceMCP: boolean
-  isHipaaProjectDisallowed: boolean
   aiOptInLevel: 'disabled' | 'schema' | 'full' | string | undefined
 }
 
@@ -110,7 +110,7 @@ export const AssistantChat = ({
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   // Whether attached queries are sent at all. One definition, shared by the chat form
   // (which folds them into the message text) and the message metadata (which states
   // whether any of them was a logs query), so the two can't disagree.
@@ -173,6 +173,8 @@ export const AssistantChat = ({
     regenerate,
   } = useChat<MessageType>({
     id: chatId,
+    // Batch token updates without throttling the SDK's tool execution or approval state.
+    throttle: 50,
     ...(chatInstance ? { chat: chatInstance } : {}),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onError: onErrorChat,
@@ -187,32 +189,36 @@ export const AssistantChat = ({
   const isChatInputDisabled =
     !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
 
+  const messagesRef = useLatest(chatMessages)
+  const isChatLoadingRef = useLatest(isChatLoading)
+
   const branchedFrom = currentChat?.branchedFrom
   const branchedConversation = branchedFrom ? snap.chats[branchedFrom.chatId] : undefined
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
-      // Find the message index in current chatMessages
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      const messages = messagesRef.current
+      const messageIndex = messages.findIndex((msg) => msg.id === messageId)
       if (messageIndex === -1) return
 
-      if (isChatLoading) stop()
+      if (isChatLoadingRef.current) stop()
 
-      snap.deleteMessagesAfter(messageId, { includeSelf: true, chatId })
+      state.deleteMessagesAfter(messageId, { includeSelf: true, chatId })
 
-      const updatedMessages = chatMessages.slice(0, messageIndex)
+      const updatedMessages = messages.slice(0, messageIndex)
       setMessages(updatedMessages)
     },
-    [snap, setMessages, chatMessages, isChatLoading, stop, chatId]
+    [state, setMessages, messagesRef, isChatLoadingRef, stop, chatId]
   )
 
   const editMessage = useCallback(
     (messageId: string) => {
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      const messages = messagesRef.current
+      const messageIndex = messages.findIndex((msg) => msg.id === messageId)
       if (messageIndex === -1) return
 
       // Target message
-      const messageToEdit = chatMessages[messageIndex]
+      const messageToEdit = messages[messageIndex]
 
       // Activate editing mode
       setEditingMessageId(messageId)
@@ -234,7 +240,7 @@ export const AssistantChat = ({
         }
       }, 100)
     },
-    [chatMessages, setValue]
+    [messagesRef, setValue]
   )
 
   const cancelEdit = useCallback(() => {
@@ -252,7 +258,7 @@ export const AssistantChat = ({
       try {
         const result = await rateMessage({
           rating,
-          messages: chatMessages,
+          messages: messagesRef.current,
           messageId,
           projectRef: project.ref,
           orgSlug: selectedOrganization.slug,
@@ -275,7 +281,7 @@ export const AssistantChat = ({
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state, chatId]
+    [messagesRef, project?.ref, selectedOrganization?.slug, rateMessage, track, state, chatId]
   )
 
   const isContextExceededError =
@@ -283,13 +289,15 @@ export const AssistantChat = ({
     (error.message?.includes('context_length_exceeded') ||
       error.message?.includes('exceeds the context window'))
 
+  const editedMessageIndex = editingMessageId
+    ? chatMessages.findIndex((message) => message.id === editingMessageId)
+    : -1
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message, index) => {
         const isBeingEdited = editingMessageId === message.id
-        const isAfterEditedMessage = editingMessageId
-          ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
-          : false
+        const isAfterEditedMessage = !!editingMessageId && editedMessageIndex < index
         const isLastMessage = index === chatMessages.length - 1
 
         return (
@@ -335,6 +343,7 @@ export const AssistantChat = ({
       editMessage,
       cancelEdit,
       editingMessageId,
+      editedMessageIndex,
       chatStatus,
       addToolApprovalResponse,
       handleRateMessage,
@@ -517,7 +526,9 @@ export const AssistantChat = ({
             onStop={() => {
               stop()
               // to save partial responses from the AI
-              const lastMessage = chatMessages[chatMessages.length - 1]
+              // Read the live SDK state: the rendered snapshot may trail the stream by 50ms.
+              const messages = chatInstance?.messages ?? chatMessages
+              const lastMessage = messages[messages.length - 1]
               if (lastMessage && lastMessage.role === 'assistant') {
                 state.updateMessage(lastMessage, chatId)
               }
@@ -559,12 +570,11 @@ export const AssistantChat = ({
           isChatLoading,
           showMetadataWarning,
           updatedOptInSinceMCP,
-          isHipaaProjectDisallowed,
           aiOptInLevel,
         })}
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
+            <ConversationContent className="w-full py-8 mb-10">
               {renderedMessages}
               <div className="w-full max-w-3xl mx-auto">
                 {error && (

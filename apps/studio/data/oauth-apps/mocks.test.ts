@@ -2,18 +2,19 @@ import { describe, expect, test } from 'vitest'
 
 import {
   getMockOAuthAppGrants,
+  getMockOAuthApprovals,
   getMockOAuthAppsAuthorizeApproveResult,
   getMockOAuthAppsAuthorizeIdentity,
   getMockOAuthAppsAuthorizeOrganizationProjects,
   getMockOAuthAppsAuthorizeRequest,
-  getMockOAuthAppsOverview,
-  getMockOAuthBlockedApps,
+  getMockOAuthAppsPreflightValidation,
   getMockOAuthOrgAppDetails,
+  getMockOAuthOwnGrants,
   OAUTH_APPS_MOCK_SCENARIOS,
   READ_ONLY_ROLE,
   USE_MOCKS,
 } from './mocks'
-import { getFailedProjects, isRoleValidationFailure } from './types'
+import { getFailedProjects, isPreflightValidationFailure, isRoleValidationFailure } from './types'
 
 const NORTHWIND_SLUG = 'northwind-traders'
 const TAILSPIN_SLUG = 'tailspin-toys'
@@ -66,7 +67,7 @@ describe('oauth-apps mocks', () => {
     expect(kinds).toEqual(new Set(['organization_bound', 'member_bound']))
   })
 
-  test('a member-bound app exists for every project scoping mode', () => {
+  test('a member-bound app exists both with and without project scoping', () => {
     const modes = new Set(
       scenarios
         .map((scenario) => getMockOAuthAppsAuthorizeRequest(scenario))
@@ -74,15 +75,15 @@ describe('oauth-apps mocks', () => {
         .map((request) => request.project_scoping_mode)
     )
 
-    expect(modes).toEqual(new Set(['off', 'optional', 'required']))
+    expect(modes).toEqual(new Set([true, false]))
   })
 
-  test('a dynamic client has a fixture', () => {
-    const dynamic = scenarios.filter(
-      (scenario) => getMockOAuthAppsAuthorizeRequest(scenario).registration_type === 'dynamic'
-    )
+  test('a DCR-registered app is forced org-bound and unscoped', () => {
+    const dynamic = getMockOAuthAppsAuthorizeRequest(OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient)
 
-    expect(dynamic.length).toBeGreaterThan(0)
+    expect(dynamic.registration_type).toBe('dynamic')
+    expect(dynamic.grant_kind).toBe('organization_bound')
+    expect(dynamic.project_scoping_mode).toBe(false)
   })
 
   test('app_name mirrors the live name field', () => {
@@ -100,28 +101,8 @@ describe('oauth-apps mocks', () => {
 })
 
 describe('org app details fixtures', () => {
-  test('an unknown pair degrades to an unblocked, grant-less default', () => {
-    const details = getMockOAuthOrgAppDetails('not-an-org', 'not-an-app')
-
-    expect(details.blocked_reason).toBeNull()
-    expect(details.existing_grant).toBeNull()
-    expect(details.organization_settings.require_project_scoping).toBe(false)
-  })
-
-  test('every blocked reason has a fixture', () => {
-    expect(getMockOAuthOrgAppDetails('fabrikam-industries', 'vercel-org-wide').blocked_reason).toBe(
-      'org_requires_project_scoping'
-    )
-    expect(getMockOAuthOrgAppDetails('litware-inc', 'vercel').blocked_reason).toBe(
-      'app_blocked_for_organization'
-    )
-  })
-
-  test('an org that requires project scoping does not block a project-scoped app', () => {
-    const details = getMockOAuthOrgAppDetails('fabrikam-industries', 'vercel')
-
-    expect(details.organization_settings.require_project_scoping).toBe(true)
-    expect(details.blocked_reason).toBeNull()
+  test('an unknown pair degrades to a grant-less default', () => {
+    expect(getMockOAuthOrgAppDetails('not-an-org', 'not-an-app').existing_grant).toBeNull()
   })
 
   test('the re-consent scenario carries an existing grant with a stale and a live ref', () => {
@@ -140,9 +121,8 @@ describe('org app details fixtures', () => {
   test('the existing grant scopes differ from the scopes the app requests today', () => {
     const request = getMockOAuthAppsAuthorizeRequest(OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent)
     const grant = getMockOAuthOrgAppDetails(TAILSPIN_SLUG, request.app_id).existing_grant
-    const requestedScopes = request.scopes.flatMap((group) => group.scopes).sort()
 
-    expect([...(grant?.approved_scopes ?? [])].sort()).not.toEqual(requestedScopes)
+    expect([...(grant?.approved_scopes ?? [])].sort()).not.toEqual([...request.scopes].sort())
   })
 
   test('an existing grant without project refs has a fixture', () => {
@@ -156,9 +136,61 @@ describe('org app details fixtures', () => {
   })
 })
 
+describe('preflight validation fixtures', () => {
+  test('an unknown org or app degrades to success', () => {
+    expect(
+      isPreflightValidationFailure(getMockOAuthAppsPreflightValidation('not-an-org', 'vercel'))
+    ).toBe(false)
+    expect(
+      isPreflightValidationFailure(
+        getMockOAuthAppsPreflightValidation(NORTHWIND_SLUG, 'not-an-app')
+      )
+    ).toBe(false)
+  })
+
+  test('an org-bound app fails the organization branch for a non-admin', () => {
+    const result = getMockOAuthAppsPreflightValidation(NORTHWIND_SLUG, 'kemal-bot')
+
+    if (!isPreflightValidationFailure(result)) throw new Error('expected a preflight failure')
+    expect(result.validation.scope_target).toBe('organization')
+    if (result.validation.scope_target !== 'organization') return
+    expect(result.validation.role.id).toBe(READ_ONLY_ROLE.id)
+    expect('failed_scopes' in result.validation).toBe(false)
+  })
+
+  test('an org-bound app passes the organization branch for an admin', () => {
+    const result = getMockOAuthAppsPreflightValidation(TAILSPIN_SLUG, 'kemal-bot')
+
+    expect(isPreflightValidationFailure(result)).toBe(false)
+  })
+
+  test('a member-bound app fails the all-projects branch for a read-only member', () => {
+    const result = getMockOAuthAppsPreflightValidation(NORTHWIND_SLUG, 'vercel')
+
+    if (!isPreflightValidationFailure(result)) throw new Error('expected a preflight failure')
+    expect(result.validation.scope_target).toBe('all_projects')
+    if (result.validation.scope_target !== 'all_projects') return
+    expect(result.validation.role.id).toBe(READ_ONLY_ROLE.id)
+    expect(result.validation.failed_scopes.length).toBeGreaterThan(0)
+  })
+
+  test('a member-bound app passes the all-projects branch for an admin', () => {
+    const result = getMockOAuthAppsPreflightValidation(TAILSPIN_SLUG, 'vercel')
+
+    expect(isPreflightValidationFailure(result)).toBe(false)
+  })
+
+  test('preflight never returns a project-level failure', () => {
+    const result = getMockOAuthAppsPreflightValidation(NORTHWIND_SLUG, 'vercel')
+
+    if (!isPreflightValidationFailure(result)) throw new Error('expected a preflight failure')
+    expect(result.validation.scope_target).not.toBe('projects')
+  })
+})
+
 describe('post-submit role validation', () => {
-  const approve = (authId: string, projectRefs: string[] | undefined) =>
-    getMockOAuthAppsAuthorizeApproveResult(authId, { slug: NORTHWIND_SLUG, projectRefs })
+  const approve = (authId: string, slug: string, projectRefs: string[] | undefined) =>
+    getMockOAuthAppsAuthorizeApproveResult(authId, { slug, projectRefs })
 
   const readOnlyRefs = () =>
     getMockOAuthAppsAuthorizeOrganizationProjects(NORTHWIND_SLUG)
@@ -176,7 +208,11 @@ describe('post-submit role validation', () => {
   })
 
   test('rejects read-only projects when write scopes are requested', () => {
-    const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, readOnlyRefs())
+    const result = approve(
+      OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation,
+      NORTHWIND_SLUG,
+      readOnlyRefs()
+    )
 
     if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
 
@@ -192,10 +228,14 @@ describe('post-submit role validation', () => {
   })
 
   test('every failed scope is one the app actually requested', () => {
-    const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, readOnlyRefs())
+    const result = approve(
+      OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation,
+      NORTHWIND_SLUG,
+      readOnlyRefs()
+    )
     const requestedScopes = getMockOAuthAppsAuthorizeRequest(
       OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation
-    ).scopes.flatMap((group) => group.scopes)
+    ).scopes
 
     if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
 
@@ -205,7 +245,7 @@ describe('post-submit role validation', () => {
   })
 
   test('rejects only the read-only refs out of a mixed selection', () => {
-    const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, [
+    const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, NORTHWIND_SLUG, [
       ...readOnlyRefs(),
       ...writableRefs(),
     ])
@@ -222,33 +262,57 @@ describe('post-submit role validation', () => {
   test('approves a selection of writable projects', () => {
     expect(
       isRoleValidationFailure(
-        approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, writableRefs())
+        approve(OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation, NORTHWIND_SLUG, writableRefs())
       )
     ).toBe(false)
   })
 
   test('scenarios outside the role-validated set approve read-only projects', () => {
     expect(
-      isRoleValidationFailure(approve(OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper, readOnlyRefs()))
+      isRoleValidationFailure(
+        approve(OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper, NORTHWIND_SLUG, readOnlyRefs())
+      )
     ).toBe(false)
   })
 
-  test('an org-wide approval by a read-only member fails on the organization branch', () => {
-    const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects, undefined)
+  test('a member-bound, all-projects approval by a read-only member fails on the all_projects branch', () => {
+    const result = approve(OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects, NORTHWIND_SLUG, undefined)
 
     if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
 
-    expect(result.validation.scope_target).toBe('organization')
-    if (result.validation.scope_target !== 'organization') return
+    expect(result.validation.scope_target).toBe('all_projects')
+    if (result.validation.scope_target !== 'all_projects') return
     expect(result.validation.role.id).toBe(READ_ONLY_ROLE.id)
     expect(result.validation.failed_scopes.length).toBeGreaterThan(0)
     expect(getFailedProjects(result)).toEqual([])
   })
 
-  test('an org-wide approval by a writable member succeeds', () => {
-    const result = getMockOAuthAppsAuthorizeApproveResult(
+  test('a member-bound, all-projects approval by a writable member succeeds', () => {
+    const result = approve(
       OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects,
-      { slug: 'fabrikam-industries', projectRefs: undefined }
+      'fabrikam-industries',
+      undefined
+    )
+
+    expect(isRoleValidationFailure(result)).toBe(false)
+  })
+
+  test('an org-bound approval by a non-admin fails on the organization branch, without failed_scopes', () => {
+    const result = approve(OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide, NORTHWIND_SLUG, undefined)
+
+    if (!isRoleValidationFailure(result)) throw new Error('expected a role validation failure')
+
+    expect(result.validation.scope_target).toBe('organization')
+    if (result.validation.scope_target !== 'organization') return
+    expect(result.validation.role.name).toBe('Developer')
+    expect('failed_scopes' in result.validation).toBe(false)
+  })
+
+  test('an org-bound approval by an admin succeeds', () => {
+    const result = approve(
+      OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide,
+      'fabrikam-industries',
+      undefined
     )
 
     expect(isRoleValidationFailure(result)).toBe(false)
@@ -256,47 +320,22 @@ describe('post-submit role validation', () => {
 })
 
 describe('authorized apps overview fixtures', () => {
-  test('both statuses the table renders have a fixture', () => {
-    const statuses = new Set(getMockOAuthAppsOverview().data.map((app) => app.status))
+  test('an app with an organization grant has a fixture', () => {
+    const withOrgGrant = getMockOAuthApprovals().data.find((app) => app.org_grant !== null)
 
-    expect(statuses).toEqual(new Set(['active', 'legacy']))
-  })
-
-  test('the legacy app carries an organization grant', () => {
-    const legacy = getMockOAuthAppsOverview().data.find((app) => app.status === 'legacy')
-
-    expect(legacy?.org_grant).not.toBeNull()
-  })
-
-  test('a singular and a plural grant count both have a fixture', () => {
-    const counts = getMockOAuthAppsOverview().data.map((app) => app.member_grant_count)
-
-    expect(counts).toContain(1)
-    expect(counts.some((count) => count > 1)).toBe(true)
+    expect(withOrgGrant).toBeDefined()
   })
 
   test('app ids are unique so the table can key rows on them', () => {
-    const apps = getMockOAuthAppsOverview().data
+    const apps = getMockOAuthApprovals().data
 
     expect(new Set(apps.map((app) => app.id)).size).toBe(apps.length)
   })
 })
 
-describe('blocked apps fixtures', () => {
-  test('lists at least one blocked app with who blocked it', () => {
-    const blocked = getMockOAuthBlockedApps().data
-
-    expect(blocked.length).toBeGreaterThan(0)
-    blocked.forEach((app) => {
-      expect(app.blocked_at).toBeTruthy()
-      expect(app.blocked_by.email).toBeTruthy()
-    })
-  })
-})
-
 describe('app grants fixtures', () => {
   test('every app in the overview resolves a grant list', () => {
-    getMockOAuthAppsOverview().data.forEach((app) => {
+    getMockOAuthApprovals().data.forEach((app) => {
       expect(Array.isArray(getMockOAuthAppGrants(app.id).data)).toBe(true)
     })
   })
@@ -305,28 +344,46 @@ describe('app grants fixtures', () => {
     expect(getMockOAuthAppGrants('not-an-app').data).toEqual([])
   })
 
-  test('an organization-bound grant has no user and no project refs', () => {
-    const grants = getMockOAuthAppsOverview().data.flatMap(
-      (app) => getMockOAuthAppGrants(app.id).data
-    )
+  test('an organization-bound grant has no user and no projects', () => {
+    const grants = getMockOAuthApprovals().data.flatMap((app) => getMockOAuthAppGrants(app.id).data)
     const orgBound = grants.filter((grant) => grant.kind === 'organization_bound')
 
     expect(orgBound.length).toBeGreaterThan(0)
     orgBound.forEach((grant) => {
       expect(grant.user).toBeNull()
-      expect(grant.project_refs).toBeNull()
+      expect(grant.projects).toBeNull()
     })
   })
 
-  test('member-bound grants carry a user', () => {
-    const grants = getMockOAuthAppsOverview().data.flatMap(
-      (app) => getMockOAuthAppGrants(app.id).data
-    )
+  test('member-bound grants carry a user and hydrated projects', () => {
+    const grants = getMockOAuthApprovals().data.flatMap((app) => getMockOAuthAppGrants(app.id).data)
     const memberBound = grants.filter((grant) => grant.kind === 'member_bound')
 
     expect(memberBound.length).toBeGreaterThan(0)
     memberBound.forEach((grant) => {
       expect(grant.user?.email).toBeTruthy()
+      expect(grant.projects?.length).toBeGreaterThan(0)
+      grant.projects?.forEach((project) => {
+        expect(project.ref).toBeTruthy()
+        expect(project.name).toBeTruthy()
+      })
+    })
+  })
+})
+
+describe('own grants fixtures', () => {
+  test("lists at least one grant across the member's orgs", () => {
+    const grants = getMockOAuthOwnGrants().data
+
+    expect(grants.length).toBeGreaterThan(0)
+    grants.forEach((grant) => {
+      expect(grant.app.name).toBeTruthy()
+      expect(grant.organization.slug).toBeTruthy()
+      expect(grant.approved_scopes.length).toBeGreaterThan(0)
+      grant.projects?.forEach((project) => {
+        expect(project.ref).toBeTruthy()
+        expect(project.name).toBeTruthy()
+      })
     })
   })
 })

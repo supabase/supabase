@@ -2,7 +2,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
+import DataGrid, {
+  Column,
+  RenderCellProps,
+  RenderRowProps,
+  Row,
+  useRowSelection,
+} from 'react-data-grid'
 import { toast } from 'sonner'
 import {
   Button,
@@ -72,6 +78,46 @@ interface Props {
   columnRenderers?: Column<LogData>[]
 }
 type LogMap = { [id: string]: LogData }
+
+/**
+ * Checkbox cell for the multi-select column. Reads and writes the grid's own row
+ * selection, which gives us react-data-grid's native shift-click range selection.
+ */
+const LogSelectCell = ({ row }: RenderCellProps<LogData>) => {
+  const { isRowSelected, onRowSelectionChange } = useRowSelection()
+
+  const handleSelect = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onRowSelectionChange({ row, checked: !isRowSelected, isShiftClick: e.shiftKey })
+  }
+
+  return (
+    <div
+      className="absolute group inset-0 flex justify-center px-2 items-center cursor-pointer"
+      // Prevent a shift-click from starting a browser text selection across rows
+      onMouseDown={(e) => {
+        if (e.shiftKey) e.preventDefault()
+      }}
+      onClick={handleSelect}
+    >
+      <Checkbox
+        className="group-hover:border-foreground-muted"
+        checked={isRowSelected}
+        // use onClick instead of onCheckedChange so the shift key is available for range selection
+        onClick={handleSelect}
+      />
+    </div>
+  )
+}
+
+const checkboxColumn: Column<LogData> = {
+  key: 'multi-select',
+  name: '',
+  width: 32,
+  maxWidth: 32,
+  minWidth: 32,
+  renderCell: (props) => <LogSelectCell {...props} />,
+}
 
 /**
  * Logs table view with focus side panel
@@ -188,44 +234,13 @@ export const LogTable = ({
     [logDataRows, selectedRows, getRowKey]
   )
 
-  const checkboxColumn: Column<LogData> = {
-    key: 'multi-select',
-    name: '',
-    width: 32,
-    maxWidth: 32,
-    minWidth: 32,
-    renderCell: ({ row }) => {
-      const key = getRowKey(row)
-      const toggle = () => {
-        const next = new Set(selectedRows)
-        if (next.has(key)) {
-          next.delete(key)
-        } else {
-          next.add(key)
-        }
-        setSelectedRows(next)
-        if (next.size > 0) {
-          setSelectedRow(null)
-          onSelectedLogChange?.(null)
-        }
-      }
-      return (
-        <div
-          className="absolute group inset-0 flex justify-center px-2 items-center cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation()
-            toggle()
-          }}
-        >
-          <Checkbox
-            className="group-hover:border-foreground-muted"
-            checked={selectedRows.has(key)}
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            onCheckedChange={toggle}
-          />
-        </div>
-      )
-    },
+  const handleSelectedRowsChange = (nextSelectedRows: Set<string>) => {
+    setSelectedRows(nextSelectedRows)
+    // Checking a row switches from the single-row side panel to multi-select
+    if (nextSelectedRows.size > 0) {
+      setSelectedRow(null)
+      onSelectedLogChange?.(null)
+    }
   }
 
   const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
@@ -310,7 +325,6 @@ export const LogTable = ({
         <Row
           key={key}
           {...props}
-          isRowSelected={false}
           selectedCellIdx={undefined}
           onClick={handleClick}
           onContextMenu={(e) => handleRowContextMenu(e, props.row)}
@@ -581,9 +595,7 @@ export const LogTable = ({
                 onCopy={handleCopySelectedRows}
                 queryType={queryType}
                 sqlQuery={sqlQuery}
-                onClear={() => {
-                  setSelectedRows(new Set())
-                }}
+                onClear={() => setSelectedRows(new Set())}
               />
             </div>
             <ContextMenu modal={false}>
@@ -629,11 +641,9 @@ export const LogTable = ({
                 )
               }}
               rows={logDataRows}
-              rowKeyGetter={(r) => {
-                if (!hasId) return JSON.stringify(r)
-                const row = r as LogData
-                return row.id
-              }}
+              rowKeyGetter={getRowKey}
+              selectedRows={selectedRows}
+              onSelectedRowsChange={handleSelectedRowsChange}
               renderers={{
                 renderRow: RowRenderer,
                 noRowsFallback: !isLoading ? (

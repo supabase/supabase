@@ -5,44 +5,38 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import {
   FilterBar,
   FilterCondition,
+  type CustomOptionProps,
   type FilterBarHandle,
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
-import { isLogsFilterColumnValue } from '../UnifiedLogs.filters'
 import {
   buildColumnFilterValues,
+  buildFilterGroup,
   buildFilterProperties,
   getUserFilterValue,
+  parseTimeRange,
+  serializeTimeRange,
+  TIME_RANGE_PROPERTY,
   USER_PROPERTY,
 } from './LogsFilterBar.utils'
 import { searchAuthUsers } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
+import { DataTableFilterTimerange } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterTimerange'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { UUID_REGEX } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const buildFilterGroup = (
-  columnFilters: { id: string; value: unknown }[],
-  filterableNames: Set<string>
-): FilterGroup => {
-  const conditions: FilterCondition[] = []
-  for (const { id, value } of columnFilters) {
-    // Non-timerange column filter values are always the wrapped `{ operator, values }`
-    // shape; skip anything else (e.g. the `date` timerange brush, which isn't in
-    // filterableNames, or an unexpected shape).
-    if (!filterableNames.has(id) || !isLogsFilterColumnValue(value)) continue
-    for (const v of value.values) {
-      conditions.push({
-        propertyName: id,
-        value: v as FilterCondition['value'],
-        operator: value.operator,
-      })
-    }
-  }
-  return { logicalOperator: 'AND', conditions }
-}
+const TimeRangeOption = ({ onChange }: CustomOptionProps) => (
+  <DataTableFilterTimerange
+    label="Time range"
+    value={TIME_RANGE_PROPERTY}
+    type="timerange"
+    variant="inline"
+    onChange={(range) => onChange(serializeTimeRange(range))}
+  />
+)
 
 export const LogsFilterBar = () => {
   const { ref: projectRef } = useParams()
@@ -74,6 +68,7 @@ export const LogsFilterBar = () => {
   const filterProperties = buildFilterProperties({
     fields: filterFields,
     userOptions: searchUserOptions,
+    timeRangeOptions: { component: TimeRangeOption },
   })
 
   const withUserCondition = (group: FilterGroup): FilterGroup => {
@@ -96,6 +91,14 @@ export const LogsFilterBar = () => {
     withUserCondition(buildFilterGroup(columnFilters, columnBackedNames))
   )
 
+  const hasTimeRangeFilter = filters.conditions.some(
+    (condition) => 'propertyName' in condition && condition.propertyName === TIME_RANGE_PROPERTY
+  )
+  const filterPropertiesWithAvailability = filterProperties.map((property) => ({
+    ...property,
+    isAvailable: property.name !== TIME_RANGE_PROPERTY || !hasTimeRangeFilter,
+  }))
+
   // Read latest values without making the effect depend on their (per-render) identity.
   const syncFromColumnFilters = useEffectEvent(() => {
     setFilters(withUserCondition(buildFilterGroup(columnFilters, columnBackedNames)))
@@ -116,6 +119,13 @@ export const LogsFilterBar = () => {
     )
     if (!isValid) return
 
+    const timeRangeCondition = (next.conditions as FilterCondition[]).find(
+      (condition) => condition.propertyName === TIME_RANGE_PROPERTY
+    )
+    const timeRange = parseTimeRange(timeRangeCondition?.value)
+    if (timeRangeCondition && !timeRange) return
+
+    table.getColumn(TIME_RANGE_PROPERTY)?.setFilterValue(timeRange)
     applyUser(getUserFilterValue(next.conditions as FilterCondition[]))
 
     const columnFilterValues = buildColumnFilterValues(next.conditions as FilterCondition[])
@@ -123,9 +133,9 @@ export const LogsFilterBar = () => {
       table.getColumn(name)?.setFilterValue(value)
     }
 
-    // Only clear filters owned by this bar — leaves externally-set filters
-    // (e.g. the timeline date range) untouched.
+    // Only clear filters owned by this bar.
     const nextNames = new Set(columnFilterValues.keys())
+    if (timeRange) nextNames.add(TIME_RANGE_PROPERTY)
     const filtersToRemove = table
       .getState()
       .columnFilters.filter((x) => columnBackedNames.has(x.id) && !nextNames.has(x.id))
@@ -144,7 +154,7 @@ export const LogsFilterBar = () => {
       variant="pill"
       freeformDefaultProperty="event_message"
       className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"
-      filterProperties={filterProperties}
+      filterProperties={filterPropertiesWithAvailability}
       freeformText={freeformText}
       filters={filters}
       onFilterChange={setFilters}

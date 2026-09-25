@@ -7,7 +7,6 @@ import {
   getFacetedMinMaxValues as getTTableFacetedMinMaxValues,
   getFacetedUniqueValues as getTTableFacetedUniqueValues,
   Row,
-  RowSelectionState,
   SortingState,
   Table,
   useReactTable,
@@ -33,7 +32,6 @@ import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
-import { RowSelectionHeader } from './RowSelectionHeader'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
@@ -63,7 +61,9 @@ import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOpt
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
 import { LiveButton } from '@/components/ui/DataTable/LiveButton'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { RowSelectionModifiers } from '@/components/ui/DataTable/rowSelection.utils'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
+import { useTableRowSelection } from '@/components/ui/DataTable/useTableRowSelection'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
@@ -131,8 +131,6 @@ export const UnifiedLogs = () => {
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const [openRowId, setOpenRowId] = useState<string | undefined>(search.id ?? undefined)
 
   const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
     LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
@@ -170,6 +168,12 @@ export const UnifiedLogs = () => {
     }
     return parameters
   }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
+
+  const { selection, selectRow, clearSelection } = useTableRowSelection({
+    scope: JSON.stringify([projectRef, searchParameters]),
+    initialId: search.id ?? undefined,
+  })
+  const rowSelection = selection.selected
 
   const {
     data: unifiedLogsData,
@@ -277,7 +281,6 @@ export const UnifiedLogs = () => {
     getRowId: (row) => row.id,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnFiltersChange: setColumnFilters,
-    onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnOrderChange: setColumnOrder,
     getSortedRowModel: getSortedRowModel(),
@@ -288,10 +291,21 @@ export const UnifiedLogs = () => {
     getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
   })
 
-  const selectedRow = useMemo(() => {
-    if ((isLoading || isFetching) && !flatData.length) return
-    return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
-  }, [isLoading, isFetching, flatData.length, table, openRowId])
+  const selectedRows = table.getSelectedRowModel().rows
+  const selectedRow =
+    selectedRows.find((row) => row.id === selection.activeId) ?? selectedRows.at(-1)
+  const openRowId = selectedRow?.id
+  const handleSelectRow = (id: string, modifiers?: RowSelectionModifiers) => {
+    selectRow(
+      table.getRowModel().rows.map((row) => row.id),
+      id,
+      modifiers
+    )
+  }
+  const setOpenRowId = (id: string | undefined) => {
+    if (id) handleSelectRow(id)
+    else clearSelection()
+  }
 
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
@@ -387,10 +401,6 @@ export const UnifiedLogs = () => {
     }
   }, [isMobile])
 
-  useEffect(() => {
-    table.resetRowSelection()
-  }, [searchParameters, table])
-
   return (
     <DataTableProvider
       table={table}
@@ -402,6 +412,7 @@ export const UnifiedLogs = () => {
       rowSelection={rowSelection}
       openRowId={openRowId}
       setOpenRowId={setOpenRowId}
+      onSelectRow={handleSelectRow}
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
       searchParameters={searchParameters}
@@ -482,8 +493,6 @@ export const UnifiedLogs = () => {
               )}
             </div>
 
-            <RowSelectionHeader />
-
             <ResizablePanelGroup
               key="main-logs"
               className="flex-1 border-t"
@@ -502,7 +511,7 @@ export const UnifiedLogs = () => {
                     'h-full [&>div]:h-full',
                     '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
                     '[&_thead_th]:[box-shadow:inset_0_-1px_0_var(--border-default)]!',
-                    '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
+                    '[&_thead_th]:text-foreground-lighter! [&_thead_tr]:bg-background! [&_thead_tr:hover]:bg-background!',
                     '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
                   )}
                 >
@@ -515,7 +524,7 @@ export const UnifiedLogs = () => {
                     hasNextPage={hasNextPage}
                     setColumnOrder={setColumnOrder}
                     setColumnVisibility={setColumnVisibility}
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                    errorSubject="Failed to retrieve logs"
                     emptyStateMessage={
                       isUserFilterUnreachable(searchParameters) ? (
                         <div className="text-sm flex flex-col gap-y-1">
@@ -532,12 +541,11 @@ export const UnifiedLogs = () => {
 
               {!!openRowId && !!selectedRow && (
                 <>
-                  <LogsListPanel selectedRow={selectedRow} />
+                  {selectedRows.length === 1 && <LogsListPanel selectedRow={selectedRow} />}
                   <ServiceFlowPanel
                     dock={dock}
                     setDock={setDock}
-                    selectedRow={selectedRow?.original}
-                    selectedRowKey={openRowId}
+                    selectedRows={selectedRows.map((row) => row.original)}
                     searchParameters={searchParameters}
                   />
                 </>

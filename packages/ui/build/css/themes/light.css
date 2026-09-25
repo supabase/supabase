@@ -1,7 +1,7 @@
 [data-theme='light'],
 .light {
   --helpers-os-appearance: Light;
-  --hue: 159;
+  --hue: 157.5;
   --surface-hue: 34;
   --chroma: 0;
   /*
@@ -16,12 +16,22 @@
   --foreground-lightness: 0.1;
   --muted-foreground-level: 0.65;
   --tertiary-foreground-level: 0.5;
+  /* Accessible primary for text and small indicators on light surfaces (~4.5:1+).
+     Solid button plates alias to the same green in light mode. Focus rings and
+     bright interactive chrome uses --primary-bright. */
+  --primary: oklch(0.525 0.12 var(--primary-hue));
+  --primary-foreground: oklch(0.99 0.00275 var(--primary-hue));
+  --primary-solid: var(--primary);
+  --primary-solid-foreground: var(--primary-foreground);
+  --primary-solid-hover: var(--primary-hover);
   /*
    * Expressive fills run darker than the dark-theme anchors so they hold contrast
    * against the near-white surface (a light amber on white disappears). Lightness
    * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
-  --warning-lightness: 0.68;
+  --warning-hue: 58;
+  /* Below on-fill flip (~0.62) so ink is light and clears ~4.5:1 */
+  --warning-lightness: 0.55;
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;
 
@@ -38,7 +48,6 @@
   --secondary-default: 247.8deg 100% 70%;
   --secondary-400: 248.3deg 54.5% 25.9%;
   --secondary-200: 248deg 53.6% 11%;
-  --brand-link: 153.4deg 86.5% 27.8%;
   --brand-default: 152.9deg 60% 52.9%;
   --brand-600: 156.5deg 86.5% 26.1%;
   --brand-500: 155.3deg 78.4% 40%;

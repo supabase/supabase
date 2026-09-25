@@ -1,14 +1,5 @@
 import { noop } from 'lodash'
-import {
-  Calendar,
-  Check,
-  ChevronsUpDown,
-  ExternalLink,
-  Hash,
-  ListPlus,
-  ToggleRight,
-  Type,
-} from 'lucide-react'
+import { Calendar, Check, ExternalLink, Hash, ListPlus, ToggleRight, Type } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useId, useState } from 'react'
 import {
@@ -17,6 +8,7 @@ import {
   AlertTitle,
   Button,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -188,14 +180,15 @@ const ColumnType = ({
       {showLabel && <Label className="text-foreground-light">Type</Label>}
       <Popover modal open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant={error ? 'danger' : 'default'}
-            role="combobox"
-            size={'small'}
+          <ComboboxTrigger
+            size="small"
             aria-expanded={open}
             aria-controls={listboxId}
-            className={cn('w-full justify-between', !hasValue && 'text-foreground-lighter')}
-            iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+            aria-invalid={Boolean(error)}
+            className={cn(
+              !hasValue && 'text-foreground-lighter',
+              error && 'border-destructive-400'
+            )}
             title={displayValue}
           >
             {hasValue ? (
@@ -206,7 +199,7 @@ const ColumnType = ({
             ) : (
               'Choose a column type...'
             )}
-          </Button>
+          </ComboboxTrigger>
         </PopoverTrigger>
         <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
           <Command>
@@ -239,7 +232,7 @@ const ColumnType = ({
                           <span className="text-foreground-lighter">{option.description}</span>
                         </div>
                         <span className="absolute right-3 top-2">
-                          {isSelected ? <Check className="text-brand" size={14} /> : ''}
+                          {isSelected ? <Check className="text-primary" size={14} /> : ''}
                         </span>
                       </CommandItem>
                     )
@@ -283,7 +276,7 @@ const ColumnType = ({
                               )}
                               {isSelected && (
                                 <span className="absolute right-3 top-2">
-                                  <Check className="text-brand" size={14} />
+                                  <Check className="text-primary" size={14} />
                                 </span>
                               )}
                             </div>

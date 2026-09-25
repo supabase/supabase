@@ -12,7 +12,7 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
-import { PropsWithChildren, useEffect, useState, type ReactNode } from 'react'
+import { PropsWithChildren, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   BreadcrumbItem,
@@ -42,13 +42,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
-import {
-  getPipelineDisplayState,
-  getStatusName,
-  PIPELINE_ACTIONABLE_STATES,
-} from './Pipeline.utils'
+import { getPipelineDisplayState, getRestartRequestStatus, getStatusName } from './Pipeline.utils'
 import { PipelineStatePill } from './PipelineStatePill'
-import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -88,10 +84,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { getRequestStatus, getIsTableResetting, setRequestStatus, updatePipelineStatus } =
-    usePipelineRequestStatus()
+  const { getRequestStatus, isRequestPending, runWithRequestStatus } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
-  const isTableResetting = getIsTableResetting(pipelineId)
+  const isPipelineRequestPending = isRequestPending(pipelineId)
 
   const {
     data: pipeline,
@@ -107,10 +102,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     isLoading: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
-  } = useReplicationPipelineStatusQuery(
-    { projectRef, pipelineId },
-    { enabled: !!pipelineId, refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  } = useReplicationPipelineStatusQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
   const { data: versionData } = useReplicationPipelineVersionQuery({
     projectRef,
     pipelineId: pipeline?.id,
@@ -143,12 +135,12 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     isPipelineLoading || (pipeline !== undefined && isDestinationLoading)
   const hasUpdate = Boolean(versionData?.new_version)
   const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
-  const isActionable = PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
 
   // What the primary button offers for each state it can act on. Anything not listed here (a
   // pipeline mid-transition, or one in an unknown state) has no action, so the button falls back
   // to the display state's own label and renders no icon.
   const lifecycle = LIFECYCLE_BY_STATUS[statusName as PipelineStatusName]
+  const isActionable = lifecycle !== undefined
   const primaryAction: LifecycleAction | undefined = lifecycle?.action
   const lifecycleLabel = isTransitioning
     ? displayState.label
@@ -163,8 +155,8 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
   const canUseMenuActions =
     isRunningOrFailed && !isTransitioning && !isPipelineStatusError && !!pipeline
-  const canRestart = canUseMenuActions && !isTableResetting && primaryAction !== 'restart'
-  const canStop = canUseMenuActions && !isTableResetting && primaryAction !== 'stop'
+  const canRestart = canUseMenuActions && !isPipelineRequestPending && primaryAction !== 'restart'
+  const canStop = canUseMenuActions && !isPipelineRequestPending && primaryAction !== 'stop'
 
   const onLifecycleAction = async (action?: LifecycleAction) => {
     const resolvedAction = action ?? primaryAction
@@ -172,17 +164,19 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
     try {
       if (resolvedAction === 'start') {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
-        await startPipeline({ projectRef, pipelineId: pipeline.id })
+        await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, () =>
+          startPipeline({ projectRef, pipelineId: pipeline.id })
+        )
       } else if (resolvedAction === 'stop') {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
-        await stopPipeline({ projectRef, pipelineId: pipeline.id })
+        await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, () =>
+          stopPipeline({ projectRef, pipelineId: pipeline.id })
+        )
       } else {
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-        await restartPipeline({ projectRef, pipelineId: pipeline.id })
+        await runWithRequestStatus(pipeline.id, getRestartRequestStatus(statusName), () =>
+          restartPipeline({ projectRef, pipelineId: pipeline.id })
+        )
       }
     } catch (error) {
-      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
       toast.error(`Failed to ${resolvedAction} pipeline: ${(error as ResponseError).message}`)
     }
   }
@@ -202,17 +196,13 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       })
       setShowDeleteDestination(false)
       toast.success(`Deleted pipeline "${pipeline.destination_name}"`)
-      router.push(`/project/${projectRef}/database/replication`)
+      router.push(`/project/${projectRef}/database/pipelines`)
     } catch (error) {
       toast.error(`Failed to delete pipeline: ${(error as ResponseError).message}`)
     } finally {
       setIsDeleting(false)
     }
   }
-
-  useEffect(() => {
-    updatePipelineStatus(pipelineId, statusName)
-  }, [pipelineId, statusName, updatePipelineStatus])
 
   const logsUrl = `/project/${projectRef}/logs/replication-logs?f=${encodeURIComponent(
     JSON.stringify({ pipeline_id: pipelineId })
@@ -225,7 +215,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           slotClassName="sticky top-0 z-20 bg-sidebar"
           actions={
             <PageBreadcrumbsActions>
-              <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+              <DocsButton href={`${DOCS_URL}/guides/database/replication/pipelines`} />
               <Button asChild variant="default">
                 <Link href={logsUrl}>View logs</Link>
               </Button>
@@ -235,7 +225,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href={`/project/${projectRef}/database/replication`}>Replication</Link>
+                <Link href={`/project/${projectRef}/database/pipelines`}>Pipelines</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -312,7 +302,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     variant="primary"
                     icon={<ArrowUpCircle />}
                     onClick={() => setShowUpdateVersionModal(true)}
-                    disabled={isTableResetting}
+                    disabled={isPipelineRequestPending || isTransitioning}
                   >
                     Update available
                   </Button>
@@ -335,7 +325,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     isPipelineStatusError ||
                     !pipeline ||
                     isTransitioning ||
-                    isTableResetting ||
+                    isPipelineRequestPending ||
                     !isActionable
                   }
                 >
@@ -348,7 +338,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       className="px-1.25 hit-area-2"
                       aria-label="Pipeline options"
                       icon={<MoreVertical />}
-                      disabled={isTableResetting}
+                      disabled={isPipelineRequestPending || isTransitioning}
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-52">
@@ -413,11 +403,6 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
         visible={showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
-        confirmLabel={
-          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
-            ? 'Update and restart'
-            : 'Update version'
-        }
       />
     </div>
   )
