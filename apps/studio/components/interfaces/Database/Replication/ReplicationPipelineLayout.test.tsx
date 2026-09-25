@@ -1,15 +1,18 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { ReactNode, type AnchorHTMLAttributes } from 'react'
+import { ReactNode, useRef, type AnchorHTMLAttributes } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
+import { replicationKeys } from '@/data/replication/keys'
 import {
   PipelineRequestStatusProvider,
+  PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
@@ -47,14 +50,36 @@ const renderLayout = (children?: ReactNode) =>
   )
 
 const TableResetFixture = () => {
-  const { setTableResetting } = usePipelineRequestStatus()
+  const queryClient = useQueryClient()
+  const { runWithRequestStatus } = usePipelineRequestStatus()
+  const finishReset = useRef<() => void>(() => {})
 
   return (
     <>
-      <button tabIndex={0} onClick={() => setTableResetting(42, true)}>
+      <button
+        tabIndex={0}
+        onClick={() =>
+          void runWithRequestStatus(
+            42,
+            PipelineStatusRequestStatus.StopRequested,
+            () =>
+              new Promise<void>((resolve) => {
+                finishReset.current = resolve
+              })
+          )
+        }
+      >
         Begin table reset
       </button>
-      <button tabIndex={0} onClick={() => setTableResetting(42, false)}>
+      <button
+        tabIndex={0}
+        onClick={async () => {
+          finishReset.current()
+          await queryClient.invalidateQueries({
+            queryKey: replicationKeys.pipelinesStatus('default', 42),
+          })
+        }}
+      >
         Finish table reset
       </button>
     </>
@@ -178,9 +203,9 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout(<div>Overview content</div>)
 
     expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
-    expect(screen.getByRole('link', { name: 'Replication' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute(
       'href',
-      '/project/default/database/replication'
+      '/project/default/database/pipelines'
     )
     expect(screen.getByRole('link', { name: 'View logs' }).getAttribute('href')).toContain(
       'pipeline_id'
@@ -300,7 +325,7 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout()
 
     const updateButton = await screen.findByRole('button', { name: 'Update available' })
-    expect(updateButton).toHaveClass('bg-brand-400')
+    expect(updateButton).toHaveClass('bg-primary-solid')
     await userEvent.click(updateButton)
     // The trigger button shares this name, so match the dialog's heading specifically
     expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()

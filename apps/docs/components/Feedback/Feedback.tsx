@@ -179,7 +179,7 @@ function Feedback({ className }: { className?: string }) {
               '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
               !isYes && 'hover:text-brand-600 hover:border-brand-500',
               isYes &&
-                'bg-brand text-brand-200 border-brand! disabled:opacity-100 -translate-x-[calc(100%+var(--container-inline-flex-gap,0.5rem))]',
+                'bg-brand-default text-brand-200 border-brand-default! disabled:opacity-100 -translate-x-[calc(100%+var(--container-inline-flex-gap,0.5rem))]',
               !showYes && 'opacity-0 invisible'
             )}
             onClick={() => handleVote('yes')}

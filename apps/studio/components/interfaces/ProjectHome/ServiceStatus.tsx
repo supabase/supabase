@@ -30,7 +30,7 @@ const iconProps = {
 }
 const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
 const AlertIcon = () => <AlertTriangle {...iconProps} />
-const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-primary" />
 const DisabledIcon = () => <MinusCircle {...iconProps} className="text-foreground-lighter" />
 
 export const StatusIcon = ({
@@ -332,7 +332,7 @@ export const ServiceStatus = () => {
                         (isProjectNew && service.status !== 'ACTIVE_HEALTHY')
                         ? 'bg-foreground-lighter animate-pulse'
                         : service.status === 'ACTIVE_HEALTHY'
-                          ? 'bg-brand'
+                          ? 'bg-brand-default'
                           : 'bg-selection'
                     )}
                   />

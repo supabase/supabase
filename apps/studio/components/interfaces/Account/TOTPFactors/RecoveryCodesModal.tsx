@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from 'ui'
 
+import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 
 interface RecoveryCodesModalProps<T>
@@ -82,10 +83,13 @@ export const RecoveryCodesModal = <T = unknown,>({
               <Button
                 variant="primary"
                 onClick={() =>
-                  copyToClipboard(mutation.data?.codes.join('\n') ?? '', () => {
-                    setCopiedToClipboard(true)
-                    setCopied(true)
-                  })
+                  copyToClipboard(
+                    mutation.data?.codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
+                    () => {
+                      setCopiedToClipboard(true)
+                      setCopied(true)
+                    }
+                  )
                 }
               >
                 Copy to clipboard
@@ -132,11 +136,14 @@ const GenerateRecoveryCodesModalContent = ({
   if (status === 'success') {
     return (
       <div className="flex flex-col gap-4">
-        <p>Save your recovery codes somewhere safe.</p>
+        <p>
+          Recovery codes allow you to recover your account in case you lost access to your MFA apps.
+          Save them somewhere safe.
+        </p>
         <pre className="relative bg-muted rounded-md py-2 px-4">
           <code className="flex gap-2 flex-wrap justify-between">
             {codes?.map((code) => (
-              <span key={code}>{code}</span>
+              <span key={code}>{formatRecoveryCode(code)}</span>
             ))}
           </code>
         </pre>

@@ -4,8 +4,6 @@ description: 'Set up a reverse proxy with HTTPS for self-hosted Supabase.'
 subtitle: 'Set up a reverse proxy with HTTPS for self-hosted Supabase.'
 ---
 
-{/* supa-mdx-lint-disable Rule004ExcludeWords */}
-
 HTTPS is required for production self-hosted Supabase deployments. This guide covers two production approaches using a reverse proxy in front of self-hosted Supabase API gateway, plus a self-signed certificate option for development environment.
 
 ## Before you begin
@@ -134,8 +132,6 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   chmod 640 volumes/api/server.key && \
   chgrp 65533 volumes/api/server.key
 ```
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Step 2: Configure Kong for SSL
 

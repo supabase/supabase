@@ -77,11 +77,11 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const CHART_CONFIG = {
   success: {
     label: <TooltipLabel level="success" />,
-    color: 'var(--chart-success)',
+    color: 'var(--chart-muted)',
   },
   warning: {
     label: <TooltipLabel level="warning" />,
-    color: 'var(--chart-warning)',
+    color: 'var(--chart-status-warning)',
   },
   error: {
     label: <TooltipLabel level="error" />,
@@ -515,7 +515,7 @@ export const UnifiedLogs = () => {
                     hasNextPage={hasNextPage}
                     setColumnOrder={setColumnOrder}
                     setColumnVisibility={setColumnVisibility}
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                    errorSubject="Failed to retrieve logs"
                     emptyStateMessage={
                       isUserFilterUnreachable(searchParameters) ? (
                         <div className="text-sm flex flex-col gap-y-1">

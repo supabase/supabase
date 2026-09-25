@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { Badge, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
@@ -47,11 +47,15 @@ export const BillingMetric = ({
         : usageMeta.usage.toLocaleString() + (metric.unitName ? ` ${metric.unitName}` : '')
     } else {
       return metric.units === 'bytes' || metric.units === 'gigabytes'
-        ? `${usageMeta.usage.toLocaleString() ?? 0} / ${usageMeta.pricing_free_units ?? 0} GB`
+        ? `${usageMeta.usage.toLocaleString() ?? 0} / ${usageMeta.pricing_free_units?.toLocaleString() ?? 0} GB`
         : `${usageMeta.usage.toLocaleString()} / ${usageMeta.pricing_free_units?.toLocaleString()}` +
             (metric.unitName ? ` ${metric.unitName}` : '')
     }
   }, [usageMeta, relativeToSubscription, metric])
+
+  const isLogMetricOnNonPlatformPlan =
+    (metric.key === PricingMetric.LOG_INGESTION || metric.key === PricingMetric.LOG_QUERYING) &&
+    subscription?.plan.id !== 'platform'
 
   const sortedProjectAllocations = useMemo(() => {
     if (!usageMeta || !usageMeta.project_allocations) return []
@@ -86,8 +90,13 @@ export const BillingMetric = ({
           {metric.anchor ? (
             <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
               <div className="group flex items-center gap-1">
-                <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                  {metric.name}
+                <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer items-center">
+                  <span>{metric.name}</span>
+                  {isLogMetricOnNonPlatformPlan && (
+                    <Badge className="ml-2" variant={'warning'}>
+                      Upcoming
+                    </Badge>
+                  )}
                 </p>
                 {usageMeta.available_in_plan && (
                   <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
@@ -97,7 +106,10 @@ export const BillingMetric = ({
               </div>
               <span className="text-sm">{usageLabel}</span>&nbsp;
               {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
-                <span className="text-sm" translate="no">
+                <span
+                  className={cn('text-sm', isLogMetricOnNonPlatformPlan && 'line-through')}
+                  translate="no"
+                >
                   ({formatCurrency(usageMeta.cost)})
                 </span>
               ) : usageMeta.available_in_plan &&
@@ -190,7 +202,7 @@ export const BillingMetric = ({
                     <Link
                       href={metric.docLink.url}
                       target="_blank"
-                      className="transition text-brand hover:text-brand-600 underline"
+                      className="transition text-primary hover:text-primary-hover underline"
                     >
                       {metric.docLink.title}
                     </Link>
@@ -201,14 +213,23 @@ export const BillingMetric = ({
 
             {subscription.usage_billing_enabled === false &&
               relativeToSubscription &&
-              (isApproachingLimit || isExceededLimit) && (
+              (isApproachingLimit || isExceededLimit) &&
+              (isLogMetricOnNonPlatformPlan ? (
+                <div className="my-2">
+                  <p className="text-sm">
+                    Enforcement of restrictions will only start after the grace period ends on Dec
+                    23, 2026. Reduce your usage, upgrade to a usage-based plan or disable the spend
+                    cap to avoid restrictions.
+                  </p>
+                </div>
+              ) : (
                 <div className="my-2">
                   <p className="text-sm">
                     Exceeding your plans included usage will lead to restrictions to your project.
                     Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
                   </p>
                 </div>
-              )}
+              ))}
 
             {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
               <table className="list-disc w-full">
