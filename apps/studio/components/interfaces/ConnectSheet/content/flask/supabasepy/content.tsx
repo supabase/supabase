@@ -7,10 +7,13 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
     {
       name: '.env',
       language: 'bash',
-      code: `
-SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}
-        `,
+      code: [
+        `SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+        projectKeys?.publishableKey
+          ? `SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey}`
+          : `SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
+        '',
+      ].join('\n'),
     },
     {
       name: 'app.py',
@@ -27,7 +30,7 @@ app = Flask(__name__)
 
 supabase: Client = create_client(
     os.environ.get("SUPABASE_URL"),
-    os.environ.get("SUPABASE_KEY")
+    os.environ.get("${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_KEY' : 'SUPABASE_ANON_KEY'}")
 )
 
 @app.route('/')
