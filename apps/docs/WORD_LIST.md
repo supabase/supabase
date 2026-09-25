@@ -944,6 +944,10 @@ Don't use these phrases:
 Don't use _tl;dr_, _ymmv_, _rtfm_, _imo_, or _fwiw_. Write out the
 meaning or remove the aside.
 
+## Further reference
+
+- [Microsoft Writing Style Guide](https://learn.microsoft.com/style-guide/welcome/)
+
 ## Attribution
 
 Portions of this word list are modifications based on work created and shared by
