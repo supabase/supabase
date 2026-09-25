@@ -30,7 +30,9 @@ Each of the following sections covers one mode, then how to combine modes and sh
 
 ### Authenticated user calls
 
-When a signed-in user calls a function, the request carries the user's session JWT on the `Authorization` header. Your app usually makes that call through `supabase.functions.invoke`. The default is `verify_jwt = true`. The platform validates the JWT before your handler runs. Use `auth: 'user'` to get a `ctx.supabase` scoped to the caller's Row Level Security (RLS) policies.
+When a signed-in user calls a function, the request carries the user's session JWT on the `Authorization` header. Your app usually makes that call through `supabase.functions.invoke`. Use `auth: 'user'` to get a `ctx.supabase` scoped to the caller's Row Level Security (RLS) policies.
+
+The default is `verify_jwt = true`, so the platform validates the JWT before your handler runs. Leave it on for user-facing functions. Turning it off to clear a 401 during development removes the platform's check, leaving `withSupabase` as the only thing that verifies the caller.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
@@ -50,6 +52,14 @@ export default {
 }
 ```
 
+Reach for `ctx.supabase` when the handler serves the signed-in caller. It applies their RLS policies to every query. Use `ctx.supabaseAdmin` only for work that has to cross those policies.
+
+<Admonition type="danger">
+
+A handler that queries a shared table through `ctx.supabaseAdmin` without filtering by the caller's ID returns every user's rows. `ctx.supabaseAdmin` bypasses Row Level Security, so filter by the caller's ID from `ctx.userClaims`, or use `ctx.supabase` instead.
+
+</Admonition>
+
 ### Service-to-service calls
 
 Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'`. The wrapper validates the key against any secret key in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work.
@@ -67,7 +77,7 @@ export default {
 
 <Admonition type="note">
 
-To accept only one specific key, use `auth: 'secret:<name>'`. For example, `auth: 'secret:automations'` accepts only the secret key named `automations`. To name a key, open [**Settings > API keys**](/dashboard/project/_/settings/api-keys) in the Supabase Dashboard. The same syntax works for publishable keys: `auth: 'publishable:<name>'`.
+To accept only one specific key, use `auth: 'secret:<name>'`. For example, `auth: 'secret:automations'` accepts only the secret key named `automations`. Every project starts with a secret key named `default`, and you can add more. To name a new key, open [**Settings > API keys**](/dashboard/project/_/settings/api-keys) in the Supabase Dashboard. The same syntax works for publishable keys: `auth: 'publishable:<name>'`.
 
 ![The Secret keys section of the Supabase Dashboard. A table with Name and API key columns lists two keys, "default" and "automations". Each row shows a masked sb_secret_ value with reveal and copy buttons.](/docs/img/guides/functions/secret-keys-automations.png)
 
