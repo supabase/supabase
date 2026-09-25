@@ -1,6 +1,6 @@
 import {
+  getRoleImpersonationLineOffset,
   ROLE_IMPERSONATION_NO_RESULTS,
-  ROLE_IMPERSONATION_SQL_LINE_COUNT,
   type SafeSqlFragment,
 } from '@supabase/pg-meta'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
@@ -188,15 +188,13 @@ export async function executeSql<T = any>(
       const [, lineNumberStr] = regex.exec(updatedError.error) ?? []
       const lineNumber = Number(lineNumberStr)
       if (!isNaN(lineNumber)) {
+        const lineOffset = getRoleImpersonationLineOffset(sql)
         updatedError = {
           ...updatedError,
-          error: updatedError.error.replace(
-            regex,
-            `LINE ${lineNumber - ROLE_IMPERSONATION_SQL_LINE_COUNT}:`
-          ),
+          error: updatedError.error.replace(regex, `LINE ${lineNumber - lineOffset}:`),
           formattedError: updatedError.formattedError.replace(
             regex,
-            `LINE ${lineNumber - ROLE_IMPERSONATION_SQL_LINE_COUNT}:`
+            `LINE ${lineNumber - lineOffset}:`
           ),
         }
       }
