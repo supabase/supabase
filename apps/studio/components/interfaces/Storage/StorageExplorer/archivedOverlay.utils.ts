@@ -1,5 +1,6 @@
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import type { StorageItem } from '../Storage.types'
+import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from './StorageExplorer.utils'
 import type { ArchivedObject } from '@/data/storage/versioning/archived-objects-query'
 
 const splitPath = (path: string): string[] => path.split('/').filter((segment) => segment !== '')
@@ -39,6 +40,10 @@ export const getArchivedOverlayItems = ({
       folderNames.add(nextSegment)
       continue
     }
+
+    // Hidden as in the live listing. It still rolled the folder up above, so an archived
+    // empty folder stays visible and actionable rather than showing its placeholder.
+    if (nextSegment === EMPTY_FOLDER_PLACEHOLDER_FILE_NAME) continue
 
     if (existingItemNames.has(nextSegment)) continue
 

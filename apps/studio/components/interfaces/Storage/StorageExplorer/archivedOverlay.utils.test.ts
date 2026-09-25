@@ -110,6 +110,24 @@ describe('getArchivedOverlayItems', () => {
     expect(rows.map((r) => r.type)).toEqual([STORAGE_ROW_TYPES.FOLDER, STORAGE_ROW_TYPES.FILE])
   })
 
+  it('hides the empty folder placeholder, as the live listing does', () => {
+    expect(overlay(['matches'], [archived('matches/.emptyFolderPlaceholder')])).toEqual([])
+  })
+
+  it('still shows the folder whose only archived object is the placeholder', () => {
+    const rows = overlay([], [archived('matches/.emptyFolderPlaceholder')])
+    expect(rows.map((r) => r.name)).toEqual(['matches'])
+    expect(rows[0].type).toBe(STORAGE_ROW_TYPES.FOLDER)
+  })
+
+  it('still shows a folder that holds a real object beside the placeholder', () => {
+    const rows = overlay(
+      [],
+      [archived('matches/.emptyFolderPlaceholder'), archived('matches/final.png')]
+    )
+    expect(rows.map((r) => r.name)).toEqual(['matches'])
+  })
+
   it('only descends one level at a time', () => {
     const rows = overlay([], [archived('a/b/c/d.png')])
     expect(rows.map((r) => r.name)).toEqual(['a'])
