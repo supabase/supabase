@@ -201,15 +201,25 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
     ```ts
     // Generate and store nonce for verification
-    const nonce = crypto.randomUUID()
+    const rawNonce = crypto.randomUUID()
 
-    // Initialize Apple ID with nonce
+    // Sign in with Apple JS places the nonce given to init() into the ID token
+    // as-is, while Supabase Auth compares the SHA-256 hash of the nonce it
+    // receives against that claim. Give Apple the hashed nonce and Supabase
+    // the raw one, like the Flutter example below.
+    const encodedNonce = new TextEncoder().encode(rawNonce)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encodedNonce)
+    const hashedNonce = Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+
+    // Initialize Apple ID with the hashed nonce
     AppleID.auth.init({
       clientId: 'your-services-id',
       scope: 'name email',
       redirectURI: 'https://your-domain.com/auth/callback',
       usePopup: true,
-      nonce: nonce,
+      nonce: hashedNonce,
     })
 
     // Listen for authorization success
@@ -218,7 +228,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
         const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: event.detail.authorization.id_token,
-          nonce: nonce,
+          nonce: rawNonce,
         })
 
         if (error) {
