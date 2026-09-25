@@ -30,7 +30,8 @@
    * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
   --warning-hue: 58;
-  --warning-lightness: 0.68;
+  /* Below on-fill flip (~0.62) so ink is light and clears ~4.5:1 */
+  --warning-lightness: 0.55;
   --destructive-lightness: 0.52;
   --info-lightness: 0.54;
 

@@ -329,7 +329,7 @@ https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
   'monitoring-agent-health': createMonitoringPrompt('Health monitor', ['health']),
   'monitoring-agent-security': createMonitoringPrompt('Security monitor', ['security']),
   'monitoring-agent-performance': createMonitoringPrompt('Performance monitor', ['performance']),
-  'monitoring-agent-usage': createMonitoringPrompt('Capacity monitor', ['usage']),
+  'monitoring-agent-usage': createMonitoringPrompt('Resource monitor', ['usage']),
 } as const
 
 export type AiPromptId = keyof typeof aiPrompts

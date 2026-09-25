@@ -183,6 +183,19 @@ export const useCreateChat = () => {
   return { createChat, openChat, isCreating }
 }
 
+/** Opens a new Explorer chat that asks the assistant to run a saved notebook and summarize its results */
+export const useAnalyzeNotebook = () => {
+  const { createChat, isCreating } = useCreateChat()
+
+  const analyzeNotebook = ({ id, name }: { id?: string; name?: string }) =>
+    createChat({
+      name: `Analyze ${name} notebook`,
+      initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
+    })
+
+  return { analyzeNotebook, isCreating }
+}
+
 export const useCreateQuery = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
