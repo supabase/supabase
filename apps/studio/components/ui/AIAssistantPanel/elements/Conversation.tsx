@@ -20,7 +20,7 @@ const FADE_GUTTER = 'inset-x-7'
 
 export const Conversation = ({ className, children, ...props }: ConversationProps) => (
   <StickToBottom
-    className={cn('relative flex-1 overflow-y-auto', className)}
+    className={cn('relative min-h-0 flex-1 overflow-hidden', className)}
     initial="smooth"
     resize="smooth"
     role="log"
@@ -44,9 +44,21 @@ export const Conversation = ({ className, children, ...props }: ConversationProp
   </StickToBottom>
 )
 
-export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (
-  <StickToBottom.Content className={cn(CONTENT_GUTTER, 'py-4', className)} {...props} />
-)
+export const ConversationContent = ({
+  className,
+  children,
+  ...props
+}: ConversationContentProps) => {
+  const context = useStickToBottomContext()
+
+  return (
+    <div ref={context.scrollRef} className="h-full w-full overflow-auto overscroll-y-contain">
+      <div {...props} ref={context.contentRef} className={cn(CONTENT_GUTTER, 'py-4', className)}>
+        {typeof children === 'function' ? children(context) : children}
+      </div>
+    </div>
+  )
+}
 
 export const ConversationScrollButton = ({
   className,

@@ -1,7 +1,8 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
+import isEqual from 'lodash/isEqual'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
-import { type ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { cn } from 'ui'
 
 import { AssistantQueryCell } from './AssistantQueryCell'
@@ -333,63 +334,66 @@ const isCompactToolPart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'tool-get_active_incidents' ||
   part.type === 'tool-load_knowledge'
 
-export function MessagePartSwitcher({
-  part,
-}: {
-  part: NonNullable<VercelMessage['parts']>[number]
-}) {
-  const content = (() => {
-    switch (part.type) {
-      case 'dynamic-tool': {
-        if (part.toolName === 'query_logs') {
+export const MessagePartSwitcher = memo(
+  function MessagePartSwitcher({ part }: { part: NonNullable<VercelMessage['parts']>[number] }) {
+    const content = (() => {
+      switch (part.type) {
+        case 'dynamic-tool': {
+          if (part.toolName === 'query_logs') {
+            return <MessagePart.QueryLogs toolPart={part} />
+          }
+          return <MessagePart.Dynamic toolPart={part} />
+        }
+        case 'tool-list_policies':
+        case 'tool-search_docs':
+        case 'tool-get_active_incidents':
+        case 'tool-load_knowledge': {
+          return <MessagePart.Tool toolPart={part} />
+        }
+        case 'reasoning':
+          return <MessagePart.Reasoning reasoningPart={part} />
+        case 'text':
+          return <MessagePart.Text textPart={part} />
+
+        case 'tool-execute_sql': {
+          return <MessagePart.ExecuteSql toolPart={part} />
+        }
+        case 'tool-query_logs': {
           return <MessagePart.QueryLogs toolPart={part} />
         }
-        return <MessagePart.Dynamic toolPart={part} />
-      }
-      case 'tool-list_policies':
-      case 'tool-search_docs':
-      case 'tool-get_active_incidents':
-      case 'tool-load_knowledge': {
-        return <MessagePart.Tool toolPart={part} />
-      }
-      case 'reasoning':
-        return <MessagePart.Reasoning reasoningPart={part} />
-      case 'text':
-        return <MessagePart.Text textPart={part} />
+        case 'tool-deploy_edge_function': {
+          return <MessagePart.DeployEdgeFunction toolPart={part} />
+        }
+        case 'tool-create_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="create" />
+        }
+        case 'tool-update_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="update" />
+        }
+        case 'tool-delete_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="delete" />
+        }
+        case 'tool-run_notebook': {
+          return <MessagePart.NotebookRun toolPart={part} />
+        }
 
-      case 'tool-execute_sql': {
-        return <MessagePart.ExecuteSql toolPart={part} />
+        case 'source-url':
+        case 'source-document':
+        case 'file':
+        default:
+          return null
       }
-      case 'tool-query_logs': {
-        return <MessagePart.QueryLogs toolPart={part} />
-      }
-      case 'tool-deploy_edge_function': {
-        return <MessagePart.DeployEdgeFunction toolPart={part} />
-      }
-      case 'tool-create_notebook': {
-        return <MessagePart.NotebookProposal toolPart={part} mode="create" />
-      }
-      case 'tool-update_notebook': {
-        return <MessagePart.NotebookProposal toolPart={part} mode="update" />
-      }
-      case 'tool-delete_notebook': {
-        return <MessagePart.NotebookProposal toolPart={part} mode="delete" />
-      }
-      case 'tool-run_notebook': {
-        return <MessagePart.NotebookRun toolPart={part} />
-      }
+    })()
 
-      case 'source-url':
-      case 'source-document':
-      case 'file':
-      default:
-        return null
-    }
-  })()
+    if (content === null) return null
+    // Tool rows depend on being direct siblings to share their compact spacing and dividers.
+    if (isCompactToolPart(part)) return content
 
-  if (content === null) return null
-  // Tool rows depend on being direct siblings to share their compact spacing and dividers.
-  if (isCompactToolPart(part)) return content
-
-  return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
-}
+    return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
+  },
+  (previous, next) => {
+    // The AI SDK clones every part of the active message on each stream update.
+    // Compare the part, not its identity, so completed tools retain their rendered subtree.
+    return isEqual(previous.part, next.part)
+  }
+)
