@@ -130,6 +130,34 @@ describe('FileExplorerRow', () => {
     expect(container.querySelector('.absolute')).toBeNull()
   })
 
+  it('gives an archived folder the same actions, since its contents are what they act on', async () => {
+    render(
+      <FileExplorerRow
+        item={
+          {
+            ...base,
+            id: null,
+            name: 'matches',
+            type: STORAGE_ROW_TYPES.FOLDER,
+            metadata: null,
+            archived: {},
+          } as any
+        }
+        index={0}
+        view={STORAGE_VIEWS.COLUMNS}
+        columnIndex={0}
+        selectedItems={[]}
+      />
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'matches actions' }))
+    expect(await screen.findByText('Restore')).toBeInTheDocument()
+    expect(screen.getByText('Delete permanently')).toBeInTheDocument()
+    // The live folder actions have no archived equivalent.
+    expect(screen.queryByText('Download')).not.toBeInTheDocument()
+    expect(screen.queryByText('Rename')).not.toBeInTheDocument()
+  })
+
   it('keeps hiding the icon on hover for a live file, which does swap in a checkbox', () => {
     const { container } = render(
       <FileExplorerRow

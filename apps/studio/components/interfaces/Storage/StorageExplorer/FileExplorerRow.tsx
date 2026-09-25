@@ -42,9 +42,14 @@ import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { ICON_STROKE_WIDTH, StorageRowIcon } from '../StorageRowIcon'
 import { getBucketVersioningState } from '../StorageVersioning.constants'
 import { useArchivedFilesContext } from './ArchivedFilesContext'
+import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
-import { copyStorageExplorerUrl, copyStoragePath } from './StorageExplorer.utils'
+import {
+  copyStorageExplorerUrl,
+  copyStoragePath,
+  getStoragePathForItem,
+} from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -174,11 +179,12 @@ export const FileExplorerRow = ({
   const { onCopyUrl } = useCopyUrl()
   const ctx = useFileExplorerContextMenu()
 
-  const { selectedArchivedObject, selectArchivedObject, clearArchivedSelection } =
+  const { archivedObjects, selectedArchivedObject, selectArchivedObject, clearArchivedSelection } =
     useArchivedFilesContext()
   const isArchived = item.archived !== undefined
   const archivedObjectId = item.archived?.archivedObjectId
   const isArchivedFile = archivedObjectId !== undefined && item.type === STORAGE_ROW_TYPES.FILE
+  const isArchivedFolder = isArchived && item.type === STORAGE_ROW_TYPES.FOLDER
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -261,10 +267,25 @@ export const FileExplorerRow = ({
             ? [
                 { name: 'Separator', icon: undefined, onClick: undefined },
                 {
-                  name: 'Delete',
-                  icon: <Trash2 size={12} className="text-foreground-light" />,
+                  // Deleting a folder deletes everything under it, so on a versioned
+                  // bucket the whole prefix is archived rather than removed.
+                  name: isVersionedBucket ? 'Archive' : 'Delete',
+                  icon: isVersionedBucket ? (
+                    <Archive size={12} className="text-foreground-light" />
+                  ) : (
+                    <Trash2 size={12} className="text-foreground-light" />
+                  ),
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
+                ...(isVersionedBucket
+                  ? [
+                      {
+                        name: 'Delete permanently',
+                        icon: <Trash2 size={12} className="text-destructive" />,
+                        onClick: () => setItemToPurge(itemWithColumnIndex),
+                      },
+                    ]
+                  : []),
               ]
             : []),
         ]
@@ -356,12 +377,42 @@ export const FileExplorerRow = ({
             : []),
         ]
 
-  const { mutate: restoreArchivedObject } = useArchivedObjectRestoreMutation({
-    onSuccess: async () => {
+  const { mutateAsync: restoreArchivedObject } = useArchivedObjectRestoreMutation()
+
+  // A folder is only a prefix, so restoring one means restoring everything archived under it.
+  const archivedFolderObjects = isArchivedFolder
+    ? getArchivedObjectsUnderFolder({
+        folderSegments: getStoragePathForItem(openedFolders, itemWithColumnIndex).split('/'),
+        archivedObjects,
+      })
+    : []
+
+  const handleRestoreArchived = async () => {
+    if (!projectRef || !selectedBucket?.id) return
+
+    const targets = isArchivedFolder
+      ? archivedFolderObjects.map((object) => ({ archivedObjectId: object.id, path: object.path }))
+      : [{ archivedObjectId, path: item.path }]
+
+    try {
+      await Promise.all(
+        targets.map(({ archivedObjectId, path }) =>
+          archivedObjectId && path
+            ? restoreArchivedObject({
+                projectRef,
+                bucketId: selectedBucket.id,
+                archivedObjectId,
+                path,
+              })
+            : Promise.resolve()
+        )
+      )
       toast.success(`Restored ${item.name}`)
       await refetchAllOpenedFolders()
-    },
-  })
+    } catch {
+      // The mutation reports its own failure.
+    }
+  }
 
   // An archived file has no live object, so downloading, copying a URL, renaming and
   // moving all have nothing to act on. Only these two do.
@@ -371,15 +422,7 @@ export const FileExplorerRow = ({
         {
           name: 'Restore',
           icon: <RotateCcw size={12} className="text-foreground-light" />,
-          onClick: () => {
-            if (!projectRef || !selectedBucket?.id || !archivedObjectId || !item.path) return
-            restoreArchivedObject({
-              projectRef,
-              bucketId: selectedBucket.id,
-              archivedObjectId,
-              path: item.path,
-            })
-          },
+          onClick: handleRestoreArchived,
         },
         { name: 'Separator', icon: undefined, onClick: undefined },
         {
@@ -416,8 +459,7 @@ export const FileExplorerRow = ({
       style={style}
       className="h-full border-b border-default"
       onContextMenu={(e) => {
-        if (isArchivedFile) return ctx?.onRowContextMenu(e, archivedRowOptions)
-        if (isArchived) return undefined
+        if (isArchived) return ctx?.onRowContextMenu(e, archivedRowOptions)
         return ctx?.onRowContextMenu(e, rowOptions)
       }}
     >
@@ -539,7 +581,6 @@ export const FileExplorerRow = ({
               size={14}
             />
           ) : isArchived ? (
-            isArchivedFile &&
             archivedRowOptions.length > 0 && (
               <RowActionsMenu name={item.name} options={archivedRowOptions} />
             )
