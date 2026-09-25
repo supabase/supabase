@@ -165,19 +165,26 @@ export const BucketFilePickerColumn = ({
 
   const items = useMemo(() => {
     const pages = data?.pages ?? []
-    const objs = pages.flatMap((page) => page.objects)
+    // v2's `name` is the full key/prefix from the bucket root (folders end with a trailing
+    // slash), not the bare file/folder name — take the last path segment for display.
+    const objs = pages
+      .flatMap((page) => page.objects)
+      .map((object) => ({ ...object, name: object.name.split('/').pop() ?? object.name }))
     // v2 returns folders and objects separately; re-combine them into the single sorted list
     // formatFolderItems expects, tagging folders with `id: null` per its existing convention.
     const folders = pages
       .flatMap((page) => page.folders)
-      .map((folder) => ({
-        id: null,
-        name: folder.name,
-        created_at: null,
-        updated_at: null,
-        last_accessed_at: null,
-        metadata: null,
-      }))
+      .map((folder) => {
+        const folderPath = folder.name.replace(/\/$/, '')
+        return {
+          id: null,
+          name: folderPath.split('/').pop() ?? folderPath,
+          created_at: null,
+          updated_at: null,
+          last_accessed_at: null,
+          metadata: null,
+        }
+      })
     const direction = sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
     const merged = [...folders, ...objs].sort((a, b) => {
       const aValue = (sortColumn === STORAGE_SORT_BY.NAME ? a.name : a[sortColumn]) ?? ''

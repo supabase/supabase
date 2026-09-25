@@ -66,13 +66,18 @@ const mockObjectsList = () => {
       // the BUCKET_CONTENTS keys, which mirror path segments without one.
       const path = body.prefix.replace(/\/$/, '')
       const contents = BUCKET_CONTENTS[path] ?? []
+      // The real API returns `name` as the full path from the bucket root, with a trailing
+      // slash for folders — not the bare name relative to the requested prefix.
+      const fullPath = (name: string) => (path ? `${path}/${name}` : name)
       return HttpResponse.json({
         folders: contents
           .filter((object) => object.id === null)
           .map((object) => ({
-            name: object.name,
+            name: `${fullPath(object.name)}/`,
           })),
-        objects: contents.filter((object) => object.id !== null).map(toV2Object),
+        objects: contents
+          .filter((object) => object.id !== null)
+          .map((object) => toV2Object({ ...object, name: fullPath(object.name) })),
         hasNext: false,
       })
     },
@@ -187,7 +192,7 @@ describe('MoveItemsModal', () => {
         return HttpResponse.json(
           isFirstPage
             ? { folders: [], objects: files.map(toV2Object), hasNext: true, nextCursor: 'page-2' }
-            : { folders: [{ name: 'buried' }], objects: [], hasNext: false }
+            : { folders: [{ name: 'buried/' }], objects: [], hasNext: false }
         )
       },
     })

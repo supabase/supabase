@@ -74,13 +74,18 @@ export const MoveItemsFolderPicker = ({
   })
 
   const folders = useMemo(() => {
+    // v2's `name` is the folder's full path from the bucket root, with a trailing slash
+    // (e.g. "outer/inner/") — not the bare folder name, and not relative to `path`.
     return (objectsData?.pages ?? [])
       .flatMap((page) => page.folders)
-      .map((folder) => ({
-        ...folder,
-        path: path ? `${path}/${folder.name}` : folder.name,
-      }))
-  }, [objectsData, path])
+      .map((folder) => {
+        const folderPath = folder.name.replace(/\/$/, '')
+        return {
+          name: folderPath.split('/').pop() ?? folderPath,
+          path: folderPath,
+        }
+      })
+  }, [objectsData])
 
   const searchResults = useMemo(
     () => filterFoldersBySearch(foldersData?.folders ?? [], debouncedSearchString),
