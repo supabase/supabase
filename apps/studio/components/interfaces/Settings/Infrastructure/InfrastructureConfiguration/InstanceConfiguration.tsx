@@ -184,7 +184,7 @@ const InstanceConfigurationUI = () => {
                       <TooltipTrigger asChild>
                         <Button
                           icon={<Network size={15} />}
-                          className={`rounded-r-none transitio motion-reduce:transition-none ${
+                          className={`rounded-r-none transition motion-reduce:transition-none ${
                             view === 'flow' ? 'opacity-100' : 'opacity-50'
                           }`}
                           onClick={() => setView('flow')}
