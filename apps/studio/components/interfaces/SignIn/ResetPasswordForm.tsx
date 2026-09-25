@@ -5,7 +5,17 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, cn, Form, FormControl, FormField, Separator } from 'ui'
+import {
+  Button,
+  cn,
+  Form,
+  FormControl,
+  FormField,
+  Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -79,11 +89,21 @@ export const ResetPasswordForm = () => {
                     placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
                     disabled={form.formState.isSubmitting}
                     actions={
-                      <Button
-                        icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
-                        className="w-7"
-                        onClick={() => setCurrentPasswordHidden((prev) => !prev)}
-                      />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
+                            className="w-7"
+                            onClick={() => setCurrentPasswordHidden((prev) => !prev)}
+                            aria-label={currentPasswordHidden ? 'Show password' : 'Hide Password'}
+                            // Tooltip repeats the label; screen readers would read it twice
+                            aria-describedby={undefined}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {currentPasswordHidden ? 'Show password' : 'Hide Password'}
+                        </TooltipContent>
+                      </Tooltip>
                     }
                     {...field}
                     onBlur={() => {
@@ -110,11 +130,21 @@ export const ResetPasswordForm = () => {
                   onFocus={() => setShowConditions(true)}
                   autoComplete="new-password"
                   actions={
-                    <Button
-                      icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      className="w-7"
-                      onClick={() => setPasswordHidden((prev) => !prev)}
-                    />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          icon={passwordHidden ? <Eye /> : <EyeOff />}
+                          className="w-7"
+                          onClick={() => setPasswordHidden((prev) => !prev)}
+                          aria-label={passwordHidden ? 'Show password' : 'Hide Password'}
+                          // Tooltip repeats the label; screen readers would read it twice
+                          aria-describedby={undefined}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        {passwordHidden ? 'Show password' : 'Hide Password'}
+                      </TooltipContent>
+                    </Tooltip>
                   }
                   {...field}
                   onBlur={() => {
