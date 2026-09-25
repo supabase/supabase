@@ -128,6 +128,7 @@ describe('getMessagePartKind', () => {
     expect(getMessagePartKind(tool('deploy_edge_function'))).toBe('block')
     expect(getMessagePartKind(tool('create_notebook'))).toBe('block')
     expect(getMessagePartKind(tool('run_notebook'))).toBe('block')
+    expect(getMessagePartKind(tool('render_page'))).toBe('block')
     expect(getMessagePartKind(dynamicTool('query_logs'))).toBe('block')
   })
 

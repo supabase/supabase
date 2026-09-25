@@ -48,6 +48,7 @@ const BLOCK_TOOL_PART_TYPES = new Set<string>([
   'tool-update_notebook',
   'tool-delete_notebook',
   'tool-run_notebook',
+  'tool-render_page',
 ])
 
 export function getMessagePartKind(part: MessagePart): MessagePartKind {
