@@ -4,6 +4,7 @@ import {
   getCatalogEntry,
   PERMISSION_CATALOG,
   PERMISSION_CATALOG_BY_CATEGORY,
+  selectionToScopes,
   type PermissionSelection,
 } from './AccessToken.permissions'
 import {
@@ -86,6 +87,22 @@ describe('applyPreset', () => {
     expect(selection['project:advisors']).toBe('read')
     expect(selection['project:database']).toBe('readwrite')
     expect(Object.keys(selection)).toHaveLength(database.entries.length + 1)
+  })
+
+  test('full access sets entries with dependencies to a non-none mode', () => {
+    const selection = applyPreset(FULL, {})
+    const entriesWithDeps = PERMISSION_CATALOG.filter((entry) => entry.dependencies.length > 0)
+    expect(entriesWithDeps.length).toBeGreaterThan(0)
+    for (const entry of entriesWithDeps) {
+      expect(selection[entry.key]).not.toBe('none')
+    }
+  })
+
+  test('full access scopes include api_gateway_keys_secret_read (#50244)', () => {
+    const selection = applyPreset(FULL, {})
+    const scopes = selectionToScopes(selection)
+    expect(scopes).toContain('api_gateway_keys_secret_read')
+    expect(scopes).toContain('api_gateway_keys_read')
   })
 })
 

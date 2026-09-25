@@ -370,7 +370,8 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     name: 'API Keys',
     description: 'Project API keys.',
     risk: 'high',
-    riskReason: 'Read exposes API keys; read-write grants elevated access to create new keys.',
+    riskReason:
+      'Read lists API key metadata; read-write can create and revoke keys. Revealing secret values requires API Key Secrets.',
     allowsRead: ['Read project API keys'],
     allowsWrite: ['Create and revoke API keys'],
   },
