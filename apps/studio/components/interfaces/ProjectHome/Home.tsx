@@ -20,6 +20,7 @@ import { cn } from 'ui'
 import { AdvisorSection } from './AdvisorSection'
 import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
+import { GeographicUsageSection } from './GeographicUsageSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
 import { ProjectUsageSection } from './ProjectUsageSection'
 import { ProjectUsageSectionDeltas } from './ProjectUsageSectionDeltas'
@@ -42,6 +43,7 @@ export const ProjectHome = () => {
   const track = useTrack()
 
   const showHomepageUsageDeltas = useFlag('newHomepageUsageDeltas')
+  const showGeographicUsage = useFlag('projectGeographicUsage') === true
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -127,6 +129,7 @@ export const ProjectHome = () => {
                         >
                           <SortableSection gripClassName={SORT_GRIP_CLASS} id={id}>
                             <UsageSection />
+                            {showGeographicUsage && <GeographicUsageSection />}
                           </SortableSection>
                         </div>
                       )
