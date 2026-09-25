@@ -197,9 +197,9 @@ begin
     ${isReplicationRole === undefined ? safeSql`` : isReplicationRole ? safeSql`replication` : safeSql`noreplication`}
     ${canBypassRls === undefined ? safeSql`` : canBypassRls ? safeSql`bypassrls` : safeSql`nobypassrls`}
     ${connectionLimit === undefined ? safeSql`` : safeSql`connection limit ${literal(connectionLimit)}`}
-    ${password === undefined ? safeSql`` : safeSql`password ${literal(password)}`}
+    ${password === undefined ? safeSql`` : safeSql`password %L`}
     ${validUntil === undefined ? safeSql`` : safeSql`valid until %L`}
-  ', old.name${validUntil === undefined ? safeSql`` : safeSql`, ${literal(validUntil)}`}));
+  ', old.name${password === undefined ? safeSql`` : safeSql`, ${literal(password)}`}${validUntil === undefined ? safeSql`` : safeSql`, ${literal(validUntil)}`}));
 
   ${
     newName === undefined
