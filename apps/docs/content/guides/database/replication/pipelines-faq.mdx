@@ -8,11 +8,9 @@ sidebar_label: 'FAQ'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ## Which plans support Pipelines?
 
-Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Replication** or contact your account manager.
+Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Pipelines** or contact your account manager.
 
 ## What destinations are supported?
 
@@ -21,8 +19,6 @@ BigQuery is in public alpha. ClickHouse, DuckLake, and Snowflake are in private 
 ## Does the destination's region affect performance?
 
 Yes. Distance between the source, pipeline, and destination adds network latency and can reduce throughput. Choose resources near the [managed pipeline region](/docs/guides/database/replication/pipelines#region), prioritizing the destination if you can optimize only one side.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What does Pipelines install in the database?
 
@@ -42,8 +38,6 @@ The `etl` schema is reserved for Pipelines. If your application already uses a s
 
 To remove the installed objects, delete all pipelines, then [disable Pipelines](#what-happens-when-you-disable-pipelines).
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ## What does Pipelines check before creating a pipeline?
 
 The Dashboard validates source access, replication capacity, publication tables, and destination connectivity and requirements. **Required** issues block creation; **Warnings** require review. See [creation checks](/docs/guides/database/replication/pipelines#creation-checks).
@@ -56,7 +50,7 @@ Support differs by destination. Check the [schema-change guides](/docs/guides/da
 
 Yes. Pipelines provides at-least-once processing: recovery can replay acknowledged data, and consumers of append-only histories must tolerate repeated events. Destination deduplication does not provide an exactly-once processing guarantee.
 
-See the data models for [BigQuery](/docs/guides/database/replication/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+See the data models for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/pipelines/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
 ## Why is a table not being replicated?
 
@@ -69,7 +63,7 @@ Check that:
 
 If new changes arrive but existing rows are missing, check the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy). [Changing a row filter](/docs/guides/database/replication/pipelines#other-publication-changes) also does not copy newly included historical rows.
 
-If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements).
+If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#source-table-requirements).
 
 ## Why is a table in error state?
 
@@ -94,8 +88,6 @@ Deleting or modifying managed objects can stop replication and require a new ini
 ## What happens when a project becomes inactive or moves to the Free Plan?
 
 Project inactivity stops its pipelines. Start them manually after restarting the project. Downgrading to the Free Plan deletes its pipelines.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What happens when you disable Pipelines?
 

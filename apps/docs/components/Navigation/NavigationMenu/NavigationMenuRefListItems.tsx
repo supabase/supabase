@@ -70,7 +70,7 @@ const FunctionLink = memo(function FunctionLink({
         className={cn(
           'cursor-pointer transition text-sm hover:text-foreground gap-3 relative',
           isParent ? 'flex justify-between' : 'leading-3',
-          active ? 'text-brand' : 'text-foreground-lighter'
+          active ? 'text-primary' : 'text-foreground-lighter'
         )}
       >
         {icon && <Image width={16} height={16} alt={icon} src={`${BASE_PATH}${icon}`} />}

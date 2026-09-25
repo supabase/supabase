@@ -26,7 +26,7 @@ All interactive page elements should be reachable by keyboard. Native buttons, l
 
 Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari, by default, requires the Option key to also be held down. Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result.
 
-Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use one shared focus ring so users recognize this state instantly.
+Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use one shared focus ring so users recognize this state instantly. Its color follows the theme's brighter primary hue in both themes. See [Primary and brand colors](../docs/color-usage#primary-and-brand-colors).
 
 ### Focus ring recipe
 
@@ -76,7 +76,7 @@ Rules:
 
 - Prefer `:focus-visible` over `:focus` so click/tap does not show a focus indicator
 - Never use `outline-none` / `outline-hidden` without a ring or outline replacement
-- Always use the shared color (`ring-ring` / `outline-ring`). Variants (primary, danger, warning) do not change focus colour
+- Always use the shared color (`ring-ring` / `outline-ring`). Variants (primary, danger, warning) do not change focus color. The shared color derives from `--primary` with enough lightness to remain visible in light mode.
 - Do not animate the focus indicator; avoid `transition-all` / `transition` on controls that show one (prefer `transition-colors`)
 - Prefer `focus-ring` / `focus-inset` over copy-pasting the class stack
 - On interactive `<tr>`s, use `focus-inset` only. `focus-ring` will look fine in some browsers and invisible in others

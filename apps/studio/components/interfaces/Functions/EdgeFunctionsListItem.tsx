@@ -87,7 +87,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
             }}
           >
             {isCopied ? (
-              <div className="text-brand">
+              <div className="text-primary">
                 <Check size={14} strokeWidth={3} />
               </div>
             ) : (

@@ -1,6 +1,7 @@
 // GENERAL
 
 export * from './src/components/Button'
+export * from './src/components/FloatingPlate'
 export * from './src/components/Icon/IconBackground'
 
 // NAV
