@@ -1942,3 +1942,13 @@ export function useStorageExplorerStateSnapshot(options?: Parameters<typeof useS
   const state = useContext(StorageExplorerStateContext)
   return useSnapshot(state, options) as StorageExplorerState
 }
+
+/**
+ * The store itself rather than a snapshot, for reads that have to be current — after
+ * awaiting a fetch, say, where a render may not have caught up with the store yet. Only
+ * read this from callbacks; during render use `useStorageExplorerStateSnapshot`, which is
+ * what subscribes the component to the values it reads.
+ */
+export function useStorageExplorerState() {
+  return useContext(StorageExplorerStateContext)
+}

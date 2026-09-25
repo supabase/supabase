@@ -1,4 +1,5 @@
 import { act, render } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
@@ -19,6 +20,9 @@ vi.mock('./useStoragePreference', () => ({
 // The columns themselves are irrelevant here — only the scroll container's geometry is.
 vi.mock('./FileExplorerColumn', () => ({
   FileExplorerColumn: () => <div data-testid="column" />,
+}))
+vi.mock('./FileExplorerKeyboardNavigation', () => ({
+  FileExplorerKeyboardNavigationProvider: ({ children }: { children: ReactNode }) => children,
 }))
 
 const COLUMN_WIDTH = 256
