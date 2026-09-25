@@ -1,0 +1,98 @@
+---
+id: usage-examples
+title: Usage examples
+---
+
+Each example is a Fetch handler. Deno, Bun, and Supabase Edge Functions run the `export default { fetch }` shape as is. Cloudflare Workers also need the `nodejs_compat` flag or the `env` option, so `withSupabase` can read your project's URL and keys. On Node, use an adapter or the primitives with your framework.
+
+### Protect an endpoint with a user JWT
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    `withSupabase` wraps your handler. With `auth: 'user'`, it checks the caller's JWT before your handler runs. A request without valid credentials gets a JSON error response, and your handler never runs.
+
+    `withSupabase` also answers every `OPTIONS` request with `204` and adds CORS headers to every response. Set `cors: 'disabled'` when your framework handles CORS.
+
+    `ctx.supabase` is scoped to the caller, so Row Level Security policies apply. `ctx.supabaseAdmin` bypasses RLS. Use it only for work that needs full database access.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { withSupabase } from '@supabase/server'
+
+    export default {
+      fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
+        const { data } = await ctx.supabase.from('todos').select()
+        return Response.json(data)
+      }),
+    }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Serve a public endpoint
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    `auth: 'none'` lets every request through. `ctx.userClaims` is `null`, and `ctx.supabase` runs as an anonymous client.
+
+    Supabase Edge Functions check for a valid JWT on every request by default. For a function that uses `auth: 'none'`, `auth: 'publishable'`, or `auth: 'secret'`, turn that check off in `supabase/config.toml`. The `auth` setting on `withSupabase` then decides who gets in.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { withSupabase } from '@supabase/server'
+
+    export default {
+      fetch: withSupabase({ auth: 'none' }, async () => {
+        return Response.json({ status: 'ok', time: new Date().toISOString() })
+      }),
+    }
+    ```
+
+    ```toml supabase/config.toml
+    [functions.my-function]
+    verify_jwt = false
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Build the context yourself
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    `createSupabaseContext` runs the same auth checks as `withSupabase` but returns `{ data, error }` instead of a response. Use it inside a framework route handler, or anywhere you want to shape the error response yourself.
+
+    On success, `data` is the same `SupabaseContext` that `withSupabase` passes to your handler. On failure, `error.status` holds the HTTP status to send. `createSupabaseContext` does not handle CORS.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { createSupabaseContext } from '@supabase/server'
+
+    export default {
+      fetch: async (req: Request) => {
+        const { data: ctx, error } = await createSupabaseContext(req, { auth: 'user' })
+        if (error) {
+          return Response.json(error.toJSON(), { status: error.status })
+        }
+
+        const { data } = await ctx.supabase.from('todos').select()
+        return Response.json(data)
+      },
+    }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
