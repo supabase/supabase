@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
@@ -29,7 +28,6 @@ import {
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
-import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -44,19 +42,12 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 }
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
-  const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const { setLastVisitedExplorerTab } = useDashboardHistory()
   const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
   const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
   const [section, setSection] = useState<ExplorerResourceType>()
-
-  const { setIsTemporary: setIsTemporarySqlEditorVisit } = useIsTemporarySqlEditorVisit(ref)
-
-  useEffect(() => {
-    if (ref) setIsTemporarySqlEditorVisit(false)
-  }, [ref, setIsTemporarySqlEditorVisit])
 
   const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
   const isActiveExplorerTab =

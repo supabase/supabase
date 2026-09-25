@@ -3,13 +3,11 @@ import { SqlEditor } from 'icons'
 import Link from 'next/link'
 import { Button } from 'ui'
 
-import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const ExplorerSqlEditorFooter = () => {
   const { ref } = useParams()
   const track = useTrack()
-  const { setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
 
   if (!ref) return null
 
@@ -29,10 +27,7 @@ export const ExplorerSqlEditorFooter = () => {
       <Button asChild block variant="outline" icon={<SqlEditor size={14} strokeWidth={1.5} />}>
         <Link
           href={`/project/${ref}/sql`}
-          onClick={() => {
-            setIsTemporary(true)
-            track('explorer_temp_access_sql_editor_clicked')
-          }}
+          onClick={() => track('explorer_temp_access_sql_editor_clicked')}
         >
           Open SQL Editor
         </Link>

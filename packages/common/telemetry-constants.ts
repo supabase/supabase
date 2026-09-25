@@ -1624,8 +1624,8 @@ export interface ExplorerTempAccessSqlEditorClickedEvent {
 }
 
 /**
- * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
- * visit originated from the Explorer sidebar footer.
+ * User clicked the Explorer sidebar nav item while on the SQL Editor page, navigating back
+ * to Explorer.
  *
  * @group Events
  * @source studio
