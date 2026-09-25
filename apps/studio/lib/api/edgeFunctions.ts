@@ -35,24 +35,33 @@ export const isEdgeFunctionUrl = (
   )
 }
 
+const FUNCTIONS_PATH_PREFIX = /^\/functions\/v[0-9]{1}\//
+
 export const isValidEdgeFunctionURL = (url: string, isPlatform: boolean) => {
+  // Validate the parsed URL, not the raw string. A raw-string regex can be
+  // passed by '/functions/v1/../../<path>' while fetch normalizes the dots
+  // away before sending, so the request escapes the functions prefix to any
+  // path on any host (SSRF; e.g. cloud metadata endpoints on self-hosted).
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return false
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return false
+  if (!FUNCTIONS_PATH_PREFIX.test(parsed.pathname)) return false
+
   if (NIMBUS_PROD_PROJECTS_URL !== undefined) {
     const apexDomain = NIMBUS_PROD_PROJECTS_URL.replace('https://*.', '').replace(/\./g, '\\.')
-    const nimbusRegex = new RegExp('^https://[a-z]*\\.' + apexDomain + '/functions/v[0-9]{1}/.*$')
-    return nimbusRegex.test(url)
+    const nimbusHostRegex = new RegExp('^[a-z]*\\.' + apexDomain + '$')
+    return parsed.protocol === 'https:' && nimbusHostRegex.test(parsed.host)
   }
 
   if (!isPlatform) {
-    const regexValidLocalEdgeFunctionURL = new RegExp(
-      /^https?:\/\/[^\s/?#]+\/functions\/v[0-9]{1}\/.*$/
-    )
-
-    return regexValidLocalEdgeFunctionURL.test(url)
+    // Self-hosted may serve edge functions on a custom domain, so any host is
+    // allowed; the normalized path prefix above is the security invariant.
+    return true
   }
 
-  const regexValidEdgeFunctionURL = new RegExp(
-    /^https:\/\/[a-z]{20}\.supabase\.(red|co)\/functions\/v[0-9]{1}\/.*$/
-  )
-
-  return regexValidEdgeFunctionURL.test(url)
+  return parsed.protocol === 'https:' && /^[a-z]{20}\.supabase\.(red|co)$/.test(parsed.host)
 }
