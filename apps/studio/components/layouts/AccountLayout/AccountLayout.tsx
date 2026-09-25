@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
@@ -27,7 +28,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const currentPath = router.pathname
 
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-
+  const showOAuthApps = useFlag('OauthAppScopedGrants')
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
@@ -88,6 +89,16 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
                         label: 'Security',
                         href: '/account/security',
                         isActive: currentPath === '/account/security',
+                      },
+                    ]
+                  : []),
+                ...(showOAuthApps
+                  ? [
+                      {
+                        key: 'oauth-apps',
+                        label: 'OAuth Apps',
+                        href: '/account/apps',
+                        isActive: currentPath === '/account/apps',
                       },
                     ]
                   : []),

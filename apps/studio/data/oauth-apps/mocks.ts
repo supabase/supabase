@@ -417,10 +417,7 @@ const MOCK_OWN_GRANTS: ListOwnGrantsResponse = {
       grant_id: 'grant-vercel-admin',
       app: { id: 'vercel', name: 'Vercel', icon: null },
       organization: { slug: 'northwind-traders', name: 'Northwind Traders' },
-      projects: [
-        { ref: 'northwindstorefront1', name: 'northwind-storefront' },
-        { ref: 'northwindcms1', name: 'northwind-cms' },
-      ],
+      projects: null,
       approved_scopes: ['database:read', 'database:write', 'projects:read'],
       approved_at: '2026-08-18T09:12:00.000Z',
     },
@@ -428,7 +425,10 @@ const MOCK_OWN_GRANTS: ListOwnGrantsResponse = {
       grant_id: 'grant-northwind-mcp-ops',
       app: { id: 'dynamic-mcp-client', name: 'Northwind MCP', icon: null },
       organization: { slug: 'northwind-traders', name: 'Northwind Traders' },
-      projects: [{ ref: 'northwindstorefront1', name: 'northwind-storefront' }],
+      projects: [
+        { ref: 'northwindstorefront1', name: 'northwind-storefront' },
+        { ref: 'northwindcms1', name: 'northwind-cms' },
+      ],
       approved_scopes: ['database:read', 'database:write'],
       approved_at: '2026-09-01T08:45:00.000Z',
     },
