@@ -19,9 +19,17 @@ export const configKeys = {
   projectCreationPostgresVersions: (
     organizationSlug: string | undefined,
     cloudProvider: string,
-    dbRegion: string
+    dbRegion: string,
+    highAvailability?: boolean
   ) =>
-    ['projects', organizationSlug, cloudProvider, dbRegion, 'available-creation-versions'] as const,
+    [
+      'projects',
+      organizationSlug,
+      cloudProvider,
+      dbRegion,
+      'available-creation-versions',
+      highAvailability,
+    ] as const,
   projectUnpausePostgresVersions: (projectRef: string | undefined) =>
     ['projects', projectRef, 'available-unpause-versions'] as const,
   diskAutoscaleConfig: (projectRef: string | undefined) =>
