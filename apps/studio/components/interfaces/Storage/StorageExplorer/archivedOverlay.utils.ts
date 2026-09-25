@@ -13,6 +13,16 @@ const isUnderFolder = (folderSegments: string[], objectSegments: string[]): bool
   return folderSegments.every((segment, index) => segment === objectSegments[index])
 }
 
+/** Every archived object inside a folder, at any depth. A folder is only a prefix. */
+export const getArchivedObjectsUnderFolder = ({
+  folderSegments,
+  archivedObjects,
+}: {
+  folderSegments: string[]
+  archivedObjects: ArchivedObject[]
+}): ArchivedObject[] =>
+  archivedObjects.filter((object) => isUnderFolder(folderSegments, getArchivedSegments(object)))
+
 export interface ArchivedOverlayInput {
   folderSegments: string[]
   archivedObjects: ArchivedObject[]
