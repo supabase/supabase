@@ -1795,7 +1795,7 @@ export interface paths {
     get: operations['OAuthAppClientSecretsController_listClientSecrets']
     put?: never
     /** Create oauth app client secret */
-    post: operations['OAuthAppClientSecretsController_CreateClientSecret']
+    post: operations['OAuthAppClientSecretsController_createClientSecret']
     delete?: never
     options?: never
     head?: never
@@ -1813,7 +1813,7 @@ export interface paths {
     put?: never
     post?: never
     /** Remove oauth app client secret */
-    delete: operations['OAuthAppClientSecretsController_RemoveClientSecret']
+    delete: operations['OAuthAppClientSecretsController_removeClientSecret']
     options?: never
     head?: never
     patch?: never
@@ -6360,11 +6360,11 @@ export interface components {
           }[]
           require_sso?: boolean
           /**
-           * @description Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.
+           * @description Role name to assign. Must be on a Team, Platform, or Enterprise plan to use the read-only or no-access roles. no-access grants no project visibility until project-scoped roles are assigned separately.
            * @example developer
            * @enum {string}
            */
-          role?: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role?: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
           role_id?: number
         }
       }[]
@@ -6820,6 +6820,8 @@ export interface components {
             | 'm8g.medium'
             | 'm9g.medium'
             | 'c6g.medium'
+            | 'c7g.medium'
+            | 'c8g.medium'
             | 'm6g.large'
             | 'm6a.large'
             | 'm6i.large'
@@ -6827,6 +6829,7 @@ export interface components {
             | 'm8i.large'
             | 'm7a.large'
             | 'm8a.large'
+            | 'c6a.large'
             | 'm6g.xlarge'
             | 'm6a.xlarge'
             | 'm6i.xlarge'
@@ -10405,7 +10408,7 @@ export interface components {
     }
     OrganizationRoleResponse_Output: {
       org_scoped_roles: {
-        base_role_id: number
+        base_role_id: number | null
         description: string | null
         id: number
         name: string
@@ -10419,7 +10422,7 @@ export interface components {
         }[]
       }[]
       project_scoped_roles: {
-        base_role_id: number
+        base_role_id: number | null
         description: string | null
         id: number
         name: string
@@ -10434,6 +10437,7 @@ export interface components {
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
+      high_availability?: boolean
       /** @enum {string} */
       provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
       region: string
@@ -12290,6 +12294,11 @@ export interface components {
       }[]
     }
     RealtimeConfigResponse_Output: {
+      /**
+       * Format: date-time
+       * @description If set, the Realtime service has been suspended by an admin.
+       */
+      admin_suspended_at?: string | null
       /** @description Sets connection pool size for Realtime Authorization */
       connection_pool?: number | null
       /** @description Sets maximum number of bytes per second rate per channel limit */
@@ -22392,7 +22401,7 @@ export interface operations {
       }
     }
   }
-  OAuthAppClientSecretsController_CreateClientSecret: {
+  OAuthAppClientSecretsController_createClientSecret: {
     parameters: {
       query?: never
       header?: never
@@ -22436,7 +22445,7 @@ export interface operations {
       }
     }
   }
-  OAuthAppClientSecretsController_RemoveClientSecret: {
+  OAuthAppClientSecretsController_removeClientSecret: {
     parameters: {
       query?: never
       header?: never
@@ -23028,7 +23037,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -23044,7 +23058,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -23097,7 +23116,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file: string
               /** Format: uri */
@@ -23113,7 +23137,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file?: string
               metadata_xml_url: string
@@ -23137,7 +23166,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -23153,7 +23187,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -23206,7 +23245,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file: string
               /** Format: uri */
@@ -23222,7 +23266,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file?: string
               metadata_xml_url: string
@@ -23246,7 +23295,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -23262,7 +23316,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -29696,6 +29755,7 @@ export interface operations {
           | '48xlarge_optimized_memory'
           | '48xlarge_optimized_cpu'
           | '48xlarge_high_memory'
+        high_availability?: string
         organization_slug: string
       }
       header?: never
