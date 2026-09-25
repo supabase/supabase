@@ -81,7 +81,7 @@ function MultipleSources({ children, sources }: PropsWithChildren<MultipleSource
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button tabIndex={0} className={SOURCE_FOOTER_CLASSES}>
-              <IconGitHubSolid size={14} />
+              <IconGitHubSolid size={14} aria-hidden />
               View source
             </button>
           </DropdownMenuTrigger>
@@ -113,7 +113,7 @@ function SingleSource({ children, source }: PropsWithChildren<SingleSourceProps>
           rel="noopener noreferrer"
           className={SOURCE_FOOTER_CLASSES}
         >
-          <IconGitHubSolid size={14} />
+          <IconGitHubSolid size={14} aria-hidden />
           View source
         </Link>
       }
