@@ -33,10 +33,17 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
           href={observabilityUrl}
           className="border-t px-3 py-2 hover:bg-surface-200 transition flex items-center gap-x-3 text-xs"
         >
-          {/* Stable live region: announces loading/failure, never the polled values */}
+          {/* Stable live region: announces loading/unavailability, never the polled values */}
           <span role="status" className="sr-only">
             {isMetricsLoading && 'Loading metrics'}
             {!isMetricsLoading && isMetricsError && 'Metrics unavailable'}
+            {!isMetricsLoading && !isMetricsError && (
+              <>
+                {cpu === null && 'CPU unavailable. '}
+                {disk === null && 'Disk unavailable. '}
+                {memory === null && 'RAM unavailable.'}
+              </>
+            )}
           </span>
           {/* h-4 matches the text-xs line height so the card doesn't shift when metrics load */}
           {isMetricsLoading && (
