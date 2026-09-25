@@ -134,7 +134,8 @@ function findTargetCell(
 
 function downgradeNoOpMoves(
   entries: NotebookCellDiffEntry[],
-  notebook: NotebookWire
+  notebook: NotebookWire,
+  anchorByEntry: WeakMap<NotebookCellDiffEntry, string>
 ): NotebookCellDiffEntry[] {
   if (!entries.some((entry) => entry._tag === 'moved')) return entries
 
@@ -155,11 +156,89 @@ function downgradeNoOpMoves(
     )
   }
 
-  return entries.map((entry) =>
-    entry._tag === 'moved' && hasSamePredecessors(entry.cell._id)
-      ? { _tag: 'unchanged', cell: entry.cell }
-      : entry
+  const downgradedIds = new Set(
+    entries
+      .filter((entry) => entry._tag === 'moved' && hasSamePredecessors(entry.cell._id))
+      .map((entry) => entry.cell._id)
   )
+  if (downgradedIds.size === 0) return entries
+
+  // Flip the downgraded moves to unchanged first, keeping a handle on each new
+  // entry so the relocation pass below can recognize them as block heads.
+  const newEntryByCellId = new Map<string, NotebookCellDiffEntry>()
+  const tagged = entries.map((entry) => {
+    if (entry._tag === 'moved' && downgradedIds.has(entry.cell._id)) {
+      const fresh: NotebookCellDiffEntry = { _tag: 'unchanged', cell: entry.cell }
+      newEntryByCellId.set(entry.cell._id, fresh)
+      return fresh
+    }
+    return entry
+  })
+
+  // Pull each downgraded move out together with the contiguous run of entries
+  // inserted after it, so they are relocated as one block and keep their
+  // relative order.
+  const removedBlocks = new Map<string, NotebookCellDiffEntry[]>()
+  const working: NotebookCellDiffEntry[] = []
+  let cursor = 0
+  while (cursor < tagged.length) {
+    const entry = tagged[cursor]
+    const headCellId =
+      (entry._tag === 'unchanged' || entry._tag === 'moved') &&
+      newEntryByCellId.get(entry.cell._id) === entry
+        ? entry.cell._id
+        : undefined
+
+    if (headCellId !== undefined) {
+      const block: NotebookCellDiffEntry[] = [entry]
+      cursor++
+      while (cursor < tagged.length && anchorByEntry.get(tagged[cursor]) === headCellId) {
+        block.push(tagged[cursor])
+        cursor++
+      }
+      removedBlocks.set(headCellId, block)
+      continue
+    }
+    working.push(entry)
+    cursor++
+  }
+
+  // A no-op move leaves the cell where it originally sat relative to the other
+  // surviving cells, so put the downgraded block back into its original slot.
+  // Otherwise entries that stay behind at their own slots (removed/replaced)
+  // would end up displaced below the moved cell.
+  const cellIndexById = new Map(notebook.cells.map((cell, index) => [cell._id, index]))
+  const originalCellId = (entry: NotebookCellDiffEntry): string | undefined => {
+    switch (entry._tag) {
+      case 'unchanged':
+      case 'removed':
+        return entry.cell._id
+      case 'replaced':
+        return entry.before._id
+      default:
+        return undefined
+    }
+  }
+
+  for (const cell of notebook.cells) {
+    if (!downgradedIds.has(cell._id)) continue
+
+    const block = removedBlocks.get(cell._id)
+    if (block === undefined || block.length === 0) continue
+
+    const cellIndex = cellIndexById.get(cell._id)!
+    const insertAt = working.findIndex((existing) => {
+      const existingId = originalCellId(existing)
+      if (existingId === undefined) return false
+      const existingIndex = cellIndexById.get(existingId)
+      return existingIndex !== undefined && existingIndex > cellIndex
+    })
+
+    if (insertAt === -1) working.push(...block)
+    else working.splice(insertAt, 0, ...block)
+  }
+
+  return working
 }
 
 export function deriveNotebookDiff(
@@ -183,7 +262,7 @@ export function deriveNotebookDiff(
     cell,
   }))
 
-  const insertedAfter = new Map<string, number>()
+  const anchorByEntry = new WeakMap<NotebookCellDiffEntry, string>()
   const insertAfter = (
     anchor: string,
     entry: NotebookCellDiffEntry
@@ -193,9 +272,17 @@ export function deriveNotebookDiff(
       return { _tag: 'unknown_cell_id', cell_id: anchor }
     }
 
-    const offset = insertedAfter.get(anchor) ?? 0
-    entries.splice(anchorIndex + 1 + offset, 0, entry)
-    insertedAfter.set(anchor, offset + 1)
+    // Place the entry after the anchor, skipping past entries that earlier
+    // operations already inserted after this same anchor at its current
+    // position. Anchoring by entry (rather than a per-anchor offset) keeps
+    // later inserts correct even when the anchor cell itself is moved.
+    let insertIndex = anchorIndex + 1
+    while (insertIndex < entries.length) {
+      if (anchorByEntry.get(entries[insertIndex]) !== anchor) break
+      insertIndex++
+    }
+    entries.splice(insertIndex, 0, entry)
+    anchorByEntry.set(entry, anchor)
     return undefined
   }
 
@@ -275,7 +362,7 @@ export function deriveNotebookDiff(
     return { success: false, error: { _tag: 'empty_result' } }
   }
 
-  return { success: true, entries: downgradeNoOpMoves(entries, notebook) }
+  return { success: true, entries: downgradeNoOpMoves(entries, notebook, anchorByEntry) }
 }
 
 function resultingCells(entries: NotebookCellDiffEntry[]): OperationResultCell[] {
