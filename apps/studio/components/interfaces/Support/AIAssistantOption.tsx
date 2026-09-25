@@ -39,7 +39,8 @@ export const AIAssistantOption = ({
   }, [onClick, projectRef, organizationSlug, track])
 
   // If no specific project selected, use the wildcard route
-  const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?sidebar=ai-assistant&slug=${organizationSlug}`
+  const projectPathRef = projectRef && projectRef !== NO_PROJECT_MARKER ? projectRef : '_'
+  const aiLink = `/project/${projectPathRef}?sidebar=ai-assistant&slug=${organizationSlug}`
 
   if (!organizationSlug || organizationSlug === NO_ORG_MARKER) return null
 
