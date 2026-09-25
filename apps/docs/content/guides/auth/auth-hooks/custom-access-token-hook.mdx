@@ -200,6 +200,16 @@ Return these only if your hook processed the input without errors.
 | -------- | -------- | ----------------------------------------------- |
 | `claims` | `object` | The updated claims after the hook has been run. |
 
+<Admonition type="caution" title="Don't update the signing-in user from an HTTP hook">
+
+During sign-in, Supabase Auth calls this hook from inside the database transaction that issues the token. That transaction has already updated the user's row in `auth.users`, so it holds a lock on the row until the hook returns.
+
+If your hook waits for an update to the same user, such as `supabase.auth.admin.updateUserById()`, the update waits for the sign-in transaction to finish, and the transaction waits for your hook. The hook then times out, and sign-in fails with a `hook_timeout` error. Updates to other users aren't affected.
+
+To update the signing-in user, do it after your hook responds. In an Edge Function, pass the update to [`EdgeRuntime.waitUntil()`](/docs/guides/functions/background-tasks) instead of awaiting it.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
