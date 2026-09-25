@@ -160,7 +160,7 @@
     "cheerio": "^1.0.0-rc.12",
     "chokidar": "^4.0.3",
     "config": "workspace:*",
-    "dotenv": "^16.0.3",
+    "dotenv": "^17.4.2",
     "ejs": "^3.1.10",
     "globby": "^13.2.2",
     "graphiql": "^4.0.2",

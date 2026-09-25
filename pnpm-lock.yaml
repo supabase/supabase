@@ -661,8 +661,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       dotenv:
-        specifier: ^16.0.3
-        version: 16.3.1
+        specifier: ^17.4.2
+        version: 17.4.2
       ejs:
         specifier: ^3.1.10
         version: 3.1.10
@@ -2194,8 +2194,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0(encoding@0.1.13)
       dotenv:
-        specifier: ^16.5.0
-        version: 16.5.0
+        specifier: ^17.4.2
+        version: 17.4.2
       otpauth:
         specifier: ^9.4.1
         version: 9.4.1
@@ -2281,8 +2281,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       dotenv:
-        specifier: ^16.3.1
-        version: 16.3.1
+        specifier: ^17.4.2
+        version: 17.4.2
       libpg-query:
         specifier: 15.2.0
         version: 15.2.0(encoding@0.1.13)(supports-color@8.1.1)
@@ -11559,10 +11559,6 @@ packages:
 
   dotenv@16.0.3:
     resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
-    engines: {node: '>=12'}
-
-  dotenv@16.3.1:
-    resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
     engines: {node: '>=12'}
 
   dotenv@16.5.0:
@@ -29013,8 +29009,6 @@ snapshots:
       type-fest: 5.6.0
 
   dotenv@16.0.3: {}
-
-  dotenv@16.3.1: {}
 
   dotenv@16.5.0: {}
 
