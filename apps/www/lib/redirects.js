@@ -3493,9 +3493,6 @@ module.exports = [
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
   },
-  // Workers was renamed to Compute
-  { permanent: true, source: '/workers', destination: '/compute' },
-  { permanent: true, source: '/workers.md', destination: '/compute.md' },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },

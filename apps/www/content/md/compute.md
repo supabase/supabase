@@ -2,7 +2,7 @@
 
 > Run AI-agent sandboxes and production backends on one runtime, next to your database. Now in Private Alpha.
 
-Supabase Compute is a fully managed compute service built for agentic development. Use it as a sandbox platform offering short-lived, isolated environments to execute untrusted code with SSH access, or as a place to run always-on HTTP services written in any language. Everything runs in the same region and network as your primary Postgres database.
+Supabase Compute is a fully managed compute service built for agentic development. Use it as a sandbox platform offering short-lived, isolated environments to execute code, or as a place to run always-on HTTP services written in any language. Everything runs in the same region and network as your primary Postgres database.
 
 ## Key Features
 

@@ -63,9 +63,9 @@ const MainProducts: ProductType = {
     label: '',
     url: '/edge-functions',
   },
-  [PRODUCT_SHORTNAMES.WORKERS]: {
-    name: PRODUCT_NAMES.WORKERS,
-    icon: products.workers.icon[24],
+  [PRODUCT_SHORTNAMES.COMPUTE]: {
+    name: PRODUCT_NAMES.COMPUTE,
+    icon: products.compute.icon[24],
     description: (
       <>
         Run <strong>AI-agent sandboxes and backend services</strong> on one runtime, next to your
