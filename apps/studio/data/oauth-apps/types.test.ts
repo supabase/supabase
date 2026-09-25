@@ -97,7 +97,7 @@ describe('isRoleValidationFailure', () => {
       isRoleValidationFailure({
         error_code: 'role_validation_failed',
         message: 'nope',
-        validation: { scope_target: 'organization', role: READ_ONLY_ROLE, failed_scopes: [] },
+        validation: { scope_target: 'organization', role: READ_ONLY_ROLE },
       })
     ).toBe(true)
   })
@@ -130,11 +130,7 @@ describe('getFailedProjects', () => {
       getFailedProjects({
         error_code: 'role_validation_failed',
         message: 'nope',
-        validation: {
-          scope_target: 'organization',
-          role: READ_ONLY_ROLE,
-          failed_scopes: ['database:write'],
-        },
+        validation: { scope_target: 'organization', role: READ_ONLY_ROLE },
       })
     ).toEqual([])
   })
