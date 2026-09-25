@@ -1,6 +1,6 @@
 ---
 id: 'auth-twitter'
-title: 'Login with X / Twitter'
+title: 'Sign in with X / Twitter'
 description: 'Add X / Twitter OAuth to your Supabase project'
 ---
 
@@ -15,16 +15,16 @@ provider will be deprecated in future releases.
 
 </Admonition>
 
-Setting up X / Twitter logins for your application consists of 3 parts:
+Setting up X / Twitter sign-in for your application consists of 3 parts:
 
 - Create and configure an X Project and App on the [X Developer Dashboard](https://developer.x.com/en/portal/dashboard).
 - Add your X OAuth 2.0 `Client ID` and `Client Secret` to your [Supabase Project](/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your X developer account
 
 - Go to [developer.x.com](https://developer.x.com).
-- Click on `Sign in` at the top right to log in.
+- Click on `Sign in` at the top right to sign in.
 
 ## Find your callback URL
 
@@ -77,7 +77,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable

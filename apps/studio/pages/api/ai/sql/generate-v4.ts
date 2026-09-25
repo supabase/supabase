@@ -18,7 +18,6 @@ import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
 import {
-  DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   getAssistantModelEntry,
   isAssistantBaseModelId,
@@ -96,7 +95,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     messages: rawMessages,
     projectRef,
     connectionString,
-    orgSlug,
+    orgSlug: rawOrgSlug,
     chatId,
     chatName,
     model: rawRequestedModel,
@@ -122,10 +121,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
-  let orgHasHipaaAddon: boolean | undefined
-  let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
+  let isHighComplianceProject: boolean | undefined
   let orgId: number | undefined
+  let orgSlug: string | undefined
   let planId: string | undefined
 
   if (!IS_PLATFORM) {
@@ -133,17 +132,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     hasAccessToAdvanceModel = true
   }
 
-  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+  if (IS_PLATFORM && rawOrgSlug && authorization && projectRef) {
     try {
-      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
+      const aiDetails = await getAIDetails({ orgSlug: rawOrgSlug, projectRef, authorization })
 
       aiOptInLevel = aiDetails.aiOptInLevel
       hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
-      orgHasHipaaAddon = aiDetails.hasHipaaAddon
       orgId = aiDetails.orgId
+      orgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
-      projectIsSensitive = aiDetails.isSensitive
       projectRegion = aiDetails.region
+      isHighComplianceProject = aiDetails.isHighComplianceProject
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -155,7 +154,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
-  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
+  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
   if (!hasAccessToAdvanceModel || (envThrottled && !isAssistantBaseModelId(effectiveModel))) {
     effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
   }
@@ -226,15 +225,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       projectRef,
       chatId,
       chatName,
-      allowTracing: isTracingAllowed({
-        orgHasHipaaAddon,
-        projectIsSensitive,
-        projectRegion,
-      }),
+      allowTracing: isTracingAllowed({ projectRegion }),
       supportMode,
       userId,
       orgId,
+      orgSlug,
       planId,
+      isHighComplianceProject,
       includesLogsSnippets,
       isExplorerEnabled: explorerEnabled,
       requestedModel,

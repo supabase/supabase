@@ -1,4 +1,3 @@
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
 /**
@@ -9,11 +8,7 @@ import { defineConfig } from 'vitest/config'
  * suite that gates every apps/www PR.
  */
 export default defineConfig({
-  plugins: [
-    tsconfigPaths({
-      projects: ['.'],
-    }),
-  ],
+  resolve: { tsconfigPaths: true },
   test: {
     include: ['components/Partners/PartnerIntakeForm.sync.test.ts'],
   },

@@ -8,8 +8,6 @@ Self-hosted Supabase uses an [Envoy](https://www.envoyproxy.io/)-based API gatew
 
 This guide explains the architecture, configuration layout, and security posture of the Envoy gateway for operators who want to understand or customize it. It is not an Envoy tutorial - for reference on filters, routes, and clusters, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/).
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ## Using the gateway
 
 Envoy is the default API gateway and runs automatically when you start the stack - no extra configuration is required.
@@ -19,7 +17,7 @@ Envoy is registered as the `api-gw` service and also exposes `envoy` and `kong` 
 Confirm the gateway is routing requests and enforcing API keys:
 
 ```sh
-curl -i -H "apikey: your-service-role-key" http://<your-domain>/rest/v1/
+curl -i -H "apikey: your-supabase-secret-key" http://<your-domain>/rest/v1/
 ```
 
 A `200 OK` response from PostgREST confirms the gateway is up. A `401 Unauthorized` without the `apikey` header confirms enforcement is active.

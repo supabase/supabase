@@ -61,12 +61,12 @@ export const WorkflowLogsCard = ({
         <CircleDotDashed size={16} strokeWidth={1.5} className="text-warning" />
       </motion.div>
     ) : isSuccess ? (
-      <GitMerge size={16} strokeWidth={1.5} className="text-brand" />
+      <GitMerge size={16} strokeWidth={1.5} className="text-primary" />
     ) : null)
 
   return (
     <Card className="bg-background overflow-hidden h-64 flex flex-col">
-      <CardHeader className={isSuccess ? 'text-brand' : isFailed ? 'text-destructive' : ''}>
+      <CardHeader className={isSuccess ? 'text-primary' : isFailed ? 'text-destructive' : ''}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {displayIcon}

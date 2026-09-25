@@ -176,7 +176,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
         <SectionContainer>
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <SectionHeading eyebrow="Get started" title={pageData.howToApply.title} />
-            <Button asChild size="small" variant="default">
+            <Button asChild size="small">
               <Link href={pageData.howToApply.cta.link}>{pageData.howToApply.cta.label}</Link>
             </Button>
           </div>
@@ -203,7 +203,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
       {featuredPartners.length > 0 && (
         <SectionContainer>
           <div className="flex flex-col items-center text-center gap-3">
-            <span className="text-brand font-mono text-sm uppercase tracking-wide">Partners</span>
+            <span className="text-primary font-mono text-sm uppercase tracking-wide">Partners</span>
             <h2 className="text-foreground text-3xl md:text-4xl tracking-tight max-w-[35ch] text-balance">
               {pageData.featuredPartners.title}
             </h2>
@@ -252,7 +252,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
             ))}
           </div>
           <div className="mt-8 flex justify-center">
-            <Button asChild variant="default" size="small" iconRight={<ArrowRight />}>
+            <Button asChild size="small" iconRight={<ArrowRight />}>
               <Link href="/partners/catalog">Browse the Partner Catalog</Link>
             </Button>
           </div>

@@ -200,6 +200,12 @@ export const examples: Registry = [
     files: ['example/button-default.tsx'],
   },
   {
+    name: 'button-floating-plate',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-floating-plate.tsx'],
+  },
+  {
     name: 'button-warning',
     type: 'components:example',
     registryDependencies: ['button'],
@@ -550,6 +556,18 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['dialog', 'button'],
     files: ['example/dialog-centered-off.tsx'],
+  },
+  {
+    name: 'disabled-focusable',
+    type: 'components:example',
+    registryDependencies: ['button', 'tooltip'],
+    files: ['example/disabled-focusable.tsx'],
+  },
+  {
+    name: 'disabled-unavailable-with-notice',
+    type: 'components:example',
+    registryDependencies: ['admonition', 'button', 'card', 'tooltip'],
+    files: ['example/disabled-unavailable-with-notice.tsx'],
   },
   {
     name: 'drawer-demo',
@@ -1002,6 +1020,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['textarea', 'form'],
     files: ['example/textarea-form.tsx'],
+  },
+  {
+    name: 'textarea-with-addon',
+    type: 'components:example',
+    registryDependencies: ['textarea', 'input-group'],
+    files: ['example/textarea-with-addon.tsx'],
   },
   {
     name: 'textarea-with-button',
@@ -1512,6 +1536,11 @@ export const examples: Registry = [
     name: 'multi-select-disabled',
     type: 'components:example',
     files: ['example/multi-select-disabled.tsx'],
+  },
+  {
+    name: 'multi-select-without-icon',
+    type: 'components:example',
+    files: ['example/multi-select-without-icon.tsx'],
   },
   {
     name: 'multi-select-badge-limit-wrap',

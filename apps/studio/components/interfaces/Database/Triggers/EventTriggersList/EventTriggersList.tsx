@@ -254,7 +254,6 @@ export const EventTriggersList = () => {
           description="Event triggers run on database-level events like DDL commands."
         >
           <ButtonTooltip
-            variant="default"
             disabled={!canUpdateEventTriggers}
             onClick={createEventTrigger}
             tooltip={{

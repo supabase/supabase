@@ -20,7 +20,6 @@ import {
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import * as z from 'zod'
@@ -29,7 +28,7 @@ import { urlRegex } from '../Auth.constants'
 import { AUTH_TEMPLATE_RESET_TYPES } from '../EmailTemplates/EmailTemplates.constants'
 import { isBeforeFreeTierTemplateBlockCutoff } from '../EmailTemplates/EmailTemplates.utils'
 import { SmtpDisableConfirmationDialog } from './SmtpDisableConfirmationDialog'
-import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
+import { defaultDisabledSmtpFormValues, STORED_SECRET_PLACEHOLDER } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -39,6 +38,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 const smtpEnabledSchema = z.object({
   ENABLE_SMTP: z.literal(true),
@@ -53,8 +53,7 @@ const smtpEnabledSchema = z.object({
     .trim()
     .min(1, 'Host URL is required')
     .regex(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address'),
-  SMTP_PORT: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
+  SMTP_PORT: preprocessEmptyNumberInput(
     z.coerce
       .number({
         required_error: 'Port number is required',
@@ -63,8 +62,7 @@ const smtpEnabledSchema = z.object({
       .min(1, 'Must be a valid port number more than 0')
       .max(65535, 'Must be a valid port number no more than 65535')
   ),
-  SMTP_MAX_FREQUENCY: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
+  SMTP_MAX_FREQUENCY: preprocessEmptyNumberInput(
     z.coerce
       .number({
         required_error: 'Rate limit is required',
@@ -82,14 +80,8 @@ const smtpDisabledSchema = z.object({
   SMTP_ADMIN_EMAIL: z.string().optional(),
   SMTP_SENDER_NAME: z.string().optional(),
   SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
-    z.coerce.number().optional()
-  ),
-  SMTP_MAX_FREQUENCY: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
-    z.coerce.number().optional()
-  ),
+  SMTP_PORT: preprocessEmptyNumberInput(z.coerce.number().optional()),
+  SMTP_MAX_FREQUENCY: preprocessEmptyNumberInput(z.coerce.number().optional()),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
 })
@@ -481,10 +473,28 @@ export const SmtpForm = () => {
                           render={({ field }) => (
                             <FormItemLayout
                               label="Password"
-                              description="Password for your SMTP server. For security reasons, this password cannot be viewed once saved."
+                              description={
+                                isSmtpEnabled(authConfig)
+                                  ? 'Stored password is hidden. Enter a new password to replace it.'
+                                  : 'Password for your SMTP server.'
+                              }
                             >
                               <FormControl>
-                                <PasswordInput {...field} reveal copy disabled={!canUpdateConfig} />
+                                <Input
+                                  {...field}
+                                  type="password"
+                                  autoComplete="new-password"
+                                  data-1p-ignore
+                                  data-lpignore="true"
+                                  data-form-type="other"
+                                  data-bwignore
+                                  placeholder={
+                                    isSmtpEnabled(authConfig)
+                                      ? STORED_SECRET_PLACEHOLDER
+                                      : undefined
+                                  }
+                                  disabled={!canUpdateConfig}
+                                />
                               </FormControl>
                             </FormItemLayout>
                           )}
@@ -516,7 +526,6 @@ export const SmtpForm = () => {
                 <div className="flex items-center gap-x-2">
                   {isDirty && (
                     <Button
-                      variant="default"
                       onClick={() => {
                         form.reset()
                       }}

@@ -11,6 +11,7 @@ import {
   getAvailableRegions,
   getHighAvailabilityRegionCode,
   resolveDefaultDbRegion,
+  resolveSelectedRegionOptionType,
 } from './ProjectCreation.utils'
 
 describe('resolveDefaultDbRegion', () => {
@@ -69,6 +70,55 @@ describe('resolveDefaultDbRegion', () => {
   })
 })
 
+describe('resolveSelectedRegionOptionType', () => {
+  const smartGroupRegions = [{ name: 'Americas' }, { name: 'APAC' }]
+  const specificRegions = [{ name: 'ap-southeast-1' }, { name: 'us-east-1' }]
+
+  it('returns general when the "Best available region" shortcut was used', () => {
+    expect(
+      resolveSelectedRegionOptionType({
+        isBestAvailableSelected: true,
+        dbRegion: 'ap-southeast-1',
+        smartGroupRegions,
+        specificRegions,
+      })
+    ).toBe('general')
+  })
+
+  it('returns general when the region was picked from the smart group list', () => {
+    expect(
+      resolveSelectedRegionOptionType({
+        isBestAvailableSelected: false,
+        dbRegion: 'Americas',
+        smartGroupRegions,
+        specificRegions,
+      })
+    ).toBe('general')
+  })
+
+  it('returns specific when the region was picked from the specific regions list', () => {
+    expect(
+      resolveSelectedRegionOptionType({
+        isBestAvailableSelected: false,
+        dbRegion: 'ap-southeast-1',
+        smartGroupRegions,
+        specificRegions,
+      })
+    ).toBe('specific')
+  })
+
+  it('returns undefined when the region matches neither list', () => {
+    expect(
+      resolveSelectedRegionOptionType({
+        isBestAvailableSelected: false,
+        dbRegion: undefined,
+        smartGroupRegions,
+        specificRegions,
+      })
+    ).toBeUndefined()
+  })
+})
+
 describe('getAvailableRegions', () => {
   it.each(['local', 'staging', 'prod'])('returns all AWS regions for AWS on %s', (environment) => {
     expect(getAvailableRegions('AWS', environment)).toEqual(AWS_REGIONS)
@@ -94,7 +144,7 @@ describe('High Availability project creation constraints', () => {
   it.each([
     ['local', 'eu-central-1'],
     ['staging', 'us-east-1'],
-    ['prod', undefined],
+    ['prod', 'us-east-1'],
   ])('resolves the %s region restriction', (environment, expectedRegion) => {
     expect(getHighAvailabilityRegionCode(environment)).toBe(expectedRegion)
   })
@@ -102,7 +152,7 @@ describe('High Availability project creation constraints', () => {
   it.each([
     ['local', undefined],
     ['staging', 'us-east-1'],
-    ['prod', undefined],
+    ['prod', 'us-east-1'],
   ])(
     'applies the %s region restriction to high availability projects',
     (environment, expectedRegion) => {

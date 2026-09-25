@@ -27,7 +27,7 @@ Supabase reads the incoming trace context and stamps the same `trace_id` onto th
 
 ## How to set it up
 
-This walkthrough covers supabase-js. Trace propagation is also available in Swift, Flutter, and Python; see the [docs](https://supabase.com/docs/guides/monitoring-and-debugging/client-side-tracing) for per-language setup and the current list.
+This walkthrough covers supabase-js. Trace propagation is also available in Swift, Flutter, and Python; see the [docs](https://supabase.com/docs/guides/observability/client-side-tracing) for per-language setup and the current list.
 
 The SDK doesn't configure OpenTelemetry for you. You bring your own tracer, then tell the client to propagate.
 
@@ -90,4 +90,4 @@ Trace propagation is available now in `supabase-js`. Add `import '@supabase/supa
 
 Already using `tracePropagation` from an earlier release? Upgrade to `supabase-js` 2.112.0 or later and add the `import '@supabase/supabase-js/tracing'` line. Versions 2.106.0 through 2.111.x silently sent no trace headers in bundled apps, so the upgrade is what actually fixes propagation, not just the import.
 
-Full setup, including the sampling options, is in the [client-side tracing guide](https://supabase.com/docs/guides/monitoring-and-debugging/client-side-tracing).
+Full setup, including the sampling options, is in the [client-side tracing guide](https://supabase.com/docs/guides/observability/client-side-tracing).

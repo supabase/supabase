@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import type { Snapshot } from 'valtio'
 
 import { contentKeys } from '@/data/content/keys'
+import { removeNotebookDraft } from '@/state/notebooks/notebook-drafts'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { StateNotebook } from '@/state/notebooks/types'
 import { hasUnsavedChanges } from '@/state/sql-editor/sql-editor-lifecycle'
@@ -43,6 +44,7 @@ export function evictNotebookFromCaches({
 }): boolean {
   notebooksState.removeNotebook({ id })
   queryClient.removeQueries({ queryKey: contentKeys.resource(projectRef, id) })
+  removeNotebookDraft({ projectRef, id })
 
   return true
 }

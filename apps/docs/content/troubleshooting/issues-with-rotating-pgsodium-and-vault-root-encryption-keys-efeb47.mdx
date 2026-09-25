@@ -1,0 +1,16 @@
+---
+title = "Issues with rotating pgsodium and Vault root encryption keys"
+date_created = "2026-09-10T21:04:34+00:00"
+topics = [ "database" ]
+keywords = []
+---
+
+If you can still decrypt existing Vault secrets after an attempted key rotation, the project is still using the legacy root key. The Supabase Management API `/pgsodium` endpoint is the correct mechanism for key rotation, but it requires a specific format to trigger the update across the database instance.
+
+## How to rotate the root key
+
+1. Generate a new 64-character hexadecimal string to serve as the root key.
+2. Issue a PUT request to the project's `/pgsodium` Management API endpoint using a valid Personal Access Token.
+3. Pass the new 64-character hex key in the request body.
+4. Verify rotation by attempting to decrypt data encrypted with the previous key. After rotation, you can no longer decrypt legacy data.
+5. Manually re-encrypt or re-store your Vault secrets using the new key configuration.

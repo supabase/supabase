@@ -432,7 +432,7 @@ export default function MarketingForm({
           }
         >
           <p className="h3">Thank you!</p>
-          <div className="text-foreground-light [&_a]:text-brand-link [&_a]:decoration-brand-link">
+          <div className="text-foreground-light [&_a]:text-primary [&_a]:decoration-brand">
             <ReactMarkdown
               components={{
                 p: ({ children }) => <p>{children}</p>,
@@ -531,7 +531,7 @@ export default function MarketingForm({
         </Button>
 
         {disclaimer && (
-          <div className="text-xs text-foreground-lighter leading-relaxed [&_a]:text-brand-link [&_a]:decoration-brand-link">
+          <div className="text-xs text-foreground-lighter leading-relaxed [&_a]:text-primary [&_a]:decoration-brand">
             <ReactMarkdown
               components={{
                 p: ({ children }) => <p>{children}</p>,

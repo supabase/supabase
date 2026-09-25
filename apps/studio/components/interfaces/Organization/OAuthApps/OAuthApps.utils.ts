@@ -176,3 +176,22 @@ export function getOAuthImpersonationWarning({
     redirectHost: hostname,
   }
 }
+
+type SortOrder = 'asc' | 'desc'
+
+export const parseSort = <C extends string>(sort: string): [C, SortOrder] => {
+  return sort.split(':') as [C, SortOrder]
+}
+
+export const toggleSort = <S extends string>(
+  currentSort: S,
+  column: string,
+  setSort: (sort: S) => void
+) => {
+  const [currentColumn, currentOrder] = parseSort(currentSort)
+  if (currentColumn === column) {
+    setSort(`${column}:${currentOrder === 'asc' ? 'desc' : 'asc'}` as S)
+  } else {
+    setSort(`${column}:asc` as S)
+  }
+}

@@ -581,11 +581,20 @@ export const fillTimeseries = (
     })
   }
 
-  if (timeseriesData.length <= 1 && !(min && max)) return timeseriesData
-  const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
+  if (timeseriesData.length === 1 && !(min && max)) {
+    const timestamp = timeseriesData[0][timestampKey]
+    timeseriesData[0][timestampKey] = isUnixMicro(timestamp)
+      ? unixMicroToIsoTimestamp(timestamp)
+      : dayjs.utc(timestamp).toISOString()
+    return timeseriesData
+  }
+  const dates = timeseriesData.map((datum) => {
+    const timestamp = datum[timestampKey]
+    return dayjs.utc(isUnixMicro(timestamp) ? unixMicroToIsoTimestamp(timestamp) : timestamp)
+  })
 
-  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
-  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
+  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max(...dates.map((date) => date.valueOf())))
+  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min(...dates.map((date) => date.valueOf())))
 
   // When no data exists but min/max are provided, we need to determine truncation from the time range
   const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
@@ -601,10 +610,10 @@ export const fillTimeseries = (
       truncation = unitMap[unitChar]
     } else {
       // Fallback for invalid format
-      truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+      truncation = getTimestampTruncation(truncationSamples)
     }
   } else {
-    truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+    truncation = getTimestampTruncation(truncationSamples)
   }
 
   // If no data exists and no interval specified, default to minute precision
@@ -612,11 +621,8 @@ export const fillTimeseries = (
     truncation = 'minute'
   }
 
-  const newData = timeseriesData.map((datum) => {
-    const timestamp = datum[timestampKey]
-    const iso = isUnixMicro(timestamp)
-      ? unixMicroToIsoTimestamp(timestamp)
-      : dayjs.utc(timestamp).toISOString()
+  const newData = timeseriesData.map((datum, index) => {
+    const iso = dates[index].toISOString()
 
     if (Array.isArray(valueKey) && valueKey.length === 0) {
       return { [timestampKey]: iso }
@@ -628,8 +634,7 @@ export const fillTimeseries = (
 
   let currentDate = minDate
   while (currentDate.isBefore(maxDate) || currentDate.isSame(maxDate)) {
-    const found = dates.find((d) => {
-      const d_date = d as Dayjs
+    const found = dates.find((d_date) => {
       return (
         d_date.year() === currentDate.year() &&
         d_date.month() === currentDate.month() &&
@@ -956,4 +961,53 @@ export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: 
     sqlContext +
     '\n\nWhat do these logs indicate? What steps can I take to resolve it? Keep your answer very concise and actionable. Max 2 or 3 bullet points.'
   )
+}
+
+/**
+ * Computes the next multi-select set after a shift-click on `targetKey`, extending
+ * the selection from `anchorKey` (the last row the user clicked). Every key between
+ * anchor and target (inclusive, in `orderedKeys` order) is added. If the whole range is
+ * already selected, the range is removed instead. Falls back to a plain toggle of
+ * `targetKey` when there is no usable anchor (null, or no longer in `orderedKeys`).
+ */
+export function getShiftClickSelection({
+  orderedKeys,
+  selectedKeys,
+  anchorKey,
+  targetKey,
+}: {
+  orderedKeys: string[]
+  selectedKeys: Set<string>
+  anchorKey: string | null
+  targetKey: string
+}): Set<string> {
+  const next = new Set(selectedKeys)
+
+  const anchorIndex = anchorKey === null ? -1 : orderedKeys.indexOf(anchorKey)
+  const targetIndex = orderedKeys.indexOf(targetKey)
+  const hasUsableAnchor = anchorIndex !== -1 && targetIndex !== -1
+
+  if (!hasUsableAnchor) {
+    if (next.has(targetKey)) {
+      next.delete(targetKey)
+    } else {
+      next.add(targetKey)
+    }
+    return next
+  }
+
+  const startIndex = Math.min(anchorIndex, targetIndex)
+  const endIndex = Math.max(anchorIndex, targetIndex)
+  const rangeKeys = orderedKeys.slice(startIndex, endIndex + 1)
+  const isRangeFullySelected = rangeKeys.every((key) => selectedKeys.has(key))
+
+  rangeKeys.forEach((key) => {
+    if (isRangeFullySelected) {
+      next.delete(key)
+    } else {
+      next.add(key)
+    }
+  })
+
+  return next
 }

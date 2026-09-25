@@ -83,7 +83,6 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 return (
                   <Button
                     block
-                    variant="default"
                     role="combobox"
                     aria-label="Select a project"
                     aria-expanded={open}
@@ -199,14 +198,14 @@ export const PlanExpectationInfoContent = ({
 
       {shouldShowUpgradeActions && (
         <div className="flex flex-wrap gap-2 pt-1">
-          <Button asChild size="tiny">
+          <Button variant="primary" asChild size="tiny">
             <Link
               href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
             >
               Upgrade plan
             </Link>
           </Button>
-          <Button asChild variant="default" size="tiny" icon={<ExternalLink />}>
+          <Button asChild size="tiny" icon={<ExternalLink />}>
             <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
               Enquire about Enterprise
             </Link>

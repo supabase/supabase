@@ -8,32 +8,29 @@ sidebar_label: 'Monitoring'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-After setting up Supabase Pipelines, you can monitor the status and health of your pipelines directly from the Dashboard. A pipeline first performs an initial sync of existing rows, then uses ongoing replication (CDC) to send subsequent database changes to your destination.
+Use the Dashboard to check [replication progress](#viewing-detailed-pipeline-metrics), [investigate lag](#dealing-with-replication-lag), and [recover from errors](#handling-errors).
 
 ## Viewing pipeline status
 
-To monitor your pipelines:
-
-1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
-2. You'll see a list of all your destinations with their pipeline status
+Open [**Database > Pipelines**](/dashboard/project/_/database/pipelines) to see each destination's pipeline status.
 
 ### Pipeline states
 
-Each destination shows its pipeline in one of these states:
+| State          | Meaning                                                         |
+| -------------- | --------------------------------------------------------------- |
+| **Stopped**    | Not running; requires a manual start                            |
+| **Starting**   | Starting or replacing the process after a restart               |
+| **Running**    | Process is running                                              |
+| **Stopping**   | Finishing in-flight work before stopping                        |
+| **Restarting** | Applying settings or table state before restarting              |
+| **Failed**     | Reports a startup or runtime failure; can recover automatically |
+| **Unknown**    | Status is unavailable                                           |
 
-| State          | Description                                                                     |
-| -------------- | ------------------------------------------------------------------------------- |
-| **Stopped**    | Pipeline is not running                                                         |
-| **Starting**   | Pipeline is being started                                                       |
-| **Running**    | Pipeline is actively replicating data                                           |
-| **Stopping**   | Pipeline is being stopped                                                       |
-| **Restarting** | Pipeline settings or table state are being applied before replication restarts  |
-| **Failed**     | Pipeline has encountered an error (hover over the status to view error details) |
-| **Unknown**    | The Dashboard can't currently determine the pipeline status                     |
+**Running** does not confirm that initial sync has finished, the source is connected, or destination writes are complete. Check table states and lag to assess progress.
 
 ## Viewing detailed pipeline metrics
 
-For detailed information about a specific pipeline, click **View pipeline** on the destination. This opens the pipeline status page where you can monitor replication performance and table states.
+Click a pipeline in the list to inspect its metrics and table states.
 
 <Image
   alt="Running pipeline status page showing replication metrics and a live table"
@@ -44,198 +41,140 @@ For detailed information about a specific pipeline, click **View pipeline** on t
   zoomable
 />
 
+### Table states
+
+| State             | Meaning                                                              |
+| ----------------- | -------------------------------------------------------------------- |
+| **Queued**        | Waiting to begin initial sync                                        |
+| **Copying**       | Copying existing rows                                                |
+| **Copied**        | Copy finished; changes made during the copy still need to be applied |
+| **Live**          | Following WAL changes, including catch-up after copying              |
+| **Error**         | Replication encountered an error                                     |
+| **Restarting**    | Restarting replication for the table from scratch                    |
+| **Not Available** | State is temporarily unavailable during a pipeline state change      |
+| **Unknown**       | The Dashboard does not recognize the reported state                  |
+
 ### Replication lag metrics
 
-The status page shows replication lag metrics that help you determine how far the pipeline is behind Postgres. These metrics are loaded directly from Postgres replication slot state.
+These metrics come from Postgres replication slot state. The pipeline list also shows a byte-based lag value: **Caught up** means no gap between the confirmed flush position and current WAL position at measurement time. It does not guarantee that every table has finished initial sync or that data is visible to destination queries.
 
-The destinations list also shows a compact lag value. This value is byte-based: it shows how much WAL the pipeline has not confirmed as flushed yet. A value of **Caught up** means the pipeline has confirmed every change currently available for its slot.
+| Metric                      | Meaning                                                                                            | Investigate when                                               |
+| --------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **Waiting to sync**         | WAL bytes between the confirmed flush position and current Postgres WAL position                   | The value keeps growing                                        |
+| **WAL retention remaining** | WAL that can accumulate before the slot risks becoming unusable, based on `max_slot_wal_keep_size` | The value is small or shrinking                                |
+| **Last check-in**           | Time since the last replication feedback to Postgres                                               | Feedback is old or missing                                     |
+| **Connected**               | Whether the replication slot is active                                                             | It says **Not connected** while the pipeline should be running |
+| **Slot status**             | Whether required WAL is still retained                                                             | The slot is **Unreserved** or **Lost**                         |
 
-The detailed status page shows:
+The Dashboard displays **Unlimited** when Postgres returns no `safe_wal_size`. That happens both with unlimited retention and with a **Lost** slot, so always check slot status. See [Postgres replication slot metrics](https://www.postgresql.org/docs/current/view-pg-replication-slots.html).
 
-| Metric                      | What it means                                                                                                                                    | What to watch for                                                                                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Waiting to sync**         | Bytes of WAL between the pipeline's confirmed flush position and the current Postgres WAL position. This is the main byte-based replication lag. | A value that keeps growing means the pipeline is receiving changes more slowly than Postgres produces them.                                                     |
-| **WAL retention remaining** | How much WAL can still accumulate before the replication slot is at risk of becoming unusable. This is controlled by `max_slot_wal_keep_size`.   | A small or shrinking value means you should investigate before required WAL is removed. `Unlimited` means Postgres is not reporting a slot WAL retention limit. |
-| **Last check-in**           | How long it has been since the pipeline last sent replication feedback to Postgres.                                                              | An old value can mean the pipeline is stopped, disconnected, overloaded, or unable to make progress.                                                            |
-| **Connected**               | Whether the pipeline's replication slot is active and currently being used.                                                                      | `Not connected` while the pipeline should be running usually means you should check pipeline status and logs.                                                   |
-| **Slot status**             | How safely Postgres is keeping the WAL files the pipeline still needs.                                                                           | `Unreserved` and `Lost` require action. See [Slot statuses](#slot-statuses).                                                                                    |
+Pipelines keeps sending feedback during slow writes and while WAL reading is paused. It repeats the last safe position without acknowledging unfinished writes. A recent check-in and an active connection can therefore coexist with growing lag.
 
-Pipelines uses one main pipeline replication slot for ongoing replication. During the initial sync, it can also create temporary table-sync replication slots. These temporary slots let multiple tables sync in parallel, make large initial syncs faster, and allow individual tables to be retried without restarting the whole pipeline.
-
-Temporary table-sync slots show the same kind of lag and slot health metrics while they are active. After a table finishes its initial sync and catches up, its temporary slot is removed and ongoing replication continues through the main pipeline slot. For overall replication health, focus first on the main pipeline slot.
+The main slot tracks ongoing replication. [Table-sync slots](#initial-sync-and-table-sync-slots) appear temporarily during initial sync and have the same metrics.
 
 ### Slot statuses
 
-Replication slot status tells you whether Postgres is still retaining the WAL that the pipeline needs to continue from its current position.
+| Status         | Meaning                                                                             |
+| -------------- | ----------------------------------------------------------------------------------- |
+| **Reserved**   | Required WAL is retained within the normal WAL size limit                           |
+| **Extended**   | Required WAL is retained beyond that limit; this alone does not mean lag is growing |
+| **Unreserved** | Required WAL is no longer fully reserved and can be removed                         |
+| **Lost**       | Required WAL has been removed; replication cannot continue from this slot           |
+| **Unknown**    | Slot state is unavailable or unrecognized                                           |
 
-| Status         | Meaning                                                                                                                                                                                                                                                                      |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Reserved**   | Healthy. Postgres is keeping the WAL files this pipeline's replication slot needs, and they are within the normal WAL size limit.                                                                                                                                            |
-| **Extended**   | Healthy, but growing. The slot is holding on to more WAL than usual, but Postgres is still keeping everything the pipeline needs.                                                                                                                                            |
-| **Unreserved** | At risk. Postgres is no longer reserving all WAL files this pipeline's replication slot needs. If the pipeline does not catch up soon, those files may be removed.                                                                                                           |
-| **Lost**       | Broken. Some WAL files this pipeline's replication slot needs have already been removed. The pipeline can no longer continue from this slot. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** in the pipeline's advanced settings and restart it. |
-| **Unknown**    | Postgres reported an unknown or unavailable state for this pipeline's replication slot.                                                                                                                                                                                      |
-
-### Table states
-
-The pipeline status page also shows the state of individual tables being replicated. Each table can be in one of these states:
-
-| State             | Description                                                              |
-| ----------------- | ------------------------------------------------------------------------ |
-| **Queued**        | Table is waiting for the pipeline to begin its initial sync              |
-| **Copying**       | Existing rows are being copied during the initial sync                   |
-| **Copied**        | Initial sync is complete and the table is preparing to replicate changes |
-| **Live**          | Table is now receiving ongoing replication                               |
-| **Error**         | Table has experienced an error during replication                        |
-| **Restarting**    | The table's initial sync is being restarted                              |
-| **Not Available** | Table state is temporarily unavailable while the pipeline changes state  |
-| **Unknown**       | The Dashboard received a table state it doesn't recognize                |
-
-## Dealing with replication lag
-
-Replication lag means the pipeline is behind the source database. Some lag is expected during the initial sync, after a burst of writes, or after restarting a stopped pipeline. Lag becomes a problem when it keeps increasing, when **WAL retention remaining** is running low, or when the slot status moves to **Unreserved** or **Lost**.
-
-Lag can come from several places:
-
-- **Destination throughput**: The destination is slow, rate-limited, unavailable, or rejecting writes.
-- **Pipeline throughput**: The pipeline is overloaded, processing a very large transaction, or not performing as expected for the project workload.
-- **Source database activity**: Postgres is producing WAL faster than the pipeline can consume it, often during bulk writes, migrations, or backfill jobs.
-- **Network latency**: Latency or instability between the pipeline and source database can slow down WAL streaming.
-- **Stopped or disconnected pipeline**: When a pipeline is stopped, disconnected, or failed, Postgres keeps WAL for the slot until the retention limit is reached.
-- **Slow initial sync**: A temporary table-sync slot can fall behind if existing rows are copied more slowly than new changes are written to that table.
-
-### Initial sync and table-sync slots
-
-A common initial sync issue happens when a large or busy table is still in **Copying** while new rows keep being inserted or updated. The temporary table-sync slot retains changes that happen during the initial sync. If copying is too slow compared to the table's write rate, the slot can move to **Unreserved** and then **Lost** if Postgres removes changes the sync still needs.
-
-When a table-sync slot is lost, the affected table needs to run its initial sync again. Tune the copy settings, then retry the table:
-
-- Increase **Copy connections per table** when one large table is the bottleneck. This lets the pipeline copy chunks of that table over multiple source connections, up to the point where the source database, network, or destination becomes the limit.
-- Increase **Table sync workers** when several tables need to copy at the same time. Each worker can copy one table, and each worker uses an additional temporary replication slot during initial sync.
-- If possible, run the initial sync during a quieter write period or reduce bulk writes until the table reaches **Live**.
-
-After the affected table finishes copying and catches up, the temporary slot is deleted. The table then continues through the main pipeline replication slot.
-
-### Investigate the lag
-
-1. Open [**Database > Replication**](/dashboard/project/_/database/replication) and check the destination's lag column.
-2. Click **View pipeline** and check **Waiting to sync**, **WAL retention remaining**, **Last check-in**, **Connected**, and **Slot status**.
-3. Check table states. Tables in **Copying** can create temporary lag while the initial sync catches up to ongoing changes. If a table-sync slot is **Unreserved** or **Lost**, tune copy parallelism and retry the affected table's initial sync.
-4. Open [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) and look for destination errors, retries, rate limits, schema errors, or repeated restarts.
-5. Compare the lag trend with recent database activity, such as imports, migrations, bulk updates, or long transactions.
-
-### Respond based on the slot status
-
-| Slot status    | What to do                                                                                                                                                                                                                                                                                                       |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Reserved**   | If **Waiting to sync** is stable or decreasing, continue monitoring. If it keeps increasing, check destination write performance, logs, and whether the publication includes more tables or write volume than expected.                                                                                          |
-| **Extended**   | Treat it as an early warning. Confirm the pipeline is connected, check logs for retries or destination slowness, and reduce avoidable write bursts if possible until the pipeline catches up.                                                                                                                    |
-| **Unreserved** | Act soon. The slot is at risk of losing required WAL. Check whether the pipeline is connected and making progress, fix destination or pipeline errors, and contact support if the lag continues to grow.                                                                                                         |
-| **Lost**       | The pipeline cannot continue from the existing slot because required WAL has been removed. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** in the pipeline's advanced settings and restart the pipeline. This creates a new slot and starts replication from scratch for all tables. |
-| **Unknown**    | Check replication logs for errors or missing slot details. If the status remains unknown while the pipeline should be running, contact support with the pipeline ID and recent log details.                                                                                                                      |
-
-### Reduce future lag risk
-
-- Keep publications focused on the tables and operations you need at the destination.
-- Avoid leaving pipelines stopped for long periods while the source database is still receiving writes.
-- Schedule bulk updates, imports, and migrations during lower-traffic windows when possible.
-- For BigQuery, verify that service account permissions, table requirements, and replica identity settings match the [BigQuery destination guide](/docs/guides/database/replication/bigquery).
-- For ClickHouse, check the HTTPS endpoint, target-database permissions, selected table engine, server version, and source table requirements against the [ClickHouse destination guide](/docs/guides/database/replication/clickhouse).
-- For DuckLake, check catalog connectivity, object-storage permissions, catalog and storage latency, and source row identity against the [DuckLake destination guide](/docs/guides/database/replication/ducklake).
-- For Snowflake, check the service user's default role, schema privileges, key pair, row limits, and replica identity against the [Snowflake destination guide](/docs/guides/database/replication/snowflake).
-- If the initial sync is the bottleneck, review **Table sync workers** and **Copy connections per table** in the pipeline's advanced settings. Increasing either can use more source database connections; increasing table sync workers can also use more temporary replication slots.
-
-## Handling errors
-
-Errors can occur at two levels: per table or per pipeline.
-
-### Table errors
-
-Table errors occur during the initial sync and affect individual tables. These errors can be retried without stopping the entire pipeline.
-
-**Viewing table error details:**
-
-1. Click **View pipeline** on your destination
-2. Check the table states section to identify tables in **Error** state
-3. Review the error message for that specific table
-
-**Recovering from table errors:**
-
-When a table encounters an error during the initial sync, you can reset the table state. This deletes the table's existing destination data and restarts its initial sync from the beginning. For ClickHouse, the reset drops and recreates the table and any generated current-state view. For DuckLake, it drops and recreates the table in the catalog; managed maintenance later cleans up unreferenced files. For Snowflake, it drops and recreates the append-only history table and its managed streaming channel.
-
-### Pipeline errors
-
-Pipeline errors can occur during startup or ongoing replication and affect the entire pipeline. If a non-retryable pipeline-level error occurs, the entire pipeline stops and enters a **Failed** state instead of silently skipping the failure.
-
-**Viewing pipeline error details:**
-
-1. Hover over the **Failed** status in the destinations list to see a quick error summary
-2. Click **View pipeline** for comprehensive error information
-3. Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) section of the Dashboard for detailed error logs
-
-**Recovering from pipeline errors:**
-
-To recover from a pipeline error, you'll need to:
-
-1. Investigate the root cause using the error details and logs
-2. Fix the underlying issue (e.g., destination connectivity, schema compatibility)
-3. Restart the pipeline from the destinations list
+See [Respond based on the slot status](#respond-based-on-the-slot-status) for recovery actions.
 
 ## Viewing logs
 
-To see detailed logs for all your pipelines:
+Open [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) for errors, retries, and performance warnings. Include the pipeline ID and relevant errors when [contacting support](/dashboard/support/new).
 
-1. Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) section of the Dashboard
-2. Select **Replication** from the log source filter
-3. You'll see all logs from your pipelines
+## Handling errors
 
-<Admonition type="note">
+Table errors can pause one table while others continue replicating. Pipeline errors affect the overall process.
 
-Logs contain diagnostic information that may be too technical for most users. If you're experiencing issues with replication, reaching out to support with your error details is recommended.
+### Table errors
 
-</Admonition>
+Open the pipeline, inspect the table error and any scheduled retry, and fix the cause. If replication cannot safely resume from its saved state, [restart replication for the affected tables](#restarting-tables).
 
-## Common monitoring scenarios
+### Pipeline errors
 
-### Checking if replication is healthy
+A **Failed** pipeline can recover automatically. Check logs for persistent connectivity, permission, schema, or destination errors, fix the cause, and restart if needed. Supabase stops pipelines after repeated failures; a **Stopped** pipeline requires a manual start.
 
-1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
-2. Verify your destination shows a "Running" status
-3. Click **View pipeline** to check replication lag and table states
-4. Ensure all tables show a "Live" state
+## Dealing with replication lag
 
-### Investigating errors
+Lag grows when Postgres produces WAL faster than Pipelines confirms progress. Some lag is expected during initial sync, write bursts, and recovery from downtime. Sustained growth or shrinking WAL retention requires investigation.
 
-If you see a **Failed** status:
+### Investigate the lag
 
-1. Hover over the status to see the error summary
-2. Click **View pipeline** to see detailed error information
-3. Check table states to identify which tables are affected
-4. Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) section of the Dashboard for full error details
-5. For table errors, attempt to reset the affected tables
+1. Open the pipeline and compare **Waiting to sync** with **WAL retention remaining** and **Slot status**.
+2. Check **Connected** and **Last check-in** for connection or feedback problems.
+3. Check table states for initial sync or table errors.
+4. Open [replication logs](#viewing-logs) and look for destination errors, rate limits, retries, or repeated restarts.
+5. Compare the lag trend with source activity, such as bulk imports, large transactions, or long-running writes.
 
-### Monitoring performance
+Common causes include a slow destination, source or pipeline resource limits, network latency, and stopped or disconnected pipelines.
 
-To ensure optimal performance:
+### Initial sync and table-sync slots
 
-1. Regularly check replication lag metrics in the pipeline status view
-2. Monitor table states to ensure tables are staying in a "Live" state
-3. Review logs for warnings or performance issues
-4. If lag is consistently high, review your publication and destination configuration
+Pipelines uses one main slot plus up to one temporary slot per active table-sync worker. These slots retain changes made while rows are copied. After copying and catch-up finish, the temporary slot is removed and the table continues through the main slot.
 
-## Troubleshooting
+If a table-sync slot is lost, that table must repeat its initial sync. Automatic retries can recover individual tables; a manual [table restart](#restarting-tables) temporarily stops the whole pipeline.
 
-If you notice issues with your replication:
+To improve copy throughput:
 
-1. **Check pipeline state**: Ensure the pipeline is in **Running** state
-2. **Review table states**: Identify tables in **Error** state
-3. **Check logs**: Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) section of the Dashboard for detailed error information
-4. **Verify publication**: Ensure your Postgres publication is properly configured
-5. **Monitor replication lag**: High lag may indicate performance issues
+- Increase **Initial sync connections per table** when one large table is the bottleneck.
+- Increase **Table sync workers** when several tables need to copy concurrently.
+- Reduce bulk writes until the table is **Live** and its lag has caught up.
 
-For more troubleshooting tips, see the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq).
+Higher concurrency uses more source connections, and additional workers need more slots. Increase it only while the source database, network, and destination have capacity. See [setting defaults and limits](/docs/guides/database/replication/pipelines#advanced-settings).
 
-## Next steps
+### Respond based on the slot status
 
-- [Set up Pipelines](/docs/guides/database/replication/pipelines)
-- [View the Pipelines FAQ](/docs/guides/database/replication/pipelines-faq)
+| Slot status                  | Action                                                                                                                                        |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reserved** or **Extended** | Monitor the trend. If lag keeps growing, investigate destination performance, source write volume, and logs.                                  |
+| **Unreserved**               | Restore connectivity or resolve throughput and write failures before Postgres removes required WAL. Contact support if lag continues to grow. |
+| **Lost**                     | For a table-sync slot, retry the affected table. For the main slot, use the recovery procedure that follows.                                  |
+| **Unknown**                  | Check logs and slot details. If the state persists, contact support with the pipeline ID and error details.                                   |
+
+To recover a lost main slot, open **Edit pipeline > Advanced settings** and set **Invalidated slot behavior** to **Recreate slot**. Review the effects below, then click **Apply and restart pipeline** or **Apply and start pipeline**, depending on its current state.
+
+**This replaces every destination table.** Existing source rows are copied only for tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy); excluded tables resume with new changes only. Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+
+Alternatively, stop and delete the pipeline, then [create a new one](/docs/guides/database/replication/pipelines#setup-overview). Deletion automatically removes that pipeline's main slot, table-sync slots, and saved replication state when the source database is reachable. It leaves source tables, existing destination data, and the [shared Pipelines installation](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines) in place.
+
+### Reduce future lag risk
+
+- Review the [WAL retention recommendation](/docs/guides/database/replication/pipelines#creation-checks) at creation and continue monitoring retention after startup.
+- Publish only the tables and operations you need.
+- Avoid prolonged stops while the source is receiving writes.
+- Schedule bulk writes and initial sync during quieter periods when possible.
+
+## Restarting tables
+
+Restart table replication to rebuild one or more destination tables from scratch, for example after a schema change or an unrecoverable table error. **Restart pipeline** restarts the process using saved replication progress; it does not request a table rebuild. See [pipeline restart and recovery behavior](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery) for exceptions during initial sync or lost-slot recovery.
+
+When you restart table replication:
+
+- **All existing data in the affected destination tables is deleted.** The original Postgres source tables and their rows are unchanged.
+- For tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy), Pipelines copies all current source rows included by the publication again, then resumes ongoing replication. Tables excluded from initial sync resume with new changes only; their existing source rows are not copied.
+- The table restart resets replication progress only for the selected tables.
+- Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+
+The pipeline stops temporarily to apply the table restart. The Dashboard restarts it automatically, or starts it if it was stopped. Replication for other tables is paused during this process, and their unfinished initial syncs can restart from scratch.
+
+Before restarting, use **Edit pipeline** to check the **Initial sync** selection. Include any affected tables whose existing source rows you need to copy again, then apply your changes. Open the pipeline from the list on **Database > Pipelines**.
+
+### Restart a single table
+
+1. Click the restart icon on the table's row.
+2. Review the table name, data replacement, and cost details in the confirmation dialog.
+3. Click **Restart replication**.
+
+### Restart multiple tables
+
+1. Click **Restart all tables**, or open the arrow menu beside it and select **Restart failed tables only**.
+2. Review the affected tables, data replacement, and cost details. The failed-tables action affects every table that is failed when the request runs.
+3. Confirm **Restart all tables** or **Restart failed tables**, matching the scope you chose.
+
+If a table restart fails, refresh the pipeline and table states before retrying. Start the pipeline explicitly if it remains **Stopped**.

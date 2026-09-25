@@ -401,7 +401,7 @@ export const CreateBranchModal = () => {
                               isCheckingGHBranchValidity ? (
                                 <Loader2 size={14} className="animate-spin" />
                               ) : isGitBranchValid ? (
-                                <Check size={14} className="text-brand" strokeWidth={2} />
+                                <Check size={14} className="text-primary" strokeWidth={2} />
                               ) : null
                             ) : null}
                           </div>
@@ -611,11 +611,7 @@ export const CreateBranchModal = () => {
             </DialogSection>
 
             <DialogFooter className="justify-end gap-2" padding="medium">
-              <Button
-                variant="default"
-                disabled={isCreatingBranch}
-                onClick={() => setShowCreateBranchModal(false)}
-              >
+              <Button disabled={isCreatingBranch} onClick={() => setShowCreateBranchModal(false)}>
                 Cancel
               </Button>
               <ButtonTooltip

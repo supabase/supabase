@@ -17,7 +17,7 @@ export default function BecomeAPartner() {
           align="center"
           title={
             <>
-              Apply to become a <span className="text-brand-link block">Supabase partner</span>
+              Apply to become a <span className="text-primary block">Supabase partner</span>
             </>
           }
           description="Tell us about your company, what you’re building and the program you're interested in.
