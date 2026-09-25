@@ -1,6 +1,12 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
-import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
+import {
+  isToolUIPart,
+  type DynamicToolUIPart,
+  type ReasoningUIPart,
+  type TextUIPart,
+  type ToolUIPart,
+} from 'ai'
+import { BrainIcon, CheckIcon, CircleStop, Loader2 } from 'lucide-react'
 import { type ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -338,6 +344,32 @@ export function MessagePartSwitcher({
 }: {
   part: NonNullable<VercelMessage['parts']>[number]
 }) {
+  const { isLoading, isLastMessage } = useMessageInfoContext()
+  const isActiveMessage = isLoading && isLastMessage
+  // Compact rows and query_logs run on the server, so `input-available` means the tool never
+  // returned. Other tools wait in that state for the user to act.
+  const isServerToolAwaitingOutput =
+    isToolUIPart(part) &&
+    part.state === 'input-available' &&
+    (isCompactToolPart(part) ||
+      part.type === 'tool-query_logs' ||
+      (part.type === 'dynamic-tool' && part.toolName === 'query_logs'))
+  const isIncompletePart =
+    (part.type === 'reasoning' && part.state === 'streaming') ||
+    (isToolUIPart(part) && part.state === 'input-streaming') ||
+    isServerToolAwaitingOutput
+
+  if (!isActiveMessage && isIncompletePart) {
+    return (
+      <Tool
+        icon={<CircleStop strokeWidth={1.5} size={12} className="text-foreground-muted" />}
+        label="Response interrupted"
+      >
+        {part.type === 'reasoning' ? part.text : undefined}
+      </Tool>
+    )
+  }
+
   const content = (() => {
     switch (part.type) {
       case 'dynamic-tool': {
