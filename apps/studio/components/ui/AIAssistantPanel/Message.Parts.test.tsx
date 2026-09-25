@@ -105,6 +105,29 @@ describe('MessagePartToolGroup', () => {
     expect(toolRows[1].querySelector('.shimmer')).toBeInTheDocument()
   })
 
+  it('moves the shimmer to each new tool call as it arrives', async () => {
+    const user = userEvent.setup()
+    const { container, rerender } = renderInMessage(
+      <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={true} />
+    )
+    await user.click(screen.getByRole('button', { name: 'Ran load_knowledge' }))
+
+    const nextReasoningPart = { ...reasoningPart, state: 'streaming' as const }
+    rerender(
+      inMessage(
+        <MessagePartToolGroup
+          parts={[reasoningPart, toolPart, nextReasoningPart]}
+          isRunning={true}
+        />
+      )
+    )
+
+    const toolRows = container.querySelectorAll('.tool-item')
+    expect(toolRows).toHaveLength(3)
+    expect(toolRows[1].querySelector('.shimmer')).toBeNull()
+    expect(toolRows[2].querySelector('.shimmer')).toBeInTheDocument()
+  })
+
   it('shimmers the summary only while running', async () => {
     const { rerender } = renderInMessage(
       <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={true} />

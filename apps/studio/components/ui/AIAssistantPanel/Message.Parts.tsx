@@ -1,7 +1,7 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { memo, useState, type ReactNode } from 'react'
 import { cn } from 'ui'
 
 import { AssistantQueryCell } from './AssistantQueryCell'
@@ -11,7 +11,12 @@ import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
 import { ToolGroup } from './elements/ToolGroup'
 import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
-import { getCompactPartLabel, getMessagePartKind, getToolGroupHeader } from './Message.Parts.utils'
+import {
+  areMessagePartsEqual,
+  getCompactPartLabel,
+  getMessagePartKind,
+  getToolGroupHeader,
+} from './Message.Parts.utils'
 import {
   deployEdgeFunctionInputSchema,
   deployEdgeFunctionOutputSchema,
@@ -324,69 +329,73 @@ const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   // Unlabelled code fences resolve to SQL in MessageMarkdown, too.
   (part.type === 'text' && /```(?:sql)?(?:\s|$)/i.test(part.text))
 
-export function MessagePartSwitcher({
-  part,
-  isActive,
-}: {
-  part: NonNullable<VercelMessage['parts']>[number]
-  /** Marks the in-progress tool call within a running tool group. */
-  isActive?: boolean
-}) {
-  const content = (() => {
-    switch (part.type) {
-      case 'dynamic-tool': {
-        if (part.toolName === 'query_logs') {
+export const MessagePartSwitcher = memo(
+  function MessagePartSwitcher({
+    part,
+    isActive,
+  }: {
+    part: NonNullable<VercelMessage['parts']>[number]
+    /** Marks the in-progress tool call within a running tool group. */
+    isActive?: boolean
+  }) {
+    const content = (() => {
+      switch (part.type) {
+        case 'dynamic-tool': {
+          if (part.toolName === 'query_logs') {
+            return <MessagePart.QueryLogs toolPart={part} />
+          }
+          return <MessagePart.Tool toolPart={part} isActive={isActive} />
+        }
+        case 'tool-list_policies':
+        case 'tool-search_docs':
+        case 'tool-get_active_incidents':
+        case 'tool-load_knowledge': {
+          return <MessagePart.Tool toolPart={part} isActive={isActive} />
+        }
+        case 'reasoning':
+          return <MessagePart.Reasoning reasoningPart={part} isActive={isActive} />
+        case 'text':
+          return <MessagePart.Text textPart={part} />
+
+        case 'tool-execute_sql': {
+          return <MessagePart.ExecuteSql toolPart={part} />
+        }
+        case 'tool-query_logs': {
           return <MessagePart.QueryLogs toolPart={part} />
         }
-        return <MessagePart.Tool toolPart={part} isActive={isActive} />
-      }
-      case 'tool-list_policies':
-      case 'tool-search_docs':
-      case 'tool-get_active_incidents':
-      case 'tool-load_knowledge': {
-        return <MessagePart.Tool toolPart={part} isActive={isActive} />
-      }
-      case 'reasoning':
-        return <MessagePart.Reasoning reasoningPart={part} isActive={isActive} />
-      case 'text':
-        return <MessagePart.Text textPart={part} />
+        case 'tool-deploy_edge_function': {
+          return <MessagePart.DeployEdgeFunction toolPart={part} />
+        }
+        case 'tool-create_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="create" />
+        }
+        case 'tool-update_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="update" />
+        }
+        case 'tool-delete_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="delete" />
+        }
+        case 'tool-run_notebook': {
+          return <MessagePart.NotebookRun toolPart={part} />
+        }
 
-      case 'tool-execute_sql': {
-        return <MessagePart.ExecuteSql toolPart={part} />
+        case 'source-url':
+        case 'source-document':
+        case 'file':
+        default:
+          return null
       }
-      case 'tool-query_logs': {
-        return <MessagePart.QueryLogs toolPart={part} />
-      }
-      case 'tool-deploy_edge_function': {
-        return <MessagePart.DeployEdgeFunction toolPart={part} />
-      }
-      case 'tool-create_notebook': {
-        return <MessagePart.NotebookProposal toolPart={part} mode="create" />
-      }
-      case 'tool-update_notebook': {
-        return <MessagePart.NotebookProposal toolPart={part} mode="update" />
-      }
-      case 'tool-delete_notebook': {
-        return <MessagePart.NotebookProposal toolPart={part} mode="delete" />
-      }
-      case 'tool-run_notebook': {
-        return <MessagePart.NotebookRun toolPart={part} />
-      }
+    })()
 
-      case 'source-url':
-      case 'source-document':
-      case 'file':
-      default:
-        return null
-    }
-  })()
+    if (content === null) return null
+    // Tool rows depend on being direct siblings to share their compact spacing and dividers.
+    if (getMessagePartKind(part) === 'compact') return content
 
-  if (content === null) return null
-  // Tool rows depend on being direct siblings to share their compact spacing and dividers.
-  if (getMessagePartKind(part) === 'compact') return content
-
-  return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
-}
+    return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
+  },
+  (previous, next) =>
+    previous.isActive === next.isActive && areMessagePartsEqual(previous.part, next.part)
+)
 
 export function MessagePartToolGroup({
   parts,

@@ -1,5 +1,5 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { type PropsWithChildren } from 'react'
+import { memo, type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
 import { useMessageInfoContext } from './Message.Context'
@@ -42,7 +42,11 @@ function MessageDisplayMainArea({
   return <div className={cn('flex gap-4 w-auto overflow-hidden group', className)}>{children}</div>
 }
 
-function MessageDisplayContent({ message }: { message: VercelMessage }) {
+const MessageDisplayContent = memo(function MessageDisplayContent({
+  message,
+}: {
+  message: VercelMessage
+}) {
   const { id, isLoading, isLastMessage, readOnly } = useMessageInfoContext()
 
   const messageParts = message.parts
@@ -50,7 +54,9 @@ function MessageDisplayContent({ message }: { message: VercelMessage }) {
     ('content' in message && typeof message.content === 'string' && message.content.trim()) ||
     undefined
 
-  const items = groupMessageParts(messageParts ?? [])
+  // The SDK exposes its mutable object on the first write, then publishes clones. Capture
+  // state/text now so later mutations cannot change memoized parts' previous props.
+  const items = groupMessageParts((messageParts ?? []).map((part) => ({ ...part })))
   const isStreaming = isLoading && !!isLastMessage
 
   return (
@@ -78,7 +84,7 @@ function MessageDisplayContent({ message }: { message: VercelMessage }) {
           )}
     </div>
   )
-}
+})
 
 function MessageDisplayTextMessage({
   id,
