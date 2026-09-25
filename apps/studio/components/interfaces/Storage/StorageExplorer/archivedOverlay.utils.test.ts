@@ -17,6 +17,7 @@ const archived = (path: string, overrides: Partial<ArchivedObject> = {}): Archiv
     size: 1024,
     createdAt: '2026-07-01T00:00:00Z',
     action: 'overwrite',
+    mimeType: 'image/png',
   },
   noncurrentVersions: [],
   ...overrides,
@@ -91,6 +92,8 @@ describe('getArchivedOverlayItems', () => {
     expect(rows).toHaveLength(1)
     expect(rows[0].name).toBe('final.png')
     expect(rows[0].type).toBe(STORAGE_ROW_TYPES.FILE)
+    // Carried through so the row icon and the preview both know what this is.
+    expect(rows[0].metadata?.mimetype).toBe('image/png')
   })
 
   it('coalesces several objects under one subfolder into a single row', () => {
