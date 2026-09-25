@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Database, Info } from 'lucide-react'
+import { Database, Download, Info, Map as MapIcon, Table as TableIcon } from 'lucide-react'
 import { useState } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
@@ -14,6 +14,7 @@ import {
 } from 'ui'
 
 import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { CountryUsageTable } from '@/components/interfaces/ProjectHome/CountryUsageTable'
 import {
   extractIso2FromFeatureProps,
   isKnownCountryCode,
@@ -33,6 +34,8 @@ const RANGE_OPTIONS: { value: GeographicUsageRange; label: string }[] = [
   { value: '7d', label: 'Last 7 days' },
   { value: '30d', label: 'Last 30 days' },
 ]
+
+type UsageView = 'map' | 'table'
 
 const formatRequests = (value: number) => value.toLocaleString()
 
@@ -285,10 +288,12 @@ const CountryRanking = ({
 
 const GeographicUsageContent = ({
   usage,
+  view,
   selectedCode,
   onSelectCountry,
 }: {
   usage: GeographicUsage
+  view: UsageView
   selectedCode: string | undefined
   onSelectCountry: (code: string) => void
 }) => (
@@ -321,19 +326,29 @@ const GeographicUsageContent = ({
         />
       </div>
 
-      <div className="grid border-t lg:grid-cols-[minmax(0,1.65fr)_minmax(18rem,0.7fr)]">
-        <RequestMap
-          countries={usage.countries}
-          selectedCode={selectedCode}
-          onSelect={onSelectCountry}
-        />
-        <CountryRanking
+      {view === 'map' && (
+        <div className="grid border-t lg:grid-cols-[minmax(0,1.65fr)_minmax(18rem,0.7fr)]">
+          <RequestMap
+            countries={usage.countries}
+            selectedCode={selectedCode}
+            onSelect={onSelectCountry}
+          />
+          <CountryRanking
+            countries={usage.countries}
+            totalRequests={usage.totalRequests}
+            selectedCode={selectedCode}
+            onSelect={onSelectCountry}
+          />
+        </div>
+      )}
+      {view === 'table' && (
+        <CountryUsageTable
           countries={usage.countries}
           totalRequests={usage.totalRequests}
           selectedCode={selectedCode}
-          onSelect={onSelectCountry}
+          onSelectCountry={onSelectCountry}
         />
-      </div>
+      )}
     </div>
 
     <div className="flex items-start gap-2 text-xs leading-relaxed text-foreground-lighter">
@@ -349,8 +364,32 @@ const GeographicUsageContent = ({
 export const GeographicUsageSection = () => {
   const { ref: projectRef } = useParams()
   const [range, setRange] = useState<GeographicUsageRange>('24h')
+  const [view, setView] = useState<UsageView>('map')
   const [selectedCode, setSelectedCode] = useState<string>()
   const { data, isPending, isError, error } = useGeographicUsageQuery({ projectRef, range })
+
+  const handleExportCsv = () => {
+    if (!data) return
+
+    const escapeCell = (value: string | number) => `"${String(value).replaceAll('"', '""')}"`
+    const rows = [
+      ['Country', 'Country code', 'Requests', 'Share of total (%)', 'Change (%)'],
+      ...data.countries.map((country) => [
+        iso2ToCountryName(country.code),
+        country.code,
+        country.requests,
+        data.totalRequests > 0 ? ((country.requests / data.totalRequests) * 100).toFixed(1) : 0,
+        country.change === null ? '' : country.change.toFixed(1),
+      ]),
+    ]
+    const csv = rows.map((row) => row.map(escapeCell).join(',')).join('\n')
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = `database-usage-by-country-${range}.csv`
+    anchor.click()
+    window.setTimeout(() => URL.revokeObjectURL(url), 0)
+  }
 
   return (
     <section aria-labelledby="geographic-usage-title" className="space-y-5">
@@ -370,18 +409,49 @@ export const GeographicUsageSection = () => {
           </p>
         </div>
 
-        <Select value={range} onValueChange={(value) => setRange(value as GeographicUsageRange)}>
-          <SelectTrigger aria-label="Time range" className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent align="end">
-            {RANGE_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1 rounded-md border p-0.5">
+            <Button
+              type="button"
+              size="sm"
+              variant={view === 'map' ? 'default' : 'ghost'}
+              aria-pressed={view === 'map'}
+              onClick={() => setView('map')}
+            >
+              <MapIcon size={14} /> Map
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={view === 'table' ? 'default' : 'ghost'}
+              aria-pressed={view === 'table'}
+              onClick={() => setView('table')}
+            >
+              <TableIcon size={14} /> Table
+            </Button>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={handleExportCsv}
+            disabled={!data}
+          >
+            <Download size={14} /> Export CSV
+          </Button>
+          <Select value={range} onValueChange={(value) => setRange(value as GeographicUsageRange)}>
+            <SelectTrigger aria-label="Time range" className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {RANGE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {isPending && <GeographicUsageLoading />}
@@ -391,6 +461,7 @@ export const GeographicUsageSection = () => {
       {data && (
         <GeographicUsageContent
           usage={data}
+          view={view}
           selectedCode={selectedCode}
           onSelectCountry={setSelectedCode}
         />
