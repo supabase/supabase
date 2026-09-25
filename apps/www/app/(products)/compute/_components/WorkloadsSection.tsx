@@ -42,9 +42,9 @@ const workloads: Workload[] = [
     paragraph:
       'Transcription pipelines, embedding jobs, agent frameworks, and APIs — running as long as the work takes.',
     features: [
+      { icon: TrendingUp, text: 'Auto-scaling for traffic surges' },
       { icon: InfinityIcon, text: 'No wall-clock limits on execution' },
       { icon: Container, text: 'Any runtime, static binary, or Dockerfile' },
-      { icon: TrendingUp, text: 'Auto-scaling for traffic surges' },
       { icon: Server, text: 'HTTP services, background jobs, and long-running pipelines' },
     ],
   },

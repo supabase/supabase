@@ -7,7 +7,7 @@ Supabase Compute is a fully managed compute service built for agentic developmen
 ## Key Features
 
 - **Two workload shapes**: ephemeral sandboxes for untrusted code and always-on HTTP services, on one runtime
-- **Any language**: Node, Deno, or any Dockerfile in Private Alpha, with Bun and Python on the way — no wrapper scripts or glue code
+- **Any language**: Node, Deno, or any Dockerfile in Private Alpha — no wrapper scripts or glue code
 - **Next to your database**: same region and network as Postgres, with single-digit-millisecond queries
 - **Scale to zero**: idle sandboxes and services suspend automatically and resume in under a second
 - **No wall-clock limits**: jobs and pipelines run as long as the work takes

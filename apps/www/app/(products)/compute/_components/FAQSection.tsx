@@ -7,7 +7,7 @@ const faqs = [
   {
     question: 'How does Compute relate to Edge Functions?',
     answer:
-      'Edge Functions remain supported and your deployed functions keep running unchanged — there is no forced migration and no sunset at launch. Compute is a general-purpose runtime with more memory and CPU and no wall-clock limits. Because Compute supports the Deno runtime, existing Edge Functions can move over as-is whenever you choose, with secrets and routing preserved.',
+      "Compute complements Edge Functions, which remain fully supported and best for short-lived work like webhooks and lightweight APIs. Compute handles what they can't: long-running jobs, background workers, and heavier workloads with no wall-clock limits. If a function outgrows Edge Functions, you can migrate it to Compute without code changes.",
   },
   {
     question: 'Which languages and runtimes are supported?',

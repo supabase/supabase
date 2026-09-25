@@ -46,9 +46,9 @@ export function TrustBoundarySection() {
           <span className="text-foreground-lighter block">preconfigured</span>
         </h2>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          Every sandbox and service inherits your project&apos;s auth, roles, and permissions the
-          moment it starts. Agents get a sandbox that is already scoped to the data it is allowed to
-          touch — nothing more.
+          Every sandbox and service inherits your project's auth, roles, and permissions the moment
+          it starts, running in its own microVM with dedicated CPU and memory. Agents get a sandbox
+          that is already scoped to the data it is allowed to touch — nothing more.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

@@ -5,13 +5,13 @@ import { Boxes, Database, DollarSign, Terminal } from 'lucide-react'
 const highlights: Feature[] = [
   {
     icon: Boxes,
-    heading: 'One runtime, every workload',
+    heading: 'One primitive, every workload',
     subheading: 'Ephemeral sandboxes and always-on HTTP services, one primitive.',
   },
   {
     icon: Terminal,
     heading: 'Any language',
-    subheading: 'Node, Deno, or any Dockerfile. Bun and Python on the way.',
+    subheading: 'Node, Deno, or any Dockerfile.',
   },
   {
     icon: Database,
@@ -21,7 +21,8 @@ const highlights: Feature[] = [
   {
     icon: DollarSign,
     heading: 'Scale to zero',
-    subheading: 'Services suspend when idle. You pay nothing while they sleep.',
+    subheading:
+      'Services suspend when idle and resume in under a second. You pay nothing while they sleep.',
   },
 ]
 
