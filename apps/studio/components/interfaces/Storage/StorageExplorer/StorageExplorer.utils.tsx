@@ -266,6 +266,30 @@ export function getListV2EntryName(name: string): string {
   return trimmed.split('/').pop() ?? trimmed
 }
 
+type SortableByColumn = {
+  name: string
+  created_at: string | null
+  updated_at: string | null
+  last_accessed_at: string | null
+}
+
+/**
+ * Sorts by the given column/order. Used both to order a single merged folders+files page and
+ * to re-sort a column's items after appending another page onto it — concatenating two
+ * independently-sorted pages does not itself produce a sorted list.
+ */
+export function sortStorageItems<T extends SortableByColumn>(
+  items: T[],
+  sortBy: { column: STORAGE_SORT_BY; order: STORAGE_SORT_BY_ORDER }
+): T[] {
+  const direction = sortBy.order === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
+  return [...items].sort((a, b) => {
+    const aValue = (sortBy.column === STORAGE_SORT_BY.NAME ? a.name : a[sortBy.column]) ?? ''
+    const bValue = (sortBy.column === STORAGE_SORT_BY.NAME ? b.name : b[sortBy.column]) ?? ''
+    return direction * String(aValue).localeCompare(String(bValue))
+  })
+}
+
 /**
  * v2 returns folders and files as two separate arrays; merges them into the single sorted list
  * `formatFolderItems` expects, tagging folders with `id: null` per its v1-derived convention.
@@ -290,12 +314,7 @@ export function formatFolderItemsV2(
     ...object,
     name: getListV2EntryName(object.name),
   }))
-  const direction = sortBy.order === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
-  const merged = [...folders, ...objects].sort((a, b) => {
-    const aValue = (sortBy.column === STORAGE_SORT_BY.NAME ? a.name : a[sortBy.column]) ?? ''
-    const bValue = (sortBy.column === STORAGE_SORT_BY.NAME ? b.name : b[sortBy.column]) ?? ''
-    return direction * String(aValue).localeCompare(String(bValue))
-  })
+  const merged = sortStorageItems([...folders, ...objects], sortBy)
   return formatFolderItems(merged, prefix)
 }
 

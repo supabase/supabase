@@ -2,8 +2,11 @@ import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { createStorageExplorerState } from './storage-explorer'
-import { STORAGE_ROW_STATUS } from '@/components/interfaces/Storage/Storage.constants'
-import type { StorageColumn } from '@/components/interfaces/Storage/Storage.types'
+import {
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+} from '@/components/interfaces/Storage/Storage.constants'
+import type { StorageColumn, StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import type { StorageObjectsPage } from '@/data/storage/bucket-objects-infinite-query'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -189,7 +192,21 @@ describe('fetchMoreFolderContents', () => {
     }
   }
 
-  it('sends the column cursor and appends the next page', async () => {
+  function makeItem(name: string): StorageItem {
+    return {
+      id: name,
+      name,
+      type: STORAGE_ROW_TYPES.FILE,
+      status: STORAGE_ROW_STATUS.READY,
+      metadata: null,
+      isCorrupted: false,
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+      last_accessed_at: '2024-01-01T00:00:00Z',
+    }
+  }
+
+  it('sends the column cursor, re-sorts, and appends the next page', async () => {
     let requestBody: any
     addAPIMock({
       method: 'post',
@@ -201,7 +218,7 @@ describe('fetchMoreFolderContents', () => {
           objects: [
             {
               id: 'f2',
-              name: 'page2.png',
+              name: 'aaa-page2.png',
               created_at: '2024-01-01T00:00:00Z',
               updated_at: '2024-01-01T00:00:00Z',
               last_accessed_at: '2024-01-01T00:00:00Z',
@@ -214,13 +231,18 @@ describe('fetchMoreFolderContents', () => {
     })
 
     const state = createState(makeBucket('bucket-a'))
-    const column = makeReadyColumn()
+    // Existing item sorts after the new page's item by name — a naive concat would leave it
+    // first anyway, so this only passes if the combined list is actually re-sorted.
+    const column = makeReadyColumn({ items: [makeItem('zzz-page1.png')] })
     state.columns = [column]
 
     await state.fetchMoreFolderContents({ index: 0, column })
 
     expect(requestBody.cursor).toBe('cursor-1')
-    expect(state.columns[0].items.map((item) => item.name)).toEqual(['page2.png'])
+    expect(state.columns[0].items.map((item) => item.name)).toEqual([
+      'aaa-page2.png',
+      'zzz-page1.png',
+    ])
     expect(state.columns[0].hasMoreItems).toBe(false)
     expect(state.columns[0].cursor).toBeNull()
   })

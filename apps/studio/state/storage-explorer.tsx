@@ -29,6 +29,7 @@ import {
   getListV2EntryName,
   getPathAlongFoldersToIndex,
   sanitizeNameForDuplicateInColumn,
+  sortStorageItems,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
@@ -127,6 +128,7 @@ export function createStorageExplorerState({
       items: formatFolderItemsV2(page, sortOptions, path),
       hasMoreItems: nextCursor !== null,
       cursor: nextCursor,
+      sortBy: sortOptions,
     }
   }
 
@@ -389,7 +391,7 @@ export function createStorageExplorerState({
       state.setColumnIsLoadingMore(index)
 
       try {
-        const { items, hasMoreItems, cursor } = await listFolderPage(
+        const { items, hasMoreItems, cursor, sortBy } = await listFolderPage(
           {
             bucketId: state.selectedBucket.id,
             path: column.path,
@@ -407,7 +409,9 @@ export function createStorageExplorerState({
           if (isStale) return { ...col, isLoadingMoreItems: false }
           return {
             ...col,
-            items: col.items.concat(items),
+            // Each page is sorted on its own; concatenating two sorted pages doesn't produce
+            // a sorted list, so the combined items need re-sorting.
+            items: sortStorageItems(col.items.concat(items), sortBy),
             isLoadingMoreItems: false,
             hasMoreItems,
             cursor,

@@ -21,6 +21,7 @@ import {
   parseStoragePath,
   sanitizeNameForDuplicateInColumn,
   serializeStoragePath,
+  sortStorageItems,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 
@@ -469,6 +470,48 @@ describe('getListV2EntryName', () => {
 
   it('takes the last segment of a full-path file name', () => {
     expect(getListV2EntryName('a/b/file.png')).toBe('file.png')
+  })
+})
+
+describe('sortStorageItems', () => {
+  function makeSortable(name: string, date: string | null = null) {
+    return { name, created_at: date, updated_at: date, last_accessed_at: date }
+  }
+
+  it('sorts by name ascending by default direction', () => {
+    const items = [makeSortable('zebra'), makeSortable('apple')]
+    expect(
+      sortStorageItems(items, {
+        column: STORAGE_SORT_BY.NAME,
+        order: STORAGE_SORT_BY_ORDER.ASC,
+      }).map((i) => i.name)
+    ).toEqual(['apple', 'zebra'])
+  })
+
+  it('sorts descending when requested', () => {
+    const items = [makeSortable('apple'), makeSortable('zebra')]
+    expect(
+      sortStorageItems(items, {
+        column: STORAGE_SORT_BY.NAME,
+        order: STORAGE_SORT_BY_ORDER.DESC,
+      }).map((i) => i.name)
+    ).toEqual(['zebra', 'apple'])
+  })
+
+  it('sorts by created_at, treating a null value as empty', () => {
+    const items = [makeSortable('has-date', '2024-01-01T00:00:00Z'), makeSortable('no-date', null)]
+    expect(
+      sortStorageItems(items, {
+        column: STORAGE_SORT_BY.CREATED_AT,
+        order: STORAGE_SORT_BY_ORDER.ASC,
+      }).map((i) => i.name)
+    ).toEqual(['no-date', 'has-date'])
+  })
+
+  it('does not mutate the input array', () => {
+    const items = [makeSortable('zebra'), makeSortable('apple')]
+    sortStorageItems(items, { column: STORAGE_SORT_BY.NAME, order: STORAGE_SORT_BY_ORDER.ASC })
+    expect(items.map((i) => i.name)).toEqual(['zebra', 'apple'])
   })
 })
 
