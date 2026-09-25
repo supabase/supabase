@@ -336,7 +336,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   </TableCell>
                 </TableRow>
 
-                {upcomingInvoice.amount_projected_usage && (
+                {/* {upcomingInvoice.amount_projected_usage && (
                   <TableRow>
                     <TableCell className="font-medium py-2 px-0 flex items-center">
                       <span className="mr-2">Projected Usage</span>
@@ -412,7 +412,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       {formatCurrency(Math.abs(upcomingInvoice.customer_balance)) ?? '-'}
                     </TableCell>
                   </TableRow>
-                )}
+                )} */}
 
                 {!!upcomingInvoice.amount_projected && (
                   <TableRow>
