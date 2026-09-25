@@ -28,12 +28,11 @@ const workloads: Workload[] = [
     label: 'Sandboxes',
     title: 'Isolated environments for agent code',
     paragraph:
-      'Execute untrusted code in a fresh environment — one per task, per session, or per agent.',
+      'Execute code in a secure, isolated environment — one per task, per session, or per agent.',
     features: [
-      { icon: Shield, text: 'Per-session isolation for untrusted code' },
-      { icon: Terminal, text: 'SSH access for humans and agents' },
-      { icon: Pause, text: 'Suspend and resume with state preserved' },
+      { icon: Shield, text: 'Per-session environment for executing code' },
       { icon: Bot, text: 'Provision programmatically via the API or MCP server' },
+      { icon: Pause, text: 'Suspend and resume with state preserved' },
     ],
   },
   {
@@ -64,7 +63,7 @@ export function WorkloadsSection() {
           </h2>
           <p className="text-foreground-lighter text-sm lg:text-base text-pretty">
             Sandboxes, APIs, and background jobs usually mean three vendors and a database somewhere
-            else. Compute runs them all inside your Supabase project.
+            else. Compute runs them all in Supabase alongside your application backend.
           </p>
         </div>
       </div>
