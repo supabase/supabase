@@ -339,6 +339,8 @@ Deno.serve(async (req: Request) => {
 
   const callWorker = async (req: Request, retriesLeft = MAX_WORKER_RETRIES): Promise<Response> => {
     // Preserve the body before fetch() can consume it, even on a failed attempt.
+    // The unread retry branch can buffer the entire body in main-worker memory,
+    // even when the first attempt succeeds.
     const retryReq = retriesLeft > 0 ? req.clone() : null
 
     try {
