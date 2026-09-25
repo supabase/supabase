@@ -227,7 +227,7 @@ Fortunately, Postgres has a relatively unknown built-in [“single user mode”]
 
 PGlite builds on the single user mode by adding Postgres wire protocol support, as standard Postgres only supports a minimal basic cancel REPL in single user mode, this enables parametrised queries and converting between Postgres types and the host languages types.
 
-There are a number of of other things in Postgres that PGlite modifies to enable its use with WASM. These include:
+There are a number of other things in Postgres that PGlite modifies to enable its use with WASM. These include:
 
 - Support for [specifying a user](https://pglite.dev/docs/api#options) for the connection when starting under single-user mode, allowing permissions and RLS to be applied.
 - Support for `COPY`, for loading CSVs or Postgres binary copy formats into the database. This was achieved by creating a virtual device on the VFS, [`/dev/blob`](https://pglite.dev/docs/api#dev-blob), which you can read and write to with the `COPY` command, and representing a JavaScript Blob object on the query.
