@@ -155,17 +155,30 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     You can use the `signInWithIdToken()` method from the Supabase JavaScript library on the website to obtain an access and refresh token once the user has given consent using Sign in with Apple JS:
 
     ```ts
+    // 1. Generate and hash the nonce (do this before initializing Apple ID)
+    const rawNonce = crypto.randomUUID() // or use your preferred nonce generation method
+    const nonceBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawNonce))
+    const hashedNonce = Array.from(new Uint8Array(nonceBuf))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+
+    // 2. Initialize Apple ID
+    AppleID.auth.init({
+      clientId: 'your-services-id',
+      scope: 'name email',
+      redirectURI: 'https://your-domain.com/auth/callback',
+      usePopup: true,
+      nonce: hashedNonce,
+    })
+
     async function signIn() {
       try {
-        // Generate a nonce for security
-        const nonce = crypto.randomUUID() // or use your preferred nonce generation method
-
         const data = await AppleID.auth.signIn()
 
         const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
-          token: data.id_token,
-          nonce: nonce,
+          token: data.authorization.id_token,
+          nonce: rawNonce,
         })
 
         if (error) {
@@ -200,16 +213,20 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     Alternatively, you can use the `AppleIDSignInOnSuccess` event with the `usePopup` option:
 
     ```ts
-    // Generate and store nonce for verification
-    const nonce = crypto.randomUUID()
+    // Generate and hash the nonce (do this before initializing Apple ID)
+    const rawNonce = crypto.randomUUID()
+    const nonceBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawNonce))
+    const hashedNonce = Array.from(new Uint8Array(nonceBuf))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
 
-    // Initialize Apple ID with nonce
+    // Initialize Apple ID with the hashed nonce
     AppleID.auth.init({
       clientId: 'your-services-id',
       scope: 'name email',
       redirectURI: 'https://your-domain.com/auth/callback',
       usePopup: true,
-      nonce: nonce,
+      nonce: hashedNonce,
     })
 
     // Listen for authorization success
@@ -218,7 +235,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
         const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: event.detail.authorization.id_token,
-          nonce: nonce,
+          nonce: rawNonce,
         })
 
         if (error) {
