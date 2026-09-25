@@ -367,6 +367,29 @@ This layers `docker-compose.logs.yml` on top of the base configuration and start
 
 The Log Explorer in Studio is also enabled automatically. Note that these services increase resource requirements.
 
+### Analytics and WAL disk usage
+
+Logflare watches its own settings tables in the `_supabase` database through a temporary logical replication slot. The slot only moves forward when one of those tables changes. Until then, Postgres keeps all the WAL written since, including WAL from writes to your own database, so the `pg_wal` directory grows.
+
+The `max_slot_wal_keep_size` setting caps how much WAL the slot can hold. The Postgres 17 image sets it to 512 MB, and the Postgres 15 image sets it to 4 GB. When the slot passes the cap, Postgres ends Logflare's replication connection and the temporary slot is dropped. Logflare logs a `terminating connection due to administrator command` error, reconnects, and creates a new slot.
+
+To see how much WAL each replication slot is holding:
+
+```sh
+docker compose exec db psql -U supabase_admin -c \
+  "select slot_name, wal_status, pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) as retained_wal from pg_replication_slots;"
+```
+
+If your disk can't spare that much WAL, lower the cap. The change takes effect when the configuration reloads, without a restart:
+
+```sh
+docker compose exec db psql -U supabase_admin \
+  -c "alter system set max_slot_wal_keep_size = '256MB';" \
+  -c "select pg_reload_conf();"
+```
+
+The cap applies to every replication slot, so make sure any other logical replication consumers you run can stay within it.
+
 ## Configuring HTTPS
 
 By default, Supabase is accessible over HTTP. For production deployments, especially when using OAuth providers, you need HTTPS with a valid TLS certificate. The recommended approach is to place a reverse proxy (such as Caddy or Nginx) in front of the API gateway.
