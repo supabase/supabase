@@ -40,11 +40,11 @@ const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.LIST, name: 'As list' },
 ]
 
+// list-v2 only supports sorting by name, created_at, or updated_at
 const SORT_BY_OPTIONS = [
   { key: STORAGE_SORT_BY.NAME, name: 'Name' },
   { key: STORAGE_SORT_BY.CREATED_AT, name: 'Time created' },
   { key: STORAGE_SORT_BY.UPDATED_AT, name: 'Time modified' },
-  { key: STORAGE_SORT_BY.LAST_ACCESSED_AT, name: 'Time last accessed' },
 ]
 
 const SORT_ORDER_OPTIONS = [
