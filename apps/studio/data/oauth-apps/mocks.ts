@@ -432,6 +432,15 @@ const MOCK_OWN_GRANTS: ListOwnGrantsResponse = {
       approved_scopes: ['database:read', 'database:write'],
       approved_at: '2026-09-01T08:45:00.000Z',
     },
+    {
+      grant_id: 'kemal-bot-all-projects',
+      app: { id: 'kemal-bot', name: 'kemal-bot', icon: null },
+      organization: { slug: 'northwind-traders', name: 'Northwind Traders' },
+      // Targets all projects
+      projects: null,
+      approved_scopes: ['database:read', 'database:write'],
+      approved_at: '2026-09-20T14:30:00.000Z',
+    },
   ],
   pagination: { next_cursor: null },
 }
