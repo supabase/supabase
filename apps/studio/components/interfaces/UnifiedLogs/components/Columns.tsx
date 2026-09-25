@@ -1,4 +1,5 @@
-import { ColumnDef } from '@tanstack/react-table'
+import { ColumnDef, RowSelectionState } from '@tanstack/react-table'
+import type { RefObject } from 'react'
 import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
@@ -8,6 +9,7 @@ import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { getShiftClickRowSelection } from '@/lib/shift-click-selection'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -30,7 +32,13 @@ function shouldHideColumn(data: ColumnSchema[], columnKey: keyof ColumnSchema): 
 }
 
 // Generate dynamic columns based on data
-export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
+export function generateDynamicColumns({
+  data,
+  selectionAnchorRef,
+}: {
+  data: ColumnSchema[]
+  selectionAnchorRef: RefObject<string | null>
+}): {
   columns: ColumnDef<ColumnSchema>[]
   columnVisibility: Record<string, boolean>
 } {
@@ -42,13 +50,48 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'select',
       header: '',
-      cell: ({ row }) => {
+      cell: ({ row, table }) => {
+        const handleToggle = (isShiftClick: boolean) => {
+          const currentSelection = table.getState().rowSelection
+          const hasSelection = Object.values(currentSelection).some(Boolean)
+          // An empty selection means no anchor, so resetRowSelection() (filter change, clear
+          // button) drops the anchor without those paths having to touch the ref
+          const anchorRowId = hasSelection ? selectionAnchorRef.current : null
+
+          let next: RowSelectionState
+          if (isShiftClick) {
+            next = getShiftClickRowSelection({
+              orderedRowIds: table.getRowModel().rows.map((tableRow) => tableRow.id),
+              rowSelection: currentSelection,
+              anchorRowId,
+              targetRowId: row.id,
+            })
+          } else {
+            next = { ...currentSelection }
+            if (next[row.id]) {
+              delete next[row.id]
+            } else {
+              next[row.id] = true
+            }
+          }
+
+          selectionAnchorRef.current = Object.keys(next).length > 0 ? row.id : null
+          table.setRowSelection(next)
+        }
+
         return (
           <Checkbox
             className="hit-area-2 hover:border-foreground-muted"
             checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            onClick={(e) => e.stopPropagation()}
+            // Prevent a shift-click from starting a browser text selection across rows
+            onMouseDown={(e) => {
+              if (e.shiftKey) e.preventDefault()
+            }}
+            // use onClick instead of onCheckedChange so the shift key is available for range selection
+            onClick={(e) => {
+              e.stopPropagation()
+              handleToggle(e.shiftKey)
+            }}
           />
         )
       },
@@ -291,7 +334,9 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
   return { columns, columnVisibility }
 }
 
-// Static fallback columns
+// Static fallback columns. These render before any data arrives, so nothing is selectable yet
+// and the anchor never has to survive past this call.
 export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns({
   data: [],
+  selectionAnchorRef: { current: null },
 }).columns
