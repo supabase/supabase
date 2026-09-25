@@ -24,7 +24,6 @@
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "catalog:",
-    "@react-router/fs-routes": "^7.4.0",
     "@supabase-labs/y-supabase": "0.1.0",
     "@supabase/postgrest-js": "catalog:",
     "@supabase/vue-blocks": "workspace:*",
@@ -72,7 +71,8 @@
   },
   "devDependencies": {
     "@babel/core": "*",
-    "@react-router/dev": "^7.9.0",
+    "@react-router/dev": "^7.17.1",
+    "@react-router/fs-routes": "^7.18.4",
     "@shikijs/compat": "^1.1.7",
     "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",
