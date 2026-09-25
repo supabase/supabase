@@ -1,4 +1,11 @@
-import { COMPUTE_REGION, computeInstanceUrl, RUNTIMES } from './Compute.constants'
+import {
+  COMPUTE_AGENT_GUIDE_URL,
+  COMPUTE_REGION,
+  COMPUTE_SKILL_NAME,
+  computeInstanceUrl,
+  LISTENING_PORT,
+  RUNTIMES,
+} from './Compute.constants'
 import type { ComputeInstanceAccess } from './Compute.types'
 import { formatSize } from './Compute.utils'
 import { CLI_NAME } from '@/lib/constants/compute'
@@ -15,6 +22,7 @@ export interface ComputeInstanceSnippetInput {
 
 export interface ComputeInstanceSnippets {
   aiPrompt: string
+  skill: string
   configToml: string
   cli: string
   curl: string
@@ -107,7 +115,73 @@ export function buildComputeInstanceSnippets(
     `print(res.json())`,
   ].join('\n')
 
-  return { aiPrompt, configToml, cli, curl, javascript, python }
+  const deployedSummary =
+    input.access === 'public'
+      ? [
+          `Once the deploy finishes, the instance answers at ${url}:`,
+          ``,
+          '```bash',
+          `curl ${url}`,
+          '```',
+        ]
+      : [
+          `A private instance has no URL. It starts from its entrypoint, runs its own loop, and reaches out — nothing can call it.`,
+        ]
+
+  const skill = [
+    `---`,
+    `name: ${COMPUTE_SKILL_NAME}`,
+    `description: Deploy and operate Supabase Compute instances with the Supabase CLI.`,
+    `---`,
+    ``,
+    `# Supabase Compute`,
+    ``,
+    `Compute runs a directory of code as a named service next to the project's database. It is in private alpha: the CLI ships it in the beta channel, behind an experimental flag.`,
+    ``,
+    `Full guide, including Deno and Dockerfile examples: ${COMPUTE_AGENT_GUIDE_URL}`,
+    ``,
+    `## Set up the CLI`,
+    ``,
+    '```bash',
+    `npm install -g supabase@beta`,
+    `supabase login   # or set SUPABASE_ACCESS_TOKEN to an sbp_... personal access token`,
+    '```',
+    ``,
+    `Turn ${CLI_NAME} on in \`supabase/config.toml\`:`,
+    ``,
+    '```toml',
+    `[experimental]`,
+    `${CLI_NAME} = true`,
+    '```',
+    ``,
+    `## Deploy ${name}`,
+    ``,
+    `Declare the instance in \`supabase/config.toml\`:`,
+    ``,
+    '```toml',
+    configBlock,
+    '```',
+    ``,
+    `Scaffold the ${runtimeMeta.label} entrypoint (\`supabase/${CLI_NAME}/${name}/${entrypointFile}\`), then deploy:`,
+    ``,
+    '```bash',
+    cli,
+    '```',
+    ``,
+    ...deployedSummary,
+    ``,
+    `## Rules`,
+    ``,
+    `- Every change is another \`supabase ${CLI_NAME} push ${name}\`. Scale with \`--instances\`; resize or change exposure by editing the TOML block and pushing again.`,
+    `- Instances are stateless and can be replaced at any time. Durable state belongs in the database or in storage.`,
+    `- A public instance must accept connections on \`$PORT\` (default ${LISTENING_PORT}) within 50 seconds of starting. Bind the port first, then load heavy dependencies.`,
+    `- Size is fixed at deploy time. A process that outgrows its memory is killed and its instance replaced.`,
+    `- Secrets reach instances as environment variables: \`supabase secrets set KEY=value\`. Running instances pick up changes within about a minute.`,
+    `- Deploys are locked to ${COMPUTE_REGION} during the alpha.`,
+    `- Diagnose failures from the CLI instead of guessing: \`supabase ${CLI_NAME} status ${name}\` carries \`state_reason\`, \`supabase ${CLI_NAME} logs ${name} --kind builds\` the build history, and \`supabase ${CLI_NAME} logs ${name} --follow\` the live output.`,
+  ].join('\n')
+
+  return { aiPrompt, skill, configToml, cli, curl, javascript, python }
 }
 
 export interface ComputeInstanceCliCommand {
