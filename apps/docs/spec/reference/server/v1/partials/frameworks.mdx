@@ -1,0 +1,719 @@
+---
+id: frameworks
+title: Frameworks
+---
+
+`@supabase/server` middleware runs inside Hono, H3, Elysia, NestJS, and TanStack Start through a bridge: one file you copy into your project. The bridge runs a `@supabase/middleware` entry array in the framework's own middleware slot. Your route handlers then read `supabase`, `jwtClaims`, and any other key the entries contribute from the place your framework keeps per-request state.
+
+The framework adapters (`@supabase/server/adapters/*`) predate the middleware engine. We are moving off them, and they will be deprecated soon. The bridges on this page replace them. If you use an adapter today, read "Moving off the adapters" below before you change anything. One step in that migration can open an endpoint up without an error.
+
+<Admonition type="note" title="Versions">
+
+The bridges need `@supabase/server` 1.6.0 or later and Node 22 or later. `withRequiredClaims` shipped in 1.5.1 and the entry form of `withSupabase` in 1.6.0. Releases before 1.5.1 have no `/middleware/*` exports.
+
+</Admonition>
+
+### What a bridge gives you
+
+An entry does three jobs. How many of them survive depends on the framework.
+
+- Context. The entries contribute typed keys such as `supabase` and `jwtClaims`, and your handler reads them.
+- Short-circuit. An entry can return a `Response`, and your route never runs. That is how `withRequiredClaims` rejects a request.
+- Response phase. An entry written as `async function*` can `yield`, see the response on the way out, and rewrite it. `withCors` needs this to stamp headers.
+
+| Framework      | Context | Short-circuit | Response phase | Pattern           |
+| -------------- | ------- | ------------- | -------------- | ----------------- |
+| Hono           | Yes     | Yes           | Yes            | middleware slot   |
+| H3 / Nuxt      | Yes     | Yes           | Yes            | middleware slot   |
+| Elysia         | Yes     | Yes           | Yes            | wrap `app.handle` |
+| NestJS         | Yes     | Yes           | No             | guard             |
+| TanStack Start | Yes     | Yes           | Yes            | middleware slot   |
+
+If you only read `supabase` inside a handler, every row works for you. Ignore the response-phase column.
+
+Each bridge folds the entry array once, when you call it, so entries keep their state across requests. Each bridge also checks the array at compile time. Two entries that contribute the same key, or an entry whose prerequisite is missing, fail to compile at the call site.
+
+The bridge files for the four frameworks that had adapters live in the server repository under [`examples/frameworks`](https://github.com/supabase/server/tree/main/examples/frameworks), next to a minimal app for each. The TanStack Start bridge is on this page. Copy the file for your framework as is, comments included. Some lines look redundant and are not. The comments say why.
+
+### Hono
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Copy [`hono/supabase-middleware.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/hono/supabase-middleware.ts) into your project. `toHono` returns Hono middleware. Register it with `.use()` in a chain, and the contributed keys type through to `c.var` with no `Env` declaration of your own. Register it before the routes it gates. Hono applies middleware only to routes added after it, so a route added first runs with no gate and no error. `withSupabaseClient<Database>()` threads the generic through, so `c.var.supabase` is a `SupabaseClient<Database>`.
+
+    One line in the bridge looks redundant: `c.res` is cleared before it is assigned. When a response-phase entry returns a new `Response`, Hono's `res` setter copies the previous response's headers onto it, which reverts any header the entry rewrote. Clearing first makes the assignment final. Keep the line and its comment.
+
+    On Cloudflare Workers the bridge seeds the pipeline with `c.env`, so `getEnv` inside the entries reads your bindings.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { Hono } from 'hono'
+    import { withRequiredClaims } from '@supabase/server/middleware/required-claims'
+    import { withSupabaseClient } from '@supabase/server/middleware/client'
+
+    import { toHono } from './lib/supabase-middleware.js'
+
+    const app = new Hono()
+      .use('*', toHono([withRequiredClaims(), withSupabaseClient()]))
+      .get('/todos', async (c) => {
+        const { data, error } = await c.var.supabase.from('todos').select()
+        if (error) return c.json({ error: error.message }, 500)
+        return c.json(data)
+      })
+      .get('/me', (c) => c.json({ id: c.var.jwtClaims.sub }))
+
+    export default { fetch: app.fetch }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### H3 / Nuxt
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Copy [`h3/supabase-middleware.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/h3/supabase-middleware.ts) into your project. `toH3` returns H3 middleware. H3 middleware return the response directly, so no workaround is needed.
+
+    `event.context` is not generic. Hoist the entry array to a `const` and read the keys through `Contributions<typeof entries>` from `@supabase/middleware`, or wrap that in a small typed accessor of your own.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { H3 } from 'h3'
+    import type { Contributions } from '@supabase/middleware'
+    import { withRequiredClaims } from '@supabase/server/middleware/required-claims'
+    import { withSupabaseClient } from '@supabase/server/middleware/client'
+
+    import { toH3 } from './lib/supabase-middleware.js'
+
+    const entries = [withRequiredClaims(), withSupabaseClient()] as const
+
+    const app = new H3()
+    app.use(toH3(entries))
+
+    app.get('/todos', async (event) => {
+      const { supabase } = event.context as Contributions<typeof entries>
+      const { data, error } = await supabase.from('todos').select()
+      if (error) throw error
+      return data
+    })
+
+    export default { fetch: app.fetch }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Elysia
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Copy [`elysia/supabase-middleware.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/elysia/supabase-middleware.ts) into your project. Elysia's lifecycle hooks run in the request phase only. A `.resolve()` hook has no `next()` and never sees the outgoing response. So `wrapElysia` composes the entries around `app.handle`, and `supabaseCtx()` is a plugin that hands the context back to your routes per request.
+
+    `supabaseCtx<typeof entries>()` types the route context. Pass the same tuple type that `wrapElysia` receives. Because the entries wrap the whole app, they apply app-wide. For per-route scoping, use Elysia's `.group()` with a separately wrapped sub-app.
+
+    The two functions work only as a pair. If you serve the app without `wrapElysia`, with `app.listen()` or `export default app`, the entries never run and `supabaseCtx()` throws on every route.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { Elysia } from 'elysia'
+    import { withRequiredClaims } from '@supabase/server/middleware/required-claims'
+    import { withSupabaseClient } from '@supabase/server/middleware/client'
+
+    import { supabaseCtx, wrapElysia } from './lib/supabase-middleware.js'
+
+    const entries = [withRequiredClaims(), withSupabaseClient()] as const
+
+    const app = new Elysia()
+      .use(supabaseCtx<typeof entries>())
+      .get('/todos', async (c) => {
+        const { data, error } = await c.supabase.from('todos').select()
+        if (error) throw error
+        return data
+      })
+
+    export default {
+      fetch: wrapElysia(entries, (req) => app.handle(req)),
+    }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### NestJS
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Copy [`nestjs/supabase.guard.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/nestjs/supabase.guard.ts) into your project. `toNestGuard` returns a guard class. A guard covers context and short-circuit. The response phase is not available: Nest's interceptors receive the controller's return value, not a `Response`, so an entry's `yield` has nothing to act on. For CORS, use `app.enableCors()`.
+
+    Call `toNestGuard` once and reuse the class on every route, so the pipeline folds once. On a short-circuit the guard copies the entry's headers onto the response, then throws an `HttpException` with the entry's status and its `{ message, code }` body. The bridge builds a Web `Request` from Nest's request with the headers and method. The body is not forwarded, so entries that read it do not work through this bridge. A contribution whose key matches a property Nest's request already has, such as `body` or `query`, throws instead of overwriting it. `Injectable()` is applied as a call, so the file works without a decorator transform.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { Controller, Get, Req, UseGuards } from '@nestjs/common'
+    import type { Contributions } from '@supabase/middleware'
+    import { withRequiredClaims } from '@supabase/server/middleware/required-claims'
+    import { withSupabaseClient } from '@supabase/server/middleware/client'
+
+    import { toNestGuard } from './lib/supabase.guard.js'
+
+    const entries = [withRequiredClaims(), withSupabaseClient()] as const
+    const SupabaseGuard = toNestGuard(entries)
+
+    @Controller('todos')
+    export class TodosController {
+      @Get()
+      @UseGuards(SupabaseGuard)
+      async list(@Req() req: Contributions<typeof entries>) {
+        const { data, error } = await req.supabase.from('todos').select()
+        if (error) throw error
+        return data
+      }
+    }
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### TanStack Start
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    TanStack Start never had an adapter, so this section is integration guidance. The migration steps below do not apply to it, and the bridge lives on this page rather than in the server repository. Copy the first block into `src/lib/supabase-middleware.ts`.
+
+    `request` is already a Web `Request`, and `next()` resolves to an object carrying the downstream `Response`, so the fit is close. Two details in the bridge carry the typing. `.server<Contributions<Entries>>` is what types `context` downstream; the generic has no constraint, so leaving it off types the context as `undefined`. And `<const Entries>` keeps the tuple, so every `context.*` read stays typed.
+
+    `createMiddleware({ type: 'request' })` is the right kind here. Its server function may return a `Response`, which is what lets an entry short-circuit, and `createServerFn().middleware([...])` accepts request middleware.
+
+    On a server function, Start's fetcher returns any `application/json` body as the call's value without checking the status. A 401 from `withRequiredClaims()` would resolve the caller's promise with `{ message, code }` where it expects its own result type: the same silent-200 class of failure as the auth trap, one layer further out. So when an entry short-circuits on a server function, the bridge rethrows it as an error carrying `status` and `code`. Server routes get the `Response` back unchanged.
+
+    The file that calls `.middleware([...])` ships to the client, so the entry modules it references are client-reachable. Read configuration through `getEnv` per request and keep secrets out of module scope.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    import { createMiddleware } from '@tanstack/react-start'
+    import { pipeline, seedContext } from '@supabase/middleware'
+    import type {
+      AnyEntry,
+      Contributions,
+      ValidateEntries,
+    } from '@supabase/middleware'
+
+    /**
+     * Resolves to `unknown` when the entries compose, so the parameter type stays
+     * `Entries`. Otherwise it is the engine's error string, and the intersection
+     * makes the call fail with the `middleware-conflict` or `middleware-prereq`
+     * message.
+     */
+    type Validated<Entries extends readonly AnyEntry[]> = [
+      ValidateEntries<Entries>,
+    ] extends [true]
+      ? unknown
+      : ValidateEntries<Entries>
+
+    /** Per-request handoff from the Start middleware to the pipeline's terminal. */
+    const HANDOFF = Symbol('toTanStackStart.handoff')
+    interface Handoff {
+      next: (options: { context: Record<string, unknown> }) => unknown
+      ran: boolean
+    }
+
+    /**
+     * Runs an entry array as a TanStack Start request middleware.
+     *
+     * The pipeline folds once, when `toTanStackStart` is called, so entries keep
+     * their state across requests. Each request travels through the fold with
+     * Start's `next` under a symbol key, which the engine's context spreads
+     * preserve. The terminal hands the contributions to Start as the server
+     * context and returns the downstream response back up through the entries.
+     *
+     * `.server<Contributions<Entries>>` is what types `context` downstream. The
+     * generic has no constraint, so leaving it off types the context as
+     * `undefined`.
+     *
+     * On a server function, Start's fetcher returns any JSON body as the call's
+     * value without checking the status, so a 401 from `withRequiredClaims` would
+     * resolve the caller's promise with `{ message, code }`. A short-circuit on a
+     * server function is therefore rethrown as an error carrying `status` and
+     * `code`. Server routes get the `Response` back unchanged.
+     */
+    export function toTanStackStart<const Entries extends readonly AnyEntry[]>(
+      entries: Entries & Validated<Entries>,
+    ) {
+      const run = pipeline(entries as readonly AnyEntry[], async (_req, ctx) => {
+        const handoff = (ctx as Record<symbol, Handoff>)[HANDOFF]
+        handoff.ran = true
+        const context: Record<string, unknown> = {}
+        for (const [key, value] of Object.entries(ctx)) {
+          context[key] = value
+        }
+        const result = (await handoff.next({ context })) as { response: Response }
+        return result.response
+      })
+
+      return createMiddleware({ type: 'request' }).server<Contributions<Entries>>(
+        async ({ request, next, handlerType }) => {
+          const handoff: Handoff = { next, ran: false }
+          const response = await run(request, {
+            ...seedContext(),
+            [HANDOFF]: handoff,
+          })
+          if (handoff.ran || handlerType !== 'serverFn') return response
+
+          const body = (await response
+            .clone()
+            .json()
+            .catch(() => null)) as { message?: string; code?: string } | null
+          throw Object.assign(
+            new Error(
+              body?.message ?? `Request failed with status ${response.status}`,
+            ),
+            {
+              status: response.status,
+              statusCode: response.status,
+              ...(body?.code !== undefined && { code: body.code }),
+            },
+          )
+        },
+      )
+    }
+    ```
+
+    ```ts
+    import { createServerFn } from '@tanstack/react-start'
+    import { withRequiredClaims } from '@supabase/server/middleware/required-claims'
+    import { withSupabaseClient } from '@supabase/server/middleware/client'
+
+    import { toTanStackStart } from './lib/supabase-middleware.js'
+
+    const supabase = toTanStackStart([withRequiredClaims(), withSupabaseClient()])
+
+    export const getTodos = createServerFn()
+      .middleware([supabase])
+      .handler(async ({ context }) => {
+        const { data, error } = await context.supabase.from('todos').select()
+        if (error) throw error
+        return data
+      })
+
+    export const whoAmI = createServerFn()
+      .middleware([supabase])
+      .handler(async ({ context }) => ({ id: context.jwtClaims.sub }))
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Moving off the adapters
+
+Each adapter solved the same problem in a framework-specific way: build a `SupabaseContext` and stash it where the handler can reach it. That meant a published entry point, a peer dependency range, and a release cycle per framework, all to wrap one call. The engine replaced the model. A middleware is now an entry, a `(handler) => handler` wrapper over the Web `Request` and `Response` pair, and `withSupabaseClient()`, `withSupabaseAdminClient()`, `withRequiredClaims()`, and the rest are ordinary entries you compose. What remains is the bridge, and it belongs in your project, not in a package that has to track your framework's major versions.
+
+The adapters still work in v1 and will be deprecated soon. They will be removed in a future major. `withSupabase(config, handler)` from `@supabase/server` is not part of this change.
+
+Three changes come with the migration. The first can open an endpoint up.
+
+### The auth trap
+
+<Admonition type="caution" title="Read this before you migrate anything">
+
+The adapters rejected unauthenticated requests. `withClaims()` does not. Migrating an `auth: 'user'` endpoint onto it instead of `withRequiredClaims()` turns a 401 into a silent 200.
+
+</Admonition>
+
+`withSupabase({ auth: 'user' })` verified the caller's token before your handler ran and returned a 401 when it was missing. The entry that looks like its replacement does not.
+
+```ts
+// Before: an anonymous request gets 401 and the handler never runs.
+app.use('*', withSupabase({ auth: 'user' }))
+
+// After, wrong: an anonymous request gets 200. The handler runs with
+// jwtClaims === null and an unauthenticated Supabase client.
+app.use('*', toHono([withClaims(), withSupabaseClient()]))
+
+// After, right: the same gate the adapter applied.
+app.use('*', toHono([withRequiredClaims(), withSupabaseClient()]))
+```
+
+`withClaims()` rejects a token that is present and invalid. A request with no credentials at all is not an error to it. It contributes `jwtClaims: null` and falls through, by design, because many pipelines want an anonymous path. Nothing throws and nothing logs. The endpoint returns 200 with whatever Row Level Security lets the anonymous role see, often an empty array. That reads like a data bug, and it can sit in production for a long time before anyone reads it as an auth bug.
+
+`withRequiredClaims()` from `@supabase/server/middleware/required-claims` is the required-caller counterpart. It verifies against the same project JWKS, rejects before your handler runs, and contributes non-null `jwtClaims`, so gated handlers read `jwtClaims.sub` with no `?.` fallback. The two are mutually exclusive. Both declare the `jwtClaims` key, so composing them is a compile-time conflict, not a fallback.
+
+Which endpoints are affected is written in the adapter config, not in the handler. That is what makes it easy to miss in review.
+
+| Adapter config               | Rejected before           | Replacement                       |
+| ---------------------------- | ------------------------- | --------------------------------- |
+| `auth: 'user'`, or no config | missing or invalid JWT    | `withRequiredClaims()`            |
+| `auth: 'none'`               | nothing                   | nothing; the client entries alone |
+| `auth: 'publishable'`        | missing or wrong `apikey` | none. Keep `withSupabase`         |
+| `auth: 'secret'`             | missing or wrong `apikey` | none. Keep `withSupabase`         |
+
+A bare `withSupabase()` with no config was `auth: 'user'` and did reject.
+
+No composable gate exists for `publishable` or `secret`. Those endpoints stay on `withSupabase({ auth: 'publishable' })` or `withSupabase({ auth: 'secret' })`, which needs no changes. Hand-rolling a key check is how endpoints get opened up. Two details catch people who try. Those modes read the `apikey` header and never `Authorization`, so a caller sending `Authorization: Bearer <key>` gets a bare 401. And `auth: 'secret:<name>'` also points `supabaseAdmin` at `secretKeys['<name>']`, so that entry has to hold a real Supabase secret key.
+
+`withRequiredClaims` answers with the standard error payload, with the same codes `withSupabase({ auth: 'user' })` returns for the same request.
+
+| Request                                               | Status | `code`                |
+| ----------------------------------------------------- | ------ | --------------------- |
+| No `Authorization` header                             | 401    | `MISSING_CREDENTIALS` |
+| An `sb_*` API key in the `Authorization` slot         | 401    | `UNUSABLE_CREDENTIAL` |
+| A token that fails verification                       | 401    | `INVALID_JWT`         |
+| A token, but the JWKS could not be fetched            | 500    | `JWKS_FETCH_FAILED`   |
+| A token, but no JWKS source and no usable project URL | 500    | `JWKS_NOT_CONFIGURED` |
+
+The adapters emitted none of these. Each rejected in its own framework-native shape. Hono threw an `HTTPException`, which renders as `text/plain` with no `code`. H3 threw an `HTTPError`. Elysia surfaced a `SupabaseError` through your `onError` handler. Only the NestJS adapter threw `HttpException({ message, code }, status)`. A client that branches on the 401 status is fine. A client that parses the body needs rechecking.
+
+Neither entry answers a CORS preflight, and the short-circuits carry no CORS headers. For browser callers, compose `withCors` from `@supabase/middleware/cors` ahead of the gate.
+
+### Keep `withSupabase` where it fits
+
+`withSupabase(config, handler)` still does the verify-then-reject work for you, and it is not deprecated. It wraps a fetch handler rather than composing into a framework chain, so it does not slot into a bridge. If an endpoint is already a plain fetch handler, staying on `withSupabase()` is a legitimate end state. It is also the only way to get the full `SupabaseContext`, `userClaims` and `authMode` included, behind an auth gate.
+
+To compose other entries around it, `withSupabase({ auth: 'user' })` with no handler is a `pipeline` entry placed by position. Entries before it run ahead of the auth gate. Entries after it receive the full `SupabaseContext`. Nesting, as in `withSupabase(config, entry(handler))`, still works. The entry form is alpha and needs 1.6.0 or later.
+
+```ts
+import { pipeline } from '@supabase/middleware'
+import { withCors } from '@supabase/middleware/cors'
+import { withSupabase } from '@supabase/server'
+
+export default {
+  fetch: pipeline(
+    [
+      withCors({ origin: ['https://app.example.com'] }),
+      withSupabase({ auth: 'user', cors: 'disabled' }),
+    ],
+    async (_req, ctx) => Response.json({ user: ctx.userClaims?.id })
+  ),
+}
+```
+
+`withSupabaseClient()` and `withSupabaseAdminClient()` throw an `EnvError` when configuration is missing, and the bridges do not catch it. The adapters turned it into a clean 500. The two fail at different moments. `withSupabaseClient()` throws from the entry chain, before your handler runs. `withSupabaseAdminClient()` builds lazily and throws on the first `supabaseAdmin` property access, inside your handler. Map both in your framework's error boundary.
+
+### The shape change
+
+Adapters exposed one nested object. The entries contribute flat keys, one per middleware.
+
+```ts
+// Before
+const { supabase, userClaims } = c.var.supabaseContext
+
+// After
+const supabase = c.var.supabase
+const jwtClaims = c.var.jwtClaims
+```
+
+For `supabase` and `supabaseAdmin` the rewrite is mechanical. For claims it is not. No entry contributes `userClaims`. `withClaims()` and `withRequiredClaims()` both contribute `jwtClaims`, the raw JWT payload, and the field names differ.
+
+| `userClaims` (adapters) | `jwtClaims` (middleware) |
+| ----------------------- | ------------------------ |
+| `.id`                   | `.sub`                   |
+| `.role`                 | `.role`                  |
+| `.email`                | `.email`                 |
+| `.appMetadata`          | `.app_metadata`          |
+| `.userMetadata`         | `.user_metadata`         |
+
+A blanket rename of `userClaims` to `jwtClaims` fails to compile in TypeScript. In plain JavaScript, or behind an `as`, `jwtClaims.id` is `undefined` with no error, and `.id` is usually the value rows get written with. Rewrite each read against the table.
+
+### Step by step
+
+Do the steps in order. The auth inventory comes before any code change, because the step that follows it is the one that can open an endpoint up. Follow the steps yourself, or hand them to a coding agent with the prompt at the end of this page.
+
+### 1. Check your versions
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    The bridges need `@supabase/server` 1.6.0 or later and Node 22 or later.
+
+    Then decide whether you need the response phase: an entry that sees the outgoing response and can rewrite it, which is what CORS and header-stamping middleware do. The table at the top of this page says what survives per framework. If you only read `supabase` inside a handler, you do not need it.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```bash
+    npm ls @supabase/server   # 1.6.0 or later
+    node --version            # 22 or later
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### 2. Inventory every adapter registration
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Do this before editing anything. What you need is in the adapter config, not in the handlers, and it stops being visible the moment you start swapping imports.
+
+    For each hit, find the `withSupabase(...)` call it feeds and write down its `auth` value. A bare `withSupabase()` with no config counts as `auth: 'user'`. Keep that list. Step 7 checks against it.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```bash
+    grep -rn "@supabase/server/adapters" src/
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### 3. Decide what replaces each auth value
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Use the table in "The auth trap" above. `auth: 'user'` and a bare `withSupabase()` become `withRequiredClaims()`. `auth: 'none'` needs no gate. `auth: 'publishable'` and `auth: 'secret'` have no composable gate: those endpoints stay on `withSupabase`, and leaving them unmigrated is the better outcome.
+
+    Do not reach for `withClaims()` here. It lets anonymous requests through by design.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    // auth: 'user', or no config
+    toHono([withRequiredClaims(), withSupabaseClient()])
+
+    // auth: 'none'
+    toHono([withSupabaseClient()])
+
+    // auth: 'publishable' or auth: 'secret'
+    // Stop. Keep withSupabase for this endpoint.
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### 4. Copy the bridge for your framework
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    One file, yours to own from here on: `src/lib/supabase-middleware.ts`, or `src/lib/supabase.guard.ts` for NestJS. Copy it as is. Some lines look redundant and are not. The Hono `c.res` clear-then-assign is the clearest example, and it carries the comment explaining why. Keep the comments.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```bash
+    mkdir -p src/lib
+    curl --fail -o src/lib/supabase-middleware.ts \
+      https://raw.githubusercontent.com/supabase/server/main/examples/frameworks/hono/supabase-middleware.ts
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### 5. Swap the registrations
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    One at a time, using the decision from step 3. Add `withSupabaseAdminClient()` from `@supabase/server/middleware/admin-client` only where the old code read `supabaseAdmin`. It needs the secret key.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts
+    // Before
+    import { withSupabase } from '@supabase/server/adapters/hono'
+    app.use('*', withSupabase({ auth: 'user' }))
+
+    // After
+    import { withRequiredClaims } from '@supabase/server/middleware/required-claims'
+    import { withSupabaseClient } from '@supabase/server/middleware/client'
+    import { toHono } from './lib/supabase-middleware.js'
+    app.use('*', toHono([withRequiredClaims(), withSupabaseClient()]))
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### 6. Rewrite the call sites
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    The adapters exposed one nested object. The entries contribute flat keys. The same shape applies to `event.context` (H3), the route context (Elysia), and `req` (NestJS).
+
+    `userClaims` is not on that list. No entry contributes it. Rewrite each claims read against the field table in "The shape change" above.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```text
+    c.var.supabaseContext.supabase       ->  c.var.supabase
+    c.var.supabaseContext.supabaseAdmin  ->  c.var.supabaseAdmin
+    c.var.supabaseContext.userClaims.id  ->  c.var.jwtClaims.sub
+    ```
+
+    ```bash
+    grep -rn "supabaseContext" src/    # expect no results
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### 7. Verify
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Three checks, in this order. The second is what this procedure exists for.
+
+    Types: run the typecheck.
+
+    Auth: for every endpoint step 2 recorded as rejecting, prove it still rejects. A clean typecheck says nothing about it. A `200` on the first call is the failure this page is arranged around. It means the gate is missing, not that the endpoint is healthy.
+
+    Behavior: run your test suite, then exercise one migrated endpoint end to end. If it was behind `auth: 'user'`, sign in and confirm the handler sees the caller: `jwtClaims.sub` is the user id.
+
+    The rejection body changed even when the status did not. See the code table in "The auth trap" above.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```bash
+    npx tsc --noEmit
+
+    BASE=http://localhost:3000
+
+    # no credentials -> expect 401
+    curl -s -o /dev/null -w "%{http_code}\n" $BASE/your-endpoint
+
+    # a valid user token -> expect 200
+    curl -s -o /dev/null -w "%{http_code}\n" \
+      -H "Authorization: Bearer $TOKEN" $BASE/your-endpoint
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### 8. Clean up
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Anything left is either an endpoint you kept on purpose (the `publishable` and `secret` cases from step 3) or one you missed. Uninstall the framework peer dependency only if nothing else uses it.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```bash
+    grep -rn "@supabase/server/adapters" src/
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Call-site cheat sheet
+
+| Before                                                          | After                                                                |
+| --------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `import { withSupabase } from '@supabase/server/adapters/hono'` | `import { toHono } from './lib/supabase-middleware.js'`              |
+| `app.use('*', withSupabase({ auth: 'user' }))`                  | `app.use('*', toHono([withRequiredClaims(), withSupabaseClient()]))` |
+| `app.use('*', withSupabase({ auth: 'none' }))`                  | `app.use('*', toHono([withSupabaseClient()]))`                       |
+| `c.var.supabaseContext.supabase`                                | `c.var.supabase`                                                     |
+| `c.var.supabaseContext.supabaseAdmin`                           | `c.var.supabaseAdmin`                                                |
+| `c.var.supabaseContext.userClaims.id`                           | `c.var.jwtClaims.sub` (the field names change too; see the table)    |
+| `event.context.supabaseContext.supabase` (H3)                   | `event.context.supabase`                                             |
+| `req.supabaseContext.supabase` (NestJS)                         | `req.supabase`                                                       |
+
+The adapters took `auth: 'user' | 'publishable' | 'secret' | 'none'` and did two jobs with it: verified the credentials, and rejected the request when they were missing or wrong. Of the composable entries, only `withRequiredClaims()` does both, and only for user mode. If you want the adapter's exact verify-then-build behavior with no rewrite, keep the top-level `withSupabase()`. It is not deprecated, and as an entry it composes with `pipeline`.
+
+### Hand it to an agent
+
+Paste this, and replace `hono` in the URL with `h3`, `elysia`, or `nestjs` (`supabase.guard.ts` for NestJS).
+
+```text
+Migrate this project off @supabase/server's framework adapters
+(@supabase/server/adapters/*) onto @supabase/middleware entries. Work in the
+order below. Do not start at step 3.
+
+STEP 1: INVENTORY. Do this before editing anything.
+Grep for `@supabase/server/adapters` and list every withSupabase(...)
+registration it feeds, with that call's `auth` value. A bare withSupabase()
+with no config means auth: 'user'. Show me this list before you edit.
+
+STEP 2: DECIDE THE AUTH REPLACEMENT for each one. This is the step that can
+open an endpoint up, so do it deliberately:
+  auth: 'user' (or no config) -> withRequiredClaims() from
+      '@supabase/server/middleware/required-claims'
+  auth: 'none'                -> no gate needed
+  auth: 'publishable'/'secret' -> STOP. There is no composable gate. Leave the
+      endpoint on withSupabase and tell me about it. Do not hand-roll a key
+      check.
+The adapters REJECTED unauthenticated requests. withClaims() does NOT: it
+contributes jwtClaims: null and falls through, turning a 401 endpoint into a
+200 endpoint silently. Never use withClaims() as the replacement for
+auth: 'user'. Never compose withClaims() and withRequiredClaims() together;
+they share the jwtClaims key and that is a compile-time conflict.
+
+STEP 3: FETCH THE BRIDGE. Download
+https://raw.githubusercontent.com/supabase/server/main/examples/frameworks/hono/supabase-middleware.ts
+and save it as src/lib/supabase-middleware.ts, verbatim. Do not "improve",
+condense, or drop comments from it.
+
+STEP 4: SWAP each registration to the bridge called on an entry array, e.g.
+  toHono([withRequiredClaims(), withSupabaseClient()])
+For NestJS, call toNestGuard(entries) once, assign it to a const, and pass
+that const to every @UseGuards().
+Import the client entries from '@supabase/server/middleware/client' and
+'@supabase/server/middleware/admin-client'. Only include
+withSupabaseAdminClient() where the old code actually read supabaseAdmin.
+
+STEP 5: REWRITE call sites from the nested shape to flat keys:
+  c.var.supabaseContext.supabase       -> c.var.supabase
+  c.var.supabaseContext.supabaseAdmin  -> c.var.supabaseAdmin
+Apply the equivalent for event.context / the Elysia context / req.
+userClaims is NOT one of these. No middleware contributes that key;
+c.var.userClaims does not exist. The entries contribute jwtClaims, the RAW JWT
+payload, with different field names:
+  userClaims.id            -> jwtClaims.sub
+  userClaims.role          -> jwtClaims.role
+  userClaims.email         -> jwtClaims.email
+  userClaims.appMetadata   -> jwtClaims.app_metadata
+  userClaims.userMetadata  -> jwtClaims.user_metadata
+Rewrite each read individually. Do NOT do a blanket rename; in plain
+JavaScript that leaves .id undefined with no error.
+When finished there must be no remaining reference to `supabaseContext`.
+
+STEP 6: VERIFY. Run the typecheck. Then, for every endpoint you listed in
+step 1 as rejecting, confirm an unauthenticated request still returns 401 and
+an authenticated one still returns 200. A passing typecheck does not prove
+this; check it separately.
+
+CONSTRAINTS
+- Do NOT remove the `c.res = undefined` line in the Hono bridge or its comment.
+  It looks redundant and is not: when a response-phase entry returns a new
+  Response, Hono merges the previous response's headers over it, reverting
+  anything the entry rewrote.
+
+REPORT, as a table: every adapter registration you found, its old `auth` value,
+and whether the migrated version still rejects anonymous requests. Then list
+every file you changed and anything you could not migrate.
+```
