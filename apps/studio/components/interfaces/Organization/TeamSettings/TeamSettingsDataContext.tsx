@@ -5,7 +5,7 @@ import type { OrganizationRolesResponse } from '@/data/organization-members/orga
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 import type { OrganizationBase } from '@/data/organizations/organizations-query'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
-import type { Permission } from '@/types'
+import type { Permission, PermissionV2 } from '@/types'
 
 type TeamSettingsDataContextValue = {
   members: OrganizationMember[]
@@ -13,6 +13,7 @@ type TeamSettingsDataContextValue = {
   isLoadingRoles: boolean
   orgProjects: OrgProject[]
   permissions: Permission[] | undefined
+  permissionsV2: PermissionV2 | undefined
   selectedOrganization: OrganizationBase | undefined
   organizationMembersDeletionEnabled: boolean
   onManageAccess: (member: OrganizationMember) => void
@@ -35,6 +36,7 @@ export const TeamSettingsDataProvider = ({
   isLoadingRoles,
   orgProjects,
   permissions,
+  permissionsV2,
   selectedOrganization,
   organizationMembersDeletionEnabled,
   onManageAccess,
@@ -46,6 +48,7 @@ export const TeamSettingsDataProvider = ({
       isLoadingRoles,
       orgProjects,
       permissions,
+      permissionsV2,
       selectedOrganization,
       organizationMembersDeletionEnabled,
       onManageAccess,
@@ -56,6 +59,7 @@ export const TeamSettingsDataProvider = ({
       isLoadingRoles,
       orgProjects,
       permissions,
+      permissionsV2,
       selectedOrganization,
       organizationMembersDeletionEnabled,
       onManageAccess,
