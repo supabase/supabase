@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ArchivedFilePreviewPane } from '@/components/interfaces/Storage/StorageExplorer/ArchivedFilePreviewPane'
 import type { ArchivedObject } from '@/data/storage/versioning/archived-objects-query'
@@ -19,6 +19,7 @@ const ARCHIVED_OBJECT: ArchivedObject = {
     size: 100,
     createdAt: '2024-01-01T00:00:00Z',
     action: 'initial upload',
+    mimeType: 'image/png',
   },
   noncurrentVersions: [],
 }
@@ -43,6 +44,30 @@ vi.mock('@/hooks/misc/useCheckPermissions', () => ({
 }))
 
 describe('ArchivedFilePreviewPane', () => {
+  // The pane previews the archived file, so every test makes this request.
+  let signed: unknown[] = []
+  beforeEach(() => {
+    signed = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/sign',
+      response: async ({ request }) => {
+        signed.push(await request.json())
+        return Response.json({ signedUrl: 'https://example.com/gone.png' })
+      },
+    })
+  })
+
+  it('signs the archived version, since the path itself resolves to the delete marker', async () => {
+    render(<ArchivedFilePreviewPane />)
+
+    await waitFor(() => expect(signed).toHaveLength(1))
+    expect(signed[0]).toMatchObject({
+      path: 'images/gone.png',
+      options: { versionId: 'v-current' },
+    })
+  })
+
   it('refreshes the live listing after a restore, so the file reappears', async () => {
     addAPIMock({
       method: 'delete',
