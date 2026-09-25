@@ -50,9 +50,15 @@ export const useDatabaseCronJobToggleMutation = ({
     mutationFn: (vars) => toggleDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, searchTerm } = variables
-      await queryClient.invalidateQueries({
-        queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
-      })
+      // Invalidate the whole jobs prefix (list, count, etc.) plus the minimal list,
+      // which renders the table when the main query hits the cost threshold — without
+      // this, the switch keeps showing the stale active state after a toggle
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseCronJobsKeys.jobs(projectRef) }),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.listInfiniteMinimal(projectRef, searchTerm),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
