@@ -64,7 +64,7 @@ export const getArchivedOverlayItems = ({
       status: STORAGE_ROW_STATUS.READY,
       metadata: {
         size: object.currentVersion.size,
-        mimetype: '',
+        mimetype: object.currentVersion.mimeType ?? '',
         cacheControl: '',
         contentLength: object.currentVersion.size,
         httpStatusCode: 0,
