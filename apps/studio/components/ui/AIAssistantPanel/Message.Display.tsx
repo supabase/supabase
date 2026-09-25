@@ -3,7 +3,8 @@ import { type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
 import { useMessageInfoContext } from './Message.Context'
-import { MessagePartSwitcher } from './Message.Parts'
+import { MessagePartSwitcher, MessagePartToolGroup } from './Message.Parts'
+import { groupMessageParts } from './Message.Parts.utils'
 import { MessageMarkdown } from './MessageMarkdown'
 import { ProfileImage as ProfileImageDisplay } from '@/components/ui/ProfileImage'
 import { useProfileNameAndPicture } from '@/lib/profile'
@@ -42,18 +43,31 @@ function MessageDisplayMainArea({
 }
 
 function MessageDisplayContent({ message }: { message: VercelMessage }) {
-  const { id, isLoading, readOnly } = useMessageInfoContext()
+  const { id, isLoading, isLastMessage, readOnly } = useMessageInfoContext()
 
   const messageParts = message.parts
   const content =
     ('content' in message && typeof message.content === 'string' && message.content.trim()) ||
     undefined
 
+  const items = groupMessageParts(messageParts ?? [])
+  const isStreaming = isLoading && !!isLastMessage
+
   return (
     <div className="flex-1 min-w-0">
       {messageParts?.length > 0
-        ? messageParts.map((part: NonNullable<VercelMessage['parts'][number]>, idx) => {
-            return <MessagePartSwitcher key={idx} part={part} />
+        ? items.map((item, idx) => {
+            if (item.type === 'part') {
+              return <MessagePartSwitcher key={item.partIndex} part={item.part} />
+            }
+            return (
+              <MessagePartToolGroup
+                key={`tool-group-${item.groupIndex}`}
+                parts={item.parts}
+                // Only the trailing group can still grow while the response streams
+                isRunning={isStreaming && idx === items.length - 1}
+              />
+            )
           })
         : content && (
             <div className="w-full max-w-3xl mx-auto">
