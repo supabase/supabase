@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest'
-
 import type { Edge, Node } from '@xyflow/react'
+import { describe, expect, it } from 'vitest'
 
 import {
   easeInOutCubic,
@@ -99,9 +98,7 @@ describe('withEdgeOpacity', () => {
 
 describe('getLayoutTransitionTimings', () => {
   it('includes fade windows only when that side has edges', () => {
-    expect(
-      getLayoutTransitionTimings({ hasOutgoingEdges: true, hasIncomingEdges: true })
-    ).toEqual({
+    expect(getLayoutTransitionTimings({ hasOutgoingEdges: true, hasIncomingEdges: true })).toEqual({
       fadeOutMs: EDGE_FADE_MS,
       moveMs: NODE_LAYOUT_ANIMATION_MS,
       fadeInMs: EDGE_FADE_MS,

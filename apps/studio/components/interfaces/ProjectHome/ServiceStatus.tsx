@@ -321,7 +321,8 @@ export const ServiceStatus = ({
     return 'Healthy'
   }
 
-  const overallStatusLabel = getFailoverSimulationStatusLabel(failoverPhase) ?? getOverallStatusLabel()
+  const overallStatusLabel =
+    getFailoverSimulationStatusLabel(failoverPhase) ?? getOverallStatusLabel()
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>

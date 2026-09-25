@@ -8,7 +8,7 @@ import {
   ReactFlow,
   useNodesInitialized,
   useReactFlow,
-  type Padding,
+  type FitViewOptions,
 } from '@xyflow/react'
 import { useReducedMotion } from 'common'
 import { useTheme } from 'next-themes'
@@ -18,10 +18,7 @@ import '@xyflow/react/dist/style.css'
 
 import { cn } from 'ui'
 
-import {
-  getLayoutTransitionFrame,
-  hasLayoutDelta,
-} from './DiagramFlow.utils'
+import { getLayoutTransitionFrame, hasLayoutDelta } from './DiagramFlow.utils'
 import { getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { timeout } from '@/lib/helpers'
 
@@ -35,7 +32,7 @@ interface DiagramFlowProps {
   /** Prepends background group nodes (regions, shards) after the dagre layout runs */
   addGroupNodes: (nodes: Node[], edges: Edge[]) => { nodes: Node[]; edges: Edge[] }
   ranksep?: number
-  fitViewPadding?: Padding
+  fitViewPadding?: FitViewOptions['padding']
 }
 
 /**

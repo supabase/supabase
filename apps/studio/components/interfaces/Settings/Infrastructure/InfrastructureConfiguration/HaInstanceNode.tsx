@@ -42,13 +42,7 @@ const PromotionBadge = ({ state }: { state: NonNullable<HaPoolerNodeData['promot
   </span>
 )
 
-const PoolerCardTitleRow = ({
-  title,
-  children,
-}: {
-  title: string
-  children?: ReactNode
-}) => (
+const PoolerCardTitleRow = ({ title, children }: { title: string; children?: ReactNode }) => (
   <div className="flex items-center justify-between gap-x-2">
     <p className="text-sm">{title}</p>
     {children !== undefined && (
@@ -181,11 +175,11 @@ export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
               : 'bg-surface-100 border-foreground/20'
           )}
         >
-            {status === 'coming_up' || isPromoting ? (
-              <Loader2 aria-hidden="true" className="motion-safe:animate-spin" size={16} />
-            ) : (
-              <DatabaseBackup aria-hidden="true" size={16} />
-            )}
+          {status === 'coming_up' || isPromoting ? (
+            <Loader2 aria-hidden="true" className="motion-safe:animate-spin" size={16} />
+          ) : (
+            <DatabaseBackup aria-hidden="true" size={16} />
+          )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-y-0.5">
           <PoolerCardTitleRow title="Read Replica">

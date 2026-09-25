@@ -162,7 +162,10 @@ export const ActivityStats = ({
   return (
     <div className="@container">
       <div className="grid grid-cols-1 @md:grid-cols-2 gap-2 @md:gap-6 flex-wrap">
-        <ServiceStatus isHighAvailabilityOverride={isHighAvailability} failoverPhase={failoverPhase} />
+        <ServiceStatus
+          isHighAvailabilityOverride={isHighAvailability}
+          failoverPhase={failoverPhase}
+        />
 
         <SingleStat
           icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
