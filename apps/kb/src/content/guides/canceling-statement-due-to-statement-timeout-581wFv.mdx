@@ -1,0 +1,16 @@
+---
+title: 'Canceling statement due to "statement timeout"'
+description: 'Explains how to check and raise the statement_timeout setting for a role and diagnose slow queries that get canceled by a statement timeout.'
+topics: ['Troubleshooting', 'Database']
+github_url: 'https://github.com/orgs/supabase/discussions/14256'
+---
+
+> If encountering 504 or timeout errors in the Dashboard, check out [this guide](https://github.com/orgs/supabase/discussions/21133#discussioncomment-9573776)
+
+You can run this query to check the current settings set for your roles: `SELECT rolname, rolconfig FROM   pg_roles;`
+
+To increase the `statement_timeout` for a specific role, you may follow the instructions [here](/docs/guides/database/postgres/timeouts#role-level). Note that it may require a quick reboot for the changes to take effect.
+
+Additionally, to check how long a query is taking, you can check the [Query Performance report](/dashboard/project/_/advisors/query-performance), which can give you more information on the query's performance. You can use the [query plan analyzer](https://www.postgresql.org/docs/current/sql-explain.html) on any expensive queries that you have identified: `explain analyze <query-statement-here>;`. For supabase-js/ PostgREST queries you can use `.explain()`.
+
+You can also make use of [Postgres logs](/dashboard/project/_/logs/postgres-logs), which give you useful information like when the query was executed.

@@ -1,0 +1,21 @@
+---
+title: 'Reload/refresh postgrest schema'
+description: 'Shows how to manually reload the PostgREST schema cache from the SQL Editor after a "Could not find a relationship" error.'
+topics: ['Troubleshooting', 'Database', 'Data API']
+---
+
+To refresh your PostgREST schema, go to your project **Dashboard**, and open the **SQL Editor**.
+
+Then, paste the following SQL statement:
+
+```sql
+NOTIFY pgrst, 'reload schema';
+```
+
+And click on **Run**.
+
+You should see a confirmation message under the **Results** tab:
+
+```text
+Success. No rows returned
+```

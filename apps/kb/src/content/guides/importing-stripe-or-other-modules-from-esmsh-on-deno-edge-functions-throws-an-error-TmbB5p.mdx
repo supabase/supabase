@@ -1,0 +1,12 @@
+---
+title: 'Importing Stripe or other modules from esm.sh on Deno Edge Functions throws an error'
+description: 'Fixes import errors for esm.sh modules like Stripe in Deno Edge Functions by adding the ?target=deno parameter.'
+topics: ['Troubleshooting', 'Edge Functions']
+github_url: 'https://github.com/orgs/supabase/discussions/14303'
+---
+
+Try adding `?target=deno` to the import path of the module. For Stripe, the updated import would be:
+
+```ts
+import Stripe from 'https://esm.sh/stripe@11.2.0?target=deno'
+```

@@ -1,0 +1,16 @@
+---
+title: "Fetch requests to API endpoints aren't showing the session"
+description: 'Shows how to forward the cookie header on a fetch request so an API endpoint can access the session.'
+topics: ['Troubleshooting', 'Auth']
+github_url: 'https://github.com/orgs/supabase/discussions/15859'
+---
+
+You must pass along the cookie header with the fetch request in order for your API endpoint to get access to the cookie from this request.
+
+```ts
+const res = await fetch('http://localhost:3000/contact', {
+  headers: {
+    cookie: headers().get('cookie') as string,
+  },
+})
+```

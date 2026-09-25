@@ -1,0 +1,8 @@
+---
+title: 'How do I make the cookies HttpOnly?'
+description: 'Explains why marking auth cookies HttpOnly is unnecessary and could break session handling, since the browser needs access to the refresh token.'
+topics: ['Troubleshooting', 'Auth']
+github_url: 'https://github.com/orgs/supabase/discussions/18869'
+---
+
+This is not necessary. Both the access token and refresh token are designed to be passed around to different components in your application. The browser-based side of your application needs access to the refresh token to properly maintain a browser session anyway.

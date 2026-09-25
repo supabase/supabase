@@ -1,0 +1,26 @@
+---
+title: 'Pausing Pro-Projects'
+description: "Explains that Pro projects can't be paused directly and describes workarounds, including transferring to a free organization or backing up data with the CLI."
+topics: ['Troubleshooting', 'Supabase Platform', 'CLI']
+github_url: 'https://github.com/orgs/supabase/discussions/27399'
+---
+
+Pro-Projects at the moment cannot be paused. However, [You are allowed to have two free organizations](/docs/guides/platform/billing-on-supabase#free-plan) that can support one active project each and an unlimited amount of paused ones.
+
+If a project is under 500MB, you can [transfer it to be under a free organization](/docs/guides/platform/project-transfer). Afterwards, you can initiate a pause.
+
+Alternatively, you can download a [daily backup](/dashboard/project/_/database/backups/scheduled) of only your database for archiving. You can also manually download a .SQL file of your database and storage buckets by following this [guide](/docs/guides/platform/migrating-within-supabase/backup-restore).
+
+You can also download your storage buckets with the [Supabase CLI:](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=npx)
+
+```sql
+npx supabase login
+
+# link to your project
+npx supabase link
+
+npx supabase init
+
+# will download files to current folder
+npx supabase storage cp -r ss://bucket . --experimental
+```
