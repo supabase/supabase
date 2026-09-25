@@ -95,6 +95,38 @@
   @apply border-t border-r-0 border-l-0;
   contain: strict;
   font-size: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.rdg:hover {
+  scrollbar-color: hsl(var(--border-strong)) transparent;
+}
+
+.rdg::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.rdg::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rdg::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.rdg:hover::-webkit-scrollbar-thumb {
+  background: hsl(var(--border-strong));
+}
+
+.rdg::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground-muted));
+}
+
+.rdg::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .rdg *,
