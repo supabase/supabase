@@ -7,6 +7,7 @@ import {
   isCancellationRejection,
   isChallengeExpiredError,
   isUserAbortedOperation,
+  isValtioProxyTamperingError,
 } from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
@@ -274,6 +275,127 @@ describe('Sentry beforeSend filtering functions', () => {
       const event: SentryEvent = {}
 
       expect(isChallengeExpiredError(error, event)).toBe(false)
+    })
+  })
+
+  describe('isValtioProxyTamperingError', () => {
+    it('returns true for the Firefox Symbol.iterator wording from a minified frame', () => {
+      const event: SentryEvent = {
+        exception: {
+          values: [
+            {
+              type: 'TypeError',
+              value: "can't access property Symbol.iterator, r is undefined",
+              stacktrace: {
+                frames: [{ filename: 'app:///_next/static/chunks/main.js' } as StackFrame],
+              },
+            },
+          ],
+        },
+      }
+
+      expect(isValtioProxyTamperingError(event)).toBe(true)
+    })
+
+    it("returns true for the Chrome 'in' operator wording", () => {
+      const event: SentryEvent = {
+        exception: {
+          values: [
+            {
+              type: 'TypeError',
+              value: "Cannot use 'in' operator to search for 'value' in undefined",
+              stacktrace: {
+                frames: [{ filename: 'app:///_next/static/chunks/main.js' } as StackFrame],
+              },
+            },
+          ],
+        },
+      }
+
+      expect(isValtioProxyTamperingError(event)).toBe(true)
+    })
+
+    it('returns true for the Chrome Symbol.iterator wording', () => {
+      const event: SentryEvent = {
+        exception: {
+          values: [
+            {
+              type: 'TypeError',
+              value: 'undefined is not iterable (cannot read property Symbol(Symbol.iterator))',
+            },
+          ],
+        },
+      }
+
+      expect(isValtioProxyTamperingError(event)).toBe(true)
+    })
+
+    it('returns true when the crashing frame is in valtio (dev builds)', () => {
+      const event: SentryEvent = {
+        exception: {
+          values: [
+            {
+              type: 'TypeError',
+              value: "can't access property Symbol.iterator, r is undefined",
+              stacktrace: {
+                frames: [
+                  { filename: 'app:///_next/static/chunks/main.js' } as StackFrame,
+                  {
+                    filename:
+                      'node_modules/.pnpm/valtio@1.12.0/node_modules/valtio/esm/vanilla.mjs',
+                  } as StackFrame,
+                ],
+              },
+            },
+          ],
+        },
+      }
+
+      expect(isValtioProxyTamperingError(event)).toBe(true)
+    })
+
+    it('returns false when the crashing frame is in a different node_modules package', () => {
+      const event: SentryEvent = {
+        exception: {
+          values: [
+            {
+              type: 'TypeError',
+              value: "can't access property Symbol.iterator, r is undefined",
+              stacktrace: {
+                frames: [
+                  {
+                    filename: 'node_modules/.pnpm/some-lib@1.0.0/node_modules/some-lib/index.mjs',
+                  } as StackFrame,
+                ],
+              },
+            },
+          ],
+        },
+      }
+
+      expect(isValtioProxyTamperingError(event)).toBe(false)
+    })
+
+    it('returns false for other TypeErrors', () => {
+      const event: SentryEvent = {
+        exception: {
+          values: [
+            {
+              type: 'TypeError',
+              value: "Cannot read properties of undefined (reading 'foo')",
+              stacktrace: {
+                frames: [{ filename: 'app:///_next/static/chunks/main.js' } as StackFrame],
+              },
+            },
+          ],
+        },
+      }
+
+      expect(isValtioProxyTamperingError(event)).toBe(false)
+    })
+
+    it('returns false for empty event', () => {
+      expect(isValtioProxyTamperingError({})).toBe(false)
     })
   })
 
