@@ -10,6 +10,7 @@ import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { ArchivedVersionRestoreWidget } from './ArchivedVersionRestoreWidget'
 import { ArchivedVersionRow as ArchivedVersionListRow } from './ArchivedVersionRow'
 import { getMergedArchivedVersions, type ArchivedVersionRow } from './archivedVersions.utils'
+import { FilePreview } from './FilePreview'
 import { PreviewSection } from './PreviewSection'
 import { shortVersion } from './VersionHistory'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -152,6 +153,7 @@ export const ArchivedFilePreviewPane = () => {
           {previewedVersion !== undefined ? (
             <ArchivedVersionRestoreWidget
               version={previewedVersion}
+              path={object.path}
               isRestoring={isRestoring}
               onRestore={() => handleRestore(previewedVersion)}
               onDismiss={() => setSelectedArchivedVersion(undefined)}
@@ -159,12 +161,16 @@ export const ArchivedFilePreviewPane = () => {
           ) : (
             <div className="border-b border-overlay p-3">
               <div
-                className="flex items-center justify-center overflow-hidden rounded-md border border-dashed border-overlay"
+                className="flex items-center justify-center overflow-hidden rounded-md border border-overlay bg-surface-200"
                 style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
               >
-                <p className="px-4 text-center text-sm text-foreground-muted">
-                  No preview available for archived files
-                </p>
+                {/* The path's current row is the delete marker, so the version has to be named. */}
+                <FilePreview
+                  path={object.path}
+                  mimeType={object.currentVersion.mimeType}
+                  size={object.currentVersion.size}
+                  versionId={object.currentVersion.versionId}
+                />
               </div>
 
               <div className="mt-2 flex flex-col">
@@ -236,6 +242,7 @@ export const ArchivedFilePreviewPane = () => {
                   <ArchivedVersionListRow
                     key={version.versionId}
                     version={version}
+                    path={object.path}
                     isSelected={previewedVersion?.versionId === version.versionId}
                     canUpdateFiles={canUpdateFiles}
                     isRestoring={isRestoring}
