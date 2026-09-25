@@ -214,8 +214,8 @@ export const BillingMetric = ({
             {subscription.usage_billing_enabled && isLogMetricOnNonPlatformPlan && (
               <div className="my-2">
                 <p className="text-sm">
-                  Billing/Enforcement will only start after the grace period ends at the start of
-                  2027.
+                  Billing and enforcement of restrictions for this metric will only start after the
+                  grace period ends at the start of 2027.
                 </p>
               </div>
             )}
