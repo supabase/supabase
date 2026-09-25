@@ -115,7 +115,7 @@ export const RegionSelector = ({
     isError: isErrorAvailableRegions,
     error: errorAvailableRegions,
   } = useOrganizationAvailableRegionsQuery(
-    { slug, cloudProvider, desiredInstanceSize: instanceSize },
+    { slug, cloudProvider, desiredInstanceSize: instanceSize, highAvailability },
     { enabled: smartRegionEnabled, staleTime: 1000 * 60 * 5 } // 5 minutes
   )
 
