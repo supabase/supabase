@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-export type ThemeOverrideKey = 'chroma' | 'contrast' | 'surface' | 'elevationStep'
+export type ThemeOverrideKey = 'primaryHue' | 'chroma' | 'contrast' | 'surface' | 'elevationStep'
 export type ThemeOverrideMode = 'dark' | 'light'
 
 type ThemeOverrideRange = { min: number; max: number }
@@ -14,6 +14,13 @@ export interface ThemeOverrideKnob {
 }
 
 export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
+  {
+    key: 'primaryHue',
+    cssVar: '--primary-hue',
+    label: 'Spot color',
+    description: 'Changes the hue of primary text and controls.',
+    ranges: { dark: { min: 0, max: 360 }, light: { min: 0, max: 360 } },
+  },
   {
     key: 'chroma',
     cssVar: '--chroma',
@@ -48,8 +55,8 @@ export const THEME_OVERRIDE_DEFAULTS: Record<
   ThemeOverrideMode,
   Record<ThemeOverrideKey, number>
 > = {
-  dark: { chroma: 0.005, contrast: 0.5, surface: 0.19, elevationStep: 0.025 },
-  light: { chroma: 0, contrast: 0.53, surface: 0.995, elevationStep: 0.024 },
+  dark: { primaryHue: 157.5, chroma: 0.005, contrast: 0.5, surface: 0.19, elevationStep: 0.025 },
+  light: { primaryHue: 157.5, chroma: 0, contrast: 0.53, surface: 0.995, elevationStep: 0.024 },
 }
 
 export type ThemeOverrides = Partial<Record<ThemeOverrideKey, number>>
@@ -57,6 +64,7 @@ export type ThemeOverridesByMode = Partial<Record<ThemeOverrideMode, ThemeOverri
 
 const themeOverridesSchema = z
   .object({
+    primaryHue: z.number().finite().optional(),
     chroma: z.number().finite().optional(),
     contrast: z.number().finite().optional(),
     surface: z.number().finite().optional(),

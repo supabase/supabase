@@ -73,6 +73,8 @@ export const ThemeColorSettings = () => {
         {THEME_OVERRIDE_KNOBS.map((knob) => {
           const rawValue = draft[knob.key] ?? getThemeOverrideValue(knob, mode, overrides)
           const sliderValue = themeOverrideToSliderValue(knob, mode, rawValue)
+          const displayedValue =
+            knob.key === 'primaryHue' ? `${Math.round(rawValue)}°` : sliderValue
 
           return (
             <div key={knob.key} className="flex flex-col gap-2">
@@ -87,13 +89,17 @@ export const ThemeColorSettings = () => {
                   <span className="text-sm text-foreground-light">{knob.description}</span>
                 </div>
                 <span className="text-right text-sm text-foreground-light tabular-nums">
-                  {sliderValue}
+                  {displayedValue}
                 </span>
               </div>
               <Slider
                 className="[&_[data-slot=slider-track]]:bg-input"
                 aria-labelledby={`theme-color-${knob.key}-label`}
-                aria-valuetext={`${sliderValue} out of 100`}
+                aria-valuetext={
+                  knob.key === 'primaryHue'
+                    ? `${Math.round(rawValue)} degrees`
+                    : `${sliderValue} out of 100`
+                }
                 min={0}
                 max={100}
                 step={1}
