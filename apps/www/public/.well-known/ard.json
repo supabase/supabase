@@ -1,0 +1,72 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Supabase",
+    "identifier": "https://supabase.com",
+    "documentationUrl": "https://supabase.com/docs"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:supabase.com:mcp:server",
+      "displayName": "Supabase MCP server",
+      "type": "application/json",
+      "url": "https://mcp.supabase.com/mcp",
+      "description": "The Supabase MCP server endpoint (streamable HTTP, OAuth-protected) for managing projects, database schema, and queries from MCP clients.",
+      "tags": ["mcp", "server", "agents"],
+      "representativeQueries": [
+        "connect my agent to Supabase over MCP",
+        "run a query against my Supabase project from an MCP client",
+        "manage my Supabase project from my coding agent"
+      ]
+    },
+    {
+      "identifier": "urn:air:supabase.com:metadata:mcp-oauth",
+      "displayName": "Supabase MCP OAuth metadata",
+      "type": "application/json",
+      "url": "https://api.supabase.com/.well-known/oauth-protected-resource/mcp",
+      "description": "OAuth protected-resource metadata for connecting clients to the Supabase MCP server.",
+      "tags": ["mcp", "oauth", "authorization", "metadata"],
+      "representativeQueries": [
+        "authenticate an MCP client to the Supabase MCP server with OAuth",
+        "what OAuth scopes does the Supabase MCP server support"
+      ]
+    },
+    {
+      "identifier": "urn:air:supabase.com:api:management",
+      "displayName": "Supabase Management API",
+      "type": "application/openapi+json",
+      "url": "https://api.supabase.com/api/v1-json",
+      "description": "OpenAPI 3.0 description of the Supabase Management API for managing organizations, projects, branches, and configuration.",
+      "tags": ["api", "openapi", "projects", "management"],
+      "representativeQueries": [
+        "create a new Supabase project",
+        "list the branches of my Supabase project",
+        "update the Postgres config of a Supabase project"
+      ]
+    },
+    {
+      "identifier": "urn:air:supabase.com:docs:llms-txt",
+      "displayName": "Supabase llms.txt",
+      "type": "text/plain",
+      "url": "https://supabase.com/llms.txt",
+      "description": "Index of Supabase documentation and content available as agent-readable markdown.",
+      "tags": ["documentation", "llms", "markdown"],
+      "representativeQueries": [
+        "how do I set up Supabase auth in Next.js",
+        "Supabase Row Level Security documentation"
+      ]
+    },
+    {
+      "identifier": "urn:air:supabase.com:skills:index",
+      "displayName": "Supabase Agent Skills",
+      "type": "application/json",
+      "url": "https://supabase.com/.well-known/agent-skills/index.json",
+      "description": "Agent Skills discovery index for installable Supabase and Postgres skills.",
+      "tags": ["skills", "agents", "postgres"],
+      "representativeQueries": [
+        "write RLS policies for my Supabase tables",
+        "create a Postgres migration for my Supabase project"
+      ]
+    }
+  ]
+}

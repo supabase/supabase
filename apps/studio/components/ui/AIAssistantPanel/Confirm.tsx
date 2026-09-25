@@ -49,7 +49,7 @@ export const ConfirmFooter = ({
       )}
     >
       <div role="status" className="min-w-0 flex flex-1 items-center gap-2">
-        {outcome === 'success' && <Check className="size-3.5 shrink-0 text-brand" />}
+        {outcome === 'success' && <Check className="size-3.5 shrink-0 text-primary" />}
         {outcome === 'error' && <X className="size-3.5 shrink-0 text-danger" />}
         <span>{message}</span>
       </div>
@@ -61,7 +61,13 @@ export const ConfirmFooter = ({
                 {cancelLabel}
               </Button>
               {!denyOnly && (
-                <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isInactive}>
+                <Button
+                  size="tiny"
+                  variant="primary"
+                  onClick={onConfirm}
+                  loading={isLoading}
+                  disabled={isInactive}
+                >
                   {isLoading ? confirmLabelLoading : confirmLabel}
                 </Button>
               )}
@@ -130,6 +136,8 @@ export const Confirm = ({
   const bar = getConfirmFooterBar(state)
   const showLoading = bar.isLoading || extraLoading || isLoading
   const isApprovalRequested = state === 'approval-requested'
+  const isApprovalResponded = state === 'approval-responded'
+  const showActions = isApprovalRequested || isApprovalResponded
   const outcomeMessages = {
     success: successMessage,
     error: errorMessage,
@@ -159,7 +167,7 @@ export const Confirm = ({
           isLoading={showLoading}
           isDisabled={!isApprovalRequested}
           outcome={bar.outcome}
-          showActions={isApprovalRequested}
+          showActions={showActions}
           action={footerAction}
           denyOnly={denyOnly}
           onCancel={onCancel}

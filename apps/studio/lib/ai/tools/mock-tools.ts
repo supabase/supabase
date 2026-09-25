@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import { tool, type ToolExecutionOptions, type ToolSet } from 'ai'
+import { tool, type ToolExecutionOptions } from 'ai'
 import { z } from 'zod'
 
 import { getStudioTools } from '../tools/studio-tools'
@@ -15,7 +15,7 @@ import type {
   CellWire,
   NotebookWire,
 } from '@/data/content/notebooks/notebook-schema'
-import { createInProcessSupabaseMCPClient } from '@/lib/ai/supabase-mcp'
+import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),
@@ -92,7 +92,7 @@ const MOCK_ADVISORIES_DATA = [
     category: 'security',
     message: 'Materialized views in API schema can bypass RLS. Move them to private schema.',
     remediationUrl:
-      'https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api',
+      'https://supabase.com/docs/guides/observability/advisors?queryGroups=lint&lint=0016_materialized_view_in_api',
   },
   {
     id: '0031_functions_no_rls_guard',
@@ -100,7 +100,7 @@ const MOCK_ADVISORIES_DATA = [
     category: 'security',
     message: 'Function api.health_check should verify auth context before querying tables.',
     remediationUrl:
-      'https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0031_functions_no_rls_guard',
+      'https://supabase.com/docs/guides/observability/advisors?queryGroups=lint&lint=0031_functions_no_rls_guard',
   },
   {
     id: '1012_slow_query',
@@ -378,6 +378,7 @@ function createMockNotebookStore() {
   return {
     list: () => [...notebooks.values()],
     get: (id: string) => notebooks.get(id),
+    delete: (id: string) => notebooks.delete(id),
     create: ({
       name,
       description,
@@ -426,13 +427,20 @@ const MOCK_DATABASES_DATA = [
   },
 ]
 
-// All five notebook tools are real, locally-defined ai-SDK tools, so wrap them and
+// All notebook tools are real, locally-defined ai-SDK tools, so wrap them and
 // override only execute/needsApproval — evals must validate the model's arguments
 // against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
 // agent-authored cell ids, update_notebook's real operations schema, etc).
 function createMockNotebookTools(store: MockNotebookStore) {
-  const { list_databases, list_notebooks, get_notebook, create_notebook, update_notebook } =
-    getNotebookTools()
+  const {
+    list_databases,
+    list_notebooks,
+    get_notebook,
+    run_notebook,
+    create_notebook,
+    update_notebook,
+    delete_notebook,
+  } = getNotebookTools({ aiOptInLevel: 'schema_and_log_and_data' })
 
   return {
     list_databases: {
@@ -475,6 +483,38 @@ function createMockNotebookTools(store: MockNotebookStore) {
           visibility: notebook.visibility,
           updated_at: notebook.updated_at,
           cells: notebook.content.cells,
+        }
+      },
+    },
+    run_notebook: {
+      ...run_notebook,
+      // The eval harness cannot answer approval gates. Nothing executes here; return a
+      // deterministic empty result for each query cell in notebook order.
+      needsApproval: false,
+      execute: async (
+        { id }: { id: string; expected_updated_at: string },
+        _options: ToolExecutionOptions<unknown>
+      ) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        return {
+          id,
+          name: notebook.name,
+          updated_at: notebook.updated_at,
+          cells: notebook.content.cells.flatMap((cell) =>
+            cell._tag === 'markdown_cell'
+              ? []
+              : [
+                  {
+                    cell_id: cell._id,
+                    title: cell.title?.trim() || 'Untitled query',
+                    source: cell._tag === 'log_cell' ? ('logs' as const) : ('database' as const),
+                    status: 'success' as const,
+                    rows: [],
+                  },
+                ]
+          ),
         }
       },
     },
@@ -527,6 +567,18 @@ function createMockNotebookTools(store: MockNotebookStore) {
         return { id, name: notebook.name }
       },
     },
+    delete_notebook: {
+      ...delete_notebook,
+      // Same reasoning as create_notebook's override above.
+      needsApproval: false,
+      execute: async ({ id }: { id: string }, _options: ToolExecutionOptions<unknown>) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        store.delete(id)
+        return { id, name: notebook.name }
+      },
+    },
   }
 }
 
@@ -539,32 +591,15 @@ export type MockToolOverrides = {
  * These mirror tool names used in prompts so the model can call them,
  * but return stable, static data for repeatable tests.
  *
- * Note: search_docs uses the real implementation
+ * Note: search_docs uses the real implementation.
  */
-export async function getMockTools(overrides: MockToolOverrides | undefined, signal: AbortSignal) {
+export async function getMockTools(overrides: MockToolOverrides | undefined) {
   const mockedStudioTools = createMockedStudioTools()
   const notebookStore = createMockNotebookStore()
 
-  // Every tool here is a deterministic mock except `search_docs`, which uses the
-  // real implementation. We source it from an in-process MCP server directly
-  // (rather than `getMcpTools`) so the eval harness stays hermetic and decoupled
-  // from the assistant's transport gate (`USE_REMOTE_MCP`): the in-process server
-  // needs no live remote endpoint or real access token. See AI-897 for how to
-  // point evals at the remote MCP server instead.
-  const mcpClient = await createInProcessSupabaseMCPClient({
-    accessToken: 'mock-access-token',
-    projectRef: 'mock-project-ref',
-  })
-  // The caller owns this signal and aborts it once generation is done, which
-  // closes the client opened here (search_docs executes during generation, so
-  // the connection must stay open until then).
-  signal.addEventListener('abort', () => void mcpClient.close().catch(() => {}), { once: true })
+  const search_docs = await createSearchDocsTool()
 
-  const { search_docs } = (await mcpClient.tools()) as ToolSet
-
-  assert(search_docs, 'search_docs tool not available from MCP server')
-
-  return {
+  const tools = {
     ...mockedStudioTools,
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
@@ -575,4 +610,8 @@ export async function getMockTools(overrides: MockToolOverrides | undefined, sig
     list_policies: createMockListPoliciesTool(),
     ...createMockNotebookTools(notebookStore),
   }
+
+  assert(tools.search_docs, 'search_docs tool is missing from the eval harness')
+
+  return tools
 }

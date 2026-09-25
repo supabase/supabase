@@ -20,6 +20,18 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'How Lingo.dev clears enterprise security reviews without a single database question',
+    description:
+      'Lingo.dev is the localization engineering platform behind retrieval augmented localization: translation APIs with a memory for glossary, brand voice, and quality. It has run on Supabase since day one.',
+    organization: 'Lingo.dev',
+    imgUrl: 'images/customers/logos/on-light/lingo-dev.png',
+    logo: '/images/customers/logos/on-light/lingo-dev.png',
+    logo_inverse: '/images/customers/logos/on-dark/lingo-dev.png',
+    url: '/customers/lingodotdev',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title: 'How QA.tech built enterprise-ready AI testing agents on Supabase',
     description:
       'QA.tech is an autonomous AI testing platform whose QA agents run end-to-end testing of web and mobile products by goal and intent. Three years on Supabase took QA.tech from three founders to a global customer base, enterprise-scale daily test volume, and SOC 2 compliance.',

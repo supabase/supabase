@@ -132,6 +132,7 @@ describe('shouldShowIpv4AddonNotice', () => {
     connectionMethod: 'direct',
     useSharedPooler: false,
     hasIpv4Addon: false,
+    isHighAvailability: false,
   }
 
   test('returns true for a direct connection with no IPv4 addon', () => {
@@ -168,6 +169,10 @@ describe('shouldShowIpv4AddonNotice', () => {
 
   test('returns false when self-hosted (not platform)', () => {
     expect(shouldShowIpv4AddonNotice({ ...BASE, isPlatform: false })).toBe(false)
+  })
+
+  test('returns false for high-availability projects even with a direct connection and no addon', () => {
+    expect(shouldShowIpv4AddonNotice({ ...BASE, isHighAvailability: true })).toBe(false)
   })
 })
 

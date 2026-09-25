@@ -37,10 +37,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchDetailResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchDetailResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -91,9 +94,14 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchResponse_Output" }
+              }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -146,10 +154,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchDeleteResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchDeleteResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to delete database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -203,10 +214,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to push database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -260,10 +274,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to merge database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -317,10 +334,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to reset database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -364,14 +384,17 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchRestoreResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchRestoreResponse_Output" }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to restore database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -432,6 +455,9 @@
             "content": { "text/plain": { "schema": { "type": "string" } } },
             "description": ""
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to diff database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -455,7 +481,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse" }
+                  "items": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse_Output" }
                 }
               }
             }
@@ -468,7 +494,7 @@
         "summary": "List all projects",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["projects_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -485,7 +511,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1ProjectResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1ProjectResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -496,7 +524,7 @@
         "summary": "Create a project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["organization_projects_create"]],
         "x-oauth-scope": "projects:write"
       }
@@ -558,7 +586,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/RegionsInfo" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RegionsInfo_Output" }
+              }
             }
           }
         },
@@ -582,7 +612,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/OrganizationResponseV1" }
+                  "items": { "$ref": "#/components/schemas/OrganizationResponseV1_Output" }
                 }
               }
             }
@@ -596,7 +626,7 @@
         "summary": "List all organizations",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organizations_read"]],
         "x-oauth-scope": "organizations:read"
       },
@@ -616,7 +646,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OrganizationResponseV1" }
+                "schema": { "$ref": "#/components/schemas/OrganizationResponseV1_Output" }
               }
             }
           },
@@ -628,7 +658,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Create an organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api", "billing"],
+        "x-endpoint-owners": ["control-plane", "billing"],
         "x-fga-permissions": [["organizations_create"]]
       }
     },
@@ -722,10 +752,15 @@
             }
           }
         ],
-        "responses": { "204": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "summary": "[Beta] Authorize user through oauth",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/token": {
@@ -746,14 +781,17 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OAuthTokenResponse" }
+                "schema": { "$ref": "#/components/schemas/OAuthTokenResponse_Output" }
               }
             }
-          }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/revoke": {
@@ -768,10 +806,15 @@
             }
           }
         },
-        "responses": { "204": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/authorize/project-claim": {
@@ -853,7 +896,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Authorize user through oauth and claim a project",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]]
       }
     },
@@ -898,7 +941,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/SnippetList" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SnippetList_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -910,7 +955,7 @@
         "summary": "Lists SQL snippets for the logged in user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["snippets_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -935,7 +980,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/SnippetResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SnippetResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -947,7 +994,7 @@
         "summary": "Gets a specific SQL snippet",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["snippets_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -960,14 +1007,16 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1ProfileResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1ProfileResponse_Output" }
+              }
             }
           }
         },
         "security": [{ "bearer": [] }],
         "summary": "Gets the user's profile",
         "tags": ["Profile"],
-        "x-endpoint-owners": ["management-api"]
+        "x-endpoint-owners": ["control-plane"]
       }
     },
     "/v1/projects/{ref}/actions": {
@@ -1046,7 +1095,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ListActionRunResponse" }
+                "schema": { "$ref": "#/components/schemas/ListActionRunResponse_Output" }
               }
             }
           },
@@ -1094,7 +1143,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ActionRunResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ActionRunResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1148,7 +1199,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateRunStatusResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateRunStatusResponse_Output" }
               }
             }
           },
@@ -1243,7 +1294,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/ApiKeyResponse" }
+                  "items": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
                 }
               }
             }
@@ -1256,8 +1307,11 @@
         "summary": "Get project api keys",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
-        "x-fga-permissions": [["api_gateway_keys_read"]],
+        "x-endpoint-owners": ["auth", "control-plane"],
+        "x-fga-permissions": [
+          ["api_gateway_keys_read"],
+          ["api_gateway_keys_read", "api_gateway_keys_secret_read"]
+        ],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -1294,7 +1348,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1305,7 +1361,7 @@
         "summary": "Creates a new API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -1333,7 +1389,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LegacyApiKeysResponse" }
+                "schema": { "$ref": "#/components/schemas/LegacyApiKeysResponse_Output" }
               }
             }
           },
@@ -1345,7 +1401,7 @@
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_read"]],
         "x-oauth-scope": "secrets:read"
       },
@@ -1378,7 +1434,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LegacyApiKeysResponse" }
+                "schema": { "$ref": "#/components/schemas/LegacyApiKeysResponse_Output" }
               }
             }
           },
@@ -1390,7 +1446,7 @@
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -1441,7 +1497,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1452,7 +1510,7 @@
         "summary": "Updates an API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       },
@@ -1495,7 +1553,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1506,8 +1566,11 @@
         "summary": "Get API key",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:read", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
-        "x-fga-permissions": [["api_gateway_keys_read"]],
+        "x-endpoint-owners": ["auth", "control-plane"],
+        "x-fga-permissions": [
+          ["api_gateway_keys_read"],
+          ["api_gateway_keys_read", "api_gateway_keys_secret_read"]
+        ],
         "x-oauth-scope": "secrets:read"
       },
       "delete": {
@@ -1562,7 +1625,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1573,7 +1638,7 @@
         "summary": "Deletes an API key for the project",
         "tags": ["Secrets"],
         "x-badges": [{ "name": "OAuth scope: secrets:write", "position": "after" }],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -1604,11 +1669,14 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/BranchResponse" }
+                  "items": { "$ref": "#/components/schemas/BranchResponse_Output" }
                 }
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
         "security": [{ "bearer": [] }],
@@ -1647,9 +1715,14 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchResponse_Output" }
+              }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -1723,9 +1796,14 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchResponse_Output" }
+              }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
         "security": [{ "bearer": [] }],
@@ -1760,7 +1838,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output" }
               }
             }
           },
@@ -1773,7 +1851,7 @@
         "summary": "[Beta] Gets project's custom hostname config",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_read"]],
         "x-oauth-scope": "domains:read"
       },
@@ -1812,7 +1890,7 @@
         "summary": "[Beta] Deletes a project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -1848,7 +1926,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output" }
               }
             }
           },
@@ -1861,7 +1939,7 @@
         "summary": "[Beta] Updates project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -1889,7 +1967,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output" }
               }
             }
           },
@@ -1902,7 +1980,7 @@
         "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -1930,7 +2008,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output" }
               }
             }
           },
@@ -1943,7 +2021,7 @@
         "summary": "[Beta] Activates a custom hostname for a project.",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -1980,8 +2058,7 @@
                         "state": { "type": "string", "enum": ["enabled", "disabled"] },
                         "appliedSuccessfully": { "type": "boolean" }
                       },
-                      "required": ["state"],
-                      "additionalProperties": false
+                      "required": ["state"]
                     },
                     {
                       "type": "object",
@@ -1990,14 +2067,14 @@
                         "unavailableReason": {
                           "type": "string",
                           "enum": [
+                            "platform_unsupported",
                             "postgres_upgrade_required",
                             "ssl_enforcement_required",
                             "temporarily_unavailable"
                           ]
                         }
                       },
-                      "required": ["state", "unavailableReason"],
-                      "additionalProperties": false
+                      "required": ["state", "unavailableReason"]
                     }
                   ]
                 }
@@ -2013,7 +2090,7 @@
         "summary": "[Beta] Get project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["security", "management-api"],
+        "x-endpoint-owners": ["security", "control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -2056,8 +2133,7 @@
                         "state": { "type": "string", "enum": ["enabled", "disabled"] },
                         "appliedSuccessfully": { "type": "boolean" }
                       },
-                      "required": ["state"],
-                      "additionalProperties": false
+                      "required": ["state"]
                     },
                     {
                       "type": "object",
@@ -2066,14 +2142,14 @@
                         "unavailableReason": {
                           "type": "string",
                           "enum": [
+                            "platform_unsupported",
                             "postgres_upgrade_required",
                             "ssl_enforcement_required",
                             "temporarily_unavailable"
                           ]
                         }
                       },
-                      "required": ["state", "unavailableReason"],
-                      "additionalProperties": false
+                      "required": ["state", "unavailableReason"]
                     }
                   ]
                 }
@@ -2089,7 +2165,7 @@
         "summary": "[Beta] Update project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["security", "management-api"],
+        "x-endpoint-owners": ["security", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -2117,7 +2193,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkBanResponse" }
+                "schema": { "$ref": "#/components/schemas/NetworkBanResponse_Output" }
               }
             }
           },
@@ -2130,7 +2206,7 @@
         "summary": "[Beta] Gets project's network bans",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -2158,7 +2234,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkBanResponseEnriched" }
+                "schema": { "$ref": "#/components/schemas/NetworkBanResponseEnriched_Output" }
               }
             }
           },
@@ -2171,7 +2247,7 @@
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -2213,7 +2289,7 @@
         "summary": "[Beta] Remove network bans.",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -2241,7 +2317,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse" }
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse_Output" }
               }
             }
           },
@@ -2254,7 +2330,7 @@
         "summary": "[Beta] Gets project's network restrictions",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -2288,7 +2364,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsV2Response" }
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsV2Response_Output" }
               }
             }
           },
@@ -2301,7 +2377,7 @@
         "summary": "[Alpha] Updates project's network restrictions by adding or removing CIDRs",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -2337,7 +2413,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse" }
+                "schema": { "$ref": "#/components/schemas/NetworkRestrictionsResponse_Output" }
               }
             }
           },
@@ -2350,7 +2426,7 @@
         "summary": "[Beta] Updates project's network restrictions",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -2378,7 +2454,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse_Output" }
               }
             }
           },
@@ -2425,7 +2501,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PgsodiumConfigResponse_Output" }
               }
             }
           },
@@ -2466,7 +2542,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgrestConfigWithJWTSecretResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/PostgrestConfigWithJWTSecretResponse_Output"
+                }
               }
             }
           },
@@ -2479,8 +2557,11 @@
         "summary": "Gets project's postgrest config",
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
-        "x-fga-permissions": [["data_api_config_read"]],
+        "x-endpoint-owners": ["control-plane", "infra"],
+        "x-fga-permissions": [
+          ["data_api_config_read"],
+          ["data_api_config_read", "data_api_config_secret_read"]
+        ],
         "x-oauth-scope": "rest:read"
       },
       "patch": {
@@ -2513,7 +2594,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1PostgrestConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/V1PostgrestConfigResponse_Output" }
               }
             }
           },
@@ -2526,7 +2607,7 @@
         "summary": "Updates project's postgrest config",
         "tags": ["Rest"],
         "x-badges": [{ "name": "OAuth scope: rest:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["data_api_config_write"]],
         "x-oauth-scope": "rest:write"
       }
@@ -2554,7 +2635,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse_Output" }
               }
             }
           },
@@ -2567,7 +2648,7 @@
         "summary": "Gets a specific project that belongs to the authenticated user",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -2593,7 +2674,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse_Output" }
               }
             }
           },
@@ -2605,7 +2686,7 @@
         "summary": "Deletes the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra", "dev-workflows"],
+        "x-endpoint-owners": ["control-plane", "infra", "dev-workflows"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       },
@@ -2637,7 +2718,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectRefResponse_Output" }
               }
             }
           },
@@ -2650,7 +2731,7 @@
         "summary": "Updates the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -2681,7 +2762,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/SecretResponse" }
+                  "items": { "$ref": "#/components/schemas/SecretResponse_Output" }
                 }
               }
             }
@@ -2801,7 +2882,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse" }
+                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse_Output" }
               }
             }
           },
@@ -2814,7 +2895,7 @@
         "summary": "[Beta] Get project's SSL enforcement configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_ssl_config_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -2848,7 +2929,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse" }
+                "schema": { "$ref": "#/components/schemas/SslEnforcementResponse_Output" }
               }
             }
           },
@@ -2861,7 +2942,7 @@
         "summary": "[Beta] Update project's SSL enforcement configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_ssl_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -2896,7 +2977,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TypescriptResponse" }
+                "schema": { "$ref": "#/components/schemas/TypescriptResponse_Output" }
               }
             }
           },
@@ -2937,7 +3018,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/VanitySubdomainConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/VanitySubdomainConfigResponse_Output" }
               }
             }
           },
@@ -2960,7 +3041,7 @@
           { "name": "OAuth scope: domains:read", "position": "after" },
           { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_read"]],
         "x-oauth-scope": "domains:read"
       },
@@ -2992,7 +3073,7 @@
         "summary": "[Beta] Deletes a project's vanity subdomain configuration",
         "tags": ["Domains"],
         "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -3026,7 +3107,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SubdomainAvailabilityResponse" }
+                "schema": { "$ref": "#/components/schemas/SubdomainAvailabilityResponse_Output" }
               }
             }
           },
@@ -3049,7 +3130,7 @@
           { "name": "OAuth scope: domains:write", "position": "after" },
           { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -3083,7 +3164,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ActivateVanitySubdomainResponse" }
+                "schema": { "$ref": "#/components/schemas/ActivateVanitySubdomainResponse_Output" }
               }
             }
           },
@@ -3106,7 +3187,7 @@
           { "name": "OAuth scope: domains:write", "position": "after" },
           { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -3140,7 +3221,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProjectUpgradeInitiateResponse" }
+                "schema": { "$ref": "#/components/schemas/ProjectUpgradeInitiateResponse_Output" }
               }
             }
           },
@@ -3153,7 +3234,7 @@
         "summary": "[Beta] Upgrades the project's Postgres version",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write", "database_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3181,7 +3262,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProjectUpgradeEligibilityResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectUpgradeEligibilityResponse_Output"
+                }
               }
             }
           },
@@ -3194,7 +3277,7 @@
         "summary": "[Beta] Returns the project's eligibility for upgrades",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read", "database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3228,7 +3311,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DatabaseUpgradeStatusResponse" }
+                "schema": { "$ref": "#/components/schemas/DatabaseUpgradeStatusResponse_Output" }
               }
             }
           },
@@ -3241,7 +3324,7 @@
         "summary": "[Beta] Gets the latest status of the project's upgrade",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read", "database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3269,7 +3352,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ReadOnlyStatusResponse" }
+                "schema": { "$ref": "#/components/schemas/ReadOnlyStatusResponse_Output" }
               }
             }
           },
@@ -3282,7 +3365,7 @@
         "summary": "Returns project's readonly mode status",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
+        "x-endpoint-owners": ["control-plane", "infra", "support-tooling"],
         "x-fga-permissions": [["database_readonly_config_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -3316,7 +3399,7 @@
         "summary": "Disables project's readonly mode for the next 15 minutes",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
+        "x-endpoint-owners": ["control-plane", "infra", "support-tooling"],
         "x-fga-permissions": [["database_readonly_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -3365,7 +3448,7 @@
         "tags": ["Database"],
         "x-allowed-plans": ["Pro", "Team", "Enterprise"],
         "x-badges": [{ "name": "Only available on Pro, Team, Enterprise", "position": "before" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_read_replicas_write"]]
       }
     },
@@ -3405,7 +3488,7 @@
         "security": [{ "bearer": [] }],
         "summary": "[Beta] Remove a read replica",
         "tags": ["Database"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_read_replicas_write"]]
       }
     },
@@ -3474,7 +3557,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1ServiceHealthResponse" }
+                  "items": { "$ref": "#/components/schemas/V1ServiceHealthResponse_Output" }
                 }
               }
             }
@@ -3488,7 +3571,7 @@
         "summary": "Gets project's service health status",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3516,7 +3599,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3554,7 +3637,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3602,7 +3685,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3640,7 +3723,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeysResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeysResponse_Output" }
               }
             }
           },
@@ -3691,7 +3774,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3738,7 +3821,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3795,7 +3878,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse_Output" }
               }
             }
           },
@@ -3835,7 +3918,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/AuthConfigResponse_Output" }
               }
             }
           },
@@ -3882,7 +3965,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/AuthConfigResponse_Output" }
               }
             }
           },
@@ -3930,7 +4013,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ThirdPartyAuth_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -3969,7 +4054,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/ThirdPartyAuth" }
+                  "items": { "$ref": "#/components/schemas/ThirdPartyAuth_Output" }
                 }
               }
             }
@@ -4020,7 +4105,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ThirdPartyAuth_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4067,7 +4154,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ThirdPartyAuth" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ThirdPartyAuth_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4111,7 +4200,7 @@
         "summary": "Pauses the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4144,7 +4233,7 @@
         "summary": "Restarts the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4173,7 +4262,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetProjectAvailableRestoreVersionsResponse"
+                  "$ref": "#/components/schemas/GetProjectAvailableRestoreVersionsResponse_Output"
                 }
               }
             }
@@ -4186,7 +4275,7 @@
         "summary": "Lists available restore versions for the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -4217,7 +4306,7 @@
         "summary": "Restores the given project",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4250,7 +4339,7 @@
         "summary": "Cancels the given project restoration",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4279,7 +4368,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ListProjectAddonsResponse" }
+                "schema": { "$ref": "#/components/schemas/ListProjectAddonsResponse_Output" }
               }
             }
           },
@@ -4426,7 +4515,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProjectClaimTokenResponse" }
+                "schema": { "$ref": "#/components/schemas/ProjectClaimTokenResponse_Output" }
               }
             }
           },
@@ -4437,7 +4526,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-internal": true
       },
@@ -4463,7 +4552,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CreateProjectClaimTokenResponse" }
+                "schema": { "$ref": "#/components/schemas/CreateProjectClaimTokenResponse_Output" }
               }
             }
           },
@@ -4474,7 +4563,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Creates project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]],
         "x-internal": true
       },
@@ -4504,7 +4593,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]],
         "x-internal": true
       }
@@ -4534,7 +4623,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectAdvisorsResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectAdvisorsResponse_Output" }
               }
             }
           },
@@ -4546,7 +4635,7 @@
         "summary": "Gets project performance advisors.",
         "tags": ["Advisors"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["advisors_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -4582,7 +4671,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ProjectAdvisorsResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ProjectAdvisorsResponse_Output" }
               }
             }
           },
@@ -4594,7 +4683,7 @@
         "summary": "Gets project security advisors.",
         "tags": ["Advisors"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["advisors_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -4602,7 +4691,7 @@
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
         "deprecated": true,
-        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.\n",
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#logs-explorer) for all available sources.\n",
         "operationId": "v1-get-project-logs-all",
         "parameters": [
           {
@@ -4622,7 +4711,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
-            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "example": "select event_message from edge_logs limit 10",
               "type": "string"
@@ -4655,7 +4744,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyticsResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4667,7 +4758,7 @@
         "summary": "Gets project's logs",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -4695,7 +4786,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
-            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "example": "select event_message from edge_logs limit 10",
               "type": "string"
@@ -4728,7 +4819,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyticsResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4740,7 +4833,7 @@
         "summary": "Gets all project's logs in a single log stream",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -4778,7 +4871,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1GetUsageApiCountResponse" }
+                "schema": { "$ref": "#/components/schemas/V1GetUsageApiCountResponse_Output" }
               }
             }
           },
@@ -4790,7 +4883,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project's usage api counts",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4817,7 +4910,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1GetUsageApiRequestsCountResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/V1GetUsageApiRequestsCountResponse_Output"
+                }
               }
             }
           },
@@ -4829,7 +4924,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project's usage api requests count",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4871,7 +4966,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyticsResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -4882,7 +4979,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets a project's function combined statistics",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -4913,6 +5010,9 @@
               "application/openmetrics-text": { "schema": { "type": "string" } }
             }
           },
+          "400": {
+            "description": "Project must be active and healthy, or metrics are not available for this project"
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
@@ -4922,7 +5022,7 @@
         "summary": "Scrape a project's metrics",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -4956,7 +5056,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CreateRoleResponse" }
+                "schema": { "$ref": "#/components/schemas/CreateRoleResponse_Output" }
               }
             }
           },
@@ -4995,7 +5095,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DeleteRolesResponse" }
+                "schema": { "$ref": "#/components/schemas/DeleteRolesResponse_Output" }
               }
             }
           },
@@ -5036,7 +5136,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ListMigrationsResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ListMigrationsResponse_Output" }
               }
             }
           },
@@ -5216,7 +5316,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1GetMigrationResponse" }
+                "schema": { "$ref": "#/components/schemas/V1GetMigrationResponse_Output" }
               }
             }
           },
@@ -5315,7 +5415,7 @@
         "summary": "[Beta] Run sql query",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"], ["database_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -5356,7 +5456,7 @@
         "summary": "[Beta] Run a sql query as supabase_read_only_user",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -5390,7 +5490,7 @@
         "summary": "[Beta] Enables Database Webhooks on the project",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_webhooks_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -5420,7 +5520,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/GetProjectDbMetadataResponse" }
+                "schema": { "$ref": "#/components/schemas/GetProjectDbMetadataResponse_Output" }
               }
             }
           },
@@ -5432,7 +5532,7 @@
         "summary": "Gets database metadata for the given project.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -5468,7 +5568,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1UpdatePasswordResponse" }
+                "schema": { "$ref": "#/components/schemas/V1UpdatePasswordResponse_Output" }
               }
             }
           },
@@ -5481,7 +5581,7 @@
         "summary": "Updates the database password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -5509,7 +5609,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JitAccessResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -5556,7 +5658,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/JitAuthorizeAccessResponse" }
+                "schema": { "$ref": "#/components/schemas/JitAuthorizeAccessResponse_Output" }
               }
             }
           },
@@ -5601,7 +5703,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JitAccessResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -5640,7 +5744,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/JitListAccessResponse" }
+                "schema": { "$ref": "#/components/schemas/JitListAccessResponse_Output" }
               }
             }
           },
@@ -5688,7 +5792,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/InviteExternalUserJitResponse" }
+                "schema": { "$ref": "#/components/schemas/InviteExternalUserJitResponse_Output" }
               }
             }
           },
@@ -5735,7 +5839,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JitAccessResponse_Output" }
+              }
             }
           },
           "500": { "description": "Failed to accept invitation" }
@@ -5874,7 +5980,7 @@
         "summary": "Get PostgREST OpenAPI spec",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -5905,7 +6011,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
+                  "items": { "$ref": "#/components/schemas/FunctionResponse_Output" }
                 }
               }
             }
@@ -6002,7 +6108,9 @@
           "201": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FunctionResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -6050,7 +6158,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BulkUpdateFunctionResponse" }
+                "schema": { "$ref": "#/components/schemas/BulkUpdateFunctionResponse_Output" }
               }
             }
           },
@@ -6117,7 +6225,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DeployFunctionResponse" }
+                "schema": { "$ref": "#/components/schemas/DeployFunctionResponse_Output" }
               }
             }
           },
@@ -6167,7 +6275,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/FunctionSlugResponse" }
+                "schema": { "$ref": "#/components/schemas/FunctionSlugResponse_Output" }
               }
             }
           },
@@ -6269,7 +6377,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FunctionSlugResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -6398,7 +6508,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1StorageBucketResponse" }
+                  "items": { "$ref": "#/components/schemas/V1StorageBucketResponse_Output" }
                 }
               }
             }
@@ -6439,7 +6549,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DiskResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DiskResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -6450,7 +6562,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Get database disk attributes",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       },
       "post": {
@@ -6486,7 +6598,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Modify database disk",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_write"]]
       }
     },
@@ -6513,7 +6625,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DiskUtilMetricsResponse" }
+                "schema": { "$ref": "#/components/schemas/DiskUtilMetricsResponse_Output" }
               }
             }
           },
@@ -6525,7 +6637,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Get disk utilization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       }
     },
@@ -6552,7 +6664,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DiskAutoscaleConfig" }
+                "schema": { "$ref": "#/components/schemas/DiskAutoscaleConfig_Output" }
               }
             }
           },
@@ -6564,7 +6676,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project disk autoscale config",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       }
     },
@@ -6591,7 +6703,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/StorageConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/StorageConfigResponse_Output" }
               }
             }
           },
@@ -6668,7 +6780,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse_Output" }
               }
             }
           },
@@ -6680,7 +6792,7 @@
         "summary": "Get project's pgbouncer config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -6710,7 +6822,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/SupavisorConfigResponse" }
+                  "items": { "$ref": "#/components/schemas/SupavisorConfigResponse_Output" }
                 }
               }
             }
@@ -6758,7 +6870,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateSupavisorConfigResponse_Output" }
               }
             }
           },
@@ -6799,7 +6911,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse_Output" }
               }
             }
           },
@@ -6812,7 +6924,7 @@
         "summary": "Gets project's Postgres config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -6846,7 +6958,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PostgresConfigResponse_Output" }
               }
             }
           },
@@ -6859,7 +6971,7 @@
         "summary": "Updates project's Postgres config",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -6887,7 +6999,7 @@
             "description": "Gets project's realtime configuration",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/RealtimeConfigResponse_Output" }
               }
             }
           },
@@ -7000,7 +7112,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CreateProviderResponse" }
+                "schema": { "$ref": "#/components/schemas/CreateProviderResponse_Output" }
               }
             }
           },
@@ -7039,7 +7151,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ListProvidersResponse" }
+                "schema": { "$ref": "#/components/schemas/ListProvidersResponse_Output" }
               }
             }
           },
@@ -7091,7 +7203,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/GetProviderResponse" }
+                "schema": { "$ref": "#/components/schemas/GetProviderResponse_Output" }
               }
             }
           },
@@ -7149,7 +7261,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdateProviderResponse" }
+                "schema": { "$ref": "#/components/schemas/UpdateProviderResponse_Output" }
               }
             }
           },
@@ -7201,7 +7313,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DeleteProviderResponse" }
+                "schema": { "$ref": "#/components/schemas/DeleteProviderResponse_Output" }
               }
             }
           },
@@ -7243,7 +7355,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1BackupsResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1BackupsResponse_Output" }
+              }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -7457,7 +7571,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse" }
+                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse_Output" }
               }
             }
           },
@@ -7516,7 +7630,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse" }
+                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse_Output" }
               }
             }
           },
@@ -7608,7 +7722,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ListEntitlementsResponse" }
+                "schema": { "$ref": "#/components/schemas/V1ListEntitlementsResponse_Output" }
               }
             }
           },
@@ -7648,17 +7762,20 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1OrganizationMemberResponse" }
+                  "items": { "$ref": "#/components/schemas/V1OrganizationMemberResponse_Output" }
                 }
               }
             }
-          }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
         "summary": "List members of an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["members_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -7684,7 +7801,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1OrganizationSlugResponse" }
+                "schema": { "$ref": "#/components/schemas/V1OrganizationSlugResponse_Output" }
               }
             }
           },
@@ -7696,7 +7813,7 @@
         "summary": "Gets information about the organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -7728,7 +7845,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OrganizationProjectClaimResponse" }
+                "schema": { "$ref": "#/components/schemas/OrganizationProjectClaimResponse_Output" }
               }
             }
           },
@@ -7739,7 +7856,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Gets project details for the specified organization and claim token",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]],
         "x-internal": true
       },
@@ -7773,7 +7890,7 @@
         "security": [{ "bearer": [] }],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]],
         "x-internal": true
       }
@@ -7852,7 +7969,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OrganizationProjectsResponse" }
+                "schema": { "$ref": "#/components/schemas/OrganizationProjectsResponse_Output" }
               }
             }
           },
@@ -7865,7 +7982,7 @@
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
         "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_projects_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -7896,11 +8013,49 @@
       "description": "Visit [https://supabase.github.io/storage/](https://supabase.github.io/storage/) for complete documentation."
     }
   ],
-  "servers": [],
+  "servers": [{ "url": "https://api.supabase.com" }],
   "components": {
-    "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
+    "securitySchemes": {
+      "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" },
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://api.supabase.com/v1/oauth/authorize",
+            "tokenUrl": "https://api.supabase.com/v1/oauth/token",
+            "scopes": {
+              "analytics:read": "Read access to analytics",
+              "analytics:write": "Write access to analytics",
+              "analytics_config:read": "Read access to analytics config",
+              "analytics_config:write": "Write access to analytics config",
+              "auth:read": "Read access to auth",
+              "auth:write": "Write access to auth",
+              "database:read": "Read access to database",
+              "database:write": "Write access to database",
+              "domains:read": "Read access to domains",
+              "domains:write": "Write access to domains",
+              "edge_functions:read": "Read access to edge functions",
+              "edge_functions:write": "Write access to edge functions",
+              "environment:read": "Read access to environment",
+              "environment:write": "Write access to environment",
+              "organizations:read": "Read access to organizations",
+              "organizations:write": "Write access to organizations",
+              "projects:read": "Read access to projects",
+              "projects:write": "Write access to projects",
+              "rest:read": "Read access to rest",
+              "rest:write": "Write access to rest",
+              "secrets:read": "Read access to secrets",
+              "secrets:write": "Write access to secrets",
+              "storage:read": "Read access to storage",
+              "storage:write": "Write access to storage"
+            }
+          }
+        },
+        "description": "OAuth 2.0 authorization code flow for Supabase OAuth apps. Tokens carry the scopes approved for the app by the organization."
+      }
+    },
     "schemas": {
-      "BranchDetailResponse": {
+      "BranchDetailResponse_Output": {
         "type": "object",
         "properties": {
           "ref": { "type": "string" },
@@ -7985,7 +8140,7 @@
           "notify_url": "https://example.com/webhooks/branches"
         }
       },
-      "BranchResponse": {
+      "BranchResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -8026,24 +8181,24 @@
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "review_requested_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "with_data": { "type": "boolean" },
           "notify_url": { "type": "string", "format": "uri" },
           "deletion_scheduled_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "preview_project_status": {
             "type": "string",
@@ -8079,7 +8234,7 @@
           "with_data"
         ]
       },
-      "BranchDeleteResponse": {
+      "BranchDeleteResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["ok"] } },
         "required": ["message"]
@@ -8089,7 +8244,7 @@
         "properties": { "migration_version": { "type": "string" } },
         "example": { "migration_version": "20250312000000" }
       },
-      "BranchUpdateResponse": {
+      "BranchUpdateResponse_Output": {
         "type": "object",
         "properties": {
           "workflow_run_id": { "type": "string" },
@@ -8097,12 +8252,12 @@
         },
         "required": ["workflow_run_id", "message"]
       },
-      "BranchRestoreResponse": {
+      "BranchRestoreResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["Branch restoration initiated"] } },
         "required": ["message"]
       },
-      "V1ProjectWithDatabaseResponse": {
+      "V1ProjectWithDatabaseResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -8321,7 +8476,7 @@
         },
         "additionalProperties": false
       },
-      "V1ProjectResponse": {
+      "V1ProjectResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -8383,7 +8538,7 @@
           "status"
         ]
       },
-      "RegionsInfo": {
+      "RegionsInfo_Output": {
         "type": "object",
         "properties": {
           "recommendations": {
@@ -8494,7 +8649,7 @@
         },
         "required": ["recommendations", "all"]
       },
-      "OrganizationResponseV1": {
+      "OrganizationResponseV1_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -8562,7 +8717,7 @@
         },
         "additionalProperties": false
       },
-      "OAuthTokenResponse": {
+      "OAuthTokenResponse_Output": {
         "type": "object",
         "properties": {
           "access_token": { "type": "string" },
@@ -8577,8 +8732,7 @@
           },
           "token_type": { "type": "string", "enum": ["Bearer"] }
         },
-        "required": ["access_token", "expires_in", "token_type"],
-        "additionalProperties": false
+        "required": ["access_token", "expires_in", "token_type"]
       },
       "OAuthRevokeTokenBody": {
         "type": "object",
@@ -8599,7 +8753,7 @@
         },
         "additionalProperties": false
       },
-      "SnippetList": {
+      "SnippetList_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -8650,7 +8804,7 @@
         },
         "required": ["data"]
       },
-      "SnippetResponse": {
+      "SnippetResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -8705,7 +8859,7 @@
           "content"
         ]
       },
-      "V1ProfileResponse": {
+      "V1ProfileResponse_Output": {
         "type": "object",
         "properties": {
           "gotrue_id": { "type": "string" },
@@ -8714,7 +8868,7 @@
         },
         "required": ["gotrue_id", "primary_email", "username"]
       },
-      "ListActionRunResponse": {
+      "ListActionRunResponse_Output": {
         "type": "array",
         "items": {
           "type": "object",
@@ -8765,7 +8919,7 @@
           ]
         }
       },
-      "ActionRunResponse": {
+      "ActionRunResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -8852,12 +9006,12 @@
           "deploy": "CREATED"
         }
       },
-      "UpdateRunStatusResponse": {
+      "UpdateRunStatusResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["ok"] } },
         "required": ["message"]
       },
-      "ApiKeyResponse": {
+      "ApiKeyResponse_Output": {
         "type": "object",
         "properties": {
           "api_key": { "type": "string", "nullable": true },
@@ -8880,19 +9034,19 @@
           "inserted_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           }
         },
         "required": ["name"]
       },
-      "LegacyApiKeysResponse": {
+      "LegacyApiKeysResponse_Output": {
         "type": "object",
         "properties": { "enabled": { "type": "boolean" } },
         "required": ["enabled"]
@@ -8997,26 +9151,21 @@
           "notify_url": "https://example.com/webhooks/branches"
         }
       },
-      "UpdateCustomHostnameResponseJsonValue": {
+      "JsonValue_Output": {
         "description": "Any JSON-serializable value",
         "anyOf": [
           {
             "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }],
             "nullable": true
           },
-          {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue" }
-          },
+          { "type": "array", "items": { "$ref": "#/components/schemas/JsonValue_Output" } },
           {
             "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue"
-            }
+            "additionalProperties": { "$ref": "#/components/schemas/JsonValue_Output" }
           }
         ]
       },
-      "UpdateCustomHostnameResponse": {
+      "UpdateCustomHostnameResponse_Output": {
         "type": "object",
         "properties": {
           "status": {
@@ -9036,11 +9185,11 @@
               "success": { "type": "boolean" },
               "errors": {
                 "type": "array",
-                "items": { "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue" }
+                "items": { "$ref": "#/components/schemas/JsonValue_Output" }
               },
               "messages": {
                 "type": "array",
-                "items": { "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue" }
+                "items": { "$ref": "#/components/schemas/JsonValue_Output" }
               },
               "result": {
                 "type": "object",
@@ -9058,8 +9207,7 @@
                           "properties": {
                             "txt_name": { "type": "string" },
                             "txt_value": { "type": "string" }
-                          },
-                          "required": ["txt_name", "txt_value"]
+                          }
                         }
                       },
                       "validation_errors": {
@@ -9070,8 +9218,7 @@
                           "required": ["message"]
                         }
                       }
-                    },
-                    "required": ["status", "validation_records"]
+                    }
                   },
                   "ownership_verification": {
                     "type": "object",
@@ -9079,27 +9226,19 @@
                       "type": { "type": "string" },
                       "name": { "type": "string" },
                       "value": { "type": "string" }
-                    },
-                    "required": ["type", "name", "value"]
+                    }
                   },
                   "custom_origin_server": { "type": "string" },
                   "verification_errors": { "type": "array", "items": { "type": "string" } },
                   "status": { "type": "string" }
                 },
-                "required": [
-                  "id",
-                  "hostname",
-                  "ssl",
-                  "ownership_verification",
-                  "custom_origin_server",
-                  "status"
-                ]
+                "required": ["id", "hostname"]
               }
             },
             "required": ["success", "errors", "messages", "result"]
           }
         },
-        "required": ["status", "custom_hostname", "data"]
+        "required": ["status", "data"]
       },
       "UpdateCustomHostnameBody": {
         "type": "object",
@@ -9113,14 +9252,14 @@
         "required": ["state"],
         "example": { "state": "enabled" }
       },
-      "NetworkBanResponse": {
+      "NetworkBanResponse_Output": {
         "type": "object",
         "properties": {
           "banned_ipv4_addresses": { "type": "array", "items": { "type": "string" } }
         },
         "required": ["banned_ipv4_addresses"]
       },
-      "NetworkBanResponseEnriched": {
+      "NetworkBanResponseEnriched_Output": {
         "type": "object",
         "properties": {
           "banned_ipv4_addresses": {
@@ -9156,7 +9295,7 @@
         "required": ["ipv4_addresses"],
         "example": { "ipv4_addresses": ["203.0.113.10"], "requester_ip": false }
       },
-      "NetworkRestrictionsResponse": {
+      "NetworkRestrictionsResponse_Output": {
         "type": "object",
         "properties": {
           "entitlement": { "type": "string", "enum": ["disallowed", "allowed"] },
@@ -9188,12 +9327,12 @@
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "applied_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           }
         },
         "required": ["entitlement", "config", "status"]
@@ -9229,7 +9368,7 @@
           "remove": { "dbAllowedCidrs": ["198.51.100.0/24"] }
         }
       },
-      "NetworkRestrictionsV2Response": {
+      "NetworkRestrictionsV2Response_Output": {
         "type": "object",
         "properties": {
           "entitlement": { "type": "string", "enum": ["disallowed", "allowed"] },
@@ -9270,18 +9409,18 @@
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "applied_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "status": { "type": "string", "enum": ["stored", "applied"] }
         },
         "required": ["entitlement", "config", "status"]
       },
-      "PgsodiumConfigResponse": {
+      "PgsodiumConfigResponse_Output": {
         "type": "object",
         "properties": {
           "root_key": {
@@ -9307,7 +9446,7 @@
           "root_key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
         }
       },
-      "PostgrestConfigWithJWTSecretResponse": {
+      "PostgrestConfigWithJWTSecretResponse_Output": {
         "type": "object",
         "properties": {
           "db_schema": { "type": "string" },
@@ -9352,7 +9491,7 @@
         },
         "example": { "db_schema": "public,storage", "db_pool": 20, "max_rows": 1000 }
       },
-      "V1PostgrestConfigResponse": {
+      "V1PostgrestConfigResponse_Output": {
         "type": "object",
         "properties": {
           "db_schema": { "type": "string" },
@@ -9385,7 +9524,7 @@
           "db_pool_acquisition_timeout"
         ]
       },
-      "V1ProjectRefResponse": {
+      "V1ProjectRefResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "integer", "minimum": -9007199254740991, "maximum": 9007199254740991 },
@@ -9400,7 +9539,7 @@
         "required": ["name"],
         "example": { "name": "Acme Platform" }
       },
-      "SecretResponse": {
+      "SecretResponse_Output": {
         "type": "object",
         "properties": {
           "name": { "type": "string" },
@@ -9435,7 +9574,7 @@
         "items": { "type": "string" },
         "example": ["OPENAI_API_KEY"]
       },
-      "SslEnforcementResponse": {
+      "SslEnforcementResponse_Output": {
         "type": "object",
         "properties": {
           "currentConfig": {
@@ -9459,12 +9598,12 @@
         "required": ["requestedConfig"],
         "example": { "requestedConfig": { "database": true } }
       },
-      "TypescriptResponse": {
+      "TypescriptResponse_Output": {
         "type": "object",
         "properties": { "types": { "type": "string" } },
         "required": ["types"]
       },
-      "VanitySubdomainConfigResponse": {
+      "VanitySubdomainConfigResponse_Output": {
         "type": "object",
         "properties": {
           "status": { "type": "string", "enum": ["not-used", "custom-domain-used", "active"] },
@@ -9508,12 +9647,12 @@
         "required": ["vanity_subdomain"],
         "example": { "vanity_subdomain": "acme-prod" }
       },
-      "SubdomainAvailabilityResponse": {
+      "SubdomainAvailabilityResponse_Output": {
         "type": "object",
         "properties": { "available": { "type": "boolean" } },
         "required": ["available"]
       },
-      "ActivateVanitySubdomainResponse": {
+      "ActivateVanitySubdomainResponse_Output": {
         "type": "object",
         "properties": { "custom_domain": { "type": "string" } },
         "required": ["custom_domain"]
@@ -9530,12 +9669,12 @@
         "required": ["target_version"],
         "example": { "target_version": "17", "release_channel": "ga" }
       },
-      "ProjectUpgradeInitiateResponse": {
+      "ProjectUpgradeInitiateResponse_Output": {
         "type": "object",
         "properties": { "tracking_id": { "type": "string" } },
         "required": ["tracking_id"]
       },
-      "ProjectUpgradeEligibilityResponse": {
+      "ProjectUpgradeEligibilityResponse_Output": {
         "type": "object",
         "properties": {
           "eligible": { "type": "boolean" },
@@ -9708,6 +9847,13 @@
                     "type": { "type": "string", "enum": ["operator_estimator_gate"] }
                   },
                   "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["btree_gist_nan_reindex"] }
+                  },
+                  "required": ["type"]
                 }
               ]
             }
@@ -9728,7 +9874,7 @@
           "warnings"
         ]
       },
-      "DatabaseUpgradeStatusResponse": {
+      "DatabaseUpgradeStatusResponse_Output": {
         "type": "object",
         "properties": {
           "databaseUpgradeStatus": {
@@ -9736,7 +9882,7 @@
             "properties": {
               "initiated_at": { "type": "string" },
               "latest_status_at": { "type": "string" },
-              "target_version": { "type": "number" },
+              "target_version": { "type": "string" },
               "error": {
                 "type": "string",
                 "enum": [
@@ -9775,7 +9921,7 @@
         },
         "required": ["databaseUpgradeStatus"]
       },
-      "ReadOnlyStatusResponse": {
+      "ReadOnlyStatusResponse_Output": {
         "type": "object",
         "properties": {
           "enabled": { "type": "boolean" },
@@ -9821,7 +9967,7 @@
         "required": ["database_identifier"],
         "example": { "database_identifier": "abcdefghijklmnopqrst-rr-us-west-1-abcde" }
       },
-      "V1ServiceHealthResponse": {
+      "V1ServiceHealthResponse_Output": {
         "type": "object",
         "properties": {
           "name": {
@@ -9888,7 +10034,7 @@
         },
         "required": ["name", "healthy", "status"]
       },
-      "SigningKeyResponse": {
+      "SigningKeyResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -9905,16 +10051,15 @@
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           }
         },
-        "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"],
-        "additionalProperties": false
+        "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"]
       },
       "CreateSigningKeyBody": {
         "type": "object",
@@ -10034,7 +10179,7 @@
         "example": { "algorithm": "RS256", "status": "standby" },
         "additionalProperties": false
       },
-      "SigningKeysResponse": {
+      "SigningKeysResponse_Output": {
         "type": "object",
         "properties": {
           "keys": {
@@ -10056,21 +10201,19 @@
                 "created_at": {
                   "type": "string",
                   "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 },
                 "updated_at": {
                   "type": "string",
                   "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 }
               },
-              "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"],
-              "additionalProperties": false
+              "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"]
             }
           }
         },
-        "required": ["keys"],
-        "additionalProperties": false
+        "required": ["keys"]
       },
       "UpdateSigningKeyBody": {
         "type": "object",
@@ -10084,7 +10227,7 @@
         "example": { "status": "standby" },
         "additionalProperties": false
       },
-      "AuthConfigResponse": {
+      "AuthConfigResponse_Output": {
         "type": "object",
         "properties": {
           "api_max_request_duration": {
@@ -10417,6 +10560,10 @@
             "maximum": 9007199254740991,
             "nullable": true
           },
+          "security_update_password_require_current_password": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_update_password_require_reauthentication": {
             "type": "boolean",
             "nullable": true
@@ -10696,6 +10843,7 @@
           "security_captcha_secret",
           "security_manual_linking_enabled",
           "security_refresh_token_reuse_interval",
+          "security_update_password_require_current_password",
           "security_update_password_require_reauthentication",
           "sessions_inactivity_timeout",
           "sessions_single_per_user",
@@ -10850,8 +10998,18 @@
             "nullable": true
           },
           "security_captcha_secret": { "type": "string", "nullable": true },
-          "sessions_timebox": { "type": "number", "minimum": 0, "nullable": true },
-          "sessions_inactivity_timeout": { "type": "number", "minimum": 0, "nullable": true },
+          "sessions_timebox": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Session timebox in hours. Maximum 8760 hours (1 year).",
+            "nullable": true
+          },
+          "sessions_inactivity_timeout": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Session inactivity timeout in hours. Maximum 8760 hours (1 year).",
+            "nullable": true
+          },
           "sessions_single_per_user": { "type": "boolean", "nullable": true },
           "sessions_tags": {
             "type": "string",
@@ -10925,10 +11083,16 @@
             "type": "boolean",
             "nullable": true
           },
+          "security_update_password_require_current_password": {
+            "type": "boolean",
+            "description": "Require the user's current password when updating their password.",
+            "nullable": true
+          },
           "security_refresh_token_reuse_interval": {
             "type": "integer",
             "minimum": 0,
             "maximum": 2147483647,
+            "description": "Refresh token reuse interval in seconds. Maximum 300 seconds (5 minutes).",
             "nullable": true
           },
           "mailer_otp_exp": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
@@ -11156,7 +11320,7 @@
           "jwks_url": "https://login.acme.com/.well-known/jwks.json"
         }
       },
-      "ThirdPartyAuth": {
+      "ThirdPartyAuth_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -11175,7 +11339,7 @@
         },
         "required": ["id", "type", "inserted_at", "updated_at"]
       },
-      "GetProjectAvailableRestoreVersionsResponse": {
+      "GetProjectAvailableRestoreVersionsResponse_Output": {
         "type": "object",
         "properties": {
           "available_versions": {
@@ -11199,26 +11363,7 @@
         },
         "required": ["available_versions"]
       },
-      "ListProjectAddonsResponseJsonValue": {
-        "description": "Any JSON-serializable value",
-        "anyOf": [
-          {
-            "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }],
-            "nullable": true
-          },
-          {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue" }
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue"
-            }
-          }
-        ]
-      },
-      "ListProjectAddonsResponse": {
+      "ListProjectAddonsResponse_Output": {
         "type": "object",
         "properties": {
           "selected_addons": {
@@ -11287,7 +11432,7 @@
                       },
                       "required": ["description", "type", "interval", "amount"]
                     },
-                    "meta": { "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue" }
+                    "meta": { "$ref": "#/components/schemas/JsonValue_Output" }
                   },
                   "required": ["id", "name", "price"]
                 }
@@ -11364,7 +11509,7 @@
                         },
                         "required": ["description", "type", "interval", "amount"]
                       },
-                      "meta": { "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue" }
+                      "meta": { "$ref": "#/components/schemas/JsonValue_Output" }
                     },
                     "required": ["id", "name", "price"]
                   }
@@ -11426,7 +11571,7 @@
         "required": ["addon_variant", "addon_type"],
         "example": { "addon_variant": "pitr_7", "addon_type": "pitr" }
       },
-      "ProjectClaimTokenResponse": {
+      "ProjectClaimTokenResponse_Output": {
         "type": "object",
         "properties": {
           "token_alias": { "type": "string" },
@@ -11440,7 +11585,7 @@
         },
         "required": ["token_alias", "expires_at", "created_at", "created_by"]
       },
-      "CreateProjectClaimTokenResponse": {
+      "CreateProjectClaimTokenResponse_Output": {
         "type": "object",
         "properties": {
           "token": { "type": "string" },
@@ -11455,7 +11600,7 @@
         },
         "required": ["token", "token_alias", "expires_at", "created_at", "created_by"]
       },
-      "V1ProjectAdvisorsResponse": {
+      "V1ProjectAdvisorsResponse_Output": {
         "type": "object",
         "properties": {
           "lints": {
@@ -11464,6 +11609,7 @@
               "type": "object",
               "properties": {
                 "name": {
+                  "type": "string",
                   "enum": [
                     "unindexed_foreign_keys",
                     "auth_users_exposed",
@@ -11485,6 +11631,7 @@
                     "auth_otp_long_expiry",
                     "auth_otp_short_length",
                     "ssl_not_enforced",
+                    "log_connections_not_enabled",
                     "network_restrictions_not_set",
                     "password_requirements_min_length",
                     "pitr_not_enabled",
@@ -11493,16 +11640,28 @@
                     "auth_password_policy_missing",
                     "leaked_service_key",
                     "no_backup_admin",
-                    "vulnerable_postgres_version"
-                  ],
-                  "type": "string"
+                    "vulnerable_postgres_version",
+                    "db_not_reachable",
+                    "db_connection_failing",
+                    "db_connection_limit_reached",
+                    "instance_telemetry_lost",
+                    "instance_db_down",
+                    "instance_alert_firing",
+                    "log_data_api_error_rate_high",
+                    "log_auth_error_rate_high",
+                    "log_storage_error_rate_high",
+                    "log_edge_function_error_rate_high",
+                    "project_not_active",
+                    "advisor_check_unavailable"
+                  ]
                 },
                 "title": { "type": "string" },
                 "level": { "type": "string", "enum": ["ERROR", "WARN", "INFO"] },
                 "facing": { "type": "string", "enum": ["EXTERNAL"] },
                 "categories": {
                   "type": "array",
-                  "items": { "type": "string", "enum": ["PERFORMANCE", "SECURITY"] }
+                  "items": { "type": "string", "enum": ["PERFORMANCE", "SECURITY", "HEALTH"] },
+                  "x-ignore-array-items-must-be-objects": true
                 },
                 "description": { "type": "string" },
                 "detail": { "type": "string" },
@@ -11515,13 +11674,32 @@
                     "entity": { "type": "string" },
                     "type": {
                       "type": "string",
-                      "enum": ["table", "view", "auth", "function", "extension", "compliance"]
+                      "enum": [
+                        "table",
+                        "view",
+                        "materialized view",
+                        "foreign table",
+                        "auth",
+                        "function",
+                        "extension",
+                        "compliance",
+                        "health"
+                      ]
                     },
                     "fkey_name": { "type": "string" },
-                    "fkey_columns": { "type": "array", "items": { "type": "number" } }
+                    "fkey_columns": {
+                      "x-ignore-array-items-must-be-objects": true,
+                      "type": "array",
+                      "items": { "type": "number" }
+                    }
                   }
                 },
-                "cache_key": { "type": "string" }
+                "cache_key": { "type": "string" },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                }
               },
               "required": [
                 "name",
@@ -11539,7 +11717,7 @@
         },
         "required": ["lints"]
       },
-      "AnalyticsResponse": {
+      "AnalyticsResponse_Output": {
         "type": "object",
         "properties": {
           "result": { "type": "array", "items": {} },
@@ -11573,7 +11751,7 @@
           }
         }
       },
-      "V1GetUsageApiCountResponse": {
+      "V1GetUsageApiCountResponse_Output": {
         "type": "object",
         "properties": {
           "result": {
@@ -11630,7 +11808,7 @@
           }
         }
       },
-      "V1GetUsageApiRequestsCountResponse": {
+      "V1GetUsageApiRequestsCountResponse_Output": {
         "type": "object",
         "properties": {
           "result": {
@@ -11677,7 +11855,7 @@
         "required": ["read_only"],
         "example": { "read_only": true }
       },
-      "CreateRoleResponse": {
+      "CreateRoleResponse_Output": {
         "type": "object",
         "properties": {
           "role": { "type": "string", "minLength": 1 },
@@ -11691,19 +11869,16 @@
         },
         "required": ["role", "password", "ttl_seconds"]
       },
-      "DeleteRolesResponse": {
+      "DeleteRolesResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["ok"] } },
         "required": ["message"]
       },
-      "V1ListMigrationsResponse": {
+      "V1ListMigrationsResponse_Output": {
         "type": "array",
         "items": {
           "type": "object",
-          "properties": {
-            "version": { "type": "string", "minLength": 1 },
-            "name": { "type": "string" }
-          },
+          "properties": { "version": { "type": "string" }, "name": { "type": "string" } },
           "required": ["version"]
         }
       },
@@ -11735,10 +11910,10 @@
           "rollback": "drop table if exists public.widgets;"
         }
       },
-      "V1GetMigrationResponse": {
+      "V1GetMigrationResponse_Output": {
         "type": "object",
         "properties": {
-          "version": { "type": "string", "minLength": 1 },
+          "version": { "type": "string" },
           "name": { "type": "string" },
           "statements": { "type": "array", "items": { "type": "string" } },
           "rollback": { "type": "array", "items": { "type": "string" } },
@@ -11774,7 +11949,7 @@
         "required": ["query"],
         "example": { "query": "select * from pg_stat_activity limit 1;" }
       },
-      "GetProjectDbMetadataResponse": {
+      "GetProjectDbMetadataResponse_Output": {
         "type": "object",
         "properties": {
           "databases": {
@@ -11788,13 +11963,11 @@
                   "items": {
                     "type": "object",
                     "properties": { "name": { "type": "string" } },
-                    "required": ["name"],
-                    "additionalProperties": {}
+                    "required": ["name"]
                   }
                 }
               },
-              "required": ["name", "schemas"],
-              "additionalProperties": {}
+              "required": ["name", "schemas"]
             }
           }
         },
@@ -11806,12 +11979,12 @@
         "required": ["password"],
         "example": { "password": "correct-horse-battery-staple" }
       },
-      "V1UpdatePasswordResponse": {
+      "V1UpdatePasswordResponse_Output": {
         "type": "object",
         "properties": { "message": { "type": "string" } },
         "required": ["message"]
       },
-      "JitAccessResponse": {
+      "JitAccessResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": {
@@ -11824,7 +11997,7 @@
             "items": {
               "type": "object",
               "properties": {
-                "role": { "type": "string", "minLength": 1 },
+                "role": { "type": "string" },
                 "expires_at": { "type": "number" },
                 "allowed_networks": {
                   "type": "object",
@@ -11889,7 +12062,7 @@
         "required": ["role", "rhost"],
         "example": { "role": "postgres", "rhost": "203.0.113.10" }
       },
-      "JitAuthorizeAccessResponse": {
+      "JitAuthorizeAccessResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": {
@@ -11900,7 +12073,7 @@
           "user_role": {
             "type": "object",
             "properties": {
-              "role": { "type": "string", "minLength": 1 },
+              "role": { "type": "string" },
               "expires_at": { "type": "number" },
               "allowed_networks": {
                 "type": "object",
@@ -11942,7 +12115,7 @@
         },
         "required": ["user_id", "user_role"]
       },
-      "JitListAccessResponse": {
+      "JitListAccessResponse_Output": {
         "type": "object",
         "properties": {
           "items": {
@@ -11965,7 +12138,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "role": { "type": "string", "minLength": 1 },
+                          "role": { "type": "string" },
                           "expires_at": { "type": "number" },
                           "allowed_networks": {
                             "type": "object",
@@ -12024,7 +12197,7 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "role": { "type": "string", "minLength": 1 },
+                          "role": { "type": "string" },
                           "expires_at": { "type": "number" },
                           "allowed_networks": {
                             "type": "object",
@@ -12209,7 +12382,7 @@
           ]
         }
       },
-      "InviteExternalUserJitResponse": {
+      "InviteExternalUserJitResponse_Output": {
         "type": "object",
         "properties": {
           "email": {
@@ -12227,7 +12400,7 @@
             "items": {
               "type": "object",
               "properties": {
-                "role": { "type": "string", "minLength": 1 },
+                "role": { "type": "string" },
                 "expires_at": { "type": "number" },
                 "allowed_networks": {
                   "type": "object",
@@ -12284,7 +12457,7 @@
         "required": ["email", "token"],
         "example": { "email": "external-user@somedomain.xyz", "token": "" }
       },
-      "FunctionResponse": {
+      "FunctionResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -12372,7 +12545,7 @@
           }
         ]
       },
-      "BulkUpdateFunctionResponse": {
+      "BulkUpdateFunctionResponse_Output": {
         "type": "object",
         "properties": {
           "functions": {
@@ -12435,7 +12608,7 @@
           "metadata": { "entrypoint_path": "index.ts", "verify_jwt": true, "name": "Hello World" }
         }
       },
-      "DeployFunctionResponse": {
+      "DeployFunctionResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -12467,7 +12640,7 @@
         },
         "required": ["id", "slug", "name", "status", "version"]
       },
-      "FunctionSlugResponse": {
+      "FunctionSlugResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -12513,7 +12686,7 @@
           "verify_jwt": true
         }
       },
-      "V1StorageBucketResponse": {
+      "V1StorageBucketResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -12525,7 +12698,7 @@
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
       },
-      "DiskResponse": {
+      "DiskResponse_Output": {
         "type": "object",
         "properties": {
           "attributes": {
@@ -12637,7 +12810,7 @@
           "attributes": { "type": "gp3", "size_gb": 100, "iops": 3000, "throughput_mibps": 125 }
         }
       },
-      "DiskUtilMetricsResponse": {
+      "DiskUtilMetricsResponse_Output": {
         "type": "object",
         "properties": {
           "timestamp": { "type": "string" },
@@ -12653,7 +12826,7 @@
         },
         "required": ["timestamp", "metrics"]
       },
-      "DiskAutoscaleConfig": {
+      "DiskAutoscaleConfig_Output": {
         "type": "object",
         "properties": {
           "growth_percent": {
@@ -12680,7 +12853,7 @@
         },
         "required": ["growth_percent", "min_increment_gb", "max_size_gb"]
       },
-      "StorageConfigResponse": {
+      "StorageConfigResponse_Output": {
         "type": "object",
         "properties": {
           "fileSizeLimit": {
@@ -12739,26 +12912,19 @@
             "type": "object",
             "properties": {
               "list_v2": { "type": "boolean" },
-              "iceberg_catalog": { "type": "boolean" }
+              "iceberg_catalog": { "type": "boolean" },
+              "object_versioning": { "type": "boolean" }
             },
-            "required": ["list_v2", "iceberg_catalog"]
+            "required": ["list_v2", "iceberg_catalog", "object_versioning"]
           },
           "external": {
             "type": "object",
             "properties": { "upstreamTarget": { "type": "string", "enum": ["main", "canary"] } },
             "required": ["upstreamTarget"]
           },
-          "migrationVersion": { "type": "string" },
-          "databasePoolMode": { "type": "string" }
+          "migrationVersion": { "type": "string", "nullable": true }
         },
-        "required": [
-          "fileSizeLimit",
-          "features",
-          "capabilities",
-          "external",
-          "migrationVersion",
-          "databasePoolMode"
-        ]
+        "required": ["fileSizeLimit", "features", "capabilities", "external", "migrationVersion"]
       },
       "UpdateStorageConfigBody": {
         "type": "object",
@@ -12820,7 +12986,7 @@
         },
         "additionalProperties": false
       },
-      "V1PgbouncerConfigResponse": {
+      "V1PgbouncerConfigResponse_Output": {
         "type": "object",
         "properties": {
           "default_pool_size": {
@@ -12858,7 +13024,7 @@
           }
         }
       },
-      "SupavisorConfigResponse": {
+      "SupavisorConfigResponse_Output": {
         "type": "object",
         "properties": {
           "identifier": { "type": "string" },
@@ -12920,7 +13086,7 @@
         },
         "example": { "default_pool_size": 25, "pool_mode": "transaction" }
       },
-      "UpdateSupavisorConfigResponse": {
+      "UpdateSupavisorConfigResponse_Output": {
         "type": "object",
         "properties": {
           "default_pool_size": {
@@ -12933,7 +13099,7 @@
         },
         "required": ["default_pool_size", "pool_mode"]
       },
-      "PostgresConfigResponse": {
+      "PostgresConfigResponse_Output": {
         "type": "object",
         "properties": {
           "effective_cache_size": { "type": "string" },
@@ -13091,7 +13257,7 @@
         },
         "additionalProperties": false
       },
-      "RealtimeConfigResponse": {
+      "RealtimeConfigResponse_Output": {
         "type": "object",
         "properties": {
           "private_only": {
@@ -13104,6 +13270,13 @@
             "minimum": 1,
             "maximum": 100,
             "description": "Sets connection pool size for Realtime Authorization",
+            "nullable": true
+          },
+          "postgres_changes_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size used to create Postgres Changes subscriptions",
             "nullable": true
           },
           "max_concurrent_users": {
@@ -13165,6 +13338,7 @@
         "required": [
           "private_only",
           "connection_pool",
+          "postgres_changes_pool",
           "max_concurrent_users",
           "max_events_per_second",
           "max_bytes_per_second",
@@ -13188,6 +13362,12 @@
             "minimum": 1,
             "maximum": 100,
             "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "postgres_changes_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size used to create Postgres Changes subscriptions"
           },
           "max_concurrent_users": {
             "type": "integer",
@@ -13265,6 +13445,7 @@
                   "properties": {
                     "name": { "type": "string" },
                     "names": { "type": "array", "items": { "type": "string" } },
+                    "array": { "type": "boolean" },
                     "default": {
                       "anyOf": [
                         { "type": "object", "properties": {} },
@@ -13272,8 +13453,7 @@
                         { "type": "string" },
                         { "type": "boolean" }
                       ]
-                    },
-                    "array": { "type": "boolean" }
+                    }
                   }
                 }
               }
@@ -13304,7 +13484,7 @@
           }
         }
       },
-      "CreateProviderResponse": {
+      "CreateProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13324,6 +13504,7 @@
                       "properties": {
                         "name": { "type": "string" },
                         "names": { "type": "array", "items": { "type": "string" } },
+                        "array": { "type": "boolean" },
                         "default": {
                           "anyOf": [
                             { "type": "object", "properties": {} },
@@ -13331,8 +13512,7 @@
                             { "type": "string" },
                             { "type": "boolean" }
                           ]
-                        },
-                        "array": { "type": "boolean" }
+                        }
                       }
                     }
                   }
@@ -13367,7 +13547,7 @@
         },
         "required": ["id"]
       },
-      "ListProvidersResponse": {
+      "ListProvidersResponse_Output": {
         "type": "object",
         "properties": {
           "items": {
@@ -13392,6 +13572,7 @@
                             "properties": {
                               "name": { "type": "string" },
                               "names": { "type": "array", "items": { "type": "string" } },
+                              "array": { "type": "boolean" },
                               "default": {
                                 "anyOf": [
                                   { "type": "object", "properties": {} },
@@ -13399,8 +13580,7 @@
                                   { "type": "string" },
                                   { "type": "boolean" }
                                 ]
-                              },
-                              "array": { "type": "boolean" }
+                              }
                             }
                           }
                         }
@@ -13439,7 +13619,7 @@
         },
         "required": ["items"]
       },
-      "GetProviderResponse": {
+      "GetProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13459,6 +13639,7 @@
                       "properties": {
                         "name": { "type": "string" },
                         "names": { "type": "array", "items": { "type": "string" } },
+                        "array": { "type": "boolean" },
                         "default": {
                           "anyOf": [
                             { "type": "object", "properties": {} },
@@ -13466,8 +13647,7 @@
                             { "type": "string" },
                             { "type": "boolean" }
                           ]
-                        },
-                        "array": { "type": "boolean" }
+                        }
                       }
                     }
                   }
@@ -13518,6 +13698,7 @@
                   "properties": {
                     "name": { "type": "string" },
                     "names": { "type": "array", "items": { "type": "string" } },
+                    "array": { "type": "boolean" },
                     "default": {
                       "anyOf": [
                         { "type": "object", "properties": {} },
@@ -13525,8 +13706,7 @@
                         { "type": "string" },
                         { "type": "boolean" }
                       ]
-                    },
-                    "array": { "type": "boolean" }
+                    }
                   }
                 }
               }
@@ -13548,7 +13728,7 @@
           "domains": ["acme.com", "contractors.acme.com"]
         }
       },
-      "UpdateProviderResponse": {
+      "UpdateProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13568,6 +13748,7 @@
                       "properties": {
                         "name": { "type": "string" },
                         "names": { "type": "array", "items": { "type": "string" } },
+                        "array": { "type": "boolean" },
                         "default": {
                           "anyOf": [
                             { "type": "object", "properties": {} },
@@ -13575,8 +13756,7 @@
                             { "type": "string" },
                             { "type": "boolean" }
                           ]
-                        },
-                        "array": { "type": "boolean" }
+                        }
                       }
                     }
                   }
@@ -13611,7 +13791,7 @@
         },
         "required": ["id"]
       },
-      "DeleteProviderResponse": {
+      "DeleteProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13631,6 +13811,7 @@
                       "properties": {
                         "name": { "type": "string" },
                         "names": { "type": "array", "items": { "type": "string" } },
+                        "array": { "type": "boolean" },
                         "default": {
                           "anyOf": [
                             { "type": "object", "properties": {} },
@@ -13638,8 +13819,7 @@
                             { "type": "string" },
                             { "type": "boolean" }
                           ]
-                        },
-                        "array": { "type": "boolean" }
+                        }
                       }
                     }
                   }
@@ -13674,7 +13854,7 @@
         },
         "required": ["id"]
       },
-      "V1BackupsResponse": {
+      "V1BackupsResponse_Output": {
         "type": "object",
         "properties": {
           "region": { "type": "string" },
@@ -13745,7 +13925,7 @@
           "completed_on": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           }
         },
@@ -13759,7 +13939,7 @@
         "required": ["id"],
         "example": { "id": 12345 }
       },
-      "V1BackupScheduleResponse": {
+      "V1BackupScheduleResponse_Output": {
         "type": "object",
         "properties": {
           "schedule_for": {
@@ -13797,7 +13977,7 @@
         "required": ["name"],
         "example": { "name": "before-upgrade" }
       },
-      "V1ListEntitlementsResponse": {
+      "V1ListEntitlementsResponse_Output": {
         "type": "object",
         "properties": {
           "entitlements": {
@@ -13870,6 +14050,7 @@
                         "project_restore_after_expiry",
                         "assistant.advance_model",
                         "integrations.github_connections",
+                        "integrations.github_push_webhooks_limit",
                         "dedicated_pooler",
                         "observability.dashboard_advanced_metrics",
                         "api.members.invitations",
@@ -13916,7 +14097,7 @@
         },
         "required": ["entitlements"]
       },
-      "V1OrganizationMemberResponse": {
+      "V1OrganizationMemberResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": { "type": "string" },
@@ -13926,9 +14107,9 @@
           "mfa_enabled": { "type": "boolean" },
           "avatar_url": { "type": "string", "nullable": true }
         },
-        "required": ["user_id", "user_name", "role_name", "mfa_enabled", "avatar_url"]
+        "required": ["user_id", "user_name", "mfa_enabled", "avatar_url"]
       },
-      "V1OrganizationSlugResponse": {
+      "V1OrganizationSlugResponse_Output": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -13954,7 +14135,7 @@
         },
         "required": ["id", "name", "opt_in_tags", "allowed_release_channels"]
       },
-      "OrganizationProjectClaimResponse": {
+      "OrganizationProjectClaimResponse_Output": {
         "type": "object",
         "properties": {
           "project": {
@@ -14028,7 +14209,7 @@
         },
         "required": ["project", "preview", "expires_at", "created_at", "created_by"]
       },
-      "OrganizationProjectsResponse": {
+      "OrganizationProjectsResponse_Output": {
         "type": "object",
         "properties": {
           "projects": {

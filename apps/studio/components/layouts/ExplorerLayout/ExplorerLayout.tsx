@@ -14,8 +14,12 @@ import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
 import { type ExplorerResourceType } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
+import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { ExplorerPreferencesDropdown } from './ExplorerPreferencesDropdown'
+import { ExplorerProvider } from './ExplorerProvider'
+import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
 import {
@@ -23,6 +27,7 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -38,6 +43,9 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
   const tabs = useTabsStateSnapshot()
+  const { setLastVisitedExplorerTab } = useDashboardHistory()
+  const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
+  const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
   const [section, setSection] = useState<ExplorerResourceType>()
 
@@ -52,39 +60,49 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     entity: browserTitle?.entity ?? activeTabLabel,
   }
 
+  const handleTabChange = (id: string) => {
+    if (id === EXPLORER_HOME_TAB_ID) setLastVisitedExplorerTab(undefined)
+  }
+
   return (
-    <ProjectLayoutWithAuth
-      product="Explorer"
-      browserTitle={mergedBrowserTitle}
-      productMenu={
-        <div className="relative h-full overflow-hidden">
-          <AnimatePresence mode="wait">
-            {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
-            {section === 'notebook' && (
-              <ExplorerNavNotebooks key="notebooks" onBack={() => setSection(undefined)} />
-            )}
-            {section === 'chat' && (
-              <ExplorerNavChats key="chats" onBack={() => setSection(undefined)} />
-            )}
-          </AnimatePresence>
-        </div>
-      }
-    >
-      <ExplorerQueryTabCoordinator />
-
-      <ExplorerNotebookTabCoordinator />
-
-      <div className="flex flex-col h-full">
-        <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
-          <EditorTabs
-            isCollapseButtonHidden
-            customTabs={<HomeTabButton />}
-            newTabButton={<NewTabButton />}
+    <ExplorerProvider>
+      <ProjectLayoutWithAuth
+        product="Explorer"
+        browserTitle={mergedBrowserTitle}
+        productMenuHeader={
+          <ExplorerNavHeader
+            section={section}
+            onBack={() => setSection(undefined)}
+            rootAction={<ExplorerPreferencesDropdown />}
           />
+        }
+        productMenu={
+          <div className="relative h-full overflow-hidden">
+            <AnimatePresence mode="wait">
+              {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
+              {section === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
+              {section === 'chat' && <ExplorerNavChats key="chats" />}
+            </AnimatePresence>
+          </div>
+        }
+      >
+        <ExplorerQueryTabCoordinator />
+
+        <ExplorerNotebookTabCoordinator />
+
+        <div className="flex flex-col h-full">
+          <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
+            <EditorTabs
+              isCollapseButtonHidden
+              customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}
+              newTabButton={<NewTabButton />}
+              onTabChange={handleTabChange}
+            />
+          </div>
+          <div className="flex-grow min-h-0">{children}</div>
         </div>
-        <div className="flex-grow min-h-0">{children}</div>
-      </div>
-    </ProjectLayoutWithAuth>
+      </ProjectLayoutWithAuth>
+    </ExplorerProvider>
   )
 }
 
@@ -110,7 +128,7 @@ const HomeTabButton = () => {
       value={EXPLORER_HOME_TAB_ID}
       className={cn(
         TabClassName,
-        'relative group border-b border-default',
+        'relative group border-b border-default shadow-none!',
         explorerTabs.length === 0 && 'border-r border-r-default!',
         'bg-dash-sidebar/50 dark:bg-surface-100/50',
         'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
@@ -153,7 +171,7 @@ const NewTabButton = () => {
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuItem className="gap-x-2" onClick={() => createQuery()}>
           <SquareCode size={14} />
-          <span>New query</span>
+          <span>Run SQL</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => createNotebook()}>
           <NotebookText size={14} />

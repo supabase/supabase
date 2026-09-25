@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 import {
+  Badge,
   Button,
   cn,
   DropdownMenu,
@@ -32,8 +33,8 @@ import { Route } from '../ui/ui.types'
 import {
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
   useGenerateOtherRoutes,
+  useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
@@ -42,6 +43,7 @@ import { useLints } from '@/hooks/misc/useLints'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const ICON_SIZE = 32
@@ -167,6 +169,7 @@ export function SideBarNavLink({
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const router = useRouter()
   const { state: sidebarState } = useSidebar()
+
   const [sidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
@@ -195,6 +198,14 @@ export function SideBarNavLink({
     <>
       {route.icon}
       <span>{route.label}</span>
+      {route.isNew && (
+        <Badge
+          variant="success"
+          className="ml-auto shrink-0 px-1.5 py-0.5 text-[9px] uppercase tracking-wider"
+        >
+          New
+        </Badge>
+      )}
     </>
   )
 
@@ -214,6 +225,7 @@ export function SideBarNavLink({
           onTrigger={() => router.push(route.link!)}
           side="right"
           delayDuration={shortcutPopoverDelay}
+          label={route.key === 'explorer' ? 'Go to Explorer' : undefined}
         >
           {button}
         </Shortcut>
@@ -248,6 +260,7 @@ const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings
 
 const ProjectLinks = () => {
   const router = useRouter()
+  const track = useTrack()
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
@@ -267,16 +280,16 @@ const ProjectLinks = () => {
   ])
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
-  const workersEnabled = useFlag('workers')
+  const computeEnabled = useFlag('compute')
 
-  const toolRoutes = generateToolRoutes(ref, project)
+  const toolRoutes = useGenerateToolRoutes()
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
-    workers: workersEnabled,
+    compute: computeEnabled,
   })
   const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = generateSettingsRoutes(ref)
@@ -303,6 +316,11 @@ const ProjectLinks = () => {
               route={route}
               active={activeRoute === route.key}
               isLoading={isProjectPending}
+              onClick={
+                route.key === 'explorer' && activeRoute === 'sql'
+                  ? () => track('sql_editor_back_explorer_clicked')
+                  : undefined
+              }
             />
           ))}
         </SidebarMenu>

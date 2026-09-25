@@ -1,0 +1,120 @@
+---
+title: 'Query logs with SQL'
+description: 'Query ClickHouse logs through MCP, the Management API, or Explorer'
+---
+
+This guide explains how to query project logs with ClickHouse SQL. Use [MCP](#mcp) or the [Management API](#api) for programmatic access, or [Explorer](#studio) in Studio. To filter events without SQL, use [Logs in Studio](/docs/guides/observability/logs).
+
+## Query events [#querying-with-the-logs-explorer]
+
+Every event is a row in `logs`. Select a service with `source`, use a bounded time range, and limit the returned rows. For example, this query returns the latest API server errors within the supplied time range:
+
+```sql
+-- recent API server errors
+select timestamp, id,
+  toInt32OrZero(log_attributes['response.status_code']) as status,
+  log_attributes['request.path'] as path
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) between 500 and 599
+order by timestamp desc
+limit 100;
+```
+
+Use the returned timestamp, ID, status, and path to investigate an event. No rows means no matching recorded events in that window; check the source, filters, and retention before concluding that there were no errors.
+
+### MCP [#mcp]
+
+Connect [Supabase MCP](/docs/guides/ai-tools/mcp) with `project_ref` and `read_only=true`. Call `query_logs` with the SQL and an explicit time range, using the tool's input schema. Use `execute_sql` for Postgres database diagnostics, not ClickHouse logs.
+
+### Management API [#api]
+
+Set `SUPABASE_ACCESS_TOKEN` to a Management API access token authorized to read project logs, and `PROJECT_REF` to the project reference. Set `START` and `END` to UTC timestamps such as `2026-09-07T09:00:00Z`, with a range of 24 hours or less. Save the query above as `logs.sql`, then run:
+
+```bash
+curl --get "https://api.supabase.com/v1/projects/$PROJECT_REF/analytics/endpoints/logs" \
+  --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  --data-urlencode "sql@logs.sql" \
+  --data-urlencode "iso_timestamp_start=$START" \
+  --data-urlencode "iso_timestamp_end=$END"
+```
+
+Inspect both the HTTP status and the response for query errors before interpreting the results. Without `sql`, this endpoint queries API Gateway events only. See the [logs endpoint reference](/docs/reference/api/v1-get-project-logs) for request and response fields.
+
+### Explorer [#studio]
+
+1. Open [Explorer](/dashboard/project/_/explorer) and select **Run SQL**.
+2. Open the query source menu and select **Logs**.
+3. Choose the time range in that menu.
+4. Enter the query and select **Run**.
+
+The selected range is applied to the query. The **Logs** query source chooses ClickHouse; `source = 'edge_logs'` chooses API Gateway events within it. Select **Database** instead when running Postgres SQL.
+
+### Terminal access [#cli]
+
+The Supabase CLI does not query ClickHouse logs. Use the Management API command above. For live database statistics, use [`supabase inspect db`](/docs/guides/observability/inspect).
+
+## Sources and fields [#logs-explorer]
+
+Use the [Log sources and fields reference](/docs/guides/observability/log-field-reference) to choose the service and query expressions. API Gateway events and a service's own logs describe different layers of a request.
+
+### Read structured fields [#understanding-field-references]
+
+Read a map key with bracket access, retaining its full dotted path. Values in `log_attributes` are strings. Cast numeric values before comparing them. `toInt32OrZero` treats missing or non-numeric values as zero; do not interpret that zero as a measured status or duration.
+
+When a field is missing or unfamiliar, discover the keys present on recorded events:
+
+```sql
+-- discover Postgres attributes
+select arrayJoin(mapKeys(log_attributes)) as key, count() as events
+from logs
+where source = 'postgres_logs'
+group by key
+order by events desc
+limit 100;
+```
+
+### Time ranges [#timestamp-display-and-behavior]
+
+`timestamp` is a UTC `DateTime64` value. Compare and order it directly. Explorer supplies the chosen time range; MCP and API callers must supply their own bounded range. To compare more than 24 hours through the API, fetch separate windows within retention and combine their aggregates.
+
+## Search messages [#filtering-with-regular-expressions]
+
+Use `ilike` for a case-insensitive substring, or ClickHouse's [`match`](https://clickhouse.com/docs/sql-reference/functions/string-search-functions#match) for a regular expression:
+
+```sql
+-- find connection failures
+select timestamp, id, event_message
+from logs
+where source = 'postgres_logs'
+  and event_message ilike '%connection%'
+  and match(event_message, '(?i)failed|refused|timeout')
+order by timestamp desc
+limit 100;
+```
+
+Combine predicates with `and`, `or`, and `not`. Select only the fields needed for the investigation. To correlate sources, use an identifier present in both; a shared timestamp alone does not establish that events belong to the same request.
+
+## Query limits [#limit-and-result-row-limitations]
+
+Use an explicit `limit` and narrow time range. The logs query surface rejects `select *` and `count(*)`; list columns and use `count()`. A result limit bounds returned rows, not the time range scanned.
+
+## Record additional events [#working-with-api-logs]
+
+For HTTP header capture, see [Captured HTTP headers](/docs/guides/observability/log-field-reference#captured-http-headers). Configure event recording separately from querying:
+
+### Postgres connections [#logging-postgres-connections]
+
+See [Configure connection logging](/docs/guides/observability/configure-logging#postgres-connections).
+
+### Postgres statements [#logging-postgres-queries]
+
+See [Configure statement logging](/docs/guides/observability/configure-logging#postgres-statements).
+
+### Statement classes [#configuring-pgauditlog]
+
+See [pgAudit configuration](/docs/guides/database/extensions/pgaudit#configure-the-extension) for session and role scope.
+
+### Realtime connections [#logging-realtime-connections]
+
+See [Configure Realtime logging](/docs/guides/observability/configure-logging#realtime-connections).

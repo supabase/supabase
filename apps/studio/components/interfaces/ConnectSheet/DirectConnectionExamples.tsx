@@ -55,6 +55,10 @@ func main() {
   },
   dotnet: {
     installCommands: [
+      // SSL Negotiation=Direct in the generated connection string requires Npgsql 9.0+.
+      // Concrete version: quoting a floating version breaks on Windows cmd, and
+      // floating versions fail under Central Package Management (NU1011).
+      'dotnet add package Npgsql --version 9.0.5',
       'dotnet add package Microsoft.Extensions.Configuration.Json --version YOUR_DOTNET_VERSION',
     ],
   },

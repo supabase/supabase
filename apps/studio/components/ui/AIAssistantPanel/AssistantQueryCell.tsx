@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 import { identifyQueryType } from './AIAssistant.utils'
 import {
@@ -12,13 +12,16 @@ import {
 } from './AssistantQueryCell.utils'
 import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { QueryEditor } from '@/components/interfaces/Explorer/QueryEditor'
+import { SaveQueryDropdown } from '@/components/interfaces/Explorer/SaveQueryDropdown'
 import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
 import {
   type QuerySourceBinding,
   type QuerySourceTag,
 } from '@/data/query-sources/query-source-registry'
 import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantState } from '@/state/ai-assistant-state'
 import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 
 interface AssistantQueryCellProps {
@@ -72,6 +75,8 @@ export const AssistantQueryCell = ({
 }: AssistantQueryCellProps) => {
   const track = useTrack()
   const roleImpersonationState = useLocalRoleImpersonationState()
+  const aiAssistantState = useAiAssistantState()
+  const isExplorerEnabled = useIsExplorerEnabled()
 
   const fallbackTitle =
     initialTitle?.trim() ||
@@ -101,15 +106,18 @@ export const AssistantQueryCell = ({
   }
 
   const result = resultOverride === undefined ? initialResult : (resultOverride ?? undefined)
-  const display =
-    localDisplay ??
-    getAssistantQueryDisplay({
-      view,
-      xAxis,
-      yAxis,
-      sql: query.uncheckedSql,
-      rows: result?.rows,
-    })
+  const inferredDisplay = useMemo(
+    () =>
+      getAssistantQueryDisplay({
+        view,
+        xAxis,
+        yAxis,
+        sql: query.uncheckedSql,
+        rows: result?.rows,
+      }),
+    [view, xAxis, yAxis, query.uncheckedSql, result?.rows]
+  )
+  const display = localDisplay ?? inferredDisplay
 
   const handleTitleChange = (value: string) => {
     const nextTitle = value.trim()
@@ -141,13 +149,14 @@ export const AssistantQueryCell = ({
     })
   }
 
-  const isConfirming = confirmState !== undefined
+  const isRunDisabled =
+    confirmState === 'approval-requested' || confirmState === 'approval-responded'
   const outcomeMessages = QUERY_OUTCOME_MESSAGES[source._tag]
 
   return (
     <Confirm
       fill
-      className="h-96 w-full max-w-6xl mx-auto"
+      className="w-full max-w-3xl mx-auto"
       state={confirmState}
       message="Assistant wants to run this query"
       cancelLabel="Skip"
@@ -159,10 +168,12 @@ export const AssistantQueryCell = ({
       onCancel={onDeny}
       onConfirm={onApprove}
     >
+      {/* Keep editor state mounted; the fixed height preserves scroll geometry when skipped. */}
       <QueryEditor
         isReadOnly
         id={id}
         variant="viewport"
+        className="h-96 [content-visibility:auto] [contain-intrinsic-block-size:auto_24rem]"
         title={title}
         query={query}
         result={result}
@@ -170,7 +181,7 @@ export const AssistantQueryCell = ({
         onShowQueryChange={setShowQuery}
         roleImpersonationState={roleImpersonationState}
         display={display}
-        isRunDisabled={isConfirming}
+        isRunDisabled={isRunDisabled}
         onTitleChange={handleTitleChange}
         onSqlChange={(sql) => setQuery((current) => setAssistantQuerySql(current, sql))}
         onSourceChange={handleSourceChange}
@@ -180,6 +191,12 @@ export const AssistantQueryCell = ({
         }
         onDisplayChange={handleDisplayChange}
         onRun={handleRun}
+        onDebug={aiAssistantState.setInitialInput}
+        toolbarActions={
+          isExplorerEnabled && !isStreaming ? (
+            <SaveQueryDropdown query={{ title, sql: query.uncheckedSql }} source={query} />
+          ) : undefined
+        }
       />
     </Confirm>
   )

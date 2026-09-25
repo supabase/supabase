@@ -5,9 +5,9 @@ const terraform: FederatedContentSource = {
   section: 'deployment/terraform',
   org: 'supabase',
   repo: 'terraform-provider-supabase',
-  branch: 'v1.1.3',
+  branch: 'v1.11.0',
   docsDir: 'docs',
-  externalSite: 'https://github.com/supabase/terraform-provider-supabase/blob/v1.1.3',
+  externalSite: 'https://github.com/supabase/terraform-provider-supabase/blob/v1.11.0',
   rawFallback: true,
   pageMap: [
     {

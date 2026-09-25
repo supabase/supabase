@@ -138,7 +138,6 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
             <FormControl>
               <Button
                 id={name}
-                variant="default"
                 size="tiny"
                 type="button"
                 disabled={disabled}
@@ -157,7 +156,6 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                 <FormControl>
                   <Button
                     id={name}
-                    variant="default"
                     type="button"
                     className="justify-start h-[34px] w-full [&>div:last-child]:ml-auto"
                     disabled={disabled || isLoading}

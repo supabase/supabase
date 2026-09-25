@@ -1,13 +1,11 @@
 import { renderHook } from '@testing-library/react'
 import { useRouter } from 'next/router'
 import { withNuqsTestingAdapter } from 'nuqs/adapters/testing'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { useTableEditorFiltersSort } from '../useTableEditorFiltersSort'
 
-beforeAll(() => {
-  vi.mock('next/router', () => import('next-router-mock'))
-})
+vi.mock('next/router', () => import('next-router-mock'))
 
 describe('useTableEditorFilters', () => {
   it('should support old syntax', async () => {

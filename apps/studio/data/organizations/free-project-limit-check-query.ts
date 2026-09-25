@@ -5,7 +5,7 @@ import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { UseCustomQueryOptions } from '@/types'
 
-export type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit']
+export type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
 
 export type FreeProjectLimitCheckVariables = {
   slug?: string

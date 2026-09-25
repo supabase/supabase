@@ -21,6 +21,9 @@ export const Restriction = () => {
     usage?.usages.find(
       (metric) =>
         metric.metric !== PricingMetric.DISK_SIZE_GB_HOURS_GP3 &&
+        // Log metrics should not trigger the exceeded limits alert for now (soft rollout)
+        metric.metric !== PricingMetric.LOG_INGESTION &&
+        metric.metric !== PricingMetric.LOG_QUERYING &&
         !metric.unlimited &&
         metric.capped &&
         metric.usage > (metric?.pricing_free_units ?? 0)
@@ -71,7 +74,7 @@ export const Restriction = () => {
                 : 'Please disable spend cap to ensure that your projects remain available.'}
             </p>
             <div className="flex items-center gap-x-2 mt-3">
-              <Button key="upgrade-button" asChild variant="default">
+              <Button key="upgrade-button" asChild>
                 <Link
                   href={`/org/${org?.slug}/billing?panel=${
                     org.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
@@ -81,11 +84,11 @@ export const Restriction = () => {
                 </Link>
               </Button>
               {!isUsagePage && (
-                <Button key="view-usage-button" asChild variant="default">
+                <Button key="view-usage-button" asChild>
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild variant="default" icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLink />}>
                 <a href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}>About spend cap</a>
               </Button>
             </div>
@@ -110,7 +113,7 @@ export const Restriction = () => {
               402 status code.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
-              <Button asChild key="upgrade-button" variant="default">
+              <Button asChild key="upgrade-button">
                 <Link
                   href={`/org/${org?.slug}/billing?panel=${
                     org.plan.id === 'free'
@@ -123,12 +126,12 @@ export const Restriction = () => {
               </Button>
 
               {!isUsagePage && (
-                <Button key="view-usage-button" asChild variant="default">
+                <Button key="view-usage-button" asChild>
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
 
-              <Button asChild variant="default" icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLink />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
@@ -153,7 +156,7 @@ export const Restriction = () => {
               exceed your plan's quota.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
-              <Button key="upgrade-button" asChild variant="default">
+              <Button key="upgrade-button" asChild>
                 <Link
                   href={`/org/${org?.slug}/billing?panel=${
                     org.plan.id === 'free'
@@ -165,11 +168,11 @@ export const Restriction = () => {
                 </Link>
               </Button>
               {!isUsagePage && (
-                <Button key="view-usage-button" asChild variant="default">
+                <Button key="view-usage-button" asChild>
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild variant="default" icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLink />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
@@ -193,7 +196,7 @@ export const Restriction = () => {
               are fully lifted.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
-              <Button key="upgrade-button" asChild variant="default">
+              <Button key="upgrade-button" asChild>
                 <Link
                   href={`/org/${org?.slug}/billing?panel=${
                     org.plan.id === 'free'
@@ -205,11 +208,11 @@ export const Restriction = () => {
                 </Link>
               </Button>
               {!isUsagePage && (
-                <Button key="view-usage-button" asChild variant="default">
+                <Button key="view-usage-button" asChild>
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild variant="default" icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLink />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>

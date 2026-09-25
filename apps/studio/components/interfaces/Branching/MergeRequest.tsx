@@ -195,7 +195,7 @@ export const MergeActions = ({
           loading={isSubmitting}
           disabled={isMergeDisabled}
           onClick={onSelectMerge}
-          icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
+          icon={<GitMerge size={16} strokeWidth={1.5} className="text-primary" />}
         >
           Merge branch
         </ButtonTooltip>
@@ -204,7 +204,7 @@ export const MergeActions = ({
           variant="primary"
           loading={isSubmitting}
           onClick={onSelectMerge}
-          icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
+          icon={<GitMerge size={16} strokeWidth={1.5} className="text-primary" />}
         >
           Merge branch
         </Button>
@@ -212,12 +212,7 @@ export const MergeActions = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="default"
-            loading={isUpdating}
-            className="px-1.5"
-            icon={<MoreVertical />}
-          />
+          <Button loading={isUpdating} className="px-1.5" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           <DropdownMenuItem

@@ -4,6 +4,7 @@ import type {
   CodexMcpConfig,
   CopilotMcpConfig,
   FactoryMcpConfig,
+  FxMcpConfig,
   GeminiMcpConfig,
   GooseMcpConfig,
   GrokMcpConfig,
@@ -12,6 +13,7 @@ import type {
   McpClientConfig,
   McpClientDeepLinkOptions,
   McpFeatureGroup,
+  OmpMcpConfig,
   OpenCodeMcpConfig,
   VSCodeMcpConfig,
   WindsurfMcpConfig,
@@ -103,7 +105,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     icon: 'cursor',
     hasDistinctDarkIcon: true,
     configFile: '.cursor/mcp.json',
-    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
+    externalDocsUrl: 'https://cursor.com/docs/mcp',
     generateDeepLink: (config) => {
       const name = 'supabase'
       const mcpUrl = getMcpUrl(config)
@@ -342,6 +344,41 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     },
   },
   {
+    key: 'fx',
+    label: 'fx',
+    icon: 'fx',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.fx/mcp.json',
+    externalDocsUrl: 'https://fx.sh/docs/capabilities/mcp',
+    transformConfig: (config): FxMcpConfig => {
+      return {
+        mcp: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
+    key: 'omp',
+    label: 'omp',
+    icon: 'omp',
+    configFile: '.omp/mcp.json',
+    externalDocsUrl: 'https://github.com/can1357/oh-my-pi/blob/main/docs/mcp-config.md',
+    transformConfig: (config): OmpMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
     key: 'kiro',
     label: 'Kiro',
     icon: 'kiro',
@@ -413,12 +450,28 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
   opencode: {
     authenticate: 'opencode mcp auth supabase',
   },
+  fx: {
+    authenticate: '/mcp auth supabase --open',
+  },
+  cursor: {
+    authenticate: 'agent mcp login supabase',
+  },
 }
 
 export const MCP_CLIENT_GROUPS = [
   {
     heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'grok', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
+    keys: [
+      'claude-code',
+      'codex',
+      'grok',
+      'gemini-cli',
+      'copilot-cli',
+      'opencode',
+      'factory',
+      'fx',
+      'omp',
+    ],
   },
   {
     heading: 'Web Clients',

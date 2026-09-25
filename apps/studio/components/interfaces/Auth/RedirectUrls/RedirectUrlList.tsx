@@ -68,11 +68,8 @@ export const RedirectUrlList = ({
       <ValueContainer className="py-3 flex items-center justify-end">
         {selectedUrls.length > 0 ? (
           <div className="flex items-center gap-x-2">
-            <Button variant="default" onClick={() => onSelectClearSelection()}>
-              Clear selection
-            </Button>
+            <Button onClick={() => onSelectClearSelection()}>Clear selection</Button>
             <ButtonTooltip
-              variant="default"
               disabled={!canUpdateConfig}
               tooltip={{
                 content: {
@@ -97,6 +94,7 @@ export const RedirectUrlList = ({
             side="bottom"
           >
             <ButtonTooltip
+              variant="primary"
               disabled={!canUpdateConfig}
               onClick={() => onSelectAddURL()}
               tooltip={{

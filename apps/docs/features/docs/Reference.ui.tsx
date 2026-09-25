@@ -8,10 +8,11 @@ import type {
   TypeDetails,
 } from '~/features/docs/Reference.typeSpec'
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
-import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
+import { DetailsTrigger, ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { isEqual } from 'lodash-es'
-import { ChevronRight, XCircle } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -115,32 +116,57 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
 }
 
 export function CollapsibleDetails({ title, content }: { title: string; content: string }) {
+  const blocks = fromMarkdown(content).children
+  const isCodeOnly = blocks.length === 1 && blocks[0].type === 'code'
+
   return (
-    <Collapsible>
+    <Collapsible
+      className={cn(
+        'overflow-hidden',
+        'border border-default rounded-lg bg-surface-100',
+        'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2',
+        'has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
+      )}
+    >
       <CollapsibleTrigger
         className={cn(
-          'group',
-          'w-full h-8',
-          'border bg-surface-100 rounded-sm',
-          'px-5',
-          'flex items-center gap-3',
+          'group/trigger',
+          'w-full min-h-8',
+          'px-2 py-1.5',
+          'flex items-center gap-2',
           'text-xs text-foreground-light',
-          'data-open:bg-surface-200',
-          'data-open:rounded-b-none data-open:border-b-0',
-          'transition motion-reduce:duration-1 ease-out'
+          'cursor-pointer hover:bg-surface-200 hover:text-foreground',
+          'focus-visible:outline-none',
+          'transition-[background-color,color] duration-150 ease-out'
         )}
       >
-        <ChevronRight size={12} className="group-data-open:rotate-90 transition-transform" />
         {title}
+        <ChevronRight
+          size={12}
+          strokeWidth={2}
+          aria-hidden
+          className="ms-auto shrink-0 text-foreground-muted group-data-open/trigger:rotate-90 transition-transform duration-200 ease-out motion-reduce:transition-none"
+        />
       </CollapsibleTrigger>
       <CollapsibleContent
         className={cn(
-          'border border-default bg-surface-100 rounded-b',
-          'px-5 py-2',
-          'prose max-w-none text-sm'
+          'overflow-hidden',
+          'data-open:animate-collapsible-down data-closed:animate-collapsible-up',
+          'motion-reduce:animate-none'
         )}
       >
-        <MDXRemoteRefs source={content} />
+        <div
+          className={cn(
+            'border-t border-default',
+            'prose max-w-none text-sm',
+            !isCodeOnly && 'px-4 py-3 [&_:where(p,li)]:text-sm [&_:where(p,li)]:leading-6'
+          )}
+        >
+          <MDXRemoteRefs
+            source={content}
+            codeBlockProps={isCodeOnly ? { compact: true } : undefined}
+          />
+        </div>
       </CollapsibleContent>
     </Collapsible>
   )
@@ -276,43 +302,12 @@ function TypeSubDetails({
 }) {
   return (
     <Collapsible defaultOpen={defaultOpen}>
-      <CollapsibleTrigger
-        className={cn(
-          'group',
-          'w-fit rounded-full',
-          'px-5 py-1',
-          'border border-default',
-          'flex items-center gap-2',
-          'text-left text-sm text-foreground-light',
-          'hover:bg-surface-100',
-          'data-open:w-full',
-          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
-          'transition [transition-property:width,background-color]',
-          className
-        )}
-      >
-        <XCircle
-          size={14}
-          className={cn(
-            'text-foreground-muted',
-            'group-data-closed:rotate-45',
-            'transition-transform'
-          )}
-        />
-        Details
-      </CollapsibleTrigger>
+      <DetailsTrigger label="Details" className={className} />
       <CollapsibleContent>
-        <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+        <ul className="reference-details-panel">
           {details.map(
             (detail: SubContent | CustomTypePropertyType | TypeDetails, index: number) => (
-              <li
-                key={index}
-                className={cn(
-                  'px-5 py-3',
-                  'border-t border-default first:border-t-0',
-                  'flex flex-col gap-3'
-                )}
-              >
+              <li key={index} className="reference-details-item">
                 <ParamOrTypeDetails paramOrType={detail} />
               </li>
             )
@@ -381,6 +376,14 @@ interface ApiOperationRequestBodyDetailsInternalProps extends HTMLAttributes<HTM
   schema: ISchema
 }
 
+// Some specs have allOf/anyOf/oneOf as a single schema object instead of an
+// array. Wrap it so it still renders instead of crashing or disappearing.
+function asSchemaArray(value: unknown): Array<any> {
+  if (Array.isArray(value)) return value
+  if (value && typeof value === 'object') return [value]
+  return []
+}
+
 function ApiOperationRequestBodyDetailsInternal({
   schema,
   ...props
@@ -389,7 +392,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">All of the following:</span>
-        {schema.allOf.map((option, index) => (
+        {asSchemaArray(schema.allOf).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -398,7 +401,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">Any of the following:</span>
-        {schema.anyOf.map((option, index) => (
+        {asSchemaArray(schema.anyOf).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -407,7 +410,7 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">One of the following:</span>
-        {schema.oneOf.map((option, index) => (
+        {asSchemaArray(schema.oneOf).map((option, index) => (
           <ApiSchemaParamSubdetails key={index} schema={option} />
         ))}
       </>
@@ -431,10 +434,11 @@ function ApiOperationRequestBodyDetailsInternal({
     return (
       <>
         <span className="font-mono text-sm font-medium text-foreground">{`Array of ${displayName}`}</span>
-        {!(
-          'type' in schema.items &&
-          ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
-        ) && <ApiSchemaParamSubdetails className="mt-4" schema={schema.items} />}
+        {schema.items &&
+          !(
+            'type' in schema.items &&
+            ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
+          ) && <ApiSchemaParamSubdetails className="mt-4" schema={schema.items} />}
       </>
     )
   } else if (schema.type === 'object') {
@@ -465,17 +469,20 @@ export function ApiSchemaParamSubdetails({
   if (
     !('enum' in schema) &&
     'type' in schema &&
-    (['boolean', 'number', 'integer'].includes(schema.type) ||
+    (schema.type === 'boolean' ||
+      ((schema.type === 'number' || schema.type === 'integer') &&
+        !('minimum' in schema || 'maximum' in schema)) ||
       (schema.type === 'string' &&
         !('minLength' in schema || 'maxLength' in schema || 'pattern' in schema)) ||
       (schema.type === 'array' &&
+        schema.items &&
         'type' in schema.items &&
         ['boolean', 'number', 'integer', 'string', 'file'].includes(schema.items.type)))
   ) {
     return null
   }
 
-  const subContent =
+  const rawSubContent =
     'enum' in schema
       ? schema.enum
       : 'anyOf' in schema
@@ -491,64 +498,53 @@ export function ApiSchemaParamSubdetails({
                     constraint: key,
                     value: schema[key],
                   }))
-              : []
+              : 'type' in schema && (schema.type === 'number' || schema.type === 'integer')
+                ? ['minimum', 'maximum']
+                    .filter((key) => key in schema)
+                    .map((key) => ({
+                      constraint: key,
+                      value: schema[key],
+                    }))
+                : []
+
+  const subContent = asSchemaArray(rawSubContent)
 
   return (
     <Collapsible>
-      <CollapsibleTrigger
-        className={cn(
-          'group',
-          'w-fit rounded-full',
-          'px-5 py-1',
-          'border border-default',
-          'flex items-center gap-2',
-          'text-left text-sm text-foreground-light',
-          'hover:bg-surface-100',
-          'data-open:w-full',
-          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
-          'transition [transition-property:width,background-color]',
-          className
-        )}
-      >
-        <XCircle
-          size={14}
-          className={cn(
-            'text-foreground-muted',
-            'group-data-closed:rotate-45',
-            'transition-transform'
-          )}
-        />
-        {'enum' in schema
-          ? 'Accepted values'
-          : 'allOf' in schema || 'anyOf' in schema || 'oneOf' in schema
-            ? 'Options'
-            : schema.type === 'array'
-              ? 'Items'
-              : schema.type === 'object'
-                ? 'Object schema'
-                : 'Details'}
-      </CollapsibleTrigger>
+      <DetailsTrigger label={schemaDetailsLabel(schema)} className={className} />
       <CollapsibleContent>
         {'type' in schema && schema.type === 'object' ? (
-          <div className={cn('border-b border-x border-fault', 'rounded-b-lg', 'p-5')}>
-            <ApiSchema schema={schema} />
+          <div className="reference-details-panel">
+            <div className="p-5 border-b border-default">
+              <ApiSchema schema={schema} />
+            </div>
+            <ApiOperationRequestBodyDetailsInternal schema={schema} className="px-5" />
+          </div>
+        ) : 'type' in schema &&
+          schema.type === 'array' &&
+          'items' in schema &&
+          schema.items &&
+          typeof schema.items === 'object' &&
+          'type' in schema.items &&
+          schema.items.type === 'object' ? (
+          <div className="reference-details-panel">
+            <div className="p-5 border-b border-default">
+              <ApiSchema schema={schema} />
+            </div>
+            <ApiOperationRequestBodyDetailsInternal schema={schema.items} className="px-5" />
           </div>
         ) : (
-          <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+          <ul className="reference-details-panel">
             {subContent.map((detail: any, index: number) => (
-              <li
-                key={index}
-                className={cn(
-                  'px-5 py-3',
-                  'border-t border-default first:border-t-0',
-                  'flex flex-col gap-3'
-                )}
-              >
+              <li key={index} className="reference-details-item">
                 {'enum' in schema ? (
                   <span className="font-mono text-sm font-medium text-foreground">
                     {String(detail)}
                   </span>
-                ) : 'type' in schema && schema.type === 'string' ? (
+                ) : 'type' in schema &&
+                  (schema.type === 'string' ||
+                    schema.type === 'number' ||
+                    schema.type === 'integer') ? (
                   <span className="text-sm text-foreground flex items-baseline gap-2">
                     <span className="font-mono text-sm font-medium text-foreground">
                       {detail.constraint}
@@ -567,6 +563,15 @@ export function ApiSchemaParamSubdetails({
       </CollapsibleContent>
     </Collapsible>
   )
+}
+
+const schemaDetailsLabel = (schema: ISchema): string => {
+  if ('enum' in schema) return 'Accepted values'
+  if ('allOf' in schema || 'anyOf' in schema || 'oneOf' in schema) return 'Options'
+  if (schema.type === 'array') return 'Items'
+  if (schema.type === 'object') return 'Object schema'
+
+  return 'Details'
 }
 
 /**

@@ -7,6 +7,7 @@ Aaron Byrne
 Adam Mohammed
 Adam Mokan
 Adam Whitlock
+Aditya Maruvada
 AJ Matias
 Akash Manimaran
 Akilesh Sethu
@@ -17,6 +18,7 @@ Alex Hsu
 Alexander Alexandrov
 Alexander Korotkov
 Ali Waseem
+Alice Crosbie
 Allan S
 Amir Issaei
 Amogh Rao
@@ -28,6 +30,7 @@ Angelico de los Reyes
 Anna Baker
 Ant Evans
 Ant Wilson
+Anthony Lio
 Ariuna K
 Arshdeep Singh
 Artur Zakirov
@@ -37,16 +40,18 @@ Barco Fourie
 Barry Roodt
 Beng Eu
 Benjamin Coenen
-Bo Lu
+Beth Long
 Bobbie Soedirgo
 Brad Gyger
 Brendan Stephens
+Brent Graveland
 Brent Newson
 Brian Cullen
 Brent Schroeter
 Bruno Kilian
 Burhan A
 Carel de Waal
+Carson Adam
 Cameron Blackwood
 Cameron Michie
 Cemal Kılıç
@@ -88,6 +93,7 @@ Deji I
 Dennis Senn
 Dimitrios Liappis
 Div Arora
+Dion Zeneli
 Divit D
 Divya Sharma
 Donna Alexandra
@@ -100,7 +106,6 @@ Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
 Evan Cummack
-Eyal Ehrlich
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
@@ -109,6 +114,7 @@ Ferhat Elmas
 Filipe Cabaco
 Firas El Rachidi
 Francesco Sansalvadore
+Franek Richardson
 Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
@@ -132,10 +138,13 @@ Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
 Inian P
+Iryna Deans
 Ivan Vasilov
 Jamie Boyd
+Jake Ng
 Jared Patterson
 Jason Farber
+Jason Voegele
 Jean-Paul Argudo
 Jeff Smick
 Jefferson Venerando
@@ -163,6 +172,7 @@ Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
+Juan Manuel Valenzuela
 Julian Domke
 Julien Goux
 Kai M
@@ -212,7 +222,9 @@ Matthias Luft
 Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
+Michal Olszewski
 Michelle Jubrey
+Mike Podobnik
 Miranda Limonczenko
 Mo Khan
 Monica Khoury
@@ -243,6 +255,8 @@ Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
 Pierre Frances
+Ping-Min Lin
+Prashansa Kulshrestha
 Qiao Han
 Quintin Willison
 Rafael Chacón
@@ -254,6 +268,7 @@ Richard Kasprzak
 Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
+Román Cuellar
 Roman Hernandez
 Ronan Lehane
 Rory Wilding
@@ -261,6 +276,7 @@ Ryan Goulet
 Ryan Senior
 Ruan Maia
 Saba Pochkhua
+Safa Orhan
 Sagar Shedge
 Sam Meech-Ward
 Sam Rome
@@ -270,16 +286,17 @@ Sana Cordeaux
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi
+Sean Geoghegan
 Sean Oliver
 Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shaii O
 Shane Adams
-Shane E
 Shaun Newman
 Shardul Borhade
 Shreekar Shetty
+Simon Tomlinson
 Sreyas Udayavarman
 Stephanie Jackson (stejacks)
 Stephen Morgan
@@ -306,12 +323,15 @@ Tobias Pfeiffer
 Tom Ashley
 Tom G
 Tomás Pozo
+Tomás Torgal
+Tomohiro Mitani
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Utkarash Singh
 Victor Farazdagi
+Warda Bibi
 Warwick Mitchell
 Wen Bo Xie
 Wendie Cheung
@@ -319,6 +339,7 @@ Yara Lacerda
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov
+Zoë Braddock
 Zsolt Pazmandy
 ____________
 

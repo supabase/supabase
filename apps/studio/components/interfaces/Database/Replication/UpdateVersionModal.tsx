@@ -1,11 +1,8 @@
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger, DialogSectionSeparator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { getStatusName } from './Pipeline.utils'
-import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { getRestartRequestStatus, getStatusName } from './Pipeline.utils'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
@@ -14,35 +11,25 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import { type ResponseError } from '@/types'
 
 interface UpdateVersionModalProps {
   visible: boolean
   pipeline?: Pipeline
-  confirmLabel?: string
-  confirmLabelLoading?: string
   onClose: () => void
 }
 
-export const UpdateVersionModal = ({
-  visible,
-  pipeline,
-  confirmLabel,
-  confirmLabelLoading = 'Updating',
-  onClose,
-}: UpdateVersionModalProps) => {
+export const UpdateVersionModal = ({ visible, pipeline, onClose }: UpdateVersionModalProps) => {
   const { ref: projectRef } = useParams()
-  const { setRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus()
 
-  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
-    { projectRef, pipelineId: pipeline?.id },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
+  const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
-  // Treat an unresolved/unknown status as stopped so we don't optimistically claim a restart
-  // for a pipeline whose active state hasn't been confirmed yet.
-  const isStopped = statusName === undefined || statusName === PipelineStatusName.STOPPED
+  const requestStatus = getRestartRequestStatus(statusName)
+  const shouldRestart = requestStatus === PipelineStatusRequestStatus.StopRequested
 
   const { data: versionData, isPending: isLoadingVersion } = useReplicationPipelineVersionQuery({
     projectRef,
@@ -51,30 +38,29 @@ export const UpdateVersionModal = ({
   const currentVersionName = versionData?.version?.name
   const newVersionName = versionData?.new_version?.name
 
-  const { mutateAsync: updatePipelineVersion } = useUpdatePipelineVersionMutation()
+  const { mutateAsync: updatePipelineVersion, isPending: isUpdating } =
+    useUpdatePipelineVersionMutation()
 
   const onConfirmUpdate = async () => {
     if (!projectRef || !pipeline?.id) return
     const versionId = versionData?.new_version?.id
     if (!versionId) return
 
-    // Step 1: Update to the new version
     try {
-      await updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
-    } catch (e) {
-      // 404: default changed; version cache will refresh via mutation onError. Keep dialog open.
-      if ((e as ResponseError)?.code === 404) return
-      // Other errors are already toasted by the mutation; do not double-toast here.
+      await runWithRequestStatus(pipeline.id, requestStatus, () =>
+        updatePipelineVersion({
+          projectRef,
+          pipelineId: pipeline.id,
+          versionId,
+          skipStatusInvalidation: true,
+        })
+      )
+    } catch {
+      // The mutation reports errors and refreshes version info if the default image changed.
       return
     }
 
-    // Step 2: Reflect optimistic restart status (the pipeline restarts automatically on the backend)
-    if (!isStopped) {
-      setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-      toast.success('Pipeline successfully updated and is currently restarting')
-    } else {
-      toast.success('Pipeline successfully updated')
-    }
+    toast.success('Pipeline version updated.')
 
     onClose()
   }
@@ -82,49 +68,40 @@ export const UpdateVersionModal = ({
   return (
     <ConfirmationModal
       size="small"
+      variant={shouldRestart ? 'warning' : 'default'}
       visible={visible}
-      title="Update pipeline image"
-      className="p-0!"
-      confirmLabel={confirmLabel ?? (isStopped ? 'Update image' : 'Update and restart')}
-      confirmLabelLoading={confirmLabelLoading}
+      title="Update available"
+      confirmLabel={shouldRestart ? 'Update and restart' : 'Update version'}
+      confirmLabelLoading="Updating version..."
+      loading={isUpdating}
       onCancel={onClose}
       onConfirm={onConfirmUpdate}
     >
-      <div className="flex flex-col gap-y-3 py-4 px-5">
-        <p className="text-sm text-foreground">
-          A new pipeline image is available with improvements and bug fixes. Proceed to update?
+      <div className="flex flex-col gap-y-3">
+        <p className="text-sm text-foreground-light">
+          {shouldRestart
+            ? 'A newer pipeline version is available with improvements and bug fixes. The pipeline will restart and continue from where it left off.'
+            : 'A newer pipeline version is available with improvements and bug fixes.'}
         </p>
-        {!isStopped && (
-          <p className="text-sm text-foreground-light">
-            The pipeline will automatically restart when updating. Replication will continue from
-            where it left off.
-          </p>
-        )}
+        <div className="overflow-hidden rounded-md border">
+          <table className="w-full text-sm">
+            <tbody aria-live="polite" aria-atomic="true">
+              <tr className="border-b">
+                <td className="px-3 py-2 text-foreground-lighter">Current</td>
+                <td className="px-3 py-2 text-right text-foreground" translate="no">
+                  {isLoadingVersion ? 'Loading…' : (currentVersionName ?? 'Unknown')}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 text-foreground-lighter">New</td>
+                <td className="px-3 py-2 text-right text-foreground" translate="no">
+                  {isLoadingVersion ? 'Loading…' : (newVersionName ?? 'Unknown')}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <DialogSectionSeparator />
-
-      <Collapsible className="px-5 py-3 group">
-        <CollapsibleTrigger className="w-full flex items-center justify-between text-sm text-foreground-light">
-          <p>View version update details</p>
-          <ChevronDown size={14} className="group-data-open:-rotate-180 transition" />
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="flex flex-col gap-y-2 mt-2 pb-2">
-            <div className="text-sm text-foreground prose max-w-full">
-              <p className="text-foreground-light mb-1">Current version:</p>{' '}
-              <code className="text-code-inline">
-                {isLoadingVersion ? 'Loading...' : (currentVersionName ?? 'Unknown')}
-              </code>
-            </div>
-            <div className="text-sm text-foreground prose max-w-full">
-              <p className="text-foreground-light mb-1">New version:</p>{' '}
-              <code className="text-code-inline">
-                {isLoadingVersion ? 'Loading...' : (newVersionName ?? 'Unknown')}
-              </code>
-            </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
     </ConfirmationModal>
   )
 }

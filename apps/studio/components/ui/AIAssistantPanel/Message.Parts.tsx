@@ -1,7 +1,7 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
-import { type ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { cn } from 'ui'
 
 import { AssistantQueryCell } from './AssistantQueryCell'
@@ -10,6 +10,7 @@ import { getManualToolApprovalHandlers } from './Confirm.utils'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
 import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
+import { areMessagePartsEqual } from './Message.Parts.utils'
 import {
   deployEdgeFunctionInputSchema,
   deployEdgeFunctionOutputSchema,
@@ -18,6 +19,7 @@ import {
 import { MessageMarkdown } from './MessageMarkdown'
 import { MessagePartQueryLogs } from './MessagePartQueryLogs'
 import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookProposalRenderer'
+import { NotebookRunRenderer } from './NotebookRunRenderer'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
@@ -219,6 +221,7 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
 const NOTEBOOK_DRAFTING_LABEL: Record<NotebookProposalMode, string> = {
   create: 'Drafting notebook...',
   update: 'Drafting notebook update...',
+  delete: 'Preparing to delete notebook...',
 }
 
 function MessagePartNotebookProposal({
@@ -233,12 +236,7 @@ function MessagePartNotebookProposal({
   const { addToolApprovalResponse } = useMessageActionsContext()
 
   if (state === 'input-streaming') {
-    return (
-      <div className="my-4 mx-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
-        {NOTEBOOK_DRAFTING_LABEL[mode]}
-      </div>
-    )
+    return <ToolDisplayExecuteSqlLoading label={NOTEBOOK_DRAFTING_LABEL[mode]} />
   }
 
   const { confirmState, onApprove, onDeny, denyWithReason } = getManualToolApprovalHandlers({
@@ -261,6 +259,32 @@ function MessagePartNotebookProposal({
   )
 }
 
+function MessagePartNotebookRun({ toolPart }: { toolPart: ToolUIPart }) {
+  const { state, input: submittedInput, output } = toolPart
+  const input = state === 'output-error' ? (submittedInput ?? toolPart.rawInput) : submittedInput
+  const { addToolApprovalResponse } = useMessageActionsContext()
+
+  if (state === 'input-streaming')
+    return <ToolDisplayExecuteSqlLoading label="Preparing notebook..." />
+
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
+
+  return (
+    <NotebookRunRenderer
+      state={state}
+      input={input}
+      output={output}
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    />
+  )
+}
+
 const MessagePart = {
   Text: MessagePartText,
   Dynamic: MessagePartDynamicTool,
@@ -270,7 +294,12 @@ const MessagePart = {
   QueryLogs: MessagePartQueryLogs,
   DeployEdgeFunction: MessagePartDeployEdgeFunction,
   NotebookProposal: MessagePartNotebookProposal,
+  NotebookRun: MessagePartNotebookRun,
 } as const
+
+// Wide parts share the default width for now; the split stays so a part can diverge again.
+const MESSAGE_PART_WIDTH = 'max-w-3xl'
+const WIDE_MESSAGE_PART_WIDTH = 'max-w-3xl'
 
 function MessagePartContainer({
   children,
@@ -279,7 +308,11 @@ function MessagePartContainer({
   children: ReactNode
   isWide?: boolean
 }) {
-  return <div className={cn('w-full mx-auto', isWide ? 'max-w-6xl' : 'max-w-3xl')}>{children}</div>
+  return (
+    <div className={cn('w-full mx-auto', isWide ? WIDE_MESSAGE_PART_WIDTH : MESSAGE_PART_WIDTH)}>
+      {children}
+    </div>
+  )
 }
 
 const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
@@ -287,6 +320,8 @@ const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'tool-query_logs' ||
   part.type === 'tool-create_notebook' ||
   part.type === 'tool-update_notebook' ||
+  part.type === 'tool-delete_notebook' ||
+  part.type === 'tool-run_notebook' ||
   (part.type === 'dynamic-tool' && part.toolName === 'query_logs') ||
   // Unlabelled code fences resolve to SQL in MessageMarkdown, too.
   (part.type === 'text' && /```(?:sql)?(?:\s|$)/i.test(part.text))
@@ -299,57 +334,62 @@ const isCompactToolPart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'tool-get_active_incidents' ||
   part.type === 'tool-load_knowledge'
 
-export function MessagePartSwitcher({
-  part,
-}: {
-  part: NonNullable<VercelMessage['parts']>[number]
-}) {
-  const content = (() => {
-    switch (part.type) {
-      case 'dynamic-tool': {
-        if (part.toolName === 'query_logs') {
+export const MessagePartSwitcher = memo(
+  function MessagePartSwitcher({ part }: { part: NonNullable<VercelMessage['parts']>[number] }) {
+    const content = (() => {
+      switch (part.type) {
+        case 'dynamic-tool': {
+          if (part.toolName === 'query_logs') {
+            return <MessagePart.QueryLogs toolPart={part} />
+          }
+          return <MessagePart.Dynamic toolPart={part} />
+        }
+        case 'tool-list_policies':
+        case 'tool-search_docs':
+        case 'tool-get_active_incidents':
+        case 'tool-load_knowledge': {
+          return <MessagePart.Tool toolPart={part} />
+        }
+        case 'reasoning':
+          return <MessagePart.Reasoning reasoningPart={part} />
+        case 'text':
+          return <MessagePart.Text textPart={part} />
+
+        case 'tool-execute_sql': {
+          return <MessagePart.ExecuteSql toolPart={part} />
+        }
+        case 'tool-query_logs': {
           return <MessagePart.QueryLogs toolPart={part} />
         }
-        return <MessagePart.Dynamic toolPart={part} />
-      }
-      case 'tool-list_policies':
-      case 'tool-search_docs':
-      case 'tool-get_active_incidents':
-      case 'tool-load_knowledge': {
-        return <MessagePart.Tool toolPart={part} />
-      }
-      case 'reasoning':
-        return <MessagePart.Reasoning reasoningPart={part} />
-      case 'text':
-        return <MessagePart.Text textPart={part} />
+        case 'tool-deploy_edge_function': {
+          return <MessagePart.DeployEdgeFunction toolPart={part} />
+        }
+        case 'tool-create_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="create" />
+        }
+        case 'tool-update_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="update" />
+        }
+        case 'tool-delete_notebook': {
+          return <MessagePart.NotebookProposal toolPart={part} mode="delete" />
+        }
+        case 'tool-run_notebook': {
+          return <MessagePart.NotebookRun toolPart={part} />
+        }
 
-      case 'tool-execute_sql': {
-        return <MessagePart.ExecuteSql toolPart={part} />
+        case 'source-url':
+        case 'source-document':
+        case 'file':
+        default:
+          return null
       }
-      case 'tool-query_logs': {
-        return <MessagePart.QueryLogs toolPart={part} />
-      }
-      case 'tool-deploy_edge_function': {
-        return <MessagePart.DeployEdgeFunction toolPart={part} />
-      }
-      case 'tool-create_notebook': {
-        return <MessagePart.NotebookProposal toolPart={part} mode="create" />
-      }
-      case 'tool-update_notebook': {
-        return <MessagePart.NotebookProposal toolPart={part} mode="update" />
-      }
+    })()
 
-      case 'source-url':
-      case 'source-document':
-      case 'file':
-      default:
-        return null
-    }
-  })()
+    if (content === null) return null
+    // Tool rows depend on being direct siblings to share their compact spacing and dividers.
+    if (isCompactToolPart(part)) return content
 
-  if (content === null) return null
-  // Tool rows depend on being direct siblings to share their compact spacing and dividers.
-  if (isCompactToolPart(part)) return content
-
-  return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
-}
+    return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
+  },
+  (previous, next) => areMessagePartsEqual(previous.part, next.part)
+)

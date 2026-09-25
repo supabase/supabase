@@ -1,12 +1,10 @@
-import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, cn } from 'ui'
+import { Button } from 'ui'
 
-import { LastSignInWrapper } from '@/components/interfaces/SignIn/LastSignInWrapper'
 import { SignInForm } from '@/components/interfaces/SignIn/SignInForm'
-import { SignInWithCustom } from '@/components/interfaces/SignIn/SignInWithCustom'
+import { SignInOptions } from '@/components/interfaces/SignIn/SignInOptions'
 import { SignInWithExternalProvider } from '@/components/interfaces/SignIn/SignInWithExternalProvider'
 import { AuthenticationLayout } from '@/components/layouts/AuthenticationLayout'
 import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
@@ -15,7 +13,6 @@ import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProv
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ExternalIdentityProviderConfig } from '@/lib/external-identity-providers'
 import { getSignUpReturnTo } from '@/lib/gotrue'
 import type { NextPageWithLayout } from '@/types'
 
@@ -45,47 +42,6 @@ const SignInPage: NextPageWithLayout = () => {
   const { focusProvider } = useInboundBranding('sign-in')
   const signInProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignIn)
 
-  const renderAuthOptions = (
-    providers: ExternalIdentityProviderConfig[],
-    dividerBgClass = 'bg-studio'
-  ) => {
-    const showOrDivider =
-      (providers.length > 0 || signInWithSsoEnabled || customProviders.length > 0) &&
-      signInWithEmailEnabled
-
-    return (
-      <>
-        {Array.isArray(customProviders) &&
-          customProviders.map((providerName: string) => (
-            <SignInWithCustom key={providerName} providerName={providerName} />
-          ))}
-        {providers.map((provider) => (
-          <SignInWithExternalProvider key={provider.id} provider={provider} />
-        ))}
-        {signInWithSsoEnabled && (
-          <LastSignInWrapper type="sso">
-            <Button asChild block size="large" variant="outline" icon={<Lock />}>
-              <Link href={{ pathname: '/sign-in-sso', query: router.query }}>
-                Continue with SSO
-              </Link>
-            </Button>
-          </LastSignInWrapper>
-        )}
-        {showOrDivider && (
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-strong" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className={cn('px-2 text-sm text-foreground', dividerBgClass)}>or</span>
-            </div>
-          </div>
-        )}
-        {signInWithEmailEnabled && <SignInForm />}
-      </>
-    )
-  }
-
   useEffect(() => {
     if (!IS_PLATFORM) {
       // on selfhosted instance just redirect to projects page
@@ -106,9 +62,13 @@ const SignInPage: NextPageWithLayout = () => {
     return (
       <div className="flex flex-col gap-5">
         <SignInWithExternalProvider provider={focusProvider} />
+
         {hasOtherOptions &&
           (showOtherOptions ? (
-            renderAuthOptions(otherProviders, 'bg-surface-100')
+            <>
+              <SignInOptions providers={otherProviders} dividerBgClass="bg-surface-100" />
+              {signInWithEmailEnabled && <SignInForm />}
+            </>
           ) : (
             <Button
               block
@@ -126,7 +86,10 @@ const SignInPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-5">{renderAuthOptions(signInProviders)}</div>
+      <div className="flex flex-col gap-5">
+        <SignInOptions providers={signInProviders} />
+        {signInWithEmailEnabled && <SignInForm />}
+      </div>
 
       {signUpEnabled && (
         <div className="self-center my-8 text-sm">

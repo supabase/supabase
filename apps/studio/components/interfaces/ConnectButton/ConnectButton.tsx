@@ -41,6 +41,7 @@ export const ConnectButton = ({
       >
         <Button
           variant={buttonVariant}
+          aria-label="Connect"
           disabled={!isActiveHealthy}
           className={cn('rounded-full', className)}
           icon={<Plug className="rotate-90" />}
@@ -50,7 +51,7 @@ export const ConnectButton = ({
             setShowConnect(true)
           }}
         >
-          <span className={cn({ 'sr-only': iconOnly })}>Connect</span>
+          {!iconOnly && <span>Connect</span>}
         </Button>
       </ShortcutTooltip>
     )

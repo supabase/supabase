@@ -2,19 +2,26 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import dayjs from 'dayjs'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import {
+  SELECT_26_STUDIO_DISMISSAL_KEY,
+  useSelect26PromotionActive,
+} from 'ui-patterns/Banners/Select26Promotion'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
-import { isLogsOrObservabilityPath } from './AppBannerWrapper.utils'
+import { isLogsOrObservabilityPath, isOrganizationLandingPath } from './AppBannerWrapper.utils'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerLogsAllDeprecation } from '@/components/ui/BannerStack/Banners/BannerLogsAllDeprecation'
-import { BannerTOSUpdate } from '@/components/ui/BannerStack/Banners/BannerTOSUpdate'
+import { BannerPrivacyPolicyUpdate } from '@/components/ui/BannerStack/Banners/BannerPrivacyPolicyUpdate'
+import { BannerSelect2026 } from '@/components/ui/BannerStack/Banners/BannerSelect2026'
+import {
+  SELECT_26_BANNER_PRIORITY,
+  shouldShowSelect26Banner,
+} from '@/components/ui/BannerStack/Banners/BannerSelect2026.utils'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
-
-const TOSUpdateExpiry = new Date('2026-08-29T00:00:00Z')
 
 // Update this whenever the banner content changes so old client bundles stop
 // displaying the notice after the removal date passes.
@@ -31,25 +38,61 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const pathname = usePathname()
   const track = useTrack()
 
-  const [TOSUpdateAcknowledged, , { isSuccess }] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_UPDATE,
-    false
-  )
+  const [privacyPolicyUpdateAcknowledged, , { isSuccess: isPrivacyPolicyDismissalLoaded }] =
+    useLocalStorageQuery(LOCAL_STORAGE_KEYS.PRIVACY_POLICY_UPDATE, false)
+
+  const [isSelect26BannerDismissed, , { isSuccess: isSelect26DismissalLoaded }] =
+    useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
+  const isSelect26PromotionActive = useSelect26PromotionActive()
 
   useEffect(() => {
-    if (Date.now() >= TOSUpdateExpiry.getTime()) return
+    if (!isSelect26DismissalLoaded) return
 
-    if (isSuccess && !TOSUpdateAcknowledged) {
+    const shouldShow = shouldShowSelect26Banner({
+      isPlatform: IS_PLATFORM,
+      dismissalLoaded: isSelect26DismissalLoaded,
+      isActive: isSelect26PromotionActive,
+      isDismissed: isSelect26BannerDismissed,
+    })
+
+    if (shouldShow) {
       addBanner({
-        id: 'tos-update-banner',
+        id: BANNER_ID.SELECT_26,
         isDismissed: false,
-        content: <BannerTOSUpdate />,
+        content: <BannerSelect2026 />,
+        priority: SELECT_26_BANNER_PRIORITY,
+      })
+    } else {
+      dismissBanner(BANNER_ID.SELECT_26)
+    }
+  }, [
+    isSelect26DismissalLoaded,
+    isSelect26PromotionActive,
+    isSelect26BannerDismissed,
+    addBanner,
+    dismissBanner,
+  ])
+
+  useEffect(() => {
+    if (!isPrivacyPolicyDismissalLoaded || pathname == null) return
+
+    if (isOrganizationLandingPath(pathname) && !privacyPolicyUpdateAcknowledged) {
+      addBanner({
+        id: BANNER_ID.PRIVACY_POLICY_UPDATE,
+        isDismissed: false,
+        content: <BannerPrivacyPolicyUpdate />,
         priority: 0,
       })
     } else {
-      dismissBanner('tos-update-banner')
+      dismissBanner(BANNER_ID.PRIVACY_POLICY_UPDATE)
     }
-  }, [TOSUpdateAcknowledged, isSuccess, addBanner, dismissBanner])
+  }, [
+    pathname,
+    privacyPolicyUpdateAcknowledged,
+    isPrivacyPolicyDismissalLoaded,
+    addBanner,
+    dismissBanner,
+  ])
 
   const [isLogsAllDeprecationDismissed, , { isSuccess: isLogsAllDeprecationLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LOGS_ALL_DEPRECATION_2026_09_23, false)

@@ -20,11 +20,10 @@ export function useOnRowsChange(rows: SupaRow[]) {
     (_rows: SupaRow[], data: RowsChangeData<SupaRow, unknown>) => {
       const rowData = _rows[data.indexes[0]]
       const previousRow = rows.find((x) => x.idx == rowData.idx)
-      const changedColumn = Object.keys(rowData).find(
-        (name) => rowData[name] !== previousRow![name]
-      )
+      if (!previousRow) return
 
-      if (!previousRow || !changedColumn) return
+      const changedColumn = Object.keys(rowData).find((name) => rowData[name] !== previousRow[name])
+      if (!changedColumn) return
 
       const enumArrayColumns = snap.originalTable.columns
         ?.filter((column) => {

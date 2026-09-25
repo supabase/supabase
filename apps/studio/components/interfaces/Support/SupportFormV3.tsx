@@ -251,7 +251,6 @@ export const SupportFormV3 = ({
             orgSlug={selectedOrgSlug}
             projectRef={currentProjectRef}
             subscriptionPlanId={subscriptionPlanId}
-            category={category}
           />
           <CategoryAndSeverityInfo
             form={form}

@@ -40,8 +40,10 @@ export const toolSetValidationSchema = z.record(
     'list_databases',
     'list_notebooks',
     'get_notebook',
+    'run_notebook',
     'create_notebook',
     'update_notebook',
+    'delete_notebook',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
@@ -96,8 +98,10 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_databases: TOOL_CATEGORIES.SCHEMA,
   list_notebooks: TOOL_CATEGORIES.SCHEMA,
   get_notebook: TOOL_CATEGORIES.SCHEMA,
+  run_notebook: TOOL_CATEGORIES.SCHEMA,
   create_notebook: TOOL_CATEGORIES.SCHEMA,
   update_notebook: TOOL_CATEGORIES.SCHEMA,
+  delete_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,
@@ -158,13 +162,16 @@ function isToolAllowed(toolName: string, aiOptInLevel: AiOptInLevel): boolean {
 }
 
 /**
- * Create a privacy message tool that explains why the tool is not available
+ * Replaces a blocked tool with a stub that explains the opt-in instead of executing.
+ *
+ * Names no provider. Studio switches inference providers, and a stale name here becomes a
+ * false privacy claim shown to users.
  */
 export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
   const privacyMessage =
-    "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. Supabase Assistant uses Amazon Bedrock, which does not store or log your prompts and completions, use them to train AWS models, or distribute them to third parties. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to Bedrock solely to generate responses."
+    "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to third-party AI providers solely to generate responses."
   const condensedPrivacyMessage =
-    'Requires opting in to sending data to Bedrock which does not store, train on, or distribute it. You can opt in via organization settings.'
+    'Requires opting in to sharing data with third-party AI providers. You can opt in via organization settings.'
   const toolDescription = toolInstance.description
   const description =
     typeof toolDescription === 'function'
@@ -176,6 +183,9 @@ export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
     ...toolInstance,
     description,
     execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
+    // The original transformer expects the original tool's output shape. The privacy
+    // stub returns only a status message, so retaining it can crash the response stream.
+    toModelOutput: undefined,
   }
 }
 

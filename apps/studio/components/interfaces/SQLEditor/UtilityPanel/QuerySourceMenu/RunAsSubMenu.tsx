@@ -34,7 +34,6 @@ export const RunAsSubMenu = (props: RunAsSubMenuProps) => {
       dropdown's typeahead. */}
       <DropdownMenuSubContent className="w-80 p-0" onKeyDown={(e) => e.stopPropagation()}>
         <RoleImpersonationSelectorInterface
-          orientation="vertical"
           header="Run SQL query as a role"
           serviceRoleLabel={SERVICE_ROLE_LABEL}
           state={state}

@@ -9,7 +9,12 @@ The shorthands below are composed of core [Tailwind utility classes](../docs/tai
 
 ## Shorthands
 
-| Value              | Usage                                                                        |
-| ------------------ | ---------------------------------------------------------------------------- |
-| `text-code-inline` | Apply to a `code` element for inline code or similar custom inline content   |
-| `text-brand-link`  | Supabase green text that meets contrast requirements in light and dark modes |
+| Value              | Usage                                                                      |
+| ------------------ | -------------------------------------------------------------------------- |
+| `text-code-inline` | Apply to a `code` element for inline code or similar custom inline content |
+| `text-primary`     | Accessible Supabase green for readable branded text                        |
+
+`text-primary` meets WCAG AA for normal text on app surfaces: darkened in light mode,
+bright in dark mode. Focus rings and selected controls derive their brighter fill from
+the same primary hue. See [Primary and brand colors](../docs/color-usage#primary-and-brand-colors) for when
+to use each green.

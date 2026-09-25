@@ -47,12 +47,7 @@ export default function PricingContent() {
               Compare Plans
             </Button>
           </a>
-          <Button
-            size="tiny"
-            variant="default"
-            asChild
-            iconRight={<ArrowUpRight className="w-4" />}
-          >
+          <Button size="tiny" asChild iconRight={<ArrowUpRight className="w-4" />}>
             <a
               href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
               target="_blank"
@@ -77,7 +72,7 @@ export default function PricingContent() {
           <div className="flex items-center justify-center gap-1">
             <span className="py-1 px-3 bg-surface-100 flex items-center gap-1 border rounded-full text-xs text-foreground-lighter">
               What is &ldquo;compute&rdquo;?
-              <InfoTooltip side="bottom" className="max-w-[280px]">
+              <InfoTooltip side="bottom" className="max-w-[280px]" label="About compute">
                 Think of compute as the computer your database runs on. As your app grows, you scale
                 CPU and memory to handle more traffic and data.
               </InfoTooltip>

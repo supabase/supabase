@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import { Alert } from 'ui/src/components/shadcn/ui/alert'
-import { Button } from 'ui/src/components/shadcn/ui/button'
 import {
+  Alert,
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'ui/src/components/shadcn/ui/dialog'
+} from 'ui'
 
 import { Input } from '../DataInputs/Input'
 

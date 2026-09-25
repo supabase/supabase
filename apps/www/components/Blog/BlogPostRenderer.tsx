@@ -109,7 +109,7 @@ const BlogPostRenderer = async ({
            */}
           <div className="flex justify-center lg:grid grid-cols-12 gap-x-8">
             {/* Main container — indented 1 col at lg, alongside back button at xl */}
-            <div className="max-w-[65ch] lg:max-w-none col-span-12 lg:col-start-2 lg:col-span-10 xl:col-start-2 xl:col-span-11">
+            <div className="min-w-0 w-full max-w-[65ch] lg:max-w-none col-span-12 lg:col-start-2 lg:col-span-10 xl:col-start-2 xl:col-span-11">
               {/* Article header — spans the full main container width */}
               <div className="py-8 md:py-12 space-y-4">
                 <div className="flex items-center gap-1.5 text-foreground-lighter text-sm">
@@ -202,7 +202,7 @@ const BlogPostRenderer = async ({
                   )}
 
                   <article>
-                    <div className="prose prose-docs">
+                    <div className="prose prose-docs wrap-break-word">
                       {blogMetaData.youtubeHero ? (
                         <iframe
                           title="YouTube video player"

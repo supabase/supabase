@@ -9,10 +9,10 @@ conflict, follow `CONTRIBUTING.md`. Match literal code, API names, UI labels, an
 third-party product names even when they differ from this guidance, and format them
 as code or UI text as appropriate.
 
-Many unambiguous rules in this list are checked by `supa-mdx-lint`. Run
-`pnpm lint:mdx` from `apps/docs` after editing MDX. A lint warning still requires
-judgment: rewrite the sentence instead of applying a replacement that changes its
-meaning.
+The `/write-the-docs` and `/edit-the-docs` agent skills apply this list as you draft.
+
+Every rule here still requires judgment: rewrite the sentence instead of applying a
+replacement that changes its meaning.
 
 ## Numbers and symbols
 
@@ -20,8 +20,8 @@ meaning.
 
 Don't use `+` to mean _or later_.
 
-- Recommended: Postgres 15 or later
-- Not recommended: Postgres 15+
+- **Recommended**: Postgres 15 or later
+- **Not recommended**: Postgres 15+
 
 ### `&`
 
@@ -38,8 +38,6 @@ abbreviations such as API, CPU, HTML, HTTP, or SQL unless the audience needs it.
 
 Use `for example` instead of `e.g.` when practical. If space is constrained, write
 `e.g.` with both periods. Use `that is` instead of `i.e.`.
-
-The linter warns about malformed forms of `e.g.` and about `i.e.`.
 
 ### abort
 
@@ -71,11 +69,11 @@ is familiar with the term.
 Use _allowlist_ and _denylist_ as nouns. Prefer a precise verb that describes the
 action instead of using either term as a verb.
 
-- Recommended: Allow requests from the IP address.
-- Recommended: Add the IP address to the allowlist.
-- Not recommended: Allowlist the IP address.
+- **Recommended**: Allow requests from the IP address.
+- **Recommended**: Add the IP address to the allowlist.
+- **Not recommended**: Allowlist the IP address.
 
-Don't use _blacklist_ or _whitelist_. The linter reports these terms as errors.
+Don't use _blacklist_ or _whitelist_.
 When a literal code item contains one of them, format the item as code and explain
 what it does.
 
@@ -83,9 +81,9 @@ what it does.
 
 Use _lets you_, or make the reader the subject of the sentence.
 
-- Recommended: You can query the table.
-- Recommended: The API lets you query the table.
-- Not recommended: The API allows you to query the table.
+- **Recommended**: You can query the table.
+- **Recommended**: The API lets you query the table.
+- **Not recommended**: The API allows you to query the table.
 
 ### alpha and beta
 
@@ -195,7 +193,7 @@ In API documentation, a _client_ is usually an app that sends requests. Don't us
 _client_ as an abbreviation for _client library_ when that could be ambiguous.
 
 Use _concurrent connections_, not _concurrent clients_, when discussing database
-connections. The linter checks this usage.
+connections.
 
 ### codebase
 
@@ -265,9 +263,9 @@ _disabled_ to mean that something is broken or unavailable.
 
 _Display_ is a transitive verb and requires an object.
 
-- Recommended: The Dashboard displays the query results.
-- Recommended: The query results appear.
-- Not recommended: The query results display.
+- **Recommended**: The Dashboard displays the query results.
+- **Recommended**: The query results appear.
+- **Not recommended**: The query results display.
 
 ### docs
 
@@ -291,8 +289,8 @@ context-appropriate term.
 ### easy, quick, and simple
 
 Avoid claiming that a task is _easy_, _quick_, or _simple_. These words can be
-subjective and usually add no information. The linter warns about _easy_,
-_easily_, _quickly_, _simple_, and _simply_.
+subjective and usually add no information. Don't use _easy_, _easily_, _quickly_,
+_simple_, or _simply_.
 
 ### email
 
@@ -350,7 +348,7 @@ Users _fill in_ individual fields and _fill out_ an entire form.
 ### first person
 
 Address the reader as _you_. Don't use singular first person (_I_, _me_, _my_, or
-_mine_); the linter reports it as an error.
+_mine_).
 
 Use _we_ only when it clearly refers to Supabase, not when it means the writer and
 reader together.
@@ -400,8 +398,8 @@ is clearer.
 
 Use _impact_ as a noun. Prefer _affect_ as the verb.
 
-- Recommended: The change affects performance.
-- Not recommended: The change impacts performance.
+- **Recommended**: The change affects performance.
+- **Not recommended**: The change impacts performance.
 
 ### index
 
@@ -415,8 +413,7 @@ operation also performs substantial processing.
 
 ### in order to
 
-Use _to_ unless _in order to_ is necessary to prevent ambiguity. The linter warns
-about _in order to_.
+Use _to_ unless _in order to_ is necessary to prevent ambiguity.
 
 ### inline
 
@@ -431,7 +428,7 @@ Use lowercase _internet_ except at the beginning of a sentence.
 ### just
 
 Remove _just_ when it is filler. If it means _only_ or _previously_, use the more
-specific word. The linter warns about _just_.
+specific word.
 
 ## K
 
@@ -455,8 +452,8 @@ literal commands, signals, and established technical operations.
 
 Use _later_ and _earlier_ for version ranges.
 
-- Recommended: Version 2.2 or later
-- Not recommended: Version 2.2 or higher
+- **Recommended**: Version 2.2 or later
+- **Not recommended**: Version 2.2 or higher
 
 ### latest, new, and soon
 
@@ -465,7 +462,7 @@ specific product state instead.
 
 ### leverage
 
-Use _use_ or a more specific verb. The linter warns about _leverage_.
+Use _use_ or a more specific verb instead of _leverage_.
 
 ### lifecycle
 
@@ -473,18 +470,14 @@ Write _lifecycle_, not _life cycle_ or _life-cycle_.
 
 ### login and log in
 
-Use _login_ as a noun or adjective and _log in_ as a verb. Follow the terminology
-in the product UI when it uses _sign in_.
-
-- Recommended: Open the login page, and then log in.
-- Not recommended: Login to the Dashboard.
+Don't use _login_ or _log in_ in prose. Use _sign in_. See
+[sign in and sign-in](#sign-in-and-sign-in).
 
 ## M
 
 ### marketing language
 
-Describe measurable behavior instead of making promotional claims. The linter
-warns about:
+Describe measurable behavior instead of making promotional claims. Don't use:
 
 - _best in class_ and _best-in-class_
 - _cutting edge_ and _cutting-edge_
@@ -527,6 +520,29 @@ Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation
 Use a more precise term when possible, such as _built-in_,
 _platform-specific_, or _compiled_. Don't use _native_ to describe people.
 
+### numbers
+
+Spell out zero through nine. Use numerals for 10 and greater. Use numerals
+regardless for versions, technical quantities, step and page numbers, prices, and
+percentages, and throughout a sentence that mixes a number under 10 with a larger
+one.
+
+- **Recommended**: four options, 24 hours, version 3, 128 bits, step 2, 40%
+- **Not recommended**: 4 options, twenty-four hours
+
+Spell out ordinals. Group digits in large numbers with commas, counting left from
+the decimal point. Write fractions as decimals where practical. Use a hyphen with
+no spaces for a range.
+
+- **Recommended**: first, forty-third, 1,532,784 bytes, 0.75, 2012-2016
+- **Not recommended**: 1st, 1532784 bytes, three-quarters, 2012 - 2016
+
+Omit a count of steps or items unless the count helps the reader plan. Name the
+action or link the heading rather than citing a step or section number.
+
+- **Recommended**: To connect to your database:
+- **Recommended**: After you create the project, copy the project URL.
+
 ### numbers in product versions
 
 Write an explicit comparison, such as _version 3.0 or later_. Don't use _newer_,
@@ -540,8 +556,7 @@ Write _OAuth 2.0_, not _OAuth2_, _OAuth 2_, or _Oauth_.
 
 ### obviously and of course
 
-Remove these phrases. They can sound dismissive and don't help the reader. The
-linter warns about both.
+Remove these phrases. They can sound dismissive and don't help the reader.
 
 ### once
 
@@ -562,9 +577,9 @@ memory_, or _handles more concurrent connections_.
 
 Avoid using _persist_ as a transitive verb.
 
-- Recommended: Store the session.
-- Recommended: Make the session persistent.
-- Not recommended: Persist the session.
+- **Recommended**: Store the session.
+- **Recommended**: Make the session persistent.
+- **Not recommended**: Persist the session.
 
 ### plain text and plaintext
 
@@ -574,7 +589,7 @@ Use _plain text_ in general contexts. Use _plaintext_ in cryptography.
 
 Don't use _please_ in normal instructions. Use it only when asking permission,
 apologizing for an inconvenience, or requesting an action that primarily benefits
-Supabase. The linter warns about _please_.
+Supabase.
 
 ### plugin
 
@@ -587,17 +602,16 @@ _popup_ or _pop-up_ as a generic noun.
 
 ### Postgres
 
-Use _Postgres_, not _PostgreSQL_, outside code and literal third-party names. The
-linter checks this usage.
+Use _Postgres_, not _PostgreSQL_, outside code and literal third-party names.
 
 ### powered by
 
-Prefer _with_, _by_, or _through_, depending on the relationship. The linter warns
-about _powered by_.
+Don't use _powered by_. Prefer _with_, _by_, or _through_, depending on the
+relationship.
 
 ### prior to and subsequent to
 
-Use _before_ and _after_. The linter checks both phrases.
+Use _before_ and _after_.
 
 ## R
 
@@ -652,18 +666,28 @@ risk or control.
 
 Use _setup_ as a noun or adjective and _set up_ as a verb.
 
-- Recommended: Complete the setup to set up authentication.
-- Not recommended: Setup authentication.
+- **Recommended**: Complete the setup to set up authentication.
+- **Not recommended**: Setup authentication.
+
+### sign in and sign-in
+
+Use _sign in_, _sign out_, and _sign up_ as verbs. Use the hyphenated forms
+_sign-in_, _sign-out_, and _sign-up_ as nouns or adjectives. Match the product UI
+labels **Sign in**, **Sign out**, and **Sign up**.
+
+Keep _login_, _log in_, _logout_, _log out_, and `logOut` when quoting
+third-party UI or when they are part of code, routes, URL slugs, CLI commands, or
+established feature names such as _social login_.
 
 ### singular they
 
 Use _they_, _them_, and _their_ as gender-neutral singular pronouns. Don't use
-_s/he_, _he/she_, _(s)he_, or _him/her_. The linter reports these forms as errors.
+_s/he_, _he/she_, _(s)he_, or _him/her_.
 
 ### slang abbreviations
 
-Don't use internet slang in documentation. The linter warns about _tl;dr_, _ymmv_,
-_rtfm_, _imo_, and _fwiw_.
+Don't use internet slang in documentation, such as _tl;dr_, _ymmv_, _rtfm_, _imo_,
+or _fwiw_.
 
 ### spin up
 
@@ -678,9 +702,9 @@ examples unless uppercase is required by the surrounding convention.
 
 Don't use _SSH_ or `ssh` as a verb.
 
-- Recommended: Connect to the server by using SSH.
-- Recommended: Use the `ssh` command.
-- Not recommended: SSH into the server.
+- **Recommended**: Connect to the server by using SSH.
+- **Recommended**: Use the `ssh` command.
+- **Not recommended**: SSH into the server.
 
 ### startup and start up
 
@@ -716,8 +740,8 @@ either form with `3rd`.
 
 Add a noun after _this_ or _that_ when the reference could be unclear.
 
-- Recommended: This setting controls connection pooling.
-- Not recommended: This controls connection pooling.
+- **Recommended**: This setting controls connection pooling.
+- **Not recommended**: This controls connection pooling.
 
 ### timeout and time out
 
@@ -760,14 +784,14 @@ the reader is building or administering.
 
 ### utilize
 
-Use _use_. Use _utilization_ only when referring to the measured proportion of a
-resource in use. The linter warns about forms of _utilize_ and _utilise_.
+Use _use_, not _utilize_ or _utilise_. Use _utilization_ only when referring to the
+measured proportion of a resource in use.
 
 ## V
 
 ### vague verbs
 
-Describe the concrete action. The linter suggests:
+Describe the concrete action:
 
 - _view and resolve errors_ instead of _handle errors_
 - _create, edit, or delete tables_ instead of _manage tables_
@@ -775,6 +799,18 @@ Describe the concrete action. The linter suggests:
 
 Choose a different precise verb if the suggested replacement doesn't match the
 actual operation.
+
+### vCPU
+
+Use _vCPU_ (plural _vCPUs_) for the CPU resources of Supabase compute sizes.
+Don't describe Supabase compute in _cores_.
+
+_Core_ remains correct for hardware the reader owns or manages, such as
+self-hosting requirements or a migration VM, and in general CPU discussion.
+
+- Recommended: The 16XL compute size has 64 vCPUs.
+- Recommended: Run the migration from a VM with 8 CPU cores.
+- Not recommended: The 16XL compute size has 64 cores.
 
 ### versus
 
@@ -796,7 +832,7 @@ _We_ is acceptable when it unambiguously means Supabase.
 ### while
 
 Use _while_ for events that occur at the same time. Use _although_ or _whereas_
-for contrast. Use _while_, not _whilst_; the linter checks _whilst_.
+for contrast. Use _while_, not _whilst_.
 
 ### will and would
 
@@ -817,50 +853,49 @@ scope on first use.
 Address the reader as _you_. Use _user_ only for a person who uses the software
 that the reader is developing or administering.
 
-## Lint-enforced phrase groups
+## Phrase groups
 
-The alphabetical entries explain the intent behind the rules. This section mirrors
-the exact terminology checks configured in
-`supa-mdx-lint/Rule004ExcludeWords`. Update this section when those rules change.
+The alphabetical entries explain the intent behind each rule. This section collects
+the full term lists in one place, grouped by the problem they cause.
 
 ### Filler
 
-The linter warns about _actually_, _easily_, _easy_, _just_, _let's_,
-_obviously_, _of course_, _please_, _quickly_, _simple_, _simply_, and
-_that's it_. Remove the term or state the intended meaning directly.
+Don't use _actually_, _easily_, _easy_, _just_, _let's_, _obviously_,
+_of course_, _please_, _quickly_, _simple_, _simply_, or _that's it_. Remove the term or state the intended meaning directly.
+_please_ is the exception: keep it when asking permission, apologizing for an
+inconvenience, or requesting an action that primarily benefits Supabase.
 
 ### Marketing language
 
-The linter warns about _best in class_, _best-in-class_, _cutting edge_,
+Don't use _best in class_, _best-in-class_, _cutting edge_,
 _cutting-edge_, _effortlessly_, _game changer_, _game-changer_, _hassle free_,
-_hassle-free_, _powerful_, and _seamlessly_. Describe specific behavior or
+_hassle-free_, _powerful_, or _seamlessly_. Describe specific behavior or
 measurable results instead.
 
 ### Vague verbs
 
-The linter suggests _view and resolve errors_ for _handle errors_, _create, edit,
-or delete tables_ for _manage tables_, and _query and update data_ for _work with
-data_. Use a different precise replacement when the suggestion doesn't match the
-operation.
+Use _view and resolve errors_ for _handle errors_, _create, edit, or delete tables_
+for _manage tables_, and _query and update data_ for _work with data_. Use a
+different precise replacement when none of these match the operation.
 
 ### Apologies
 
-The linter warns about _oops_ and _sorry_. State what happened directly. Apologize
+Don't use _oops_ or _sorry_. State what happened directly. Apologize
 only when an apology is genuinely useful to the reader.
 
 ### First person
 
-The linter reports _I_, _I'm_, _me_, _my_, and _mine_ as errors. Address the
+Don't use _I_, _I'm_, _me_, _my_, or _mine_. Address the
 reader as _you_ and use an explicit noun for other actors.
 
 ### Gender-neutral pronouns
 
-The linter reports _s/he_, _he/she_, _(s)he_, and _him/her_ as errors. Use the
+Don't use _s/he_, _he/she_, _(s)he_, or _him/her_. Use the
 singular _they_ or rewrite the sentence.
 
 ### Inclusive language
 
-The linter reports these terms as errors:
+Don't use these terms:
 
 - _mankind_: use _humankind_ or _people_
 - _manmade_: use _manufactured_, _artificial_, or _synthetic_
@@ -870,18 +905,18 @@ The linter reports these terms as errors:
 
 ### Abbreviations
 
-The linter corrects _eg._ and _eg_ to _e.g._. It replaces _i.e._, _ie._, and
+Write _e.g._ with both periods, not _eg._ or _eg_. Replace _i.e._, _ie._, and
 _ie_ with _that is_. Prefer _for example_ and _that is_ in prose when space
 allows.
 
 ### Powered by
 
-The linter warns about _powered by_. Use _with_, _by_, or _through_, depending on
-the relationship.
+Don't use _powered by_. Use _with_, _by_, or _through_, depending on the
+relationship.
 
 ### Preferred usage
 
-The linter suggests:
+Use:
 
 - _Postgres_ for _PostgreSQL_
 - _concurrent connections_ for _concurrent clients_
@@ -891,7 +926,7 @@ The linter suggests:
 
 ### Direct, concise language
 
-The linter warns about these phrases:
+Don't use these phrases:
 
 - _aforementioned_: name the item
 - _amongst_: use _among_
@@ -906,7 +941,7 @@ The linter warns about these phrases:
 
 ### Internet slang
 
-The linter warns about _tl;dr_, _ymmv_, _rtfm_, _imo_, and _fwiw_. Write out the
+Don't use _tl;dr_, _ymmv_, _rtfm_, _imo_, or _fwiw_. Write out the
 meaning or remove the aside.
 
 ## Attribution

@@ -2,11 +2,10 @@ import type { QueryClient } from '@tanstack/react-query'
 import type { Snapshot } from 'valtio'
 
 import { contentKeys } from '@/data/content/keys'
+import { removeNotebookDraft } from '@/state/notebooks/notebook-drafts'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { StateNotebook } from '@/state/notebooks/types'
 import { hasUnsavedChanges } from '@/state/sql-editor/sql-editor-lifecycle'
-
-export type NotebookCacheEvictionMode = 'refresh' | 'remove'
 
 /**
  * Whether a notebook has edits worth discarding on close: anything not yet
@@ -25,35 +24,27 @@ export function hasDiscardableChanges(
 
 /**
  * Evicts a notebook from the React Query cache and the Valtio store together.
- * Applies to a persisted notebook (always safe to refetch) and to a dirty
- * unsaved notebook (safe once the caller has confirmed discarding it).
+ * Callers are responsible for confirming before discarding unsaved edits.
  *
- * @returns A boolean indicating whether the notebook was successfully evicted
- *          from the cache.
+ * Removes the query entry outright rather than invalidating it: a mounted
+ * `useNotebookQuery` observer would otherwise read the stale cached value
+ * synchronously, before its refetch lands, and `notebooksState.setNotebook`'s
+ * merge guard would treat that stale merge as already-loaded and drop the
+ * real update.
+ *
  */
-export async function evictNotebookFromCaches({
+export function evictNotebookFromCaches({
   queryClient,
   projectRef,
   id,
-  mode,
 }: {
   queryClient: QueryClient
   projectRef: string
   id: string
-  mode: NotebookCacheEvictionMode
-}): Promise<boolean> {
-  const stateNotebook = notebooksState.notebooks[id]
-  const canEvict = stateNotebook?.status === 'saved' || hasDiscardableChanges(stateNotebook)
-  if (!canEvict) return false
-
+}): boolean {
   notebooksState.removeNotebook({ id })
-
-  const queryKey = contentKeys.resource(projectRef, id)
-  if (mode === 'remove') {
-    queryClient.removeQueries({ queryKey })
-  } else {
-    await queryClient.invalidateQueries({ queryKey })
-  }
+  queryClient.removeQueries({ queryKey: contentKeys.resource(projectRef, id) })
+  removeNotebookDraft({ projectRef, id })
 
   return true
 }

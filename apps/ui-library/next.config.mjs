@@ -1,5 +1,3 @@
-import { withContentlayer } from 'next-contentlayer2'
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
@@ -11,6 +9,10 @@ const nextConfig = {
         as: '*.js',
       },
     },
+  },
+  outputFileTracingIncludes: {
+    '/api/docs-md/**/*': ['./public/markdown/docs/**/*'],
+    '/api/index-md/**/*': ['./public/markdown/index.md'],
   },
   async redirects() {
     return [
@@ -34,4 +36,4 @@ const nextConfig = {
   },
 }
 
-export default withContentlayer(nextConfig)
+export default nextConfig

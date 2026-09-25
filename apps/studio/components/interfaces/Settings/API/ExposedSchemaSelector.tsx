@@ -101,7 +101,6 @@ export const ExposedSchemaSelector = ({
       <PopoverTrigger asChild>
         <Button
           size="small"
-          variant="default"
           className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
@@ -157,7 +156,7 @@ export const ExposedSchemaSelector = ({
                       >
                         <div className="w-full flex flex-col">
                           <div className="w-full flex items-center gap-x-2">
-                            <Check size={16} className="text-brand shrink-0" />
+                            <Check size={16} className="text-primary shrink-0" />
                             <span className="truncate">{schema}</span>
                           </div>
                           {internalSchemasCannotExpose.has(schema) ? (
@@ -188,7 +187,7 @@ export const ExposedSchemaSelector = ({
                           <div
                             className={cn('w-full flex items-center gap-x-2', !isExposed && 'ml-6')}
                           >
-                            {isExposed && <Check size={16} className="text-brand shrink-0" />}
+                            {isExposed && <Check size={16} className="text-primary shrink-0" />}
                             <span className="truncate">{schema.name}</span>
                           </div>
                         </CommandItem>

@@ -29,6 +29,25 @@ describe('Confirm', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('keeps the confirm and cancel buttons visible but disabled while loading after approval', () => {
+    render(
+      <Confirm
+        state="approval-responded"
+        message="Run query"
+        confirmLabel="Confirm"
+        confirmLabelLoading="Running..."
+      >
+        <div>Query preview</div>
+      </Confirm>
+    )
+
+    const cancelButton = screen.getByRole('button', { name: 'Skip' })
+    const confirmButton = screen.getByRole('button', { name: 'Running...' })
+
+    expect(cancelButton).toBeDisabled()
+    expect(confirmButton).toBeDisabled()
+  })
+
   it('announces outcome updates in the existing status region', () => {
     const { rerender } = render(
       <Confirm state="approval-requested" message="Run query" successMessage="Query executed">
