@@ -35,12 +35,15 @@ export function useFeaturePreviewCommands() {
   const setPage = useSetPage()
   const setIsOpen = useSetCommandMenuOpen()
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
-  const { selectFeaturePreview, toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const { selectFeaturePreview } = useFeaturePreviewModal()
   const track = useTrack()
 
   const openFeaturePreviewDetails = (key: string) => {
+    // selectFeaturePreview(key) alone is enough to open the modal to `key`
+    // (it sets the URL param the modal reads). Don't also call
+    // toggleFeaturePreviewModal(true) here — it re-selects whatever preview
+    // was selected *before* this render, overwriting `key` with a stale value.
     selectFeaturePreview(key)
-    toggleFeaturePreviewModal(true)
     setIsOpen(false)
   }
 
@@ -113,14 +116,33 @@ export function useFeaturePreviewCommands() {
           id: `feature-previews-${category ?? 'others'}`,
           name: category ?? 'Others',
           commands: previews.flatMap((preview) => [
+            // Forced previews can't be toggled off (toggleFeaturePreview
+            // early-returns for them) — the command menu has no "disabled"
+            // state, so a toggle command here would look clickable but
+            // silently do nothing. Only non-forced previews get one.
+            ...(preview.isForced
+              ? []
+              : [
+                  {
+                    id: `feature-preview-${preview.key}`,
+                    name: preview.name,
+                    value: `${preview.name}, Feature preview, Toggle ${preview.name}`,
+                    action: () => toggleFeaturePreview(preview),
+                    icon: () => (flagsRef.current[preview.key] ? <Check /> : <Square />),
+                    badge: preview.isNew ? () => <Badge variant="success">New</Badge> : undefined,
+                  },
+                ]),
             {
-              id: `feature-preview-${preview.key}`,
-              name: preview.name,
+              id: `feature-preview-${preview.key}-details`,
+              name: `${preview.name}: View details`,
               value: preview.isForced
-                ? `${preview.name}, Feature preview, now the default, can't be turned off`
-                : `${preview.name}, Feature preview, Toggle ${preview.name}`,
-              action: () => toggleFeaturePreview(preview),
-              icon: () => (flagsRef.current[preview.key] ? <Check /> : <Square />),
+                ? `${preview.name}, Feature preview, now the default, can't be turned off, About, Learn more, Description, Feedback, Discussion`
+                : `${preview.name}, About, Learn more, Description, Feedback, Discussion`,
+              action: () => openFeaturePreviewDetails(preview.key),
+              icon: () => <ExternalLink />,
+              // Forced previews have no toggle command to show the "Default"
+              // badge on, so show it here instead, and surface this command
+              // by default rather than hiding it behind search.
               badge: preview.isForced
                 ? () => (
                     <Badge
@@ -130,17 +152,8 @@ export function useFeaturePreviewCommands() {
                       Default
                     </Badge>
                   )
-                : preview.isNew
-                  ? () => <Badge variant="success">New</Badge>
-                  : undefined,
-            },
-            {
-              id: `feature-preview-${preview.key}-details`,
-              name: `${preview.name}: View details`,
-              value: `${preview.name}, About, Learn more, Description, Feedback, Discussion`,
-              action: () => openFeaturePreviewDetails(preview.key),
-              icon: () => <ExternalLink />,
-              defaultHidden: true,
+                : undefined,
+              defaultHidden: !preview.isForced,
             },
           ]),
         })),
