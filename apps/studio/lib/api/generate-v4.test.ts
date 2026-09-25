@@ -133,7 +133,7 @@ test('generateV4 flags a response the deadline stopped and releases the request'
         }),
       }) as unknown as ReturnType<typeof streamText>
   )
-  const { mockRes, callGenerateV4 } = createMocks()
+  const { callGenerateV4 } = createMocks()
 
   await callGenerateV4()
   const chunks = await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value
