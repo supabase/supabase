@@ -218,7 +218,7 @@ describe('assistant feed rendering', () => {
       state: 'input-streaming' as const,
     }
     const message: UIMessage = { id: 'tool-1', role: 'assistant', parts: [tool] }
-    const { rerender } = render(<FeedMessage message={message} />)
+    const { rerender } = render(<FeedMessage message={message} isLastMessage />)
     expect(screen.getByText('Writing SQL...')).toBeInTheDocument()
 
     Object.assign(tool, {
@@ -226,7 +226,7 @@ describe('assistant feed rendering', () => {
       input: { sql: 'select 1' },
       output: [{ value: 1 }],
     })
-    rerender(<FeedMessage message={structuredClone(message)} isLoading={false} />)
+    rerender(<FeedMessage message={structuredClone(message)} isLoading={false} isLastMessage />)
 
     expect(screen.queryByText('Writing SQL...')).not.toBeInTheDocument()
     expect(screen.getByText('[{"value":1}]')).toBeInTheDocument()

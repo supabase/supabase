@@ -38,7 +38,11 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import type { AssistantMessageMetadata } from '@/lib/ai/assistant-message-metadata'
+import {
+  isTimedOutMessage,
+  type AssistantMessageMetadata,
+} from '@/lib/ai/assistant-message-metadata'
+import { ASSISTANT_TIMEOUT_MESSAGE } from '@/lib/ai/assistant-timeout'
 import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import { IS_PLATFORM } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
@@ -297,6 +301,11 @@ export const AssistantChat = ({
   const editedMessageIndex = editingMessageId
     ? chatMessages.findIndex((message) => message.id === editingMessageId)
     : -1
+
+  const isTimedOut = !error && !isChatLoading && isTimedOutMessage(chatMessages.at(-1))
+  let displayError = IS_PLATFORM ? ASSISTANT_ERRORS['default'] : error
+  if (isContextExceededError) displayError = ASSISTANT_ERRORS['context-exceeded']
+  if (isTimedOut) displayError = { message: ASSISTANT_TIMEOUT_MESSAGE }
 
   const renderedMessages = useMemo(
     () =>
@@ -586,18 +595,16 @@ export const AssistantChat = ({
             <ConversationContent className="w-full py-8 mb-10">
               {renderedMessages}
               <div className="w-full max-w-3xl mx-auto">
-                {error && (
+                {(error || isTimedOut) && (
                   <AlertError
-                    error={
-                      isContextExceededError
-                        ? ASSISTANT_ERRORS['context-exceeded']
-                        : IS_PLATFORM
-                          ? ASSISTANT_ERRORS['default']
-                          : error
-                    }
+                    error={displayError}
                     showErrorPrefix={false}
                     showInstructions={false}
-                    subject="Sorry, I'm having trouble responding right now."
+                    subject={
+                      isTimedOut
+                        ? 'Assistant response timed out'
+                        : "Sorry, I'm having trouble responding right now."
+                    }
                     additionalActions={
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (

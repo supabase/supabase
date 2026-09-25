@@ -12,7 +12,9 @@ import { NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import {
   assistantMessageMetadataSchema,
   messagesIncludeLogsSnippets,
+  type AssistantMessageMetadata,
 } from '@/lib/ai/assistant-message-metadata'
+import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
 import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
@@ -31,7 +33,7 @@ import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
 import { trustedUserEmail } from '@/lib/server/configcat'
 
-export const maxDuration = 120
+export const maxDuration = 300
 
 export const config = {
   api: {
@@ -75,6 +77,7 @@ const requestBodySchema = z.object({
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
+  const requestStartedAt = Date.now()
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
@@ -176,8 +179,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
-    // Fires when the response finishes streaming or the connection drops, which
-    // is what tears down the remote MCP connection opened in getTools.
+    // Fires when the connection drops. Aborting tears down the remote MCP connection opened
+    // in getTools. The TanStack adapter doesn't emit it, so the stream's onEnd also aborts.
     res.on('close', () => abortController.abort())
 
     const tools = await getTools({
@@ -237,6 +240,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       requestedModel,
       systemProviderOptions,
       abortSignal: abortController.signal,
+      timeout: { totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)) },
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)
       },
@@ -265,12 +269,23 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
         return JSON.stringify(error)
       },
+      // The browser never receives an abort caused by its own disconnect, so any abort that
+      // reaches it is the deadline. Chat ignores abort chunks, so flag the message instead.
+      messageMetadata: ({ part }): AssistantMessageMetadata =>
+        part.type === 'abort' ? { timedOut: true } : undefined,
+      // Runs when the stream finishes, aborts, or is cancelled.
+      onEnd: () => abortController.abort(),
     })
 
-    pipeUIMessageStreamToResponse({
+    // Keep this asynchronous so the TanStack adapter can return the streaming
+    // Response immediately. Handle piping failures after headers have been sent.
+    void pipeUIMessageStreamToResponse({
       response: res,
       stream,
       headers: { 'Content-Encoding': 'none' },
+    }).catch((error) => {
+      console.error('Error piping Assistant stream:', error)
+      abortController.abort()
     })
   } catch (error) {
     console.error('Error in handlePost:', error)
