@@ -15,3 +15,6 @@ export const DEFAULT_MAX_TABLE_SYNC_WORKERS = 4
 export const DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE = 4
 export const DEFAULT_CONNECTION_POOL_SIZE = 4
 export const DEFAULT_DUCKLAKE_POOL_SIZE = 4
+
+export const START_PIPELINE_LABEL = 'Start pipeline'
+export const START_PIPELINE_ANYWAY_LABEL = 'Start pipeline anyway'

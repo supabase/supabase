@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
+  cn,
   FormControl,
   FormField,
   Input,
@@ -25,6 +26,10 @@ import {
   STORED_SECRET_PLACEHOLDER,
 } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  ANALYTICS_BUCKET_BUCKET_FIELD_COPY,
+  ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 import {
   isMetadataListErrorVisible,
   isMetadataListLoading,
@@ -74,10 +79,12 @@ export const AnalyticsBucketFields = ({
   form,
   editMode,
   onSelectNewBucket,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
   onSelectNewBucket: () => void
+  className?: string
 }) => {
   const [warehouseName, s3AccessKeyId, namespace] = useWatch({
     control: form.control,
@@ -146,7 +153,7 @@ export const AnalyticsBucketFields = ({
   })
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">Analytics Bucket settings</p>
 
       <div className="flex flex-col gap-y-4">
@@ -155,9 +162,9 @@ export const AnalyticsBucketFields = ({
           name="warehouseName"
           render={({ field }) => (
             <FormItemLayout
-              label="Bucket"
+              label={ANALYTICS_BUCKET_BUCKET_FIELD_COPY.label}
               layout="horizontal"
-              description="The Analytics Bucket where data will be stored"
+              description={ANALYTICS_BUCKET_BUCKET_FIELD_COPY.description}
             >
               <FormControl>
                 <Select
@@ -207,9 +214,9 @@ export const AnalyticsBucketFields = ({
           name="namespace"
           render={({ field }) => (
             <FormItemLayout
-              label="Namespace"
+              label={ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.label}
               layout="horizontal"
-              description="The namespace within the bucket where tables will be organized"
+              description={ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.description}
             >
               <FormControl>
                 <Select

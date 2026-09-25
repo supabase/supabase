@@ -6,6 +6,10 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  BIGQUERY_DATASET_ID_FIELD_COPY,
+  BIGQUERY_PROJECT_ID_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 
 const MAX_SERVICE_ACCOUNT_KEY_LENGTH = 5000
 
@@ -26,7 +30,6 @@ const readServiceAccountFile = async (
   try {
     const contents = await file.text()
     if (!isCurrentRequest()) return
-
     if (contents.length > MAX_SERVICE_ACCOUNT_KEY_LENGTH) {
       form.setError('serviceAccountKey', {
         message: 'Service account key must be 5,000 characters or fewer.',
@@ -52,9 +55,11 @@ const readServiceAccountFile = async (
 export const BigQueryFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const serviceAccountFileInputRef = useRef<HTMLInputElement>(null)
   const fileReadRequestIdRef = useRef(0)
@@ -92,7 +97,7 @@ export const BigQueryFields = ({
   }
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">BigQuery settings</p>
       <div className="flex flex-col gap-y-4">
         <FormField
@@ -101,8 +106,8 @@ export const BigQueryFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Project ID"
-              description="The Google Cloud project ID where data will be sent"
+              label={BIGQUERY_PROJECT_ID_FIELD_COPY.label}
+              description={BIGQUERY_PROJECT_ID_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="my-gcp-project" />
@@ -116,9 +121,9 @@ export const BigQueryFields = ({
           name="datasetId"
           render={({ field }) => (
             <FormItemLayout
-              label="Dataset ID"
+              label={BIGQUERY_DATASET_ID_FIELD_COPY.label}
               layout="horizontal"
-              description="The BigQuery dataset where replicated tables will be created"
+              description={BIGQUERY_DATASET_ID_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="my_dataset" />
