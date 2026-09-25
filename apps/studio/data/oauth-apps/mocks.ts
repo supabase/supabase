@@ -1,18 +1,18 @@
 import type { OAuthAppsAuthorizeIdentity } from './oauth-apps-authorize-organizations-query'
 import type {
-  ListAppGrantsResponse,
-  ListBlockedAppsResponse,
-  ListOAuthAppsOverviewResponse,
+  ListOAuthApprovalsResponse,
+  ListOrgAppGrantsResponse,
+  ListOwnGrantsResponse,
   OAuthAppsAuthorizeApproveResult,
   OAuthAppsAuthorizeOrganizationProject,
+  OAuthAppsAuthorizePreflightResult,
   OAuthAppsAuthorizeRequest,
   OAuthExistingGrant,
   OAuthOrganizationRole,
   OAuthOrgAppDetails,
   OAuthScope,
-  OAuthScopeGroup,
-  OAuthScopeLevel,
 } from './types'
+import { isPreflightValidationFailure, isWriteScope } from './types'
 import type { OrganizationRole } from '@/data/organization-members/organization-roles-query'
 
 const ENABLE_MOCKS = true
@@ -25,7 +25,6 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   vercelOrgAdmin: 'mock-vercel-org-admin',
   vercelManyProjects: 'mock-vercel-many-projects',
   vercelRoleValidation: 'mock-vercel-role-validation',
-  vercelBlocked: 'mock-vercel-blocked',
   vercelOptionalProjects: 'mock-vercel-optional-projects',
   vercelAllProjects: 'mock-vercel-all-projects',
   vercelReconsentAllProjects: 'mock-vercel-reconsent-all-projects',
@@ -66,24 +65,16 @@ export const READ_ONLY_ROLE: OrganizationRole = {
   projects: [],
 }
 
-const VERCEL_SCOPE_GROUPS: OAuthScopeGroup[] = [
-  {
-    name: 'Database, Environment, Secrets',
-    level: 'read_write',
-    scopes: [
-      'database:read',
-      'database:write',
-      'environment:read',
-      'environment:write',
-      'secrets:read',
-      'secrets:write',
-    ],
-  },
-  {
-    name: 'Projects, Edge Functions, Storage',
-    level: 'read',
-    scopes: ['projects:read', 'edge_functions:read', 'storage:read'],
-  },
+const VERCEL_SCOPES: OAuthScope[] = [
+  'database:read',
+  'database:write',
+  'environment:read',
+  'environment:write',
+  'secrets:read',
+  'secrets:write',
+  'projects:read',
+  'edge_functions:read',
+  'storage:read',
 ]
 
 const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
@@ -96,22 +87,20 @@ const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
   registration_type: 'manual',
   expires_at: '2026-09-17T12:00:00.000Z',
   grant_kind: 'member_bound',
-  project_scoping_mode: 'required',
-  allow_partial_grants: false,
-  scopes: VERCEL_SCOPE_GROUPS,
+  project_scoping_mode: true,
+  scopes: VERCEL_SCOPES,
 }
 
 const VERCEL_OPTIONAL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
   app_id: 'vercel-optional',
-  project_scoping_mode: 'optional',
-  allow_partial_grants: true,
+  project_scoping_mode: true,
 }
 
 const VERCEL_ALL_PROJECTS_REQUEST: OAuthAppsAuthorizeRequest = {
   ...VERCEL_REQUEST,
   app_id: 'vercel-org-wide',
-  project_scoping_mode: 'off',
+  project_scoping_mode: false,
 }
 
 const DYNAMIC_MCP_CLIENT_REQUEST: OAuthAppsAuthorizeRequest = {
@@ -123,6 +112,9 @@ const DYNAMIC_MCP_CLIENT_REQUEST: OAuthAppsAuthorizeRequest = {
   domain: 'mcp.northwind.example',
   redirect_uri: 'https://mcp.northwind.example/callback',
   registration_type: 'dynamic',
+  // DCR (MCP) oauth apps are forced org-bound, unscoped.
+  grant_kind: 'organization_bound',
+  project_scoping_mode: false,
 }
 
 const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
@@ -135,21 +127,14 @@ const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
   registration_type: 'manual',
   expires_at: '2026-09-17T12:00:00.000Z',
   grant_kind: 'organization_bound',
-  project_scoping_mode: 'required',
-  allow_partial_grants: false,
-  scopes: [
-    {
-      name: 'Projects',
-      level: 'read',
-      scopes: ['projects:read'],
-    },
-  ],
+  project_scoping_mode: true,
+  scopes: ['projects:read'],
 }
 
 const KEMAL_BOT_ORG_WIDE_REQUEST: OAuthAppsAuthorizeRequest = {
   ...KEMAL_BOT_REQUEST,
   app_id: 'kemal-bot-org-wide',
-  project_scoping_mode: 'off',
+  project_scoping_mode: false,
 }
 
 const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
@@ -159,7 +144,6 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOrgAdmin]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelManyProjects]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation]: VERCEL_REQUEST,
-  [OAUTH_APPS_MOCK_SCENARIOS.vercelBlocked]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects]: VERCEL_OPTIONAL_PROJECTS_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: VERCEL_ALL_PROJECTS_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: VERCEL_OPTIONAL_PROJECTS_REQUEST,
@@ -234,10 +218,6 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
   },
-  [OAUTH_APPS_MOCK_SCENARIOS.vercelBlocked]: {
-    email: 'admin@example.com',
-    organizations: [LITWARE_DEVELOPER, NORTHWIND_TRADERS_DEVELOPER],
-  },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
@@ -309,93 +289,66 @@ const TAILSPIN_VERCEL_OPTIONAL_EXISTING_GRANT: OAuthExistingGrant = {
 }
 
 const DEFAULT_ORG_APP_DETAILS: OAuthOrgAppDetails = {
-  organization_settings: { require_project_scoping: false },
-  blocked_reason: null,
-  existing_grant: null,
-}
-
-const FABRIKAM_ORG_APP_DETAILS: OAuthOrgAppDetails = {
-  organization_settings: { require_project_scoping: true },
-  blocked_reason: null,
   existing_grant: null,
 }
 
 const MOCK_ORG_APP_DETAILS: Record<string, Record<string, OAuthOrgAppDetails>> = {
   'tailspin-toys': {
-    vercel: { ...DEFAULT_ORG_APP_DETAILS, existing_grant: TAILSPIN_VERCEL_EXISTING_GRANT },
-    'vercel-optional': {
-      ...DEFAULT_ORG_APP_DETAILS,
-      existing_grant: TAILSPIN_VERCEL_OPTIONAL_EXISTING_GRANT,
-    },
-  },
-  'fabrikam-industries': {
-    vercel: FABRIKAM_ORG_APP_DETAILS,
-    'vercel-org-wide': {
-      ...FABRIKAM_ORG_APP_DETAILS,
-      blocked_reason: 'org_requires_project_scoping',
-    },
-    'kemal-bot-org-wide': {
-      ...FABRIKAM_ORG_APP_DETAILS,
-      blocked_reason: 'org_requires_project_scoping',
-    },
-  },
-  'litware-inc': {
-    vercel: { ...DEFAULT_ORG_APP_DETAILS, blocked_reason: 'app_blocked_for_organization' },
+    vercel: { existing_grant: TAILSPIN_VERCEL_EXISTING_GRANT },
+    'vercel-optional': { existing_grant: TAILSPIN_VERCEL_OPTIONAL_EXISTING_GRANT },
   },
 }
 
-const MOCK_APPS_OVERVIEW: ListOAuthAppsOverviewResponse = {
+// Real oauth_apps config, keyed by app_id — preflight-validation is org+app scoped, not tied to
+// an in-flight authorization request.
+const MOCK_APPS_BY_ID: Record<string, OAuthAppsAuthorizeRequest> = {
+  vercel: VERCEL_REQUEST,
+  'vercel-optional': VERCEL_OPTIONAL_PROJECTS_REQUEST,
+  'vercel-org-wide': VERCEL_ALL_PROJECTS_REQUEST,
+  'dynamic-mcp-client': DYNAMIC_MCP_CLIENT_REQUEST,
+  'kemal-bot': KEMAL_BOT_REQUEST,
+  'kemal-bot-org-wide': KEMAL_BOT_ORG_WIDE_REQUEST,
+}
+
+// The current member's org-level role, keyed by org slug — same reasoning as MOCK_APPS_BY_ID.
+const MOCK_ORGANIZATIONS_BY_SLUG: Record<string, OAuthOrganizationRole> = {
+  'northwind-traders': NORTHWIND_TRADERS_READ_ONLY,
+  'tailspin-toys': TAILSPIN_TOYS_ADMIN,
+  'fabrikam-industries': FABRIKAM_OWNER,
+  'contoso-labs': CONTOSO_LABS,
+  'wingtip-toys': WINGTIP_TOYS_DEVELOPER,
+  'litware-inc': LITWARE_DEVELOPER,
+}
+
+const MOCK_APPROVALS: ListOAuthApprovalsResponse = {
   data: [
     {
       id: 'vercel',
       name: 'Vercel',
       icon: null,
-      status: 'active',
-      member_grant_count: 33,
-      last_used_at: '2026-09-16T08:12:00.000Z',
       org_grant: null,
     },
     {
       id: 'dynamic-mcp-client',
       name: 'Northwind MCP',
       icon: null,
-      status: 'active',
-      member_grant_count: 1,
-      last_used_at: '2026-09-01T08:45:00.000Z',
       org_grant: null,
     },
     {
       id: 'contoso-analytics',
       name: 'Contoso Analytics',
       icon: null,
-      status: 'legacy',
-      member_grant_count: 0,
-      last_used_at: '2026-07-02T10:00:00.000Z',
       org_grant: {
         grant_id: 'grant-contoso-analytics-org',
         approved_scopes: ['analytics:read', 'projects:read'],
         approved_at: '2025-11-03T14:20:00.000Z',
-        last_used_at: '2026-07-02T10:00:00.000Z',
       },
     },
   ],
   pagination: { next_cursor: null },
 }
 
-const MOCK_BLOCKED_APPS: ListBlockedAppsResponse = {
-  data: [
-    {
-      app_id: 'kemal-bot',
-      name: 'kemal-bot',
-      icon: null,
-      blocked_at: '2026-09-10T15:30:00.000Z',
-      blocked_by: { gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000001', email: 'admin@example.com' },
-    },
-  ],
-  pagination: { next_cursor: null },
-}
-
-const MOCK_APP_GRANTS: Record<string, ListAppGrantsResponse> = {
+const MOCK_APP_GRANTS: Record<string, ListOrgAppGrantsResponse> = {
   vercel: {
     data: [
       {
@@ -405,10 +358,12 @@ const MOCK_APP_GRANTS: Record<string, ListAppGrantsResponse> = {
           gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000001',
           email: 'admin@example.com',
         },
-        project_refs: ['northwindstorefront1', 'northwindcms1'],
+        projects: [
+          { ref: 'northwindstorefront1', name: 'northwind-storefront' },
+          { ref: 'northwindcms1', name: 'northwind-cms' },
+        ],
         approved_scopes: ['database:read', 'database:write', 'projects:read'],
         approved_at: '2026-08-18T09:12:00.000Z',
-        last_used_at: '2026-09-16T08:12:00.000Z',
       },
       {
         grant_id: 'grant-vercel-developer',
@@ -418,10 +373,9 @@ const MOCK_APP_GRANTS: Record<string, ListAppGrantsResponse> = {
           email: 'developer@example.com',
           avatar_url: 'https://avatars.example/developer.png',
         },
-        project_refs: ['northwindcms1'],
+        projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
         approved_scopes: ['projects:read'],
         approved_at: '2026-08-16T11:30:00.000Z',
-        last_used_at: null,
       },
     ],
     pagination: { next_cursor: null },
@@ -435,10 +389,9 @@ const MOCK_APP_GRANTS: Record<string, ListAppGrantsResponse> = {
           gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000003',
           email: 'ops@example.com',
         },
-        project_refs: ['northwindstorefront1'],
+        projects: [{ ref: 'northwindstorefront1', name: 'northwind-storefront' }],
         approved_scopes: ['database:read', 'database:write'],
         approved_at: '2026-09-01T08:45:00.000Z',
-        last_used_at: '2026-09-01T08:45:00.000Z',
       },
     ],
     pagination: { next_cursor: null },
@@ -449,26 +402,52 @@ const MOCK_APP_GRANTS: Record<string, ListAppGrantsResponse> = {
         grant_id: 'grant-contoso-analytics-org',
         kind: 'organization_bound',
         user: null,
-        project_refs: null,
+        projects: null,
         approved_scopes: ['analytics:read', 'projects:read'],
         approved_at: '2025-11-03T14:20:00.000Z',
-        last_used_at: '2026-07-02T10:00:00.000Z',
       },
     ],
     pagination: { next_cursor: null },
   },
 }
 
-export function getMockOAuthAppsOverview(): ListOAuthAppsOverviewResponse {
-  return MOCK_APPS_OVERVIEW
+const MOCK_OWN_GRANTS: ListOwnGrantsResponse = {
+  data: [
+    {
+      grant_id: 'grant-vercel-admin',
+      app: { id: 'vercel', name: 'Vercel', icon: null },
+      organization: { slug: 'northwind-traders', name: 'Northwind Traders' },
+      projects: [
+        { ref: 'northwindstorefront1', name: 'northwind-storefront' },
+        { ref: 'northwindcms1', name: 'northwind-cms' },
+      ],
+      approved_scopes: ['database:read', 'database:write', 'projects:read'],
+      approved_at: '2026-08-18T09:12:00.000Z',
+    },
+    {
+      grant_id: 'grant-northwind-mcp-ops',
+      app: { id: 'dynamic-mcp-client', name: 'Northwind MCP', icon: null },
+      organization: { slug: 'northwind-traders', name: 'Northwind Traders' },
+      projects: [{ ref: 'northwindstorefront1', name: 'northwind-storefront' }],
+      approved_scopes: ['database:read', 'database:write'],
+      approved_at: '2026-09-01T08:45:00.000Z',
+    },
+  ],
+  pagination: { next_cursor: null },
 }
 
-export function getMockOAuthBlockedApps(): ListBlockedAppsResponse {
-  return MOCK_BLOCKED_APPS
+// Fixture lists are small and static — cursor is accepted for real-endpoint parity but not
+// used to actually paginate the mock data.
+export function getMockOAuthApprovals(_cursor?: string): ListOAuthApprovalsResponse {
+  return MOCK_APPROVALS
 }
 
-export function getMockOAuthAppGrants(appId: string): ListAppGrantsResponse {
+export function getMockOAuthAppGrants(appId: string, _cursor?: string): ListOrgAppGrantsResponse {
   return MOCK_APP_GRANTS[appId] ?? { data: [], pagination: { next_cursor: null } }
+}
+
+export function getMockOAuthOwnGrants(_cursor?: string): ListOwnGrantsResponse {
+  return MOCK_OWN_GRANTS
 }
 
 export function getMockOAuthAppsAuthorizeRequest(authId: string): OAuthAppsAuthorizeRequest {
@@ -491,6 +470,12 @@ export function getMockOAuthAppsAuthorizeOrganizationProjects(
 
 export function getMockOAuthOrgAppDetails(slug: string, appId: string): OAuthOrgAppDetails {
   return MOCK_ORG_APP_DETAILS[slug]?.[appId] ?? DEFAULT_ORG_APP_DETAILS
+}
+
+function findMockOrganization(authId: string, slug: string): OAuthOrganizationRole | undefined {
+  return getMockOAuthAppsAuthorizeIdentity(authId).organizations.find(
+    (candidate) => candidate.slug === slug
+  )
 }
 
 const MOCK_OAUTH_STATE = 'mock_state_9f2c1b'
@@ -523,12 +508,55 @@ export function getMockOAuthAppsAuthorizeRedirect(
 const ROLE_VALIDATED_SCENARIOS = new Set<string>([
   OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation,
   OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects,
+  OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide,
 ])
-
-const WRITE_SCOPE_LEVELS: OAuthScopeLevel[] = ['write', 'read_write']
 
 function isReadOnlyRole(role: OrganizationRole) {
   return role.id === READ_ONLY_ROLE.id
+}
+
+function isOwnerOrAdmin(role: OrganizationRole) {
+  return role.id === OWNER_ROLE.id || role.id === ADMINISTRATOR_ROLE.id
+}
+
+// Upfront org-level check shared by preflight-validation and the "all projects" branch of approve.
+// Never checks project-scoped roles (that's approve's job once project_refs are known).
+function evaluateGrantEligibility(
+  request: OAuthAppsAuthorizeRequest,
+  organization: OAuthOrganizationRole
+): OAuthAppsAuthorizePreflightResult {
+  if (request.grant_kind === 'organization_bound') {
+    if (isOwnerOrAdmin(organization.default_role)) return { ok: true }
+    return {
+      error_code: 'role_validation_failed',
+      message: `Your ${organization.default_role.name} role cannot install this app for the organization.`,
+      validation: { scope_target: 'organization', role: organization.default_role },
+    }
+  }
+
+  const failedScopes = request.scopes.filter(isWriteScope)
+  if (failedScopes.length === 0 || !isReadOnlyRole(organization.default_role)) return { ok: true }
+
+  return {
+    error_code: 'role_validation_failed',
+    message: `Your ${organization.default_role.name} role cannot satisfy this app's scopes for all projects.`,
+    validation: {
+      scope_target: 'all_projects',
+      role: organization.default_role,
+      failed_scopes: failedScopes,
+    },
+  }
+}
+
+export function getMockOAuthAppsPreflightValidation(
+  slug: string,
+  appId: string
+): OAuthAppsAuthorizePreflightResult {
+  const request = MOCK_APPS_BY_ID[appId]
+  const organization = MOCK_ORGANIZATIONS_BY_SLUG[slug]
+  if (!request || !organization) return { ok: true }
+
+  return evaluateGrantEligibility(request, organization)
 }
 
 export function getMockOAuthAppsAuthorizeApproveResult(
@@ -538,27 +566,17 @@ export function getMockOAuthAppsAuthorizeApproveResult(
   const approved = getMockOAuthAppsAuthorizeRedirect(authId, { approved: true })
   if (!ROLE_VALIDATED_SCENARIOS.has(authId)) return approved
 
-  const failedScopes: OAuthScope[] = getMockOAuthAppsAuthorizeRequest(authId)
-    .scopes.filter((scopeGroup) => WRITE_SCOPE_LEVELS.includes(scopeGroup.level))
-    .flatMap((scopeGroup) => scopeGroup.scopes)
-  if (failedScopes.length === 0) return approved
+  const request = getMockOAuthAppsAuthorizeRequest(authId)
+  const organization = findMockOrganization(authId, slug)
+  if (!organization) return approved
 
-  if (projectRefs === undefined) {
-    const organization = getMockOAuthAppsAuthorizeIdentity(authId).organizations.find(
-      (candidate) => candidate.slug === slug
-    )
-    if (!organization || !isReadOnlyRole(organization.default_role)) return approved
-
-    return {
-      error_code: 'role_validation_failed',
-      message: `Your ${organization.default_role.name} role cannot grant write access to this organization.`,
-      validation: {
-        scope_target: 'organization',
-        role: organization.default_role,
-        failed_scopes: failedScopes,
-      },
-    }
+  if (projectRefs === undefined || request.grant_kind === 'organization_bound') {
+    const result = evaluateGrantEligibility(request, organization)
+    return isPreflightValidationFailure(result) ? result : approved
   }
+
+  const failedScopes = request.scopes.filter(isWriteScope)
+  if (failedScopes.length === 0) return approved
 
   const blocked = getMockOAuthAppsAuthorizeOrganizationProjects(slug).filter(
     (project) => projectRefs.includes(project.ref) && isReadOnlyRole(project.role)

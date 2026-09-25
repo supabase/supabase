@@ -33,9 +33,16 @@ export const useOAuthAppRevokeMutation = ({
   return useMutation<OAuthAppRevokeData, ResponseError, OAuthAppRevokeVariables>({
     mutationFn: (vars) => revokeOAuthApp(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries({
-        queryKey: oauthAppsKeys.authorizedApps(variables.slug),
-      })
+      // Revoking an app deletes every row for (app_id, organization_id), both kinds — the
+      // org's approvals overview, this app's grant list, and any member's own-grants view are
+      // all stale.
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: oauthAppsKeys.approvals(variables.slug) }),
+        queryClient.invalidateQueries({
+          queryKey: oauthAppsKeys.appMemberGrants(variables.slug, variables.appId),
+        }),
+        queryClient.invalidateQueries({ queryKey: oauthAppsKeys.grants() }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

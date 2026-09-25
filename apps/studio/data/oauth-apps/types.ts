@@ -9,30 +9,20 @@ export type OAuthAppsAuthorizeLiveFields = Pick<
   'name' | 'website' | 'domain' | 'icon' | 'redirect_uri' | 'registration_type' | 'expires_at'
 >
 
-// TODO(rfc): RFC has one OAuthScope type; confirm the vocabulary is unchanged from the live coarse enum.
 export type OAuthScope = NonNullable<LiveAuthorizeRequest['scopes']>[number]
 
-export type OAuthScopeLevel = 'read' | 'write' | 'read_write'
-
-// TODO(rfc): OAuthScopeGroup is referenced but undefined in the RFC; shape below is our guess and drives the scope badges.
-export type OAuthScopeGroup = {
-  name: string
-  level: OAuthScopeLevel
-  scopes: OAuthScope[]
+export function isWriteScope(scope: OAuthScope): boolean {
+  return scope.endsWith(':write')
 }
 
 export type OAuthGrantKind = 'organization_bound' | 'member_bound'
 
-export type OAuthProjectScopingMode = 'off' | 'optional' | 'required'
-
 export type OAuthAppsAuthorizeRequest = OAuthAppsAuthorizeLiveFields & {
   app_id: string
-  // TODO(rfc): confirm whether app_name supersedes the live name field.
   app_name: string
   grant_kind: OAuthGrantKind
-  project_scoping_mode: OAuthProjectScopingMode
-  allow_partial_grants: boolean
-  scopes: OAuthScopeGroup[]
+  project_scoping_mode: boolean
+  scopes: OAuthScope[]
 }
 
 export type OAuthOrganizationRole = {
@@ -49,22 +39,12 @@ export type OAuthAppsAuthorizeOrganizationProject = {
 
 export type OAuthExistingGrant = {
   approved_scopes: OAuthScope[] | null
-  // TODO(rfc): non-nullable here but OAuthGrantItem uses null for "all projects"; confirm how an all-projects grant is represented.
   project_refs: string[]
   approved_at: string
 }
 
-export type OAuthBlockedReason = 'org_requires_project_scoping' | 'app_blocked_for_organization'
-
 export type OAuthOrgAppDetails = {
-  organization_settings: { require_project_scoping: boolean }
-  blocked_reason: OAuthBlockedReason | null
   existing_grant: OAuthExistingGrant | null
-}
-
-export type OAuthOrgScopeCheck = {
-  role: OrganizationRole
-  failed_scopes: OAuthScope[]
 }
 
 export function getPreselectedProjectRefs({
@@ -86,6 +66,8 @@ export function getPreselectedProjectRefs({
 }
 
 export type OAuthAuthorizeApproveRequest = {
+  // not allowed when project_scoping_mode is false.
+  // when project_scoping_mode is true, if omitted, this means all projects
   project_refs?: string[]
 }
 
@@ -95,6 +77,10 @@ export type OAuthAppsAuthorizeRedirect =
 export type OAuthScopeValidationResult =
   | {
       scope_target: 'organization'
+      role: OrganizationRole
+    }
+  | {
+      scope_target: 'all_projects'
       role: OrganizationRole
       failed_scopes: OAuthScope[]
     }
@@ -136,51 +122,49 @@ export function getFailedProjects(
   return failure.validation.scope_target === 'projects' ? failure.validation.failures : []
 }
 
-export type OAuthAppOverviewItem = {
+export type OAuthAppsAuthorizePreflightSuccess = { ok: true }
+
+export type OAuthAppsAuthorizePreflightResult =
+  | OAuthAppsAuthorizePreflightSuccess
+  | OAuthAppsAuthorizeRoleValidationFailure
+
+export function isPreflightValidationFailure(
+  result: OAuthAppsAuthorizePreflightResult
+): result is OAuthAppsAuthorizeRoleValidationFailure {
+  return 'error_code' in result && result.error_code === 'role_validation_failed'
+}
+
+export type OAuthApprovalItem = {
   id: string
   name: string
   icon: string | null
-  status: 'active' | 'legacy'
-  // TODO(rfc): may become string ("50+"); RFC undecided.
-  member_grant_count: number
-  last_used_at: string | null
   org_grant: {
     grant_id: string
     approved_scopes: string[]
     approved_at: string
-    last_used_at: string | null
   } | null
 }
 
-export type ListOAuthAppsOverviewResponse = {
-  data: OAuthAppOverviewItem[]
+export type ListOAuthApprovalsResponse = {
+  data: OAuthApprovalItem[]
   pagination: { next_cursor: string | null }
 }
 
-export type OAuthBlockedAppItem = {
-  app_id: string
+export type OAuthGrantProject = {
+  ref: string
   name: string
-  icon: string | null
-  blocked_at: string
-  blocked_by: { gotrue_id: string; email: string }
-}
-
-export type ListBlockedAppsResponse = {
-  data: OAuthBlockedAppItem[]
-  pagination: { next_cursor: string | null }
 }
 
 export type OAuthGrantItem = {
   grant_id: string
   kind: OAuthGrantKind
   user: { gotrue_id: string; email: string; avatar_url?: string } | null
-  project_refs: string[] | null
+  projects: OAuthGrantProject[] | null
   approved_scopes: string[]
   approved_at: string
-  last_used_at: string | null
 }
 
-export type ListAppGrantsResponse = {
+export type ListOrgAppGrantsResponse = {
   data: OAuthGrantItem[]
   pagination: { next_cursor: string | null }
 }
@@ -189,19 +173,12 @@ export type MemberOauthGrantItem = {
   grant_id: string
   app: { id: string; name: string; icon: string | null }
   organization: { slug: string; name: string }
-  project_refs: string[] | null
+  projects: OAuthGrantProject[] | null
   approved_scopes: string[]
   approved_at: string
-  last_used_at: string | null
-  access_affected: boolean
-  access_affected_reason: 'role_below_granted_scopes' | 'project_access_revoked' | null
 }
 
 export type ListOwnGrantsResponse = {
   data: MemberOauthGrantItem[]
   pagination: { next_cursor: string | null }
 }
-
-export type OAuthOrganizationSettings = { require_project_scoping: boolean }
-
-export type OAuthOrganizationSettingsUpdate = { require_project_scoping: boolean }
