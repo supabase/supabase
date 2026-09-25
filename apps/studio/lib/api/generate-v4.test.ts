@@ -118,6 +118,39 @@ test('generateV4 calls the tool sanitizer', async () => {
   expect(mockRes.on).toHaveBeenCalledWith('close', expect.any(Function))
 })
 
+test('generateV4 streams a tool result that continues the previous assistant message', async () => {
+  vi.mocked(streamText).mockClear()
+  vi.mocked(pipeUIMessageStreamToResponse).mockClear()
+  // After an approval, streamText runs the approved tool first and streams its result into the
+  // assistant message the client already has, so the tool call never appears in this stream.
+  vi.mocked(streamText).mockImplementationOnce(
+    () =>
+      ({
+        stream: new ReadableStream({
+          start(controller) {
+            controller.enqueue({ type: 'start' })
+            controller.enqueue({
+              type: 'tool-result',
+              toolCallId: 'test-tool-call-id',
+              toolName: 'render_page',
+              input: {},
+              output: { status: 'ready' },
+            })
+            controller.close()
+          },
+        }),
+      }) as unknown as ReturnType<typeof streamText>
+  )
+  const { callGenerateV4 } = createMocks()
+
+  await callGenerateV4()
+  const chunks = await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value
+
+  expect(chunks).toContainEqual(
+    expect.objectContaining({ type: 'tool-output-available', toolCallId: 'test-tool-call-id' })
+  )
+})
+
 test('generateV4 flags a response the deadline stopped and releases the request', async () => {
   vi.mocked(streamText).mockClear()
   vi.mocked(pipeUIMessageStreamToResponse).mockClear()
@@ -145,5 +178,5 @@ test('generateV4 flags a response the deadline stopped and releases the request'
   expect(totalMs).toBeGreaterThan(0)
   expect(totalMs).toBeLessThanOrEqual(ASSISTANT_TIMEOUT_MS)
   // Ending the stream aborts the request signal, which closes the remote MCP client.
-  expect(params.abortSignal?.aborted).toBe(true)
+  await vi.waitFor(() => expect(params.abortSignal?.aborted).toBe(true))
 })

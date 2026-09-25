@@ -180,7 +180,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
     // Fires when the connection drops. Aborting tears down the remote MCP connection opened
-    // in getTools. The TanStack adapter doesn't emit it, so the stream's onEnd also aborts.
+    // in getTools. The TanStack adapter doesn't emit it, so settling the pipe below also aborts.
     res.on('close', () => abortController.abort())
 
     const tools = await getTools({
@@ -273,20 +273,20 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       // reaches it is the deadline. Chat ignores abort chunks, so flag the message instead.
       messageMetadata: ({ part }): AssistantMessageMetadata =>
         part.type === 'abort' ? { timedOut: true } : undefined,
-      // Runs when the stream finishes, aborts, or is cancelled.
-      onEnd: () => abortController.abort(),
     })
 
     // Keep this asynchronous so the TanStack adapter can return the streaming
     // Response immediately. Handle piping failures after headers have been sent.
+    // Abort here rather than in toUIMessageStream's onEnd: that callback rebuilds the response
+    // message, which fails on approval continuations without the client's original messages.
     void pipeUIMessageStreamToResponse({
       response: res,
       stream,
       headers: { 'Content-Encoding': 'none' },
-    }).catch((error) => {
-      console.error('Error piping Assistant stream:', error)
-      abortController.abort()
     })
+      .catch((error) => console.error('Error piping Assistant stream:', error))
+      // Runs when the stream finishes, aborts, or is cancelled.
+      .finally(() => abortController.abort())
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
