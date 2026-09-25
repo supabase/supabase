@@ -211,15 +211,24 @@ export const BillingMetric = ({
               </div>
             )}
 
+            {subscription.usage_billing_enabled && isLogMetricOnNonPlatformPlan && (
+              <div className="my-2">
+                <p className="text-sm">
+                  Billing/Enforcement will only start after the grace period ends at the start of
+                  2027.
+                </p>
+              </div>
+            )}
+
             {subscription.usage_billing_enabled === false &&
               relativeToSubscription &&
               (isApproachingLimit || isExceededLimit) &&
               (isLogMetricOnNonPlatformPlan ? (
                 <div className="my-2">
                   <p className="text-sm">
-                    Enforcement of restrictions will only start after the grace period ends on Dec
-                    23, 2026. Reduce your usage, upgrade to a usage-based plan or disable the spend
-                    cap to avoid restrictions.
+                    Enforcement of restrictions will only start after the grace period ends at the
+                    start of 2027. Reduce your usage, upgrade to a usage-based plan or disable the
+                    spend cap to avoid restrictions.
                   </p>
                 </div>
               ) : (
