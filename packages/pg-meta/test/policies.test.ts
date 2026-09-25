@@ -21,6 +21,13 @@ const withTestDatabase = (
   })
 }
 
+test('retrieve by name/schema/table quotes the reserved "table" identifier', () => {
+  const { sql } = pgMeta.policies.retrieve({ name: 'my policy', schema: 'public', table: 'memes' })
+  // `table` is a reserved keyword, so it must be quoted or the query is a syntax error.
+  expect(sql).toContain('"table" = \'memes\'')
+  expect(sql).not.toMatch(/\btable = /)
+})
+
 withTestDatabase('list policies', async ({ executeQuery }) => {
   const { sql, zod } = pgMeta.policies.list()
   const res = zod.parse(await executeQuery(sql))
