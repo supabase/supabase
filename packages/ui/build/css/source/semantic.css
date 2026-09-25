@@ -13,11 +13,11 @@
    * and the brand, so the two could never drift apart. They are now split so a
    * theme can run, say, a cool-gray surface against the green brand:
    *   --surface-hue  tints backgrounds, text and borders (the neutral ramp)
-   *   --primary-hue  is the brand hue that --primary is built from
-   * Both default to --hue (Supabase green ≈159° in OKLCH), so a theme that only
+   *   --primary-hue  is the spot hue that functional primary colors use
+   * Both default to --hue (Supabase green ≈157.5° in OKLCH), so a theme that only
    * sets --hue keeps surfaces and brand locked together as before; override
    * either one to let them diverge. */
-  --hue: 159;
+  --hue: 157.5;
   --surface-hue: var(--hue);
   --primary-hue: var(--hue);
   /* Root defaults mirror the dark theme (the app's default appearance). */
@@ -104,7 +104,7 @@
    * (matching the "no additional charge" badge); like the others it pulls a touch
    * with the brand --primary-hue but clamps so it always reads violet.
    */
-  --brand-hue-reference: 159;
+  --brand-hue-reference: 157.5;
   --status-hue-pull: 0.15;
   --warning-hue: clamp(
     65,
@@ -138,7 +138,7 @@
    */
   --expressive-chroma: 0.14;
   --warning-lightness: 0.8;
-  --destructive-lightness: 0.75;
+  --destructive-lightness: 0.55;
   --info-lightness: 0.7;
 
   /* shadcn semantic pairs */
@@ -150,7 +150,7 @@
   );
   /* Inverse of --foreground: canvas-coloured text for use on inverted fills
      (bg-foreground, bg-black / dark:bg-white, etc). Not the same as
-     --primary-foreground, which stays dark for the vivid primary fill. */
+     --primary-solid-foreground, which stays light on the deep button plate. */
   --foreground-contrast: oklch(var(--surface) calc(var(--chroma) * 0.55) var(--surface-hue));
 
   --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
@@ -158,16 +158,54 @@
   --popover: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
   --popover-foreground: var(--foreground);
 
-  /* Primary is the brand-derived accent: a fixed, vivid Supabase green on
-     --primary-hue, mode-invariant and decoupled from the --chroma knob so it
-     holds its identity even as neutrals desaturate. NOTE: the `brand` utility
-     (--color-brand in theme.css) is deliberately NOT this — it maps to the
-     per-theme --brand-default scale (master behavior) while we resolve how
-     `brand` is used across the interface. */
+  /*
+   * Primary ink vs primary solid fill:
+   *   --primary              Readable branded text / small indicators. Root
+   *                          values mirror dark theme (bright). Light theme
+   *                          overrides for AA text on light surfaces.
+   *   --primary-solid        Deeper button plate (dark mode). Light theme
+   *                          aliases these to --primary so ink and buttons
+   *                          share one green there.
+   * --primary-bright keeps rings and selected chrome vivid while sharing the
+   * hue of --primary. It is brighter than readable ink in light mode.
+   *
+   * Hover shifts lightness only (preserves hue/chroma). Mixing with --foreground
+   * pulls light-mode surface-hue (warm) into the green and reads as yellow.
+   * Sign of --tone-span: darken in light, lighten in dark.
+   */
   --primary: oklch(0.76 0.15 var(--primary-hue));
+  --primary-bright: oklch(from var(--primary) max(l, 0.7) max(c, 0.15) h);
+  --button-fill-hover-delta: 0.04;
+  --primary-hover: oklch(
+    from var(--primary)
+      calc(
+        l + var(--button-fill-hover-delta) * var(--tone-span) /
+          max(var(--tone-span), calc(var(--tone-span) * -1))
+      )
+      c h
+  );
+  --primary-bright-hover: oklch(
+    from var(--primary-bright)
+      calc(
+        l + var(--button-fill-hover-delta) * var(--tone-span) /
+          max(var(--tone-span), calc(var(--tone-span) * -1))
+      )
+      c h
+  );
   --primary-foreground: oklch(
     min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
   );
+
+  --primary-solid: oklch(0.43627 0.11 var(--primary-hue));
+  --primary-solid-hover: oklch(
+    from var(--primary-solid)
+      calc(
+        l + var(--button-fill-hover-delta) * var(--tone-span) /
+          max(var(--tone-span), calc(var(--tone-span) * -1))
+      )
+      c h
+  );
+  --primary-solid-foreground: oklch(0.95 0.00275 var(--primary-hue));
 
   --secondary: oklch(
     from var(--background) calc(l + var(--elevation-step) * var(--elevation-3)) c h
@@ -221,8 +259,24 @@
   --control: var(--control-raised);
 
   --warning: oklch(var(--warning-lightness) var(--expressive-chroma) var(--warning-hue));
+  --warning-hover: oklch(
+    from var(--warning)
+      calc(
+        l + var(--button-fill-hover-delta) * var(--tone-span) /
+          max(var(--tone-span), calc(var(--tone-span) * -1))
+      )
+      c h
+  );
   --destructive: oklch(
     var(--destructive-lightness) var(--expressive-chroma) var(--destructive-hue)
+  );
+  --destructive-hover: oklch(
+    from var(--destructive)
+      calc(
+        l + var(--button-fill-hover-delta) * var(--tone-span) /
+          max(var(--tone-span), calc(var(--tone-span) * -1))
+      )
+      c h
   );
   /*
    * Text that sits on the solid fill: dark ink on light fills (amber), white on
@@ -247,7 +301,9 @@
   --border-destructive: oklch(from var(--destructive) l c h / 30%);
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-info: oklch(from var(--info) l c h / 30%);
-  --border-brand: oklch(from var(--primary) l c h / 30%);
+  /* Keep the brand border for explicitly Supabase-branded surfaces. */
+  --border-brand-default: oklch(from hsl(var(--brand-default)) l c h / 30%);
+  --border-primary-bright: oklch(from var(--primary-bright) l c h / 30%);
 
   --border: oklch(
     from var(--foreground) l calc(c * 0.54) h / calc(2% + 20% * var(--contrast-border))
@@ -263,5 +319,6 @@
   --border-control-hover: oklch(
     from var(--foreground) l calc(c * 0.5) h / calc(12% + 58% * var(--contrast-border))
   );
-  --ring: oklch(from var(--primary) l c h / 55%);
+  /* Focus chrome follows the theme's primary hue without muddy light-mode ink. */
+  --ring: oklch(from var(--primary-bright) l c h / 55%);
 }

@@ -24,4 +24,3 @@ pnpm run -F docs test:local:unwatch
 - Always reset the local DB before running docs tests to avoid state leakage.
 - Prefer `test:local:unwatch` for non-watch CI-like runs. Append a path to run a single file: `pnpm run -F docs test:local:unwatch internals/internal-links.test.ts`.
 - `pnpm test` (from `apps/docs`) wraps `test:local` in `supabase start` / `supabase stop`, but does not reset the DB and runs in watch mode, so it is not a substitute for the sequence above.
-- MDX content lint is `pnpm lint:mdx` (from `apps/docs`); it lints the whole `content/` tree and takes no path arguments.

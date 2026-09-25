@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "mcp-server",
-  "type": "registry:item",
   "title": "MCP Server",
   "description": "Add a user-scoped MCP server to your product.",
   "files": [
@@ -54,5 +53,6 @@
       "target": "~/supabase/functions/mcp-server/tools/index.ts"
     }
   ],
-  "docs": "Disable gateway JWT verification, then deploy the Edge Function. A trusted product backend can call it with the signed-in user's access token. For external clients, install the [OAuth Consent block](https://supabase.com/library/docs/nextjs/oauth-consent), enable OAuth and dynamic registration, and set the Auth Site URL to the consent app. Every call runs through the user's RLS-scoped client. OAuth tokens include `client_id`; product sessions do not, so define policies for both paths. See [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication) and [token security](https://supabase.com/docs/guides/auth/oauth-server/token-security)."
+  "docs": "Disable gateway JWT verification, then deploy the Edge Function. A trusted product backend can call it with the signed-in user's access token. For external clients, install the [OAuth Consent block](https://supabase.com/library/docs/nextjs/oauth-consent), enable OAuth and dynamic registration, and set the Auth Site URL to the consent app. Every call runs through the user's RLS-scoped client. OAuth tokens include `client_id`; product sessions do not, so define policies for both paths. See [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication) and [token security](https://supabase.com/docs/guides/auth/oauth-server/token-security).",
+  "type": "registry:item"
 }

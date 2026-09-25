@@ -52,7 +52,7 @@ export function MarkdownActions({
         className={cn(itemClass, 'cursor-pointer text-left')}
       >
         {copied ? (
-          <Check size={14} strokeWidth={1.5} className="text-brand" aria-hidden />
+          <Check size={14} strokeWidth={1.5} className="text-primary" aria-hidden />
         ) : (
           <Copy size={14} strokeWidth={1.5} aria-hidden />
         )}

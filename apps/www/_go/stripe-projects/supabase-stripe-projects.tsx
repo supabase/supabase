@@ -126,14 +126,17 @@ stripe projects env --sync`,
         <div className="flex flex-wrap gap-4 justify-center mt-4">
           <a
             href="https://docs.stripe.com/stripe-cli/install"
-            className="text-brand hover:underline"
+            className="text-primary hover:underline"
           >
             Stripe CLI install docs
           </a>
-          <a href="https://docs.stripe.com/stripe-projects" className="text-brand hover:underline">
+          <a
+            href="https://docs.stripe.com/stripe-projects"
+            className="text-primary hover:underline"
+          >
             Stripe Projects docs
           </a>
-          <a href="https://supabase.com/docs" className="text-brand hover:underline">
+          <a href="https://supabase.com/docs" className="text-primary hover:underline">
             Supabase docs
           </a>
         </div>
