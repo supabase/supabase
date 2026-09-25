@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.117.0
+  version: 2.118.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -103,7 +103,7 @@ flags:
     default_value: supabase
   - id: workdir
     name: --workdir <string>
-    description: path to a Supabase project directory
+    description: path to the directory containing your supabase/ folder; used exactly as given, with no ancestor directory search (defaults to searching upward from the current directory)
     default_value: ''
   - id: 'yes'
     name: --yes
@@ -1072,7 +1072,7 @@ commands:
 
       Requires the local development stack to be running when linting against the local database. To lint against a remote or self-hosted database, specify the `--linked` or `--db-url` flag respectively.
 
-      Runs `plpgsql_check` extension in the local Postgres container to check for errors in all schemas. The default lint level is `warning` and can be raised to error via the `--level` flag.
+      Runs the `plpgsql_check` extension against the local database (native or container) to check for errors in all schemas. The default lint level is `warning` and can be raised to error via the `--level` flag.
 
       To lint against specific schemas only, pass in the `--schema` flag.
 
@@ -1500,7 +1500,7 @@ commands:
 
       Exports the schema of a live database (local, linked, or custom URL) into SQL files under the declarative schema directory. This is the entrypoint for bootstrapping declarative mode.
 
-      The bundled pg-delta engine writes one directory per schema at the root of that directory (`supabase/schemas/public/tables/users.sql`, `supabase/schemas/public/schema.sql`), with cluster-level objects that belong to no schema under a reserved `_cluster/` directory (`supabase/schemas/_cluster/roles.sql`). A schema literally named `_cluster` or `_custom`, in any casing, has its leading underscore percent-encoded (`%5Fcluster/`) so it can never claim a directory the export owns. Hand-authored SQL that pg-delta does not model belongs in `_custom/`, which the export never writes to and never prunes.
+      The bundled pg-delta engine writes one directory per schema at the root of that directory (`supabase/schemas/public/tables/users.sql`, `supabase/schemas/public/schema.sql`), with cluster-level objects that belong to no schema under a reserved `_cluster/` directory (`supabase/schemas/_cluster/roles.sql`). When platform default grants (`anon`/`authenticated`/`service_role`) need an overlay `REVOKE ALL`, the export writes `adp_wipes.sql` after `schema.sql` in that schema — or `_cluster/adp_wipes.sql` for cluster-wide overlays — so a load onto a fresh project keeps privileges that were revoked in the source. A schema literally named `_cluster` or `_custom`, in any casing, has its leading underscore percent-encoded (`%5Fcluster/`) so it can never claim a directory the export owns. Hand-authored SQL that pg-delta does not model belongs in `_custom/`, which the export never writes to and never prunes.
 
       Emitted SQL uses the same default format as `db pull` (uppercase keywords, indent 2, width 180, column-aligned). Override with `[experimental.pgdelta] format_options`, or set `format_options = "null"` for raw statements.
 
@@ -1789,6 +1789,57 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-feedback
+    title: supabase feedback
+    summary: Send feedback to the Supabase team
+    description: Send feedback about the Supabase CLI to the Supabase team.
+    tags:
+      - other-commands
+    links: []
+    subcommands:
+      - supabase-feedback-add
+      - supabase-feedback-delete
+    flags: []
+  - id: supabase-feedback-add
+    title: supabase feedback add
+    summary: Send feedback to the Supabase team
+    description: Send quick feedback about the Supabase CLI to the Supabase team.
+    examples:
+      - id: example-1
+        name: Send quick feedback about a papercut in one line
+        code: supabase feedback add "when I run multiple stacks in parallel I get port conflicts"
+      - id: example-2
+        name: Use -- when the message starts with a dash
+        code: supabase feedback add -- "--yes should be the default in CI"
+      - id: example-3
+        name: Attribute the feedback to a project from an unlinked directory
+        code: supabase feedback add --project-ref abcdefghijklmnopqrst "branching is slow here"
+    tags: []
+    links: []
+    usage: supabase feedback add [message] ... [flags]
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref to attribute the feedback to (defaults to SUPABASE_PROJECT_ID, then the linked project).
+        default_value: ''
+  - id: supabase-feedback-delete
+    title: supabase feedback delete
+    summary: Delete previously submitted feedback
+    description: Delete previously submitted feedback using its deletion token.
+    examples:
+      - id: example-1
+        name: Delete feedback using the token printed when it was submitted
+        code: supabase feedback delete 123e4567-e89b-12d3-a456-426614174000
+    tags: []
+    links: []
+    usage: supabase feedback delete <token> [flags]
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project the feedback was submitted with.
         default_value: ''
   - id: supabase-functions
     title: supabase functions
@@ -3436,6 +3487,57 @@ commands:
         description: enable experimental features
         required: true
         default_value: 'false'
+  - id: supabase-notebooks
+    title: supabase notebooks
+    summary: Manage Supabase notebooks
+    description: 'Manage Supabase notebooks: SQL and markdown cells stored with your project, kept in supabase/notebooks/<name>.json.'
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-notebooks-pull
+      - supabase-notebooks-push
+    flags: []
+  - id: supabase-notebooks-pull
+    title: supabase notebooks pull
+    summary: Pull notebooks from Supabase
+    description: Write the linked Supabase project's notebooks into supabase/notebooks. Without a notebook id, existing local files are preserved and only missing notebooks are written.
+    examples:
+      - id: example-1
+        name: Pull every notebook from the linked project
+        code: supabase notebooks pull
+      - id: example-2
+        name: Replace the local copy of one notebook by id
+        code: supabase notebooks pull 44444444-4444-4444-8444-444444444444
+    tags: []
+    links: []
+    usage: supabase notebooks pull [Notebook id] [flags]
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-notebooks-push
+    title: supabase notebooks push
+    summary: Push notebooks to Supabase
+    description: Write supabase/notebooks into the linked Supabase project. If no notebook name is provided, pushes all of them and asks what to do about project notebooks the directory does not have.
+    examples:
+      - id: example-1
+        name: Push every notebook in supabase/notebooks to the linked project
+        code: supabase notebooks push
+      - id: example-2
+        name: Push a single notebook by name
+        code: supabase notebooks push sales-dashboard
+    tags: []
+    links: []
+    usage: supabase notebooks push [Notebook name] [flags]
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-orgs
     title: supabase orgs
     summary: Manage Supabase organizations
@@ -3771,6 +3873,91 @@ commands:
     usage: supabase projects list [flags]
     subcommands: []
     flags: []
+  - id: supabase-pull
+    title: supabase pull
+    summary: Pull remote project state into the local checkout
+    description: |
+
+
+      Refreshes local project state from a linked Supabase project or branch in one step, instead of running `config pull`, `db pull`, `migration fetch`, and `functions download` individually. It runs four steps, always in this order: pull config into `supabase/config.toml`, optionally fetch the remote migration history table into `supabase/migrations`, pull the database schema into `supabase/migrations` (also updating that database's own migration history table), and download every Edge Function's source into `supabase/functions`. The order is fixed rather than parallel: the database step depends on `db.major_version` in the config file the first step may have just changed, and on the local migration history the second step may have just populated.
+
+      Pass `--project-ref` to target a specific project, or the name (or UUID) of a branch of the currently linked project — values that are exactly 20 lowercase letters are always treated as project refs. Without it, the linked project is the target. `--remote-label` overrides the `[remotes.*]` block the config step would otherwise reuse or create for that target, identically to `config pull`'s own flag of the same name (see `supabase config pull`'s docs for the reuse/creation rules it follows).
+
+      On a fresh checkout, the migration history step runs automatically even without `--with-migration-history`, whenever `supabase/migrations` is missing or a raw directory listing of it turns up no entries at all — the same "existing files" check `migration fetch` itself uses, so a directory holding only a `.gitkeep`/`README.md` already counts as non-empty for this purpose (the listing is unfiltered — any entry at all disqualifies it) and the two commands never disagree about it. There's nothing local to overwrite when the directory is truly empty or missing, and it's what lets the database step run at all: without it, `db pull` would hard-fail comparing an empty local directory against a remote project that already has migration history. Pass `--with-migration-history` to force a re-fetch whenever the directory already has any files in it, including only non-migration ones — unlike the bootstrap case, this DOES overwrite: any local migration file that shares a name with a remote history entry is replaced.
+
+      `supabase pull` shows one confirmation before writing anything, covering all four steps. It opens by naming the target (`Pulling from project <ref>`, or with `(branch "<name>")` appended when the target is a branch), then lists the four steps in the order they run: the config step's part is a real diff, computed the same way `config diff`/`config pull` compute theirs (or "No config differences found." when there is nothing to change); the migration-history line only appears when that step will actually run this invocation, and calls out that it overwrites same-named local files when it's running because of `--with-migration-history` rather than the bootstrap case; the database line notes that it also updates the remote migration history table and requires Docker; the functions line describes the download. `--dry-run` prints this exact same disclosure body — not a placeholder or a status-only summary — before exiting without writing or changing anything. `--yes` skips the confirmation and takes its default answer.
+
+      `supabase pull` checks THREE locations for uncommitted or untracked changes in git before writing: `supabase/config.toml` (or `config.json`), `supabase/migrations`, and `supabase/functions`. The config check only fires when the config step itself has work to write — a config that's already fully converged with the target never triggers it. The other two fire unconditionally: the database step always attempts to run and has no way to know in advance whether it will find schema drift and write into `supabase/migrations`, and the functions step always runs with no equivalent "nothing to do" signal available without calling the API first — so both are checked every run to avoid silently missing real uncommitted work. Each location's dirty state is tracked separately: the confirmation body and any abort message name exactly which path(s) are actually dirty, e.g. `supabase/config.toml has uncommitted or untracked changes...` for one, or `supabase/config.toml, supabase/migrations, and supabase/functions have uncommitted or untracked changes...` when all three are. `--force` writes even when any of the three is dirty — without it, an interactive run's confirmation defaults to declining instead of proceeding, and every other case (non-interactive, machine output format, or `--yes` on any TTY) aborts outright rather than silently overwriting local edits.
+
+      **This command is not purely a local, read-only refresh.** Pulling the database schema also updates that database's own migration history table on the **remote** project — the same behavior `db pull` has always had — not just a local file write. The database step also requires Docker (it runs a shadow Postgres container, and — on the very first pull — a `pg_dump` container) to compute the schema diff. Without Docker running, that one step fails and is reported as such, but the other three steps (config, migration history, functions) still run and complete normally; a project with nothing in its database yet can still successfully pull its config and functions without Docker installed.
+
+      If the database is already in sync with the local migrations, that step reports `unchanged` rather than failing — this differs from running `supabase db pull` directly, which treats "nothing to pull" as an error condition.
+
+      Storage bucket definitions are not pulled by this command: the Management API doesn't currently return enough detail (file size limits, allowed MIME types, the storage backend path) to populate `storage.buckets` config faithfully.
+
+      ## Example
+
+      ```sh
+      supabase pull
+      ```
+
+      Pulls config, database schema, and functions from the linked project, fetching migration history first if `supabase/migrations` is empty.
+
+      ```sh
+      supabase pull --project-ref staging
+      ```
+
+      Pulls from the `staging` branch of the linked project.
+
+      ```sh
+      supabase pull --dry-run
+      ```
+
+      Prints the full confirmation body — the target header, the real config diff (or "No config differences found."), the migration-history/database/functions lines (including the Docker mention and, if applicable, the uncommitted-changes warning) — without writing or changing anything.
+
+      ```sh
+      supabase pull --remote-label staging
+      ```
+
+      Pulls into the `[remotes.staging]` block instead of whatever block the target would otherwise reuse or create.
+
+      Machine-readable output is available through `--output-format json|stream-json` — a single object (`schema_version`, `target`, `dry_run`, `confirmed`, `wrote`, `step_order`, `steps`, `counts`) with one entry per step under `steps`, keyed `config`, `migration_history`, `db`, and `functions`, each carrying its own `status` (`changed`, `unchanged`, `skipped`, `planned`, or `failed`), the paths it wrote, and a step-specific `detail` object. The legacy global `-o`/`--output` flag is not supported by this command; use `--output-format json|stream-json` instead.
+    examples:
+      - id: example-1
+        name: Pull config, schema, and functions from the linked project
+        code: supabase pull
+      - id: example-2
+        name: Pull from the 'staging' branch of the linked project
+        code: supabase pull --project-ref staging
+      - id: example-3
+        name: Preview what would be pulled without writing anything
+        code: supabase pull --dry-run
+    tags:
+      - other-commands
+    links: []
+    usage: supabase pull [flags]
+    subcommands: []
+    flags:
+      - id: dry-run
+        name: --dry-run
+        description: Show what would be pulled without writing or changing anything.
+        default_value: 'false'
+      - id: force
+        name: --force
+        description: Write even when supabase/config.toml (or config.json), supabase/migrations, or supabase/functions has uncommitted or untracked changes in git.
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project, or the name (or UUID) of one of its branches. Values that are exactly 20 lowercase letters are always treated as project refs.
+        default_value: ''
+      - id: remote-label
+        name: --remote-label <string>
+        description: Name of the [remotes.*] block the config step writes into, overriding the block it would otherwise reuse or create.
+        default_value: ''
+      - id: with-migration-history
+        name: --with-migration-history
+        description: Fetch the remote migration history table into supabase/migrations, even when it already has files. Runs automatically when supabase/migrations is missing or empty.
+        default_value: 'false'
   - id: supabase-secrets
     title: supabase secrets
     summary: Manage Supabase secrets
@@ -4819,3 +5006,20 @@ commands:
         description: enable experimental features
         required: true
         default_value: 'false'
+  - id: supabase-whoami
+    title: supabase whoami
+    summary: Show the current user
+    description: Show information about the currently logged-in user.
+    examples:
+      - id: example-1
+        name: Show the current user
+        code: supabase whoami
+      - id: example-2
+        name: Show the current user as JSON
+        code: supabase whoami --output-format json
+    tags:
+      - management-api
+    links: []
+    usage: supabase whoami [flags]
+    subcommands: []
+    flags: []
