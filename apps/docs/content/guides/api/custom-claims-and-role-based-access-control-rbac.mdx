@@ -4,7 +4,7 @@ title: 'Custom Claims & Role-based Access Control (RBAC)'
 description: 'Use Auth Hooks to add custom claims for managing role-based access control.'
 ---
 
-Custom Claims are special attributes attached to a user that you can use to control access to portions of your application. For example:
+Custom claims are attributes attached to a user that you can use to control access to parts of your app. For example:
 
 ```json
 {
@@ -18,13 +18,13 @@ Custom Claims are special attributes attached to a user that you can use to cont
 }
 ```
 
-To implement Role-Based Access Control (RBAC) with `custom claims`, use a [Custom Access Token Auth Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook). This hook runs before a token is issued. You can use it to add additional claims to the user's JWT.
+To implement role-based access control (RBAC) with custom claims, use a [Custom Access Token Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook). The hook runs before a token is issued, so you can use it to add claims to the user's JWT.
 
 This guide uses the [Slack Clone example](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone) to demonstrate how to add a `user_role` claim and use it in your [Row Level Security (RLS) policies](/docs/guides/database/postgres/row-level-security).
 
 ## Create a table to track user roles and permissions
 
-In this example, you will implement two user roles with specific permissions:
+This example implements two user roles, each with its own permissions:
 
 - `moderator`: A moderator can delete all messages but not channels.
 - `admin`: An admin can delete all messages and channels.
@@ -53,13 +53,9 @@ create table public.role_permissions (
 comment on table public.role_permissions is 'Application permissions for each role.';
 ```
 
-<Admonition type="note">
+For the full schema, see the [Slack Clone example](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone) on GitHub.
 
-For the [full schema](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone/README.md), see the example application on [GitHub](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone).
-
-</Admonition>
-
-You can now manage your roles and permissions in SQL. For example, to add the mentioned roles and permissions from above, run:
+You can now manage roles and permissions in SQL. To create the two roles described above, run:
 
 ```sql supabase/seed.sql
 insert into public.role_permissions (role, permission)
@@ -71,7 +67,7 @@ values
 
 ## Create Auth Hook to apply user role
 
-The [Custom Access Token Auth Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook) runs before a token is issued. You can use it to edit the JWT.
+Write the hook as a Postgres function that reads the user's role and adds it to the JWT.
 
 <Tabs
   scrollable
@@ -142,19 +138,13 @@ using (true);
 
 ### Enable the hook
 
-In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate Postgres function from the dropdown menu.
+In the Supabase Dashboard, go to [Authentication > Auth Hooks](/dashboard/project/_/auth/hooks) and select your Postgres function from the dropdown menu.
 
 When developing locally, follow the [local development](/docs/guides/auth/auth-hooks#local-development) instructions.
 
-<Admonition type="note">
-
-To learn more about Auth Hooks, see the [Auth Hooks docs](/docs/guides/auth/auth-hooks).
-
-</Admonition>
-
 ## Accessing custom claims in RLS policies
 
-To use Role-Based Access Control (RBAC) in Row Level Security (RLS) policies, create an `authorize` method that reads the user's role from their JWT and checks the role's permissions:
+To use RBAC in Row Level Security (RLS) policies, create an `authorize` function that reads the user's role from their JWT and checks the role's permissions:
 
 ```sql supabase/migrations/init.sql
 create or replace function public.authorize(
@@ -179,13 +169,9 @@ end;
 $$ language plpgsql stable security definer set search_path = '';
 ```
 
-<Admonition type="note">
+To learn more about using functions in RLS policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security#use-security-definer-functions).
 
-You can read more about using functions in RLS policies in the [RLS guide](/docs/guides/database/postgres/row-level-security#use-security-definer-functions).
-
-</Admonition>
-
-You can then use the `authorize` method within your RLS policies. For example, to enable the desired delete access, you would add the following policies:
+You can then call `authorize` from your RLS policies. To grant the delete access described above, add these policies:
 
 ```sql
 create policy "Allow authorized delete access" on public.channels for delete to authenticated using ( (SELECT authorize('channels.delete')) );
@@ -194,9 +180,9 @@ create policy "Allow authorized delete access" on public.messages for delete to 
 
 ## Accessing custom claims in your application
 
-The auth hook will only modify the access token JWT but not the auth response. Therefore, to access the custom claims in your application, e.g. your browser client, or server-side middleware, you will need to decode the `access_token` JWT on the auth session.
+The hook modifies the access token JWT, not the auth response. To read the custom claims anywhere else, such as your browser client or your server-side middleware, decode the `access_token` on the auth session.
 
-In a JavaScript client application you can for example use the [`jwt-decode` package](https://www.npmjs.com/package/jwt-decode):
+In a JavaScript client, you can use the [`jwt-decode` package](https://www.npmjs.com/package/jwt-decode):
 
 ```js
 import { jwtDecode } from 'jwt-decode'
@@ -209,7 +195,7 @@ const { subscription: authListener } = supabase.auth.onAuthStateChange(async (ev
 })
 ```
 
-For server-side logic you can use packages like [`express-jwt`](https://github.com/auth0/express-jwt), [`koa-jwt`](https://github.com/stiang/koa-jwt), [`PyJWT`](https://github.com/jpadilla/pyjwt), [dart_jsonwebtoken](https://pub.dev/packages/dart_jsonwebtoken), [Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer), etc.
+For server-side logic, you can use a JWT package for your language, such as [`express-jwt`](https://github.com/auth0/express-jwt), [`koa-jwt`](https://github.com/stiang/koa-jwt), [`PyJWT`](https://github.com/jpadilla/pyjwt), [dart_jsonwebtoken](https://pub.dev/packages/dart_jsonwebtoken), or [Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer).
 
 ## Conclusion
 
