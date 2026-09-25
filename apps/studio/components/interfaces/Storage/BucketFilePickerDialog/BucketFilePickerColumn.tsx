@@ -141,10 +141,8 @@ export const BucketFilePickerColumn = ({
   }
   const isLastFolder = index === columns.length
 
+  // Already normalized to exclude 'last_accessed_at', which v2's sortBy.column doesn't support.
   const { view, sortBy, sortByOrder } = useStoragePreference(projectRef!)
-  // v2's sortBy.column doesn't support 'last_accessed_at'; the picker's own sort dropdown no
-  // longer offers it, but the preference is shared with the (still v1) main file explorer.
-  const sortColumn = sortBy === STORAGE_SORT_BY.LAST_ACCESSED_AT ? STORAGE_SORT_BY.NAME : sortBy
 
   const debouncedSearchString = useDebounce(itemSearchString, 500)
   const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useInfiniteQuery({
@@ -154,7 +152,7 @@ export const BucketFilePickerColumn = ({
       path,
       options: {
         sortBy: {
-          column: sortColumn,
+          column: sortBy,
           order: sortByOrder,
         },
         // When a user tries to search, only search in the last opened folder (rightmost column)
@@ -187,12 +185,12 @@ export const BucketFilePickerColumn = ({
       })
     const direction = sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
     const merged = [...folders, ...objs].sort((a, b) => {
-      const aValue = (sortColumn === STORAGE_SORT_BY.NAME ? a.name : a[sortColumn]) ?? ''
-      const bValue = (sortColumn === STORAGE_SORT_BY.NAME ? b.name : b[sortColumn]) ?? ''
+      const aValue = (sortBy === STORAGE_SORT_BY.NAME ? a.name : a[sortBy]) ?? ''
+      const bValue = (sortBy === STORAGE_SORT_BY.NAME ? b.name : b[sortBy]) ?? ''
       return direction * String(aValue).localeCompare(String(bValue))
     })
     return formatFolderItems(merged)
-  }, [data, sortColumn, sortByOrder])
+  }, [data, sortBy, sortByOrder])
 
   const haveSelectedItems = selectedItems.length > 0
   const columnItemsId = items.map((item) => item.id)

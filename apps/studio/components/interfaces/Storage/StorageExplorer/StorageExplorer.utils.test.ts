@@ -10,6 +10,8 @@ import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
+  formatFolderItemsV2,
+  getListV2EntryName,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
   getStorageExplorerUrlForItem,
@@ -180,6 +182,7 @@ describe('sanitizeNameForDuplicateInColumn', () => {
         name: `col-${i}`,
         path: `col-${i}`,
         status: STORAGE_ROW_STATUS.READY,
+        cursor: null,
         items: columnItems.map((overrides) => ({
           id: 'file-id',
           name: 'file.txt',
@@ -450,5 +453,73 @@ describe('clipboard helpers', () => {
 
     onCopied?.()
     expect(toast.success).toHaveBeenCalledWith('Copied URL for "photo.png"')
+  })
+})
+
+describe('getListV2EntryName', () => {
+  it('returns a bare file name unchanged', () => {
+    expect(getListV2EntryName('file.png')).toBe('file.png')
+  })
+
+  it('strips the trailing slash off a folder and takes the last segment', () => {
+    expect(getListV2EntryName('outer/inner/')).toBe('inner')
+  })
+
+  it('takes the last segment of a full-path file name', () => {
+    expect(getListV2EntryName('a/b/file.png')).toBe('file.png')
+  })
+})
+
+describe('formatFolderItemsV2', () => {
+  it('tags folders with id: null and puts them ahead of files', () => {
+    const items = formatFolderItemsV2({
+      folders: [{ name: 'a/inner/' }],
+      objects: [
+        {
+          id: 'file-id',
+          name: 'a/file.png',
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+          last_accessed_at: '2024-01-01T00:00:00Z',
+          metadata: { size: 1, mimetype: 'image/png' },
+        },
+      ],
+    })
+
+    expect(items.map((item) => ({ name: item.name, type: item.type, id: item.id }))).toEqual([
+      { name: 'inner', type: STORAGE_ROW_TYPES.FOLDER, id: null },
+      { name: 'file.png', type: STORAGE_ROW_TYPES.FILE, id: 'file-id' },
+    ])
+  })
+
+  it('drops the empty-folder placeholder and builds path from the given prefix', () => {
+    const items = formatFolderItemsV2(
+      {
+        folders: [],
+        objects: [
+          {
+            id: 'placeholder-id',
+            name: 'a/b/.emptyFolderPlaceholder',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            last_accessed_at: '2024-01-01T00:00:00Z',
+            metadata: null,
+          },
+          {
+            id: 'file-id',
+            name: 'a/b/file.png',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            last_accessed_at: '2024-01-01T00:00:00Z',
+            metadata: { size: 1, mimetype: 'image/png' },
+          },
+        ],
+      },
+      'a/b'
+    )
+
+    expect(items.map((item) => ({ name: item.name, path: item.path }))).toEqual([
+      { name: 'file.png', path: 'a/b/file.png' },
+    ])
   })
 })

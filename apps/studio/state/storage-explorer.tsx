@@ -18,19 +18,24 @@ import {
   StorageItem,
   StorageItemMetadata,
   StorageItemWithColumn,
+  StorageObjectV2Object,
 } from '@/components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
-  formatFolderItems,
+  formatFolderItemsV2,
   formatTime,
   getFilesDataTransferItems,
+  getListV2EntryName,
   getPathAlongFoldersToIndex,
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
-import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
+import {
+  getStoragePreference,
+  toListV2SortColumn,
+} from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
@@ -40,7 +45,7 @@ import type { ProjectStorageConfigResponse } from '@/data/config/project-storage
 import { getQueryClient } from '@/data/query-client'
 import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
 import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
-import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
+import { listBucketObjectsV2, toListV2Prefix } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { moveStorageObject } from '@/data/storage/object-move-mutation'
@@ -59,7 +64,8 @@ type UploadProgress = {
 }
 
 const LIMIT = 200
-const OFFSET = 0
+// v2's documented default; its confirmed hard limit is unknown, unlike v1's 10k
+const LIST_ALL_PAGE_SIZE = 1000
 const DEFAULT_RETRY_SECONDS = 5
 const RATE_LIMIT_RETRY_SECONDS = 60
 
@@ -85,7 +91,42 @@ export function createStorageExplorerState({
 }) {
   const getSortOptions = () => {
     const { sortBy, sortByOrder } = getStoragePreference(projectRef)
-    return { column: sortBy, order: sortByOrder }
+    return { column: toListV2SortColumn(sortBy), order: sortByOrder }
+  }
+
+  /** Lists one v2 page of a folder's contents and formats it into a StorageColumn-shaped result. */
+  const listFolderPage = async (
+    {
+      bucketId,
+      path,
+      searchString,
+      cursor,
+    }: {
+      bucketId?: string
+      path: string
+      searchString?: string
+      cursor?: string
+    },
+    signal?: AbortSignal
+  ) => {
+    const page = await listBucketObjectsV2(
+      {
+        projectRef,
+        bucketId,
+        prefix: toListV2Prefix(path, searchString),
+        cursor,
+        options: { limit: LIMIT, sortBy: getSortOptions() },
+      },
+      signal
+    )
+    // A backend that says there's more but doesn't advance the cursor would otherwise send
+    // load-more into an infinite loop re-fetching the same page forever; treat it as the end.
+    const nextCursor = page.hasNext && page.nextCursor !== cursor ? (page.nextCursor ?? null) : null
+    return {
+      items: formatFolderItemsV2(page, path),
+      hasMoreItems: nextCursor !== null,
+      cursor: nextCursor,
+    }
   }
 
   const state = proxy({
@@ -293,25 +334,14 @@ export function createStorageExplorerState({
           path: prefix,
           status: STORAGE_ROW_STATUS.LOADING,
           items: [],
+          cursor: null,
         },
         index
       )
 
-      const options = {
-        limit: LIMIT,
-        offset: OFFSET,
-        search: searchString,
-        sortBy: getSortOptions(),
-      }
-
       try {
-        const data = await listBucketObjects(
-          {
-            bucketId,
-            projectRef: state.projectRef,
-            path: prefix,
-            options,
-          },
+        const { items, hasMoreItems, cursor } = await listFolderPage(
+          { bucketId, path: prefix, searchString },
           abortController?.signal
         )
 
@@ -320,18 +350,15 @@ export function createStorageExplorerState({
           status: STORAGE_ROW_STATUS.READY,
           columnIndex: index,
         })
-        const formattedItems = formatFolderItems(data, prefix)
         state.pushColumnAtIndex(
           {
             id: folderId || folderName,
             name: folderName,
             path: prefix,
             status: STORAGE_ROW_STATUS.READY,
-            items: formattedItems,
-            // Compare the raw page, not the formatted one: formatFolderItems drops the
-            // .emptyFolderPlaceholder, so a full page can format to LIMIT - 1 and stop
-            // pagination a page early.
-            hasMoreItems: (data ?? []).length === LIMIT,
+            items,
+            hasMoreItems,
+            cursor,
             isLoadingMoreItems: false,
           },
           index
@@ -360,41 +387,38 @@ export function createStorageExplorerState({
     }) => {
       state.setColumnIsLoadingMore(index)
 
-      const options = {
-        limit: LIMIT,
-        offset: column.items.length,
-        search: searchString,
-        sortBy: getSortOptions(),
-      }
-
       try {
-        const data = await listBucketObjects(
+        const { items, hasMoreItems, cursor } = await listFolderPage(
           {
-            projectRef: state.projectRef,
             bucketId: state.selectedBucket.id,
             path: column.path,
-            options,
+            searchString,
+            cursor: column.cursor ?? undefined,
           },
           abortController?.signal
         )
 
-        // Add items to column
-        const formattedItems = formatFolderItems(data, column.path)
         state.columns = state.columns.map((col, idx) => {
-          if (idx === index) {
-            return {
-              ...col,
-              items: col.items.concat(formattedItems),
-              isLoadingMoreItems: false,
-              hasMoreItems: data.length === LIMIT,
-            }
+          if (idx !== index) return col
+          // The column was replaced (e.g. a refresh completed) mid-flight — drop this page
+          // rather than appending it onto contents it no longer follows on from.
+          const isStale = col.path !== column.path || col.cursor !== column.cursor
+          if (isStale) return { ...col, isLoadingMoreItems: false }
+          return {
+            ...col,
+            items: col.items.concat(items),
+            isLoadingMoreItems: false,
+            hasMoreItems,
+            cursor,
           }
-          return col
         })
       } catch (error: any) {
         if (!error.message.includes('aborted')) {
           toast.error(`Failed to retrieve more folder contents: ${error.message}`)
         }
+        state.columns = state.columns.map((col, idx) =>
+          idx === index ? { ...col, isLoadingMoreItems: false } : col
+        )
       }
     },
 
@@ -437,48 +461,45 @@ export function createStorageExplorerState({
 
       if (showLoading) {
         state.columns = [state.selectedBucket.name].concat(paths).map((path) => {
-          return { id: path, name: path, path, status: STORAGE_ROW_STATUS.LOADING, items: [] }
+          return {
+            id: path,
+            name: path,
+            path,
+            status: STORAGE_ROW_STATUS.LOADING,
+            items: [],
+            cursor: null,
+          }
         })
       }
 
       const foldersItems = await Promise.all(
         pathsWithEmptyPrefix.map(async (_path, idx) => {
           const prefix = paths.slice(0, idx).join('/')
-          const options = {
-            limit: LIMIT,
-            offset: OFFSET,
-            search: searchString,
-            sortBy: getSortOptions(),
-          }
-
           try {
-            const data = await listBucketObjects({
-              projectRef: state.projectRef,
-              bucketId: state.selectedBucket.id,
+            const page = await listFolderPage({
+              bucketId: bucketIdAtStart,
               path: prefix,
-              options,
+              searchString,
             })
-            return { items: data, isComplete: true }
+            return { ...page, isComplete: true }
           } catch (error: any) {
             toast.error(`Failed to fetch folders: ${error.message}`)
             // Flagged so an empty listing isn't read as "the folder has nothing in it"
-            return { items: [], isComplete: false }
+            return { items: [], hasMoreItems: false, cursor: null, isComplete: false }
           }
         })
       )
 
-      const formattedFolders = foldersItems.map(({ items }, idx) => {
+      const formattedFolders = foldersItems.map(({ items, hasMoreItems, cursor }, idx) => {
         const prefix = paths.slice(0, idx).join('/')
-        const formattedItems = formatFolderItems(items, prefix)
         return {
           id: null,
           status: STORAGE_ROW_STATUS.READY,
           name: idx === 0 ? state.selectedBucket.name : pathsWithEmptyPrefix[idx],
           path: prefix,
-          items: formattedItems,
-          // Raw page length — see fetchFolderContents. Getting this wrong here also
-          // makes isParentListingExhaustive below claim a folder is missing.
-          hasMoreItems: items.length === LIMIT,
+          items,
+          hasMoreItems,
+          cursor,
           isLoadingMoreItems: false,
         }
       })
@@ -524,18 +545,14 @@ export function createStorageExplorerState({
      */
     validateParentFolderEmpty: async (parentFolderPrefix: string) => {
       try {
-        const data = await listBucketObjects({
+        const page = await listBucketObjectsV2({
           projectRef: state.projectRef,
           bucketId: state.selectedBucket.id,
-          path: parentFolderPrefix,
-          options: {
-            limit: LIMIT,
-            offset: OFFSET,
-            sortBy: getSortOptions(),
-          },
+          prefix: toListV2Prefix(parentFolderPrefix),
+          options: { limit: 1 },
         })
 
-        if (data.length === 0) {
+        if (page.folders.length === 0 && page.objects.length === 0) {
           const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
           const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
           await client.storage
@@ -928,8 +945,8 @@ export function createStorageExplorerState({
       name: string
       columnIndex: number
       prefix?: string
-    }): Promise<(StorageObject & { prefix: string })[]> => {
-      const items: (StorageObject & { prefix: string })[] = []
+    }): Promise<(StorageObjectV2Object & { prefix: string })[]> => {
+      const items: (StorageObjectV2Object & { prefix: string })[] = []
 
       let hasError = false
       let formattedPathToFolder = ''
@@ -945,47 +962,46 @@ export function createStorageExplorerState({
         formattedPathToFolder = `${prefix}/${name}`
       }
 
-      // [Joshen] limit is set to 10k to optimize reduction of requests, we've done some experiments
-      // that prove that the time to fetch all files in a folder reduces as the batch size increases
-      // 10k however, is the hard limit at the API level.
-      const options = {
-        limit: 10000,
-        offset: OFFSET,
-        sortBy: getSortOptions(),
-      }
-      let folderContents: StorageObject[] = []
+      const folderPrefix = toListV2Prefix(formattedPathToFolder)
+      const objects: StorageObjectV2Object[] = []
+      const subfolders: { name: string }[] = []
+      let cursor: string | undefined
 
-      for (;;) {
+      do {
         try {
-          const data = await listBucketObjects({
+          // No sortBy: order doesn't matter for a full walk, and a stored last-accessed
+          // preference would otherwise make v2 reject the request outright.
+          const page = await listBucketObjectsV2({
             projectRef: state.projectRef,
             bucketId: state.selectedBucket.id,
-            path: formattedPathToFolder,
-            options,
+            prefix: folderPrefix,
+            cursor,
+            options: { limit: LIST_ALL_PAGE_SIZE },
           })
-          folderContents = folderContents.concat(data)
-          options.offset += options.limit
-          if ((data || []).length < options.limit) {
-            break
-          }
+          objects.push(...page.objects)
+          subfolders.push(...page.folders)
+          cursor = page.hasNext && page.nextCursor !== cursor ? page.nextCursor : undefined
         } catch (e) {
           hasError = true
           break
         }
-      }
+      } while (cursor)
 
       if (hasError) {
         throw new Error('Failed to retrieve all files within folder')
       }
 
-      const subfolders = folderContents?.filter((item) => item.id === null) ?? []
-      const folderItems = folderContents?.filter((item) => item.id !== null) ?? []
-
-      folderItems.forEach((item) => items.push({ ...item, prefix: formattedPathToFolder }))
+      objects.forEach((item) =>
+        items.push({ ...item, name: getListV2EntryName(item.name), prefix: formattedPathToFolder })
+      )
 
       const subFolderContents = await Promise.all(
         subfolders.map((folder) =>
-          state.getAllItemsAlongFolder({ ...folder, columnIndex: 0, prefix: formattedPathToFolder })
+          state.getAllItemsAlongFolder({
+            name: getListV2EntryName(folder.name),
+            columnIndex: 0,
+            prefix: formattedPathToFolder,
+          })
         )
       )
       subFolderContents.map((subfolderContent) => {

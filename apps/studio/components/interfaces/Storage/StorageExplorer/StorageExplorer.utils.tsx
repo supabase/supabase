@@ -4,6 +4,7 @@ import { copyToClipboard } from 'ui'
 import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../CreateBucketModal.utils'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
+import type { StorageObjectsPage } from '@/data/storage/bucket-objects-infinite-query'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { BASE_PATH } from '@/lib/constants'
 import type { StorageExplorerState } from '@/state/storage-explorer'
@@ -249,6 +250,40 @@ export const formatFolderItems = (items: StorageObject[] = [], prefix?: string):
         return itemObj
       }) ?? []
   return formattedItems
+}
+
+/**
+ * v2's `name` is the full key/prefix from the bucket root (folders end with a trailing slash),
+ * not the bare file/folder name — strips the slash and takes the last path segment.
+ */
+export function getListV2EntryName(name: string): string {
+  const trimmed = name.replace(/\/$/, '')
+  return trimmed.split('/').pop() ?? trimmed
+}
+
+/**
+ * v2 returns folders and files as two separate arrays; merges them into the single list
+ * `formatFolderItems` expects, tagging folders with `id: null` per its v1-derived convention.
+ * Folders are kept ahead of files (as v1's listing always had them) rather than re-sorted by
+ * name, so page boundaries stay in the server's order.
+ */
+export function formatFolderItemsV2(
+  page: Pick<StorageObjectsPage, 'folders' | 'objects'>,
+  prefix?: string
+): StorageItem[] {
+  const folders = page.folders.map((folder) => ({
+    id: null,
+    name: getListV2EntryName(folder.name),
+    created_at: null,
+    updated_at: null,
+    last_accessed_at: null,
+    metadata: null,
+  }))
+  const objects = page.objects.map((object) => ({
+    ...object,
+    name: getListV2EntryName(object.name),
+  }))
+  return formatFolderItems([...folders, ...objects], prefix)
 }
 
 export const getFile = async (fileEntry: FileSystemFileEntry): Promise<File | undefined> => {

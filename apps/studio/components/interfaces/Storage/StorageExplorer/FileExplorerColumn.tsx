@@ -386,9 +386,6 @@ export const FileExplorerColumn = ({
             <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.UPDATED_AT)}>
               <span className="text-xs">Last modified</span>
             </ContextMenuItem>
-            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.LAST_ACCESSED_AT)}>
-              <span className="text-xs">Last accessed</span>
-            </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSub>

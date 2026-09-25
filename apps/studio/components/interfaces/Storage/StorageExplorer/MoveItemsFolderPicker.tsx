@@ -10,6 +10,7 @@ import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
 import { MoveItemsFolderPickerBreadcrumb } from './MoveItemsFolderPickerBreadcrumb'
 import { FolderPickerRow } from './MoveItemsFolderPickerRow'
 import { filterFoldersBySearch, getDestinationLabel } from './MoveItemsModal.utils'
+import { getListV2EntryName } from './StorageExplorer.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { bucketFoldersQueryOptions } from '@/data/storage/bucket-folders-query'
@@ -78,13 +79,10 @@ export const MoveItemsFolderPicker = ({
     // (e.g. "outer/inner/") — not the bare folder name, and not relative to `path`.
     return (objectsData?.pages ?? [])
       .flatMap((page) => page.folders)
-      .map((folder) => {
-        const folderPath = folder.name.replace(/\/$/, '')
-        return {
-          name: folderPath.split('/').pop() ?? folderPath,
-          path: folderPath,
-        }
-      })
+      .map((folder) => ({
+        name: getListV2EntryName(folder.name),
+        path: folder.name.replace(/\/$/, ''),
+      }))
   }, [objectsData])
 
   const searchResults = useMemo(
