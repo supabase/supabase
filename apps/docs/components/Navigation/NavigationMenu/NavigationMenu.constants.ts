@@ -1100,6 +1100,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/functions' as `/${string}`,
         },
         {
+          name: 'Debugging database functions',
+          url: '/guides/database/debugging-functions' as `/${string}`,
+        },
+        {
           name: 'Managing database triggers',
           url: '/guides/database/postgres/triggers' as `/${string}`,
         },
