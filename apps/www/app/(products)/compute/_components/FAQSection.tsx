@@ -22,7 +22,7 @@ const faqs = [
   {
     question: 'Where does Compute run?',
     answer:
-      "Sandboxes and services deploy to your primary database's region — that's where writes happen, and it keeps behavior predictable. They can still read from replicas via the load-balanced connection endpoint, so replica capacity isn't wasted. Pinning a workload to a specific replica region is on the roadmap.",
+      "During Private Alpha, Compute is only available in us-west-2, with more regions rolling out over time until every Supabase region is covered. Sandboxes and services deploy to your primary database's region — that's where writes happen, and it keeps behavior predictable. They can still read from replicas via the load-balanced connection endpoint, so replica capacity isn't wasted. Pinning a workload to a specific replica region is on the roadmap.",
   },
   {
     question: 'Can I attach a persistent disk?',

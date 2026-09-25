@@ -204,7 +204,13 @@ export function WaitlistForm() {
       </Button>
 
       <p className="text-foreground-lighter text-xs text-left">
-        By submitting this form, I confirm that I have read and understood the{' '}
+        By submitting this form, you acknowledge that Supabase Compute is offered as a private alpha
+        preview, provided on an "as is" and "as available" basis without warranties of any kind. It
+        is intended for internal evaluation only and should not be used to serve production
+        workloads or your own end customers. Supabase may modify, suspend, or discontinue the
+        preview at any time without notice, and there is no guarantee it will become a generally
+        available product. You confirm you are authorized to submit this request on behalf of your
+        organization, and that you have read and understood our{' '}
         <Link href="/privacy" className="text-foreground hover:underline">
           Privacy Policy
         </Link>
