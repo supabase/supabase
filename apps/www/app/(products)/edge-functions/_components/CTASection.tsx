@@ -53,7 +53,11 @@ function TerminalAnimation() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
               className={
-                line.accent ? 'text-brand' : line.dim ? 'text-foreground-light' : 'text-foreground'
+                line.accent
+                  ? 'text-primary'
+                  : line.dim
+                    ? 'text-foreground-light'
+                    : 'text-foreground'
               }
             >
               {line.text || '\u00A0'}

@@ -12,8 +12,6 @@ Before adding a new lint job or CI check, **scan this list first** — see
 ```
 PR opened / updated
     │
-    ├── docs_lint                  (MDX/content linting; required)
-    ├── docs_lint_comment_external (posts results as PR comments for external PRs)
     ├── Docs Tests                 (pnpm test:docs on relevant docs code/spec changes)
     ├── TypeScript & Lint          (tsc + eslint)
     ├── Prettier                   (format check)
@@ -29,12 +27,7 @@ Merge to master
 
 Workflows run in parallel against any PR touching the repo:
 
-### 1. `docs_lint`
-
-Primary docs-specific CI check. MDX/content linting for the docs. **Required
-check before merging.** Backed by `supa-mdx-lint`.
-
-### 2. Docs Tests (`docs-tests.yml`)
+### 1. Docs Tests (`docs-tests.yml`)
 
 Triggered on relevant docs code/spec changes, including the generated scoped
 PAT partials and their shared permission catalog. Runs on a Blacksmith 4-vCPU
@@ -49,29 +42,24 @@ Ubuntu runner with concurrency controls to cancel stale builds.
 - Run `pnpm run test:docs` (with dummy GitHub OAuth env vars to prevent local
   Supabase startup errors).
 
-### 3. TypeScript & Lint (`typecheck.yml`)
+### 2. TypeScript & Lint (`typecheck.yml`)
 
 TypeScript type checking and ESLint across the monorepo.
 
-### 4. Prettier (`prettier.yml`)
+### 3. Prettier (`prettier.yml`)
 
 Format checking across the whole repo including `apps/docs`.
 
-### 5. `docs_lint_comment_external`
-
-Companion to `docs_lint` that posts lint results as PR comments for external
-contributors.
-
-### 6. Authorize Vercel Deploys
+### 4. Authorize Vercel Deploys
 
 Gates Vercel preview deployment on a GitHub-side check first. Prevents
 arbitrary forks from triggering Vercel builds.
 
-### 7. reviewdog
+### 5. reviewdog
 
 Inline code review annotations via reviewdog.
 
-### 8. Validate pull request
+### 6. Validate pull request
 
 PR metadata validation (title format, labels, etc.).
 
@@ -102,8 +90,9 @@ builds/deploys the Next.js site to their CDN.
 
 Before adding a new GitHub Actions workflow:
 
-1. **Can `docs_lint` absorb it?** — most MDX/content checks belong inside
-   `supa-mdx-lint` configuration, not as a new workflow.
+1. **Is it a prose or terminology check?** — it belongs in the authoring
+   skills, not in a workflow. The repo ran a blocking MDX linter and retired
+   it.
 2. **Can `Docs Tests` absorb it?** — TypeScript / vitest checks for new
    functionality fit here.
 3. **Is it cross-cutting?** — typecheck, prettier, and reviewdog already

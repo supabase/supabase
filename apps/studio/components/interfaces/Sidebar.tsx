@@ -43,6 +43,7 @@ import { useLints } from '@/hooks/misc/useLints'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const ICON_SIZE = 32
@@ -259,6 +260,7 @@ const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings
 
 const ProjectLinks = () => {
   const router = useRouter()
+  const track = useTrack()
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
@@ -314,6 +316,11 @@ const ProjectLinks = () => {
               route={route}
               active={activeRoute === route.key}
               isLoading={isProjectPending}
+              onClick={
+                route.key === 'explorer' && activeRoute === 'sql'
+                  ? () => track('sql_editor_back_explorer_clicked')
+                  : undefined
+              }
             />
           ))}
         </SidebarMenu>

@@ -291,7 +291,7 @@ export const connectSchema: ConnectSchema = {
     {
       id: 'warehouse',
       label: 'Warehouse',
-      description: 'Connect to Warehouse',
+      description: 'Analytical endpoint',
       fields: [],
     },
   ],

@@ -11,6 +11,7 @@ import { allDocs } from '@/.velite'
 import { metadata as mainMetadata } from '@/app/layout'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
+import { OpenInV0Button } from '@/components/open-in-v0-button'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { getTableOfContents } from '@/lib/toc'
@@ -96,7 +97,10 @@ export default async function DocPage(props: DocPageProps) {
               </p>
             )}
           </div>
-          <FrameworkSelector />
+          <div className="flex items-center gap-2">
+            <FrameworkSelector />
+            {doc.v0Name && <OpenInV0Button name={doc.v0Name} />}
+          </div>
         </div>
         <SourcePanel doc={doc} />
         <div className="pb-12">

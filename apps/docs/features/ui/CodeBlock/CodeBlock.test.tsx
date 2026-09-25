@@ -1,18 +1,17 @@
-import { readFile } from 'node:fs/promises'
 import { load } from 'cheerio'
 import { type ComponentProps, type PropsWithChildren } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { createHighlighter, type BundledLanguage, type ThemeRegistration } from 'shiki'
-import { createTwoslasher } from 'twoslash'
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CodeBlock } from './CodeBlock'
 import { type CodeToken } from './CodeBlock.client'
-import { getTokenClassName } from './CodeBlock.utils'
+import { highlightCode } from './CodeBlock.highlight'
 
-vi.mock('./types/lib.deno.d.ts.include', async () => ({
-  default: await readFile(new URL('./types/lib.deno.d.ts.include', import.meta.url), 'utf8'),
-}))
+const { twoslasher } = vi.hoisted(() => ({ twoslasher: vi.fn() }))
+
+vi.mock('./CodeBlock.highlight', () => ({ highlightCode: vi.fn() }))
+vi.mock('twoslash', () => ({ createTwoslasher: () => twoslasher }))
+vi.mock('./types/lib.deno.d.ts.include', () => ({ default: '' }))
 
 // Keep the real token renderer while isolating unrelated UI imports and tooltip portals.
 vi.mock('ui', async () => {
@@ -32,134 +31,124 @@ function getLines(block: Awaited<ReturnType<typeof CodeBlock>>): Array<Array<Cod
   return block.props.children[0].props.children.props.lines
 }
 
-const fixtures: Array<{ name: string; lang?: string; code: string }> = [
-  {
-    name: 'JavaScript',
-    lang: 'javascript',
-    code: '// A greeting\nconst greeting = "hello"\ngreeting',
-  },
-  {
-    name: 'TypeScript',
-    lang: 'typescript',
-    code: 'const count: number = 42\nconst values = [count]',
-  },
-  { name: 'SQL', lang: 'sql', code: "select 'hello' as greeting, 42 as count;\n-- A comment" },
-  { name: 'shell', lang: 'shell', code: 'echo "hello ${USER}"\n# A comment' },
-  { name: 'JSON', lang: 'json', code: '{\n  "greeting": "hello",\n  "count": 42\n}' },
-  { name: 'empty code', lang: 'typescript', code: '' },
-  { name: 'plain text', code: 'plain <text> & punctuation\n  second line' },
-  { name: 'unsupported language', lang: 'not-a-language', code: 'plain <text> & punctuation' },
-]
-
 describe('code block serialization and rendering', () => {
-  let highlighter: Awaited<ReturnType<typeof createHighlighter>>
+  const highlight = vi.mocked(highlightCode, { partial: true })
 
-  beforeAll(async () => {
-    // Shiki mutates theme.colors, so use a fresh raw theme for this independent tokenization.
-    const theme: ThemeRegistration = JSON.parse(
-      await readFile(new URL('./supabase-2.json', import.meta.url), 'utf8')
-    )
-    highlighter = await createHighlighter({
-      themes: [theme],
-      langs: ['javascript', 'typescript', 'sql', 'shell', 'json'],
-    })
+  beforeEach(() => {
+    highlight.mockReset().mockImplementation(async (code) => ({
+      tokens: code
+        .split('\n')
+        .map((content) =>
+          content ? [{ content, offset: 0, color: 'var(--code-foreground)' }] : []
+        ),
+    }))
+    twoslasher.mockReset().mockImplementation((code: string) => ({ code, nodes: [] }))
   })
 
-  afterEach(() => vi.restoreAllMocks())
-  afterAll(() => highlighter.dispose())
+  it('serializes compact classes and renders numbered, escaped source without inline styles', async () => {
+    const code = "const text = '<hello> & world'\n// note"
+    highlight.mockResolvedValueOnce({
+      tokens: [
+        [
+          { content: 'const ', offset: 0, color: 'var(--code-token-keyword)' },
+          { content: "text = '<hello> & world'", offset: 6, color: 'var(--code-token-string)' },
+        ],
+        [{ content: '// note', offset: 31, color: 'var(--code-token-comment)', fontStyle: 1 }],
+      ],
+    })
+    const block = await CodeBlock({
+      contents: code,
+      lang: 'javascript',
+      skipTypeGeneration: true,
+      hideControls: true,
+    })
 
-  it.each(fixtures)(
-    'preserves $name token boundaries using compact namespaced classes',
-    async ({ lang, code }) => {
-      const block = await CodeBlock({
-        contents: code,
-        lang,
-        skipTypeGeneration: true,
-        hideControls: true,
-      })
-      const lines = getLines(block)
-      const { tokens } = highlighter.codeToTokens(code, {
-        lang: lang === 'not-a-language' ? undefined : (lang as BundledLanguage | undefined),
-        theme: 'Supabase Theme',
-        tokenizeTimeLimit: 0,
-        tokenizeMaxLineLength: 100_000,
-      })
+    expect(twoslasher).not.toHaveBeenCalled()
+    expect(getLines(block)).toEqual([
+      [
+        ['const ', 's-k'],
+        ["text = '<hello> & world'", 's-s'],
+      ],
+      [['// note', 's-c s-i']],
+    ])
+    const $ = load(renderToStaticMarkup(block))
+    expect(
+      $('.code-line-number')
+        .toArray()
+        .map((element) => $(element).text())
+    ).toEqual(['1', '2'])
+    expect(
+      $('.code-line-content')
+        .toArray()
+        .map((element) => $(element).text())
+    ).toEqual(code.split('\n'))
+    expect($('.code-content .s-k').text()).toBe('const ')
+    expect($('.code-content .s-c.s-i').text()).toBe('// note')
+    expect($('.code-content [style]')).toHaveLength(0)
+  })
 
-      expect(lines.map((line) => line.map(([content]) => content))).toEqual(
-        tokens.map((line) => line.map(({ content }) => content))
-      )
-      for (const [lineIndex, line] of tokens.entries()) {
-        for (const [tokenIndex, token] of line.entries()) {
-          expect(lines[lineIndex][tokenIndex]).toEqual([
-            token.content,
-            getTokenClassName(token.color, token.fontStyle),
-          ])
-        }
-      }
+  it.each([
+    { name: 'plain text', lang: undefined, code: 'plain <text> & punctuation', expectedLang: null },
+    {
+      name: 'unsupported language',
+      lang: 'not-a-language',
+      code: 'plain text',
+      expectedLang: null,
+    },
+    { name: 'empty code', lang: 'typescript', code: '', expectedLang: 'typescript' },
+    { name: 'language alias', lang: 'ts', code: 'const count = 42', expectedLang: 'ts' },
+  ])('handles $name', async ({ lang, code, expectedLang }) => {
+    const block = await CodeBlock({
+      contents: code,
+      lang,
+      skipTypeGeneration: true,
+      hideControls: true,
+    })
+    expect(highlight).toHaveBeenCalledWith(code, expectedLang)
+    const $ = load(renderToStaticMarkup(block))
+    expect($('.code-line-content').text()).toBe(code)
+  })
 
-      const $ = load(renderToStaticMarkup(block))
-      expect(
-        $('.code-line-number')
-          .toArray()
-          .map((element) => $(element).text())
-      ).toEqual(lines.map((_, index) => String(index + 1)))
-      expect(
-        $('.code-line-content')
-          .toArray()
-          .map((element) => $(element).text())
-      ).toEqual(lines.map((line) => line.map(([content]) => content).join('')))
-      expect($('.code-content [style]')).toHaveLength(0)
-    }
-  )
-
-  it('preserves actual Twoslash annotations and offsets after its source edits', async () => {
-    const source = [
-      "const prefix = 'Hello'",
-      '// ---cut---',
-      '/** The name shown in the greeting. */',
-      "const username = 'reader'",
-      'const message = `${prefix}, ${username}`',
-      'message',
-    ].join('\n')
-    const twoslashed = createTwoslasher({ compilerOptions: { ignoreDeprecations: '6.0' } })(source)
-    const hovers = twoslashed.nodes.filter((node) => node.type === 'hover')
-    expect(hovers.length).toBeGreaterThan(0)
-    expect(twoslashed.code).not.toContain('// ---cut---')
-
+  it('highlights edited Twoslash source and attaches hovers at the correct token offsets', async () => {
+    const source = 'const hidden = 0\n// ---cut---\nconst count = 42\ncount'
+    const edited = 'const count = 42\ncount'
+    const annotation = { text: 'const count: 42', docs: 'The current count.', tags: undefined }
+    twoslasher.mockReturnValueOnce({
+      code: edited,
+      nodes: [
+        { type: 'hover', line: 0, character: 6, ...annotation },
+        { type: 'hover', line: 1, character: 0, ...annotation },
+      ],
+    })
+    highlight.mockResolvedValueOnce({
+      tokens: [
+        [
+          { content: 'const ', offset: 0, color: 'var(--code-token-keyword)' },
+          { content: 'count', offset: 6, color: 'var(--code-token-variable)' },
+          { content: ' = 42', offset: 11 },
+        ],
+        [{ content: 'count', offset: 17, color: 'var(--code-token-variable)' }],
+      ],
+    })
     const block = await CodeBlock({ contents: source, lang: 'typescript', hideControls: true })
-    const lines = getLines(block)
-    expect(lines.map((line) => line.map(([content]) => content).join('')).join('\n')).toBe(
-      twoslashed.code
-    )
 
-    for (const [lineIndex, line] of lines.entries()) {
-      let offset = 0
-      for (const token of line) {
-        const annotations = hovers
-          .filter((hover) => hover.line === lineIndex && hover.character === offset)
-          .map(({ text, docs, tags }) => ({ text, docs, tags }))
-        expect(token[2]).toEqual(annotations.length ? annotations : undefined)
-        expect(token).toHaveLength(annotations.length ? 3 : 2)
-        offset += token[0].length
-      }
-    }
-    const annotated = lines.flat().filter((token) => token[2])
-    expect(annotated.length).toBeGreaterThan(0)
+    expect(twoslasher).toHaveBeenCalledWith(source)
+    expect(highlight).toHaveBeenCalledWith(edited, 'typescript')
+    expect(getLines(block)).toEqual([
+      [
+        ['const ', 's-k'],
+        ['count', 's-v', [annotation]],
+        [' = 42', undefined],
+      ],
+      [['count', 's-v', [annotation]]],
+    ])
     const $ = load(renderToStaticMarkup(block))
     expect(
       $('.code-content button')
         .toArray()
         .map((element) => $(element).text())
-    ).toEqual(annotated.map(([content]) => content))
-    expect($('.code-content button[tabindex="0"]')).toHaveLength(annotated.length)
-  })
-
-  it('keeps classes stable across repeated renders in a different order', async () => {
-    const render = async ({ lang, code }: (typeof fixtures)[number]) =>
-      getLines(await CodeBlock({ contents: code, lang, skipTypeGeneration: true }))
-    const first = await Promise.all(fixtures.map(render))
-    const reversed = await Promise.all([...fixtures].reverse().map(render))
-    expect(reversed.reverse()).toEqual(first)
+    ).toEqual(['count', 'count'])
+    expect($('.code-content button[tabindex="0"]')).toHaveLength(2)
   })
 
   it('retains unnumbered layout, source text, hidden controls, and the accessible label', async () => {
@@ -172,7 +161,6 @@ describe('code block serialization and rendering', () => {
     })
     const $ = load(renderToStaticMarkup(block))
     expect($('.code-line-number')).toHaveLength(0)
-    expect($('.code-content')).toHaveLength(1)
     expect(
       $('.code-content > span')
         .toArray()

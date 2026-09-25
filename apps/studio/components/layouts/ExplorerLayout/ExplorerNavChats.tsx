@@ -1,13 +1,13 @@
 import { useParams } from 'common'
-import { MessageSquare } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { cn } from 'ui'
 
-import { ExplorerNavResourceWrapper, rowClassName } from './ExplorerLayout.constants'
-import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
+import { ExplorerNavResourceWrapper } from './ExplorerLayout.constants'
+import { ExplorerNavItem } from './ExplorerNavItem'
+import { useExplorerDeleteItem } from './ExplorerProvider'
 import type { ChatSession } from '@/state/ai-assistant-state'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 const getVisibleChats = (chats: ChatSession[], search: string): ChatSession[] => {
   const normalizedSearch = search.trim().toLowerCase()
@@ -21,15 +21,16 @@ const getVisibleChats = (chats: ChatSession[], search: string): ChatSession[] =>
 export const ExplorerNavChats = () => {
   const [search, setSearch] = useState('')
   const router = useRouter()
-  const { id } = useParams()
-  const { openChat } = useCreateChat()
+  const { id, ref } = useParams()
   const chatList = useAiAssistantChatList()
+  const tabs = useTabsStateSnapshot()
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const chats = getVisibleChats(chatList, search)
 
   return (
     <ExplorerNavResourceWrapper type="chat" search={search} setSearch={setSearch}>
-      <div className="flex flex-1 flex-col gap-px overflow-y-auto px-3 pb-3">
+      <div className="flex flex-1 flex-col gap-px overflow-y-auto p-3">
         {chats.length === 0 ? (
           <p className="px-2 py-2 text-xs text-foreground-lighter">
             {search ? 'No chats found' : 'No chats created yet'}
@@ -39,19 +40,17 @@ export const ExplorerNavChats = () => {
             const isActive = router.pathname.includes('/explorer/chat/') && id === chat.id
 
             return (
-              <button
+              <ExplorerNavItem
+                type="chat"
                 key={chat.id}
-                type="button"
-                tabIndex={0}
-                className={rowClassName(isActive)}
-                onClick={() => openChat(chat.id)}
-              >
-                <MessageSquare
-                  size={14}
-                  className={cn('shrink-0', isActive && 'text-foreground')}
-                />
-                <span className="truncate text-left">{chat.name}</span>
-              </button>
+                name={chat.name}
+                isActive={isActive}
+                href={`/project/${ref}/explorer/chat/${chat.id}`}
+                onDoubleClick={() => tabs.makeTabPermanent(createTabId('chat', { id: chat.id }))}
+                onSelectDelete={() =>
+                  onSelectDelete({ id: chat.id, type: 'chat', name: chat.name })
+                }
+              />
             )
           })
         )}

@@ -16,6 +16,9 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -372,7 +375,7 @@ export const CreateWrapperSheet = ({
                                     <WarningIcon />
                                     <span className="text-xs text-left">
                                       This feature requires the{' '}
-                                      <span className="text-brand">wrappers</span> extension to be
+                                      <span className="text-primary">wrappers</span> extension to be
                                       of minimum version of 0.5.0.
                                     </span>
                                   </div>
@@ -426,20 +429,36 @@ export const CreateWrapperSheet = ({
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <Button
-                                className="px-1"
-                                icon={<Edit />}
-                                onClick={() => {
-                                  setSelectedTableToEdit(table)
-                                }}
-                              />
-                              <Button
-                                className="px-1"
-                                icon={<Trash />}
-                                onClick={() => {
-                                  removeTable(tableIndex)
-                                }}
-                              />
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    className="px-1"
+                                    icon={<Edit />}
+                                    onClick={() => {
+                                      setSelectedTableToEdit(table)
+                                    }}
+                                    aria-label={`Edit ${table.table_name} foreign table`}
+                                    // Tooltip repeats the label; screen readers would read it twice
+                                    aria-describedby={undefined}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">{`Edit ${table.table_name} foreign table`}</TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    className="px-1"
+                                    icon={<Trash />}
+                                    onClick={() => {
+                                      removeTable(tableIndex)
+                                    }}
+                                    aria-label={`Remove ${table.table_name} foreign table`}
+                                    // Tooltip repeats the label; screen readers would read it twice
+                                    aria-describedby={undefined}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">{`Remove ${table.table_name} foreign table`}</TooltipContent>
+                              </Tooltip>
                             </div>
                           </div>
                         )
