@@ -1,15 +1,14 @@
-import { ColumnDef, RowSelectionState } from '@tanstack/react-table'
-import type { RefObject } from 'react'
+import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { getEventMessageDisplay } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
+import { LogLevelDot } from './LogLevelDot'
 import { LogTypeIcon } from './LogTypeIcon'
-import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { getShiftClickRowSelection } from '@/lib/shift-click-selection'
+import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -32,13 +31,7 @@ function shouldHideColumn(data: ColumnSchema[], columnKey: keyof ColumnSchema): 
 }
 
 // Generate dynamic columns based on data
-export function generateDynamicColumns({
-  data,
-  selectionAnchorRef,
-}: {
-  data: ColumnSchema[]
-  selectionAnchorRef: RefObject<string | null>
-}): {
+export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
   columns: ColumnDef<ColumnSchema>[]
   columnVisibility: Record<string, boolean>
 } {
@@ -48,53 +41,15 @@ export function generateDynamicColumns({
 
   const columns: ColumnDef<ColumnSchema>[] = [
     {
-      accessorKey: 'select',
+      accessorKey: 'level',
       header: '',
-      cell: ({ row, table }) => {
-        const handleToggle = (isShiftClick: boolean) => {
-          const currentSelection = table.getState().rowSelection
-          const hasSelection = Object.values(currentSelection).some(Boolean)
-          // An empty selection means no anchor, so resetRowSelection() (filter change, clear
-          // button) drops the anchor without those paths having to touch the ref
-          const anchorRowId = hasSelection ? selectionAnchorRef.current : null
-
-          let next: RowSelectionState
-          if (isShiftClick) {
-            next = getShiftClickRowSelection({
-              orderedRowIds: table.getRowModel().rows.map((tableRow) => tableRow.id),
-              rowSelection: currentSelection,
-              anchorRowId,
-              targetRowId: row.id,
-            })
-          } else {
-            next = { ...currentSelection }
-            if (next[row.id]) {
-              delete next[row.id]
-            } else {
-              next[row.id] = true
-            }
-          }
-
-          selectionAnchorRef.current = Object.keys(next).length > 0 ? row.id : null
-          table.setRowSelection(next)
-        }
-
-        return (
-          <Checkbox
-            className="hit-area-2 hover:border-foreground-muted"
-            checked={row.getIsSelected()}
-            // Prevent a shift-click from starting a browser text selection across rows
-            onMouseDown={(e) => {
-              if (e.shiftKey) e.preventDefault()
-            }}
-            // use onClick instead of onCheckedChange so the shift key is available for range selection
-            onClick={(e) => {
-              e.stopPropagation()
-              handleToggle(e.shiftKey)
-            }}
-          />
-        )
-      },
+      cell: ({ row }) => (
+        <LogSelectionIndicator
+          id={row.id}
+          level={row.original.level}
+          isSelected={row.getIsSelected()}
+        />
+      ),
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
@@ -106,26 +61,6 @@ export function generateDynamicColumns({
         // pl-3.5 → toggle-filter icon; pr-3 matches date pl-3 (equal gaps around the dot)
         cellClassName: 'w-[42px] min-w-[42px] pl-3.5 pr-3',
         headerClassName: 'w-[42px] min-w-[42px] pl-3.5 pr-3',
-      },
-    },
-    // Level column - always visible
-    {
-      accessorKey: 'level',
-      header: '',
-      cell: ({ row }) => {
-        const level = row.getValue<ColumnSchema['level']>('level')
-        return level ? <DataTableColumnLevelIndicator value={level} /> : null
-      },
-      enableHiding: false,
-      enableResizing: false,
-      enableSorting: false,
-      filterFn: () => true,
-      size: 8,
-      minSize: 8,
-      maxSize: 8,
-      meta: {
-        cellClassName: 'w-2 min-w-2 px-0',
-        headerClassName: 'w-2 min-w-2 px-0',
       },
     },
     // Date column - always visible
@@ -334,9 +269,49 @@ export function generateDynamicColumns({
   return { columns, columnVisibility }
 }
 
-// Static fallback columns. These render before any data arrives, so nothing is selectable yet
-// and the anchor never has to survive past this call.
+// Static fallback columns
 export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns({
   data: [],
-  selectionAnchorRef: { current: null },
 }).columns
+
+function LogSelectionIndicator({
+  id,
+  level,
+  isSelected,
+}: {
+  id: string
+  level: ColumnSchema['level']
+  isSelected: boolean
+}) {
+  const { onSelectRow } = useDataTable()
+  return (
+    <div className="relative flex h-4 w-4 items-center justify-center">
+      <div
+        className={cn(
+          'pointer-events-none group-hover/row:opacity-0 group-focus-within/row:opacity-0',
+          isSelected && 'opacity-0'
+        )}
+      >
+        <LogLevelDot level={level} />
+      </div>
+      <Checkbox
+        aria-label="Select log"
+        tabIndex={-1}
+        className={cn(
+          'absolute inset-0 cursor-pointer opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-visible:opacity-100',
+          isSelected && 'opacity-100'
+        )}
+        checked={isSelected}
+        onClick={(event) => {
+          event.stopPropagation()
+          onSelectRow?.(id, {
+            shiftKey: event.shiftKey,
+            metaKey: event.metaKey,
+            ctrlKey: event.ctrlKey,
+            toggle: true,
+          })
+        }}
+      />
+    </div>
+  )
+}

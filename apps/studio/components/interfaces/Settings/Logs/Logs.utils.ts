@@ -859,7 +859,11 @@ export function role(metadata: any) {
   return payload.role
 }
 
-export function formatLogsAsJson(rows: LogData[]): string {
+type LogExportData = Pick<LogData, 'id' | 'event_message'> & {
+  timestamp: string | number
+} & Record<string, unknown>
+
+export function formatLogsAsJson(rows: LogExportData[]): string {
   return JSON.stringify(rows, null, 2)
 }
 
@@ -867,7 +871,7 @@ export function formatLogsAsCsv(rows: LogData[]): string {
   return convertResultsToCSV(rows as unknown as Record<string, unknown>[]) ?? ''
 }
 
-export function formatLogsAsMarkdown(rows: LogData[]): string {
+export function formatLogsAsMarkdown(rows: LogExportData[]): string {
   return rows
     .map((row, i) => {
       const lines: string[] = [`## Log ${i + 1}`]
@@ -887,7 +891,7 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
       if (row.event_message) {
         lines.push(`**Message:** ${row.event_message}`)
       }
-      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row as any
+      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row
       if (Object.keys(rest).length > 0) {
         lines.push('', '**Details:**', '```json', JSON.stringify(rest, null, 2), '```')
       }
@@ -947,7 +951,11 @@ function extractServiceLabelFromSql(sql: string): string | null {
   return tableName && isLogsTableName(tableName) ? LOG_TABLE_TO_SERVICE_LABEL[tableName] : null
 }
 
-export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: string): string {
+export function buildLogsPrompt(
+  rows: LogExportData[],
+  queryType?: string,
+  sqlQuery?: string
+): string {
   const serviceLabel =
     (queryType && isQueryType(queryType) ? QUERY_TYPE_LABELS[queryType] : null) ??
     (sqlQuery ? extractServiceLabelFromSql(sqlQuery) : null)
