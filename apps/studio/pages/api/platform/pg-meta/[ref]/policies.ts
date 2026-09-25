@@ -5,8 +5,9 @@ import { constructHeaders } from '@/lib/api/apiHelpers'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { PG_META_URL } from '@/lib/constants'
 
-export default (req: NextApiRequest, res: NextApiResponse) =>
+const route = (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
+export default route
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
