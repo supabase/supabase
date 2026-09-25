@@ -22,7 +22,6 @@ export interface ProjectMultiSelectProps {
   error?: string
   flaggedRefs?: string[]
   unavailableRefs?: string[]
-  showAllProjectsOption?: boolean
   allProjectsSelected?: boolean
   onAllProjectsChange?: (selected: boolean) => void
 }
@@ -35,7 +34,6 @@ export const ProjectMultiSelect = ({
   error,
   flaggedRefs = [],
   unavailableRefs = [],
-  showAllProjectsOption = false,
   allProjectsSelected = false,
   onAllProjectsChange,
 }: ProjectMultiSelectProps) => {
@@ -65,15 +63,13 @@ export const ProjectMultiSelect = ({
         )}
       </div>
 
-      {showAllProjectsOption && (
-        <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground">
-          <Checkbox
-            checked={allProjectsSelected}
-            onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
-          />
-          {CONSENT_COPY.allProjectsOption}
-        </label>
-      )}
+      <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground">
+        <Checkbox
+          checked={allProjectsSelected}
+          onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
+        />
+        {CONSENT_COPY.allProjectsOption}
+      </label>
 
       {!allProjectsSelected && (
         <>

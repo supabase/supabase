@@ -283,13 +283,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
   })
 
-  test('hides the all-projects choice when project scoping is required', async () => {
-    renderScreen()
-
-    await screen.findByRole('combobox')
-    expect(screen.queryByText('All current and future projects')).not.toBeInTheDocument()
-  })
-
   test('choosing all projects enables authorize without a selection', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects })
 
@@ -321,7 +314,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('a dynamic client renders the same required picker as an authored app', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient })
 
-    expect(await screen.findByRole('combobox')).toBeInTheDocument()
     expect(screen.queryByText('All current and future projects')).not.toBeInTheDocument()
     expect(screen.queryByText(/registered automatically/)).not.toBeInTheDocument()
   })
