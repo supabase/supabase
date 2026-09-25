@@ -53,17 +53,17 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
           {!isMetricsLoading && !isMetricsError && (
             <>
               <span>
-                CPU <span className={metricColor(cpu)}>{cpu.toFixed(0)}%</span>
+                CPU <MetricValue value={cpu} />
               </span>
               <span className="text-foreground-lighter">·</span>
               <span>
-                Disk <span className={metricColor(disk)}>{disk.toFixed(0)}%</span>
+                Disk <MetricValue value={disk} />
               </span>
               <span className="text-foreground-lighter">·</span>
               <span>
-                RAM <span className={metricColor(memory)}>{memory.toFixed(0)}%</span>
+                RAM <MetricValue value={memory} />
               </span>
-              {showConnections && connections.max > 0 && (
+              {showConnections && connections !== null && connections.max > 0 && (
                 <>
                   <span className="text-foreground-lighter">·</span>
                   <span className="text-foreground-light">
@@ -78,4 +78,12 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
       <TooltipContent side="bottom">Go to Database Report</TooltipContent>
     </Tooltip>
   )
+}
+
+function MetricValue({ value }: { value: number | null }) {
+  if (value === null) {
+    return <span className="text-foreground-lighter">Unavailable</span>
+  }
+
+  return <span className={metricColor(value)}>{value.toFixed(0)}%</span>
 }
