@@ -421,9 +421,19 @@ export default function MarketingForm({
     rows.push([pendingHalf])
   }
 
+  // Rendered first in both the form and success views so React keeps the same
+  // live region mounted across the swap — screen readers only announce changes
+  // to a region that already exists.
+  const statusRegion = (
+    <p role="status" className="sr-only">
+      {submitState === 'success' ? 'Thank you! We’ve received your submission.' : ''}
+    </p>
+  )
+
   if (submitState === 'success') {
     return (
       <div className={className}>
+        {statusRegion}
         <div
           className={
             card
@@ -453,6 +463,7 @@ export default function MarketingForm({
 
   return (
     <div className={className}>
+      {statusRegion}
       {(title || description) && (
         <div className="flex flex-col items-center gap-4 text-center text-balance mb-10">
           {title && (

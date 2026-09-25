@@ -13,6 +13,9 @@ on:
       - 'apps/www/components/Partners/PartnerIntakeForm.sync.test.ts'
       - 'apps/www/components/Partners/__generated__/partner-intake-form.hubspot.json'
       - 'apps/www/lib/staticFormCrm.ts'
+      - 'apps/www/vitest.sync.config.ts'
+      - 'apps/www/package.json'
+      - '.github/workflows/www-partner-form-sync-check.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

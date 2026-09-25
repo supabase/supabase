@@ -224,7 +224,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
             ].map((row, rowIdx) => (
               <div
                 key={rowIdx}
-                className={`flex gap-10 md:gap-14 will-change-transform animate-marquee transform-3d backface-hidden ${
+                className={`flex gap-10 md:gap-14 will-change-transform animate-marquee motion-reduce:animate-none motion-reduce:will-change-none transform-3d backface-hidden ${
                   row.reverse ? 'direction-[reverse]' : ''
                 }`}
               >

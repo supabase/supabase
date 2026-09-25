@@ -74,6 +74,54 @@ describe('PartnerIntakeForm HubSpot sync', () => {
     expect(missing).toEqual([])
   })
 
+  it('binds company name and website to the Company object', () => {
+    // The `0-2/` prefix makes HubSpotClient submit these against the Company
+    // object rather than the Contact — dropping it silently mis-files them.
+    expect(fieldMap.company_name).toBe('0-2/name')
+    expect(fieldMap.company_website).toBe('0-2/website')
+  })
+
+  it('keeps requiredness and conditional visibility in sync for every mapped field', () => {
+    // A field HubSpot requires but we don't (or one we only show for the wrong
+    // partner types) makes the HubSpot submission fail for some users only.
+    const mismatches: string[] = []
+
+    for (const field of fields) {
+      if (excludeFields.has(field.name)) continue
+
+      const hubspotName = hubspotNameFor(field.name)
+      const hubspotField = hubspotFieldsByName.get(hubspotName)
+      if (!hubspotField) continue
+
+      if (Boolean(field.required) !== hubspotField.required) {
+        mismatches.push(
+          `${field.name}: required is ${Boolean(field.required)}, HubSpot's ${hubspotName} is ${hubspotField.required}`
+        )
+      }
+
+      const ours = field.showWhen
+        ? {
+            field: hubspotNameFor(field.showWhen.field),
+            values: [
+              ...(field.showWhen.in ?? []),
+              ...(field.showWhen.equals !== undefined ? [field.showWhen.equals] : []),
+            ].sort(),
+          }
+        : undefined
+      const theirs = hubspotField.dependsOn
+        ? { field: hubspotField.dependsOn.field, values: [...hubspotField.dependsOn.values].sort() }
+        : undefined
+
+      if (JSON.stringify(ours) !== JSON.stringify(theirs)) {
+        mismatches.push(
+          `${field.name}: shown when ${JSON.stringify(ours ?? 'always')}, HubSpot's ${hubspotName} when ${JSON.stringify(theirs ?? 'always')}`
+        )
+      }
+    }
+
+    expect(mismatches).toEqual([])
+  })
+
   it('forwards every non-excluded app field to a HubSpot property that actually exists', () => {
     // An app field forwarded to a HubSpot property HubSpot doesn't define
     // causes the *entire* HubSpot submission to fail (see HubSpotClient).
