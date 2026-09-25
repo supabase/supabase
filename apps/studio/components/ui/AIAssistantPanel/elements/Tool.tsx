@@ -5,9 +5,11 @@ type ToolProps = PropsWithChildren<{
   className?: string
   label: ReactNode
   icon?: ReactNode
+  /** Shimmers the label to mark the tool call that is currently in progress. */
+  isActive?: boolean
 }>
 
-export function Tool({ className, label, icon, children }: ToolProps) {
+export function Tool({ className, label, icon, isActive = false, children }: ToolProps) {
   const isCollapsible = !!children
 
   return (
@@ -26,11 +28,7 @@ export function Tool({ className, label, icon, children }: ToolProps) {
           disabled={!children}
         >
           {icon}
-          {typeof label === 'string' ? (
-            <span className="text-foreground-lighter">{label}</span>
-          ) : (
-            label
-          )}
+          <span className={cn('text-foreground-lighter', isActive && 'shimmer')}>{label}</span>
         </CollapsibleTrigger>
 
         {isCollapsible && (

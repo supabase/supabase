@@ -83,10 +83,12 @@ const callbacks = {
 function FeedMessage({
   message = initialMessage,
   isLoading = true,
+  isLastMessage,
   addToolApprovalResponse = callbacks.addToolApprovalResponse,
 }: {
   message?: UIMessage
   isLoading?: boolean
+  isLastMessage?: boolean
   addToolApprovalResponse?: typeof callbacks.addToolApprovalResponse
 }) {
   return (
@@ -95,6 +97,7 @@ function FeedMessage({
       id={message.id}
       message={message}
       isLoading={isLoading}
+      isLastMessage={isLastMessage}
       isAfterEditedMessage={false}
       isBeingEdited={false}
       addToolApprovalResponse={addToolApprovalResponse}
@@ -184,12 +187,14 @@ describe('assistant feed rendering', () => {
       state: 'streaming' as 'streaming' | 'done',
     }
     const message: UIMessage = { id: 'reasoning-1', role: 'assistant', parts: [reasoning] }
-    const { rerender } = render(<FeedMessage message={message} />)
+    const { rerender } = render(<FeedMessage message={message} isLastMessage />)
+    // Expand the tool group so the reasoning row itself is rendered
+    fireEvent.click(screen.getByRole('button', { name: 'Thinking...' }))
     expect(screen.getByText('Thinking...')).toBeInTheDocument()
 
     // Chat.pushMessage exposes the initial object; subsequent replaceMessage calls clone it.
     reasoning.state = 'done'
-    rerender(<FeedMessage message={structuredClone(message)} isLoading={false} />)
+    rerender(<FeedMessage message={structuredClone(message)} isLoading={false} isLastMessage />)
 
     expect(screen.queryByText('Thinking...')).not.toBeInTheDocument()
     expect(screen.getByText('Reasoned')).toBeInTheDocument()
