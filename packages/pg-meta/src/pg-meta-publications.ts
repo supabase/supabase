@@ -3,6 +3,21 @@ import { z } from 'zod'
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { PUBLICATIONS_SQL } from './sql/publications'
 
+// DO blocks are dollar-quoted, so any user-derived value interpolated into the
+// block body could contain the closing delimiter and terminate the block early.
+// Generate a delimiter that cannot appear in any of the values instead.
+function getDoBlockDelimiter(values: (string | null | undefined)[]): SafeSqlFragment {
+  const candidates = values.filter((value): value is string => typeof value === 'string')
+  let suffix = 0
+  while (true) {
+    const delimiter = suffix === 0 ? safeSql`$pg_meta$` : safeSql`$pg_meta_${literal(suffix)}$`
+    if (candidates.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 const pgPublicationTableZod = z.object({
   id: z.number().optional(),
   name: z.string(),
@@ -141,8 +156,9 @@ function update(
     tables,
   }: PublicationUpdateParams
 ): { sql: SafeSqlFragment } {
+  const delimiter = getDoBlockDelimiter([name, owner, ...(tables ?? [])])
   const sql = safeSql`
-do $$
+do ${delimiter}
 declare
   id oid := ${literal(id)};
   old record;
@@ -225,14 +241,14 @@ begin
 
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
   if new_name is not null and new_name != old.pubname then
-    execute(format('alter publication %I rename to %I;', old.pubname, coalesce(new_name, old.pubname)));
+    execute(format('alter publication %I rename to %I;', old.pubname, new_name));
   end if;
 
   -- We need to retrieve the publication later, so we need a way to uniquely identify which publication this is.
   -- We can't rely on id because it gets changed if it got recreated.
   -- We use a temp table to store the unique name - DO blocks can't return a value.
   create temp table pg_meta_publication_tmp (name) on commit drop as values (coalesce(new_name, old.pubname));
-end $$;
+end ${delimiter};
 `
   return { sql }
 }
