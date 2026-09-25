@@ -1,6 +1,6 @@
 export type FailoverSimulationPhase = 'off' | 'healthy' | 'failing' | 'promoting' | 'failover'
 
-export const FAILOVER_SIMULATION_HEALTHY_MS = 3_000
+export const FAILOVER_SIMULATION_HEALTHY_MS = 5_000
 /** Beat between the primary failing and promotion starting, so the two read as cause and effect. */
 export const FAILOVER_SIMULATION_FAILING_MS = 600
 export const FAILOVER_SIMULATION_PROMOTING_MS = 2_500
