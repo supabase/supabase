@@ -54,7 +54,11 @@ export const createSQLPolicy = (
   }
 
   if (!isEmpty(fieldsToUpdate)) {
-    return createSQLStatementForUpdatePolicy(formattedPolicyFormFields, fieldsToUpdate)
+    return createSQLStatementForUpdatePolicy(
+      formattedPolicyFormFields,
+      fieldsToUpdate,
+      originalPolicyFormFields
+    )
   }
 
   return {}
@@ -77,9 +81,11 @@ const createSQLStatementForCreatePolicy = (policyFormFields: PolicyFormField): P
 
 const createSQLStatementForUpdatePolicy = (
   policyFormFields: PolicyFormField,
-  fieldsToUpdate: Partial<PolicyFormField>
+  fieldsToUpdate: Partial<PolicyFormField>,
+  originalPolicyFormFields?: PGPolicy
 ): PolicyForReview => {
   const { name, schema, table } = policyFormFields
+  const alterName = originalPolicyFormFields?.name ?? name
 
   const definitionChanged = has(fieldsToUpdate, ['definition'])
   const checkChanged = has(fieldsToUpdate, ['check'])
@@ -97,11 +103,23 @@ const createSQLStatementForUpdatePolicy = (
   const roles =
     (fieldsToUpdate?.roles ?? []).length === 0 ? ['public'] : (fieldsToUpdate.roles as string[])
 
-  const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
+  const alterStatement = `ALTER POLICY "${alterName}" ON "${schema}"."${table}"`
   const statement = [
     'BEGIN;',
-    ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
-    ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
+    ...(definitionChanged
+      ? [
+          `  ${alterStatement} USING (${
+            fieldsToUpdate.definition ? fieldsToUpdate.definition : 'NULL'
+          });`,
+        ]
+      : []),
+    ...(checkChanged
+      ? [
+          `  ${alterStatement} WITH CHECK (${
+            fieldsToUpdate.check ? fieldsToUpdate.check : 'NULL'
+          });`,
+        ]
+      : []),
     ...(rolesChanged ? [`  ${alterStatement} TO ${roles.join(', ')};`] : []),
     ...(nameChanged ? [`  ${alterStatement} RENAME TO "${fieldsToUpdate.name}";`] : []),
     'COMMIT;',
@@ -144,10 +162,10 @@ export const createPayloadForUpdatePolicy = (
     payload.name = policyFormFields.name
   }
   if (!isEqual(formattedDefinition, originalPolicyFormFields.definition)) {
-    payload.definition = !formattedDefinition ? undefined : untrustedSql(formattedDefinition)
+    payload.definition = !formattedDefinition ? null : untrustedSql(formattedDefinition)
   }
   if (!isEqual(formattedCheck, originalPolicyFormFields.check)) {
-    payload.check = !formattedCheck ? undefined : untrustedSql(formattedCheck)
+    payload.check = !formattedCheck ? null : untrustedSql(formattedCheck)
   }
   if (!isEqual(policyFormFields.roles, originalPolicyFormFields.roles)) {
     if (policyFormFields.roles.length === 0) payload.roles = ['public']
