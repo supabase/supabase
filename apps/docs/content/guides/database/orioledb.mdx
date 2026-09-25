@@ -9,7 +9,7 @@ The [OrioleDB](https://www.orioledb.com/) Postgres extension provides a drop-in 
 OrioleDB addresses Postgres's scalability limitations by removing bottlenecks in the shared memory cache under high concurrency. It also optimizes write-ahead-log (WAL) insertion through row-level WAL logging. These changes lead to significant improvements in the industry standard TPC-C benchmark, which approximates a real-world transactional workload. The following benchmark was performed on a c7g.metal instance and shows OrioleDB's performance outperforming the default Postgres heap method with a 3.3x speedup.
 
 <Image
-  alt="TPC-C (warehouses = 500)"
+  alt="Line chart of TPC-C throughput at 500 warehouses, in transactions per minute (tpmC), from 0 to 320 connections. OrioleDB rises to about 350,000 tpmC by 20 connections and holds between about 400,000 and 490,000 from 80 connections onward. Heap stays between about 30,000 and 90,000 across the whole range."
   src="/docs/img/database/orioledb-tpc-c-500-warehouse.png"
   className="max-w-[550px] mx-auto! border rounded-md"
   width={1000}
@@ -18,7 +18,7 @@ OrioleDB addresses Postgres's scalability limitations by removing bottlenecks in
 
 <Admonition type="note">
 
-OrioleDB is in active development and has [certain limitations](https://www.orioledb.com/docs/usage/getting-started#current-limitations). Native B-tree indexes give the best performance, and an Index Access Method bridge provides experimental support for other index types built for heap storage, including pg_vector's HNSW indexes. In the Supabase OrioleDB image the default storage method has been updated to use OrioleDB, granting better performance out of the box.
+OrioleDB is in public beta, and projects that use it have access to the same paid features as other Supabase projects. OrioleDB has [some limitations](https://www.orioledb.com/docs/usage/getting-started#current-limitations) compared to the default heap storage engine, so review them before you choose it for a project. Native B-tree indexes give the best performance, and an Index Access Method bridge provides experimental support for other index types built for heap storage, including pg_vector's HNSW indexes. In the Supabase OrioleDB image the default storage method has been updated to use OrioleDB, granting better performance out of the box.
 
 </Admonition>
 
@@ -44,20 +44,12 @@ OrioleDB implements copy-on-write checkpoints to persist data efficiently. This 
 
 ### Creating OrioleDB project
 
-You can get started with OrioleDB by enabling the extension in your Supabase dashboard.
-To get started with OrioleDB you need to [create a new Supabase project](/dashboard/new/_) and choose `OrioleDB Public Alpha` Postgres version.
+You choose OrioleDB when you create a project. You can't add OrioleDB to an existing project or remove it later.
 
-<Image
-  alt="Creating OrioleDB project"
-  src={{
-    light: '/docs/img/database/orioledb-creating-project--light.png',
-    dark: '/docs/img/database/orioledb-creating-project.png',
-  }}
-  className="max-w-[550px] mx-auto! border rounded-md"
-
-width={1376}
-height={2034}
-/>
+1. [Create a new Supabase project](/dashboard/new/_).
+1. Expand **Advanced Configuration**.
+1. Under **Postgres Type**, select **Postgres with OrioleDB**.
+1. Finish creating the project.
 
 ### Creating tables
 
@@ -120,10 +112,11 @@ explain select * from blog_post order by published_at desc limit 10;
    ->  Index Scan Backward using blog_post_published_at on blog_post  (cost=0.15..48.95 rows=320 width=120)
 
 explain select * from blog_post where id = 1;
-                                    QUERY PLAN
-──────────────────────────────────────────────────────────────────────────────────
- Index Scan using blog_post_pkey on blog_post  (cost=0.15..8.17 rows=1 width=120)
-   Index Cond: (id = 1)
+                              QUERY PLAN
+───────────────────────────────────────────────────────────────────────
+ Custom Scan (o_scan) on blog_post  (cost=0.15..8.17 rows=1 width=120)
+   Forward index scan of: blog_post_pkey
+   Conds: (id = 1)
 
 explain (analyze, buffers) select * from blog_post order by published_at desc limit 10;
                                                                       QUERY PLAN
@@ -167,7 +160,7 @@ A smaller set of OrioleDB settings has a `user` [context](/docs/guides/database/
 
 | Setting                             | Description                                                                                                                                                                                                          | Default      |
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| `orioledb.default_compress`         | Default compression level for OrioleDB tables. Set to `-1` to disable compression, or `0` or a positive integer to trade write speed for a smaller table on disk.                                                    | `-1`         |
+| `orioledb.default_compress`         | Default compression level for OrioleDB tables. Set to `-1` to disable compression, or `0` to `22` to trade write speed for a smaller table on disk.                                                                  | `-1`         |
 | `orioledb.default_primary_compress` | Default compression level for the primary index. Accepts the same values as `orioledb.default_compress`.                                                                                                             | `-1`         |
 | `orioledb.default_toast_compress`   | Default compression level for TOASTed values. Accepts the same values as `orioledb.default_compress`.                                                                                                                | `-1`         |
 | `orioledb.serializable`             | How OrioleDB handles `SERIALIZABLE` transactions. `table_lock` acquires a coarse lock per touched table, `repeatable_read` silently downgrades the isolation level, and `error` rejects `SERIALIZABLE` transactions. | `table_lock` |
