@@ -16,7 +16,7 @@ The way Broadcast works changes based on the channel you are using:
 
 <Admonition type="note">
 
-The public flag (the last argument in `realtime.send(payload, event, topic, is_private)`) only affects who can subscribe to the topic not who can read messages from the database.
+The `private` flag (the last argument in `realtime.send(payload, event, topic, private)`) only affects who can subscribe to the topic not who can read messages from the database.
 
 - Public (`false`) → Anyone can subscribe to that topic without authentication
 - Private (`true`) → Only authenticated clients can subscribe to that topic
@@ -509,7 +509,7 @@ select
     jsonb_build_object('hello', 'world'), -- JSONB Payload
     'event', -- Event name
     'topic', -- Topic
-    false -- Public / Private flag
+    true  -- private: true = private channel (default), false = public channel
   );
 ```
 
@@ -530,7 +530,7 @@ select
     '\x012345'::bytea, -- bytea payload
     'event',           -- Event name
     'topic',           -- Topic
-    true               -- Private / Public flag (defaults to true)
+    true               -- private: true = private channel (default), false = public channel
   );
 ```
 
@@ -1036,7 +1036,7 @@ SELECT realtime.send (
 	'{}'::jsonb, -- JSONB Payload
 	'event', -- Event name
 	'topic', -- Topic
-	FALSE -- Public / Private flag
+	FALSE -- private: true = private channel (default), false = public channel
 );
 ```
 
