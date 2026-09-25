@@ -30,7 +30,7 @@
     "ui-patterns": "workspace:*",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
-    "yaml": "^2.9.0"
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.2.4",
