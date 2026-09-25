@@ -184,11 +184,12 @@ const InstanceConfigurationUI = () => {
                       <TooltipTrigger asChild>
                         <Button
                           icon={<Network size={15} />}
-                          className={`rounded-r-none transition ${
+                          className={`rounded-r-none transitio motion-reduce:transition-none ${
                             view === 'flow' ? 'opacity-100' : 'opacity-50'
                           }`}
                           onClick={() => setView('flow')}
                           aria-label="Show infrastructure as a diagram"
+                          aria-pressed={view === 'flow'}
                           // Tooltip repeats the label; screen readers would read it twice
                           aria-describedby={undefined}
                         />
@@ -201,11 +202,12 @@ const InstanceConfigurationUI = () => {
                       <TooltipTrigger asChild>
                         <Button
                           icon={<Globe2 size={15} />}
-                          className={`rounded-l-none transition ${
+                          className={`rounded-l-none transition motion-reduce:transition-none ${
                             view === 'map' ? 'opacity-100' : 'opacity-50'
                           }`}
                           onClick={() => setView('map')}
                           aria-label="Show infrastructure on the map"
+                          aria-pressed={view === 'map'}
                           // Tooltip repeats the label; screen readers would read it twice
                           aria-describedby={undefined}
                         />
