@@ -509,7 +509,7 @@ select
     jsonb_build_object('hello', 'world'), -- JSONB Payload
     'event', -- Event name
     'topic', -- Topic
-    false -- Public / Private flag
+    false -- Public / Private flag (defaults to true)
   );
 ```
 
@@ -530,7 +530,7 @@ select
     '\x012345'::bytea, -- bytea payload
     'event',           -- Event name
     'topic',           -- Topic
-    true               -- Private / Public flag (defaults to true)
+    false              -- Public / Private flag (defaults to true)
   );
 ```
 
@@ -1036,7 +1036,7 @@ SELECT realtime.send (
 	'{}'::jsonb, -- JSONB Payload
 	'event', -- Event name
 	'topic', -- Topic
-	FALSE -- Public / Private flag
+	FALSE -- Public / Private flag (defaults to true)
 );
 ```
 
