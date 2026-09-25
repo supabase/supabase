@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Card,
@@ -54,14 +54,21 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   const selectedWrapper = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
   const isSelectedWrapperShared = selectedWrapper !== undefined && isSharedWrapper(selectedWrapper)
   const selectedWrapperToEdit = isSelectedWrapperShared ? undefined : selectedWrapper
+  const openedWrapperId = useRef<string | null>(null)
 
   useEffect(() => {
-    if ((isSuccess || isError) && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
-      toast(
-        isSelectedWrapperShared
-          ? 'Shared wrappers cannot be edited in the dashboard. Use the SQL Editor to edit this connection.'
-          : 'Wrapper not found'
-      )
+    if (!selectedWrapperIdToEdit) {
+      openedWrapperId.current = null
+    } else if (selectedWrapperToEdit) {
+      openedWrapperId.current = selectedWrapperIdToEdit
+    } else if (isSuccess || isError) {
+      if (openedWrapperId.current !== selectedWrapperIdToEdit) {
+        toast(
+          isSelectedWrapperShared
+            ? 'Shared wrappers cannot be edited in the dashboard. Use the SQL Editor to edit this connection.'
+            : 'Wrapper not found'
+        )
+      }
       setSelectedWrapperToEdit(null)
     }
   }, [
