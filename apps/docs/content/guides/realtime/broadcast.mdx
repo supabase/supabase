@@ -16,12 +16,12 @@ The way Broadcast works changes based on the channel you are using:
 
 <Admonition type="note">
 
-The public flag (the last argument in `realtime.send(payload, event, topic, is_private)`) only affects who can subscribe to the topic not who can read messages from the database.
+The `private` flag (the last argument in `realtime.send(payload, event, topic, private)`) only affects who can subscribe to the topic, not who can read messages from the database.
 
+- Private (`true`, default) → Only authenticated clients can subscribe to that topic
 - Public (`false`) → Anyone can subscribe to that topic without authentication
-- Private (`true`) → Only authenticated clients can subscribe to that topic
 
-Regardless if it's public or private, the Realtime service connects to your database as the authenticated Supabase Admin role.
+Regardless of whether it's public or private, the Realtime service connects to your database as the authenticated Supabase Admin role.
 
 </Admonition>
 
@@ -507,9 +507,9 @@ You can send messages directly from your database using the `realtime.send()` fu
 select
   realtime.send(
     jsonb_build_object('hello', 'world'), -- JSONB Payload
-    'event', -- Event name
-    'topic', -- Topic
-    false -- Public / Private flag
+    'event',                              -- Event name
+    'topic',                              -- Topic
+    private => true                       -- Private / Public flag (defaults to true)
   );
 ```
 
@@ -530,7 +530,7 @@ select
     '\x012345'::bytea, -- bytea payload
     'event',           -- Event name
     'topic',           -- Topic
-    true               -- Private / Public flag (defaults to true)
+    private => true    -- Private / Public flag (defaults to true)
   );
 ```
 
@@ -1033,10 +1033,10 @@ The `realtime.send()` function provides the most flexibility by allowing you to 
 
 ```sql
 SELECT realtime.send (
-	'{}'::jsonb, -- JSONB Payload
-	'event', -- Event name
-	'topic', -- Topic
-	FALSE -- Public / Private flag
+  '{}'::jsonb,    -- JSONB Payload
+  'event',        -- Event name
+  'topic',        -- Topic
+  private => true -- Private / Public flag (defaults to true)
 );
 ```
 
