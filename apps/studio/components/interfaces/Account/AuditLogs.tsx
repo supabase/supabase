@@ -13,12 +13,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { LogsDatePicker } from '../../Settings/Logs/Logs.DatePickers'
-import { AuditLogDetailsPanel } from './AuditLogDetailsPanel'
-import { getAuditLogColumns } from './AuditLogs.columns'
-import { filterByProjects } from './AuditLogs.utils'
-import { AuditLogsSelectionHeader } from './AuditLogsSelectionHeader'
-import { AuditLogsTable } from './AuditLogsTable'
+import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
+import { AuditLogDetailsPanel } from '@/components/interfaces/AuditLogs/AuditLogDetailsPanel'
+import { getAuditLogColumns } from '@/components/interfaces/AuditLogs/AuditLogs.columns'
+import { filterByProjects } from '@/components/interfaces/AuditLogs/AuditLogs.utils'
+import { AuditLogsSelectionHeader } from '@/components/interfaces/AuditLogs/AuditLogsSelectionHeader'
+import { AuditLogsTable } from '@/components/interfaces/AuditLogs/AuditLogsTable'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -218,22 +218,18 @@ export const AuditLogs = () => {
           {isSuccess && (
             <>
               {logs.length === 0 ? (
-                <div
-                  className={cn(
-                    CONTENT_PADDING,
-                    'bg-surface-100 border rounded-sm p-4 flex items-center justify-between'
-                  )}
-                >
-                  <p className="prose text-sm">You do not have any audit logs available yet</p>
+                <div className={CONTENT_PADDING}>
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                    <p className="prose text-sm">You do not have any audit logs available yet</p>
+                  </div>
                 </div>
               ) : logs.length > 0 && filteredLogs.length === 0 ? (
-                <div
-                  className={cn(
-                    CONTENT_PADDING,
-                    'bg-surface-100 border rounded-sm p-4 flex items-center justify-between'
-                  )}
-                >
-                  <p className="prose text-sm">No audit logs found based on the filters applied</p>
+                <div className={CONTENT_PADDING}>
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                    <p className="prose text-sm">
+                      No audit logs found based on the filters applied
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="border-y overflow-hidden flex-1 min-h-0">

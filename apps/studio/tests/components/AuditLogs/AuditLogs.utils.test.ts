@@ -1,11 +1,8 @@
 import dayjs from 'dayjs'
 import { describe, expect, test } from 'vitest'
 
-import {
-  filterByProjects,
-  filterByUsers,
-  sortAuditLogs,
-} from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
+import { filterByProjects } from '@/components/interfaces/AuditLogs/AuditLogs.utils'
+import { filterByUsers } from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
 import {
   TIMESTAMP_MICROS_PER_MS,
   type AuditLog,
@@ -52,32 +49,6 @@ describe('timestamp conversion (microseconds → milliseconds)', () => {
     // Guard: confirms the bug we fixed — dayjs.unix() treats the value as seconds,
     // overflowing JS Date's max and producing "Invalid Date"
     expect(dayjs.unix(TS_A).isValid()).toBe(false)
-  })
-})
-
-describe('sortAuditLogs', () => {
-  test('sorts descending (newest first)', () => {
-    const result = sortAuditLogs([logA, logC, logB], true)
-    expect(result.map((l) => l.request_id)).toEqual(['req-c', 'req-b', 'req-a'])
-  })
-
-  test('sorts ascending (oldest first)', () => {
-    const result = sortAuditLogs([logC, logA, logB], false)
-    expect(result.map((l) => l.request_id)).toEqual(['req-a', 'req-b', 'req-c'])
-  })
-
-  test('does not mutate the input array', () => {
-    const input = [logC, logA]
-    sortAuditLogs(input, true)
-    expect(input[0].request_id).toBe('req-c')
-  })
-
-  test('returns empty array unchanged', () => {
-    expect(sortAuditLogs([], true)).toEqual([])
-  })
-
-  test('handles a single log', () => {
-    expect(sortAuditLogs([logA], true)).toEqual([logA])
   })
 })
 
