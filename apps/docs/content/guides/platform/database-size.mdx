@@ -126,7 +126,24 @@ To resolve it, upgrade your plan or disable your Spend Cap to lift the restricti
 
 In some cases Supabase may put your database into read-only mode to prevent your database from exceeding the billing or disk limitations.
 
-In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`. Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size,
+In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`. The Postgres SQLSTATE code for this error is **25006** (`read_only_sql_transaction`). During severe disk exhaustion, **SQLSTATE 53100** (`disk_full`) may also appear. Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size.
+
+While in read-only mode, all write operations are blocked — including background jobs, scheduled tasks, and internal monitoring writes. Data that those jobs write (such as disk usage snapshots) will be stale until the database returns to read-write mode.
+
+To confirm that your database has entered read-only mode, query Postgres logs for the relevant SQLSTATE codes using the [Logs Explorer](/dashboard/project/_/logs/explorer) with the query source set to **Logs**:
+
+```sql
+select
+  timestamp,
+  log_attributes['parsed.error_severity'] as severity,
+  log_attributes['parsed.sql_state_code'] as sqlstate,
+  event_message
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] in ('25006', '53100', '57P03')
+order by timestamp desc
+limit 50;
+```
 
 ### Disabling read-only mode
 
@@ -138,7 +155,7 @@ First, change the [transaction access mode](https://www.postgresql.org/docs/curr
 set session characteristics as transaction read write;
 ```
 
-This allows you to delete data from within the session. After deleting data, consider running a vacuum to reclaim as much space as possible:
+This allows you to delete data from within the current session. After deleting data, consider running a vacuum to reclaim as much space as possible:
 
 ```sql
 vacuum;
@@ -149,6 +166,12 @@ Once you have reclaimed space, you can run the following to disable [read-only](
 ```sql
 set default_transaction_read_only = 'off';
 ```
+
+<Admonition type="note">
+
+`SET SESSION CHARACTERISTICS` applies only to the current session. Background jobs and scheduled tasks resume writes automatically once the platform exits read-only mode — no manual step is needed.
+
+</Admonition>
 
 ### Disk size distribution
 
