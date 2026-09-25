@@ -136,11 +136,68 @@ using (true);
 </TabPanel>
 </Tabs>
 
+<Admonition type="caution">
+
+Without these grants, every sign-up and sign-in fails with `500: Error running hook URI`, not only for users who have a role. Supabase Auth runs the hook as `supabase_auth_admin`, which has no access to the `public` schema by default.
+
+</Admonition>
+
 ## Enable the hook
+
+None of the SQL above does anything until the hook is enabled. The function, the claim, and the policies all exist, and every permission check returns false because the role never reaches the token.
+
+### Hosted projects
 
 In the Supabase Dashboard, go to [Authentication > Auth Hooks](/dashboard/project/_/auth/hooks) and select your Postgres function from the dropdown menu.
 
-When developing locally, follow the [local development](/docs/guides/auth/auth-hooks#local-development) instructions.
+### Local development
+
+Add the hook to your config file:
+
+```toml supabase/config.toml
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/custom_access_token_hook"
+```
+
+Supabase Auth reads this setting when it starts, so restart the stack to apply it:
+
+```bash
+supabase stop && supabase start
+```
+
+For the other hook types and their settings, see [Auth Hooks](/docs/guides/auth/auth-hooks#local-development).
+
+## Verify that the claim reaches the token
+
+Check the claim before you write any policies. The failure is silent, so a policy written against a claim that never arrives looks correct and denies everyone.
+
+1. Give a user a role:
+
+   ```sql
+   insert into public.user_roles (user_id, role)
+   values ('<user-uuid>', 'admin');
+   ```
+
+2. Sign in as that user and decode their access token:
+
+   ```js
+   import { jwtDecode } from 'jwt-decode'
+
+   const {
+     data: { session },
+   } = await supabase.auth.signInWithPassword({ email, password })
+
+   console.log(jwtDecode(session.access_token).user_role)
+   ```
+
+The output tells you which part of the setup to look at:
+
+| Output      | What it means                                                                                                  |
+| ----------- | -------------------------------------------------------------------------------------------------------------- |
+| `admin`     | The hook is running and the role reaches the token.                                                            |
+| `null`      | The hook is running, and this user has no row in `user_roles`.                                                 |
+| `undefined` | The hook isn't running. Check that you enabled it, and that you restarted the stack if you're working locally. |
 
 ## Accessing custom claims in RLS policies
 
@@ -171,7 +228,7 @@ $$ language plpgsql stable security definer set search_path = '';
 
 To learn more about using functions in RLS policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security#use-security-definer-functions).
 
-You can then call `authorize` from your RLS policies. To grant the delete access described above, add these policies:
+You can then call `authorize` from your RLS policies. To grant the delete access described above, add these policies. `channels` and `messages` come from the [Slack Clone schema](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone), so substitute your own tables:
 
 ```sql
 create policy "Allow authorized delete access" on public.channels for delete to authenticated using ( (SELECT authorize('channels.delete')) );
