@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE,
+  getEmailTemplateIssues,
   hasCustomEmailSender,
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
@@ -133,5 +134,71 @@ describe('EmailTemplates.utils', () => {
         projectInsertedAt: POST_CUTOFF,
       })
     ).toBe(false)
+  })
+})
+
+describe('getEmailTemplateIssues', () => {
+  // Template from https://github.com/supabase/supabase/issues/36990
+  const recoveryBody =
+    '<p><a href="{{ .ConfirmationURL }}/?token_hash={{ .TokenHash }}&flow=reset_password&email={{ .Email }}">Reset Password</a></p>'
+
+  it('returns no issues for empty content', () => {
+    expect(getEmailTemplateIssues(undefined)).toEqual([])
+    expect(getEmailTemplateIssues('')).toEqual([])
+  })
+
+  it('returns no issues when ConfirmationURL is the entire value', () => {
+    const body = '<p><a href="{{ .ConfirmationURL }}">Reset Password</a></p>'
+
+    expect(getEmailTemplateIssues(body)).toEqual([])
+  })
+
+  it('flags parameters appended after ConfirmationURL', () => {
+    expect(getEmailTemplateIssues(recoveryBody)).toEqual([
+      {
+        type: 'appended-after-confirmation-url',
+        snippet: '{{ .ConfirmationURL }}/?token_hash=',
+      },
+    ])
+  })
+
+  it('flags query strings and fragments appended after ConfirmationURL', () => {
+    expect(
+      getEmailTemplateIssues('<p>Visit {{ .ConfirmationURL }}?code=1</p>')
+    ).toEqual([
+      { type: 'appended-after-confirmation-url', snippet: '{{ .ConfirmationURL }}?code=1' },
+    ])
+
+    expect(getEmailTemplateIssues('<a href="{{ .ConfirmationURL }}#section">Link</a>')).toEqual([
+      { type: 'appended-after-confirmation-url', snippet: '{{ .ConfirmationURL }}#section' },
+    ])
+  })
+
+  it('does not flag trailing punctuation or a closing tag after ConfirmationURL', () => {
+    expect(getEmailTemplateIssues('<p>Visit {{ .ConfirmationURL }}</p>')).toEqual([])
+    expect(getEmailTemplateIssues('<p>Visit {{ .ConfirmationURL }}.</p>')).toEqual([])
+  })
+
+  it('flags misspelled casing of the ConfirmationURL variable', () => {
+    expect(getEmailTemplateIssues('<a href="{{ .ConfirmationUrl }}">Link</a>')).toEqual([
+      { type: 'case-mismatched-confirmation-url', snippet: '{{ .ConfirmationUrl }}' },
+    ])
+
+    expect(getEmailTemplateIssues('<a href="{{.confirmationurl}}">Link</a>')).toEqual([
+      { type: 'case-mismatched-confirmation-url', snippet: '{{.confirmationurl}}' },
+    ])
+  })
+
+  it('does not flag the documented custom link built from SiteURL and TokenHash', () => {
+    const body =
+      '<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery">Reset Password</a>'
+
+    expect(getEmailTemplateIssues(body)).toEqual([])
+  })
+
+  it('ignores unrelated template variables', () => {
+    const body = '<p>{{ .Token }} {{ .Email }} {{ .SiteURL }}/reset</p>'
+
+    expect(getEmailTemplateIssues(body)).toEqual([])
   })
 })

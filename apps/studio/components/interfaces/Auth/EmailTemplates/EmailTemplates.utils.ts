@@ -73,3 +73,53 @@ export const isCustomEmailTemplateEditingRestricted = ({
   // Temporary Studio-side paygate while Platform/Auth own the exact eligibility cohort.
   return !hasCustomEmailSender(authConfig)
 }
+
+export type EmailTemplateIssueType =
+  | 'appended-after-confirmation-url'
+  | 'case-mismatched-confirmation-url'
+
+export interface EmailTemplateIssue {
+  type: EmailTemplateIssueType
+  /** Offending excerpt from the template body, for display in the editor */
+  snippet?: string
+}
+
+const TEMPLATE_VARIABLE_PATTERN = /\{\{\s*\.([A-Za-z0-9_]+)\s*\}\}/g
+
+// Matches `{{ .ConfirmationURL }}` when non-whitespace text (path, query, or
+// fragment) is written directly after it inside an attribute or link body
+const APPENDED_CONFIRMATION_URL_PATTERN = /(\{\{\s*\.ConfirmationURL\s*\}\})([^\s"'<>{}]{1,40})/
+
+/**
+ * Scans a template body for known-broken usages of email template variables.
+ *
+ * - Text appended directly after `{{ .ConfirmationURL }}` never reaches the
+ *   sent email: the auth server generates that URL itself (including its query
+ *   parameters) and does not merge anything appended by the template, so the
+ *   extra parameters are dropped or produce a malformed link.
+ * - Variable names are case-sensitive; e.g. `{{ .ConfirmationUrl }}` renders
+ *   as empty and the link falls back to the site root without any token.
+ */
+export const getEmailTemplateIssues = (content?: string): EmailTemplateIssue[] => {
+  if (!content) return []
+
+  const issues: EmailTemplateIssue[] = []
+
+  const appended = APPENDED_CONFIRMATION_URL_PATTERN.exec(content)
+  if (appended) {
+    issues.push({
+      type: 'appended-after-confirmation-url',
+      snippet: `${appended[1]}${appended[2]}`,
+    })
+  }
+
+  for (const match of content.matchAll(TEMPLATE_VARIABLE_PATTERN)) {
+    const name = match[1]
+    if (name.toLowerCase() === 'confirmationurl' && name !== 'ConfirmationURL') {
+      issues.push({ type: 'case-mismatched-confirmation-url', snippet: match[0] })
+      break
+    }
+  }
+
+  return issues
+}
