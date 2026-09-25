@@ -29,7 +29,7 @@ function renderHeader(navStack: ExplorerNavEntry[]) {
         <ExplorerNavHeader
           navStack={navStack}
           onBack={onBack}
-          rootAction={<span>Switch to SQL Editor</span>}
+          rootAction={<span>Explorer preferences</span>}
         />
       }
     />
@@ -40,11 +40,11 @@ function renderHeader(navStack: ExplorerNavEntry[]) {
 describe('Explorer sidebar header', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('shows the smaller root title with the SQL action', () => {
+  it('shows the smaller root title with the preferences action', () => {
     renderHeader([])
     expect(screen.getAllByText('Explorer')).toHaveLength(1)
     expect(screen.getByText('Explorer')).toHaveClass('text-sm')
-    expect(screen.getByText('Switch to SQL Editor')).toBeInTheDocument()
+    expect(screen.getByText('Explorer preferences')).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
@@ -65,7 +65,7 @@ describe('Explorer sidebar header', () => {
         'page'
       )
       expect(within(breadcrumb).getAllByRole('listitem')).toHaveLength(2)
-      expect(screen.queryByText('Switch to SQL Editor')).not.toBeInTheDocument()
+      expect(screen.queryByText('Explorer preferences')).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
       const user = userEvent.setup()
       await user.click(screen.getByRole('button', { name: parent }))
