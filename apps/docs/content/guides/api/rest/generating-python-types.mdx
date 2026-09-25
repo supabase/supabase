@@ -80,17 +80,34 @@ client = create_client("YOUR_SUPABASE_URL", "YOUR_SUPABASE_KEY")
 movies = client.table("movies")
 
 # Select
-selected = [PublicMovies(m) for m in movies.select("*").execute().data]
+selected = [
+    PublicMovies.model_validate(m)
+    for m in movies.select("*").execute().data
+]
 
 # Insert
-inserted = [PublicMovies(m) for m in movies.insert(PublicMoviesInsert(name="foo", data="bar")) \
-                                          .execute().data]
+inserted = [
+    PublicMovies.model_validate(m)
+    for m in (
+        movies.insert(PublicMoviesInsert(name="foo", data="bar"))
+        .select("*")
+        .execute().data
+     )
+]
 
 # Update
-updated  = [PublicMovies(m) for m in movies.update(PublicMoviesUpdate(name="bar")) \
-                                        .eq("id", 5) \
-                                        .execute().data]
+updated  = [
+    PublicMovies.model_validate(m)
+    for m in (
+        movies.update(PublicMoviesUpdate(name="bar"))
+        .select("*")
+        .eq("id", 5)
+        .execute().data
+    )
+]
 ```
+
+Note: using `TypedDict` in insert/update currently doesn't work with tables including non-serializable columns like UUID or timestamp. Manually serialize values before passing to insert/update ([GitHub issue](https://github.com/supabase/supabase-py/issues/1443)).
 
 ## Update types automatically with GitHub Actions
 
