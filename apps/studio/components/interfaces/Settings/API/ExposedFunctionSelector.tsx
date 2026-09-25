@@ -131,6 +131,17 @@ export const ExposedFunctionSelector = ({
           Select functions
         </TooltipContent>
       </Tooltip>
+      <span aria-live="polite" className="sr-only">
+        {isCountsPending
+          ? 'Loading functions...'
+          : totalCount === 0
+            ? 'No functions available'
+            : `${grantsCount} of ${totalCount} functions exposed${
+                pendingCount > 0
+                  ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
+                  : ''
+              }`}
+      </span>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"

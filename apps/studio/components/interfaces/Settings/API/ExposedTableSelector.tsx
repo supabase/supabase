@@ -125,6 +125,17 @@ export const ExposedTableSelector = ({
           Select tables
         </TooltipContent>
       </Tooltip>
+      <span aria-live="polite" className="sr-only">
+        {isCountsPending
+          ? 'Loading tables...'
+          : totalCount === 0
+            ? 'No tables available'
+            : `${grantsCount} of ${totalCount} tables exposed${
+                pendingCount > 0
+                  ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
+                  : ''
+              }`}
+      </span>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"

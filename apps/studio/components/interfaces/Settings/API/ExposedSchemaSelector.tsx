@@ -128,6 +128,11 @@ export const ExposedSchemaSelector = ({
           Select schemas
         </TooltipContent>
       </Tooltip>
+      <span aria-live="polite" className="sr-only">
+        {isSuccess
+          ? `${selectedCount} of ${totalCount} ${pluralize(totalCount, 'schema')} exposed`
+          : 'Loading schemas...'}
+      </span>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
