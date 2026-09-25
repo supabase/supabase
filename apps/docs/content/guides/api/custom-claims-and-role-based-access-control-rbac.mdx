@@ -199,7 +199,9 @@ For server-side logic, you can use a JWT package for your language, such as [`ex
 
 ## Conclusion
 
-You now have a robust system in place to manage user roles and permissions within your database that automatically propagates to Supabase Auth.
+You now have a system for managing user roles and permissions in your database, and the Auth Hook copies a user's role into every access token it issues.
+
+A role change reaches a user the next time their access token is issued, not immediately. Sessions that are already open keep the role they were issued with until the client refreshes them. To apply a role change right away, refresh the session with [`refreshSession()`](/docs/reference/javascript/auth-refreshsession) or have the user sign in again. See [Sessions](/docs/guides/auth/sessions) for how long an access token lasts.
 
 ## More resources
 
