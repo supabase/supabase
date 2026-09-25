@@ -10,7 +10,11 @@ import { useComputeMetrics } from '@/hooks/analytics/useComputeMetrics'
  * to the database report. Metrics are project-scoped, which reports the
  * primary on both standard and High Availability projects.
  */
-export const ComputeMetricsFooter = ({ showConnections = true }: { showConnections?: boolean }) => {
+export const ComputeMetricsFooter = ({
+  isConnectionsAvailable = true,
+}: {
+  isConnectionsAvailable?: boolean
+}) => {
   const { ref } = useParams()
 
   const {
@@ -25,6 +29,7 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
   })
 
   const observabilityUrl = `/project/${ref}/observability/database`
+  const hasConnectionMetrics = isConnectionsAvailable && connections !== null && connections.max > 0
 
   return (
     <Tooltip>
@@ -41,7 +46,8 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
               <>
                 {cpu === null && 'CPU unavailable. '}
                 {disk === null && 'Disk unavailable. '}
-                {memory === null && 'RAM unavailable.'}
+                {memory === null && 'RAM unavailable. '}
+                {!hasConnectionMetrics && 'Connection metrics unavailable.'}
               </>
             )}
           </span>
@@ -70,14 +76,18 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
               <span>
                 RAM <MetricValue value={memory} />
               </span>
-              {showConnections && connections !== null && connections.max > 0 && (
-                <>
-                  <span className="text-foreground-lighter">·</span>
-                  <span className="text-foreground-light">
+              <span className="text-foreground-lighter">·</span>
+              <span className="text-foreground-light">
+                {hasConnectionMetrics ? (
+                  <>
                     {connections.peak}/{connections.max} conns
-                  </span>
-                </>
-              )}
+                  </>
+                ) : (
+                  <>
+                    Conns <span className="text-foreground-lighter">Unavailable</span>
+                  </>
+                )}
+              </span>
             </>
           )}
         </Link>
