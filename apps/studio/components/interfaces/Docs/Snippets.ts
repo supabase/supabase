@@ -1,3 +1,41 @@
+type SchemaHeaderMode = 'read' | 'write'
+
+export const getSchemaHeaders = (schema: string, mode: SchemaHeaderMode = 'read') =>
+  schema === 'public'
+    ? { bash: '', js: '' }
+    : {
+        bash: ` \\\n-H "${mode === 'write' ? 'Content-Profile' : 'Accept-Profile'}: ${schema}"`,
+        js: `.schema('${schema}')`,
+      }
+
+export const getSchemaPrefix = (schema: string) => {
+  const schemaHeaders = getSchemaHeaders(schema)
+  return schemaHeaders.js.length > 0 ? `${schemaHeaders.js}\n  ` : ''
+}
+
+function withSchemaContext<T>(
+  schema: string,
+  build: (context: {
+    schemaHeaders: ReturnType<typeof getSchemaHeaders>
+    schemaPrefix: string
+  }) => T,
+  mode: SchemaHeaderMode = 'read'
+) {
+  return build({
+    schemaHeaders: getSchemaHeaders(schema, mode),
+    schemaPrefix: getSchemaPrefix(schema),
+  })
+}
+
+export function getSchemaQualifiedEntity(id: string) {
+  if (!id.includes('.')) {
+    return { schema: 'public', name: id }
+  }
+
+  const [schema, ...nameParts] = id.split('.')
+  return { schema, name: nameParts.join('.') }
+}
+
 const snippets = {
   endpoint: (endpoint: string) => ({
     title: 'API URL',
@@ -96,13 +134,16 @@ const supabase = createClient(SUPABASE_URL, process.env.${keyName || 'SUPABASE_K
     endpoint,
     apiKey,
     showBearer = true,
+    schema = 'public',
   }: {
     rpcName: string
     rpcParams: any[]
     endpoint: string
     apiKey: string
-    showBearer: boolean
+    showBearer?: boolean
+    schema?: string
   }) => {
+    const schemaHeaders = getSchemaHeaders(schema, 'write')
     let rpcList = rpcParams.map((x) => `"${x.name}": "value"`).join(', ')
     let noParams = !rpcParams.length
     let bashParams = noParams ? '' : `\n-d '{ ${rpcList} }' \\`
@@ -123,7 +164,7 @@ const supabase = createClient(SUPABASE_URL, process.env.${keyName || 'SUPABASE_K
         code: `
 curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
 -H "Content-Type: application/json" \\
--H "apikey: ${apiKey}" ${
+-H "apikey: ${apiKey}"${schemaHeaders.bash}${
           showBearer
             ? `\\
 -H "Authorization: Bearer ${apiKey}"`
@@ -135,14 +176,14 @@ curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
         language: 'js',
         code: `
 let { data, error } = await supabase
-  .rpc('${rpcName}'${jsParams})
+  ${getSchemaPrefix(schema)}.rpc('${rpcName}'${jsParams})
 if (error) console.error(error)
 else console.log(data)
 `,
       },
     }
   },
-  subscribeAll: (listenerName: string, resourceId: string) => ({
+  subscribeAll: (listenerName: string, resourceId: string, schema = 'public') => ({
     title: 'Subscribe to all events',
     bash: {
       language: 'bash',
@@ -154,7 +195,7 @@ else console.log(data)
 const ${listenerName} = supabase.channel('custom-all-channel')
   .on(
     'postgres_changes',
-    { event: '*', schema: 'public', table: '${resourceId}' },
+    { event: '*', schema: '${schema}', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -162,7 +203,7 @@ const ${listenerName} = supabase.channel('custom-all-channel')
   .subscribe()`,
     },
   }),
-  subscribeInserts: (listenerName: string, resourceId: string) => ({
+  subscribeInserts: (listenerName: string, resourceId: string, schema = 'public') => ({
     title: 'Subscribe to inserts',
     bash: {
       language: 'bash',
@@ -174,7 +215,7 @@ const ${listenerName} = supabase.channel('custom-all-channel')
 const ${listenerName} = supabase.channel('custom-insert-channel')
   .on(
     'postgres_changes',
-    { event: 'INSERT', schema: 'public', table: '${resourceId}' },
+    { event: 'INSERT', schema: '${schema}', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -182,7 +223,7 @@ const ${listenerName} = supabase.channel('custom-insert-channel')
   .subscribe()`,
     },
   }),
-  subscribeUpdates: (listenerName: string, resourceId: string) => ({
+  subscribeUpdates: (listenerName: string, resourceId: string, schema = 'public') => ({
     title: 'Subscribe to updates',
     bash: {
       language: 'bash',
@@ -194,7 +235,7 @@ const ${listenerName} = supabase.channel('custom-insert-channel')
 const ${listenerName} = supabase.channel('custom-update-channel')
   .on(
     'postgres_changes',
-    { event: 'UPDATE', schema: 'public', table: '${resourceId}' },
+    { event: 'UPDATE', schema: '${schema}', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -202,7 +243,7 @@ const ${listenerName} = supabase.channel('custom-update-channel')
   .subscribe()`,
     },
   }),
-  subscribeDeletes: (listenerName: string, resourceId: string) => ({
+  subscribeDeletes: (listenerName: string, resourceId: string, schema = 'public') => ({
     title: 'Subscribe to deletes',
     bash: {
       language: 'bash',
@@ -214,7 +255,7 @@ const ${listenerName} = supabase.channel('custom-update-channel')
 const ${listenerName} = supabase.channel('custom-delete-channel')
   .on(
     'postgres_changes',
-    { event: 'DELETE', schema: 'public', table: '${resourceId}' },
+    { event: 'DELETE', schema: '${schema}', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -222,7 +263,13 @@ const ${listenerName} = supabase.channel('custom-delete-channel')
   .subscribe()`,
     },
   }),
-  subscribeEq: (listenerName: string, resourceId: string, columnName: string, value: string) => ({
+  subscribeEq: (
+    listenerName: string,
+    resourceId: string,
+    columnName: string,
+    value: string,
+    schema = 'public'
+  ) => ({
     title: 'Subscribe to specific rows',
     bash: {
       language: 'bash',
@@ -234,7 +281,7 @@ const ${listenerName} = supabase.channel('custom-delete-channel')
 const ${listenerName} = supabase.channel('custom-filter-channel')
   .on(
     'postgres_changes',
-    { event: '*', schema: 'public', table: '${resourceId}', filter: '${columnName}=eq.${value}' },
+    { event: '*', schema: '${schema}', table: '${resourceId}', filter: '${columnName}=eq.${value}' },
     (payload) => {
       console.log('Change received!', payload)
     }
@@ -242,24 +289,26 @@ const ${listenerName} = supabase.channel('custom-filter-channel')
   .subscribe()`,
     },
   }),
-  readAll: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'Read all rows',
-    bash: {
-      language: 'bash',
-      code: `
+  readAll: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(schema, ({ schemaHeaders, schemaPrefix }) => ({
+      title: 'Read all rows',
+      bash: {
+        language: 'bash',
+        code: `
 curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}"
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+      },
+      js: {
+        language: 'js',
+        code: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .select('*')
 `,
-    },
+      },
+    })),
   }),
   readColumns: ({
     title = 'Read specific columns',
@@ -267,46 +316,51 @@ let { data: ${resourceId}, error } = await supabase
     endpoint,
     apiKey,
     columnName = 'some_column,other_column',
+    schema = 'public',
   }: {
     title?: string
     resourceId: string
     endpoint: string
     apiKey: string
     columnName?: string
+    schema?: string
   }) => ({
-    title,
-    bash: {
-      language: 'bash',
-      code: `
+    ...withSchemaContext(schema, ({ schemaHeaders, schemaPrefix }) => ({
+      title,
+      bash: {
+        language: 'bash',
+        code: `
 curl '${endpoint}/rest/v1/${resourceId}?select=${columnName}' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}"
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+      },
+      js: {
+        language: 'js',
+        code: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .select('${columnName}')
 `,
-    },
+      },
+    })),
   }),
-  readForeignTables: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'Read referenced tables',
-    bash: {
-      language: 'bash',
-      code: `
+  readForeignTables: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(schema, ({ schemaHeaders, schemaPrefix }) => ({
+      title: 'Read referenced tables',
+      bash: {
+        language: 'bash',
+        code: `
 curl '${endpoint}/rest/v1/${resourceId}?select=some_column,other_table(foreign_key)' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}"
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+      },
+      js: {
+        language: 'js',
+        code: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .select(\`
     some_column,
     other_table (
@@ -314,36 +368,40 @@ let { data: ${resourceId}, error } = await supabase
     )
   \`)
 `,
-    },
+      },
+    })),
   }),
-  readRange: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'With pagination',
-    bash: {
-      language: 'bash',
-      code: `
+  readRange: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(schema, ({ schemaHeaders, schemaPrefix }) => ({
+      title: 'With pagination',
+      bash: {
+        language: 'bash',
+        code: `
 curl '${endpoint}/rest/v1/${resourceId}?select=*' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Range: 0-9"
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+      },
+      js: {
+        language: 'js',
+        code: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .select('*')
   .range(0, 9)
 `,
-    },
+      },
+    })),
   }),
-  readFilters: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'With filtering',
-    bash: {
-      language: 'bash',
-      code: `
+  readFilters: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(schema, ({ schemaHeaders, schemaPrefix }) => ({
+      title: 'With filtering',
+      bash: {
+        language: 'bash',
+        code: `
 curl --get '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Range: 0-9" \\
 -d "select=*" \\
@@ -368,12 +426,12 @@ curl --get '${endpoint}/rest/v1/${resourceId}' \\
 -d "column=not.like.Negate+filter" \\
 -d "or=(some_column.eq.Some+value,other_column.eq.Other+value)"
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+      },
+      js: {
+        language: 'js',
+        code: `
 let { data: ${resourceId}, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .select("*")
 
   // Filters
@@ -396,124 +454,155 @@ let { data: ${resourceId}, error } = await supabase
   .not('column', 'like', 'Negate filter')
   .or('some_column.eq.Some value, other_column.eq.Other value')
 `,
-    },
+      },
+    })),
   }),
-  insertSingle: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'Insert a row',
-    bash: {
-      language: 'bash',
-      code: `
+  insertSingle: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(
+      schema,
+      ({ schemaHeaders, schemaPrefix }) => ({
+        title: 'Insert a row',
+        bash: {
+          language: 'bash',
+          code: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: return=minimal" \\
 -d '{ "some_column": "someValue", "other_column": "otherValue" }'
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+        },
+        js: {
+          language: 'js',
+          code: `
 const { data, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .insert([
     { some_column: 'someValue', other_column: 'otherValue' },
   ])
   .select()
 `,
-    },
+        },
+      }),
+      'write'
+    ),
   }),
-  insertMany: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'Insert many rows',
-    bash: {
-      language: 'bash',
-      code: `
+  insertMany: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(
+      schema,
+      ({ schemaHeaders, schemaPrefix }) => ({
+        title: 'Insert many rows',
+        bash: {
+          language: 'bash',
+          code: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -d '[{ "some_column": "someValue" }, { "other_column": "otherValue" }]'
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+        },
+        js: {
+          language: 'js',
+          code: `
 const { data, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .insert([
     { some_column: 'someValue' },
     { some_column: 'otherValue' },
   ])
   .select()
 `,
-    },
+        },
+      }),
+      'write'
+    ),
   }),
-  upsert: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'Upsert matching rows',
-    bash: {
-      language: 'bash',
-      code: `
+  upsert: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(
+      schema,
+      ({ schemaHeaders, schemaPrefix }) => ({
+        title: 'Upsert matching rows',
+        bash: {
+          language: 'bash',
+          code: `
 curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: resolution=merge-duplicates" \\
 -d '{ "some_column": "someValue", "other_column": "otherValue" }'
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+        },
+        js: {
+          language: 'js',
+          code: `
 const { data, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .upsert({ some_column: 'someValue' })
   .select()
 `,
-    },
+        },
+      }),
+      'write'
+    ),
   }),
-  update: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'Update matching rows',
-    bash: {
-      language: 'bash',
-      code: `
+  update: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(
+      schema,
+      ({ schemaHeaders, schemaPrefix }) => ({
+        title: 'Update matching rows',
+        bash: {
+          language: 'bash',
+          code: `
 curl -X PATCH '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}" \\
 -H "Content-Type: application/json" \\
 -H "Prefer: return=minimal" \\
 -d '{ "other_column": "otherValue" }'
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+        },
+        js: {
+          language: 'js',
+          code: `
 const { data, error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .update({ other_column: 'otherValue' })
   .eq('some_column', 'someValue')
   .select()
 `,
-    },
+        },
+      }),
+      'write'
+    ),
   }),
-  delete: (resourceId: string, endpoint: string, apiKey: string) => ({
-    title: 'Delete matching rows',
-    bash: {
-      language: 'bash',
-      code: `
+  delete: (resourceId: string, endpoint: string, apiKey: string, schema = 'public') => ({
+    ...withSchemaContext(
+      schema,
+      ({ schemaHeaders, schemaPrefix }) => ({
+        title: 'Delete matching rows',
+        bash: {
+          language: 'bash',
+          code: `
 curl -X DELETE '${endpoint}/rest/v1/${resourceId}?some_column=eq.someValue' \\
--H "apikey: ${apiKey}" \\
+-H "apikey: ${apiKey}"${schemaHeaders.bash} \\
 -H "Authorization: Bearer ${apiKey}"
 `,
-    },
-    js: {
-      language: 'js',
-      code: `
+        },
+        js: {
+          language: 'js',
+          code: `
 const { error } = await supabase
-  .from('${resourceId}')
+  ${schemaPrefix}.from('${resourceId}')
   .delete()
   .eq('some_column', 'someValue')
 `,
-    },
+        },
+      }),
+      'write'
+    ),
   }),
   authSignup: (endpoint: string, apiKey: string, randomPassword: string) => ({
     title: 'User signup',
