@@ -21,6 +21,7 @@ import { useExplorerDeleteItem } from '@/components/layouts/ExplorerLayout/Explo
 import { AIAssistantMetadataWarning } from '@/components/ui/AIAssistantPanel/AIAssistantMetadataWarning'
 import type { AssistantChatHeaderProps } from '@/components/ui/AIAssistantPanel/AssistantChat'
 import { ShortcutPills } from '@/components/ui/ShortcutTooltip'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -54,8 +55,12 @@ export const ExplorerChatToolbar = ({
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID, handleCopyChatId, {
     enabled: shortcutsEnabled && !isChatLoading,
   })
+  // The opt-in level is an organization setting that only exists on the platform.
+  // Self-hosted and CLI Studio always share schema metadata (see useOrgAiOptInLevel).
+  const canOpenPermissionSettings = IS_PLATFORM
+
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS, () => setIsOptInModalOpen(true), {
-    enabled: shortcutsEnabled && !isChatLoading,
+    enabled: shortcutsEnabled && !isChatLoading && canOpenPermissionSettings,
   })
 
   return (
@@ -84,20 +89,22 @@ export const ExplorerChatToolbar = ({
                   sequence={SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID].sequence}
                 />
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="justify-between"
-                onClick={() => setIsOptInModalOpen(true)}
-              >
-                <div className="flex items-center gap-x-2">
-                  <Settings size={14} />
-                  <span>Permission settings</span>
-                </div>
-                <ShortcutPills
-                  sequence={
-                    SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS].sequence
-                  }
-                />
-              </DropdownMenuItem>
+              {canOpenPermissionSettings && (
+                <DropdownMenuItem
+                  className="justify-between"
+                  onClick={() => setIsOptInModalOpen(true)}
+                >
+                  <div className="flex items-center gap-x-2">
+                    <Settings size={14} />
+                    <span>Permission settings</span>
+                  </div>
+                  <ShortcutPills
+                    sequence={
+                      SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS].sequence
+                    }
+                  />
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="gap-x-2"
