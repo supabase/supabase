@@ -89,6 +89,18 @@ export const ExposedTableSelector = ({
     }
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, isPending, fetchNextPage])
 
+  let tablesSummary: string
+
+  if (isCountsPending) {
+    tablesSummary = 'Loading tables...'
+  } else if (totalCount === 0) {
+    tablesSummary = 'No tables available'
+  } else {
+    tablesSummary = `${grantsCount} of ${totalCount} tables exposed${
+      pendingCount > 0 ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}` : ''
+    }`
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <Tooltip>
@@ -106,17 +118,7 @@ export const ExposedTableSelector = ({
               aria-describedby={undefined}
             >
               <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">
-                  {isCountsPending
-                    ? 'Loading tables...'
-                    : totalCount === 0
-                      ? 'No tables available'
-                      : `${grantsCount} of ${totalCount} tables exposed${
-                          pendingCount > 0
-                            ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
-                            : ''
-                        }`}
-                </p>
+                <p className="text-foreground-lighter">{tablesSummary}</p>
               </div>
             </Button>
           </PopoverTrigger>
@@ -126,15 +128,7 @@ export const ExposedTableSelector = ({
         </TooltipContent>
       </Tooltip>
       <span aria-live="polite" className="sr-only">
-        {isCountsPending
-          ? 'Loading tables...'
-          : totalCount === 0
-            ? 'No tables available'
-            : `${grantsCount} of ${totalCount} tables exposed${
-                pendingCount > 0
-                  ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
-                  : ''
-              }`}
+        {tablesSummary}
       </span>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"

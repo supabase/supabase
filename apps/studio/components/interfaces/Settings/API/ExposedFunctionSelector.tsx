@@ -95,6 +95,18 @@ export const ExposedFunctionSelector = ({
     }
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, isPending, fetchNextPage])
 
+  let functionsSummary: string
+
+  if (isCountsPending) {
+    functionsSummary = 'Loading functions...'
+  } else if (totalCount === 0) {
+    functionsSummary = 'No functions available'
+  } else {
+    functionsSummary = `${grantsCount} of ${totalCount} functions exposed${
+      pendingCount > 0 ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}` : ''
+    }`
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <Tooltip>
@@ -112,17 +124,7 @@ export const ExposedFunctionSelector = ({
               aria-describedby={undefined}
             >
               <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">
-                  {isCountsPending
-                    ? 'Loading functions...'
-                    : totalCount === 0
-                      ? 'No functions available'
-                      : `${grantsCount} of ${totalCount} functions exposed${
-                          pendingCount > 0
-                            ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
-                            : ''
-                        }`}
-                </p>
+                <p className="text-foreground-lighter">{functionsSummary}</p>
               </div>
             </Button>
           </PopoverTrigger>
@@ -132,15 +134,7 @@ export const ExposedFunctionSelector = ({
         </TooltipContent>
       </Tooltip>
       <span aria-live="polite" className="sr-only">
-        {isCountsPending
-          ? 'Loading functions...'
-          : totalCount === 0
-            ? 'No functions available'
-            : `${grantsCount} of ${totalCount} functions exposed${
-                pendingCount > 0
-                  ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
-                  : ''
-              }`}
+        {functionsSummary}
       </span>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"

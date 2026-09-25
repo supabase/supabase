@@ -99,6 +99,14 @@ export const ExposedSchemaSelector = ({
     protectedSchemas: internalSchemasCannotExpose,
   })
 
+  let schemasSummary: string
+
+  if (isSuccess) {
+    schemasSummary = `${selectedCount} of ${totalCount} ${pluralize(totalCount, 'schema')} exposed`
+  } else {
+    schemasSummary = 'Loading schemas...'
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <Tooltip>
@@ -115,11 +123,7 @@ export const ExposedSchemaSelector = ({
               aria-describedby={undefined}
             >
               <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">
-                  {isSuccess
-                    ? `${selectedCount} of ${totalCount} ${pluralize(totalCount, 'schema')} exposed`
-                    : 'Loading schemas...'}
-                </p>
+                <p className="text-foreground-lighter">{schemasSummary}</p>
               </div>
             </Button>
           </PopoverTrigger>
@@ -129,9 +133,7 @@ export const ExposedSchemaSelector = ({
         </TooltipContent>
       </Tooltip>
       <span aria-live="polite" className="sr-only">
-        {isSuccess
-          ? `${selectedCount} of ${totalCount} ${pluralize(totalCount, 'schema')} exposed`
-          : 'Loading schemas...'}
+        {schemasSummary}
       </span>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
