@@ -66,7 +66,7 @@ Sie können auch [selbst hosten](https://supabase.com/docs/guides/hosting/overvi
 - [pg_graphql](http://github.com/supabase/pg_graphql/) ist eine PostgreSQL-Erweiterung, die eine GraphQL-API bereitstellt
 - [Storage](https://github.com/supabase/storage-api) bietet eine RESTful-Schnittstelle für die Verwaltung von Dateien, die in S3 gespeichert sind, und nutzt Postgres für die Verwaltung von Berechtigungen.
 - [postgres-meta](https://github.com/supabase/postgres-meta) ist eine RESTful-API für die Verwaltung von Postgres, mit der Sie Tabellen abrufen, Rollen hinzufügen, Abfragen ausführen können usw.
-- [GoTrue](https://github.com/netlify/gotrue) ist eine SWT-basierte API für die Verwaltung von Benutzern und die Ausgabe von SWT-Tokens.
+- [GoTrue](https://github.com/supabase/gotrue) ist eine JWT-basierte API für die Verwaltung von Benutzern und die Ausgabe von JWT-Tokens.
 - [Kong](https://github.com/Kong/kong) ist ein Cloud-natives API-Gateway.
 
 #### Client-Bibliotheken

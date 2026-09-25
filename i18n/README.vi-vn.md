@@ -65,7 +65,7 @@ Bạn cũng có thể [tự quản lý](https://supabase.com/docs/guides/hosting
 - [PostgREST](http://postgrest.org/) là một máy chủ web có khả năng biến cơ sở dữ liệu PostgreSQL của bạn thành một hệ thống REST API một cách trực tiếp.
 - [Storage](https://github.com/supabase/storage-api) cung cấp giao diện RESTful để quản lý các tệp được lưu trữ trong S3, sử dụng Postgres để quản lý quyền.
 - [postgres-meta](https://github.com/supabase/postgres-meta) là một API RESTful để quản lý Postgres của bạn, cho phép bạn tìm nạp bảng, thêm vai trò và chạy truy vấn, v.v.
-- [GoTrue](https://github.com/netlify/gotrue) là một API dựa trên SWT để quản lý người dùng và phát hành mã token SWT.
+- [GoTrue](https://github.com/supabase/gotrue) là một API dựa trên JWT để quản lý người dùng và phát hành mã token JWT.
 - [Kong](https://github.com/Kong/kong) là một cổng API trên đám mây.
 
 #### Thư viện hỗ trợ

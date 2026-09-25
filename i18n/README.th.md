@@ -57,7 +57,7 @@ Supabase เป็น [hosted platform](https://supabase.com/dashboard). คุ�
 - [PostgREST](http://postgrest.org/) เป็น web server ที่ทำหน้าที่ในการแปลงฐานข้อมูล Postgres ให้กลายเป็น RESTful API โดยตรง
 - [Storage](https://github.com/supabase/storage-api) ทำหน้าที่ในการเป็น RESTful interface สำหรับการจัดการไฟล์ที่ถูกเก็บใน S3 และใช้ Postgres ในการจัดการ permissions
 - [postgres-meta](https://github.com/supabase/postgres-meta) เป็น RESTful API สำหรับจัดการ Postgres ของคุณ ทำให้คุณสามารถเรียกดูตาราง (Database tables), เพิ่ม Roles และเรียกดูข้อมูล (run queries) ได้
-- [GoTrue](https://github.com/netlify/gotrue) เป็น API ที่สร้างขึ้นจาก SWT สำหรับการจัดการผู้ใช้ และสร้าง SWT tokens
+- [GoTrue](https://github.com/supabase/gotrue) เป็น API ที่สร้างขึ้นจาก JWT สำหรับการจัดการผู้ใช้ และสร้าง JWT tokens
 - [Kong](https://github.com/Kong/kong) เป็น cloud-native API gateway
 
 #### ไคลเอนต์ไลบรารี่
@@ -67,7 +67,7 @@ Supabase เป็น [hosted platform](https://supabase.com/dashboard). คุ�
 - **`supabase-{lang}`**: รวบรวมไลบรารี่ต่าง ๆ เข้าด้วยกัน
   - `postgrest-{lang}`: ไคลเอนต์ไลบรารี่ในการทำงานกับ [PostgREST](https://github.com/postgrest/postgrest)
   - `realtime-{lang}`: ไคลเอนต์ไลบรารี่ในการทำงานกับ [Realtime](https://github.com/supabase/realtime)
-  - `gotrue-{lang}`: ไคลเอนต์ไลบรารี่ในการทำงานกับ [GoTrue](https://github.com/netlify/gotrue)
+  - `gotrue-{lang}`: ไคลเอนต์ไลบรารี่ในการทำงานกับ [GoTrue](https://github.com/supabase/gotrue)
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
