@@ -7,6 +7,7 @@ import { ApplicationError, UserError } from '../common/errors.ts'
 const openAiKey = Deno.env.get('OPENAI_API_KEY')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const MAX_QUERY_LENGTH = 500
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,17 @@ Deno.serve(async (req) => {
     // Handle CORS
     if (req.method === 'OPTIONS') {
       return new Response('ok', { headers: corsHeaders })
+    }
+
+    if (req.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          Allow: 'POST, OPTIONS',
+          'Content-Type': 'application/json',
+        },
+      })
     }
 
     if (!openAiKey) {
@@ -40,14 +52,22 @@ Deno.serve(async (req) => {
 
     const { query, useAlternateSearchIndex } = requestData
 
-    if (!query) {
+    if (typeof query !== 'string') {
       throw new UserError('Missing query in request data')
     }
 
-    // Intentionally log the query
-    console.log({ query })
-
     const sanitizedQuery = query.trim()
+
+    if (!sanitizedQuery) {
+      throw new UserError('Missing query in request data')
+    }
+
+    if (sanitizedQuery.length > MAX_QUERY_LENGTH) {
+      throw new UserError('Query is too long')
+    }
+
+    // Intentionally log the query
+    console.log({ query: sanitizedQuery })
 
     const supabaseClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
