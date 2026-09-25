@@ -2,7 +2,12 @@ import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
 import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../CreateBucketModal.utils'
-import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
+import {
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+  STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
+} from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
 import type { StorageObjectsPage } from '@/data/storage/bucket-objects-infinite-query'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
@@ -262,13 +267,15 @@ export function getListV2EntryName(name: string): string {
 }
 
 /**
- * v2 returns folders and files as two separate arrays; merges them into the single list
+ * v2 returns folders and files as two separate arrays; merges them into the single sorted list
  * `formatFolderItems` expects, tagging folders with `id: null` per its v1-derived convention.
- * Folders are kept ahead of files (as v1's listing always had them) rather than re-sorted by
- * name, so page boundaries stay in the server's order.
+ * Re-sorted by the given column rather than left folders-first: v1's listing put folders first
+ * because its single query was a `UNION ALL` of a folders CTE then objects, but a chosen sort
+ * (e.g. by created_at) should interleave folders and files, not group all folders up front.
  */
 export function formatFolderItemsV2(
   page: Pick<StorageObjectsPage, 'folders' | 'objects'>,
+  sortBy: { column: STORAGE_SORT_BY; order: STORAGE_SORT_BY_ORDER },
   prefix?: string
 ): StorageItem[] {
   const folders = page.folders.map((folder) => ({
@@ -283,7 +290,13 @@ export function formatFolderItemsV2(
     ...object,
     name: getListV2EntryName(object.name),
   }))
-  return formatFolderItems([...folders, ...objects], prefix)
+  const direction = sortBy.order === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
+  const merged = [...folders, ...objects].sort((a, b) => {
+    const aValue = (sortBy.column === STORAGE_SORT_BY.NAME ? a.name : a[sortBy.column]) ?? ''
+    const bValue = (sortBy.column === STORAGE_SORT_BY.NAME ? b.name : b[sortBy.column]) ?? ''
+    return direction * String(aValue).localeCompare(String(bValue))
+  })
+  return formatFolderItems(merged, prefix)
 }
 
 export const getFile = async (fileEntry: FileSystemFileEntry): Promise<File | undefined> => {

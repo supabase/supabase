@@ -109,13 +109,14 @@ export function createStorageExplorerState({
     },
     signal?: AbortSignal
   ) => {
+    const sortOptions = getSortOptions()
     const page = await listBucketObjectsV2(
       {
         projectRef,
         bucketId,
         prefix: toListV2Prefix(path, searchString),
         cursor,
-        options: { limit: LIMIT, sortBy: getSortOptions() },
+        options: { limit: LIMIT, sortBy: sortOptions },
       },
       signal
     )
@@ -123,7 +124,7 @@ export function createStorageExplorerState({
     // load-more into an infinite loop re-fetching the same page forever; treat it as the end.
     const nextCursor = page.hasNext && page.nextCursor !== cursor ? (page.nextCursor ?? null) : null
     return {
-      items: formatFolderItemsV2(page, path),
+      items: formatFolderItemsV2(page, sortOptions, path),
       hasMoreItems: nextCursor !== null,
       cursor: nextCursor,
     }

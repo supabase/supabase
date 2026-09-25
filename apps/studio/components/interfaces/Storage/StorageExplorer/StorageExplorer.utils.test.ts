@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
+  STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
 } from '@/components/interfaces/Storage/Storage.constants'
 import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
@@ -471,25 +473,56 @@ describe('getListV2EntryName', () => {
 })
 
 describe('formatFolderItemsV2', () => {
-  it('tags folders with id: null and puts them ahead of files', () => {
-    const items = formatFolderItemsV2({
-      folders: [{ name: 'a/inner/' }],
-      objects: [
-        {
-          id: 'file-id',
-          name: 'a/file.png',
-          created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-01-01T00:00:00Z',
-          last_accessed_at: '2024-01-01T00:00:00Z',
-          metadata: { size: 1, mimetype: 'image/png' },
-        },
-      ],
-    })
+  const NAME_ASC = { column: STORAGE_SORT_BY.NAME, order: STORAGE_SORT_BY_ORDER.ASC }
 
-    expect(items.map((item) => ({ name: item.name, type: item.type, id: item.id }))).toEqual([
-      { name: 'inner', type: STORAGE_ROW_TYPES.FOLDER, id: null },
-      { name: 'file.png', type: STORAGE_ROW_TYPES.FILE, id: 'file-id' },
+  it('tags folders with id: null', () => {
+    const items = formatFolderItemsV2({ folders: [{ name: 'a/inner/' }], objects: [] }, NAME_ASC)
+
+    expect(items).toEqual([
+      expect.objectContaining({ name: 'inner', type: STORAGE_ROW_TYPES.FOLDER, id: null }),
     ])
+  })
+
+  it('sorts folders and files together by the given column, interleaving rather than grouping folders first', () => {
+    const items = formatFolderItemsV2(
+      {
+        folders: [{ name: 'banana/' }],
+        objects: [
+          {
+            id: 'apple-id',
+            name: 'apple.png',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            last_accessed_at: '2024-01-01T00:00:00Z',
+            metadata: null,
+          },
+          {
+            id: 'cherry-id',
+            name: 'cherry.png',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            last_accessed_at: '2024-01-01T00:00:00Z',
+            metadata: null,
+          },
+        ],
+      },
+      NAME_ASC
+    )
+
+    expect(items.map((item) => ({ name: item.name, type: item.type }))).toEqual([
+      { name: 'apple.png', type: STORAGE_ROW_TYPES.FILE },
+      { name: 'banana', type: STORAGE_ROW_TYPES.FOLDER },
+      { name: 'cherry.png', type: STORAGE_ROW_TYPES.FILE },
+    ])
+  })
+
+  it('sorts descending when requested', () => {
+    const items = formatFolderItemsV2(
+      { folders: [{ name: 'banana/' }], objects: [] },
+      { column: STORAGE_SORT_BY.NAME, order: STORAGE_SORT_BY_ORDER.DESC }
+    )
+
+    expect(items.map((item) => item.name)).toEqual(['banana'])
   })
 
   it('drops the empty-folder placeholder and builds path from the given prefix', () => {
@@ -515,6 +548,7 @@ describe('formatFolderItemsV2', () => {
           },
         ],
       },
+      NAME_ASC,
       'a/b'
     )
 

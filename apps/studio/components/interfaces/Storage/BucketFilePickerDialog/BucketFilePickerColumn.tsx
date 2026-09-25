@@ -10,15 +10,9 @@ import { toast } from 'sonner'
 import { Checkbox, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  STORAGE_ROW_STATUS,
-  STORAGE_ROW_TYPES,
-  STORAGE_SORT_BY,
-  STORAGE_SORT_BY_ORDER,
-  STORAGE_VIEWS,
-} from '../Storage.constants'
+import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageItem } from '../Storage.types'
-import { formatFolderItems } from '../StorageExplorer/StorageExplorer.utils'
+import { formatFolderItemsV2 } from '../StorageExplorer/StorageExplorer.utils'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { uploadFilesToBucket } from './BucketFilePickerDialog.utils'
 import { BucketFilePickerRow } from './BucketFilePickerRow'
@@ -163,33 +157,13 @@ export const BucketFilePickerColumn = ({
 
   const items = useMemo(() => {
     const pages = data?.pages ?? []
-    // v2's `name` is the full key/prefix from the bucket root (folders end with a trailing
-    // slash), not the bare file/folder name — take the last path segment for display.
-    const objs = pages
-      .flatMap((page) => page.objects)
-      .map((object) => ({ ...object, name: object.name.split('/').pop() ?? object.name }))
-    // v2 returns folders and objects separately; re-combine them into the single sorted list
-    // formatFolderItems expects, tagging folders with `id: null` per its existing convention.
-    const folders = pages
-      .flatMap((page) => page.folders)
-      .map((folder) => {
-        const folderPath = folder.name.replace(/\/$/, '')
-        return {
-          id: null,
-          name: folderPath.split('/').pop() ?? folderPath,
-          created_at: null,
-          updated_at: null,
-          last_accessed_at: null,
-          metadata: null,
-        }
-      })
-    const direction = sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
-    const merged = [...folders, ...objs].sort((a, b) => {
-      const aValue = (sortBy === STORAGE_SORT_BY.NAME ? a.name : a[sortBy]) ?? ''
-      const bValue = (sortBy === STORAGE_SORT_BY.NAME ? b.name : b[sortBy]) ?? ''
-      return direction * String(aValue).localeCompare(String(bValue))
-    })
-    return formatFolderItems(merged)
+    return formatFolderItemsV2(
+      {
+        folders: pages.flatMap((page) => page.folders),
+        objects: pages.flatMap((page) => page.objects),
+      },
+      { column: sortBy, order: sortByOrder }
+    )
   }, [data, sortBy, sortByOrder])
 
   const haveSelectedItems = selectedItems.length > 0

@@ -165,8 +165,9 @@ describe('fetchFolderContents', () => {
     const column = state.columns[0]
     expect(column.hasMoreItems).toBe(true)
     expect(column.cursor).toBe('cursor-1')
-    // Bare names, folder ahead of file, placeholder dropped
-    expect(column.items.map((item) => item.name)).toEqual(['inner', 'file.png'])
+    // Bare names, sorted by name (default preference) rather than grouped by folder/file,
+    // placeholder dropped
+    expect(column.items.map((item) => item.name)).toEqual(['file.png', 'inner'])
   })
 })
 
