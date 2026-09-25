@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Badge, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
@@ -18,7 +18,6 @@ export interface BillingMetricProps {
   usage: OrgUsageResponse
   subscription: OrgSubscription
   relativeToSubscription: boolean
-  className?: string
 }
 
 export const BillingMetric = ({
@@ -27,7 +26,6 @@ export const BillingMetric = ({
   usage,
   subscription,
   relativeToSubscription,
-  className,
 }: BillingMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
 
@@ -84,9 +82,9 @@ export const BillingMetric = ({
         : `(${(+(usageRatio * 100).toFixed(0)).toLocaleString()}%)`
 
   return (
-    <HoverCard openDelay={50} closeDelay={200}>
-      <HoverCardTrigger asChild>
-        <div className={cn('flex items-center justify-between', className)}>
+    <Tooltip delayDuration={100}>
+      <TooltipTrigger asChild>
+        <div className={cn('flex items-center justify-between')}>
           {metric.anchor ? (
             <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
               <div className="group flex items-center gap-1">
@@ -186,58 +184,50 @@ export const BillingMetric = ({
             </div>
           )}
         </div>
-      </HoverCardTrigger>
+      </TooltipTrigger>
       {usageMeta.available_in_plan && (
-        <HoverCardContent side="bottom" align="end" className="w-[500px]" animate="slide-in">
-          <div className="text-sm">
+        <TooltipContent side="bottom" align="start" className="max-w-[400px]" alignOffset={-15}>
+          <div className="text-xs flex flex-col gap-y-2">
             <p className="font-medium" translate="no">
               {usageMeta.unit_price_desc}
             </p>
 
             {metric.tip && (
-              <div className="my-2">
-                <p className="text-sm">
-                  {metric.tip}{' '}
-                  {metric.docLink && (
-                    <Link
-                      href={metric.docLink.url}
-                      target="_blank"
-                      className="transition text-primary hover:text-primary-hover underline"
-                    >
-                      {metric.docLink.title}
-                    </Link>
-                  )}
-                </p>
-              </div>
+              <p className="text-foreground-light">
+                {metric.tip}{' '}
+                {metric.docLink && (
+                  <Link
+                    href={metric.docLink.url}
+                    target="_blank"
+                    className="transition text-primary hover:text-primary-hover underline"
+                  >
+                    {metric.docLink.title}
+                  </Link>
+                )}
+              </p>
             )}
 
             {subscription.usage_billing_enabled && isLogMetricOnNonPlatformPlan && (
-              <div className="my-2">
-                <p className="text-sm">
-                  Billing and enforcement of restrictions for this metric will only start after the
-                  grace period ends at the start of 2027.
-                </p>
-              </div>
+              <p className="text-foreground-light">
+                Billing and enforcement of restrictions for this metric will only start after the
+                grace period ends at the start of 2027.
+              </p>
             )}
 
             {subscription.usage_billing_enabled === false &&
               relativeToSubscription &&
               (isApproachingLimit || isExceededLimit) &&
               (isLogMetricOnNonPlatformPlan ? (
-                <div className="my-2">
-                  <p className="text-sm">
-                    Enforcement of restrictions will only start after the grace period ends at the
-                    start of 2027. Reduce your usage, upgrade to a usage-based plan or disable the
-                    spend cap to avoid restrictions.
-                  </p>
-                </div>
+                <p className="text-foreground-light">
+                  Enforcement of restrictions will only start after the grace period ends at the
+                  start of 2027. Reduce your usage, upgrade to a usage-based plan or disable the
+                  spend cap to avoid restrictions.
+                </p>
               ) : (
-                <div className="my-2">
-                  <p className="text-sm">
-                    Exceeding your plans included usage will lead to restrictions to your project.
-                    Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
-                  </p>
-                </div>
+                <p className="text-foreground-light">
+                  Exceeding your plans included usage will lead to restrictions to your project.
+                  Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
+                </p>
               ))}
 
             {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
@@ -248,23 +238,22 @@ export const BillingMetric = ({
                     <th className="text-right">Usage</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="[&>tr:last-child>td]:pb-1">
                   {sortedProjectAllocations.map((allocation) => (
                     <tr key={`${usageMeta.metric}_${allocation.ref}`}>
-                      <td>{allocation.name}</td>
-                      <td className="text-right">
+                      <td className="text-foreground-light">{allocation.name}</td>
+                      <td className="text-foreground-light text-right">
                         {formatUsage(usageMeta.metric as PricingMetric, allocation)}
                       </td>
                     </tr>
                   ))}
-                  <tr></tr>
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td className="py-2 border-t text-left">
+                    <td className="py-1 border-t text-left">
                       Total{unit && <span> ({unit})</span>}
                     </td>
-                    <td className="py-2 border-t text-right">
+                    <td className="py-1 border-t text-right">
                       {formatUsage(usageMeta.metric as PricingMetric, {
                         usage: usageMeta.usage_original,
                       })}{' '}
@@ -274,8 +263,8 @@ export const BillingMetric = ({
               </table>
             )}
           </div>
-        </HoverCardContent>
+        </TooltipContent>
       )}
-    </HoverCard>
+    </Tooltip>
   )
 }
