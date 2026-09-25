@@ -7,7 +7,9 @@ import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 type ConversationProps = Omit<ComponentProps<typeof StickToBottom>, 'children'> & {
   children?: ReactNode
 }
-type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>
+type ConversationContentProps = ComponentProps<typeof StickToBottom.Content> & {
+  scrollClassName?: string
+}
 type ConversationScrollButtonProps = ComponentProps<typeof Button>
 
 /**
@@ -46,13 +48,17 @@ export const Conversation = ({ className, children, ...props }: ConversationProp
 
 export const ConversationContent = ({
   className,
+  scrollClassName,
   children,
   ...props
 }: ConversationContentProps) => {
   const context = useStickToBottomContext()
 
   return (
-    <div ref={context.scrollRef} className="h-full w-full overflow-auto overscroll-y-contain">
+    <div
+      ref={context.scrollRef}
+      className={cn('h-full w-full overflow-auto overscroll-y-contain', scrollClassName)}
+    >
       <div {...props} ref={context.contentRef} className={cn(CONTENT_GUTTER, 'py-4', className)}>
         {typeof children === 'function' ? children(context) : children}
       </div>

@@ -1,6 +1,5 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
-import isEqual from 'lodash/isEqual'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
 import { memo, type ReactNode } from 'react'
 import { cn } from 'ui'
@@ -11,6 +10,7 @@ import { getManualToolApprovalHandlers } from './Confirm.utils'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
 import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
+import { areMessagePartsEqual } from './Message.Parts.utils'
 import {
   deployEdgeFunctionInputSchema,
   deployEdgeFunctionOutputSchema,
@@ -391,9 +391,5 @@ export const MessagePartSwitcher = memo(
 
     return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
   },
-  (previous, next) => {
-    // The AI SDK clones every part of the active message on each stream update.
-    // Compare the part, not its identity, so completed tools retain their rendered subtree.
-    return isEqual(previous.part, next.part)
-  }
+  (previous, next) => areMessagePartsEqual(previous.part, next.part)
 )
