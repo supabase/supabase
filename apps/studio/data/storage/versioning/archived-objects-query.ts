@@ -14,6 +14,8 @@ export interface ArchivedObjectVersion {
   size: number
   createdAt: string
   action: ObjectVersionAction
+  /** What the preview renders from. A delete marker carries no metadata. */
+  mimeType?: string
 }
 
 export interface ArchivedObject {
@@ -43,6 +45,7 @@ const toVersion = (object: StorageObjectV2, action: ObjectVersionAction) => ({
   size: Number(object.metadata?.size ?? 0),
   createdAt: object.created_at ?? object.updated_at ?? '',
   action,
+  mimeType: object.metadata?.mimetype ?? undefined,
 })
 
 /** An object is archived when the row currently at its path is a delete marker. */
