@@ -2,17 +2,14 @@ import type { ReactNode } from 'react'
 import { Button } from 'ui'
 
 import { ScopeGroupCard } from './ScopeGroupCard'
-import type {
-  OAuthAppsAuthorizeOrganizationProject,
-  OAuthScopeGroup,
-} from '@/data/oauth-apps/types'
+import type { OAuthAppsAuthorizeOrganizationProject, OAuthScope } from '@/data/oauth-apps/types'
 
 export type AuthorizeSuccessGrant = {
   email: string
   organization_slug: string
   project_refs: string[] | null
   projects: OAuthAppsAuthorizeOrganizationProject[]
-  scope_groups: OAuthScopeGroup[]
+  scopes: OAuthScope[]
 }
 
 export interface AuthorizeSuccessScreenProps {
@@ -56,10 +53,10 @@ export const AuthorizeSuccessScreen = ({
         </DetailRow>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <section className="flex flex-col gap-3">
         <p className="text-xs text-foreground">Permissions granted</p>
-        <ScopeGroupCard appName={appName} scopeGroups={grant.scope_groups} showHeading={false} />
-      </div>
+        <ScopeGroupCard scopes={grant.scopes} />
+      </section>
 
       <Button variant="text" block onClick={onReturn}>
         Return to {appName}
