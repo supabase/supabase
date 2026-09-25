@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 
 import { getCreateFDWSql } from '../../../src'
-import { literal } from '../../../src/pg-format'
+import { ident, literal } from '../../../src/pg-format'
 
 const baseArgs = {
   mode: 'skip' as const,
@@ -53,4 +53,55 @@ test('encrypted server options still resolve their value through Vault unchanged
   // Encrypted options keep the ''%s'' placeholder filled by the vault secret id.
   expect(sql).toContain("api_secret ''%s''")
   expect(sql).toContain('vault.create_secret')
+})
+
+// A legal Postgres identifier whose spelling collides with the fixed DO-block
+// dollar-quote delimiter used before the delimiter became generated.
+const dollarWrapper = { wrapper_name: 'x$pg_meta$y', server_name: 'my_server' }
+
+test('DO-block delimiters avoid collision with user values containing dollar quotes', () => {
+  const sql = getCreateFDWSql({
+    ...baseArgs,
+    wrapperMeta: {
+      handlerName: 'wasm_fdw_handler',
+      validatorName: 'wasm_fdw_validator',
+      server: { options: [{ name: 'api_key', encrypted: false }] },
+    },
+    formState: { ...dollarWrapper, api_key: 'plain' },
+  })
+
+  // The base delimiter cannot be used when a value itself contains it.
+  expect(sql).not.toContain('do $pg_meta$')
+  // A collision-free suffix is picked instead.
+  expect(sql).toContain('do $pg_meta_1$')
+})
+
+test('server and wrapper names are passed as format() arguments, not embedded in the E-string', () => {
+  const sql = getCreateFDWSql({
+    ...baseArgs,
+    wrapperMeta: {
+      handlerName: 'wasm_fdw_handler',
+      validatorName: 'wasm_fdw_validator',
+      server: { options: [{ name: 'api_key', encrypted: false }] },
+    },
+    formState: { wrapper_name: "wrap'per\\x", server_name: "serv'er", api_key: 'plain' },
+  })
+
+  // Names reach format() as %s arguments so quotes/backslashes in the names
+  // never interact with the outer E'...' string.
+  expect(sql).toContain(`E'create server %s foreign data wrapper %s options (`)
+
+  // Assert the identifiers appear as the following format() arguments, in
+  // order, and that the format template itself embeds neither identifier.
+  const formatIndex = sql.indexOf(`E'create server %s foreign data wrapper %s options (`)
+  const formatSql = sql.slice(formatIndex)
+  const serverArg = formatSql.indexOf(ident("serv'er"))
+  const wrapperArg = formatSql.indexOf(ident("wrap'per\\x"))
+  expect(formatIndex).toBeGreaterThan(-1)
+  expect(serverArg).toBeGreaterThan(-1)
+  expect(wrapperArg).toBeGreaterThan(serverArg)
+  expect(formatSql.slice(0, serverArg)).not.toContain(ident("serv'er"))
+  expect(formatSql.slice(serverArg + ident("serv'er").length, wrapperArg)).not.toContain(
+    ident("wrap'per\\x")
+  )
 })
