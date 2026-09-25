@@ -9,7 +9,7 @@ const row = (overrides: Record<string, unknown>) =>
     updated_at: '2026-01-01T00:00:00Z',
     created_at: '2026-01-01T00:00:00Z',
     last_accessed_at: '2026-01-01T00:00:00Z',
-    metadata: { size: 100 },
+    metadata: { size: 100, mimetype: 'image/jpeg' },
     ...overrides,
   }) as any
 
@@ -30,6 +30,8 @@ describe('toArchivedObjects', () => {
     expect(archived[0].path).toBe('folder/photo.jpg')
     expect(archived[0].archivedAt).toBe('2026-02-01T00:00:00Z')
     expect(archived[0].currentVersion.versionId).toBe('v1')
+    // The preview needs it to decide what to render.
+    expect(archived[0].currentVersion.mimeType).toBe('image/jpeg')
   })
 
   it('ignores a live object', () => {
