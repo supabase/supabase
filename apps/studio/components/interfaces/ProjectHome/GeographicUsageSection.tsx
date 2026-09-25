@@ -14,6 +14,7 @@ import {
 } from 'ui'
 
 import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { CountryUsageDetailsDialog } from '@/components/interfaces/ProjectHome/CountryUsageDetailsDialog'
 import { CountryUsageTable } from '@/components/interfaces/ProjectHome/CountryUsageTable'
 import {
   extractIso2FromFeatureProps,
@@ -367,6 +368,7 @@ export const GeographicUsageSection = () => {
   const [view, setView] = useState<UsageView>('map')
   const [selectedCode, setSelectedCode] = useState<string>()
   const { data, isPending, isError, error } = useGeographicUsageQuery({ projectRef, range })
+  const selectedCountry = data?.countries.find((country) => country.code === selectedCode)
 
   const handleExportCsv = () => {
     if (!data) return
@@ -393,6 +395,13 @@ export const GeographicUsageSection = () => {
 
   return (
     <section aria-labelledby="geographic-usage-title" className="space-y-5">
+      <CountryUsageDetailsDialog
+        projectRef={projectRef}
+        country={selectedCountry}
+        totalRequests={data?.totalRequests ?? 0}
+        range={range}
+        onClose={() => setSelectedCode(undefined)}
+      />
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-foreground-lighter">
@@ -439,7 +448,13 @@ export const GeographicUsageSection = () => {
           >
             <Download size={14} /> Export CSV
           </Button>
-          <Select value={range} onValueChange={(value) => setRange(value as GeographicUsageRange)}>
+          <Select
+            value={range}
+            onValueChange={(value) => {
+              setRange(value as GeographicUsageRange)
+              setSelectedCode(undefined)
+            }}
+          >
             <SelectTrigger aria-label="Time range" className="w-40">
               <SelectValue />
             </SelectTrigger>

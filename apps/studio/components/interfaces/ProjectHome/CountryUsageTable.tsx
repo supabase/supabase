@@ -7,59 +7,12 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
+import { Button } from 'ui'
 
 import { iso2ToCountryName } from '@/components/interfaces/Reports/utils/geo'
 import type { GeographicUsageCountry } from '@/data/analytics/geographic-usage-query'
 
 type CountryUsageRow = GeographicUsageCountry & { share: number }
-
-const columns: ColumnDef<CountryUsageRow>[] = [
-  {
-    accessorFn: (row) => iso2ToCountryName(row.code),
-    id: 'country',
-    header: 'Country',
-    cell: ({ getValue }) => getValue<string>(),
-  },
-  {
-    accessorKey: 'requests',
-    header: 'Requests',
-    cell: ({ row, getValue }) => (
-      <div className="min-w-32 space-y-1.5">
-        <span>{Number(getValue()).toLocaleString()}</span>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-300">
-          <div
-            className="h-full rounded-full bg-brand"
-            style={{ width: `${row.original.share}%` }}
-          />
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'share',
-    header: 'Share',
-    cell: ({ getValue }) => `${Number(getValue()).toFixed(1)}%`,
-  },
-  {
-    accessorFn: (row) => row.change ?? undefined,
-    id: 'change',
-    header: 'Change',
-    sortUndefined: 'last',
-    cell: ({ getValue }) => {
-      const change = getValue<number | undefined>()
-      if (change === undefined)
-        return <span className="text-foreground-lighter">No prior data</span>
-
-      const direction = change >= 0 ? '↑' : '↓'
-      const color = change >= 0 ? 'text-brand-600' : 'text-warning-600'
-      return (
-        <span className={color}>
-          {direction} {Math.abs(change).toFixed(1)}%
-        </span>
-      )
-    },
-  },
-]
 
 export const CountryUsageTable = ({
   countries,
@@ -80,6 +33,67 @@ export const CountryUsageTable = ({
         share: totalRequests > 0 ? Math.min(100, (country.requests / totalRequests) * 100) : 0,
       })),
     [countries, totalRequests]
+  )
+  const columns = useMemo<ColumnDef<CountryUsageRow>[]>(
+    () => [
+      {
+        accessorFn: (row) => iso2ToCountryName(row.code),
+        id: 'country',
+        header: 'Country',
+        cell: ({ row, getValue }) => (
+          <Button
+            type="button"
+            variant="link"
+            className="h-auto p-0 font-normal text-foreground"
+            aria-pressed={row.original.code === selectedCode}
+            onClick={() => onSelectCountry(row.original.code)}
+          >
+            {getValue<string>()}
+          </Button>
+        ),
+      },
+      {
+        accessorKey: 'requests',
+        header: 'Requests',
+        cell: ({ row, getValue }) => (
+          <div className="min-w-32 space-y-1.5">
+            <span>{Number(getValue()).toLocaleString()}</span>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-300">
+              <div
+                className="h-full rounded-full bg-brand"
+                style={{ width: `${row.original.share}%` }}
+              />
+            </div>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'share',
+        header: 'Share',
+        cell: ({ getValue }) => `${Number(getValue()).toFixed(1)}%`,
+      },
+      {
+        accessorFn: (row) => row.change ?? undefined,
+        id: 'change',
+        header: 'Change',
+        sortUndefined: 'last',
+        cell: ({ getValue }) => {
+          const change = getValue<number | undefined>()
+          if (change === undefined) {
+            return <span className="text-foreground-lighter">No prior data</span>
+          }
+
+          const direction = change >= 0 ? '↑' : '↓'
+          const color = change >= 0 ? 'text-brand-600' : 'text-warning-600'
+          return (
+            <span className={color}>
+              {direction} {Math.abs(change).toFixed(1)}%
+            </span>
+          )
+        },
+      },
+    ],
+    [onSelectCountry, selectedCode]
   )
   const table = useReactTable({
     data,
@@ -133,15 +147,7 @@ export const CountryUsageTable = ({
                 key={row.id}
                 aria-selected={isSelected}
                 data-state={isSelected ? 'selected' : undefined}
-                className="cursor-pointer border-t hover:bg-surface-200 data-[state=selected]:bg-brand-200/30"
-                onClick={() => onSelectCountry(row.original.code)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    onSelectCountry(row.original.code)
-                  }
-                }}
-                tabIndex={0}
+                className="border-t hover:bg-surface-200 data-[state=selected]:bg-brand-200/30"
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-4 py-3 align-middle">

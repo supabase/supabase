@@ -27,6 +27,11 @@ export type GeographicUsage = {
   countries: GeographicUsageCountry[]
 }
 
+export type GeographicUsageTrendPoint = {
+  timestamp: string
+  requests: number
+}
+
 type GeographicUsageRow = {
   country: string | null
   requests: number | string
@@ -169,6 +174,70 @@ async function getGeographicUsage({
   })
 }
 
+async function getGeographicUsageTrend({
+  projectRef,
+  countryCode,
+  range,
+  useOtel,
+  signal,
+}: {
+  projectRef: string
+  countryCode: string
+  range: GeographicUsageRange
+  useOtel: boolean
+  signal?: AbortSignal
+}) {
+  const period = getGeographicUsagePeriod(range)
+  const country = analyticsLiteral(countryCode)
+  const bucket = range === '24h' ? 'hour' : 'day'
+  const otelBucket =
+    bucket === 'hour' ? safeSql`toStartOfHour(timestamp)` : safeSql`toStartOfDay(timestamp)`
+  const bigQueryBucket = bucket === 'hour' ? safeSql`hour` : safeSql`day`
+  const sql = useOtel
+    ? safeSql`
+        select
+          ${otelBucket} as timestamp,
+          count() as requests
+        from logs
+        where source = 'edge_logs'
+          and log_attributes['request.cf.country'] = ${country}
+        group by timestamp
+        order by timestamp asc
+        limit 1000
+      `
+    : safeSql`
+        select
+          timestamp_trunc(t.timestamp, ${bigQueryBucket}) as timestamp,
+          count(t.id) as requests
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.request) as request
+          cross join unnest(request.cf) as cf
+        where cf.country = ${country}
+        group by timestamp
+        order by timestamp asc
+        limit 1000
+      `
+  const response = await executeAnalyticsSql({
+    projectRef,
+    endpoint: logsAllEndpointUrl(useOtel),
+    sql,
+    iso_timestamp_start: period.start.toISOString(),
+    iso_timestamp_end: period.end.toISOString(),
+    method: 'post',
+    signal,
+  })
+  const rows = (response?.result ?? []) as {
+    timestamp: string | number
+    requests: number | string
+  }[]
+
+  return rows.map((row) => ({
+    timestamp: String(row.timestamp),
+    requests: Number(row.requests),
+  }))
+}
+
 export function geographicUsageQueryOptions({
   projectRef,
   range,
@@ -189,6 +258,29 @@ export function geographicUsageQueryOptions({
   })
 }
 
+export function geographicUsageTrendQueryOptions({
+  projectRef,
+  countryCode,
+  range,
+  useOtel = false,
+}: {
+  projectRef?: string
+  countryCode?: string
+  range: GeographicUsageRange
+  useOtel?: boolean
+}) {
+  return queryOptions({
+    queryKey: geographicUsageKeys.trend(projectRef, countryCode, range, useOtel),
+    queryFn: ({ signal }) => {
+      if (!projectRef) throw new Error('projectRef is required')
+      if (!countryCode) throw new Error('countryCode is required')
+      return getGeographicUsageTrend({ projectRef, countryCode, range, useOtel, signal })
+    },
+    enabled: IS_PLATFORM && projectRef !== undefined && countryCode !== undefined,
+    staleTime: 15 * 60 * 1000,
+  })
+}
+
 export function useGeographicUsageQuery({
   projectRef,
   range,
@@ -202,5 +294,27 @@ export function useGeographicUsageQuery({
   return useQuery({
     ...geographicUsageQueryOptions({ projectRef, range, useOtel }),
     enabled: IS_PLATFORM && hasLoadedFlags === true && projectRef !== undefined,
+  })
+}
+
+export function useGeographicUsageTrendQuery({
+  projectRef,
+  countryCode,
+  range,
+}: {
+  projectRef?: string
+  countryCode?: string
+  range: GeographicUsageRange
+}) {
+  const useOtel = IS_PLATFORM && Boolean(useFlag('otelReports'))
+  const { hasLoaded: hasLoadedFlags } = useContext(FeatureFlagContext)
+
+  return useQuery({
+    ...geographicUsageTrendQueryOptions({ projectRef, countryCode, range, useOtel }),
+    enabled:
+      IS_PLATFORM &&
+      hasLoadedFlags === true &&
+      projectRef !== undefined &&
+      countryCode !== undefined,
   })
 }
