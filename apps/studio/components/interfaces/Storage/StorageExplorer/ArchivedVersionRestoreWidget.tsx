@@ -3,12 +3,14 @@ import { RotateCcw, X } from 'lucide-react'
 import { Button } from 'ui'
 
 import type { ArchivedVersionRow } from './archivedVersions.utils'
+import { FilePreview } from './FilePreview'
 import { shortVersion } from './VersionHistory'
-import { VersionThumbnail } from './VersionThumbnail'
 import { formatBytes } from '@/lib/helpers'
 
 interface ArchivedVersionRestoreWidgetProps {
   version: ArchivedVersionRow
+  /** Full path within the bucket, which is what the version endpoints address. */
+  path: string
   isRestoring: boolean
   onRestore: () => void
   onDismiss: () => void
@@ -17,6 +19,7 @@ interface ArchivedVersionRestoreWidgetProps {
 // No side-by-side comparison: the whole file is archived, so nothing is current.
 export const ArchivedVersionRestoreWidget = ({
   version,
+  path,
   isRestoring,
   onRestore,
   onDismiss,
@@ -38,9 +41,16 @@ export const ArchivedVersionRestoreWidget = ({
       </button>
     </div>
 
-    <div className="flex items-center gap-x-2">
-      <VersionThumbnail isCurrent={false} size={20} />
-      <p className="min-w-0 flex-1 truncate font-mono text-[11px] text-foreground-light">
+    <div className="space-y-1.5">
+      <div className="flex h-24 items-center justify-center overflow-hidden rounded-md border border-brand-400 bg-surface-200">
+        <FilePreview
+          path={path}
+          mimeType={version.mimeType}
+          size={version.size}
+          versionId={version.versionId}
+        />
+      </div>
+      <p className="truncate text-center font-mono text-[11px] text-foreground-light">
         {dayjs(version.createdAt).format('MMM D, YYYY · HH:mm')} · {formatBytes(version.size)}
       </p>
     </div>

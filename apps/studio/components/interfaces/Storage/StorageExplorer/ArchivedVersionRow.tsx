@@ -18,6 +18,8 @@ import { formatBytes } from '@/lib/helpers'
 
 interface ArchivedVersionRowProps {
   version: ArchivedVersion
+  /** Full path within the bucket, which is what the version endpoints address. */
+  path: string
   isSelected: boolean
   canUpdateFiles: boolean
   isRestoring: boolean
@@ -29,6 +31,7 @@ interface ArchivedVersionRowProps {
 
 export const ArchivedVersionRow = ({
   version,
+  path,
   isSelected,
   canUpdateFiles,
   isRestoring,
@@ -50,7 +53,13 @@ export const ArchivedVersionRow = ({
       className="flex min-w-0 flex-1 items-center gap-x-2.5 text-left"
       onClick={onSelect}
     >
-      <VersionThumbnail isCurrent={false} />
+      <VersionThumbnail
+        isCurrent={false}
+        path={path}
+        versionId={version.versionId}
+        mimeType={version.mimeType}
+        byteSize={version.size}
+      />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm text-foreground group-hover:underline">
           {dayjs(version.createdAt).format('MMM D, HH:mm')}
