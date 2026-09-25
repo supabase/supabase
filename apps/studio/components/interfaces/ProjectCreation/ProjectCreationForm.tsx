@@ -285,6 +285,7 @@ export const ProjectCreationForm = ({
         slug: slug,
         cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
         desiredInstanceSize: instanceSize as DesiredInstanceSize,
+        highAvailability,
       },
       {
         enabled: flagsLoaded && smartRegionEnabled && hasSelectedOrganization,
@@ -339,6 +340,7 @@ export const ProjectCreationForm = ({
       cloudProvider: cloudProvider as CloudProvider,
       dbRegion: smartRegionEnabled ? dbRegionExact : (dbRegion ?? ''),
       organizationSlug: organization,
+      highAvailability,
     },
     { enabled: currentOrg !== null }
   )
