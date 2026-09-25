@@ -255,6 +255,8 @@ export function getCreateFDWSql({
                 ([key, value]) =>
                   key !== 'table_name' &&
                   key !== 'schema_name' &&
+                  key !== 'schema' &&
+                  key !== 'id' &&
                   key !== 'columns' &&
                   key !== 'index' &&
                   key !== 'is_new_schema' &&
