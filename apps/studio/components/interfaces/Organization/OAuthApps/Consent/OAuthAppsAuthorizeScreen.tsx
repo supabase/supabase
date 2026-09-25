@@ -54,9 +54,7 @@ export const OAuthAppsAuthorizeScreen = ({
   navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
   const grantKind = request.grant_kind
-  const projectScopingMode = request.project_scoping_mode
-  const showProjectPicker = projectScopingMode !== 'off'
-  const allowAllProjects = projectScopingMode === 'optional'
+  const isProjectScopingModeEnabled = request.project_scoping_mode
 
   const { data: identity } = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
 
@@ -68,7 +66,7 @@ export const OAuthAppsAuthorizeScreen = ({
   )
 
   const needsOrgResolution =
-    showProjectPicker &&
+    isProjectScopingModeEnabled &&
     !organizationSlug &&
     projectRef !== null &&
     (identity?.organizations.length ?? 0) > 1
@@ -109,11 +107,11 @@ export const OAuthAppsAuthorizeScreen = ({
   useEffect(() => {
     if (seeded.current || !projects || !orgAppDetails || !orgResolutionSettled) return
     seeded.current = true
-    if (!showProjectPicker) return
+    if (!isProjectScopingModeEnabled) return
 
     const grant = orgAppDetails.existing_grant
     const hasAllProjectsGrant = grant !== null && grant.project_refs.length === 0
-    if (hasAllProjectsGrant && allowAllProjects) {
+    if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
       return
     }
@@ -124,14 +122,7 @@ export const OAuthAppsAuthorizeScreen = ({
       liveProjects: projects,
     })
     if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
-  }, [
-    orgAppDetails,
-    projects,
-    orgResolutionSettled,
-    allowAllProjects,
-    showProjectPicker,
-    projectRef,
-  ])
+  }, [orgAppDetails, projects, orgResolutionSettled, isProjectScopingModeEnabled, projectRef])
 
   const signOut = useSignOut()
 
@@ -156,7 +147,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
   if (!identity || !orgSlug || !memberOrg || !orgResolutionSettled || !orgAppDetails) return null
 
-  const isBlockedOnProjects = showProjectPicker && !hasProjects
+  const isBlockedOnProjects = isProjectScopingModeEnabled && !hasProjects
   const canProceed = !isBlockedOnProjects
 
   const grantedProjects = (projects ?? []).filter((project) =>
@@ -172,7 +163,7 @@ export const OAuthAppsAuthorizeScreen = ({
     : `Authorize ${request.name}`
   const primaryActionVariant = hasRoleFailure || isSubmitting ? 'default' : 'primary'
 
-  const usesSelectedProjects = showProjectPicker && !allProjectsSelected
+  const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
   const approveBody: OAuthAuthorizeApproveRequest = usesSelectedProjects
@@ -194,7 +185,7 @@ export const OAuthAppsAuthorizeScreen = ({
             organization_slug: memberOrg.slug,
             project_refs: usesSelectedProjects ? selectedProjectRefs : null,
             projects: grantedProjects,
-            scope_groups: request.scopes,
+            scopes: request.scopes,
           }}
           onReturn={() => {
             window.location.href = approveRedirect.url
@@ -259,7 +250,7 @@ export const OAuthAppsAuthorizeScreen = ({
             />
           )}
 
-          {canProceed && showProjectPicker && (
+          {canProceed && isProjectScopingModeEnabled && (
             <div className="flex flex-col gap-2">
               <ProjectMultiSelect
                 projects={projects ?? []}
@@ -269,7 +260,6 @@ export const OAuthAppsAuthorizeScreen = ({
                 error={hasNoSelection ? CONSENT_COPY.selectionRequired : undefined}
                 flaggedRefs={flaggedRefs}
                 unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
-                showAllProjectsOption={allowAllProjects}
                 allProjectsSelected={allProjectsSelected}
                 onAllProjectsChange={setAllProjectsSelected}
               />
@@ -278,9 +268,18 @@ export const OAuthAppsAuthorizeScreen = ({
 
           {canProceed && (
             <>
-              <ScopeGroupCard appName={request.name} scopeGroups={request.scopes} />
+              <section className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm text-foreground">Permissions requested</p>
+                  <p className="text-xs text-foreground-lighter">
+                    Authorizing {request.name} grants it the following access permissions to{' '}
+                    {isProjectScopingModeEnabled ? 'the selected' : 'all'} projects.
+                  </p>
+                </div>
+                <ScopeGroupCard scopes={request.scopes} />
+              </section>
 
-              {!showProjectPicker && (
+              {!isProjectScopingModeEnabled && (
                 <Admonition
                   type="default"
                   title={CONSENT_COPY.coversEveryProject.title}
