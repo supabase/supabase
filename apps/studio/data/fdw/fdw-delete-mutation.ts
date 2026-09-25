@@ -14,7 +14,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string | null
-  wrapper: { name: string }
+  wrapper: { id: number; name: string; server_name: string }
   wrapperMeta: WrapperMeta
 }
 
@@ -57,9 +57,7 @@ export const useFDWDeleteMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(
-          `Failed to disable ${variables.wrapper.name} foreign data wrapper: ${data.message}`
-        )
+        toast.error(`Failed to delete ${variables.wrapper.name} connection: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

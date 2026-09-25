@@ -85,14 +85,8 @@ function replaceCodeTabs(node: MdxJsxFlowElement, ancestors: Array<Parent>) {
   )
   const tabsWrapper: MdxJsxFlowElement = {
     type: 'mdxJsxFlowElement',
-    name: 'Tabs',
-    attributes: [
-      {
-        type: 'mdxJsxAttribute',
-        name: 'listClassNames',
-        value: 'flex-nowrap overflow-x-auto -mb-6',
-      },
-    ],
+    name: 'CodeTabs',
+    attributes: [],
     children: remappedChildren,
   }
 
