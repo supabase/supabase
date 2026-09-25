@@ -84,6 +84,29 @@ export interface Permission {
   project_refs: string[] | null
 }
 
+// TODO: should use the response type from mgmt api. But i'm not sure how to update the type for studio ;((
+export type RoleV2 = 'member' | 'readonly' | 'developer' | 'administrator' | 'owner'
+// TODO: narrow to a union of FGA relation names (via shared-types) once the fga migration settles; string for now
+export type FgaPermission = string
+export interface ProjectPermissions {
+  ref: string
+  role: RoleV2
+  permissions: FgaPermission[]
+}
+export interface OrganizationPermissions {
+  slug: string
+  /** null when the user only has project-scoped roles in this organization */
+  role: RoleV2 | null
+  /** applies to all projects in the organization; project entries below are additive overrides */
+  permissions: FgaPermission[]
+  /** only projects with an explicit project-scoped role; org-level roles are not expanded here */
+  projects: ProjectPermissions[]
+}
+export interface PermissionV2 {
+  organizations: OrganizationPermissions[]
+}
+// End TODO
+
 export interface ResponseFailure {
   error: ResponseError
 }
