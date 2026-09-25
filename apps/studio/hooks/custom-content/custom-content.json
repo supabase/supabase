@@ -60,5 +60,7 @@
   "infra:cloud_providers": ["AWS", "AWS_K8S", "FLY"],
   "infra:aws_nimbus_label": "AWS Nimbus",
 
-  "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt"
+  "ssl:certificate_url": "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt",
+
+  "status_page:visibility_field_ids": ["", "01M3D1YZJ1FV5495GP53VMZKCY"]
 }

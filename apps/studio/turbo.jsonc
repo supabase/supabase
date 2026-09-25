@@ -105,6 +105,8 @@
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
+        "INCIDENT_IO_WIDGET_URL",
+        "INCIDENT_IO_STATUS_PAGE_ID",
         "LIVE_SUPABASE_SECRET_KEY",
         // Selects the build mode for the studio's `build`/`start` scripts
         // (e.g. e2e sets `MODE=test`). Listed so turbo invalidates the
