@@ -523,6 +523,8 @@ services:
         "-c",
         "config_file=/etc/postgresql/postgresql.conf",
         "-c",
+        "pg_net.database_name=${POSTGRES_DB:-postgres}", # pg_net's worker must poll the database where Database Webhooks queue requests
+        "-c",
         "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
       ]
 
