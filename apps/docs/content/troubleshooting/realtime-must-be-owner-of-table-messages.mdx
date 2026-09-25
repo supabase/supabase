@@ -1,0 +1,84 @@
+---
+title = "Realtime: \"must be owner of table messages\" when setting up Authorization"
+topics = [ "realtime" ]
+keywords = [ "realtime.messages", "must be owner", "42501", "row level security", "policy", "authorization", "broadcast", "migration" ]
+
+[[errors]]
+code = "42501"
+message = "must be owner of table messages"
+---
+
+A migration that adds an RLS policy to `realtime.messages` fails:
+
+```
+ERROR:  42501: must be owner of table messages
+```
+
+## Cause
+
+`realtime.messages` is owned by an internal role, `supabase_realtime_admin`. The `postgres` role is not a member of it and is not a superuser.
+
+Policies still work because of [`supautils`](https://github.com/supabase/supautils), the extension that gives the `postgres` role its elevated permissions on a Supabase project. It lets `postgres` run `create policy`, `alter policy`, and `drop policy` on a fixed list of tables it does not own, and `realtime.messages` is on that list. The list covers policy statements only, so `ALTER TABLE` is still refused.
+
+The failing statement is usually not the `create policy`. It's an `ALTER TABLE` earlier in the same migration:
+
+```sql
+alter table realtime.messages enable row level security;
+alter table realtime.messages add column ...;
+alter table realtime.messages owner to postgres;
+```
+
+The first one is the common case. RLS is already enabled on `realtime.messages`, and Postgres checks ownership before it checks whether the setting would change, so the statement fails on every project.
+
+A failed statement aborts the transaction, so Postgres skips everything after it, including the `create policy`. `supabase db push` runs each migration file in one transaction, so the file rolls back and nothing is written to `supabase_migrations.schema_migrations`.
+
+## Fix
+
+Remove the `ALTER TABLE` line. Keep the policy:
+
+```sql
+create policy "authenticated can read messages on room-1"
+on "realtime"."messages"
+for select
+to authenticated
+using (
+  (select realtime.topic()) = 'room-1'
+);
+```
+
+Run it from the SQL editor or with `supabase db push`. Both connect as `postgres`.
+
+To check that RLS is on, read the catalog instead of setting it:
+
+```sql
+select relrowsecurity from pg_class where oid = 'realtime.messages'::regclass;
+```
+
+## What doesn't work
+
+Granting the owning role fails, and support can't grant it either:
+
+```sql
+grant supabase_realtime_admin to postgres;
+-- ERROR:  42501: "supabase_realtime_admin" role memberships are reserved, only superusers can grant them
+```
+
+Restarting the project changes nothing.
+
+Wrapping the `ALTER TABLE` in a function or a `do` block changes nothing either. The ownership check still runs, and a `security definer` function owned by `postgres` is still not the table owner.
+
+## What postgres can do on realtime.messages
+
+The `Yes` rows are what `supautils` delegates, plus the privileges granted to `postgres` directly.
+
+| Statement                                             | Allowed |
+| ----------------------------------------------------- | ------- |
+| `create policy`, `alter policy`, `drop policy`        | Yes     |
+| `comment on policy`                                   | Yes     |
+| `select`, `insert`                                    | Yes     |
+| `grant select`, `grant insert` to your own roles      | Yes     |
+| `alter table` in any form                             | No      |
+| `drop table`                                          | No      |
+| Creating tables or functions in the `realtime` schema | No      |
+
+See [Realtime Authorization](/docs/guides/realtime/authorization) for writing the policies.
