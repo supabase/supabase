@@ -17,18 +17,8 @@ const segmentIndicatorOptions = {
   insetByPadding: false,
 }
 
-/**
- * Selected treatment for a segmented item that has no indicator to defer to, which is
- * only ever a `type="multiple"` group. A single indicator cannot straddle several
- * selected items, so those paint their own.
- */
 const segmentedSelfPaint = 'data-[state=on]:bg-overlay-hover aria-checked:bg-overlay-hover'
 
-/**
- * `tone` restyles a segmented group using the Button variant vocabulary. It is a second
- * axis on purpose: `variant` is shadcn's, and its `outline` value is already in use, so
- * it cannot be redefined to mean Button's.
- */
 const segmentedToneVariants = cva('', {
   variants: {
     tone: {
@@ -74,16 +64,7 @@ const ToggleGroupContext = React.createContext<
 
 type ToggleGroupProps = React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root> &
   VariantProps<typeof toggleVariants> & {
-    /**
-     * Whether clicking the active item in a `type="single"` group clears the selection.
-     *
-     * Defaults to `true`, matching Radix. Set to `false` for segmented controls, which
-     * have no "nothing selected" state.
-     */
     allowDeselect?: boolean
-    /**
-     * Button-flavoured styling for a segmented group. Ignored by other variants.
-     */
     tone?: VariantProps<typeof segmentedToneVariants>['tone']
   }
 
@@ -98,13 +79,8 @@ const ToggleGroup = React.forwardRef<
     const rootRef = React.useRef<HTMLDivElement>(null)
     useTabIndicator(rootRef, segmentIndicatorOptions)
 
-    // The indicator is the only selected-state affordance, so a segmented group always
-    // renders one rather than leaving it to the callsite to remember.
     const hasIndicator = variant === 'segmented' && props.type === 'single'
 
-    // Swallowing the callback is enough when the caller owns `value`, but an uncontrolled
-    // group's state lives inside Radix, which has already cleared it by the time the change
-    // reaches us. Take ownership for that case so the active item actually stays put.
     const ownsValue = !allowDeselect && props.type === 'single' && props.value === undefined
     const [internalValue, setInternalValue] = React.useState(() =>
       typeof props.defaultValue === 'string' ? props.defaultValue : ''
@@ -116,8 +92,6 @@ const ToggleGroup = React.forwardRef<
       if (onValueChange) onValueChange(value)
     }
 
-    // Cast is contained: `ownsValue` has already narrowed `type` to 'single' at runtime,
-    // which the spread cannot carry through Radix's discriminated union.
     const rootProps = (
       ownsValue ? { ...props, value: internalValue, defaultValue: undefined } : props
     ) as React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root>
