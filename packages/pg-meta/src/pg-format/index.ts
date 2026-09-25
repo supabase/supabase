@@ -61,10 +61,22 @@ const FMT_PATTERN_CONFIG: PgFormatConfigPattern = {
 }
 
 // convert to Postgres default ISO 8601 format
+/**
+ * Converts a string representing a date into PostgreSQL's default ISO 8601 format.
+ *
+ * @param date - The date string to format
+ * @returns The formatted date string
+ */
 function formatDate(date: SafeSqlFragment): SafeSqlFragment {
   return date.replace('T', ' ').replace('Z', '+00') as SafeSqlFragment
 }
 
+/**
+ * Checks if a given string is a PostgreSQL reserved keyword.
+ *
+ * @param value - The string to check
+ * @returns True if the string is a reserved keyword, false otherwise
+ */
 function isReserved(value: string): boolean {
   if (POSTGRESQL_RESERVED_WORDS.has(value.toUpperCase())) {
     return true
@@ -72,6 +84,15 @@ function isReserved(value: string): boolean {
   return false
 }
 
+/**
+ * Formats an array of elements into a comma-separated SQL list, optionally
+ * prefixed with a space before the opening parenthesis.
+ *
+ * @param useSpace - Whether to include a space before the opening parenthesis
+ * @param array - The array of elements to format
+ * @param formatter - The formatting function to apply to each element
+ * @returns The formatted list fragment
+ */
 function arrayToList<ElementType = unknown>(
   useSpace: boolean,
   array: ElementType[],
@@ -79,7 +100,7 @@ function arrayToList<ElementType = unknown>(
 ): SafeSqlFragment {
   let sql = safeSql``
 
-  sql = useSpace ? safeSql`${sql} (` : safeSql`${sql} (`
+  sql = useSpace ? safeSql`${sql} (` : safeSql`${sql}(`
   for (const [index, element] of array.entries()) {
     sql = safeSql`${sql}${index === 0 ? safeSql`` : safeSql`, `}${formatter(element)}`
   }
@@ -90,6 +111,13 @@ function arrayToList<ElementType = unknown>(
 
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
 // eslint-disable-next-line radar/cognitive-complexity
+/**
+ * Safely formats a value as a PostgreSQL identifier, wrapping it in double
+ * quotes if necessary and escaping internal quotes.
+ *
+ * @param value - The identifier value to format
+ * @returns The formatted identifier fragment
+ */
 export function ident(value?: unknown): SafeSqlFragment {
   if (value === undefined || value === null) {
     throw new Error('SQL identifier cannot be null or undefined')
@@ -135,6 +163,13 @@ export function ident(value?: unknown): SafeSqlFragment {
 
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
 // eslint-disable-next-line radar/cognitive-complexity
+/**
+ * Safely formats a value as a PostgreSQL string literal, wrapping it in single
+ * quotes and escaping internal quotes/backslashes. Handles arrays, dates, and objects.
+ *
+ * @param value - The value to format as a literal
+ * @returns The formatted literal fragment
+ */
 export function literal(value?: unknown): SafeSqlFragment {
   let tliteral = ''
   let explicitCast: string | undefined
@@ -169,9 +204,9 @@ export function literal(value?: unknown): SafeSqlFragment {
   }
   if (Array.isArray(value)) {
     const temporary: string[] = []
-    for (const [index, element] of value.entries()) {
+    for (const [, element] of value.entries()) {
       if (Array.isArray(element) === true) {
-        temporary.push(arrayToList(index !== 0, element, literal))
+        temporary.push(arrayToList(temporary.length !== 0, element, literal))
       } else {
         temporary.push(literal(element))
       }
@@ -247,6 +282,13 @@ type Stringifyable =
   | Stringifyable[]
 
 // eslint-disable-next-line radar/cognitive-complexity
+/**
+ * Formats a value as a basic string representation suitable for interpolation.
+ * Nulls and undefined values are skipped in arrays.
+ *
+ * @param value - The value to format
+ * @returns The formatted string fragment
+ */
 export function string(value?: Stringifyable): SafeSqlFragment {
   if (value === undefined || value === null) {
     return safeSql``
@@ -262,10 +304,10 @@ export function string(value?: Stringifyable): SafeSqlFragment {
   }
   if (Array.isArray(value)) {
     const temporary: SafeSqlFragment[] = []
-    for (const [index, element] of value.entries()) {
+    for (const [, element] of value.entries()) {
       if (element !== null && element !== undefined) {
         if (Array.isArray(element) === true) {
-          temporary.push(arrayToList(index !== 0, element, string))
+          temporary.push(arrayToList(temporary.length !== 0, element, string))
         } else {
           temporary.push(string(element))
         }
@@ -281,6 +323,12 @@ export function string(value?: Stringifyable): SafeSqlFragment {
   return String(value).toString().slice(0) as SafeSqlFragment // return copy
 }
 
+/**
+ * Configures the formatting patterns used for identifier, literal, and string
+ * substitution placeholders.
+ *
+ * @param cfg - The configuration options
+ */
 export function config(cfg: PgFormatConfig): void {
   // default
   FMT_PATTERN_CONFIG.ident = 'I'
