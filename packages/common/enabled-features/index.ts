@@ -1,14 +1,27 @@
-import type { components } from 'api-types'
-
 import enabledFeaturesRaw from './enabled-features.json' with { type: 'json' }
 
 const enabledFeaturesStaticObj = enabledFeaturesRaw as Omit<typeof enabledFeaturesRaw, '$schema'>
 
-type Profile = components['schemas']['ProfileResponse_Output']
+// Features the platform can disable per-user via the profile's `disabled_features`.
+// The API types this as `string[]`, so the known values are listed here to keep `Feature` narrow.
+type RuntimeFeature =
+  | 'organizations:create'
+  | 'organizations:delete'
+  | 'organization_members:create'
+  | 'organization_members:delete'
+  | 'projects:create'
+  | 'projects:transfer'
+  | 'project_auth:all'
+  | 'project_storage:all'
+  | 'project_edge_function:all'
+  | 'profile:update'
+  | 'billing:account_data'
+  | 'billing:credits'
+  | 'billing:invoices'
+  | 'billing:payment_methods'
+  | 'realtime:all'
 
-export type Feature =
-  | NonNullable<Profile['disabled_features']>[number]
-  | keyof typeof enabledFeaturesStaticObj
+export type Feature = RuntimeFeature | keyof typeof enabledFeaturesStaticObj
 
 const disabledFeaturesStaticArray = Object.entries(enabledFeaturesStaticObj)
   .filter(([_, value]) => !value)
