@@ -371,7 +371,7 @@ export const InviteMemberButton = () => {
                                 <RadioGroupStackedItem
                                   value={role.id.toString()}
                                   disabled={disabled}
-                                  label={role.name}
+                                  label={role.name == 'None' ? 'No-access' : role.name}
                                   description={
                                     <>
                                       {ROLE_DESCRIPTIONS[role.name] ??
