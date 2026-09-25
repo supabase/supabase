@@ -38,13 +38,19 @@ const PromotionBadge = ({ state }: { state: NonNullable<HaPoolerNodeData['promot
     )}
   >
     {state === 'promoting' ? 'Promoting' : 'Promoted'}
-    <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-white/35 to-transparent blur-md" />
+    {/* Shimmer only while work is in progress; a finished promotion sits still */}
+    {state === 'promoting' && (
+      <span className="motion-safe:animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-white/35 to-transparent blur-md" />
+    )}
   </span>
 )
 
 const PoolerCardTitleRow = ({ title, children }: { title: string; children?: ReactNode }) => (
   <div className="flex items-center justify-between gap-x-2">
-    <p className="text-sm">{title}</p>
+    {/* Keyed so a role change (e.g. a replica promoted to primary) fades the new title in */}
+    <p key={title} className="text-sm motion-safe:animate-in motion-safe:fade-in duration-300">
+      {title}
+    </p>
     {children !== undefined && (
       <div className="inline-flex shrink-0 items-center gap-x-2">{children}</div>
     )}
@@ -100,7 +106,7 @@ export const MultigatewayNode = ({ data }: NodeProps<Node<MultigatewayNodeData>>
 
 export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
-  const { cell, name, hasGateway, statusOverride } = data
+  const { cell, name, hasGateway, isFormerPrimary, statusOverride } = data
   const { status, availabilityZone, computeSize, primaryRegion } = useHaPoolerCard({
     cell,
     name,
@@ -117,9 +123,11 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
       />
       <div
         className={cn(
-          'flex flex-col rounded-sm bg-surface-100 border border-default',
+          'flex flex-col rounded-sm bg-surface-100 border border-default transition-opacity duration-500',
           status === 'unhealthy' &&
-            'bg-destructive-200 border-destructive-400 motion-safe:animate-ha-primary-fail-flash'
+            'bg-destructive-200 border-destructive-400 motion-safe:animate-ha-primary-fail-flash',
+          // Out of rotation once a replica has taken over, so attention moves to the new primary
+          isFormerPrimary && 'opacity-50'
         )}
       >
         <div className="flex gap-x-3 p-3" style={{ width: NODE_CARD_WIDTH }}>
@@ -127,7 +135,7 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
             <Database aria-hidden="true" size={16} />
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-y-0.5">
-            <PoolerCardTitleRow title="Primary Database">
+            <PoolerCardTitleRow title={isFormerPrimary ? 'Former Primary' : 'Primary Database'}>
               {/* Stable live region so polled status changes are announced */}
               <span role="status" className="inline-flex items-center">
                 {status !== undefined && <PoolerStatusBadge status={status} />}
@@ -159,6 +167,7 @@ export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
     statusOverride,
   })
   const isPromoting = promotion === 'promoting'
+  const isPromoted = promotion === 'promoted'
 
   return (
     <>
@@ -169,24 +178,29 @@ export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
       >
         <div
           className={cn(
-            'w-8 h-8 shrink-0 border rounded-md flex items-center justify-center',
-            status === 'healthy'
-              ? 'bg-brand-400 border-brand-500'
-              : 'bg-surface-100 border-foreground/20'
+            'w-8 h-8 shrink-0 border rounded-md flex items-center justify-center transition-colors duration-300',
+            isPromoted && 'bg-brand-500 border-brand-600',
+            !isPromoted && status === 'healthy' && 'bg-brand-400 border-brand-500',
+            !isPromoted && status !== 'healthy' && 'bg-surface-100 border-foreground/20'
           )}
         >
-          {status === 'coming_up' || isPromoting ? (
+          {(status === 'coming_up' || isPromoting) && (
             <Loader2 aria-hidden="true" className="motion-safe:animate-spin" size={16} />
-          ) : (
+          )}
+          {isPromoted && <Database aria-hidden="true" size={16} />}
+          {status !== 'coming_up' && promotion === undefined && (
             <DatabaseBackup aria-hidden="true" size={16} />
           )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-y-0.5">
-          <PoolerCardTitleRow title="Read Replica">
-            {promotion !== undefined && <PromotionBadge state={promotion} />}
-            {/* Stable live region so polled status changes are announced */}
+          <PoolerCardTitleRow title={isPromoted ? 'Primary Database' : 'Read Replica'}>
+            {/* Stable live region so polled status and promotion changes are announced.
+                A promotion badge stands in for the status badge to keep the row uncluttered. */}
             <span role="status" className="inline-flex items-center">
-              {status !== undefined && <PoolerStatusBadge status={status} />}
+              {promotion !== undefined && <PromotionBadge state={promotion} />}
+              {promotion === undefined && status !== undefined && (
+                <PoolerStatusBadge status={status} />
+              )}
             </span>
           </PoolerCardTitleRow>
           <PoolerCardSubtitle availabilityZone={availabilityZone} computeSize={computeSize} />

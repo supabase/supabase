@@ -88,6 +88,23 @@ describe('generateHaNodesAndEdges', () => {
     )
   })
 
+  it('freezes traffic out of the failed primary before and during promotion', () => {
+    for (const failoverPhase of ['failing', 'promoting'] as const) {
+      const { nodes, edges } = generateHaNodesAndEdges(failoverTopology(), { failoverPhase })
+      const primary = nodes.find((node) => node.type === 'HA_PRIMARY')
+
+      expect(primary?.data.statusOverride).toBe('unhealthy')
+      expect(primary?.data.isFormerPrimary).toBe(false)
+      expect(edges.every((edge) => edge.className?.includes('opacity-30'))).toBe(true)
+    }
+  })
+
+  it('shows the primary failing before any replica starts promoting', () => {
+    const { nodes } = generateHaNodesAndEdges(failoverTopology(), { failoverPhase: 'failing' })
+
+    expect(nodes.some((node) => node.data.promotion !== undefined)).toBe(false)
+  })
+
   it('marks the primary unhealthy and routes the gateway to the promoted replica during failover', () => {
     const { nodes, edges, layoutEdges } = generateHaNodesAndEdges(failoverTopology(), {
       failoverPhase: 'failover',
@@ -118,7 +135,9 @@ describe('generateHaNodesAndEdges', () => {
     )
     expect(promotedEdges.every((edge) => edge.type === 'smoothstep')).toBe(true)
     expect(promotedEdges.every((edge) => edge.animated)).toBe(true)
-    expect(promotedEdges.every((edge) => edge.style?.strokeDasharray === '3 5')).toBe(true)
+    expect(promotedEdges.every((edge) => edge.style?.strokeDasharray === '4 6')).toBe(true)
+    expect(primary?.data.isFormerPrimary).toBe(true)
+    expect(edges.some((edge) => edge.className?.includes('opacity-30'))).toBe(false)
     expect(gatewayLayoutTargets).toEqual(expect.arrayContaining([primary?.id, promotedReplica?.id]))
   })
 

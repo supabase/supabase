@@ -3,11 +3,14 @@ import {
   ColorMode,
   Edge,
   EdgeTypes,
+  getNodesBounds,
+  getViewportForBounds,
   Node,
   NodeTypes,
   ReactFlow,
   useNodesInitialized,
   useReactFlow,
+  useStoreApi,
   type FitViewOptions,
 } from '@xyflow/react'
 import { useReducedMotion } from 'common'
@@ -18,9 +21,17 @@ import '@xyflow/react/dist/style.css'
 
 import { cn } from 'ui'
 
-import { getLayoutTransitionFrame, hasLayoutDelta } from './DiagramFlow.utils'
+import {
+  getLayoutTransitionFrame,
+  hasLayoutDelta,
+  NODE_LAYOUT_ANIMATION_MS,
+} from './DiagramFlow.utils'
 import { getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { timeout } from '@/lib/helpers'
+
+const DIAGRAM_ZOOM = 0.9
+// React Flow's own fitView default, used when no padding is passed.
+const DEFAULT_FIT_VIEW_PADDING = 0.1
 
 interface DiagramFlowProps {
   nodes: Node[]
@@ -53,6 +64,7 @@ export const DiagramFlow = ({
   fitViewPadding,
 }: DiagramFlowProps) => {
   const reactFlow = useReactFlow()
+  const storeApi = useStoreApi()
   const prefersReducedMotion = useReducedMotion()
   const { resolvedTheme } = useTheme()
   const nodesInitialized = useNodesInitialized()
@@ -71,7 +83,23 @@ export const DiagramFlow = ({
   }
 
   const fitDiagram = () => {
-    reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9, padding: fitViewPadding })
+    reactFlow.fitView({ maxZoom: DIAGRAM_ZOOM, minZoom: DIAGRAM_ZOOM, padding: fitViewPadding })
+  }
+
+  // fitView measures the nodes currently in the store, so it can't target a
+  // layout that's still animating. This pans straight to where fitView would
+  // land for the final layout, moving the camera together with the nodes.
+  const panToLayout = (targetNodes: Node[], duration: number) => {
+    const { width, height } = storeApi.getState()
+    const viewport = getViewportForBounds(
+      getNodesBounds(targetNodes),
+      width,
+      height,
+      DIAGRAM_ZOOM,
+      DIAGRAM_ZOOM,
+      fitViewPadding ?? DEFAULT_FIT_VIEW_PADDING
+    )
+    reactFlow.setViewport(viewport, { duration })
   }
 
   const setReactFlow = useEffectEvent(async ({ isMeasuredPass }: { isMeasuredPass: boolean }) => {
@@ -107,7 +135,7 @@ export const DiagramFlow = ({
     if (shouldAnimate) {
       const fromEdges = reactFlow.getEdges()
       const startedAt = performance.now()
-      let hasFitted = false
+      panToLayout(updatedNodes, NODE_LAYOUT_ANIMATION_MS)
 
       const step = (now: number) => {
         if (generation !== layoutGenerationRef.current) return
@@ -121,12 +149,7 @@ export const DiagramFlow = ({
         reactFlow.setNodes(frame.nodes)
         reactFlow.setEdges(frame.edges)
 
-        if (frame.stage !== 'fade-out' && frame.stage !== 'move' && !hasFitted) {
-          hasFitted = true
-          fitDiagram()
-        }
-
-        if (frame.stage === 'done') {
+        if (frame.isDone) {
           animationFrameRef.current = undefined
           if (isMeasuredPass) setHasMeasuredLayout(true)
           return
@@ -191,7 +214,7 @@ export const DiagramFlow = ({
       // FIXME: https://github.com/xyflow/xyflow/issues/4876
       colorMode={'' as unknown as ColorMode}
       fitView
-      fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9, padding: fitViewPadding }}
+      fitViewOptions={{ minZoom: DIAGRAM_ZOOM, maxZoom: DIAGRAM_ZOOM, padding: fitViewPadding }}
       // Keep the diagram invisible (but laid out, so nodes can be measured)
       // until the measured-height layout pass has run.
       className={cn(

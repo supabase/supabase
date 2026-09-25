@@ -173,7 +173,7 @@ describe('HaInstanceConfiguration', () => {
     ).toBeInTheDocument()
   })
 
-  test('shows the primary as unhealthy and a replica as promoted and healthy during simulated failover', async () => {
+  test('relabels the promoted replica as primary and the failed primary as former during simulated failover', async () => {
     mockProject('ACTIVE_HEALTHY')
 
     customRender(
@@ -183,15 +183,14 @@ describe('HaInstanceConfiguration', () => {
       { profileContext: PROFILE_CONTEXT }
     )
 
-    expect(await screen.findByText('Primary Database')).toBeInTheDocument()
-    expect(screen.getAllByText('Read Replica')).toHaveLength(2)
-    expect(screen.getAllByText('Healthy')).toHaveLength(2)
-    expect(screen.getByText('Unhealthy')).toBeInTheDocument()
+    expect(await screen.findByText('Former Primary')).toBeInTheDocument()
+    expect(screen.getAllByText('Read Replica')).toHaveLength(1)
+    expect(screen.getAllByText('Healthy')).toHaveLength(1)
     expect(
-      within(screen.getByText('Primary Database').parentElement!).getByText('Unhealthy')
+      within(screen.getByText('Former Primary').parentElement!).getByText('Unhealthy')
     ).toBeInTheDocument()
     expect(
-      within(screen.getByText('Promoted').parentElement!).getByText('Healthy')
+      within(screen.getByText('Primary Database').parentElement!).getByText('Promoted')
     ).toBeInTheDocument()
   })
 })

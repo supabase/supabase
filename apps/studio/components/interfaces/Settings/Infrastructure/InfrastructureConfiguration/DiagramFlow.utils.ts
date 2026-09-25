@@ -1,16 +1,19 @@
 import type { Edge, Node } from '@xyflow/react'
 
-export const NODE_LAYOUT_ANIMATION_MS = 800
-export const EDGE_FADE_MS = 250
-
-export type LayoutTransitionStage = 'fade-out' | 'move' | 'fade-in' | 'done'
+export const NODE_LAYOUT_ANIMATION_MS = 600
+export const EDGE_FADE_MS = 200
+/**
+ * How far through the node move incoming edges start fading in. Edges route
+ * between live node positions, so holding new ones back until nodes are near
+ * their targets skips the awkward mid-move routing.
+ */
+export const EDGE_FADE_IN_START = 0.5
 
 export type LayoutTransitionTimings = {
-  fadeOutMs: number
   moveMs: number
-  fadeInMs: number
-  moveStartsAt: number
+  fadeOutMs: number
   fadeInStartsAt: number
+  fadeInMs: number
   doneAt: number
 }
 
@@ -74,6 +77,10 @@ export const withEdgeOpacity = (edges: Edge[], opacity: number): Edge[] =>
     style: { ...edge.style, opacity },
   }))
 
+/** Current opacity of an edge, so an interrupted fade resumes instead of jumping back to 1. */
+const getEdgeOpacity = (edge: Edge): number =>
+  typeof edge.style?.opacity === 'number' ? edge.style.opacity : 1
+
 export const getLayoutTransitionTimings = ({
   hasOutgoingEdges,
   hasIncomingEdges,
@@ -87,36 +94,31 @@ export const getLayoutTransitionTimings = ({
 }): LayoutTransitionTimings => {
   const fadeOutMs = hasOutgoingEdges ? edgeFadeMs : 0
   const fadeInMs = hasIncomingEdges ? edgeFadeMs : 0
+  const fadeInStartsAt = nodeMoveMs * EDGE_FADE_IN_START
   return {
-    fadeOutMs,
     moveMs: nodeMoveMs,
+    fadeOutMs,
+    fadeInStartsAt,
     fadeInMs,
-    moveStartsAt: fadeOutMs,
-    fadeInStartsAt: fadeOutMs + nodeMoveMs,
-    doneAt: fadeOutMs + nodeMoveMs + fadeInMs,
+    doneAt: Math.max(nodeMoveMs, fadeOutMs, fadeInStartsAt + fadeInMs),
   }
 }
 
 const clampElapsedMs = (elapsedMs: number): number =>
   !Number.isFinite(elapsedMs) || elapsedMs < 0 ? 0 : elapsedMs
 
-export const getLayoutTransitionStage = (
-  elapsedMs: number,
-  timings: LayoutTransitionTimings
-): LayoutTransitionStage => {
-  const elapsed = clampElapsedMs(elapsedMs)
-  if (elapsed < timings.moveStartsAt) return 'fade-out'
-  if (elapsed < timings.fadeInStartsAt) return 'move'
-  if (elapsed < timings.doneAt) return 'fade-in'
-  return 'done'
-}
-
 const stageProgress = (elapsedMs: number, startAt: number, durationMs: number): number => {
   if (durationMs <= 0) return 1
   return Math.min(1, Math.max(0, (elapsedMs - startAt) / durationMs))
 }
 
-/** Fade outgoing edges, interpolate nodes with no edges, then fade incoming edges in. */
+/**
+ * One frame of a layout change. Nodes interpolate to their new positions while
+ * edges stay attached: edges in both layouts follow the nodes, removed edges
+ * fade out as the move starts, and added edges fade in once nodes are close to
+ * their targets. Edges are added to the list only when their fade starts, so
+ * an edge's mount animation (e.g. a draw-in) lines up with its appearance.
+ */
 export const getLayoutTransitionFrame = ({
   elapsedMs,
   fromNodes,
@@ -129,29 +131,39 @@ export const getLayoutTransitionFrame = ({
   toNodes: Node[]
   fromEdges: Edge[]
   toEdges: Edge[]
-}): { nodes: Node[]; edges: Edge[]; stage: LayoutTransitionStage } => {
+}): { nodes: Node[]; edges: Edge[]; isDone: boolean } => {
   const elapsed = clampElapsedMs(elapsedMs)
+  const fromEdgeIds = new Set(fromEdges.map((edge) => edge.id))
+  const toEdgeIds = new Set(toEdges.map((edge) => edge.id))
+  const outgoingEdges = fromEdges.filter((edge) => !toEdgeIds.has(edge.id))
+  const retainedEdges = toEdges.filter((edge) => fromEdgeIds.has(edge.id))
+  const incomingEdges = toEdges.filter((edge) => !fromEdgeIds.has(edge.id))
   const timings = getLayoutTransitionTimings({
-    hasOutgoingEdges: fromEdges.length > 0,
-    hasIncomingEdges: toEdges.length > 0,
+    hasOutgoingEdges: outgoingEdges.length > 0,
+    hasIncomingEdges: incomingEdges.length > 0,
   })
-  const stage = getLayoutTransitionStage(elapsed, timings)
 
-  if (stage === 'fade-out') {
-    const opacity = 1 - stageProgress(elapsed, 0, timings.fadeOutMs)
-    return { nodes: fromNodes, edges: withEdgeOpacity(fromEdges, opacity), stage }
-  }
+  if (elapsed >= timings.doneAt) return { nodes: toNodes, edges: toEdges, isDone: true }
 
-  if (stage === 'move') {
-    const t = stageProgress(elapsed, timings.moveStartsAt, timings.moveMs)
-    const fromById = new Map(fromNodes.map((node) => [node.id, node]))
-    return { nodes: interpolateNodes(fromById, toNodes, t), edges: [], stage }
-  }
+  const fromById = new Map(fromNodes.map((node) => [node.id, node]))
+  const nodes = interpolateNodes(fromById, toNodes, stageProgress(elapsed, 0, timings.moveMs))
 
-  if (stage === 'fade-in') {
-    const opacity = stageProgress(elapsed, timings.fadeInStartsAt, timings.fadeInMs)
-    return { nodes: toNodes, edges: withEdgeOpacity(toEdges, opacity), stage }
-  }
+  const fadeOutProgress = stageProgress(elapsed, 0, timings.fadeOutMs)
+  const fadingOutEdges =
+    fadeOutProgress < 1
+      ? outgoingEdges.map((edge) => ({
+          ...edge,
+          style: { ...edge.style, opacity: getEdgeOpacity(edge) * (1 - fadeOutProgress) },
+        }))
+      : []
 
-  return { nodes: toNodes, edges: toEdges, stage }
+  const fadingInEdges =
+    elapsed >= timings.fadeInStartsAt
+      ? withEdgeOpacity(
+          incomingEdges,
+          stageProgress(elapsed, timings.fadeInStartsAt, timings.fadeInMs)
+        )
+      : []
+
+  return { nodes, edges: [...retainedEdges, ...fadingInEdges, ...fadingOutEdges], isDone: false }
 }

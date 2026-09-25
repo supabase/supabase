@@ -20,15 +20,25 @@ export type HaPoolerNodeData = {
   shardName: string
   // Only set on primary nodes; hides the unused top handle when no gateway exists.
   hasGateway?: boolean
+  // Only set on primary nodes once a replica has been promoted in their place.
+  isFormerPrimary?: boolean
   promotion?: 'promoting' | 'promoted'
   statusOverride?: HaPoolerStatus
 }
+
+/** Simulated failover steps that change the diagram (healthy renders as no phase). */
+export type HaFailoverPhase = 'failing' | 'promoting' | 'failover'
 
 export type HaShardNodeData = {
   name: string
 }
 
-const REPLICATION_EDGE_STYLE = { strokeDasharray: '3 5' } as const
+// The dash period (4 + 6) matches the 10px offset of React Flow's `dashdraw`
+// keyframe, so animated dashes loop seamlessly instead of jumping each cycle.
+const REPLICATION_EDGE_STYLE = { strokeDasharray: '4 6' } as const
+// Traffic on the edge has stopped: freeze its flowing dashes in place and dim it.
+const INTERRUPTED_EDGE_CLASS =
+  'opacity-30 transition-opacity duration-300 [&_path]:[animation-play-state:paused]'
 
 // Records without a complete identity fall back to a positional id so two of
 // them never collide on the same React Flow node id (which would drop a card).
@@ -40,18 +50,20 @@ const createSmoothstepEdge = ({
   target,
   animated = false,
   dashed = false,
+  isInterrupted = false,
 }: {
   source: string
   target: string
   animated?: boolean
   dashed?: boolean
+  isInterrupted?: boolean
 }): Edge => ({
   id: `${source}-${target}`,
   source,
   target,
   type: 'smoothstep',
   animated,
-  className: 'cursor-default!',
+  className: isInterrupted ? `cursor-default! ${INTERRUPTED_EDGE_CLASS}` : 'cursor-default!',
   ...(dashed ? { style: REPLICATION_EDGE_STYLE } : {}),
 })
 
@@ -60,11 +72,14 @@ export const generateHaNodesAndEdges = (
   {
     isSimulated = false,
     failoverPhase,
-  }: { isSimulated?: boolean; failoverPhase?: 'promoting' | 'failover' } = {}
+  }: { isSimulated?: boolean; failoverPhase?: HaFailoverPhase } = {}
 ): { nodes: Node[]; edges: Edge[]; layoutEdges: Edge[] } => {
   const isPromoting = failoverPhase === 'promoting'
   const isFailover = failoverPhase === 'failover'
-  const isPrimaryFailed = isPromoting || isFailover
+  const isPrimaryFailed = failoverPhase !== undefined
+  // Between the primary failing and the promotion completing, nothing is
+  // serving traffic, so the primary's edges freeze instead of flowing.
+  const isTrafficInterrupted = isPrimaryFailed && !isFailover
   const position = { x: 0, y: 0 }
   const nodes: Node[] = []
   const edges: Edge[] = []
@@ -101,6 +116,7 @@ export const generateHaNodesAndEdges = (
           shardId: shard.id,
           shardName: shard.name,
           hasGateway,
+          isFormerPrimary: isFailover,
           statusOverride,
         } satisfies HaPoolerNodeData,
       })
@@ -150,6 +166,7 @@ export const generateHaNodesAndEdges = (
           source: primaryId,
           target: replicaId,
           animated: true,
+          isInterrupted: isTrafficInterrupted,
         })
         edges.push(replicationEdge)
         layoutEdges.push(replicationEdge)
@@ -160,7 +177,11 @@ export const generateHaNodesAndEdges = (
       const gatewayTargetId = promotedId ?? primaryId
       if (gatewayTargetId !== undefined) {
         edges.push({
-          ...createSmoothstepEdge({ source: 'multigateway', target: gatewayTargetId }),
+          ...createSmoothstepEdge({
+            source: 'multigateway',
+            target: gatewayTargetId,
+            isInterrupted: isTrafficInterrupted,
+          }),
           type: isFailover ? 'failover' : 'smoothstep',
         })
       }

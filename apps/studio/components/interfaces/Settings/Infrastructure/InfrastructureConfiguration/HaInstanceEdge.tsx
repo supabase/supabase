@@ -5,7 +5,12 @@ const CORNER_RADIUS = 8
 /** Turns soon after leaving the gateway so the corner sits above the primary row. */
 const FAILOVER_DIVERGE_OFFSET = 48
 
-/** Routes failover traffic sideways before descending, avoiding the primary card. */
+/**
+ * Routes failover traffic sideways before descending, avoiding the primary card.
+ * Draws itself in from the gateway on mount, so traffic visibly re-routes to
+ * the promoted replica. `pathLength` normalizes the path so the draw-in
+ * keyframe works whatever the route's length.
+ */
 export const HaFailoverEdge = ({
   sourceX,
   sourceY,
@@ -37,5 +42,13 @@ export const HaFailoverEdge = ({
     `L ${targetX} ${targetY}`,
   ].join(' ')
 
-  return <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+  return (
+    <BaseEdge
+      path={edgePath}
+      pathLength={1}
+      className="motion-safe:animate-ha-edge-draw"
+      markerEnd={markerEnd}
+      style={style}
+    />
+  )
 }

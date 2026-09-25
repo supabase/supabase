@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   FAILOVER_SIMULATION_FAILOVER_AT_MS,
   FAILOVER_SIMULATION_HEALTHY_MS,
+  FAILOVER_SIMULATION_PROMOTING_AT_MS,
   getFailoverSimulationDelayMs,
   getFailoverSimulationPhase,
   getFailoverSimulationStatusLabel,
@@ -33,13 +34,22 @@ describe('getFailoverSimulationPhase', () => {
     ).toBe('failover')
   })
 
-  it('plays healthy, then promoting, then failover without looping', () => {
+  it('plays healthy, failing, promoting, then failover without looping', () => {
     expect(getFailoverSimulationPhase({ enabled: true, elapsedMs: 0 })).toBe('healthy')
     expect(
       getFailoverSimulationPhase({ enabled: true, elapsedMs: FAILOVER_SIMULATION_HEALTHY_MS - 1 })
     ).toBe('healthy')
     expect(
       getFailoverSimulationPhase({ enabled: true, elapsedMs: FAILOVER_SIMULATION_HEALTHY_MS })
+    ).toBe('failing')
+    expect(
+      getFailoverSimulationPhase({
+        enabled: true,
+        elapsedMs: FAILOVER_SIMULATION_PROMOTING_AT_MS - 1,
+      })
+    ).toBe('failing')
+    expect(
+      getFailoverSimulationPhase({ enabled: true, elapsedMs: FAILOVER_SIMULATION_PROMOTING_AT_MS })
     ).toBe('promoting')
     expect(
       getFailoverSimulationPhase({
@@ -68,11 +78,14 @@ describe('getFailoverSimulationPhase', () => {
 })
 
 describe('getFailoverSimulationDelayMs', () => {
-  it('waits the remaining healthy window, then the promoting window, then stops', () => {
+  it('waits out each remaining phase window, then stops', () => {
     expect(getFailoverSimulationDelayMs(0)).toBe(FAILOVER_SIMULATION_HEALTHY_MS)
     expect(getFailoverSimulationDelayMs(1)).toBe(FAILOVER_SIMULATION_HEALTHY_MS - 1)
     expect(getFailoverSimulationDelayMs(FAILOVER_SIMULATION_HEALTHY_MS)).toBe(
-      FAILOVER_SIMULATION_FAILOVER_AT_MS - FAILOVER_SIMULATION_HEALTHY_MS
+      FAILOVER_SIMULATION_PROMOTING_AT_MS - FAILOVER_SIMULATION_HEALTHY_MS
+    )
+    expect(getFailoverSimulationDelayMs(FAILOVER_SIMULATION_PROMOTING_AT_MS)).toBe(
+      FAILOVER_SIMULATION_FAILOVER_AT_MS - FAILOVER_SIMULATION_PROMOTING_AT_MS
     )
     expect(getFailoverSimulationDelayMs(FAILOVER_SIMULATION_FAILOVER_AT_MS - 1)).toBe(1)
     expect(getFailoverSimulationDelayMs(FAILOVER_SIMULATION_FAILOVER_AT_MS)).toBeUndefined()
@@ -88,9 +101,10 @@ describe('getFailoverSimulationDelayMs', () => {
 })
 
 describe('getFailoverSimulationStatusLabel', () => {
-  it('returns copy only for in-progress and completed failover', () => {
+  it('returns copy only once the primary has failed', () => {
     expect(getFailoverSimulationStatusLabel('off')).toBeUndefined()
     expect(getFailoverSimulationStatusLabel('healthy')).toBeUndefined()
+    expect(getFailoverSimulationStatusLabel('failing')).toBe('Primary unhealthy')
     expect(getFailoverSimulationStatusLabel('promoting')).toBe('Promoting replica')
     expect(getFailoverSimulationStatusLabel('failover')).toBe('Replica promoted')
   })

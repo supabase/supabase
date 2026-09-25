@@ -61,7 +61,8 @@
   --animate-chevron-up: chevron-up 2s ease-in-out infinite;
   --animate-sway: sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-marketplace-featured-progress: marketplace-featured-progress linear forwards;
-  --animate-ha-primary-fail-flash: ha-primary-fail-flash 0.7s ease-in-out both;
+  --animate-ha-primary-fail-flash: ha-primary-fail-flash 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-ha-edge-draw: ha-edge-draw 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   /* font sizing and weights optimized for Inter */
   --text-sm: 0.8125rem;
@@ -119,23 +120,33 @@
   }
 }
 
+/* One pulse into the failed state, with a ring that ripples out and fades. */
 @keyframes ha-primary-fail-flash {
-  0%,
-  28% {
+  0% {
     background-color: var(--background-surface-100);
     border-color: var(--border-color-default);
-    box-shadow: 0 0 0 0 transparent;
+    box-shadow: 0 0 0 0 hsl(var(--destructive-600) / 0.5);
   }
-  14%,
-  42% {
+  30% {
     background-color: var(--color-destructive-200);
     border-color: var(--color-destructive-400);
-    box-shadow: 0 0 0 3px hsl(var(--destructive-600) / 0.4);
   }
   100% {
     background-color: var(--color-destructive-200);
     border-color: var(--color-destructive-400);
-    box-shadow: 0 0 0 0 transparent;
+    box-shadow: 0 0 0 12px hsl(var(--destructive-600) / 0);
+  }
+}
+
+/* Draws a path from its start; pair with pathLength="1" on the path. */
+@keyframes ha-edge-draw {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
   }
 }
 

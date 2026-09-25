@@ -5,7 +5,11 @@ import { useMemo } from 'react'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { DiagramFlow } from './DiagramFlow'
-import { addShardNodes, generateHaNodesAndEdges } from './HaInstanceConfiguration.utils'
+import {
+  addShardNodes,
+  generateHaNodesAndEdges,
+  type HaFailoverPhase,
+} from './HaInstanceConfiguration.utils'
 import { HaFailoverEdge } from './HaInstanceEdge'
 import { HaPrimaryNode, HaReplicaNode, HaShardNode, MultigatewayNode } from './HaInstanceNode'
 import { buildHaTopology, selectTopologyPoolers } from './HaTopology.utils'
@@ -115,8 +119,8 @@ export const HaInstanceConfiguration = ({
     ? simulatedTopology.gateways
     : queriedGatewaysData?.gateways
   const poolers = simulateHighAvailability ? simulatedTopology.poolers : queriedPoolers
-  const failoverLayoutPhase =
-    failoverPhase === 'promoting' || failoverPhase === 'failover' ? failoverPhase : undefined
+  const failoverLayoutPhase: HaFailoverPhase | undefined =
+    failoverPhase === 'off' || failoverPhase === 'healthy' ? undefined : failoverPhase
 
   const { nodes, edges, layoutEdges } = useMemo(
     () =>
