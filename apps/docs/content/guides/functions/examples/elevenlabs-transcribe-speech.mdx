@@ -189,7 +189,7 @@ const telegramBotToken = Deno.env.get('TELEGRAM_BOT_TOKEN')
 const bot = new Bot(telegramBotToken || '')
 const startMessage = `Welcome to the ElevenLabs Scribe Bot\\! I can transcribe speech in 99 languages with super high accuracy\\!
     \nTry it out by sending or forwarding me a voice message, video, or audio file\\!
-    \n[Learn more about Scribe](https://elevenlabs.io/speech-to-text) or [build your own bot](https://elevenlabs.io/docs/cookbooks/speech-to-text/telegram-bot)\\!
+    \n[Learn more about Scribe](https://elevenlabs.io/speech-to-text) or [build your own bot](https://elevenlabs.io/docs/eleven-api/guides/cookbooks/speech-to-text)\\!
   `
 bot.command('start', (ctx) => ctx.reply(startMessage.trim(), { parse_mode: 'MarkdownV2' }))
 
