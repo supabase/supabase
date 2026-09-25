@@ -71,7 +71,7 @@ export const EdgeFunctionRecentErrors = ({
     [updatedAt]
   )
   const emptyStateFallback =
-    'Runtime errors since the last deploy will appear here when this function returns a 5xx response.'
+    'Runtime errors in the last 24h will appear here when this function returns a 5xx response.'
 
   const isQueryEnabled = Boolean(projectRef && functionId && isoTimestampStart)
   const recentErrorInvocationsSql = useMemo(
@@ -160,8 +160,8 @@ export const EdgeFunctionRecentErrors = ({
 
     return (
       <>
-        There {verb} been <span className="text-foreground">{invocationPhrase}</span> since last
-        deploy and no errors.
+        There {verb} been <span className="text-foreground">{invocationPhrase}</span> in the last
+        24h and no errors.
       </>
     )
   }, [

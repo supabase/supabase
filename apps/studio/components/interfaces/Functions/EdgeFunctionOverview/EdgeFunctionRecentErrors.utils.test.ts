@@ -137,13 +137,13 @@ limit 25`)
     expect(getSinceLastDeployInvocationPhrase(1200)).toBe('1,200 invocations')
 
     expect(getNoErrorsSinceLastDeployMessage(0)).toBe(
-      'There have been 0 invocations since last deploy and no errors.'
+      'There have been 0 invocations in the last 24h and no errors.'
     )
     expect(getNoErrorsSinceLastDeployMessage(1)).toBe(
-      'There has been 1 invocation since last deploy and no errors.'
+      'There has been 1 invocation in the last 24h and no errors.'
     )
     expect(getNoErrorsSinceLastDeployMessage(1200)).toBe(
-      'There have been 1,200 invocations since last deploy and no errors.'
+      'There have been 1,200 invocations in the last 24h and no errors.'
     )
   })
 
