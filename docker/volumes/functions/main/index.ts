@@ -12,12 +12,108 @@ type AuthFailure = {
   message?: string
 }
 
+type FunctionFailure = {
+  code: RequestErrors
+  message: string
+  status: number
+}
+
 export enum RequestErrors {
   InvalidLegacyJWT = 'UNAUTHORIZED_LEGACY_JWT',
   InvalidAsymmetricJWT = 'UNAUTHORIZED_ASYMMETRIC_JWT',
   InvalidTokenFormat = 'UNAUTHORIZED_INVALID_JWT_FORMAT',
   UnsupportedTokenAlgorithm = 'UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM',
   MissingAuthHeader = 'UNAUTHORIZED_NO_AUTH_HEADER',
+  NotFound = 'NOT_FOUND',
+  BootError = 'BOOT_ERROR',
+  EdgeFunctionError = 'EDGE_FUNCTION_ERROR',
+  IdleTimeout = 'IDLE_TIMEOUT',
+  WorkerResourceLimit = 'WORKER_RESOURCE_LIMIT',
+  WorkerError = 'WORKER_ERROR',
+  InvalidResponseStatusCode = 'INVALID_RESPONSE_STATUS_CODE',
+}
+
+function getFunctionErrorResponse({ code, message, status }: FunctionFailure): Response {
+  return Response.json(
+    { code, message },
+    {
+      status,
+      headers: {
+        'sb-error-code': code,
+        'Access-Control-Expose-Headers': 'sb-error-code',
+      },
+    }
+  )
+}
+
+function handleWorkerResponse(response: Response): Response {
+  if (response.status < 500) return response
+
+  const headers = new Headers(response.headers)
+  headers.set('sb-error-code', RequestErrors.EdgeFunctionError)
+
+  const exposedHeaders = (headers.get('Access-Control-Expose-Headers') ?? '')
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean)
+  if (!exposedHeaders.some((name) => name.toLowerCase() === 'sb-error-code')) {
+    exposedHeaders.push('sb-error-code')
+  }
+  headers.set('Access-Control-Expose-Headers', exposedHeaders.join(', '))
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
+function resolveRuntimeError(e: unknown): FunctionFailure {
+  // These error classes are supplied by Edge Runtime, rather than stock Deno.
+  if (e instanceof Deno.errors.InvalidWorkerCreation) {
+    return {
+      code: RequestErrors.BootError,
+      message: 'Function failed to start (please check logs)',
+      status: 503,
+    }
+  }
+  if (e instanceof Deno.errors.WorkerRequestCancelled) {
+    return {
+      code: RequestErrors.WorkerResourceLimit,
+      message: 'Function failed due to not having enough compute resources (please check logs)',
+      status: 546,
+    }
+  }
+  if (e instanceof Deno.errors.WorkerRequestIdleTimeout) {
+    return {
+      code: RequestErrors.IdleTimeout,
+      message: 'Request idle timeout limit (150s) reached',
+      status: 504,
+    }
+  }
+  // No dedicated runtime error class exists for invalid response statuses.
+  // The Response constructor throws directly here or inside the user worker.
+  if (
+    (e instanceof RangeError || e instanceof Deno.errors.InvalidWorkerResponse) &&
+    e.message.includes('is not equal to 101 and outside the range [200, 599]')
+  ) {
+    return {
+      code: RequestErrors.InvalidResponseStatusCode,
+      message: 'Function returned an invalid HTTP status code (please check logs)',
+      status: 500,
+    }
+  }
+  if (
+    e instanceof Deno.errors.WorkerAlreadyRetired ||
+    e instanceof Deno.errors.InvalidWorkerResponse
+  ) {
+    return {
+      code: RequestErrors.WorkerError,
+      message: 'Function exited due to an error (please check logs)',
+      status: 500,
+    }
+  }
+  return { code: RequestErrors.EdgeFunctionError, message: 'Internal Server Error', status: 500 }
 }
 
 // NOTE:(kallebysantos) We don't check for valid keys but just the bare array parsing,
@@ -190,18 +286,45 @@ Deno.serve(async (req: Request) => {
   const service_name = path_parts[1]
 
   if (!service_name || service_name === '') {
-    const error = { msg: 'missing function name in request' }
-    return new Response(JSON.stringify(error), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
+    return getFunctionErrorResponse({
+      code: RequestErrors.NotFound,
+      message: 'Requested function was not found',
+      status: 404,
     })
   }
 
   const servicePath = `/home/deno/functions/${service_name}`
   console.error(`serving the request with ${servicePath}`)
 
+  try {
+    const serviceInfo = await Deno.stat(servicePath)
+    if (!serviceInfo.isDirectory) {
+      return getFunctionErrorResponse({
+        code: RequestErrors.NotFound,
+        message: 'Requested function was not found',
+        status: 404,
+      })
+    }
+  } catch (e) {
+    if (e instanceof Deno.errors.NotFound) {
+      return getFunctionErrorResponse({
+        code: RequestErrors.NotFound,
+        message: 'Requested function was not found',
+        status: 404,
+      })
+    }
+    console.error(e)
+    return getFunctionErrorResponse({
+      code: RequestErrors.BootError,
+      message: 'Function failed to start (please check logs)',
+      status: 503,
+    })
+  }
+
   const memoryLimitMb = 150
-  const workerTimeoutMs = 1 * 60 * 1000
+  // Keep the wall clock above the 150s request idle timeout configured in Compose.
+  const workerTimeoutMs = 400_000
+  const requestAbsentTimeoutMs = 60_000
   const noModuleCache = false
   // Using a common Import Map for all functions 
   // to use a scope 'deno.json' it must be dinamically resolved base on the 'service_name'
@@ -217,16 +340,14 @@ Deno.serve(async (req: Request) => {
       servicePath,
       memoryLimitMb,
       workerTimeoutMs,
+      context: { supervisor: { requestAbsentTimeoutMs } },
       noModuleCache,
       importMapPath,
       envVars,
     })
-    return await worker.fetch(req)
+    return handleWorkerResponse(await worker.fetch(req))
   } catch (e) {
-    const error = { msg: e.toString() }
-    return new Response(JSON.stringify(error), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    console.error(e)
+    return getFunctionErrorResponse(resolveRuntimeError(e))
   }
 })
