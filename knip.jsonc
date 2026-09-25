@@ -65,13 +65,13 @@
         // read are documentation of the valid values, not dead code. Scoped to
         // this file so `enumMembers` keeps working everywhere else.
         "data/database/constraints-query.ts": ["enumMembers"],
-        // Data contracts and mock hooks for the OAuth authorization
-        // interstitial, landed ahead of the UI that consumes them. `exports`
-        // and `types` cover the contract types that only gain consumers in the
-        // consent-screen PR.
-        // TODO(PROD-625): drop every oauth-apps knip exception in the
-        // consent-screen PR, once the interstitial route imports them.
-        "data/oauth-apps/**": ["files", "exports", "types"],
+        // Org settings authorized-apps data layer, landed in #49476 ahead of the
+        // tables that consume it. Scoped to the three files rather than the whole
+        // folder so everything else here stays gated.
+        // TODO(FE-4330): remove — used from #50529, drop this entry in that PR.
+        "data/oauth-apps/oauth-apps-authorized-apps-query.ts": ["files"],
+        "data/oauth-apps/oauth-apps-member-grants-query.ts": ["files"],
+        "data/oauth-apps/oauth-apps-revoke-mutation.ts": ["files"],
         "hooks/misc/useTrackExperimentExposure.ts": ["files"],
         // Staging-only pinned Postgres image + FDW request payload for creating
         // Warehouse test projects by hand. Nothing imports it yet — it's kept
