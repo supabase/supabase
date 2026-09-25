@@ -13,13 +13,10 @@ import {
   SelectValue,
   TextArea,
 } from 'ui'
-import type { z } from 'zod'
 
 import { submitFormAction } from '../go/actions/submitForm'
-import { formFieldSchema, type GoFormFieldShowWhen } from '../go/schemas'
-
-/** Input-shape field type — fields with Zod defaults (`half`, `required`) are optional here. */
-export type MarketingFormField = z.input<typeof formFieldSchema>
+import type { GoFormFieldShowWhen } from '../go/schemas'
+import { validateCheckboxFields, type MarketingFormField } from './MarketingForm.utils'
 
 /**
  * Opaque reference the client posts back to the server action. The server
@@ -216,39 +213,14 @@ export default function MarketingForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Required checkboxes aren't covered by HTML5 validation; check them manually.
-    const uncheckedRequired = visibleFields.filter(
-      (f) => f.type === 'checkbox' && f.required && !f.group && values[f.name] !== 'true'
-    )
-    if (uncheckedRequired.length > 0) {
+    // Checkbox rules aren't covered by HTML5 validation; check them manually.
+    const checkboxErrors = validateCheckboxFields(visibleFields, values)
+    if (checkboxErrors.length > 0) {
       setSubmitState('error')
-      setErrorMessages(
-        uncheckedRequired.map((f) => `Please confirm: ${f.label.replace(/\*$/, '').trim()}`)
-      )
+      setErrorMessages(checkboxErrors)
       return
     }
 
-    const requiredCheckboxGroups = new Map<string, MarketingFormField[]>()
-    visibleFields.forEach((field) => {
-      if (field.type !== 'checkbox' || !field.group || !field.groupRequired) return
-      const groupFields = requiredCheckboxGroups.get(field.group) ?? []
-      groupFields.push(field)
-      requiredCheckboxGroups.set(field.group, groupFields)
-    })
-
-    const missingRequiredGroups = Array.from(requiredCheckboxGroups.values()).filter((group) =>
-      group.every((field) => values[field.name] !== 'true')
-    )
-    if (missingRequiredGroups.length > 0) {
-      setSubmitState('error')
-      setErrorMessages(
-        missingRequiredGroups.map((group) => {
-          const labels = group.map((field) => field.label).join(', ')
-          return `Please select at least one option: ${labels}`
-        })
-      )
-      return
-    }
     // Strip values for fields that are currently hidden so stale data doesn't leak.
     const submittedValues = Object.fromEntries(
       Object.entries(values).filter(([name]) => visibleFieldNames.has(name))
