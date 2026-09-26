@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
@@ -25,9 +26,30 @@ import {
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { BucketVersioningFields } from './BucketVersioningFields'
+import {
+  fromLifecycleRules,
+  hasLifecyclePolicyChanged,
+  toLifecycleRules,
+} from './BucketVersioningFields.lifecycle'
+import {
+  bucketVersioningFormFields,
+  superRefineBucketVersioning,
+} from './BucketVersioningFields.schema'
+import {
+  getNextVersioningState,
+  getVersioningFormDefaults,
+  isEnablingVersioning,
+  isSuspendingVersioning,
+  toVersioningStatusUpdate,
+  type BucketVersioningSettings,
+} from './EditBucketModal.utils'
+import { getBucketVersioningState } from './StorageVersioning.constants'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -35,9 +57,12 @@ import {
 } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { bucketLifecycleQueryOptions } from '@/data/storage/bucket-lifecycle-query'
+import { useBucketLifecycleUpdateMutation } from '@/data/storage/bucket-lifecycle-update-mutation'
 import { useBucketUpdateMutation } from '@/data/storage/bucket-update-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -45,16 +70,21 @@ export interface EditBucketModalProps {
   onClose: () => void
 }
 
-const BucketSchema = z.object({
-  name: z.string(),
-  public: z.boolean().default(false),
-  has_file_size_limit: z.boolean().default(false),
-  formatted_size_limit: z.coerce
-    .number()
-    .min(0, 'File size upload limit has to be at least 0')
-    .optional(),
-  allowed_mime_types: z.string().trim().default(''),
-})
+const BucketSchema = z
+  .object({
+    name: z.string(),
+    public: z.boolean().default(false),
+    has_file_size_limit: z.boolean().default(false),
+    formatted_size_limit: z.coerce
+      .number()
+      .min(0, 'File size upload limit has to be at least 0')
+      .optional(),
+    allowed_mime_types: z.string().trim().default(''),
+    ...bucketVersioningFormFields,
+  })
+  .superRefine(superRefineBucketVersioning)
+
+type BucketFormValues = z.infer<typeof BucketSchema>
 
 const formId = 'edit-storage-bucket-form'
 
@@ -69,12 +99,45 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const { value: fileSizeLimit } = convertFromBytes(bucket?.file_size_limit ?? 0)
 
-  const { mutate: updateBucket, isPending: isUpdating } = useBucketUpdateMutation({
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+
+  const { data: lifecycle } = useQuery({
+    ...bucketLifecycleQueryOptions({ projectRef: ref, bucketId: bucket?.id }),
+    enabled: isStorageVersioningEnabled && visible && !!ref && !!bucket?.id,
+  })
+  const storedPolicy = fromLifecycleRules(lifecycle)
+
+  const versioningSettings: BucketVersioningSettings = {
+    versioning: getBucketVersioningState(bucket),
+    versionExpiryDays: storedPolicy.versionExpiryDays,
+    maxNoncurrentVersions: storedPolicy.maxNoncurrentVersions,
+    expirationMode: storedPolicy.expirationMode,
+  }
+
+  // Held while the suspend confirmation is open, so confirming completes the save.
+  const [pendingSuspendValues, setPendingSuspendValues] = useState<BucketFormValues | null>(null)
+
+  const track = useTrack()
+  // Stashed at submit time and only reported once the save actually succeeds.
+  const enabledVersioningRef = useRef<{ hasLifecyclePolicy: boolean } | null>(null)
+
+  const { mutateAsync: updateLifecycle, isPending: isUpdatingLifecycle } =
+    useBucketLifecycleUpdateMutation()
+
+  const { mutate: updateBucket, isPending: isUpdatingBucket } = useBucketUpdateMutation({
     onSuccess: () => {
+      setPendingSuspendValues(null)
+      if (enabledVersioningRef.current !== null) {
+        track('storage_bucket_versioning_enabled', enabledVersioningRef.current)
+        enabledVersioningRef.current = null
+      }
       toast.success(`Successfully updated bucket "${bucket?.name}"`)
       onClose()
     },
     onError: (error) => {
+      // Release the suspend dialog too, so a failed save doesn't trap the user in it.
+      setPendingSuspendValues(null)
+
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''
 
@@ -105,19 +168,23 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     },
   })
 
+  const isUpdating = isUpdatingBucket || isUpdatingLifecycle
+
   const defaultValues = {
     name: bucket?.name ?? '',
     public: bucket?.public,
     has_file_size_limit: Boolean(bucket?.file_size_limit),
     formatted_size_limit: bucket?.file_size_limit ? (fileSizeLimit ?? 0) : undefined,
     allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
+    ...getVersioningFormDefaults(versioningSettings),
   }
 
-  const form = useForm<z.infer<typeof BucketSchema>>({
+  const form = useForm<BucketFormValues>({
     resolver: zodResolver(BucketSchema),
     defaultValues,
     values: defaultValues,
-    mode: 'onSubmit',
+    // Show numeric versioning bounds as the user types, not only on submit.
+    mode: 'onChange',
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
 
@@ -136,7 +203,63 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     onClose()
   }
 
-  const onSubmit: SubmitHandler<z.infer<typeof BucketSchema>> = async (values) => {
+  const persistChanges = async (values: BucketFormValues) => {
+    if (bucket === undefined) return console.error('Bucket is required')
+    if (ref === undefined) return console.error('Project ref is required')
+
+    enabledVersioningRef.current =
+      isStorageVersioningEnabled &&
+      isEnablingVersioning(versioningSettings.versioning, values.enable_versioning)
+        ? {
+            hasLifecyclePolicy:
+              values.version_expiry_days !== '' || values.max_noncurrent_versions !== '',
+          }
+        : null
+
+    const nextVersioningState = getNextVersioningState(
+      versioningSettings.versioning,
+      values.enable_versioning
+    )
+    const versioningStatus = isStorageVersioningEnabled
+      ? toVersioningStatusUpdate(nextVersioningState)
+      : undefined
+
+    // Saved first, so a rejected policy leaves the bucket untouched.
+    if (
+      isStorageVersioningEnabled &&
+      nextVersioningState !== 'disabled' &&
+      hasLifecyclePolicyChanged(storedPolicy, values)
+    ) {
+      try {
+        await updateLifecycle({
+          projectRef: ref,
+          bucketId: bucket.id,
+          rules: toLifecycleRules(values),
+        })
+      } catch {
+        // The mutation raises its own toast; leave the modal open to retry.
+        return
+      }
+    }
+
+    updateBucket({
+      projectRef: ref,
+      id: bucket.id,
+      isPublic: values.public,
+      versioning_status: versioningStatus,
+      file_size_limit:
+        values.has_file_size_limit && values.formatted_size_limit
+          ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
+          : null,
+      allowed_mime_types: hasAllowedMimeTypes
+        ? values.allowed_mime_types.length > 0
+          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
+          : null
+        : null,
+    })
+  }
+
+  const onSubmit: SubmitHandler<BucketFormValues> = async (values) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
 
@@ -160,20 +283,15 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       }
     }
 
-    updateBucket({
-      projectRef: ref,
-      id: bucket.id,
-      isPublic: values.public,
-      file_size_limit:
-        values.has_file_size_limit && values.formatted_size_limit
-          ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
-          : null,
-      allowed_mime_types: hasAllowedMimeTypes
-        ? values.allowed_mime_types.length > 0
-          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
-          : null
-        : null,
-    })
+    // Future uploads stop producing recoverable versions, so confirm first.
+    if (
+      isStorageVersioningEnabled &&
+      isSuspendingVersioning(versioningSettings.versioning, values.enable_versioning)
+    ) {
+      return setPendingSuspendValues(values)
+    }
+
+    await persistChanges(values)
   }
 
   useEffect(() => {
@@ -189,49 +307,109 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   }, [visible, bucket, form])
 
   return (
-    <Dialog
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) closeModal()
-      }}
-    >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{`Edit bucket “${bucket?.name}”`}</DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog
+        open={visible}
+        onOpenChange={(open) => {
+          if (!open) closeModal()
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{`Edit bucket “${bucket?.name}”`}</DialogTitle>
+          </DialogHeader>
 
-        <DialogSectionSeparator />
+          <DialogSectionSeparator />
 
-        <Form {...form}>
-          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="space-y-6">
-              <FormField
-                key="name"
-                name="name"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    hideMessage
-                    label="Bucket name"
-                    labelOptional="Cannot be changed after creation"
-                  >
-                    <FormControl>
-                      <Input {...field} disabled />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-
-              <div className="flex flex-col gap-y-3">
+          <Form {...form}>
+            <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+              <DialogSection className="space-y-6">
                 <FormField
-                  key="public"
-                  name="public"
+                  key="name"
+                  name="name"
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
                       hideMessage
-                      label="Public bucket"
-                      description="Allow anyone to read objects without authorization"
+                      label="Bucket name"
+                      labelOptional="Cannot be changed after creation"
+                    >
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+
+                <div className="flex flex-col gap-y-3">
+                  <FormField
+                    key="public"
+                    name="public"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        hideMessage
+                        label="Public bucket"
+                        description="Allow anyone to read objects without authorization"
+                        layout="flex"
+                      >
+                        <FormControl>
+                          <Switch
+                            size="large"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  {isChangingBucketVisibility && (
+                    <Admonition
+                      type="warning"
+                      title={`Warning: Making bucket ${isMakingBucketPublic ? 'public' : 'private'}`}
+                      description={
+                        <>
+                          {isMakingBucketPublic && (
+                            <p>This will make all objects in your bucket publicly accessible.</p>
+                          )}
+
+                          {isMakingBucketPrivate && (
+                            <>
+                              <p className="mb-2 leading-normal!">
+                                All objects in your bucket will only accessible via signed URLs, or
+                                downloaded with the right authorization headers.
+                              </p>
+                              <p className="leading-normal!">
+                                Assets cached in the CDN may still be publicly accessible. You can
+                                consider{' '}
+                                <InlineLink
+                                  href={`${DOCS_URL}/guides/storage/cdn/smart-cdn#cache-eviction`}
+                                >
+                                  purging the cache
+                                </InlineLink>{' '}
+                                or moving your assets to a new bucket.
+                              </p>
+                            </>
+                          )}
+                        </>
+                      }
+                    />
+                  )}
+                </div>
+              </DialogSection>
+
+              <DialogSectionSeparator />
+
+              <DialogSection className="space-y-2">
+                <FormField
+                  key="has_file_size_limit"
+                  name="has_file_size_limit"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Restrict file size"
+                      description="Prevent uploading of files larger than a specified limit"
                       layout="flex"
                     >
                       <FormControl>
@@ -244,180 +422,156 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     </FormItemLayout>
                   )}
                 />
+                {hasFileSizeLimit && (
+                  <div>
+                    <FormField
+                      key="formatted_size_limit"
+                      name="formatted_size_limit"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout hideMessage label="File size limit">
+                          <div className="grid grid-cols-12 gap-x-2">
+                            <div className="col-span-8">
+                              <FormControl>
+                                <Input
+                                  aria-label="File size limit"
+                                  type="number"
+                                  min={0}
+                                  placeholder="0"
+                                  {...field}
+                                />
+                              </FormControl>
+                            </div>
+                            <div className="col-span-4">
+                              <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                                <SelectTrigger aria-label="File size limit unit" size="small">
+                                  <SelectValue>{selectedUnit}</SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Object.values(StorageSizeUnits).map((unit: string) => (
+                                    <SelectItem key={unit} value={unit} className="text-xs">
+                                      {unit}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </FormItemLayout>
+                      )}
+                    />
+                    {formattedSizeLimitError?.message === 'exceed_global_limit' && (
+                      <FormMessage className="mt-2">
+                        Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
+                        <InlineLink
+                          className="text-destructive decoration-destructive-500 hover:decoration-destructive"
+                          href={`/project/${ref}/storage/settings`}
+                          onClick={onClose}
+                        >
+                          Storage Settings
+                        </InlineLink>{' '}
+                        first.
+                      </FormMessage>
+                    )}
 
-                {isChangingBucketVisibility && (
-                  <Admonition
-                    type="warning"
-                    title={`Warning: Making bucket ${isMakingBucketPublic ? 'public' : 'private'}`}
-                    description={
-                      <>
-                        {isMakingBucketPublic && (
-                          <p>This will make all objects in your bucket publicly accessible.</p>
-                        )}
-
-                        {isMakingBucketPrivate && (
-                          <>
-                            <p className="mb-2 leading-normal!">
-                              All objects in your bucket will only accessible via signed URLs, or
-                              downloaded with the right authorization headers.
-                            </p>
-                            <p className="leading-normal!">
-                              Assets cached in the CDN may still be publicly accessible. You can
-                              consider{' '}
-                              <InlineLink
-                                href={`${DOCS_URL}/guides/storage/cdn/smart-cdn#cache-eviction`}
-                              >
-                                purging the cache
-                              </InlineLink>{' '}
-                              or moving your assets to a new bucket.
-                            </p>
-                          </>
-                        )}
-                      </>
-                    }
-                  />
+                    {IS_PLATFORM && (
+                      <p className="text-sm text-foreground-lighter mt-2">
+                        This project has a{' '}
+                        <InlineLink
+                          className="text-foreground-light hover:text-foreground"
+                          href={`/project/${ref}/storage/settings`}
+                          onClick={onClose}
+                        >
+                          global file size limit
+                        </InlineLink>{' '}
+                        of {formattedGlobalUploadLimit}.
+                      </p>
+                    )}
+                  </div>
                 )}
-              </div>
-            </DialogSection>
+              </DialogSection>
 
-            <DialogSectionSeparator />
+              <DialogSectionSeparator />
 
-            <DialogSection className="space-y-2">
-              <FormField
-                key="has_file_size_limit"
-                name="has_file_size_limit"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Restrict file size"
-                    description="Prevent uploading of files larger than a specified limit"
-                    layout="flex"
-                  >
-                    <FormControl>
-                      <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-              {hasFileSizeLimit && (
-                <div>
+              <DialogSection className="space-y-2">
+                <FormItemLayout
+                  label="Restrict MIME types"
+                  description="Allow only certain types of files to be uploaded"
+                  layout="flex"
+                >
+                  <FormControl>
+                    <Switch
+                      size="large"
+                      checked={hasAllowedMimeTypes}
+                      onCheckedChange={setHasAllowedMimeTypes}
+                    />
+                  </FormControl>
+                </FormItemLayout>
+                {hasAllowedMimeTypes && (
                   <FormField
-                    key="formatted_size_limit"
-                    name="formatted_size_limit"
+                    key="allowed_mime_types"
+                    name="allowed_mime_types"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout hideMessage label="File size limit">
-                        <div className="grid grid-cols-12 gap-x-2">
-                          <div className="col-span-8">
-                            <FormControl>
-                              <Input
-                                aria-label="File size limit"
-                                type="number"
-                                min={0}
-                                placeholder="0"
-                                {...field}
-                              />
-                            </FormControl>
-                          </div>
-                          <div className="col-span-4">
-                            <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                              <SelectTrigger aria-label="File size limit unit" size="small">
-                                <SelectValue>{selectedUnit}</SelectValue>
-                              </SelectTrigger>
-                              <SelectContent>
-                                {Object.values(StorageSizeUnits).map((unit: string) => (
-                                  <SelectItem key={unit} value={unit} className="text-xs">
-                                    {unit}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
+                      <FormItemLayout
+                        label="Allowed MIME types"
+                        labelOptional="Comma separated values"
+                        description="Wildcards are allowed, e.g. image/*."
+                      >
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                          />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
-                  {formattedSizeLimitError?.message === 'exceed_global_limit' && (
-                    <FormMessage className="mt-2">
-                      Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
-                      <InlineLink
-                        className="text-destructive decoration-destructive-500 hover:decoration-destructive"
-                        href={`/project/${ref}/storage/settings`}
-                        onClick={onClose}
-                      >
-                        Storage Settings
-                      </InlineLink>{' '}
-                      first.
-                    </FormMessage>
-                  )}
+                )}
+              </DialogSection>
 
-                  {IS_PLATFORM && (
-                    <p className="text-sm text-foreground-lighter mt-2">
-                      This project has a{' '}
-                      <InlineLink
-                        className="text-foreground-light hover:text-foreground"
-                        href={`/project/${ref}/storage/settings`}
-                        onClick={onClose}
-                      >
-                        global file size limit
-                      </InlineLink>{' '}
-                      of {formattedGlobalUploadLimit}.
-                    </p>
-                  )}
-                </div>
-              )}
-            </DialogSection>
-
-            <DialogSectionSeparator />
-
-            <DialogSection className="space-y-2">
-              <FormItemLayout
-                label="Restrict MIME types"
-                description="Allow only certain types of files to be uploaded"
-                layout="flex"
-              >
-                <FormControl>
-                  <Switch
-                    size="large"
-                    checked={hasAllowedMimeTypes}
-                    onCheckedChange={setHasAllowedMimeTypes}
-                  />
-                </FormControl>
-              </FormItemLayout>
-              {hasAllowedMimeTypes && (
-                <FormField
-                  key="allowed_mime_types"
-                  name="allowed_mime_types"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Allowed MIME types"
-                      labelOptional="Comma separated values"
-                      description="Wildcards are allowed, e.g. image/*."
-                    >
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
-                        />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
+              {isStorageVersioningEnabled && (
+                <BucketVersioningFields
+                  initialVersioningState={versioningSettings.versioning}
+                  initialRetentionDays={versioningSettings.versionExpiryDays}
+                  initialMaxVersions={versioningSettings.maxNoncurrentVersions}
+                  isPublicBucket={isPublicBucket}
                 />
               )}
-            </DialogSection>
-          </form>
-        </Form>
+            </form>
+          </Form>
 
-        <DialogFooter>
-          <Button disabled={isUpdating} onClick={closeModal}>
-            Cancel
-          </Button>
-          <Button variant="primary" form={formId} type="submit" loading={isUpdating}>
-            Save
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button disabled={isUpdating} onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button variant="primary" form={formId} type="submit" loading={isUpdating}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmationModal
+        variant="warning"
+        visible={pendingSuspendValues !== null}
+        title="Suspend object versioning?"
+        confirmLabel="Suspend versioning"
+        confirmLabelLoading="Suspending versioning..."
+        loading={isUpdating}
+        onCancel={() => setPendingSuspendValues(null)}
+        // Cleared by the mutation, so the dialog keeps its loading state while the save runs.
+        onConfirm={() => {
+          if (pendingSuspendValues !== null) persistChanges(pendingSuspendValues)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Overwriting or deleting an object in{' '}
+          <span className="text-foreground">{bucket?.name}</span> will no longer keep a recoverable
+          copy. Every version already retained stays until you delete it or a lifecycle policy
+          expires it, and you can re-enable versioning at any time.
+        </p>
+      </ConfirmationModal>
+    </>
   )
 }

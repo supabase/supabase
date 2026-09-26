@@ -56,6 +56,8 @@ export const storageKeys = {
     ] as const,
   folders: (projectRef: string | undefined, bucketId: string | undefined) =>
     ['projects', projectRef, 'buckets', bucketId, 'folders'] as const,
+  bucketLifecycle: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId, 'lifecycle'] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({

@@ -28,12 +28,21 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { BucketVersioningFields } from './BucketVersioningFields'
+import { toLifecycleRules } from './BucketVersioningFields.lifecycle'
+import {
+  bucketVersioningFormFields,
+  superRefineBucketVersioning,
+} from './BucketVersioningFields.schema'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
+import { PROJECT_VERSIONING_DEFAULTS } from './StorageVersioning.constants'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
+import { useBucketLifecycleUpdateMutation } from '@/data/storage/bucket-lifecycle-update-mutation'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -59,6 +68,7 @@ const FormSchema = z
       .min(0, 'File size upload limit has to be at least 0')
       .optional(),
     allowed_mime_types: z.string().trim().default(''),
+    ...bucketVersioningFormFields,
   })
   .superRefine((data, ctx) => {
     if (!validBucketNameRegex.test(data.name)) {
@@ -71,11 +81,25 @@ const FormSchema = z
           : 'Bucket name contains an invalid special character',
       })
     }
+
+    superRefineBucketVersioning(data, ctx)
   })
 
 const formId = 'create-storage-bucket-form'
 
 export type CreateBucketForm = z.infer<typeof FormSchema>
+
+const DEFAULT_VALUES: CreateBucketForm = {
+  name: '',
+  public: false,
+  has_file_size_limit: false,
+  formatted_size_limit: undefined,
+  allowed_mime_types: '',
+  enable_versioning: false,
+  version_expiry_days: PROJECT_VERSIONING_DEFAULTS.versionExpiryDays,
+  max_noncurrent_versions: PROJECT_VERSIONING_DEFAULTS.maxNoncurrentVersions,
+  expiration_mode: 'and',
+}
 
 interface CreateBucketModalProps {
   open: boolean
@@ -91,21 +115,22 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+
   const track = useTrack()
   const { mutateAsync: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
   })
+  const { mutateAsync: updateLifecycle, isPending: isUpdatingLifecycle } =
+    useBucketLifecycleUpdateMutation({ onError: () => {} })
+  const isSaving = isCreatingBucket || isUpdatingLifecycle
 
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: '',
-      public: false,
-      has_file_size_limit: false,
-      formatted_size_limit: undefined,
-      allowed_mime_types: '',
-    },
+    defaultValues: DEFAULT_VALUES,
+    // Show numeric versioning bounds as the user types, not only on submit
+    mode: 'onChange',
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
   const isPublicBucket = useWatch({ control: form.control, name: 'public' })
@@ -133,6 +158,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         })
       }
 
+      const isVersioningEnabled = isStorageVersioningEnabled && values.enable_versioning
+
       await createBucket({
         projectRef: ref,
         id: values.name,
@@ -140,8 +167,20 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         isPublic: values.public,
         file_size_limit: fileSizeLimit,
         allowed_mime_types: allowedMimeTypes,
+        // A bucket is only ever created DISABLED or ENABLED; suspending comes later.
+        versioning_status: isVersioningEnabled ? 'ENABLED' : 'DISABLED',
       })
-      track('storage_bucket_created', { bucketType: 'STANDARD' })
+
+      // A second call, so a failure here leaves the bucket versioned with no retention policy.
+      const lifecycleRules = isVersioningEnabled ? toLifecycleRules(values) : []
+      if (lifecycleRules.length > 0) {
+        await updateLifecycle({ projectRef: ref, bucketId: values.name, rules: lifecycleRules })
+      }
+
+      track('storage_bucket_created', {
+        bucketType: 'STANDARD',
+        hasVersioningEnabled: isVersioningEnabled,
+      })
 
       toast.success(`Successfully created bucket ${values.name}`)
       form.reset()
@@ -368,19 +407,23 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                 />
               )}
             </DialogSection>
+
+            {isStorageVersioningEnabled && (
+              <BucketVersioningFields isPublicBucket={isPublicBucket} />
+            )}
           </form>
         </Form>
 
         <DialogFooter>
-          <Button disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
+          <Button disabled={isSaving} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
             variant="primary"
             form={formId}
             type="submit"
-            loading={isCreatingBucket}
-            disabled={isCreatingBucket}
+            loading={isSaving}
+            disabled={isSaving}
           >
             Create
           </Button>
