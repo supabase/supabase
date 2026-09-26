@@ -2359,6 +2359,8 @@ commands:
       > You may override the directory path by specifying the `SUPABASE_WORKDIR` environment variable or `--workdir` flag.
 
       In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
+
+      To use OrioleDB as the Postgres storage engine, run `supabase init --use-orioledb`. The command writes the OrioleDB version to `experimental.orioledb_version` in `supabase/config.toml`; `--experimental` is not required.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -2367,6 +2369,10 @@ commands:
       - id: from-workdir
         name: Initialize from an existing directory
         code: supabase init --workdir .
+        response: Finished supabase init.
+      - id: with-orioledb
+        name: Initialize with OrioleDB
+        code: supabase init --use-orioledb
         response: Finished supabase init.
     tags:
       - local-dev
