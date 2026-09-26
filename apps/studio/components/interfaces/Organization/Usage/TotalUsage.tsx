@@ -34,9 +34,7 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_SIZE_GB_HOURS_GP3,
   PricingMetric.DISK_SIZE_GB_HOURS_IO2,
   PricingMetric.DISK_THROUGHPUT_GP3,
-  PricingMetric.LOG_INGESTION,
   PricingMetric.LOG_STORAGE,
-  PricingMetric.LOG_QUERYING,
   PricingMetric.ACTIVE_COMPUTE_HOURS,
   PricingMetric.ETL_PIPELINE,
   PricingMetric.ETL_REPLICATED_DATA,
@@ -82,6 +80,9 @@ export const TotalUsage = ({
         (usageItem) =>
           // Filter out compute as compute has no quota and is always being charged for
           !usageItem.metric.startsWith('COMPUTE_') &&
+          // Log metrics should not trigger the exceeded limits alert for now (soft rollout)
+          usageItem.metric !== PricingMetric.LOG_INGESTION &&
+          usageItem.metric !== PricingMetric.LOG_QUERYING &&
           !usageItem.unlimited &&
           usageItem.usage > (usageItem?.pricing_free_units ?? 0)
       )
@@ -90,17 +91,28 @@ export const TotalUsage = ({
   const sortedBillingMetrics = useMemo(() => {
     if (!usage) return []
 
-    const breakdownMetrics = BILLING_BREAKDOWN_METRICS.filter((metric) =>
-      usage.usages.some((usage) => usage.metric === metric.key)
-    ).filter((metric) => {
-      if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
+    const breakdownMetrics = BILLING_BREAKDOWN_METRICS(subscription)
+      .filter((metric) => usage.usages.some((usage) => usage.metric === metric.key))
+      .filter((metric) => {
+        if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
 
-      const metricUsage = usage.usages.find((it) => it.metric === metric.key)
+        const metricUsage = usage.usages.find((it) => it.metric === metric.key)
 
-      return metricUsage && metricUsage.usage > 0
-    })
+        return metricUsage && metricUsage.usage > 0
+      })
+
+    const PINNED_METRICS = [PricingMetric.LOG_INGESTION, PricingMetric.LOG_QUERYING]
 
     return breakdownMetrics.slice().sort((a, b) => {
+      const pinnedIndexA = PINNED_METRICS.indexOf(a.key as PricingMetric)
+      const pinnedIndexB = PINNED_METRICS.indexOf(b.key as PricingMetric)
+
+      if (pinnedIndexA !== -1 || pinnedIndexB !== -1) {
+        if (pinnedIndexA === -1) return 1
+        if (pinnedIndexB === -1) return -1
+        return pinnedIndexA - pinnedIndexB
+      }
+
       const usageMetaA = usage.usages.find((x) => x.metric === a.key)
       const usageRatioA =
         typeof usageMetaA !== 'number'
@@ -120,7 +132,7 @@ export const TotalUsage = ({
         usageRatioB - usageRatioA
       )
     })
-  }, [usage])
+  }, [usage, subscription])
 
   const computeMetrics = (usage?.usages || [])
     .filter((it) => it.metric.startsWith('COMPUTE'))
@@ -199,12 +211,16 @@ export const TotalUsage = ({
                 )}
               </p>
             )}
+
             <div className="grid grid-cols-2 mt-3 gap-px bg-border">
               {sortedBillingMetrics.map((metric, i) => {
                 return (
                   <div
                     key={metric.key}
-                    className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
+                    className={cn(
+                      'col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4',
+                      i % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
+                    )}
                   >
                     <BillingMetric
                       idx={i}
@@ -213,7 +229,6 @@ export const TotalUsage = ({
                       usage={usage}
                       subscription={subscription!}
                       relativeToSubscription={showRelationToSubscription}
-                      className={cn(i % 2 === 0 ? 'md:pr-4' : 'md:pl-4')}
                     />
                   </div>
                 )
