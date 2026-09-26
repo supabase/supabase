@@ -25,6 +25,7 @@ import {
   TabsList,
   TabsTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -40,6 +41,8 @@ import {
 import z from 'zod'
 
 import CommandRender from '../CommandRender'
+import { getJwtVerificationState } from '../jwtVerification.utils'
+import { useIsJwtVerificationAvailable } from '../useIsJwtVerificationAvailable'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
@@ -83,6 +86,13 @@ export const EdgeFunctionDetails = () => {
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+
+  const isJwtVerificationAvailable = useIsJwtVerificationAvailable()
+  const { canToggle: canToggleJwtVerification, isUnsatisfiable: isJwtVerificationUnsatisfiable } =
+    getJwtVerificationState({
+      isAvailable: isJwtVerificationAvailable,
+      isEnforced: selectedFunction?.verify_jwt ?? false,
+    })
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
   const functionUrl = `${endpoint}/functions/v1/${selectedFunction?.slug}`
@@ -181,36 +191,51 @@ export const EdgeFunctionDetails = () => {
                             label="Verify JWT with legacy secret"
                             layout="flex-row-reverse"
                             description={
-                              <>
-                                <p className="mb-2">
-                                  Requires a JWT signed{' '}
-                                  <em className="text-foreground not-italic">
-                                    only by the legacy secret
-                                  </em>{' '}
-                                  in the{' '}
-                                  <code className="text-code-inline break-keep!">
-                                    Authorization
-                                  </code>{' '}
-                                  header. The <code className="text-code-inline">anon</code> key
-                                  satisfies this.
-                                </p>
+                              isJwtVerificationAvailable ? (
+                                <>
+                                  <p className="mb-2">
+                                    Requires a JWT signed{' '}
+                                    <em className="text-foreground not-italic">
+                                      only by the legacy secret
+                                    </em>{' '}
+                                    in the{' '}
+                                    <code className="text-code-inline break-keep!">
+                                      Authorization
+                                    </code>{' '}
+                                    header. The <code className="text-code-inline">anon</code> key
+                                    satisfies this.
+                                  </p>
+                                  <p>
+                                    Recommended: OFF with JWT and custom auth logic in your function
+                                    code.
+                                  </p>
+                                </>
+                              ) : (
                                 <p>
-                                  Recommended: OFF with JWT and custom auth logic in your function
-                                  code.
+                                  Unavailable while legacy JWT keys are disabled on this project.
+                                  Authenticate callers in your function code instead.
                                 </p>
-                              </>
+                              )
                             }
                           >
                             <FormControl>
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                disabled={!canUpdateEdgeFunction}
+                                disabled={!canUpdateEdgeFunction || !canToggleJwtVerification}
                               />
                             </FormControl>
                           </FormItemLayout>
                         )}
                       />
+                      {isJwtVerificationUnsatisfiable && (
+                        <Admonition
+                          type="warning"
+                          className="mt-4"
+                          title="This function rejects every request"
+                          description="Legacy JWT keys are disabled on this project, so no key can satisfy JWT verification. Turn it off and authenticate callers in your function code."
+                        />
+                      )}
                     </CardContent>
 
                     <CardFooter className="flex justify-end space-x-2">
