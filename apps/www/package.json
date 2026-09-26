@@ -41,7 +41,7 @@
     "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "@typescript/native": "catalog:",
-    "@vercel/og": "^0.6.2",
+    "@vercel/og": "^1.0.2",
     "ai-commands": "workspace:*",
     "animejs": "^4.0.2",
     "class-variance-authority": "^0.7.1",
