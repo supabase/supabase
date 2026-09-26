@@ -1,7 +1,7 @@
 import { AuthUsersSearchSubmittedEvent } from 'common/telemetry-constants'
 import { Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
-import { Dispatch, forwardRef, SetStateAction } from 'react'
+import { Dispatch, FormEvent, forwardRef, SetStateAction } from 'react'
 import {
   Button,
   cn,
@@ -26,6 +26,9 @@ import {
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { useTrack } from '@/lib/telemetry/track'
 
+const USERS_SEARCH_FORM_ID = 'auth-users-search'
+const SEARCH_VALIDATION_ID = `${USERS_SEARCH_FORM_ID}-validation`
+
 const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
   switch (column) {
     case 'id':
@@ -40,6 +43,28 @@ const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
       return 'Search by user ID, email, phone or name'
     default:
       return 'Search users...'
+  }
+}
+
+const getSearchInputMode = (column: SpecificFilterColumn) => {
+  switch (column) {
+    case 'email':
+      return 'email'
+    case 'phone':
+      return 'tel'
+    default:
+      return 'search'
+  }
+}
+
+const getSearchValidationMessage = (column: SpecificFilterColumn) => {
+  switch (column) {
+    case 'id':
+      return 'User ID must be a valid UUID prefix.'
+    case 'phone':
+      return 'Phone number can only include + and digits.'
+    default:
+      return ''
   }
 }
 
@@ -94,98 +119,133 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
     })
   }
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (searchInvalid) return
+    onSubmitSearch()
+  }
+
   return (
-    <div className="flex items-center">
-      <div className="text-xs h-[26px] flex items-center px-1.5 border border-strong rounded-l-md bg-surface-300">
-        <Search size={14} />
-      </div>
-
-      <Select
-        value={specificFilterColumn}
-        onValueChange={(v) => onSelectFilterColumn(v as typeof specificFilterColumn)}
-      >
-        <SelectTrigger
-          size="tiny"
-          className={cn(
-            'w-[130px] bg-transparent! rounded-none -ml-px',
-            specificFilterColumn === 'freeform' && 'text-warning'
-          )}
+    // Mobile keyboards (especially Android Chrome) often do not fire keydown
+    // with code/key "Enter". They submit the nearest form instead.
+    <form
+      id={USERS_SEARCH_FORM_ID}
+      role="search"
+      className="flex flex-col items-start"
+      onSubmit={handleSubmit}
+    >
+      <div className="flex items-center">
+        <button
+          type="submit"
+          aria-label="Search users"
+          disabled={searchInvalid}
+          tabIndex={searchInvalid ? -1 : 0}
+          className="text-xs h-[26px] flex items-center px-1.5 border border-strong rounded-l-md bg-surface-300 text-foreground-light hover:text-foreground focus-ring disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectItem value="id" className="text-xs">
-              User ID
-            </SelectItem>
-            <SelectItem value="email" className="text-xs">
-              Email address
-            </SelectItem>
-            {improvedSearchEnabled && (
-              <SelectItem value="name" className="text-xs">
-                Name
-              </SelectItem>
-            )}
-            <SelectItem value="phone" className="text-xs">
-              Phone number
-            </SelectItem>
-            {!improvedSearchEnabled && (
-              <>
-                <SelectSeparator />
-                <Tooltip>
-                  <TooltipTrigger>
-                    <SelectItem value="freeform" className="text-xs">
-                      Unified search
-                    </SelectItem>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="w-64 text-center">
-                    Search by all columns at once, including mid-string search. May impact database
-                    performance if you have many users.
-                  </TooltipContent>
-                </Tooltip>
-              </>
-            )}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+          <Search size={14} aria-hidden />
+        </button>
 
-      <Input
-        ref={ref}
-        size="tiny"
-        containerClassName="w-[245px] rounded-l-none -ml-px"
-        className={cn(
-          'bg-transparent',
-          searchInvalid ? 'text-red-900 dark:border-red-900' : '',
-          search.length > 1 && 'pr-6'
-        )}
-        placeholder={getSearchPlaceholder(specificFilterColumn)}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-            if (!searchInvalid) onSubmitSearch()
-            return
-          }
-          onSearchInputEscape(search, () => {
+        <Select
+          value={specificFilterColumn}
+          onValueChange={(v) => onSelectFilterColumn(v as typeof specificFilterColumn)}
+        >
+          <SelectTrigger
+            type="button"
+            size="tiny"
+            className={cn(
+              'w-[130px] bg-transparent! rounded-none -ml-px',
+              specificFilterColumn === 'freeform' && 'text-warning'
+            )}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="id" className="text-xs">
+                User ID
+              </SelectItem>
+              <SelectItem value="email" className="text-xs">
+                Email address
+              </SelectItem>
+              {improvedSearchEnabled && (
+                <SelectItem value="name" className="text-xs">
+                  Name
+                </SelectItem>
+              )}
+              <SelectItem value="phone" className="text-xs">
+                Phone number
+              </SelectItem>
+              {!improvedSearchEnabled && (
+                <>
+                  <SelectSeparator />
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <SelectItem value="freeform" className="text-xs">
+                        Unified search
+                      </SelectItem>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="w-64 text-center">
+                      Search by all columns at once, including mid-string search. May impact
+                      database performance if you have many users.
+                    </TooltipContent>
+                  </Tooltip>
+                </>
+              )}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        <Input
+          ref={ref}
+          size="tiny"
+          type="search"
+          enterKeyHint="search"
+          inputMode={getSearchInputMode(specificFilterColumn)}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          containerClassName="w-[245px] rounded-l-none -ml-px"
+          className={cn(
+            'bg-transparent [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none',
+            searchInvalid ? 'text-red-900 dark:border-red-900' : '',
+            search.length > 1 && 'pr-6'
+          )}
+          placeholder={getSearchPlaceholder(specificFilterColumn)}
+          aria-label={getSearchPlaceholder(specificFilterColumn)}
+          aria-invalid={searchInvalid}
+          aria-describedby={SEARCH_VALIDATION_ID}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={onSearchInputEscape(search, () => {
             setSearch('')
             setFilterKeywords('')
-          })(e)
-        }}
-        actions={
-          search ? (
-            <Button
-              size="tiny"
-              variant="text"
-              className="p-0 h-5 w-5"
-              icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
-              onClick={() => {
-                setSearch('')
-                setFilterKeywords('')
-              }}
-            />
-          ) : null
-        }
-      />
-    </div>
+          })}
+          actions={
+            search ? (
+              <Button
+                size="tiny"
+                type="button"
+                variant="text"
+                className="p-0 h-5 w-5"
+                aria-label="Clear search"
+                icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
+                onClick={() => {
+                  setSearch('')
+                  setFilterKeywords('')
+                }}
+              />
+            ) : null
+          }
+        />
+      </div>
+      <p
+        id={SEARCH_VALIDATION_ID}
+        role="status"
+        className={cn('text-xs mt-1 text-destructive', !searchInvalid && 'sr-only')}
+      >
+        {searchInvalid ? getSearchValidationMessage(specificFilterColumn) : ''}
+      </p>
+    </form>
   )
 })
