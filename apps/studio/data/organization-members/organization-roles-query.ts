@@ -5,7 +5,14 @@ import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only']
+export const FIXED_ROLE_ORDER = [
+  'Owner',
+  'Administrator',
+  'Developer',
+  'Read-only',
+  'None',
+  'No-access',
+]
 export type OrganizationRolesVariables = { slug?: string }
 export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponse_Output']
 export type OrganizationRole =

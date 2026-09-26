@@ -11,10 +11,11 @@ For each organization and project, a member can have one of the following roles:
 - **Administrator**: full access to everything in organization and project resources **except** updating organization settings, transferring projects outside of the organization, and adding new owners.
 - **Developer**: read-only access to organization resources and content access to project resources but cannot change any project settings.
 - **Read-Only**: read-only access to organization and project resources.
+- **No access**: no access to any organization or project resources by default. Use this for members who should only see the specific projects they're granted a [project-scoped role](#organization-scoped-roles-vs-project-scoped-roles) on.
 
 <Admonition type="note">
 
-Read-Only role is only available on the [Team and Enterprise plans](/pricing).
+Read-Only and No access roles are only available on the [Team and Enterprise plans](/pricing).
 
 </Admonition>
 
@@ -66,6 +67,8 @@ Each member in the organization can be assigned a role that is scoped either to 
 - If a member is assigned a project-scoped role, they will only have access to the specific projects they've been assigned to. They will not be able to view, access, or even see other projects within the organization on the Supabase Dashboard.
 
 This allows for more granular control, ensuring that users only have visibility and access to the projects relevant to their role.
+
+To default a member to zero project access and grant access on a per-project basis, assign them the organization-level **No access** role, then grant project-scoped roles for the specific projects they need. The **No access** role is omitted from the permission tables below since it has none of the listed permissions by default.
 
 ### Organization permissions across roles
 
