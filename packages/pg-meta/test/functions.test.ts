@@ -412,3 +412,47 @@ withTestDatabase(
     await executeQuery(removeSql)
   }
 )
+
+withTestDatabase(
+  'procedure rows parse with null return_type in list and retrieve',
+  async ({ executeQuery }) => {
+    const { sql: createSql } = pgMeta.functions.create({
+      type: 'procedure',
+      name: 'test_proc_null_return',
+      schema: 'public',
+      definition: 'BEGIN NULL; END',
+      language: 'plpgsql',
+    })
+    await executeQuery(createSql)
+
+    // A single procedure must not fail the whole list() parse
+    const { sql: listSql, zod: listZod } = pgMeta.functions.list()
+    const listResult = listZod.parse(await executeQuery(listSql))
+    const proc = listResult.find(({ name }) => name === 'test_proc_null_return')
+    expect(proc).toBeDefined()
+    expect(proc!.type).toBe('procedure')
+    expect(proc!.return_type).toBeNull()
+
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+      name: 'test_proc_null_return',
+      schema: 'public',
+      args: [],
+    })
+    const retrieved = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(retrieved).toBeDefined()
+    expect(retrieved!.type).toBe('procedure')
+    expect(retrieved!.return_type).toBeNull()
+
+    // Updating a procedure definition round-trips through PGSavedFunction
+    const { sql: updateSql } = pgMeta.functions.update(asSavedFunction(retrieved!), {
+      definition: 'BEGIN RAISE NOTICE \'hi\'; END;',
+    })
+    await executeQuery(updateSql)
+    const updated = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updated!.definition).toBe("BEGIN RAISE NOTICE 'hi'; END;")
+    expect(updated!.return_type).toBeNull()
+
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(updated!))
+    await executeQuery(removeSql)
+  }
+)
