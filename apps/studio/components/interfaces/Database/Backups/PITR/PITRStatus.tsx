@@ -3,7 +3,6 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
 
-import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
@@ -12,8 +11,8 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface PITRStatusProps {
-  selectedTimezone: Timezone
-  onUpdateTimezone: (timezone: Timezone) => void
+  selectedTimezone: string
+  onUpdateTimezone: (timezone: string) => void
   onSetConfiguration: () => void
 }
 
@@ -33,12 +32,12 @@ const PITRStatus = ({
 
   const earliestAvailableBackup = dayjs
     .unix(earliestPhysicalBackupDateUnix ?? 0)
-    .tz(selectedTimezone?.utc[0])
+    .tz(selectedTimezone)
     .format('DD MMM YYYY, HH:mm:ss')
 
   const latestAvailableBackup = dayjs
     .unix(latestPhysicalBackupDateUnix ?? 0)
-    .tz(selectedTimezone?.utc[0])
+    .tz(selectedTimezone)
     .format('DD MMM YYYY, HH:mm:ss')
 
   const { can: canTriggerPhysicalBackup } = useAsyncCheckPermissions(
