@@ -11,13 +11,31 @@ Every [Compute Add-On](/docs/guides/platform/compute-and-disk) has a pre-configu
 
 ### Configuring Supavisor's pool size
 
-You can change how many database connections Supavisor can manage by altering the pool size in the "Connection pooling" section of the [Database Settings](/dashboard/project/_/database/settings):
+You can change how many database connections the poolers open by altering the pool size in the "Connection pooling" section of the [Database Settings](/dashboard/project/_/database/settings):
 
-![Connection Info and Certificate.](/docs/img/database/pool-size.png)
+![The connection pooling configuration panel, showing Pool Mode fixed to Transaction, a Pool Size field set to 15, and a Max Client Connections field fixed at 200 for a Nano compute size.](/docs/img/database/pool-size.png)
 
-The general rule is that if you are heavily using the PostgREST database API, you should be conscientious about raising your pool size past 40% of the Database Max Connections. Otherwise, you can commit 80% to the pool. This leaves adequate room for the Authentication server and other utilities.
+The shared pooler (Supavisor) and the dedicated pooler (PgBouncer) read the same pool size and apply it independently, so raising it raises the number of database connections each one can open. **Max client connections** is a different limit. It caps how many clients can connect to a pooler at once, it's fixed by your compute size, and it doesn't consume database connections. For more information about the two limits, see [client connections and backend connections](/docs/guides/database/connecting-to-postgres/pooling-and-limits#client-connections-and-backend-connections).
 
-These numbers are generalizations and depends on other Supabase products that you use and the extent of their usage. The actual values depend on your concurrent peak connection usage. For instance, if you were only using 80 connections in a week period and your database max connections is set to 500, then realistically you could allocate the difference of 420 (minus a reasonable buffer) to service more demand.
+The general rule is that if you are heavily using the PostgREST database API, you should be conscientious about raising your pool size past 40% of the Database Max Connections. Otherwise, you can commit 80% to the pool. This leaves adequate room for Auth, Realtime, and the other Supabase services that hold their own connections.
+
+These numbers are generalizations and depend on other Supabase products that you use and the extent of their usage. The actual values depend on your concurrent peak connection usage. For instance, if you were only using 80 connections in a week period and your database max connections is set to 500, then realistically you could allocate the difference of 420 (minus a reasonable buffer) to service more demand.
+
+### Supabase services with their own connection pools
+
+Your database's `max_connections` covers more than the poolers. The Data API, Auth, and Realtime each keep their own connection pool, and every connection in those pools counts towards the same total.
+
+| Service              | Pools it holds                                                         | Where to set the size                                                                                                                          |
+| -------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Data API (PostgREST) | One                                                                    | **Pool size** in [Data API settings](/dashboard/project/_/integrations/data_api/settings)                                                      |
+| Auth                 | One                                                                    | **Maximum connections** in [Auth performance settings](/dashboard/project/_/auth/performance)                                                  |
+| Realtime             | One for Realtime Authorization, one for Postgres Changes subscriptions | **Database connection pool size** and **Postgres Changes connection pool size** in [Realtime settings](/dashboard/project/_/realtime/settings) |
+
+The Data API pool size is unset by default, and Supabase sizes it from your compute size. The Supabase Dashboard leaves the field empty rather than showing that value. Auth takes either a percent of `max_connections` or an absolute number of connections.
+
+Storage is the exception. It connects through the shared pooler instead of holding its own pool, so its connections come out of the pooler's pool size. For more information about which services use the pooler, see the [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI).
+
+Size these pools together with each pooler's pool size and your direct connections. Their total is what has to stay under `max_connections`.
 
 ## Monitoring connections
 
