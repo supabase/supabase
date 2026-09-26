@@ -31,12 +31,50 @@ type SingleLogParams = {
   projectRef: string
   queryType?: QueryType
   paramsToMerge?: Partial<LogsEndpointParams>
+  /**
+   * The selected row's own timestamp (microseconds), when known. A single log is
+   * always looked up by `id`, which is not part of the logs table's sort key, so
+   * the query is bounded tightly around this timestamp instead of the
+   * (potentially much wider) selected search range. Falls back to the search
+   * range when unavailable — e.g. a deep-linked log that isn't in a loaded page.
+   */
+  logTimestampMicros?: number | null
 }
+
+// The row's timestamp is the exact stored value carried over from the row we
+// already fetched, not an approximate clock reading, so this only needs to
+// absorb rounding — not real clock skew. Mirrors `INSPECTION_WINDOW_MS` in
+// `data/logs/unified-log-inspection-query.ts`.
+const SINGLE_LOG_WINDOW_MS = 60 * 1000
+
+/**
+ * Resolves the time bounds for a single-log lookup: a tight window around the
+ * row's own timestamp when it's known, otherwise the selected search range.
+ */
+export const resolveSingleLogWindow = (
+  logTimestampMicros: number | null | undefined,
+  paramsToMerge?: Partial<LogsEndpointParams>
+): { isoTimestampStart: string; isoTimestampEnd: string } => {
+  if (typeof logTimestampMicros !== 'number' || !Number.isFinite(logTimestampMicros)) {
+    return {
+      isoTimestampStart: paramsToMerge?.iso_timestamp_start ?? '',
+      isoTimestampEnd: paramsToMerge?.iso_timestamp_end ?? '',
+    }
+  }
+
+  const timestampMs = logTimestampMicros / 1000
+  return {
+    isoTimestampStart: new Date(timestampMs - SINGLE_LOG_WINDOW_MS).toISOString(),
+    isoTimestampEnd: new Date(timestampMs + SINGLE_LOG_WINDOW_MS).toISOString(),
+  }
+}
+
 function useSingleLog({
   projectRef,
   id,
   queryType,
   paramsToMerge,
+  logTimestampMicros,
 }: SingleLogParams): SingleLogHook {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
 
@@ -48,7 +86,7 @@ function useSingleLog({
     if (!id || !table) return safeSql``
     if (useOtel) {
       try {
-        return genSingleLogQueryOtel(id)
+        return genSingleLogQueryOtel(table, id)
       } catch {
         // Malformed (non-uuid) id — emit nothing rather than throwing in render.
         return safeSql``
@@ -56,6 +94,13 @@ function useSingleLog({
     }
     return genSingleLogQuery(table, id)
   }, [id, table, useOtel])
+
+  // Bound the lookup to a tight window around the row's own timestamp, falling
+  // back to the selected search range when it isn't known.
+  const { isoTimestampStart, isoTimestampEnd } = useMemo(
+    () => resolveSingleLogWindow(logTimestampMicros, paramsToMerge),
+    [logTimestampMicros, paramsToMerge?.iso_timestamp_start, paramsToMerge?.iso_timestamp_end]
+  )
 
   const enabled = Boolean(id && table)
 
@@ -77,8 +122,8 @@ function useSingleLog({
       'single-log',
       id,
       queryType,
-      paramsToMerge?.iso_timestamp_start,
-      paramsToMerge?.iso_timestamp_end,
+      isoTimestampStart,
+      isoTimestampEnd,
       { otel: useOtel },
     ],
     queryFn: async ({ signal }) => {
@@ -86,8 +131,8 @@ function useSingleLog({
         projectRef,
         endpoint,
         sql,
-        iso_timestamp_start: paramsToMerge?.iso_timestamp_start ?? '',
-        iso_timestamp_end: paramsToMerge?.iso_timestamp_end ?? '',
+        iso_timestamp_start: isoTimestampStart,
+        iso_timestamp_end: isoTimestampEnd,
         method: 'get',
         signal,
       })

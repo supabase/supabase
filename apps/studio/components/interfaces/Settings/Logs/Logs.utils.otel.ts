@@ -311,14 +311,21 @@ ORDER BY timestamp ASC`
 }
 
 // Reject non-uuid ids before putting them in the query (injection guard).
-export const genSingleLogQueryOtel = (id: string): SafeLogSqlFragment => {
+//
+// `id` is not part of the table's sort key, so a lookup on it alone scans the
+// whole selected time window while materializing `log_attributes` — by far the
+// widest column. `source` is the second sort-key component, so filtering on it
+// narrows the sorted range before the time bound even applies. The caller pairs
+// this with a tight `iso_timestamp_*` bracket around the row's own timestamp
+// (see `useSingleLog`), mirroring `getUnifiedLogInspection`.
+export const genSingleLogQueryOtel = (table: LogsTableName, id: string): SafeLogSqlFragment => {
   if (!/^[0-9a-fA-F-]{1,64}$/.test(id)) {
     throw new Error('Invalid logId')
   }
   return safeSql`-- Single Log Query (otel)
 SELECT id, timestamp, event_message, source, severity_text, log_attributes
 FROM logs
-WHERE id = ${lit(id)}
+WHERE id = ${lit(id)} AND source = ${lit(OTEL_SOURCES[table].source)}
 LIMIT 1`
 }
 

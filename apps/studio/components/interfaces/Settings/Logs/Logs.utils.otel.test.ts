@@ -535,8 +535,8 @@ describe('genChartQueryOtel', () => {
 })
 
 describe('genSingleLogQueryOtel', () => {
-  it('fetches a single row by id with raw attributes', () => {
-    expect(fmt(genSingleLogQueryOtel('123e4567-e89b-12d3-a456-426614174000')))
+  it('fetches a single row by id with raw attributes, narrowed by source', () => {
+    expect(fmt(genSingleLogQueryOtel(LogsTableName.EDGE, '123e4567-e89b-12d3-a456-426614174000')))
       .toMatchInlineSnapshot(`
       "-- Single Log Query (otel)
       select
@@ -550,13 +550,25 @@ describe('genSingleLogQueryOtel', () => {
         logs
       where
         id = '123e4567-e89b-12d3-a456-426614174000'
+        and source = 'edge_logs'
       limit
         1"
     `)
   })
 
+  // `id` isn't in the table's sort key, so the `source` predicate is what
+  // narrows the scan — it must track the table, not be hardcoded.
+  it('emits the source for the requested table', () => {
+    expect(
+      fmt(genSingleLogQueryOtel(LogsTableName.AUTH, '123e4567-e89b-12d3-a456-426614174000'))
+    ).toContain("source = 'auth_logs'")
+    expect(
+      fmt(genSingleLogQueryOtel(LogsTableName.PG_CRON, '123e4567-e89b-12d3-a456-426614174000'))
+    ).toContain("source = 'postgres_logs'")
+  })
+
   it('rejects a non-uuid id', () => {
-    expect(() => genSingleLogQueryOtel("1' OR '1'='1")).toThrow('Invalid logId')
+    expect(() => genSingleLogQueryOtel(LogsTableName.EDGE, "1' OR '1'='1")).toThrow('Invalid logId')
   })
 })
 
