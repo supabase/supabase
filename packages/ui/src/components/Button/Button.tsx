@@ -134,6 +134,9 @@ const buttonVariants = cva(
       rounded: {
         true: 'rounded-full',
       },
+      iconOnly: {
+        true: 'hit-area-2 w-6.5',
+      },
     },
     // Match <Button size="tiny"> so raw buttonVariants({ variant }) keeps sizing.
     // Fixed icon shells that omit size must override padding (e.g. px-0 with h/w-[30px]).
@@ -197,7 +200,7 @@ export interface ButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     // omit 'disabled' as it is included in HTMLButtonElement
-    Omit<ButtonVariantProps, 'disabled'>,
+    Omit<ButtonVariantProps, 'disabled' | 'iconOnly'>,
     LoadingVariantProps {
   asChild?: boolean
   variant?: ButtonVariantProps['variant']
@@ -281,6 +284,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             focusableWhenDisabled,
             block,
             rounded,
+            iconOnly: children == null || children === false,
           }),
           className
         )}
