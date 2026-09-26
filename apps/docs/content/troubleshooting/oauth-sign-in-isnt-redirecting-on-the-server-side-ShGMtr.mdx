@@ -38,15 +38,36 @@ throw redirect(303, data.url)
 **Remix:**
 
 ```ts
-import { redirect } from "@remix-run/node"; // or cloudflare/deno
-// Your server client factory: createServerClient with a setAll that appends
-// Set-Cookie to `headers`, returning both. See the PKCE flow's Server example.
-import { createClient } from "~/lib/supabase.server";
-...
-const { supabase, headers } = createClient(request)
-const { data } = await supabase.auth.signInWithOAuth({
-  provider: 'github',
-})
+import { redirect, type ActionFunctionArgs } from '@remix-run/node' // or cloudflare/deno
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
-return redirect(data.url, { headers })
+export async function action({ request }: ActionFunctionArgs) {
+  const responseHeaders = new Headers()
+
+  // Collect every cookie the client sets, so they can be sent with the redirect
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+        },
+      },
+    }
+  )
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+  })
+  if (error) throw error
+
+  return redirect(data.url, { headers: responseHeaders })
+}
 ```
