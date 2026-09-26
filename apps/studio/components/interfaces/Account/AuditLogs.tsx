@@ -82,8 +82,11 @@ export const AuditLogs = () => {
     }
   )
 
-  const logs = data?.result ?? []
-  const filteredLogs = filterByProjects(logs, filters.projects)
+  const logs = useMemo(() => data?.result ?? [], [data?.result])
+  const filteredLogs = useMemo(
+    () => filterByProjects(logs, filters.projects),
+    [logs, filters.projects]
+  )
 
   const lastSelectedRowId = useRef<string | null>(null)
   const columns = useMemo(

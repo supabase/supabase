@@ -131,8 +131,11 @@ export const AuditLogs = () => {
   const { data: members } = useOrganizationMembersQuery({ slug }, { enabled: showFilters })
   const activeMembers = (members ?? []).filter((x) => !x.invited_at)
 
-  const logs = data?.result ?? []
-  const filteredLogs = filterByProjects(filterByUsers(logs, filters.users), filters.projects)
+  const logs = useMemo(() => data?.result ?? [], [data?.result])
+  const filteredLogs = useMemo(
+    () => filterByProjects(filterByUsers(logs, filters.users), filters.projects),
+    [logs, filters.users, filters.projects]
+  )
 
   const lastSelectedRowId = useRef<string | null>(null)
   const columns = useMemo(
