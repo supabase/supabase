@@ -12,6 +12,7 @@ import {
   Move,
   RotateCcw,
   Trash2,
+  Upload,
 } from 'lucide-react'
 import type { CSSProperties, ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -45,6 +46,7 @@ import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
+import { pickFile } from './pickFile'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
@@ -168,6 +170,7 @@ export const FileExplorerRow = ({
     setSelectedItemsToDelete,
     setItemToPurge,
     refetchAllOpenedFolders,
+    replaceFile,
     downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
@@ -208,6 +211,11 @@ export const FileExplorerRow = ({
     }
     clearArchivedSelection()
     setPreviewedFile(itemWithColumnIndex)
+  }
+
+  const onReplaceFile = async () => {
+    const file = await pickFile()
+    if (file !== undefined) await replaceFile({ file, item: itemWithColumnIndex })
   }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
@@ -346,6 +354,11 @@ export const FileExplorerRow = ({
                         name: 'Move',
                         icon: <Move size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
+                      },
+                      {
+                        name: isVersionedBucket ? 'Upload new version' : 'Replace file',
+                        icon: <Upload size={12} className="text-foreground-light" />,
+                        onClick: onReplaceFile,
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]

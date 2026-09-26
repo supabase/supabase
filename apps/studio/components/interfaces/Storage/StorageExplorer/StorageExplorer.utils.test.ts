@@ -10,9 +10,11 @@ import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
+  describeUploadFailure,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
   getStorageExplorerUrlForItem,
+  getStorageItemPath,
   getStoragePathForItem,
   parseStoragePath,
   sanitizeNameForDuplicateInColumn,
@@ -450,5 +452,59 @@ describe('clipboard helpers', () => {
 
     onCopied?.()
     expect(toast.success).toHaveBeenCalledWith('Copied URL for "photo.png"')
+  })
+})
+
+describe('getStorageItemPath', () => {
+  const openedFolders = [makeFolder('images'), makeFolder('2024'), makeFolder('january')]
+
+  it('returns the bare name for an item at the bucket root', () => {
+    expect(getStorageItemPath({ openedFolders }, { name: 'avatar.png', columnIndex: 0 })).toBe(
+      'avatar.png'
+    )
+  })
+
+  it('prefixes the folders opened above the item', () => {
+    expect(getStorageItemPath({ openedFolders }, { name: 'avatar.png', columnIndex: 2 })).toBe(
+      'images/2024/avatar.png'
+    )
+  })
+
+  it('ignores folders opened below the item', () => {
+    // The user drilled into january, but the item sits in the 2024 column.
+    expect(getStorageItemPath({ openedFolders }, { name: 'notes.txt', columnIndex: 1 })).toBe(
+      'images/notes.txt'
+    )
+  })
+})
+
+describe('describeUploadFailure', () => {
+  it('names the allowed types when the bucket rejects the mime type', () => {
+    expect(
+      describeUploadFailure({
+        status: 415,
+        fallback: 'tus: unexpected response',
+        allowedMimeTypes: ['image/png', 'image/jpeg'],
+      })
+    ).toBe(
+      'that file type is not allowed in this bucket. Allowed MIME types: image/png, image/jpeg.'
+    )
+  })
+
+  it('omits the list when the bucket allows everything', () => {
+    expect(describeUploadFailure({ status: 415, fallback: 'tus: unexpected response' })).toBe(
+      'that file type is not allowed in this bucket.'
+    )
+  })
+
+  it('explains a size rejection', () => {
+    expect(describeUploadFailure({ status: 413, fallback: 'tus: unexpected response' })).toBe(
+      'the file exceeds the bucket file size limit.'
+    )
+  })
+
+  it('falls back to the raw message for anything else', () => {
+    expect(describeUploadFailure({ status: 500, fallback: 'network down' })).toBe('network down')
+    expect(describeUploadFailure({ fallback: 'network down' })).toBe('network down')
   })
 })

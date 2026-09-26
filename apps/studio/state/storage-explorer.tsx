@@ -21,15 +21,20 @@ import {
 } from '@/components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
+  describeUploadFailure,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
   getPathAlongFoldersToIndex,
+  getStorageItemPath,
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
-import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
+import {
+  fetchFileUrl,
+  fileUrlKey,
+} from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -1471,6 +1476,82 @@ export function createStorageExplorerState({
       // TODO: invalidate the file preview cache when moving files
       await state.refetchAllOpenedFolders()
       state.setSelectedItemsToMove([])
+    },
+
+    /**
+     * Overwrites an object in place, which on a versioned bucket is what creates a new
+     * version. Not `uploadFiles`: that renames rather than overwrites on a name clash.
+     */
+    replaceFile: async ({ file, item }: { file: File; item: StorageItemWithColumn }) => {
+      const path = getStorageItemPath(state, item)
+      const toastId = toast.loading(`Uploading a new version of ${item.name}...`)
+
+      state.updateRowStatus({
+        name: item.name,
+        status: STORAGE_ROW_STATUS.LOADING,
+        columnIndex: item.columnIndex,
+      })
+
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const upload = new tus.Upload(file, {
+            endpoint: state.resumableUploadUrl,
+            retryDelays: [0, 200, 500, 1500, 3000, 5000],
+            // Without upsert the write is rejected as a conflict: the path exists.
+            headers: { 'x-source': 'supabase-dashboard', 'x-upsert': 'true' },
+            uploadDataDuringCreation: true,
+            removeFingerprintOnSuccess: true,
+            metadata: {
+              bucketName: state.selectedBucket.name,
+              objectName: path,
+              contentType: file.type || 'application/octet-stream',
+              cacheControl: '3600',
+            },
+            onBeforeRequest: async (req) => {
+              const { apiKey } = await getOrRefreshTemporaryApiKey(state.projectRef)
+              req.setHeader('apikey', apiKey)
+              if (!IS_PLATFORM) req.setHeader('Authorization', `Bearer ${apiKey}`)
+            },
+            onError: (error) => reject(error),
+            onSuccess: () => resolve(),
+          })
+
+          // No `findPreviousUploads`: a resumed upload would write the wrong file's bytes.
+          upload.start()
+        })
+
+        toast.success(`Uploaded a new version of ${item.name}`, { id: toastId })
+        await state.refetchAllOpenedFolders()
+        await Promise.all([
+          getQueryClient().invalidateQueries({
+            queryKey: storageKeys.objectVersions(state.projectRef, state.selectedBucket.id, path),
+          }),
+          // The preview URL is cached for a week against the path, so without this the
+          // panel keeps rendering the bytes from before the replace.
+          getQueryClient().invalidateQueries({
+            queryKey: fileUrlKey({
+              projectRef: state.projectRef,
+              isBucketPublic: state.selectedBucket.public,
+              bucketId: state.selectedBucket.id,
+              path,
+            }),
+          }),
+        ])
+      } catch (error: any) {
+        const status =
+          error instanceof tus.DetailedError ? error.originalResponse?.getStatus() : undefined
+        const reason = describeUploadFailure({
+          status,
+          fallback: error.message,
+          allowedMimeTypes: state.selectedBucket.allowed_mime_types,
+        })
+        toast.error(`Failed to upload a new version of ${item.name}: ${reason}`, { id: toastId })
+        state.updateRowStatus({
+          name: item.name,
+          status: STORAGE_ROW_STATUS.READY,
+          columnIndex: item.columnIndex,
+        })
+      }
     },
 
     deleteFiles: async ({
