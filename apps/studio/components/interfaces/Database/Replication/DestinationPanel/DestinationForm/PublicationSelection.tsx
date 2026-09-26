@@ -7,6 +7,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { PublicationsComboBox } from './PublicationsComboBox'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 
 type PublicationSelectionProps = {
@@ -25,6 +26,11 @@ export const PublicationSelection = ({
 
   const { data: publications, isSuccess: isSuccessPublications } =
     useReplicationPublicationNamesQuery({ projectRef, sourceId })
+  const { data: selectedPublication } = useReplicationPublicationQuery({
+    projectRef,
+    sourceId,
+    publicationName,
+  })
 
   const isSelectedPublicationMissing =
     isSuccessPublications &&
@@ -71,6 +77,14 @@ export const PublicationSelection = ({
               onNewPublicationClick={() => onSelectNewPublication()}
             />
           </FormControl>
+          {selectedPublication !== undefined && (
+            <p className="mt-2 text-xs text-foreground-lighter">
+              <span className="font-medium text-foreground-light">Partitioned tables: </span>
+              {selectedPublication.config.publish_via_partition_root
+                ? 'Publish changes as the parent table.'
+                : 'Publish changes as individual partitions.'}
+            </p>
+          )}
           {isSelectedPublicationMissing && (
             <Admonition
               type="warning"
