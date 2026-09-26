@@ -85,9 +85,9 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
     getNextPageParam(lastPage, pages) {
       const page = pages.length
       const currentTotalCount = page * limit
-      const totalCount = lastPage.pagination.count
+      const totalCount = lastPage.pagination?.count
 
-      if (currentTotalCount >= totalCount) return undefined
+      if (totalCount === undefined || currentTotalCount >= totalCount) return undefined
       return page
     },
     ...options,

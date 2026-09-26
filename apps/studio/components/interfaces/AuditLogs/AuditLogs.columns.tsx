@@ -1,4 +1,4 @@
-import type { ColumnDef } from '@tanstack/react-table'
+import type { CellContext, ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Box, Boxes } from 'lucide-react'
 import type { MutableRefObject } from 'react'
@@ -17,6 +17,7 @@ import {
 interface AuditLogColumnsOptions {
   projects: { ref?: string; name: string }[]
   organizations: { slug?: string; name: string }[]
+  members?: { gotrue_id?: string; username?: string }[]
   lastSelectedRowId: MutableRefObject<string | null>
   isLoadingProjects: boolean
   isLoadingOrganizations: boolean
@@ -25,6 +26,7 @@ interface AuditLogColumnsOptions {
 export function getAuditLogColumns({
   projects,
   organizations,
+  members,
   lastSelectedRowId,
   isLoadingProjects,
   isLoadingOrganizations,
@@ -105,6 +107,35 @@ export function getAuditLogColumns({
         headerClassName: 'w-[155px] min-w-[155px] pl-3',
       },
     },
+    ...(members
+      ? [
+          {
+            id: 'actor',
+            header: 'Actor',
+            accessorFn: (log: AuditLog) => log.actor.user_id ?? log.actor.email,
+            cell: ({ row }: CellContext<AuditLog, unknown>) => {
+              const log = row.original
+              const member = members.find((m) => m.gotrue_id === log.actor.user_id)
+              const name = member?.username || log.actor.email
+
+              if (!name) return <span className="text-foreground-light text-xs">-</span>
+
+              return (
+                <p className="truncate text-foreground-light" title={name}>
+                  {name}
+                </p>
+              )
+            },
+            size: 160,
+            minSize: 160,
+            maxSize: 160,
+            meta: {
+              cellClassName: 'w-[160px] min-w-[160px]',
+              headerClassName: 'w-[160px] min-w-[160px]',
+            },
+          } satisfies ColumnDef<AuditLog>,
+        ]
+      : []),
     {
       id: 'target_type',
       header: '',
@@ -169,12 +200,12 @@ export function getAuditLogColumns({
           </p>
         )
       },
-      size: 120,
-      minSize: 120,
-      maxSize: 120,
+      size: 130,
+      minSize: 130,
+      maxSize: 130,
       meta: {
-        cellClassName: 'w-[120px] min-w-[120px]',
-        headerClassName: 'w-[120px] min-w-[120px]',
+        cellClassName: 'w-[130px] min-w-[130px]',
+        headerClassName: 'w-[130px] min-w-[130px]',
       },
     },
     {
