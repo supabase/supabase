@@ -546,6 +546,26 @@ BEGIN;
 COMMIT;
 ```
 
+### `ogr2ogr` warns that the user lacks superuser privilege
+
+When you import spatial data with GDAL's `ogr2ogr`, version 3.9 or later might print this warning:
+
+```text
+Warning 1: User lacks super user privilege to be able to create event trigger ogr_system_tables_event_trigger_for_metadata
+```
+
+Your data still imports. GDAL can store extra layer metadata, such as a layer description, in its own `ogr_system_tables` schema. It keeps that schema tidy with an event trigger, and it only creates that trigger when you connect as a superuser. The `postgres` role [isn't a superuser](/docs/guides/database/postgres/roles-superuser), so GDAL skips the metadata and imports your tables and rows as usual. You don't need to convert the file to SQL first.
+
+To import without the warning, turn off GDAL's metadata support with the `OGR_PG_ENABLE_METADATA` option:
+
+```bash
+ogr2ogr --config OGR_PG_ENABLE_METADATA NO \
+  -f PostgreSQL \
+  PG:"host=<host> port=5432 dbname=postgres user=<user> password=<password>" \
+  campings.geojson \
+  -nln public.campings
+```
+
 ## Resources
 
 - [Official PostGIS documentation](https://postgis.net/documentation/)
