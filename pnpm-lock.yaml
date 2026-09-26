@@ -2386,6 +2386,9 @@ importers:
         specifier: 'catalog:'
         version: 2.3.2(@types/react@19.2.14)(react@19.2.6)
     devDependencies:
+      '@testing-library/react':
+        specifier: ^16.3.0
+        version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@types/lodash':
         specifier: 4.17.5
         version: 4.17.5
