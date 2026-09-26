@@ -66,6 +66,7 @@ const REALTIME_CONFIG = {
   presence_enabled: true,
   private_only: false,
   suspend: false,
+  admin_suspended_at: null,
 } as const satisfies RealtimeConfigurationData
 
 const buildRealtimeEntitlements = (
@@ -268,5 +269,28 @@ describe('RealtimeSettings', () => {
 
     expect(await screen.findByText('Cannot exceed 50,000 concurrent clients')).toBeInTheDocument()
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  test('shows a suspension banner when Realtime has been admin-suspended', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/config/realtime',
+      response: () =>
+        HttpResponse.json<RealtimeConfigurationData>({
+          ...REALTIME_CONFIG,
+          admin_suspended_at: '2026-01-01T00:00:00+00:00',
+        }),
+    })
+
+    customRender(<RealtimeSettings />)
+
+    expect(await screen.findByText('Realtime has been suspended')).toBeInTheDocument()
+  })
+
+  test('does not show a suspension banner when Realtime has not been admin-suspended', async () => {
+    customRender(<RealtimeSettings />)
+
+    await screen.findByLabelText('Postgres Changes connection pool size')
+    expect(screen.queryByText('Realtime has been suspended')).not.toBeInTheDocument()
   })
 })
