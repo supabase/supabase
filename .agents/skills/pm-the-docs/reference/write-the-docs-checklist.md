@@ -20,7 +20,7 @@ _Self-serve first ([agent skills](../../../../apps/docs/CONTRIBUTING.md#ai-agent
 - **Examples are runnable and have been tested** (commands, code, expected result)
 - **Correct stage** like GA is stated; limitations are named honestly.
 - The page **lives in the right place** in the IA and links to and from related pages.
-- Terminology and formatting match existing docs (and style guide once it lands).
+- Terminology and formatting match the [style guide](../../../../apps/docs/style-guide/README.md).
 
 ### 1. Frame
 

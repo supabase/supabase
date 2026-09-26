@@ -3096,14 +3096,13 @@ export const telemetry: NavMenuConstant = {
       name: 'Hire an agent',
       items: [
         { name: 'Set up an agent', url: '/guides/observability/automate-with-agents' },
-        { name: 'Generalist', url: '/guides/observability/automate-with-agents/all' },
         { name: 'Health monitor', url: '/guides/observability/automate-with-agents/health' },
         { name: 'Security monitor', url: '/guides/observability/automate-with-agents/security' },
         {
           name: 'Performance monitor',
           url: '/guides/observability/automate-with-agents/performance',
         },
-        { name: 'Capacity monitor', url: '/guides/observability/automate-with-agents/usage' },
+        { name: 'Resource monitor', url: '/guides/observability/automate-with-agents/usage' },
       ],
     },
     {
