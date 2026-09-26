@@ -246,20 +246,21 @@ insert into public.signup_email_domains (domain, type, reason) values
 create or replace function public.hook_restrict_signup_by_email_domain(event jsonb)
 returns jsonb
 language plpgsql
+security definer
 as $$
 declare
   email text;
-  domain text;
+  email_domain text;
   is_allowed int;
   is_denied int;
 begin
   email := event->'user'->>'email';
-  domain := split_part(email, '@', 2);
+  email_domain := split_part(email, '@', 2);
 
   -- Check for allow match
   select count(*) into is_allowed
   from public.signup_email_domains
-  where type = 'allow' and lower(domain) = lower($1);
+  where type = 'allow' and domain = lower(email_domain);
 
   if is_allowed > 0 then
     return '{}'::jsonb;
@@ -268,7 +269,7 @@ begin
   -- Check for deny match
   select count(*) into is_denied
   from public.signup_email_domains
-  where type = 'deny' and lower(domain) = lower($1);
+  where type = 'deny' and domain = lower(email_domain);
 
   if is_denied > 0 then
     return jsonb_build_object(
@@ -393,6 +394,7 @@ values
 create or replace function public.hook_restrict_signup_by_network(event jsonb)
 returns jsonb
 language plpgsql
+security definer
 as $$
 declare
   ip inet;
@@ -648,6 +650,7 @@ values
 create or replace function public.hook_restrict_signup_by_network(event jsonb)
 returns jsonb
 language plpgsql
+security definer
 as $$
 declare
   ip inet;
