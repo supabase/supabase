@@ -40,7 +40,7 @@ async function processMessage(message: QueueMessage) {
   // Delete the message from the queue
   const { error: deleteError } = await supabase.schema('pgmq_public').rpc('delete', {
     queue_name: queueName,
-    msg_id: message.msg_id,
+    message_id: message.msg_id,
   })
 
   if (deleteError) {
@@ -53,7 +53,7 @@ async function processMessage(message: QueueMessage) {
 Deno.serve(async (req) => {
   const { data: messages, error } = await supabase.schema('pgmq_public').rpc('read', {
     queue_name: queueName,
-    sleep_seconds: 0, // Don't wait if queue is empty
+    sleep_seconds: 30, // Hide these messages from other readers for 30 seconds
     n: 5, // Read 5 messages off the queue
   })
 
@@ -103,7 +103,9 @@ Every time this Edge Function is run it:
 1. Read 5 messages off the queue
 2. Call the `processMessage` function
 3. At the end of `processMessage`, the message is deleted from the queue
-4. If `processMessage` throws an error, the error is logged. In this case, the message is still in the queue, so the next time this Edge Function runs it reads the message again.
+4. If `processMessage` throws an error, the error is logged. In this case, the message is still in the queue. Once its 30-second visibility timeout expires, the next run of this Edge Function reads it again.
+
+Set `sleep_seconds` longer than a run takes to process and delete its messages. If it's shorter, or `0`, another run can read the same messages before they're deleted and process them twice. See [`pgmq_public.read`](/docs/guides/queues/api#pgmqpublicreadqueuename-sleepseconds-n) for details.
 
 You might find this kind of setup handy to run with [Supabase Cron](/docs/guides/cron). You can set up Cron so that every N number of minutes or seconds, the Edge Function will run and process a number of messages off the queue.
 
