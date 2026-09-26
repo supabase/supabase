@@ -200,6 +200,12 @@ export const examples: Registry = [
     files: ['example/button-default.tsx'],
   },
   {
+    name: 'button-floating-plate',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-floating-plate.tsx'],
+  },
+  {
     name: 'button-warning',
     type: 'components:example',
     registryDependencies: ['button'],
@@ -1016,6 +1022,12 @@ export const examples: Registry = [
     files: ['example/textarea-form.tsx'],
   },
   {
+    name: 'textarea-with-addon',
+    type: 'components:example',
+    registryDependencies: ['textarea', 'input-group'],
+    files: ['example/textarea-with-addon.tsx'],
+  },
+  {
     name: 'textarea-with-button',
     type: 'components:example',
     registryDependencies: ['textarea', 'button'],
@@ -1056,6 +1068,18 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['toggle-group'],
     files: ['example/toggle-group-outline.tsx'],
+  },
+  {
+    name: 'toggle-group-segmented',
+    type: 'components:example',
+    registryDependencies: ['toggle-group'],
+    files: ['example/toggle-group-segmented.tsx'],
+  },
+  {
+    name: 'toggle-group-segmented-filter',
+    type: 'components:example',
+    registryDependencies: ['toggle-group'],
+    files: ['example/toggle-group-segmented-filter.tsx'],
   },
   {
     name: 'toggle-group-sm',

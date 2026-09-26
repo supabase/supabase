@@ -33,6 +33,7 @@ export type InfraMonitoringMultiResponse = {
     values: Record<string, string | undefined>
   }[]
   series: Record<string, InfraMonitoringSeriesMetadata>
+  errors?: Record<string, { message: string }>
 }
 
 // TODO(raulb): Simplify to just InfraMonitoringMultiResponse once API always returns multi-attribute format.

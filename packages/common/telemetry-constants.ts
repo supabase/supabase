@@ -449,6 +449,21 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * omitted = PostHog flags had not loaded at the time of project creation
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
+    /**
+     * Which region option was submitted. Only present when the "Best available region" option
+     * was shown to the user (see `showBestAvailableRegionOption` in RegionSelector.tsx); omitted
+     * entirely for users who never saw that option.
+     * 'best_available' = the "Best available region" shortcut was used
+     * otherwise = the name of the region that was directly selected (e.g. 'Americas', 'ap-southeast-1')
+     */
+    selectedRegionOption?: string
+    /**
+     * Which region list `selectedRegionOption` came from. Only present alongside `selectedRegionOption`.
+     * 'general' = picked from the "General regions" (smart group) list, or the "Best available
+     * region" shortcut was used (it always resolves to a general/smart region)
+     * 'specific' = picked from the "Specific regions" list
+     */
+    selectedRegionOptionType?: 'general' | 'specific'
   }
   groups: TelemetryGroups
 }
@@ -1596,8 +1611,8 @@ export interface ExplorerBannerCtaButtonClickedEvent {
 }
 
 /**
- * User clicked the button in the Explorer sidebar title bar to temporarily switch to the SQL
- * Editor for snippet access.
+ * User clicked the SQL Editor button in the Explorer sidebar footer to temporarily switch
+ * to the SQL Editor for snippet access.
  *
  * @group Events
  * @source studio
@@ -1609,8 +1624,8 @@ export interface ExplorerTempAccessSqlEditorClickedEvent {
 }
 
 /**
- * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
- * visit originated from the Explorer's temporary switch button.
+ * User clicked the Explorer sidebar nav item while on the SQL Editor page, navigating back
+ * to Explorer.
  *
  * @group Events
  * @source studio

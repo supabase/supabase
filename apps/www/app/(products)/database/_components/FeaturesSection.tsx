@@ -15,7 +15,7 @@ function SkeletonBar({ className }: { className?: string }) {
 const FEATURES = [
   {
     title: 'Just Postgres',
-    description: 'A dedicated Postgres database.',
+    description: 'A dedicated, standalone Postgres database.',
     detail: '100% portable. Bring your existing Postgres database, or migrate away at any time.',
     visual: PostgresSkeleton,
   },
@@ -580,8 +580,8 @@ export function FeaturesSection() {
           <span className="text-foreground">from your database</span>
         </h3>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          Every Supabase project is a full Postgres database with realtime functionality,
-          fine-grained access controls, and instant APIs — no extra configuration required.
+          Every Supabase project starts as a full Postgres database. Row Level Security, realtime
+          subscriptions, and auto-generated APIs are built in and optional. Use what you need.
         </p>
       </div>
 

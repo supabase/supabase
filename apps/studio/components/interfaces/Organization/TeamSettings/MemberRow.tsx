@@ -87,7 +87,7 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
               </div>
             }
           />
-          <div className="flex item-center gap-x-3">
+          <div className="flex items-center gap-x-3">
             <p className="text-foreground-light truncate">{member.primary_email}</p>
             <div className="flex items-center gap-x-2">
               {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}

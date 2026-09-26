@@ -5,7 +5,7 @@ import curl from 'highlightjs-curl'
 import { noop } from 'lodash'
 import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Children, ReactNode, useState } from 'react'
+import { Children, memo, ReactNode, useState } from 'react'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
@@ -28,9 +28,30 @@ import swift from 'react-syntax-highlighter/dist/cjs/languages/hljs/swift'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import xml from 'react-syntax-highlighter/dist/cjs/languages/hljs/xml'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
-import { Button, cn, copyToClipboard } from 'ui'
+import { Button, cn, copyToClipboard, FloatingPlate } from 'ui'
 
 import { monokaiCustomTheme } from './CodeBlock.utils'
+
+SyntaxHighlighter.registerLanguage('js', js)
+SyntaxHighlighter.registerLanguage('ts', ts)
+SyntaxHighlighter.registerLanguage('py', py)
+SyntaxHighlighter.registerLanguage('sql', sql)
+SyntaxHighlighter.registerLanguage('bash', bash)
+SyntaxHighlighter.registerLanguage('dart', dart)
+SyntaxHighlighter.registerLanguage('csharp', csharp)
+SyntaxHighlighter.registerLanguage('json', json)
+SyntaxHighlighter.registerLanguage('kotlin', kotlin)
+SyntaxHighlighter.registerLanguage('curl', curl)
+SyntaxHighlighter.registerLanguage('http', http)
+SyntaxHighlighter.registerLanguage('php', php)
+SyntaxHighlighter.registerLanguage('python', python)
+SyntaxHighlighter.registerLanguage('go', go)
+SyntaxHighlighter.registerLanguage('pgsql', pgsql)
+SyntaxHighlighter.registerLanguage('swift', swift)
+SyntaxHighlighter.registerLanguage('html', xml)
+SyntaxHighlighter.registerLanguage('toml', ini)
+SyntaxHighlighter.registerLanguage('yaml', yaml)
+SyntaxHighlighter.registerLanguage('markdown', markdown)
 
 const codeBlockLangs = [
   'js',
@@ -106,7 +127,7 @@ export interface CodeBlockProps {
  * @param {boolean} [props.focusable=true] - Whether the code block is focusable. When true, users can focus the code block to select text or use ⌘A (Cmd+A) to select all. This is so we don't need to load Monaco Editor.
  * @param {function} [props.handleCopy] - Optional override behaviour for copying value. For e.g if the code block contains obfuscated values, but the copy behaviour should reveal those values instead.
  */
-export const CodeBlock = ({
+export const CodeBlock = memo(function CodeBlock({
   title,
   language,
   linesToHighlight = [],
@@ -125,7 +146,7 @@ export const CodeBlock = ({
   focusable = true,
   onCopyCallback = noop,
   handleCopy,
-}: CodeBlockProps) => {
+}: CodeBlockProps) {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
   const monokaiTheme = theme ?? monokaiCustomTheme(isDarkTheme)
@@ -161,26 +182,6 @@ export const CodeBlock = ({
   let lang = language ? language : className ? className.replace('language-', '') : 'js'
   // force jsx to be js highlighted
   if (lang === 'jsx') lang = 'js'
-  SyntaxHighlighter.registerLanguage('js', js)
-  SyntaxHighlighter.registerLanguage('ts', ts)
-  SyntaxHighlighter.registerLanguage('py', py)
-  SyntaxHighlighter.registerLanguage('sql', sql)
-  SyntaxHighlighter.registerLanguage('bash', bash)
-  SyntaxHighlighter.registerLanguage('dart', dart)
-  SyntaxHighlighter.registerLanguage('csharp', csharp)
-  SyntaxHighlighter.registerLanguage('json', json)
-  SyntaxHighlighter.registerLanguage('kotlin', kotlin)
-  SyntaxHighlighter.registerLanguage('curl', curl)
-  SyntaxHighlighter.registerLanguage('http', http)
-  SyntaxHighlighter.registerLanguage('php', php)
-  SyntaxHighlighter.registerLanguage('python', python)
-  SyntaxHighlighter.registerLanguage('go', go)
-  SyntaxHighlighter.registerLanguage('pgsql', pgsql)
-  SyntaxHighlighter.registerLanguage('swift', swift)
-  SyntaxHighlighter.registerLanguage('html', xml)
-  SyntaxHighlighter.registerLanguage('toml', ini)
-  SyntaxHighlighter.registerLanguage('yaml', yaml)
-  SyntaxHighlighter.registerLanguage('markdown', markdown)
 
   const large = false
   // don't show line numbers if bash == lang
@@ -266,12 +267,12 @@ export const CodeBlock = ({
             {codeValue}
           </SyntaxHighlighter>
           {!hideCopy && (value || children) && className ? (
-            <div
-              className={[
-                'absolute right-2 top-2',
+            <FloatingPlate
+              className={cn(
+                'absolute right-2 top-2 bg-surface-100 dark:bg-200',
                 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition',
-                `${isDarkTheme ? 'dark' : ''}`,
-              ].join(' ')}
+                isDarkTheme && 'dark'
+              )}
             >
               <Button
                 className="px-1.5 dark:bg-200! dark:hover:bg-button! hover:bg-alternative!"
@@ -281,7 +282,7 @@ export const CodeBlock = ({
               >
                 {copied ? 'Copied' : ''}
               </Button>
-            </div>
+            </FloatingPlate>
           ) : null}
         </div>
       ) : (
@@ -289,4 +290,4 @@ export const CodeBlock = ({
       )}
     </>
   )
-}
+})
