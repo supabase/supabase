@@ -118,9 +118,9 @@ const ScheduledBackups = () => {
               title="Point-In-Time-Recovery (PITR) enabled"
               description={
                 <div>
-                  Your project uses PITR and full daily backups are no longer taken. PITR lets you
-                  restore to a specific time (down to the second) within your selected PITR
-                  retention period.{' '}
+                  Your project uses PITR. Backups are still taken daily, with WAL continuously
+                  archived on top of them, so you can restore to any second within your selected
+                  PITR retention period instead of a fixed backup time.{' '}
                   <a
                     className="text-primary transition-colors hover:text-primary-hover"
                     href={`${DOCS_URL}/guides/platform/backups`}
