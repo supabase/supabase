@@ -48,6 +48,21 @@ const marketplaceApiProtocol: 'http' | 'https' | null =
       ? 'http'
       : null
 
+// Remote-dev proxy: forward hosted control-plane + auth paths server-side so
+// local Studio can run against a hosted backend.
+// See https://github.com/supabase/supabase-chrome-tools.
+function getRemoteDevRewrites() {
+  if (process.env.REMOTE_DEV !== 'true') return []
+  const apiOrigin = (process.env.REMOTE_API_URL ?? 'https://api.supabase.com').replace(/\/$/, '')
+  const gotrueUrl = process.env.REMOTE_GOTRUE_URL?.replace(/\/$/, '')
+
+  return [
+    { source: '/platform/:path*', destination: `${apiOrigin}/platform/:path*` },
+    { source: '/v1/:path*', destination: `${apiOrigin}/v1/:path*` },
+    ...(gotrueUrl ? [{ source: '/auth/v1/:path*', destination: `${gotrueUrl}/:path*` }] : []),
+  ]
+}
+
 // Use `satisfies` instead of `: NextConfig` so TypeScript preserves narrow
 // inferred types (e.g. async headers → Promise). This avoids TS2345 when
 // wrapper functions (bundle-analyzer, sentry) resolve their `next` peer
@@ -67,6 +82,7 @@ const nextConfig = {
         destination: `https://supabase.com/.well-known/vercel/flags`,
         basePath: false as const,
       },
+      ...getRemoteDevRewrites(),
     ]
   },
   async redirects() {
