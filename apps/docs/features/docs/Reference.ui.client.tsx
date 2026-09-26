@@ -2,19 +2,33 @@
 
 import { ReferenceContentInitiallyScrolledContext } from '~/features/docs/Reference.navigation.client'
 import { safeHistoryReplaceState } from '~/lib/historyUtils'
-import { XCircle } from 'lucide-react'
-import type { HTMLAttributes, PropsWithChildren } from 'react'
+import { Check, XCircle } from 'lucide-react'
+import type { HTMLAttributes, PropsWithChildren, ReactNode } from 'react'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import {
   cn,
   CollapsibleTrigger,
+  ComboboxTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 
 import { type IApiEndPoint } from './Reference.api.utils'
@@ -123,5 +137,123 @@ export function DetailsTrigger({ label, className }: { label: string; className?
       <XCircle size={14} aria-hidden="true" className="reference-details-trigger-icon" />
       {label}
     </CollapsibleTrigger>
+  )
+}
+
+export function ExamplesCombobox({
+  examples,
+  className,
+}: {
+  examples: Array<{ id: string; name: string; content: ReactNode }>
+  className?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState(examples[0])
+  const tabListRef = useRef<HTMLDivElement>(null)
+
+  const handleSelect = (id: string) => {
+    setSelected(examples.find((example) => example.id === id) ?? examples[0])
+    setOpen(false)
+    tabListRef.current
+      ?.querySelector(`[data-example-id="${CSS.escape(id)}"]`)
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }
+
+  if (examples.length === 1) {
+    return <div className={className}>{selected.content}</div>
+  }
+
+  return (
+    <Tabs
+      value={selected.id}
+      onValueChange={handleSelect}
+      className={cn(
+        'isolate',
+        '[&_.shiki:first-child]:rounded-t-none [&_.shiki:first-child]:border-t-0',
+        className
+      )}
+    >
+      <div
+        className={cn(
+          'flex items-stretch',
+          'relative z-1',
+          'rounded-t-lg border border-b-0 border-default bg-surface-75'
+        )}
+      >
+        <TabsList
+          ref={tabListRef}
+          className={cn(
+            'min-w-0 items-stretch border-0',
+            'rounded-tl-lg overflow-x-auto overscroll-x-none [scrollbar-width:none]'
+          )}
+        >
+          {examples.map((example) => (
+            <TabsTrigger
+              key={example.id}
+              value={example.id}
+              data-example-id={example.id}
+              className={cn(
+                'shrink-0 px-3 py-2 text-xs transition-[color]',
+                'border-b border-r last-of-type:border-r-0 border-default',
+                'data-[state=active]:border-default data-[state=active]:border-b-transparent',
+                'data-[state=active]:bg-200 data-[state=active]:shadow-none',
+                'focus-visible:ring-inset focus-visible:ring-offset-0'
+              )}
+            >
+              {example.name}
+            </TabsTrigger>
+          ))}
+          <span
+            aria-hidden
+            className="sticky right-0 w-px shrink-0 bg-surface-75 shadow-[inset_-1px_0_0_var(--border)]"
+          />
+        </TabsList>
+        <div className="flex flex-1 justify-end border-b border-default">
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <ComboboxTrigger
+                className={cn(
+                  'h-full w-auto gap-0 rounded-none border-0 bg-transparent px-2',
+                  '[&_svg]:transition-colors hover:[&_svg]:text-foreground',
+                  'data-[state=open]:[&_svg]:text-foreground',
+                  'focus-visible:rounded-md focus-visible:ring-inset focus-visible:ring-offset-0'
+                )}
+              >
+                <span className="sr-only">Select example</span>
+              </ComboboxTrigger>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="z-40 w-max min-w-56 max-w-xs p-0">
+              <Command>
+                <CommandInput placeholder="Search examples…" />
+                <CommandList>
+                  <CommandEmpty>No example found</CommandEmpty>
+                  <CommandGroup>
+                    {examples.map((example) => (
+                      <CommandItem
+                        key={example.id}
+                        value={example.id}
+                        keywords={[example.name]}
+                        onSelect={handleSelect}
+                      >
+                        <Check
+                          className={cn(
+                            'mr-2 size-4',
+                            selected.id === example.id ? 'opacity-100' : 'opacity-0'
+                          )}
+                        />
+                        {example.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+      <TabsContent value={selected.id} tabIndex={-1} className="mt-0">
+        {selected.content}
+      </TabsContent>
+    </Tabs>
   )
 }
