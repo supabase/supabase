@@ -175,6 +175,7 @@ function mockWizardEndpoints(
     overdueInvoices?: OverdueInvoiceCount[]
     orgProjects?: OrganizationProjectsResponse
     availableRegions?: RegionsInfo | 'error'
+    onAvailableRegionsRequest?: (url: URL) => void
     availableVersions?: { available_versions: AvailableVersion[] }
     entitlements?: Entitlement[]
     githubAuthorization?: object | null
@@ -221,14 +222,22 @@ function mockWizardEndpoints(
     addAPIMock({
       method: 'get',
       path: '/platform/projects/available-regions',
-      response: () =>
-        HttpResponse.json<APIErrorBody>({ message: 'Failed to load regions' }, { status: 500 }),
+      response: ({ request }) => {
+        overrides.onAvailableRegionsRequest?.(new URL(request.url))
+        return HttpResponse.json<APIErrorBody>(
+          { message: 'Failed to load regions' },
+          { status: 500 }
+        )
+      },
     })
   } else {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/available-regions',
-      response: () => HttpResponse.json<RegionsInfo>(availableRegions ?? DEFAULT_AVAILABLE_REGIONS),
+      response: ({ request }) => {
+        overrides.onAvailableRegionsRequest?.(new URL(request.url))
+        return HttpResponse.json<RegionsInfo>(availableRegions ?? DEFAULT_AVAILABLE_REGIONS)
+      },
     })
   }
   addAPIMock({
@@ -356,6 +365,43 @@ describe('project creation wizard', () => {
   beforeEach(() => {
     user = userEvent.setup({ delay: null })
     routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
+  })
+
+  test('requests available regions once without an instance size for a free-plan organization', async () => {
+    const availableRegionRequests: URL[] = []
+    mockWizardEndpoints({
+      organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+      onAvailableRegionsRequest: (url) => availableRegionRequests.push(url),
+    })
+
+    await renderWizard()
+
+    await screen.findByText('Region')
+    const regionSelect = getSelectTriggerByLabel('Region')
+    await waitFor(() => expect(regionSelect).toBeEnabled())
+    await user.click(regionSelect)
+    await screen.findByRole('option', { name: /Americas/ })
+
+    expect(availableRegionRequests).toHaveLength(1)
+    expect(availableRegionRequests[0].searchParams.has('desired_instance_size')).toBe(false)
+  })
+
+  test('requests available regions once with the micro instance size for a paid-plan organization', async () => {
+    const availableRegionRequests: URL[] = []
+    mockWizardEndpoints({
+      onAvailableRegionsRequest: (url) => availableRegionRequests.push(url),
+    })
+
+    await renderWizard()
+
+    await screen.findByText('Region')
+    const regionSelect = getSelectTriggerByLabel('Region')
+    await waitFor(() => expect(regionSelect).toBeEnabled())
+    await user.click(regionSelect)
+    await screen.findByRole('option', { name: /Americas/ })
+
+    expect(availableRegionRequests).toHaveLength(1)
+    expect(availableRegionRequests[0].searchParams.get('desired_instance_size')).toBe('micro')
   })
 
   test('creates a project on the happy path for a paid-plan organization', async () => {

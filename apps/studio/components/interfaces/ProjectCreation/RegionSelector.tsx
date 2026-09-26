@@ -43,6 +43,7 @@ import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
+  hasSelectedOrganization: boolean
   instanceSize?: DesiredInstanceSize
   layout?: 'vertical' | 'horizontal'
   showBestAvailableRegionOption: boolean
@@ -84,6 +85,7 @@ const BestAvailableRegionIcon = () => (
 
 export const RegionSelector = ({
   form,
+  hasSelectedOrganization,
   instanceSize,
   layout = 'horizontal',
   showBestAvailableRegionOption,
@@ -116,7 +118,10 @@ export const RegionSelector = ({
     error: errorAvailableRegions,
   } = useOrganizationAvailableRegionsQuery(
     { slug, cloudProvider, desiredInstanceSize: instanceSize },
-    { enabled: smartRegionEnabled, staleTime: 1000 * 60 * 5 } // 5 minutes
+    {
+      enabled: smartRegionEnabled && hasSelectedOrganization,
+      staleTime: 1000 * 60 * 5,
+    }
   )
 
   const allSmartRegions = availableRegionsData?.all.smartGroup ?? []
