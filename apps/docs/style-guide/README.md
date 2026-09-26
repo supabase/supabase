@@ -49,7 +49,12 @@ subagent with a clean context, holding only the relevant guide files and the dra
 text, and give it this instruction:
 
 > Referencing the docs style guide, cite every rule violation in the draft. Quote
-> the offending phrase and name the rule it breaks. Then resolve.
+> the offending phrase and cite the rule it breaks as `file#anchor`, for example
+> `03-page-structure.md#chunking`. Derive the anchor from the heading itself, and
+> ignore headings inside fenced code blocks, which are examples rather than rules.
+> Then resolve.
+
+Each citation has to resolve to a real heading in the guide. One that doesn't is an invented rule, so check the citations before you act on them.
 
 ## References
 

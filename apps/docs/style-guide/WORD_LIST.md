@@ -12,8 +12,15 @@ documentation consistency.
 
 To apply this word list with an agent, you can use one of our skills. For more information, see [Write the docs skills](../CONTRIBUTING.md#write-the-docs-skills).
 
-**For agents:** Consult this list at both ends of every piece of writing. Before you draft, check the
-terms you plan to introduce. After you draft, check again in a fresh context to prevent drift.
+**For agents:** Work in two passes rather than reading this file end to end.
+
+1. Mechanical pass. Read [Phrase groups](#phrase-groups). It collects every literal
+   term list in one place, so you can match it against the page in a single read.
+2. Judgment pass. Run `grep '^### ' WORD_LIST.md` for the term index, then read only
+   the entries that match words on the page. Most entries carry a condition, so read
+   the entry before you change a word.
+
+After you draft, run the mechanical pass again in a fresh context to prevent drift.
 
 ## Numbers and symbols
 
@@ -881,42 +888,46 @@ that the reader is developing or administering.
 The alphabetical entries explain the intent behind each rule. This section collects
 the full term lists in one place, grouped by the problem they cause.
 
-### Filler
+Every heading here is prefixed with `Group:`, so `### Group:` selects the whole set.
+Where a group entry and its alphabetical entry differ, the alphabetical entry governs.
+
+### Group: Filler
 
 Don't use _actually_, _easily_, _easy_, _just_, _let's_, _obviously_,
 _of course_, _please_, _quickly_, _simple_, _simply_, or _that's it_. Remove the term or state the intended meaning directly.
 _please_ is the exception: keep it when asking permission, apologizing for an
 inconvenience, or requesting an action that primarily benefits Supabase.
 
-### Marketing language
+### Group: Marketing language
 
 Don't use _best in class_, _best-in-class_, _cutting edge_,
 _cutting-edge_, _effortlessly_, _game changer_, _game-changer_, _hassle free_,
 _hassle-free_, _powerful_, or _seamlessly_. Describe specific behavior or
 measurable results instead.
 
-### Vague verbs
+### Group: Vague verbs
 
 Use _view and resolve errors_ for _handle errors_, _create, edit, or delete tables_
 for _manage tables_, and _query and update data_ for _work with data_. Use a
 different precise replacement when none of these match the operation.
 
-### Apologies
+### Group: Apologies
 
 Don't use _oops_ or _sorry_. State what happened directly. Apologize
 only when an apology is genuinely useful to the reader.
 
-### First person
+### Group: First person
 
 Don't use _I_, _I'm_, _me_, _my_, or _mine_. Address the
-reader as _you_ and use an explicit noun for other actors.
+reader as _you_ and use an explicit noun for other actors. Use _we_ only when it
+clearly refers to Supabase. See [first person](#first-person) for the full rule.
 
-### Gender-neutral pronouns
+### Group: Gender-neutral pronouns
 
 Don't use _s/he_, _he/she_, _(s)he_, or _him/her_. Use the
 singular _they_ or rewrite the sentence.
 
-### Inclusive language
+### Group: Inclusive language
 
 Don't use these terms:
 
@@ -926,18 +937,18 @@ Don't use these terms:
 - _blacklist_: use _denylist_ or a more precise term
 - _whitelist_: use _allowlist_ or a more precise term
 
-### Abbreviations
+### Group: Abbreviations
 
 Write _e.g._ with both periods, not _eg._ or _eg_. Replace _i.e._, _ie._, and
 _ie_ with _that is_. Prefer _for example_ and _that is_ in prose when space
-allows.
+allows. See [abbreviations](#abbreviations) for when to spell one out on first use.
 
-### Powered by
+### Group: Powered by
 
 Don't use _powered by_. Use _with_, _by_, or _through_, depending on the
 relationship.
 
-### Preferred usage
+### Group: Preferred usage
 
 Use:
 
@@ -947,7 +958,7 @@ Use:
 - _uses_ for _utilizes_ and _utilises_
 - _using_ for _utilizing_ and _utilising_
 
-### Direct, concise language
+### Group: Direct, concise language
 
 Don't use these phrases:
 
@@ -962,7 +973,7 @@ Don't use these phrases:
 - _subsequent to_: use _after_
 - _whilst_: use _while_
 
-### Internet slang
+### Group: Internet slang
 
 Don't use _tl;dr_, _ymmv_, _rtfm_, _imo_, or _fwiw_. Write out the
 meaning or remove the aside.
