@@ -1,0 +1,92 @@
+---
+id: 'docker-and-native-runtimes'
+title: 'Docker and native runtimes'
+description: 'How the experimental supabase stack commands run a local Supabase project in Docker or as native processes, how the CLI picks a runtime, and what the native runtime needs.'
+subtitle: 'Run a local Supabase project in containers or as processes on your machine without Docker'
+---
+
+This guide explains the two runtimes the experimental `supabase stack start` command can use for a local Supabase project, how the CLI picks one, and which to choose. The Docker runtime runs each service in a container. The native runtime runs each service as a process on your machine, with no Docker daemon, on Linux and on macOS on Apple silicon.
+
+Both runtimes run the same local Supabase project with the same services. The default `supabase start` command always uses Docker. The runtime choice only exists for local projects started with `supabase stack start` or with `supabase start` after you turn on the `[experimental] stack` setting. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects) for those commands.
+
+<Admonition type="caution" title="Experimental">
+
+The `supabase stack` commands are experimental. Their flags and output can change between releases, and the CLI compatibility promise doesn't cover them. The command ships in the CLI [beta channel](/docs/guides/local-development/cli/getting-started#beta-channel).
+
+</Admonition>
+
+## Which runtime to choose
+
+Use Docker when a Docker-compatible engine is available. Containers give each local project its own network namespace, file system, and resource limits. That isolation matters most when you run several local projects on one machine.
+
+Use the native runtime where Docker isn't available, such as coding agent sandboxes without a container engine and CI runners without a daemon. The native runtime is intended for one local project per environment. Native processes share the host's process table and file locks, so several native local projects on one machine have less isolation from each other than containers do.
+
+## How the two runtimes differ
+
+|                                  | Docker runtime                                                 | Native runtime                                                                              |
+| -------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Flag                             | `--runtime docker`                                             | `--runtime native`                                                                          |
+| How services run                 | One container per service, from images the CLI pulls           | One process per service, from binaries the CLI downloads and verifies                       |
+| Requires                         | A Docker-compatible engine and the `docker` command            | A supported platform and network access to `ghcr.io` on first start                         |
+| Data                             | Docker volumes named after the local project                   | `~/.supabase/managed/stacks/<id>/data` in your home directory                               |
+| Downloaded artifacts             | Docker image cache                                             | `~/.supabase/managed/stacks/artifacts` in your home directory, shared by all local projects |
+| First start                      | Pulls the Postgres image, then other images on first request   | Downloads the Postgres archive, then other archives in the background                       |
+| Isolation between local projects | Separate network namespaces, file systems, and resource limits | Shared host process table and file locks                                                    |
+
+In both runtimes, Postgres starts right away and other services start on their first request. Pass `--eager` to start every enabled service before the command returns.
+
+## How the CLI picks a runtime
+
+When you don't pass `--runtime`, the CLI looks for the `docker` command. If it finds one, it uses Docker. If it doesn't, it uses the native runtime. The check looks only for the command, so a stopped Docker daemon still selects Docker. The start then fails with `Container engine command failed` until you start the daemon.
+
+Passing `--runtime docker` or `--runtime native` requires that runtime. Neither falls back to the other. With `--runtime docker` and no `docker` command, the start fails with `docker executable was not found`. With `--runtime native` on an unsupported platform, the start fails with `Native runtime is unsupported on <os>/<arch>`.
+
+The CLI records the runtime when it creates a local project and reuses it on every later start. Passing a different `--runtime` to an existing local project fails and tells you to omit the flag or choose a different `--stack` name. To move an app to the other runtime, start a new named local project, or destroy the existing one and start it again. The CLI doesn't convert data between runtimes.
+
+Different apps on one machine can use different runtimes.
+
+## Native runtime requirements
+
+The native runtime runs on these platforms:
+
+| Platform                                        | Support                                                                                                                                           |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Linux on `amd64` or `arm64`                     | Supported. The binaries include their own dynamic loader, so no particular glibc version is required. Verified on Ubuntu 20.04, 22.04, and 24.04. |
+| macOS on Apple silicon                          | Supported.                                                                                                                                        |
+| Windows                                         | Not supported. Use Docker.                                                                                                                        |
+| macOS on Intel                                  | Not supported. Use Docker.                                                                                                                        |
+| Alpine Linux and other musl-based distributions | Not supported. The Supabase CLI binary itself doesn't run on musl.                                                                                |
+
+On first start, the CLI downloads service archives from `ghcr.io` and verifies their checksums before extracting them. Downloads continue in the background for the other enabled services after Postgres is ready, so the first start takes longer than later ones.
+
+The cache in `~/.supabase/managed/stacks/artifacts` is shared by every local project on the machine, and `supabase stack destroy` leaves it in place. Delete that directory to reclaim its disk space and force a fresh download.
+
+## Start with a specific runtime
+
+Start a local project in the native runtime:
+
+```bash
+supabase stack start --runtime native
+```
+
+Require Docker for a new local project:
+
+```bash
+supabase stack start --runtime docker
+```
+
+Check which runtime a local project uses:
+
+```bash
+supabase stack start --output-format json
+```
+
+The `runtime.kind` field is `native` or `container`.
+
+## Limitations
+
+- A local project keeps the runtime it was created with, and the CLI doesn't move data between runtimes. See [How the CLI picks a runtime](#how-the-cli-picks-a-runtime).
+- The native runtime allows more time than Docker for Postgres to become ready on a cold start, because it loads the database from freshly extracted binaries.
+- Running several native local projects on one machine works, but they share host resources without the limits containers provide. Use Docker for that case.
+
+<ContentListings id="local-development-runtimes-learn-more" />
