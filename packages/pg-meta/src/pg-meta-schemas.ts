@@ -4,6 +4,17 @@ import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { SCHEMAS_SQL } from './sql/schemas'
 
+function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter = suffix === 0 ? safeSql`$pg_meta$` : safeSql`$pg_meta_${literal(suffix)}$`
+    if (values.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 const pgSchemaZod = z.object({
   id: z.number(),
   name: z.string(),
@@ -94,8 +105,12 @@ function update(
   },
   { name: newName, owner }: SchemaUpdateParams
 ): { sql: SafeSqlFragment } {
+  // The schema name, new name and new owner flow into the DO block body, so
+  // the delimiter must not appear in any of them (e.g. a schema named
+  // `weird$$name` would otherwise terminate a `$$`-quoted block early).
+  const doBlockDelimiter = getDoBlockDelimiter([name ?? '', newName ?? '', owner ?? ''])
   const sql = safeSql`
-do $$
+do ${doBlockDelimiter}
 declare
   id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
@@ -116,7 +131,7 @@ begin
     execute(format('alter schema %I rename to %I;', old.nspname, new_name));
   end if;
 end
-$$;
+${doBlockDelimiter};
 `
   return { sql }
 }
@@ -136,8 +151,12 @@ function remove(
   },
   { cascade = false }: SchemaRemoveParams = {}
 ): { sql: SafeSqlFragment } {
+  // The schema name flows into the DO block body, so the delimiter must not
+  // appear in it (a schema named `weird$$name` would otherwise terminate a
+  // `$$`-quoted block early).
+  const doBlockDelimiter = getDoBlockDelimiter([name ?? ''])
   const sql = safeSql`
-do $$
+do ${doBlockDelimiter}
 declare
   id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
@@ -150,7 +169,7 @@ begin
 
   execute(format('drop schema %I %s;', old.nspname, case when cascade then 'cascade' else 'restrict' end));
 end
-$$;
+${doBlockDelimiter};
 `
   return { sql }
 }
