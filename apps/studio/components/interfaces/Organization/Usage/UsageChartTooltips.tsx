@@ -1,7 +1,8 @@
 import type { Payload, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import { cn } from 'ui'
 
-import { Attribute, COLOR_MAP } from './Usage.constants'
+import { COLOR_MAP } from './Usage.colors'
+import { Attribute } from './Usage.constants'
 
 export interface SingleAttributeTooltipContentProps {
   name: string

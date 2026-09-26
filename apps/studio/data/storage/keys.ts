@@ -74,6 +74,8 @@ export const storageKeys = {
       objectName,
       ...(lifecyclePolicy ? [lifecyclePolicy] : []),
     ] as const,
+  retentionUsage: (orgSlug: string | undefined) =>
+    ['organizations', orgSlug, 'storage-retention-usage'] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({
