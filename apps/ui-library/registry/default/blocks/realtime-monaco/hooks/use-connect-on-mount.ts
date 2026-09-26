@@ -1,6 +1,6 @@
 'use client'
 
-import { SupabasePersistenceOptions, SupabaseProvider } from '@supabase-labs/y-supabase'
+import { type SupabasePersistenceOptions, SupabaseProvider } from '@supabase-labs/y-supabase'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef } from 'react'
 import { MonacoBinding } from 'y-monaco'
