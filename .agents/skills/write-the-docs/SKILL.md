@@ -51,7 +51,7 @@ When in doubt, ask `ask-the-docs` rather than guessing — this classification i
 - Ground every behavior claim in Phase 1's code read (the linked PR when there is one); ground every "why this matters" framing in Linear/PM context or prior Frame/Shape output; mark inferred material inline (e.g. an HTML comment or a flagged line in the handoff summary) so a reviewer can find it fast.
 - **Write timeless documentation, cut redundancy, and prefer a paragraph to a single-item list.** See [timeless documentation](../../../apps/docs/style-guide/03-page-structure.md#write-timeless-documentation), [brevity](../../../apps/docs/style-guide/01-voice-and-tone.md#brevity), and [lists](../../../apps/docs/style-guide/02-elements.md#lists).
 - **Strip internal business context before the final draft.** HTML comments flagging PRD intent, roadmap speculation, internal ticket discussions, or "gap-fill" notes must be removed from MDX before handoff. Open-source docs shouldn't expose internal planning. Flag assumptions and open questions for reviewers in the PR description instead, not in the shipped content.
-- Search [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) when introducing or reviewing technical terms, UI actions, abbreviations, and potentially ambiguous language during drafting. This targeted search supplements, but does not replace, the full-file check in Phase 2.5.
+- Search [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) when introducing or reviewing technical terms, UI actions, abbreviations, and potentially ambiguous language during drafting. Use the two-pass protocol in [Use with an AI agent](../../../apps/docs/style-guide/WORD_LIST.md#use-with-an-ai-agent) rather than reading the file end to end.
 - Reuse repeated content through `apps/docs/content/_partials/` instead of copying it. For nav wiring, partials, and file placement, see [`ask-the-docs`](../ask-the-docs/SKILL.md)'s `app-map.md` and `federated-docs.md`.
 
 ## Phase 2.5 — Review checklist
@@ -73,7 +73,7 @@ Before handing off, confirm:
 
 ### Compliance checklist
 
-Read [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) in full before handoff, not just the terms searched during drafting, and check the draft against each numbered file in the [style guide](../../../apps/docs/style-guide/README.md).
+Before handoff, run both passes from [Use with an AI agent](../../../apps/docs/style-guide/WORD_LIST.md#use-with-an-ai-agent): read [Phrase groups](../../../apps/docs/style-guide/WORD_LIST.md#phrase-groups) for the literal term lists, then `grep '^### ' WORD_LIST.md` and read only the entries matching words on the page. Cover terms you didn't introduce, not just the ones you searched while drafting. Then check the draft against each numbered file in the [style guide](../../../apps/docs/style-guide/README.md).
 
 - [ ] Parentheses used only for acronyms or `(Optional)`, not prose asides
 - [ ] Bold, italics, and code used only for their distinct purposes (UI labels, must-not-miss terms), not for visual emphasis alone

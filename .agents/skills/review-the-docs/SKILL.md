@@ -206,8 +206,11 @@ Check the prose against the [style guide](../../../apps/docs/style-guide/README.
 check covers style or terminology. CodeRabbit reviews style, terminology, and
 structure on `apps/docs/content/**/*.mdx`, but only once the PR is open.
 
-Read [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) against the finished page last, including
-terms the author didn't introduce.
+Check [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) against the finished page last, using the
+two-pass protocol in [Use with an AI agent](../../../apps/docs/style-guide/WORD_LIST.md#use-with-an-ai-agent): [Phrase
+groups](../../../apps/docs/style-guide/WORD_LIST.md#phrase-groups) for the literal term lists, then `grep '^### '
+WORD_LIST.md` and read only the entries matching words on the page. Include terms
+the author didn't introduce.
 
 Checklist:
 

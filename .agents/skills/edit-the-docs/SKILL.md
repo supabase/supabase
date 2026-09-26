@@ -61,7 +61,7 @@ Inline changes only. Nothing in this PR moves a line from one place to another.
 
 - Restated points and mechanical over-explanation.
 - Time-anchored language and unshipped features: [timeless documentation](../../../apps/docs/style-guide/03-page-structure.md#write-timeless-documentation). Internal planning context in shipped MDX: [keep internal context out](../../../apps/docs/style-guide/03-page-structure.md#keep-internal-context-out). Repeated points: [brevity](../../../apps/docs/style-guide/01-voice-and-tone.md#brevity). Single-item lists and restated admonitions: [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md).
-- Terminology that doesn't match [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md). Crawl the list for terms already on the page, not only the ones you introduce. An existing page is where nonconforming terminology accumulates.
+- Terminology that doesn't match [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md). Run both passes from [Use with an AI agent](../../../apps/docs/style-guide/WORD_LIST.md#use-with-an-ai-agent): [Phrase groups](../../../apps/docs/style-guide/WORD_LIST.md#phrase-groups) gives you every literal term list in one read, then `grep '^### ' WORD_LIST.md` and open only the entries matching words on the page. Cover terms already on the page, not only the ones you introduce. An existing page is where nonconforming terminology accumulates.
 
 ## PR 2: Structure
 
