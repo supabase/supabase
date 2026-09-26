@@ -3,7 +3,7 @@ import { File, Film, FolderOpen, Image as ImageIcon, LoaderCircle, Music } from 
 
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from './Storage.constants'
 
-const ICON_STROKE_WIDTH = 1.5
+export const ICON_STROKE_WIDTH = 1.5
 
 interface StorageRowIconProps {
   view: STORAGE_VIEWS

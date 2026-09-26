@@ -90,4 +90,86 @@ describe('FileExplorerRow', () => {
     expect(screen.getByText('Copy link')).toBeInTheDocument()
     expect(screen.queryByText('Copy path to folder')).not.toBeInTheDocument()
   })
+
+  it('marks an archived file with an icon in the leading slot rather than a text badge', async () => {
+    const { container } = render(
+      <FileExplorerRow
+        item={
+          {
+            ...base,
+            id: 'f2',
+            name: 'gone.png',
+            type: STORAGE_ROW_TYPES.FILE,
+            archived: { archivedObjectId: 'a1' },
+          } as any
+        }
+        index={0}
+        view={STORAGE_VIEWS.COLUMNS}
+        columnIndex={0}
+        selectedItems={[]}
+      />
+    )
+
+    // The icon reads as a button, not the word "Archived", and sits where the file icon would.
+    const archivedIcon = screen.getByRole('button', { name: 'View archived file gone.png' })
+    expect(screen.queryByText('Archived')).not.toBeInTheDocument()
+    expect(container.querySelector('.w-\\[30px\\]')).toContainElement(archivedIcon)
+
+    // Only the actions an archived file can actually take.
+    await userEvent.click(screen.getByRole('button', { name: 'gone.png actions' }))
+    expect(await screen.findByText('Restore')).toBeInTheDocument()
+    expect(screen.getByText('Delete permanently')).toBeInTheDocument()
+    expect(screen.queryByText('Download')).not.toBeInTheDocument()
+    expect(screen.queryByText('Rename')).not.toBeInTheDocument()
+    expect(screen.queryByText('Move')).not.toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+
+    // The archive icon replaces the file icon outright, so there is nothing left to
+    // hide on hover and no checkbox to swap in.
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    expect(container.querySelector('.absolute')).toBeNull()
+  })
+
+  it('gives an archived folder the same actions, since its contents are what they act on', async () => {
+    render(
+      <FileExplorerRow
+        item={
+          {
+            ...base,
+            id: null,
+            name: 'matches',
+            type: STORAGE_ROW_TYPES.FOLDER,
+            metadata: null,
+            archived: {},
+          } as any
+        }
+        index={0}
+        view={STORAGE_VIEWS.COLUMNS}
+        columnIndex={0}
+        selectedItems={[]}
+      />
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'matches actions' }))
+    expect(await screen.findByText('Restore')).toBeInTheDocument()
+    expect(screen.getByText('Delete permanently')).toBeInTheDocument()
+    // The live folder actions have no archived equivalent.
+    expect(screen.queryByText('Download')).not.toBeInTheDocument()
+    expect(screen.queryByText('Rename')).not.toBeInTheDocument()
+  })
+
+  it('keeps hiding the icon on hover for a live file, which does swap in a checkbox', () => {
+    const { container } = render(
+      <FileExplorerRow
+        item={{ ...base, id: 'f3', name: 'live.png', type: STORAGE_ROW_TYPES.FILE } as any}
+        index={0}
+        view={STORAGE_VIEWS.COLUMNS}
+        columnIndex={0}
+        selectedItems={[]}
+      />
+    )
+
+    expect(screen.getByRole('checkbox')).toBeInTheDocument()
+    expect(container.querySelector('.absolute')?.className).toContain('group-hover:hidden')
+  })
 })
