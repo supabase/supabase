@@ -70,29 +70,39 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
   )
   const publishableKey = keys?.publishableKey?.api_key ?? keys?.anonKey?.api_key ?? ''
   const secretKey = keys?.secretKey ?? keys?.serviceKey
+  const isLegacySecret = !keys?.secretKey && !!keys?.serviceKey
   const maskedValue = secretKey?.api_key
     ? `${secretKey.api_key.slice(0, 15)}${SECRET_MASK}`
     : 'your-secret-key'
 
   const {
-    data: revealedSecret,
-    isLoading: isRevealing,
+    data: revealedSecretApi,
+    isLoading: isRevealingApi,
     reveal,
     clear,
-  } = useRevealedSecret({ projectRef, id: secretKey?.id ?? undefined })
+  } = useRevealedSecret({
+    projectRef,
+    id: !isLegacySecret ? (secretKey?.id ?? undefined) : undefined,
+  })
+
+  const revealedSecret = isLegacySecret ? (isRevealed ? secretKey?.api_key : undefined) : revealedSecretApi
+  const isRevealing = isLegacySecret ? false : isRevealingApi
 
   // toggle() and getSecretValue() can both decide to reveal before either
   // resolves (e.g. clicking "Reveal" and "Copy" in quick succession); share
   // one in-flight request rather than firing two and racing to set state.
   const revealPromiseRef = useRef<ReturnType<typeof reveal> | null>(null)
   const revealOnce = useCallback(() => {
+    if (isLegacySecret) {
+      return Promise.resolve(secretKey?.api_key)
+    }
     if (!revealPromiseRef.current) {
       revealPromiseRef.current = reveal().finally(() => {
         revealPromiseRef.current = null
       })
     }
     return revealPromiseRef.current
-  }, [reveal])
+  }, [isLegacySecret, secretKey?.api_key, reveal])
 
   // clear() invalidates the in-flight reveal request (by request id) but
   // doesn't know about revealPromiseRef, so a hide immediately followed by
@@ -110,6 +120,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
       clearReveal()
     } else {
       setIsRevealed(true)
+      if (isLegacySecret) return
       try {
         await revealOnce()
       } catch (error) {
@@ -117,15 +128,16 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
         throw new Error('Failed to reveal secret API key', { cause: error })
       }
     }
-  }, [secretKey, canReadAPIKeys, isRevealed, clearReveal, revealOnce])
+  }, [secretKey, canReadAPIKeys, isRevealed, clearReveal, isLegacySecret, revealOnce])
 
   const getSecretValue = useCallback(async () => {
     if (!secretKey || !canReadAPIKeys) return 'your-secret-key'
+    if (isLegacySecret) return secretKey.api_key || 'your-secret-key'
     if (revealedSecret) return revealedSecret
     const value = await revealOnce()
     if (!isRevealedRef.current) clearReveal()
     return value ?? 'your-secret-key'
-  }, [secretKey, canReadAPIKeys, revealedSecret, revealOnce, clearReveal])
+  }, [secretKey, canReadAPIKeys, isLegacySecret, revealedSecret, revealOnce, clearReveal])
 
   const buildEnv = useCallback(async () => {
     const secretValue = await getSecretValue()
@@ -138,13 +150,20 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
   }, [resolvedUrl, publishableKey, jwksUrl, getSecretValue])
 
   useEffect(() => {
-    if (!isRevealed || !revealedSecret) return
+    if (!isRevealed) return
+    if (!isLegacySecret && !revealedSecret) return
     const timer = setTimeout(() => {
       setIsRevealed(false)
       clearReveal()
     }, AUTO_HIDE_MS)
     return () => clearTimeout(timer)
-  }, [isRevealed, revealedSecret, clearReveal])
+  }, [isRevealed, isLegacySecret, revealedSecret, clearReveal])
+
+  useEffect(() => {
+    setIsRevealed(false)
+    clearReveal()
+  }, [projectRef, secretKey?.id, clearReveal])
+
 
   return {
     isLoading: isLoadingUrl || isLoadingKeys || isLoadingPermission,
@@ -158,7 +177,9 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
       isRevealed,
       isRevealing,
       maskedValue,
-      displayValue: isRevealed && revealedSecret ? revealedSecret : maskedValue,
+      displayValue: isRevealed
+        ? (isLegacySecret ? (secretKey?.api_key ?? maskedValue) : (revealedSecret ?? maskedValue))
+        : maskedValue,
       toggle,
       getValue: getSecretValue,
     },
