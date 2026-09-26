@@ -1,16 +1,19 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { getAccessToken, useParams } from 'common'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useState } from 'react'
 import { toast } from 'sonner'
-import { LogoLoader } from 'ui'
+import { Button, copyToClipboard, LogoLoader } from 'ui'
 
 import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
 import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { useLatest } from '@/hooks/misc/useLatest'
-import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { isAuthStorageAvailable } from '@/lib/auth-browser-support'
+import { auth, getReturnToPath } from '@/lib/gotrue'
 import { useTrack } from '@/lib/telemetry/track'
 import type { NextPageWithLayout } from '@/types'
 
@@ -34,17 +37,23 @@ const SignInMfaPage: NextPageWithLayout = () => {
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const [loading, setLoading] = useState(true)
+  const [initError, setInitError] = useState<string | null>(null)
+  const [sessionMissing, setSessionMissing] = useState(false)
+  const [isStorageBlocked, setIsStorageBlocked] = useState(false)
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
+    setIsStorageBlocked(!isAuthStorageAvailable())
     auth
       .initialize()
       .then(async ({ error }) => {
         if (error) {
-          // OAuth/SSO callback failed — bounce back to /sign-in so the error renders under the
-          // correct heading instead of "Two-factor authentication". The error is held in the
-          // shared auth context and surfaces via useAuthError() on /sign-in.
-          return router.replace({ pathname: '/sign-in', query: router.query })
+          // OAuth/SSO callback failed — stay on this page and show the error instead of
+          // bouncing to /sign-in. Redirecting hides the cause and reads as a login loop,
+          // especially in embedded browsers that drop the session (see #50788).
+          setInitError(error.message)
+          setLoading(false)
+          return
         }
 
         const token = await getAccessToken()
@@ -53,11 +62,9 @@ const SignInMfaPage: NextPageWithLayout = () => {
           const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
           if (error) {
             // if there was a problem signing in via the url, don't redirect
-            toast.error(
-              `Failed to retrieve assurance level: ${error.message}. Please try signing in again`
-            )
+            setInitError(`Failed to retrieve assurance level: ${error.message}`)
             setLoading(false)
-            return router.push({ pathname: '/sign-in', query: router.query })
+            return
           }
 
           if (data.currentLevel === data.nextLevel) {
@@ -73,18 +80,19 @@ const SignInMfaPage: NextPageWithLayout = () => {
             return
           }
         } else {
-          // if the user doesn't have a token, he needs to go back to the sign-in page
-          const redirectTo = buildPathWithParams('/sign-in')
-          router.replace(redirectTo)
+          // No session (expired, lost, or blocked storage). Stay here and explain instead of
+          // redirecting back to /sign-in, which otherwise looks like a login loop.
+          setSessionMissing(true)
+          setLoading(false)
           return
         }
       })
       .catch((error) => {
         Sentry.captureException(error)
         console.error('Auth initialization error:', error)
-        toast.error('Failed to initialize authentication. Please try again.')
+        setInitError('Failed to initialize authentication.')
         setLoading(false)
-        router.push({ pathname: '/sign-in', query: router.query })
+        return
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -94,6 +102,50 @@ const SignInMfaPage: NextPageWithLayout = () => {
       <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
         <LogoLoader />
       </div>
+    )
+  }
+
+  if (initError !== null || sessionMissing) {
+    const subject = isStorageBlocked
+      ? 'This browser blocked the sign-in session'
+      : 'Sign-in session not found'
+    const description = isStorageBlocked
+      ? 'Embedded browsers can block storage needed for sign-in. Open this page in Chrome or Edge to continue.'
+      : 'The sign-in session expired or was lost. Return to sign in and try again.'
+
+    return (
+      <SignInLayout
+        heading="Sign-in did not complete"
+        subheading="Your session was not saved in this browser"
+        logoLinkToMarketingSite={true}
+      >
+        <div className="flex flex-col gap-5">
+          <AlertError
+            subject={subject}
+            description={description}
+            error={initError ? { message: initError } : undefined}
+            hideContactSupport
+            additionalActions={
+              <>
+                <Button onClick={() => router.reload()}>Try again</Button>
+                <Button asChild variant="outline">
+                  <Link href={{ pathname: '/sign-in', query: router.query }}>Back to sign in</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    copyToClipboard(window.location.href, () =>
+                      toast.success('Sign-in link copied')
+                    )
+                  }
+                >
+                  Copy sign-in link
+                </Button>
+              </>
+            }
+          />
+        </div>
+      </SignInLayout>
     )
   }
 
