@@ -1,6 +1,6 @@
 import { infiniteQueryOptions } from '@tanstack/react-query'
 
-import { listBucketObjectsV2 } from './bucket-objects-list-mutation'
+import { listBucketObjectsV2, toListV2Prefix } from './bucket-objects-list-mutation'
 import { storageKeys } from './keys'
 import type { components } from '@/data/api'
 
@@ -26,11 +26,7 @@ export const bucketObjectsInfiniteQueryOptions = (
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   const { search, ...v2Options } = options ?? {}
-  // A trailing slash is required to browse a folder's contents with with_delimiter: true —
-  // without it, v2 treats e.g. "docs" as a partial name match against siblings like "docs-old"
-  // rather than descending into the folder.
-  const browsePrefix = path ? `${path}/` : ''
-  const prefix = search ? `${browsePrefix}${search}` : browsePrefix
+  const prefix = toListV2Prefix(path, search)
   const limit = v2Options.limit ?? DEFAULT_LIMIT
 
   return infiniteQueryOptions({
