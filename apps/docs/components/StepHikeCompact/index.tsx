@@ -65,7 +65,7 @@ const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
             className="border bg-surface-100
           border-control flex items-center justify-center rounded-full
           w-6 h-6 text-xs text-foreground font-normal font-mono
-          dropshadow-sm
+          drop-shadow-sm
           "
           >
             {step}
