@@ -1,23 +1,33 @@
 'use client'
 
+import { StepHikeCompact } from '~/components/StepHikeCompact'
 import {
   getMonitoringAgent,
   getMonitoringAgentHarnesses,
   type MonitoringAgentHarnessSetup,
 } from '~/data/monitoring-agents.utils'
-import { Sparkles } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { type ReactNode } from 'react'
+import { SOURCE_FOOTER_CLASSES, SourceFrame } from '~/features/directives/CodeSample.client'
+import { CodeTabs } from '~/features/directives/CodeTabs.components'
+import Image from 'next/image'
+import { useState, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { ConnectionIcon } from 'ui-patterns/McpUrlBuilder'
+import { cn } from 'ui'
+import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 
 import { AiPrompt } from './AiPrompt'
 import { PromptCode } from './PromptPanel'
-import { TabPanel, Tabs } from './Tabs'
+import { TabPanel } from './Tabs'
+import { useTabsWithQueryParams } from './useTabsWithQueryParams'
 
 type AgentSetupProps = {
   id: string
 }
+
+type HarnessProps = {
+  harness: MonitoringAgentHarnessSetup
+}
+
+const DOCS_NOTCH_WIDTH = 100
 
 const markdownComponents = {
   p: ({ children }: { children?: ReactNode }) => <>{children}</>,
@@ -37,9 +47,101 @@ const markdownComponents = {
   code: PromptCode,
 }
 
-function HarnessBody({ harness }: { harness: MonitoringAgentHarnessSetup }) {
+function AgentSetup({ id }: AgentSetupProps) {
+  const agent = getMonitoringAgent(id)
+  const harnesses = getMonitoringAgentHarnesses(agent)
+  const { queryTab, onTabSelected } = useTabsWithQueryParams({
+    tabIds: harnesses.map((harness) => harness.key),
+    queryGroup: 'agent-setup',
+  })
+  const [selectedHarness, setSelectedHarness] = useState<string>(harnesses[0].key)
+  const activeHarness = queryTab ?? selectedHarness
+
+  const handleHarnessChange = (key: string) => {
+    setSelectedHarness(key)
+    onTabSelected(key)
+  }
+
+  return (
+    <StepHikeCompact title={`Set up ${agent.name}`}>
+      <StepHikeCompact.Step step={1} title="Copy the prompt">
+        <StepHikeCompact.Details title="Copy the prompt" />
+        <StepHikeCompact.Code className="mt-0!">
+          <AiPrompt id={agent.promptId} telemetry={{ source: 'agent_setup' }} />
+        </StepHikeCompact.Code>
+      </StepHikeCompact.Step>
+      <StepHikeCompact.Step step={2} title="Schedule it in your agent">
+        <StepHikeCompact.Details title="Schedule it in your agent" />
+        <StepHikeCompact.Code className="mt-0!">
+          <CodeTabs value={activeHarness} onValueChange={handleHarnessChange}>
+            {harnesses.map((harness) => (
+              <TabPanel
+                key={harness.key}
+                id={harness.key}
+                label={harness.label}
+                icon={<HarnessIcon harness={harness} />}
+              >
+                <SourceFrame
+                  notchWidth={DOCS_NOTCH_WIDTH}
+                  footer={
+                    <a
+                      href={harness.docsUrl}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-label={`View ${harness.label} docs`}
+                      className={cn(SOURCE_FOOTER_CLASSES, 'pl-2')}
+                    >
+                      <HarnessIcon harness={harness} />
+                      View docs
+                    </a>
+                  }
+                >
+                  <HarnessBody harness={harness} />
+                </SourceFrame>
+              </TabPanel>
+            ))}
+          </CodeTabs>
+        </StepHikeCompact.Code>
+      </StepHikeCompact.Step>
+    </StepHikeCompact>
+  )
+}
+
+function HarnessIcon({ harness }: HarnessProps) {
+  const getSrc = (useDarkVariant: boolean) =>
+    getMcpClientIconSrc({
+      icon: harness.icon,
+      useDarkVariant,
+      hasDistinctDarkIcon: harness.hasDistinctDarkIcon,
+    })
+
+  if (!harness.hasDistinctDarkIcon) {
+    return <Image src={getSrc(false)} alt="" width={14} height={14} className="size-3.5 shrink-0" />
+  }
+
   return (
     <>
+      <Image
+        src={getSrc(false)}
+        alt=""
+        width={14}
+        height={14}
+        className="size-3.5 shrink-0 dark:hidden"
+      />
+      <Image
+        src={getSrc(true)}
+        alt=""
+        width={14}
+        height={14}
+        className="hidden size-3.5 shrink-0 dark:block"
+      />
+    </>
+  )
+}
+
+function HarnessBody({ harness }: HarnessProps) {
+  return (
+    <div className="code-sample-surface rounded-lg border border-default bg-200 px-5 pt-4 pb-10 text-sm [&>:first-child]:mt-0 [&>:last-child]:mb-0">
       <p>{harness.intro}</p>
       <ol>
         {harness.steps.map((step) => (
@@ -53,54 +155,7 @@ function HarnessBody({ harness }: { harness: MonitoringAgentHarnessSetup }) {
           <ReactMarkdown components={markdownComponents}>{harness.note}</ReactMarkdown>
         </p>
       )}
-      <p>
-        <a
-          href={harness.docsUrl}
-          className="text-primary hover:underline"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          {harness.label} docs
-        </a>
-      </p>
-    </>
-  )
-}
-
-function AgentSetup({ id }: AgentSetupProps) {
-  const agent = getMonitoringAgent(id)
-  const harnesses = getMonitoringAgentHarnesses(agent)
-  const { resolvedTheme } = useTheme()
-  const theme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
-
-  return (
-    <Tabs
-      defaultActiveId="prompt"
-      type="underlined"
-      size="small"
-      wrappable
-      queryGroup="agent-setup"
-    >
-      <TabPanel id="prompt" label="Prompt" icon={<Sparkles size={14} />}>
-        <AiPrompt id={agent.promptId} telemetry={{ source: 'agent_setup' }} />
-      </TabPanel>
-      {harnesses.map((harness) => (
-        <TabPanel
-          key={harness.key}
-          id={harness.key}
-          label={harness.label}
-          icon={
-            <ConnectionIcon
-              theme={theme}
-              connection={harness.icon}
-              hasDistinctDarkIcon={harness.hasDistinctDarkIcon}
-            />
-          }
-        >
-          <HarnessBody harness={harness} />
-        </TabPanel>
-      ))}
-    </Tabs>
+    </div>
   )
 }
 

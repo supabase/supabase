@@ -21,7 +21,8 @@ describe('AgentSetup markdown schema', () => {
   it('serializes the prompt and harness setup for a registered agent', () => {
     const markdown = AgentSetup({ props: { id: 'health' } })
 
-    expect(markdown).toContain('**Prompt**')
+    expect(markdown).toContain('**Step 1: Copy the prompt**')
+    expect(markdown).toContain('**Step 2: Schedule it in your agent**')
     expect(markdown).toContain('You are "Health monitor"')
     expect(markdown).toContain('```text')
     expect(markdown).toContain('**Claude**')
