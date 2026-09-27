@@ -129,4 +129,4 @@ const Code: FC<PropsWithChildren<ICode>> = ({ children }) => {
 StepHikeCompact.Step = Step
 StepHikeCompact.Details = Details
 StepHikeCompact.Code = Code
-export default StepHikeCompact
+export { StepHikeCompact }
