@@ -55,8 +55,9 @@ const ComputeLayoutContent = ({ children, title }: PropsWithChildren<ComputeLayo
   const { ref: projectRef } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
   const computeEnabled = useFlag('compute')
-  // The v2 compute routes require the FGA workers_read permission, which shared-types does not
-  // expose yet; they reuse the Edge Functions OAuth scope, so gate on the same product here.
+  // shared-types 0.1.95 exposes workers_read/workers_write in its FGA permissions, but the
+  // PermissionAction enum used by useAsyncCheckPermissions does not include them yet. The v2
+  // compute routes reuse the Edge Functions OAuth scope, so gate on that as a fallback.
   const { isLoading: isLoadingPermissions, can: canReadCompute } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     '*'
