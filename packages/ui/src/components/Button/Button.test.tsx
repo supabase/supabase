@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { Button } from './Button'
+import { Button, buttonVariants } from './Button'
 
 const SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'] as const
 const TYPES = [
@@ -30,16 +30,22 @@ describe('#Button', () => {
     render(<Button>Neutral</Button>)
 
     const button = screen.getByRole('button', { name: 'Neutral' })
-    expect(button.className).toContain('bg-background')
-    expect(button.className).toContain('hover:bg-popover')
-    expect(button.className).not.toContain('bg-brand-400')
+    expect(button.className).toContain('bg-card')
+    expect(button.className).toContain('hover:bg-muted')
+    expect(button.className).not.toContain('bg-primary-solid')
+  })
+
+  it('should apply tiny size classes when buttonVariants omits size', () => {
+    const className = buttonVariants({ variant: 'default' })
+    expect(className).toContain('h-[26px]')
+    expect(className).toContain('px-2.5')
   })
 
   it('should allow an explicit primary variant override', () => {
     render(<Button variant="primary">Primary</Button>)
 
     const button = screen.getByRole('button', { name: 'Primary' })
-    expect(button.className).toContain('bg-brand-400')
+    expect(button.className).toContain('bg-primary-solid')
   })
 
   it('should render different text', () => {

@@ -20,7 +20,6 @@ import {
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
-import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -193,7 +192,6 @@ export const DestinationTypeSelection = () => {
           </SelectContent>
         </Select>
       </FormItemLayout>
-      {!editMode && <ReadReplicasMovedCallout className="px-5 pb-5" />}
     </>
   )
 }

@@ -75,7 +75,7 @@ const TopNavBar: FC = () => {
                 title="Menu dropdown button"
                 className={cn(
                   buttonVariants({ variant: 'default' }),
-                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30'
+                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] px-0 data-open:bg-overlay-hover/30'
                 )}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >

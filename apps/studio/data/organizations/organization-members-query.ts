@@ -33,10 +33,13 @@ export async function getOrganizationMembers(
   const { data: orgInvites, error: orgInvitesError } = invites
 
   if (orgMembersError) handleError(orgMembersError)
-  if (orgInvitesError) handleError(orgInvitesError)
+  // Project-scoped members are not permitted to read org invitations (403)
+  // Treat that as "no invitations visible" instead of failing to load the list of members
+  if (orgInvitesError && (orgInvitesError as ResponseError).code !== 403)
+    handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
-  const invitedMembers = orgInvites.invitations.map((invite) => {
+  const invitedMembers = (orgInvites?.invitations ?? []).map((invite) => {
     const member = {
       invited_at: invite.invited_at,
       invited_id: invite.id,

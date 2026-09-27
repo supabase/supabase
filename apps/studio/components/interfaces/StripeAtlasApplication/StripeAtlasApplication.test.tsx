@@ -9,6 +9,11 @@ import { StripeAtlasApplicationScreen } from './StripeAtlasApplication'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
+vi.mock('@/lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/constants')>()),
+  IS_PLATFORM: true,
+}))
+
 type PerkApplication = platformComponents['schemas']['PerkApplicationDataResponse_Output']
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowLeft, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -9,11 +9,11 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
 import { MoveItemsFolderPickerBreadcrumb } from './MoveItemsFolderPickerBreadcrumb'
 import { FolderPickerRow } from './MoveItemsFolderPickerRow'
-import { filterFoldersBySearch, getDestinationLabel, toFolders } from './MoveItemsModal.utils'
+import { filterFoldersBySearch, getDestinationLabel } from './MoveItemsModal.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { bucketFoldersQueryOptions } from '@/data/storage/bucket-folders-query'
-import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-infinite-query'
+import { bucketObjectsInfiniteQueryOptions } from '@/data/storage/bucket-objects-infinite-query'
 import { onSearchInputEscape } from '@/lib/keyboard'
 
 const ROW_HEIGHT = 37
@@ -51,13 +51,15 @@ export const MoveItemsFolderPicker = ({
     hasNextPage,
     fetchNextPage,
     refetch: refetchObjects,
-  } = useBucketObjectsInfiniteQuery({
-    projectRef,
-    bucketId,
-    path,
-    options: {
-      sortBy: { column: STORAGE_SORT_BY.NAME, order: STORAGE_SORT_BY_ORDER.ASC },
-    },
+  } = useInfiniteQuery({
+    ...bucketObjectsInfiniteQueryOptions({
+      projectRef,
+      bucketId,
+      path,
+      options: {
+        sortBy: { column: STORAGE_SORT_BY.NAME, order: STORAGE_SORT_BY_ORDER.ASC },
+      },
+    }),
   })
 
   const {
@@ -71,10 +73,19 @@ export const MoveItemsFolderPicker = ({
     enabled: isSearching,
   })
 
-  const folders = useMemo(
-    () => toFolders(objectsData?.pages.flat() ?? [], path),
-    [objectsData, path]
-  )
+  const folders = useMemo(() => {
+    // v2's `name` is the folder's full path from the bucket root, with a trailing slash
+    // (e.g. "outer/inner/") — not the bare folder name, and not relative to `path`.
+    return (objectsData?.pages ?? [])
+      .flatMap((page) => page.folders)
+      .map((folder) => {
+        const folderPath = folder.name.replace(/\/$/, '')
+        return {
+          name: folderPath.split('/').pop() ?? folderPath,
+          path: folderPath,
+        }
+      })
+  }, [objectsData])
 
   const searchResults = useMemo(
     () => filterFoldersBySearch(foldersData?.folders ?? [], debouncedSearchString),

@@ -17,6 +17,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Check,
   Copy,
+  Download,
   FileText,
   Keyboard,
   Loader2,
@@ -60,7 +61,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
-import { useCreateChat, useLoadNotebook } from './hooks'
+import { useAnalyzeNotebook, useLoadNotebook } from './hooks'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
@@ -81,6 +82,7 @@ import {
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import {
   getNotebooksStateSnapshot,
   useCurrentNotebook,
@@ -95,7 +97,7 @@ export const ExplorerNotebookTab = () => {
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
   const queryClient = useQueryClient()
-  const { createChat, isCreating } = useCreateChat()
+  const { analyzeNotebook, isCreating } = useAnalyzeNotebook()
   const { onSelectDelete } = useExplorerDeleteItem()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
@@ -106,6 +108,7 @@ export const ExplorerNotebookTab = () => {
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
   const { isNotFound } = useLoadNotebook({ id, projectRef: ref })
+  const { data: project } = useSelectedProjectQuery()
   const cells = content?.cells ?? []
   const queryCellIds = cells.filter(isQueryCell).map((cell) => cell._id)
 
@@ -117,6 +120,7 @@ export const ExplorerNotebookTab = () => {
     mutatingQueries: QueryCellSummary[]
   } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
+  const [isExportingPdf, setIsExportingPdf] = useState(false)
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -292,12 +296,7 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const handleAnalyze = () => {
-    createChat({
-      name: `Analyze ${name} notebook`,
-      initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
-    })
-  }
+  const handleAnalyze = () => analyzeNotebook({ id, name })
 
   const handleClickAnalyze = () => {
     if (hasDiscardableChanges(currentNotebook)) {
@@ -320,6 +319,24 @@ export const ExplorerNotebookTab = () => {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       toast.error('Failed to copy notebook as Markdown: ' + message)
+    }
+  }
+
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true)
+    try {
+      const { exportNotebookToPdf } = await import('./NotebookPdf/exportNotebookToPdf')
+      await exportNotebookToPdf({
+        name: name ?? 'Untitled notebook',
+        projectName: project?.name,
+        cells,
+        getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+      })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error('Failed to export notebook as PDF: ' + message)
+    } finally {
+      setIsExportingPdf(false)
     }
   }
 
@@ -433,6 +450,18 @@ export const ExplorerNotebookTab = () => {
                 <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
                   <Copy size={14} />
                   <span>Copy as Markdown</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  disabled={isExportingPdf}
+                  onClick={handleExportPdf}
+                >
+                  {isExportingPdf ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  <span>Export as PDF</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

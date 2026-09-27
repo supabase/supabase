@@ -6,9 +6,11 @@ import { getDatabasePolicies } from '@/data/database-policies/database-policies-
 export const getSchemaTools = ({
   projectRef,
   connectionString,
+  authorization,
 }: {
   projectRef: string
   connectionString: string
+  authorization?: string
 }) => ({
   list_policies: tool({
     description: 'Get existing RLS policies for a given schema',
@@ -22,13 +24,15 @@ export const getSchemaTools = ({
           connectionString,
           schemas,
         },
-        undefined
+        undefined,
+        authorization ? { Authorization: authorization } : undefined
       )
 
       const formattedPolicies = data
         .map(
           (policy) => `
               Policy Name: "${policy.name}"
+              Table: "${policy.table}"
               Action: ${policy.action}
               Roles: ${policy.roles.join(', ')}
               Command: ${policy.command}
