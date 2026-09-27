@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "oauth-consent-tanstack",
-  "type": "registry:block",
   "title": "OAuth Consent for TanStack Start",
   "description": "OAuth 2.1 consent screen and route for an existing authenticated application.",
   "dependencies": [
@@ -26,7 +25,7 @@
     },
     {
       "path": "registry/default/blocks/oauth-consent-tanstack/routes/oauth/consent.tsx",
-      "content": "import { createFileRoute } from '@tanstack/react-router'\n\nimport { OAuthConsent } from '@/registry/default/blocks/oauth-consent/components/oauth-consent'\n\n// This route is installed into the consumer's routes directory. Their TanStack\n// route generator adds it to FileRoutesByPath after installation.\n// @ts-expect-error The local generated route tree does not include this block route.\nexport const Route = createFileRoute('/oauth/consent')({\n  component: ConsentPage,\n  validateSearch: (search) => ({\n    authorization_id: typeof search.authorization_id === 'string' ? search.authorization_id : null,\n  }),\n})\n\nfunction ConsentPage() {\n  const { authorization_id } = Route.useSearch()\n\n  return (\n    <main className=\"flex min-h-svh items-center justify-center p-6 md:p-10\">\n      <OAuthConsent className=\"w-full max-w-lg\" authorizationId={authorization_id} />\n    </main>\n  )\n}\n",
+      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createFileRoute } from '@tanstack/react-router'\n\nimport { OAuthConsent } from '@/registry/default/blocks/oauth-consent/components/oauth-consent'\n\n// This route is installed into the consumer's routes directory. Their TanStack\n// route generator adds it to FileRoutesByPath after installation.\nexport const Route = createFileRoute('/oauth/consent')({\n  component: ConsentPage,\n  validateSearch: (search) => ({\n    authorization_id:\n      typeof search.authorization_id === 'string' ? search.authorization_id : undefined,\n  }),\n})\n\nfunction ConsentPage() {\n  const { authorization_id } = Route.useSearch()\n\n  return (\n    <main className=\"flex min-h-svh items-center justify-center p-6 md:p-10\">\n      <OAuthConsent\n        className=\"w-full max-w-lg\"\n        authorizationId={authorization_id}\n        signInPath=\"/login\"\n        productName={import.meta.env.VITE_PRODUCT_NAME?.trim() || 'Your product'}\n      />\n    </main>\n  )\n}\n",
       "type": "registry:file",
       "target": "routes/oauth/consent.tsx"
     },
@@ -45,5 +44,6 @@
     "VITE_SUPABASE_URL": "",
     "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "After installation, set the following in `supabase/config.toml`. Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false` — edit that section rather than adding a second one:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`."
+  "docs": "After installation, set the following in `supabase/config.toml`. Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false` — edit that section rather than adding a second one:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+  "type": "registry:block"
 }

@@ -3,6 +3,8 @@ import path from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
 import matter from 'gray-matter'
 
+import { AGENT_RESOURCES } from '@/lib/agent-resources'
+
 export const dynamic = 'force-dynamic'
 
 interface Source {
@@ -81,6 +83,10 @@ export async function GET() {
     .map((source) => `- [${source.title}](https://supabase.com/${source.relPath})`)
     .join('\n')
 
+  const agentResourceLinks = AGENT_RESOURCES.map(
+    (resource) => `- [${resource.title}](${resource.url}): ${resource.description}`
+  ).join('\n')
+
   const content = [
     '# Supabase Docs',
     '',
@@ -93,6 +99,10 @@ export async function GET() {
     '## Pricing',
     '',
     '- [Supabase Pricing](https://supabase.com/pricing.md)',
+    '',
+    '## API and agent resources',
+    '',
+    agentResourceLinks,
   ].join('\n')
 
   return new Response(content, {

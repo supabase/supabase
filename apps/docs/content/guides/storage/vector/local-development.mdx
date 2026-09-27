@@ -16,10 +16,11 @@ Make sure you have the latest version of the Supabase CLI installed to access th
 
 <Admonition type="note" title="Local driver">
 
-In local development, vector buckets uses pg_vector as the underlying storage engine under the hood.
-The Hosted version uses S3Vectors as the Storage engine for vectors, which is optimized for large-scale vector storage and similarity search. This means that while you can develop and test your vector bucket integrations locally, there may be differences in performance and behavior compared to the cloud environment.
+Local vector buckets use pgvector as their storage engine. Hosted vector buckets use Amazon S3 Vectors, so query behavior and performance can differ between environments.
 
-The API remain consistent between local and hosted environments, so you can build your application logic against the local pg_vector implementation and expect it to work with the S3Vectors engine in production.
+Hosted `queryVectors` requests accept `topK` values up to 10,000 and return results in pages of at most 100. Use `nextToken` to retrieve each additional page. Local requests accept `topK` values up to 100 and reject `nextToken`.
+
+See [Vector Bucket limits](/docs/guides/storage/vector/limits) for the full comparison.
 
 </Admonition>
 ## Setting up local vector buckets

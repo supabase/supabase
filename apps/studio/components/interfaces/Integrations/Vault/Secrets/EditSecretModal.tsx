@@ -144,7 +144,7 @@ export const EditSecretModal = () => {
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name">
+                      <FormItemLayout label="Name">
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -156,11 +156,7 @@ export const EditSecretModal = () => {
                     name="description"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout
-                        name="description"
-                        label="Description"
-                        labelOptional="Optional"
-                      >
+                      <FormItemLayout label="Description" labelOptional="Optional">
                         <FormControl>
                           <Input {...field} data-lpignore="true" />
                         </FormControl>
@@ -172,7 +168,7 @@ export const EditSecretModal = () => {
                     name="secret"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="secret" label="Secret value">
+                      <FormItemLayout label="Secret value">
                         <div className="relative">
                           <FormControl>
                             <Textarea
@@ -201,7 +197,6 @@ export const EditSecretModal = () => {
                             />
                           </FormControl>
                           <Button
-                            variant="default"
                             title={showSecretValue ? `Hide secret value` : `Show secret value`}
                             aria-label={showSecretValue ? `Hide secret value` : `Show secret value`}
                             className="absolute right-1 top-1 w-7"
@@ -217,7 +212,6 @@ export const EditSecretModal = () => {
             </DialogSection>
             <DialogFooter>
               <Button
-                variant="default"
                 disabled={isSubmitting}
                 onClick={() => {
                   form.reset()
@@ -226,7 +220,7 @@ export const EditSecretModal = () => {
               >
                 Cancel
               </Button>
-              <Button form={formId} type="submit" loading={isSubmitting}>
+              <Button variant="primary" form={formId} type="submit" loading={isSubmitting}>
                 Update secret
               </Button>
             </DialogFooter>

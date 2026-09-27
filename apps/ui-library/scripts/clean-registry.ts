@@ -1,11 +1,18 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
+import { normalizeVueRegistryFiles } from '../lib/registry-resolution'
+
 function processJsonFile(filePath: string) {
   try {
     // Read the file
     const content = fs.readFileSync(filePath, 'utf8')
     const json = JSON.parse(content)
+
+    // Normalize only after shadcn build has read the original package source files.
+    for (const item of Array.isArray(json.items) ? json.items : [json]) {
+      if (Array.isArray(item.files)) item.files = normalizeVueRegistryFiles(item.files)
+    }
 
     // Convert to string to do replacement
     let stringified = JSON.stringify(json, null, 2)
@@ -40,11 +47,18 @@ function processJsonFile(filePath: string) {
       }
     }
 
+    // Registry source routes are absent from this app's generated TanStack tree.
+    // Consumers generate their own tree, where this suppression would be unused.
+    stringified = stringified.replaceAll(
+      '// @ts-expect-error The local generated route tree does not include this block route.\\n',
+      ''
+    )
+
     // Write back to file
     fs.writeFileSync(filePath, stringified)
     console.log(`✓ Updated ${filePath}`)
   } catch (error) {
-    console.error(`Error processing ${filePath}:`, error)
+    throw new Error(`Unable to prepare registry artifact "${filePath}"`, { cause: error })
   }
 }
 

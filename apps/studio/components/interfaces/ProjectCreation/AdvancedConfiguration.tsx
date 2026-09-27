@@ -63,7 +63,7 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                             </>
                           }
                           description="Recommended for production workloads"
-                          className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2"
+                          className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>div]:flex [&>div>div>div]:items-center [&>div>div>div]:gap-x-2"
                         />
                       </FormControl>
                     </FormItem>
@@ -82,7 +82,7 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                               }
                               description="Not recommended for production workloads"
                               className={cn(
-                                '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2',
+                                '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>div]:flex [&>div>div>div]:items-center [&>div>div>div]:gap-x-2',
                                 form.getValues('useOrioleDb') ? 'rounded-b-none!' : ''
                               )}
                               disabled={disableOrioleProjectCreation}

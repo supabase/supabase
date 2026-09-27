@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import { MoreVertical, Redo2, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -14,21 +14,15 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { useTeamSettingsData } from './TeamSettingsDataContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationDeleteInvitationMutation } from '@/data/organization-members/organization-invitation-delete-mutation'
-import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from '@/data/organizations/organization-member-delete-mutation'
-import {
-  useOrganizationMembersQuery,
-  type OrganizationMember,
-} from '@/data/organizations/organization-members-query'
-import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { doPermissionsCheck } from '@/hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 
 interface MemberActionsProps {
@@ -38,14 +32,16 @@ interface MemberActionsProps {
 export const MemberActions = ({ member }: MemberActionsProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const [showAccessModal, setShowAccessModal] = useState(false)
+  const isLoggedIn = useIsLoggedIn()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
-
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: permissions } = usePermissionsQuery()
-  const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const { data: members } = useOrganizationMembersQuery({ slug })
+  const {
+    members,
+    roles: allRoles,
+    permissions,
+    selectedOrganization,
+    organizationMembersDeletionEnabled,
+    onManageAccess,
+  } = useTeamSettingsData()
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -66,18 +62,32 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = member.role_ids.every((id) => rolesRemovable.includes(id))
 
-  const { can: canCreateUserInvites } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_invites',
-    { resource: { role_id: roleId } }
-  )
+  const canCreateUserInvites = useMemo(() => {
+    if (!IS_PLATFORM) return true
+    if (!isLoggedIn) return false
+    if (!permissions) return false
+    return doPermissionsCheck(
+      permissions,
+      PermissionAction.CREATE,
+      'user_invites',
+      { resource: { role_id: roleId } },
+      selectedOrganization?.slug
+    )
+  }, [isLoggedIn, permissions, roleId, selectedOrganization?.slug])
   const canResendInvite = canCreateUserInvites && hasOrgRole
 
-  const { can: canDeleteUserInvites } = useAsyncCheckPermissions(
-    PermissionAction.DELETE,
-    'user_invites',
-    { resource: { role_id: roleId } }
-  )
+  const canDeleteUserInvites = useMemo(() => {
+    if (!IS_PLATFORM) return true
+    if (!isLoggedIn) return false
+    if (!permissions) return false
+    return doPermissionsCheck(
+      permissions,
+      PermissionAction.DELETE,
+      'user_invites',
+      { resource: { role_id: roleId } },
+      selectedOrganization?.slug
+    )
+  }, [isLoggedIn, permissions, roleId, selectedOrganization?.slug])
   const canRevokeInvite = canDeleteUserInvites && hasOrgRole
 
   const { mutate: deleteOrganizationMember, isPending: isDeletingMember } =
@@ -163,9 +173,8 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     <>
       <div className="flex items-center justify-end gap-x-2">
         <ButtonTooltip
-          variant="default"
           disabled={isPendingInviteAcceptance || !canRemoveMember}
-          onClick={() => setShowAccessModal(true)}
+          onClick={() => onManageAccess(member)}
           tooltip={{
             content: {
               side: 'bottom',
@@ -183,6 +192,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              aria-label="More options"
               variant="text"
               className="px-1.5"
               disabled={isLoading}
@@ -291,12 +301,6 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
           <span className="text-foreground">{selectedOrganization?.name}</span>?
         </p>
       </ConfirmationModal>
-
-      <UpdateRolesPanel
-        visible={showAccessModal}
-        member={member}
-        onClose={() => setShowAccessModal(false)}
-      />
     </>
   )
 }

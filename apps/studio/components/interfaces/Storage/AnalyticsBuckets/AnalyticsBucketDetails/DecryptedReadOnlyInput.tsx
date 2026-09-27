@@ -82,17 +82,11 @@ export const DecryptedReadOnlyInput = ({
             secureEntry ? (
               isLoading ? (
                 <div className="flex items-center justify-center">
-                  <Button
-                    disabled
-                    variant="default"
-                    className="w-7"
-                    icon={<Loader className="animate-spin" />}
-                  />
+                  <Button disabled className="w-7" icon={<Loader className="animate-spin" />} />
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
                   <Button
-                    variant="default"
                     className="w-7"
                     loading={showHidden && isDecryptedValueLoading}
                     icon={showHidden ? <Eye /> : <EyeOff />}

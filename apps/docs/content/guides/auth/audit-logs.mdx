@@ -11,10 +11,10 @@ Auth audit logs provide comprehensive tracking of authentication events in your 
 
 Supabase auth audit logs automatically capture all authentication events including:
 
-- User signups and logins
+- User sign-ups and sign-ins
 - Password changes and resets
 - Email verification events
-- Token refresh and logout events
+- Token refresh and sign-out events
 
 ## Storage options
 
@@ -53,8 +53,8 @@ Audit logs contain detailed information about each authentication event:
 
 | Action                          | Description                             |
 | ------------------------------- | --------------------------------------- |
-| `login`                         | User login attempt                      |
-| `logout`                        | User logout                             |
+| `login`                         | User sign-in attempt                    |
+| `logout`                        | User sign-out                           |
 | `invite_accepted`               | Team invitation accepted                |
 | `user_signedup`                 | New user registration                   |
 | `user_invited`                  | User invitation sent                    |
@@ -75,7 +75,7 @@ Audit logs contain detailed information about each authentication event:
 | `factor_deleted`                | MFA factor deleted                      |
 | `recovery_codes_deleted`        | MFA recovery codes deleted              |
 | `factor_updated`                | MFA factor settings updated             |
-| `mfa_code_login`                | Login with MFA code                     |
+| `mfa_code_login`                | Sign in with MFA code                   |
 | `identity_unlinked`             | An identity unlinked from account       |
 
 ## Limitations

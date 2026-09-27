@@ -10,7 +10,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { FunctionsList } from '@/components/interfaces/Database/Functions/FunctionsList/FunctionsList'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'

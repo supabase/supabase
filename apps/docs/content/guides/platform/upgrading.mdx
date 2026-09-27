@@ -286,6 +286,61 @@ Reindex each index it returns, using the schema-qualified name. `REINDEX INDEX C
 REINDEX INDEX CONCURRENTLY <schema_name>.<index_name>;
 ```
 
+### Pgcrypto legacy PGP ciphers
+
+_Applies when upgrading to Postgres 15.19 or 17.11._
+
+<Admonition type="caution">
+
+You are affected only if you call pgcrypto PGP functions with a `cipher-algo` that is unavailable in your server's OpenSSL build. The default cipher (AES) is not affected — if you never pass a `cipher-algo` option, no action is needed. Use the scan below to check stored values.
+
+</Admonition>
+
+This release fixes [CVE-2026-14663](https://www.postgresql.org/support/security/CVE-2026-14663/): previously, when a requested PGP cipher was unavailable in the server's OpenSSL build, pgcrypto did not apply it, so affected values were not protected as intended and can be decrypted even with the wrong key. After upgrading, decrypting such messages fails by default, and encrypting with those ciphers returns an error.
+
+To find affected rows, scan each stored value with a deliberately wrong passphrase: properly encrypted values raise an error, while affected values decrypt successfully even with the wrong key. Run the helper and the scan in the same session (`pg_temp` functions are session-scoped):
+
+```sql
+create function pg_temp.affected_by_cve_2026_14663(msg bytea)
+returns boolean
+language plpgsql as $$
+begin
+  perform pgp_sym_decrypt_bytea(msg, 'deliberately-wrong-key');
+  return true;
+exception when others then
+  return false;
+end $$;
+
+select <id_column>
+from <your_table>
+where <your_encrypted_column> is not null
+  and pg_temp.affected_by_cve_2026_14663(<your_encrypted_column>);
+```
+
+Any rows returned hold affected values. The scan covers symmetric (`pgp_sym_*`) messages; the wrong-key probe does not apply to public-key (`pgp_pub_*`) messages. If you call `pgp_pub_encrypt` with one of the affected `cipher-algo` options, treat those values as affected and re-encrypt them the same way using `pgp_pub_decrypt` and `pgp_pub_encrypt` with your key pair.
+
+Re-encrypt affected values with a modern cipher. Before you upgrade, the current version still decrypts them normally:
+
+```sql
+update <your_table>
+set <col> = pgp_sym_encrypt(
+              pgp_sym_decrypt(<col>, '<your-key>'),
+              '<your-key>', 'cipher-algo=aes256')
+where <id_column> in (/* rows found by the scan above */);
+```
+
+After you upgrade, decrypting affected values fails by default — add `ignore-cipher-failure=1` to read them:
+
+```sql
+update <your_table>
+set <col> = pgp_sym_encrypt(
+              pgp_sym_decrypt(<col>, '<your-key>', 'ignore-cipher-failure=1'),
+              '<your-key>', 'cipher-algo=aes256')
+where <id_column> in (/* rows found by the scan above */);
+```
+
+If the plaintext is binary (encrypted with `pgp_sym_encrypt_bytea`), use `pgp_sym_decrypt_bytea` and `pgp_sym_encrypt_bytea` in the same way — the text functions reject binary plaintext. Spot-check that a recovered value decrypts to the expected plaintext before running the update across all rows. Because affected values were not protected as intended, consider rotating any secrets stored this way.
+
 ### Btree_gist indexes on float columns require reindexing after upgrade
 
 _Applies when upgrading to Postgres 15.19 or 17.11._

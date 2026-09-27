@@ -12,13 +12,14 @@ export const ExplorerPreview = () => {
   return (
     <div className="flex flex-col gap-y-4">
       <p className="text-sm text-foreground-light">
-        The Explorer is a new unified workspace for querying your data and chatting with the
-        Assistant, and is an early preview of where we're heading with the SQL Editor.
-      </p>
-      <p className="text-sm text-foreground-light">
-        Notebooks are the first new feature of the Explorer — mix query cells and markdown notes in
-        a single document, so your queries and context stay together. Use them to write runbooks,
-        document incidents, build reusable reports, and more!
+        The Explorer is a unified workspace for interacting with your database and logs via SQL,
+        chat and a new feature we are calling Notebooks.{' '}
+        <InlineLink
+          href={isExplorerEnabled ? `/project/${ref}/explorer` : `/project/${ref}/sql/new`}
+        >
+          Explorer
+        </InlineLink>{' '}
+        is an evolution of the SQL Editor and will replace it when the flag is enabled.
       </p>
 
       <Image
@@ -28,6 +29,20 @@ export const ExplorerPreview = () => {
         alt="explorer-preview"
         className="rounded-sm border"
       />
+
+      <p className="text-sm text-foreground-light">
+        Notebooks aim to replace Snippets and Custom Reports. They can contain one or many SQL
+        queries with surrounding markdown content. You can query both your own database and project
+        logs which means they can be used for observability, growth tracking, recurring tasks that
+        need extra context etc. They can be managed and run in Studio as well as by the Supabase
+        Assistant and later your own agent via code or MCP. Snippets are <em>not</em> visible in
+        Explorer, we are instead looking at a migration path from Snippets -&gt; Notebooks if
+        needed.
+      </p>
+      <p className="text-sm text-foreground-light">
+        Explorer is a glimpse at a future where reports and insights are generated on demand,
+        personalized to your needs, with Notebooks being the first primitive.
+      </p>
 
       <div className="space-y-2">
         <p className="text-sm">Enabling this preview will:</p>

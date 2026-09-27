@@ -20,6 +20,7 @@ import {
 } from '@/data/marketplace/integrations-query'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 
 const renderMarketplaceLogo = (listingLogo?: string | null) => {
   const MarketplaceLogo = ({ className, ...props }: { className?: string } = {}) => (
@@ -92,6 +93,7 @@ const useMarketplaceListings = () => {
  */
 export const useAvailableIntegrations = () => {
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const isWarehouseAvailable = useIsWarehouseEnabled()
 
   const { data: cliData } = useCLIReleaseVersionQuery()
   const isCLI = !!cliData?.current
@@ -106,7 +108,7 @@ export const useAvailableIntegrations = () => {
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
-  // Wrappers from marketplace are excluded here — they are merged into the
+  // Wrappers from marketplace are excluded here. They are merged into the
   // hardcoded studio wrappers below as content overrides.
   const marketplaceIntegrations: IntegrationDefinition[] = useMemo(
     () =>
@@ -228,6 +230,13 @@ export const useAvailableIntegrations = () => {
         return false
       }
 
+      // Warehouse is gated to an allow-list of orgs, and the API rejects every
+      // `/platform/warehouse/{ref}/*` call for the rest, so hide it entirely instead of showing an
+      // integration whose every request would fail.
+      if (integration.id === 'warehouse' && !isWarehouseAvailable) {
+        return false
+      }
+
       return true
     }).map((integration) => {
       const isWrapper = integration.type === 'wrapper'
@@ -266,7 +275,7 @@ export const useAvailableIntegrations = () => {
         ...Object.fromEntries(Object.entries(overrides).filter(([, v]) => v != null)),
       }
     })
-  }, [integrationsWrappers, isCLI, marketplaceWrappers])
+  }, [integrationsWrappers, isCLI, isWarehouseAvailable, marketplaceWrappers])
 
   const dataWithMarketplace = useMemo(() => {
     return [...marketplaceIntegrations, ...allIntegrations].sort((a, b) =>

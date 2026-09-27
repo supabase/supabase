@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useMatches } from '@tanstack/react-router'
 
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 
 export const Route = createFileRoute('/project/$ref/database')({
   component: DatabaseShell,

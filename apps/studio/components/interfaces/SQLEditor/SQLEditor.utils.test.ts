@@ -1271,8 +1271,8 @@ const makeEditor = ({
 }): IStandaloneCodeEditor =>
   ({
     getValue: () => value,
-    getSelection: () => (hasSelection ? ({ startLineNumber: 1 } as any) : null),
-    getModel: () => ({ getValueInRange: () => selectionValue }) as any,
+    getSelection: () => (hasSelection ? { startLineNumber: 1 } : null),
+    getModel: () => ({ getValueInRange: () => selectionValue }),
   }) as unknown as IStandaloneCodeEditor
 
 describe('SQLEditor.utils:getEditorSql', () => {
@@ -1418,6 +1418,7 @@ describe('SQLEditor.utils:hasBlockingIssues', () => {
 const buildDatabase = (overrides: Partial<Database> = {}): Database => ({
   cloud_provider: 'AWS',
   connectionString: 'postgres://primary',
+  connection_string_read_only: 'postgres://primary',
   db_host: 'db.example.com',
   db_name: 'postgres',
   db_port: 5432,

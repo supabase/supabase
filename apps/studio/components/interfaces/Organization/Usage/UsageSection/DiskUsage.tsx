@@ -199,7 +199,7 @@ export const DiskUsage = ({
                           </div>
                         </div>
 
-                        <Button asChild variant="default" size="tiny">
+                        <Button asChild size="tiny">
                           <Link href={getInfrastructurePath(project.ref)}>Manage Disk</Link>
                         </Button>
                       </div>

@@ -1,0 +1,82 @@
+---
+title: Headless App
+description: A backend with an agent as the primary interface
+---
+
+A headless app uses an AI agent as its primary interface. Users sign in and
+approve access in the browser, then work through their agent using MCP tools.
+This starter includes task tools and a database with Row Level Security (RLS)
+that limits each user to their own data.
+
+<BlockPreview name="headless-app" />
+
+## Installation
+
+Create a TanStack Start app:
+
+```bash
+pnpm dlx shadcn@latest init --template start --name my-app
+cd my-app
+```
+
+Install the headless app:
+
+<BlockItem name="headless-app-tanstack" showOpenInV0={false} />
+
+Merge `supabase/config.toml` if you already have project settings. Add
+`"supabase/functions/**"` to your app's `tsconfig.json` exclusions.
+
+## Customize
+
+- Set `VITE_PRODUCT_NAME` in `.env.local` and edit the generated pages and components.
+- Define your tables, grants, and RLS policies in `supabase/schemas/`.
+- Replace `supabase/functions/mcp-server/tools/tasks.ts` with your app's operations
+  and register them in `tools/index.ts`. Use the supplied user-scoped `supabase` client.
+- Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` with `supabase secrets set`.
+
+## Deploy
+
+Deploy the frontend using a [TanStack Start hosting adapter](https://tanstack.com/start/latest/docs/framework/react/guide/hosting).
+Set these environment variables in your hosting provider before building:
+
+```env
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+VITE_PRODUCT_NAME="Your app"
+```
+
+In `supabase/config.toml`, set `auth.site_url` to your deployed HTTPS origin,
+update `auth.additional_redirect_urls` for your app's destinations, and set
+`auth.email.enable_confirmations = true`. Keep the supplied OAuth and function settings.
+Use an ES256 or RS256 signing key in your project's
+[JWT Keys](https://supabase.com/dashboard/project/_/settings/jwt).
+
+In [Email Templates](https://supabase.com/dashboard/project/_/auth/templates),
+use this confirmation link for sign-up and change `type=email` to `type=recovery`
+for password reset:
+
+```html
+<a
+  href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo | urlquery }}"
+  >Confirm email</a
+>
+```
+
+With the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)
+(2.117.0 or later) and Docker installed, generate a migration:
+
+```bash
+supabase db diff -f create_tasks
+```
+
+Review the migration, including grants and RLS policies, then deploy:
+
+```bash
+supabase link --project-ref <project-ref>
+supabase db push
+supabase config push
+supabase functions deploy mcp-server
+```
+
+Open `/agents` on your deployed app, sign in, and copy the server URL into an
+MCP client that supports HTTP and OAuth. Approve access to start using your tools.

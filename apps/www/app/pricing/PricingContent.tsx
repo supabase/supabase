@@ -47,12 +47,7 @@ export default function PricingContent() {
               Compare Plans
             </Button>
           </a>
-          <Button
-            size="tiny"
-            variant="default"
-            asChild
-            iconRight={<ArrowUpRight className="w-4" />}
-          >
+          <Button size="tiny" asChild iconRight={<ArrowUpRight className="w-4" />}>
             <a
               href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
               target="_blank"

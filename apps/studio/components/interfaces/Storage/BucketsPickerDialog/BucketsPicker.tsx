@@ -118,7 +118,7 @@ export const BucketsPicker = ({
                   />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="default" icon={<ArrowDownNarrowWide />}>
+                      <Button icon={<ArrowDownNarrowWide />}>
                         Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
                       </Button>
                     </DropdownMenuTrigger>

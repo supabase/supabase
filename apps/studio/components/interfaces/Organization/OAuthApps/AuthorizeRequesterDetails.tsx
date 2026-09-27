@@ -54,7 +54,7 @@ export const ScopeSection = ({
   return (
     <div className="first:border-t border-b flex flex-row space-x-1 text-sm text-foreground-light py-2 px-1">
       <div className="pt-0.5">
-        <Check className="size-4 text-brand" strokeWidth={1.5} />
+        <Check className="size-4 text-primary" strokeWidth={1.5} />
       </div>
       <div>
         <span className="font-semibold text-foreground">{permissions}</span> {description}

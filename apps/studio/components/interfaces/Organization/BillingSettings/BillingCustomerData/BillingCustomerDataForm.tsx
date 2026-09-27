@@ -143,7 +143,6 @@ export const BillingCustomerDataForm = ({
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant="default"
                       role="combobox"
                       size="medium"
                       disabled={disabled}

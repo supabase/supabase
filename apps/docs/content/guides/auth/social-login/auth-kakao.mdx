@@ -1,6 +1,6 @@
 ---
 id: 'auth-kakao'
-title: 'Login with Kakao'
+title: 'Sign in with Kakao'
 description: 'Add Kakao OAuth to your Supabase project'
 ---
 
@@ -15,12 +15,12 @@ Kakao OAuth consists of six broad steps:
 - Obtain a `Kakao Login Client Secret code` - this serves as the `client_secret`.
 - Configure additional settings in the Kakao Developers Portal.
 - Add your `client id` and `client secret` keys to your [Supabase Project](/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your Kakao Developer account
 
 - Go to [Kakao Developers Portal](https://developers.kakao.com/changeLang?lang=en).
-- Click on **Login** at the top right to log in.
+- Click on **Login** at the top right to sign in.
 
 ![Kakao Developers Portal](/docs/img/guides/auth-kakao/kakao-developers-page.png)
 
@@ -87,7 +87,7 @@ In the Kakao Developers Portal, the "account_email" consent item is only availab
 
 If you did not request `account_email` in Kakao, enable **Allow users without an email** in the Kakao provider settings.
 
-## Add login code to your client app
+## Add sign-in code to your client app
 
 <Tabs
   scrollable

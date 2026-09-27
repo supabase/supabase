@@ -29,18 +29,18 @@ export const FileExplorer = ({
   onSelectColumnEmptySpace = noop,
   onColumnLoadMore = noop,
 }: FileExplorerProps) => {
-  const fileExplorerRef = useRef<any>(null)
+  const fileExplorerRef = useRef<HTMLDivElement>(null)
   const snap = useStorageExplorerStateSnapshot()
   const { view } = useStoragePreference(snap.projectRef)
+  const isPreviewOpen = !!snap.selectedFilePreview
 
+  // Keep the deepest column in view. Also re-runs when the preview pane opens, since it
+  // takes 450px off the container and would otherwise hide the column it belongs to.
   useEffect(() => {
-    if (fileExplorerRef) {
-      const { scrollWidth, clientWidth } = fileExplorerRef.current
-      if (scrollWidth > clientWidth) {
-        fileExplorerRef.current.scrollLeft += scrollWidth - clientWidth
-      }
-    }
-  }, [columns])
+    const container = fileExplorerRef.current
+    if (!container || view !== STORAGE_VIEWS.COLUMNS) return
+    container.scrollLeft = container.scrollWidth - container.clientWidth
+  }, [columns.length, view, isPreviewOpen])
 
   return (
     <div

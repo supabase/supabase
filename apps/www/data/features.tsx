@@ -600,7 +600,8 @@ Dedicated Poolers provide an alternative to Supavisor for specific use cases, gi
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres#serverside-poolers',
+    docsUrl:
+      'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler',
     slug: 'dedicated-poolers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -656,7 +657,7 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
 
 ## Setup
-Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
 
 ## Requirements
 Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
@@ -2343,7 +2344,7 @@ The Logs & Analytics feature in Supabase provides users with comprehensive loggi
 
 OpenTelemetry integration allows you to export logs, metrics, and traces to any OTel-compatible tool—Datadog, Honeycomb, Grafana, or your preferred monitoring platform. The Metrics API exposes ~200 Prometheus-compatible Postgres metrics, including CPU, IO, WAL, connections, and query statistics.
 
-Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/monitoring-and-debugging/client-side-tracing) for the latest on supported SDKs and target platforms.
+Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/observability/client-side-tracing) for the latest on supported SDKs and target platforms.
 
 ## Key benefits
 1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
@@ -2674,7 +2675,7 @@ $60 per drain per project, plus $0.20 per million events and $0.09 per GB egress
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
-    docsUrl: 'https://supabase.com/docs/guides/monitoring-and-debugging/log-drains',
+    docsUrl: 'https://supabase.com/docs/guides/observability/log-drains',
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.GA,

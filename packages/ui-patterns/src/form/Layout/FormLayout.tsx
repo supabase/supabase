@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 import React from 'react'
-import { cn, FormDescription, FormLabel, FormMessage, Label } from 'ui'
-import { SIZE } from 'ui/src/lib/constants'
+import { cn, FormDescription, FormLabel, FormMessage, Label, SIZE } from 'ui'
 
 type Props = {
   align?: 'left' | 'right'
@@ -334,7 +333,6 @@ export const FormLayout = React.forwardRef<
         <FormDescription
           className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
-          id={`${id}-description`}
         >
           {description}
         </FormDescription>

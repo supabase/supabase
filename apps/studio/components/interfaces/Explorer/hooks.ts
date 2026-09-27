@@ -9,6 +9,7 @@ import { useProfile } from '@/lib/profile'
 import type { AssistantModel } from '@/state/ai-assistant-state'
 import { useAiAssistantState, whenAiAssistantInitialized } from '@/state/ai-assistant-state'
 import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
+import { readNotebookDraft } from '@/state/notebooks/notebook-drafts'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
 import { Notebooks } from '@/types'
@@ -17,9 +18,16 @@ import { Notebooks } from '@/types'
  * Fetches a notebook's content by id and merges it into the valtio store, so landing on
  * a notebook any way other than creating it in this session (direct link, hard refresh,
  * clicking it from the nav list) still hydrates `notebooksState`.
+ *
+ * A notebook that isn't in the store yet is also checked for a locally-persisted draft of unsaved edits
+ * If the notebook loaded from the server, the draft is restored on top of it, otherwise if
+ * the notebook was never saved at all, the draft — if present — is the only copy
+ * that ever existed, so it's restored as a new local-only notebook instead.
  */
 export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: string }) => {
   const notebooksSnap = useNotebooksStateSnapshot()
+  const { profile } = useProfile()
+  const { data: project } = useSelectedProjectQuery()
   const currentNotebook = id ? notebooksSnap.notebooks[id] : undefined
 
   const isCurrentProjectNotebook = currentNotebook?.projectRef === projectRef
@@ -27,7 +35,7 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
   const hasLoadedNotebook =
     isCurrentProjectNotebook && currentNotebook?.notebook.content !== undefined
 
-  const { data, error, isError } = useNotebookQuery(
+  const { data, error, isError, isLoading } = useNotebookQuery(
     { projectRef, id },
     {
       retry: false,
@@ -35,15 +43,46 @@ export const useLoadNotebook = ({ id, projectRef }: { id?: string; projectRef?: 
     }
   )
 
+  const isNotFound = isError && error.code === 404
+
   const mergeNotebook = useEffectEvent(() => {
-    if (projectRef && data) notebooksSnap.setNotebook({ projectRef, notebook: data })
+    if (!projectRef || !id) return
+
+    if (data) {
+      const isFreshLoad = !isCurrentProjectNotebook
+      notebooksSnap.setNotebook({ projectRef, notebook: data })
+      if (isFreshLoad) {
+        notebooksSnap.restoreDraft({ projectRef, id, baseUpdatedAt: data.updated_at })
+      }
+      return
+    }
+
+    if (isNotFound && !isCurrentProjectNotebook && profile && project) {
+      const draft = readNotebookDraft({ projectRef, id })
+      if (!draft) return
+
+      notebooksSnap.addNotebook({
+        projectRef,
+        notebook: {
+          id,
+          type: 'notebook',
+          name: draft.name,
+          description: '',
+          visibility: 'project',
+          favorite: false,
+          content: draft.content,
+          owner_id: profile.id,
+          project_id: project.id,
+        },
+      })
+    }
   })
 
   useEffect(() => {
     mergeNotebook()
-  }, [projectRef, data])
+  }, [projectRef, id, data, isNotFound, !!profile, !!project])
 
-  return { isNotFound: isError && error.code === 404 }
+  return { isNotFound: isNotFound && !isCurrentProjectNotebook, isLoading }
 }
 
 export const useCreateNotebook = () => {
@@ -143,21 +182,41 @@ export const useCreateChat = () => {
   return { createChat, openChat, isCreating }
 }
 
+/** Opens a new Explorer chat that asks the assistant to run a saved notebook and summarize its results */
+export const useAnalyzeNotebook = () => {
+  const { createChat, isCreating } = useCreateChat()
+
+  const analyzeNotebook = ({ id, name }: { id?: string; name?: string }) =>
+    createChat({
+      name: `Analyze ${name} notebook`,
+      initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
+    })
+
+  return { analyzeNotebook, isCreating }
+}
+
 export const useCreateQuery = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const querySnap = useExplorerQueryStateSnapshot()
 
-  const createQuery = () => {
+  const createQuery = ({
+    sql,
+    name,
+    autoRun,
+    replace = false,
+  }: { sql?: string; name?: string; autoRun?: boolean; replace?: boolean } = {}) => {
     if (!project) return console.error('Project is required')
 
     const id = generateUuid()
-    querySnap.createDraft({ id, projectRef: project.ref })
+    querySnap.createDraft({ id, projectRef: project.ref, sql, name, autoRun })
 
-    router.push(`/project/${project.ref}/explorer/query/${id}`)
+    const url = `/project/${project.ref}/explorer/query/${id}`
+    if (replace) router.replace(url)
+    else router.push(url)
 
     return id
   }
 
-  return { createQuery }
+  return { createQuery, projectRef: project?.ref }
 }

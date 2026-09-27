@@ -1,7 +1,6 @@
 'use client'
 
-import { cn, Switch } from 'ui'
-import { Label } from 'ui/src/components/shadcn/ui/label'
+import { cn, Label, Switch } from 'ui'
 
 import { InfoTooltip } from '../../info-tooltip'
 import {
@@ -59,6 +58,7 @@ export function McpConfigurationOptions({
           <MultiSelectorTrigger
             className="w-full"
             label="Select features"
+            aria-label="Select features"
             badgeLimit="wrap"
             showIcon={true}
           />
