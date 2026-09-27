@@ -9,8 +9,10 @@ type HandlerContext = {
   props: Record<string, unknown>
 }
 
+const IN_PAGE_LINK = /\[([^\]]+)\]\(#[^)]+\)/g
+
 function renderMarkdownSteps(steps: string[]): string {
-  return steps.map((step, index) => `${index + 1}. ${step}`).join('\n')
+  return steps.map((step, index) => `${index + 1}. ${step.replace(IN_PAGE_LINK, '$1')}`).join('\n')
 }
 
 export function AgentSetup({ props }: HandlerContext): string {

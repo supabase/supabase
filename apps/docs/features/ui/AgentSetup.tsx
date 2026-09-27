@@ -2,6 +2,7 @@
 
 import { StepHikeCompact } from '~/components/StepHikeCompact'
 import {
+  AGENT_PROMPT_ANCHOR,
   getMonitoringAgent,
   getMonitoringAgentHarnesses,
   type MonitoringAgentHarnessSetup,
@@ -9,7 +10,7 @@ import {
 import { SOURCE_FOOTER_CLASSES, SourceFrame } from '~/features/directives/CodeSample.client'
 import { CodeTabs } from '~/features/directives/CodeTabs.components'
 import Image from 'next/image'
-import { useState, type ReactNode } from 'react'
+import { useState, type MouseEvent, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { cn } from 'ui'
 import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
@@ -28,11 +29,35 @@ type HarnessProps = {
 }
 
 const DOCS_NOTCH_WIDTH = 100
+const PROMPT_FLASH_DURATION = 1600
+
+const handleInPageLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
+  const target = document.getElementById(event.currentTarget.hash.slice(1))
+  if (!target) return
+
+  event.preventDefault()
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' })
+  target.focus({ preventScroll: true })
+
+  const brand = getComputedStyle(target).getPropertyValue('--brand-default')
+  target.animate([{ outlineColor: `hsl(${brand})` }, { outlineColor: `hsl(${brand} / 0)` }], {
+    duration: PROMPT_FLASH_DURATION,
+    easing: 'ease-out',
+  })
+}
 
 const markdownComponents = {
   p: ({ children }: { children?: ReactNode }) => <>{children}</>,
   a: ({ href, children }: { href?: string; children?: ReactNode }) => {
     if (!href) return <>{children}</>
+    if (href.startsWith('#')) {
+      return (
+        <a href={href} onClick={handleInPageLinkClick} className="text-primary hover:underline">
+          {children}
+        </a>
+      )
+    }
     const external = /^(?:[a-z][a-z0-9+\-.]*:|\/\/)/i.test(href)
     return (
       <a
@@ -67,7 +92,13 @@ function AgentSetup({ id }: AgentSetupProps) {
       <StepHikeCompact.Step step={1} title="Copy the prompt">
         <StepHikeCompact.Details title="Copy the prompt" />
         <StepHikeCompact.Code className="mt-0!">
-          <AiPrompt id={agent.promptId} telemetry={{ source: 'agent_setup' }} />
+          <div
+            id={AGENT_PROMPT_ANCHOR}
+            tabIndex={-1}
+            className="rounded-lg outline-2 outline-offset-4 outline-transparent"
+          >
+            <AiPrompt id={agent.promptId} telemetry={{ source: 'agent_setup' }} />
+          </div>
         </StepHikeCompact.Code>
       </StepHikeCompact.Step>
       <StepHikeCompact.Step step={2} title="Schedule it in your agent">
