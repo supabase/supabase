@@ -317,6 +317,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
   return (
     <nav
       aria-labelledby="main-nav-title"
+      data-feedback-region="nav"
       className={cn(
         'fixed lg:relative z-40 lg:z-auto',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',

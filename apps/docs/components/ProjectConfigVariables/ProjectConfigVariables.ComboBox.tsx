@@ -82,6 +82,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
     >
       <PopoverTrigger asChild>
         <Button
+          data-feedback-redact
           variant="outline"
           disabled={disabled}
           aria-expanded={open}
@@ -104,7 +105,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0" side="bottom" align="start">
+      <PopoverContent data-feedback-redact className="p-0" side="bottom" align="start">
         <Command shouldFilter={useCommandSearch} label={`Search ${name}`}>
           <CommandInput
             placeholder={`Search ${name}...`}

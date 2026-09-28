@@ -487,7 +487,7 @@ function ProjectConfigVariablesInternal({ variable }: { variable: Variable }) {
   const inputId = useId()
 
   return (
-    <div className="max-w-[min(100%, 500px)] my-6">
+    <div data-feedback-redact className="max-w-[min(100%, 500px)] my-6">
       <label
         htmlFor={inputId}
         className={cn('block mt-0 mb-1 font-heading font-semibold', 'text-foreground')}

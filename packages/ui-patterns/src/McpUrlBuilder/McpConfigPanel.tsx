@@ -90,7 +90,7 @@ export function McpConfigPanel({
   const innerPanelSpacing = 'px-4 py-3'
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div data-feedback-redact className={cn('space-y-6', className)}>
       <div className={cn('border rounded-lg')}>
         <h3 className={innerPanelSpacing}>Options</h3>
         <Separator />
