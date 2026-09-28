@@ -33,8 +33,8 @@ import {
   NewTable,
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import {
   FormSection,
   FormSectionContent,
@@ -153,12 +153,11 @@ export const EditWrapperSheet = ({
   const wrapper_name = useWatch({ name: 'wrapper_name', control: form.control })
 
   const [isLoadingSecrets, setIsLoadingSecrets] = useState(false)
-  // Encrypted fields are seeded with their secret UUID until the decrypted value loads.
-  // Save must stay blocked until then, otherwise submitting saves the UUID itself as
-  // the new secret value (see getUpdateFDWSql, which treats any changed field value as
-  // a new plaintext secret to store).
   const [secretsReady, setSecretsReady] = useState(false)
+
   useEffect(() => {
+    let isCurrent = true
+
     const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
     const encryptedIdsToFetch = compact(
@@ -167,10 +166,10 @@ export const EditWrapperSheet = ({
         return value ?? null
       })
     ).filter((x) => UUID_REGEX.test(x))
-    // [Joshen] ^ Validate UUID to filter out already decrypted values
 
     if (encryptedIdsToFetch.length === 0) {
       setSecretsReady(true)
+      setIsLoadingSecrets(false)
       return
     }
 
@@ -185,6 +184,7 @@ export const EditWrapperSheet = ({
           connectionString: project?.connectionString,
           ids: ids,
         })
+        if (!isCurrent) return
 
         encryptedOptions.forEach((option) => {
           const encryptedId = initialValues[option.name]
@@ -193,13 +193,18 @@ export const EditWrapperSheet = ({
         })
         setSecretsReady(true)
       } catch (error) {
+        if (!isCurrent) return
         toast.error('Failed to fetch encrypted values')
       } finally {
-        setIsLoadingSecrets(false)
+        if (isCurrent) setIsLoadingSecrets(false)
       }
     }
 
     fetchEncryptedValues(encryptedIdsToFetch)
+
+    return () => {
+      isCurrent = false
+    }
   }, [initialValues, wrapperMeta, resetField, project?.ref, project?.connectionString])
 
   return (
