@@ -16,6 +16,7 @@ import {
 } from 'ui'
 
 import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
+import { OAuthAppsRevokeDialogContent } from './OAuthAppsRevokeDialogContent'
 import type { OAuthApprovalItem, OAuthApprovalTarget } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsAuthorizedRowProps {
@@ -78,9 +79,23 @@ export const OAuthAppsAuthorizedRow = ({ approval }: OAuthAppsAuthorizedRowProps
                   View grants
                 </DropdownMenuItem>
               </DialogTrigger>
+              <DialogTrigger asChild>
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={() => setDialogContent('revoke')}
+                >
+                  Disconnect
+                </DropdownMenuItem>
+              </DialogTrigger>
             </DropdownMenuContent>
           </DropdownMenu>
           {dialogContent === 'grants' && <OAuthAppsMemberGrantsDialogContent approval={approval} />}
+          {dialogContent === 'revoke' && (
+            <OAuthAppsRevokeDialogContent
+              approval={approval}
+              onClose={() => setDialogContent(null)}
+            />
+          )}
         </Dialog>
       </TableCell>
     </TableRow>
