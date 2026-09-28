@@ -1,37 +1,75 @@
+import {
+  BotIcon,
+  Building2Icon,
+  Code2Icon,
+  Hammer,
+  Maximize2,
+  ShieldCheck,
+  TrendingUpIcon,
+} from 'lucide-react'
 import type { GoPageInput } from 'marketing'
 import Link from 'next/link'
 import { Button } from 'ui'
 
-type ThemeLink = {
-  label: string
-  href: string
-}
-
 type Theme = {
   name: string
   description: string
-  product: ThemeLink
-  feature: ThemeLink
+  cta: { label: string; href: string }
+  icon: typeof Hammer
 }
 
 const themes: Theme[] = [
   {
-    name: 'Build',
-    description: 'Ship your first Postgres-backed app fast.',
-    product: { label: 'Database', href: '/database' },
-    feature: { label: 'Auto-generated REST API', href: '/features/auto-generated-rest-api' },
+    name: 'Build anything',
+    description:
+      "Your agent sets up the backend from code, your users' agents work with your app through its own MCP server, and long-running tasks run in Supabase Compute.",
+    cta: { label: 'Read the Build Blog', href: '/docs' },
+    icon: Hammer,
   },
   {
-    name: 'Scale',
-    description: 'Grow without re-architecting your stack.',
-    product: { label: 'Edge Functions', href: '/edge-functions' },
-    feature: { label: 'Regional invocations', href: '/features/regional-invocations' },
+    name: 'Scale without limits',
+    description:
+      'The app your agent built in minutes stays on the same Postgres, from prototype to petabyte.',
+    cta: { label: 'Read the Scale Blog', href: '/docs' },
+    icon: Maximize2,
   },
   {
-    name: 'Operate',
-    description: 'Run Supabase securely in production.',
-    product: { label: 'Auth', href: '/auth' },
-    feature: { label: 'Row Level Security', href: '/features/row-level-security' },
+    name: 'Operate with confidence',
+    description:
+      'Your agent finds the problem, tests the fix, and reports what it found. You decide what ships.',
+    cta: { label: 'Read the Operate Blog', href: '/docs' },
+    icon: ShieldCheck,
+  },
+]
+
+const solutions = [
+  {
+    name: 'AI Builders',
+    description:
+      'Ship AI-powered apps with a Postgres backend built for agents. Your users get one integrated backend, so you spend time building instead of managing infrastructure.',
+    href: '/solutions/ai-builders',
+    icon: BotIcon,
+  },
+  {
+    name: 'Startups',
+    description:
+      'Move fast on a backend that scales with you. Spend your time on the product, not on managing infrastructure.',
+    href: '/solutions/startups',
+    icon: TrendingUpIcon,
+  },
+  {
+    name: 'Developers',
+    description:
+      'Get everything you need to build a backend, in one place. Database, Auth, Storage, and Realtime all run on the same Postgres platform, so you write less glue code.',
+    href: '/solutions/developers',
+    icon: Code2Icon,
+  },
+  {
+    name: 'Enterprise',
+    description:
+      'Run Supabase at scale with the security and support your team needs. Teams like GitHub and PwC trust Supabase to run their most important workloads.',
+    href: '/solutions/enterprise',
+    icon: Building2Icon,
   },
 ]
 
@@ -39,18 +77,17 @@ const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'ask-supabase-select',
   metadata: {
-    title: 'Ask Supabase: Quick Product Links',
+    title: 'Ask Supabase: Select 2026 announcements',
     description:
-      'Quick links to Supabase products and features, organized by build, scale, and operate.',
+      'Catch up on the product announcements from Supabase Select 2026, plus where to go next for your team.',
   },
   hero: {
-    title: 'Ask Supabase',
-    subtitle: 'Quick links, organized by what you are trying to do',
-    description:
-      'Jump straight to the Supabase products and features that match where you are in your project, from building your first app to operating it in production.',
+    title: 'Build in an instant. Scale to infinity.',
+    subtitle: 'Ask Supabase',
+    description: 'Questions about what shipped?\nFind the Ask Supabase team on the show floor.',
     ctas: [
       {
-        label: 'Read the docs',
+        label: 'Read the Recap',
         href: '/docs',
         variant: 'secondary',
       },
@@ -59,32 +96,55 @@ const page: GoPageInput = {
   sections: [
     {
       type: 'three-column',
-      title: 'Find what you need',
-      description:
-        'Three themes, each with a product page, a feature page, and an upcoming blog post.',
+      title: 'Our announcements',
+      description: '20+ announcements, catch up on every single one.',
       children: (
         <>
           {themes.map((theme) => (
             <div
               key={theme.name}
-              className="flex flex-col gap-4 rounded-lg border border-muted p-6"
+              className="flex flex-col gap-6 rounded-lg border border-muted p-8"
             >
-              <div>
-                <h3 className="text-lg text-foreground">{theme.name}</h3>
-                <p className="text-sm text-foreground-lighter mt-1">{theme.description}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Button asChild size="small" className="justify-start">
-                  <Link href={theme.product.href}>Product: {theme.product.label}</Link>
-                </Button>
-                <Button asChild size="small" className="justify-start">
-                  <Link href={theme.feature.href}>Feature: {theme.feature.label}</Link>
-                </Button>
-                <span className="text-sm text-foreground-lighter px-1">Blog post: coming soon</span>
-              </div>
+              <theme.icon className="h-6 w-6 stroke-brand-default" strokeWidth={1.5} />
+              <h3 className="text-lg text-foreground">{theme.name}</h3>
+              <p className="text-sm text-foreground-light">{theme.description}</p>
+              <Button asChild size="small" variant="primary" className="self-center mt-auto">
+                <Link href={theme.cta.href}>{theme.cta.label}</Link>
+              </Button>
             </div>
           ))}
         </>
+      ),
+    },
+    {
+      type: 'two-column',
+      title: 'Explore Supabase for your team',
+      children: (
+        <>
+          {solutions.map((solution) => (
+            <Link
+              key={solution.name}
+              href={solution.href}
+              className="flex flex-col gap-2 rounded-lg border border-muted p-4 transition-colors hover:border-foreground-muted hover:bg-surface-100 active:bg-surface-200"
+            >
+              <solution.icon className="h-5 w-5 stroke-brand-default" strokeWidth={1.5} />
+              <h3 className="text-base text-foreground">{solution.name}</h3>
+              <p className="text-sm text-foreground-lighter">{solution.description}</p>
+            </Link>
+          ))}
+        </>
+      ),
+    },
+    {
+      type: 'single-column',
+      title: 'Supabase features',
+      description: 'Everything you need to build and ship your next project.',
+      children: (
+        <div className="flex justify-center">
+          <Button asChild size="medium" variant="primary">
+            <Link href="/features">Explore all the latest features</Link>
+          </Button>
+        </div>
       ),
     },
   ],
