@@ -28,14 +28,14 @@ export const useBannedIPsQuery = <TData = IPData>(
   { projectRef }: BannedIPVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<IPData, IPError, TData> = {}
 ) => {
-  const { data: project } = useProjectDetailQuery(
+  const { data: project, error: projectError } = useProjectDetailQuery(
     { ref: projectRef },
     { enabled: enabled && IS_PLATFORM }
   )
   const isSupported =
     !!project && !project.high_availability && project.cloud_provider !== PROVIDERS.AWS_K8S.id
 
-  return useQuery<IPData, IPError, TData>({
+  const query = useQuery<IPData, IPError, TData>({
     queryKey: BannedIPKeys.list(projectRef),
     queryFn: ({ signal }) => getBannedIPs({ projectRef }, signal),
     enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && isSupported,
@@ -44,4 +44,16 @@ export const useBannedIPsQuery = <TData = IPData>(
     staleTime: 60_000,
     ...options,
   })
+
+  return {
+    data: isSupported ? query.data : undefined,
+    error: query.error,
+    isError: query.isError,
+    isPending: query.isPending,
+    isFetching: query.isFetching,
+    isSuccess: query.isSuccess,
+    fetchStatus: query.fetchStatus,
+    refetch: query.refetch,
+    projectError: project ? null : projectError,
+  }
 }

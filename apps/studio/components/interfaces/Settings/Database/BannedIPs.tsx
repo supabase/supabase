@@ -45,6 +45,7 @@ export const BannedIPs = () => {
     isFetching: isFetchingIPList,
     data: ipList,
     error: ipListError,
+    projectError,
   } = useBannedIPsQuery({ projectRef: ref })
 
   const { data: userIPAddress } = useUserIPAddressQuery()
@@ -105,6 +106,13 @@ export const BannedIPs = () => {
           <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
         </PageSectionMeta>
         <PageSectionContent>
+          {projectError && (
+            <AlertError
+              error={projectError}
+              subject="Failed to retrieve project details"
+              projectRef={ref}
+            />
+          )}
           {isHighAvailability && (
             <div className="mb-4">
               <HighAvailabilityDisabledSectionNotice
@@ -120,48 +128,56 @@ export const BannedIPs = () => {
               description="Fail2Ban is not supported on v3 projects."
             />
           )}
-          {!isHighAvailability &&
-            !isAwsK8s &&
-            (ipListLoading ? (
-              <Card>
-                <CardContent className="space-y-4">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-                </CardContent>
-              </Card>
-            ) : ipListError ? (
-              <AlertError error={ipListError} subject="Failed to retrieve banned IP addresses" />
-            ) : ipList.banned_ipv4_addresses.length > 0 ? (
-              <Card>
-                {ipList.banned_ipv4_addresses.map((ip) => (
-                  <CardContent key={ip} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-5">
-                      <Globe size={16} className="text-foreground-lighter" />
-                      <p className="text-sm font-mono">{ip}</p>
-                      {ip === userIPAddress && <Badge>Your IP address</Badge>}
-                    </div>
-                    <ButtonTooltip
-                      disabled={isSectionDisabled}
-                      onClick={() => openConfirmationModal(ip)}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: isSectionDisabled ? sectionDisabledReason : undefined,
-                        },
-                      }}
-                    >
-                      Unban IP
-                    </ButtonTooltip>
+          {!projectError && !isHighAvailability && !isAwsK8s && (
+            <>
+              {ipListError && (
+                <AlertError
+                  error={ipListError}
+                  subject="Failed to retrieve banned IP addresses"
+                  projectRef={ref}
+                />
+              )}
+              {!ipListError && ipListLoading && (
+                <Card>
+                  <CardContent className="space-y-4">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
                   </CardContent>
-                ))}
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="text-foreground text-sm">
-                  There are no banned IP addresses for your project
-                </CardContent>
-              </Card>
-            ))}
+                </Card>
+              )}
+              {!ipListError && !ipListLoading && ipList && (
+                <Card>
+                  {ipList.banned_ipv4_addresses.length > 0 ? (
+                    ipList.banned_ipv4_addresses.map((ip) => (
+                      <CardContent key={ip} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-5">
+                          <Globe size={16} className="text-foreground-lighter" />
+                          <p className="text-sm font-mono">{ip}</p>
+                          {ip === userIPAddress && <Badge>Your IP address</Badge>}
+                        </div>
+                        <ButtonTooltip
+                          disabled={isSectionDisabled}
+                          onClick={() => openConfirmationModal(ip)}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: isSectionDisabled ? sectionDisabledReason : undefined,
+                            },
+                          }}
+                        >
+                          Unban IP
+                        </ButtonTooltip>
+                      </CardContent>
+                    ))
+                  ) : (
+                    <CardContent className="text-foreground text-sm">
+                      There are no banned IP addresses for your project
+                    </CardContent>
+                  )}
+                </Card>
+              )}
+            </>
+          )}
         </PageSectionContent>
       </PageSection>
 

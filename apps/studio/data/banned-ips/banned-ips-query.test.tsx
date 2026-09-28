@@ -4,7 +4,9 @@ import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
 import { useBannedIPsQuery, type IPData } from './banned-ips-query'
+import { BannedIPKeys } from './keys'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
+import { projectKeys } from '@/data/projects/keys'
 import { useProjectDetailQuery, type ProjectDetail } from '@/data/projects/project-detail-query'
 import { customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
@@ -119,7 +121,7 @@ describe('useBannedIPsQuery', () => {
     expect(requests).toHaveLength(1)
   })
 
-  test('does not retrieve bans when project details fail', async () => {
+  test('exposes a project-details failure and recovers after a successful retry', async () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -133,8 +135,86 @@ describe('useBannedIPsQuery', () => {
     }))
 
     await waitFor(() => expect(result.current.project.isError).toBe(true))
+    expect(result.current.bans.projectError?.message).toBe('Project unavailable')
     expect(result.current.bans.fetchStatus).toBe('idle')
     expect(requests).toEqual([])
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<ProjectDetail>(PROJECT),
+    })
+    await act(() => result.current.project.refetch())
+
+    await waitFor(() => expect(result.current.bans.isSuccess).toBe(true))
+    expect(result.current.bans.projectError).toBeNull()
+    expect(result.current.bans.data).toEqual(BANNED_IPS)
+    expect(requests).toHaveLength(1)
+  })
+
+  test.each([
+    { name: 'v3', cloud_provider: 'AWS_K8S', high_availability: false },
+    { name: 'HA', cloud_provider: 'AWS', high_availability: true },
+  ])('hides cached bans when the same project becomes $name', async (unsupported) => {
+    let project = PROJECT
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<ProjectDetail>(project),
+    })
+    const requests = mockBannedIPs()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const { result } = customRenderHook(
+      () => ({
+        bans: useBannedIPsQuery({ projectRef: 'default' }),
+        advisor: useAdvisorSignals({ projectRef: 'default' }),
+      }),
+      { queryClient }
+    )
+
+    await waitFor(() => expect(result.current.advisor.data).toHaveLength(1))
+    project = { ...PROJECT, ...unsupported }
+    await act(() => queryClient.invalidateQueries({ queryKey: projectKeys.detail('default') }))
+
+    await waitFor(() => expect(result.current.advisor.data).toEqual([]))
+    expect(result.current.bans.data).toBeUndefined()
+    expect(result.current.bans.fetchStatus).toBe('idle')
+    expect(queryClient.getQueryData(BannedIPKeys.list('default'))).toEqual(BANNED_IPS)
+    expect(requests).toHaveLength(1)
+
+    project = PROJECT
+    await act(() => queryClient.invalidateQueries({ queryKey: projectKeys.detail('default') }))
+
+    await waitFor(() => expect(result.current.advisor.data).toHaveLength(1))
+    expect(result.current.bans.data).toEqual(BANNED_IPS)
+  })
+
+  test('keeps bans visible when project details fail to refresh with cached supported data', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<ProjectDetail>(PROJECT),
+    })
+    mockBannedIPs()
+    const { result } = customRenderHook(() => ({
+      project: useProjectDetailQuery({ ref: 'default' }),
+      bans: useBannedIPsQuery({ projectRef: 'default' }),
+      advisor: useAdvisorSignals({ projectRef: 'default' }),
+    }))
+
+    await waitFor(() => expect(result.current.advisor.data).toHaveLength(1))
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Project unavailable' }, { status: 500 }),
+    })
+    await act(() => result.current.project.refetch())
+
+    await waitFor(() => expect(result.current.project.isError).toBe(true))
+    expect(result.current.bans.projectError).toBeNull()
+    expect(result.current.bans.data).toEqual(BANNED_IPS)
+    expect(result.current.advisor.data).toHaveLength(1)
   })
 
   test.each([
