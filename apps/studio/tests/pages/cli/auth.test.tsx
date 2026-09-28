@@ -71,14 +71,14 @@ beforeEach(() => {
 })
 
 describe('CliAuthScreen requested scopes', () => {
-  test('renders valid scopes and sends exactly that list on authorize', async () => {
-    mockQuery = { scopes: 'database:write,storage:read' }
+  test('renders valid scopes grouped by access level and sends that list on authorize', async () => {
+    mockQuery = { scopes: 'project:database:write,project:snippets:read' }
     const assign = mockLocationAssign()
 
     renderCliAuthScreen()
 
     expect(await screen.findByText('Database')).toBeInTheDocument()
-    expect(screen.getByText('Storage')).toBeInTheDocument()
+    expect(screen.getByText('SQL Snippets')).toBeInTheDocument()
     expect(screen.getByText('READ-WRITE')).toBeInTheDocument()
     expect(screen.getByText('READ')).toBeInTheDocument()
 
@@ -86,11 +86,20 @@ describe('CliAuthScreen requested scopes', () => {
 
     await waitFor(() => expect(assign).toHaveBeenCalled())
     const redirectUrl = assign.mock.calls[0][0] as string
-    expect(redirectUrl).toContain('scopes=database:write,storage:read')
+    expect(redirectUrl).toContain('scopes=project:database:write,project:snippets:read')
+  })
+
+  test('groups multiple resources of the same level into one comma-separated row', async () => {
+    mockQuery = { scopes: 'project:admin:write,project:action_runs:write' }
+
+    renderCliAuthScreen()
+
+    expect(await screen.findByText('Project Settings, Action Runs')).toBeInTheDocument()
+    expect(screen.queryByText('READ')).not.toBeInTheDocument()
   })
 
   test('collapses a repeated read+write param into a single write entry', async () => {
-    mockQuery = { scopes: ['database:read', 'database:write'] }
+    mockQuery = { scopes: ['project:database:read', 'project:database:write'] }
     const assign = mockLocationAssign()
 
     renderCliAuthScreen()
@@ -103,12 +112,12 @@ describe('CliAuthScreen requested scopes', () => {
 
     await waitFor(() => expect(assign).toHaveBeenCalled())
     const redirectUrl = assign.mock.calls[0][0] as string
-    expect(redirectUrl).toContain('scopes=database:write')
-    expect(redirectUrl).not.toContain('database:read')
+    expect(redirectUrl).toContain('scopes=project:database:write')
+    expect(redirectUrl).not.toContain('project:database:read')
   })
 
   test('drops an unrecognised scope without rendering it, keeping the valid ones', async () => {
-    mockQuery = { scopes: 'database:write,bogus:read' }
+    mockQuery = { scopes: 'project:database:write,project:bogus:read' }
     const assign = mockLocationAssign()
 
     renderCliAuthScreen()
@@ -121,7 +130,7 @@ describe('CliAuthScreen requested scopes', () => {
 
     await waitFor(() => expect(assign).toHaveBeenCalled())
     const redirectUrl = assign.mock.calls[0][0] as string
-    expect(redirectUrl).toContain('scopes=database:write')
+    expect(redirectUrl).toContain('scopes=project:database:write')
   })
 
   test('shows "No permissions requested" when no scopes were passed', async () => {
@@ -131,5 +140,51 @@ describe('CliAuthScreen requested scopes', () => {
 
     expect(await screen.findByText('No permissions requested.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Authorize CLI' })).not.toBeDisabled()
+  })
+
+  test('hides commands until the toggle is expanded', async () => {
+    mockQuery = { scopes: 'project:database:write,project:storage:read' }
+
+    renderCliAuthScreen()
+
+    const toggle = await screen.findByRole('button', { name: 'Show commands' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByText('db push')).not.toBeInTheDocument()
+
+    fireEvent.click(toggle)
+
+    const expandedToggle = screen.getByRole('button', { name: 'Hide commands' })
+    expect(expandedToggle).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByText('db push')).toBeInTheDocument()
+    expect(screen.getByText('storage ls')).toBeInTheDocument()
+    expect(screen.queryByText('READ-WRITE')).not.toBeInTheDocument()
+
+    fireEvent.click(expandedToggle)
+
+    expect(screen.getByRole('button', { name: 'Show commands' })).toBeInTheDocument()
+    expect(screen.queryByText('db push')).not.toBeInTheDocument()
+    expect(screen.getByText('READ-WRITE')).toBeInTheDocument()
+  })
+
+  test('lists write commands before read commands, and write resources first', async () => {
+    mockQuery = { scopes: 'project:snippets:read,project:database:write' }
+
+    renderCliAuthScreen()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Show commands' }))
+
+    const commands = screen.getAllByText(/^(db|gen|snippets) /).map((node) => node.textContent)
+    expect(commands).toEqual(['db push', 'db reset', 'db dump', 'gen types', 'snippets list'])
+  })
+
+  test('renders a resource with no mapped commands as a name-only row', async () => {
+    mockQuery = { scopes: 'project:advisors:read' }
+
+    renderCliAuthScreen()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Show commands' }))
+
+    expect(screen.getByText('Advisors')).toBeInTheDocument()
+    expect(document.querySelectorAll('code')).toHaveLength(0)
   })
 })

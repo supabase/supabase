@@ -30,8 +30,8 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { toResourceLabel, type ParsedScope } from './auth.utils'
-import { useRequestedScopes } from './useRequestedScopes'
+import { CliAuthPermissions } from '@/components/interfaces/CliAuth/CliAuthPermissions'
+import { useRequestedScopes } from '@/components/interfaces/CliAuth/useRequestedScopes'
 import {
   InterstitialLayout,
   LogoBox,
@@ -129,54 +129,6 @@ const DetailRow = ({
   </div>
 )
 
-type ScopeGroup = { name: string; level: 'read' | 'read_write' }
-
-const ScopeGroupCard = ({
-  appName,
-  scopeGroups,
-}: {
-  appName: string
-  scopeGroups: ScopeGroup[]
-}) => (
-  <section className="flex flex-col gap-3">
-    <div className="flex flex-col gap-1">
-      <p className="text-sm text-foreground">Permissions requested</p>
-      <p className="text-xs text-foreground-lighter">
-        Authorizing {appName} grants it the following access permissions to the selected projects.
-      </p>
-    </div>
-
-    <div className="divide-y rounded-md border bg-surface-75 px-4">
-      {scopeGroups.map((scopeGroup) => (
-        <div key={scopeGroup.name} className="flex flex-col gap-2 py-3">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-foreground-light">
-            {scopeGroup.level === 'read' ? 'READ' : 'READ-WRITE'}
-          </p>
-          <p className="text-xs font-medium text-foreground">{scopeGroup.name}</p>
-        </div>
-      ))}
-    </div>
-  </section>
-)
-
-function toScopeGroups(scopes: ParsedScope[]): ScopeGroup[] {
-  const readWrite = scopes
-    .filter((scope) => scope.action === 'write')
-    .map((scope) => toResourceLabel(scope.resource))
-  const readOnly = scopes
-    .filter((scope) => scope.action === 'read')
-    .map((scope) => toResourceLabel(scope.resource))
-
-  const groups: ScopeGroup[] = []
-  if (readWrite.length > 0) {
-    groups.push({ name: readWrite.join(', '), level: 'read_write' })
-  }
-  if (readOnly.length > 0) {
-    groups.push({ name: readOnly.join(', '), level: 'read' })
-  }
-  return groups
-}
-
 function isAllowedRedirectUri(redirectUri: string) {
   try {
     const url = new URL(redirectUri)
@@ -245,7 +197,6 @@ export const CliAuthScreen = ({
     resolver: zodResolver(formSchema),
   })
 
-  const scopeGroups = toScopeGroups(requestedScopes)
   const expiresAt = dayjs().add(TOKEN_EXPIRY_DAYS, 'days')
 
   if (!code || !redirectUri) {
@@ -382,12 +333,7 @@ export const CliAuthScreen = ({
             )}
           />
 
-          {scopeGroups.length > 0 && (
-            <ScopeGroupCard appName="Supabase CLI" scopeGroups={scopeGroups} />
-          )}
-          {scopeGroups.length === 0 && (
-            <p className="text-xs text-foreground-lighter">No permissions requested.</p>
-          )}
+          <CliAuthPermissions appName="Supabase CLI" scopes={requestedScopes} />
 
           <div className="flex flex-col gap-2">
             <Button block variant="primary" type="submit">
