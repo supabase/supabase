@@ -1,14 +1,13 @@
-import { notFound } from 'next/navigation'
 import { readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-
-import { isFeatureEnabled } from 'common'
 import { ContributingToc } from '~/app/contributing/ContributingToC'
+import Breadcrumbs from '~/components/Breadcrumbs'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
-import Breadcrumbs from '~/components/Breadcrumbs'
+import { isFeatureEnabled } from 'common'
+import { notFound } from 'next/navigation'
 
 export default async function ContributingPage() {
   if (!isFeatureEnabled('docs:contribution')) {
@@ -22,7 +21,7 @@ export default async function ContributingPage() {
     <SidebarSkeleton>
       <LayoutMainContent className="pb-0 grid grid-cols-12 relative gap-4">
         <div className="col-span-12 lg:col-span-9">
-          <Breadcrumbs className="mb-2 col-span-full" />
+          <Breadcrumbs className="mb-2 col-span-full lg:hidden" />
           <article
             id="contributing"
             className="prose max-w-none relative transition-all ease-out duration-100"

@@ -1,6 +1,7 @@
 @import 'config/tailwind.config.css';
 @import './code-block.css';
 @import './reference.css';
+@import './header.css';
 @import './footer.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
@@ -82,6 +83,11 @@
 html {
   scroll-behavior: smooth;
   font-weight: 500;
+}
+
+html,
+body {
+  overscroll-behavior-y: none;
 }
 
 html[data-theme*='dark'] {

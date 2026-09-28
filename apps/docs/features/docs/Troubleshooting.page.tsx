@@ -1,9 +1,10 @@
-import { Github } from 'lucide-react'
-import Link from 'next/link'
-import { cn } from 'ui'
 import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import { Github } from 'lucide-react'
+import Link from 'next/link'
+import { cn } from 'ui'
+
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
@@ -20,7 +21,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
       className="@container/troubleshooting-entry-layout w-full max-w-(--breakpoint-lg) mx-auto lg:py-8 lg:px-5"
     >
       <div className="px-5 py-8 lg:px-0 lg:py-0">
-        <Breadcrumbs minLength={1} forceDisplayOnMobile />
+        <Breadcrumbs minLength={1} forceDisplayOnMobile className="lg:hidden" />
         <article
           id="sb-docs-troubleshooting-main-article"
           data-testid="sb-docs-troubleshooting-main-article"

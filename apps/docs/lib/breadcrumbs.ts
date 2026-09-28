@@ -1,9 +1,13 @@
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import { REFERENCES } from '~/content/navigation.references'
 
 export interface BreadcrumbItem {
   name?: string
   title?: string
   url?: string
+  icon?: string
+  items?: BreadcrumbItem[]
+  enabled?: boolean
 }
 
 const SECTION_PATH_TO_KEY: Record<string, keyof typeof NavItems> = {
@@ -53,7 +57,36 @@ function findMenuItemByUrl(
   return null
 }
 
+const getReferenceLibPath = (href: string) => href.split('/')[2]
+
+function resolveReferenceBreadcrumbs(pathname: string): BreadcrumbItem[] {
+  const libPath = getReferenceLibPath(pathname)
+  const reference = Object.values(REFERENCES).find((reference) => reference.libPath === libPath)
+  if (!reference) return []
+
+  const referenceMenu = NavItems.GLOBAL_MENU_ITEMS.flat().find(
+    (section) => section.label === 'Reference'
+  )
+  const libraries = (referenceMenu?.menuItems ?? [])
+    .flat()
+    .reduce<BreadcrumbItem[]>((libraries, item) => {
+      if (item.href?.startsWith('/') && item.enabled !== false) {
+        libraries.push({ name: item.label, url: item.href, icon: item.icon })
+      }
+      return libraries
+    }, [])
+  const library = libraries.find((item) => item.url && getReferenceLibPath(item.url) === libPath)
+
+  return [
+    { name: 'Reference', url: '/reference', items: libraries },
+    library ?? { name: reference.name, url: `/reference/${libPath}`, icon: reference.icon },
+  ]
+}
+
 export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
+  if (pathname.startsWith('/reference/')) {
+    return resolveReferenceBreadcrumbs(pathname)
+  }
   if (pathname.startsWith('/guides/troubleshooting')) {
     return [
       {

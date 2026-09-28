@@ -155,7 +155,7 @@ function Annotation({ annotation }: { annotation: CodeAnnotation }) {
   )
 }
 
-function CrossfadeIcon({
+export function CrossfadeIcon({
   active,
   activeIcon: ActiveIcon,
   inactiveIcon: InactiveIcon,

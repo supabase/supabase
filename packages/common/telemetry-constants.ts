@@ -985,7 +985,7 @@ export type MarkdownAffordancePageType =
  * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
- * @source www, docs
+ * @source www
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
@@ -1002,16 +1002,46 @@ export interface CopyAsMarkdownClickedEvent {
  *
  * @group Events
  * @source docs
+ * @page /docs/guides
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+  properties: {
+    /**
+     * Agent the user picked, as titled on the AI tools page, e.g. Claude Code
+     */
+    agent: string
+  }
+}
+
+/**
+ * User copied the URL of a guide's md version from the docs top bar and the
+ * clipboard write succeeded. Fires on success only
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface DocsMarkdownUrlCopiedEvent {
+  action: 'docs_markdown_url_copied'
+}
+
+/**
+ * User clicked "View as Markdown" in the docs top bar to open a guide's Markdown version
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface DocsViewAsMarkdownClickedEvent {
+  action: 'docs_view_as_markdown_clicked'
 }
 
 /**
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
- * @source www, docs
+ * @source www
  */
 export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
@@ -4033,6 +4063,8 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
+  | DocsMarkdownUrlCopiedEvent
+  | DocsViewAsMarkdownClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent

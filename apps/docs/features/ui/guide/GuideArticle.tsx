@@ -10,7 +10,7 @@ interface GuideArticleProps {
 export function GuideArticle({ children, className }: GuideArticleProps) {
   return (
     <>
-      <Breadcrumbs className="mb-6" />
+      <Breadcrumbs className="mb-6 lg:hidden" />
       <article
         // Used to get headings for the table of contents
         id="sb-docs-guide-main-article"
