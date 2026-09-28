@@ -14,12 +14,10 @@ import {
   CommandItem,
   CommandList,
   controlRadiusBySize,
-  controlSurfaceShadows,
   Popover,
   PopoverAnchor,
   PopoverContent,
   PopoverContentProps,
-  raisedControlSurface,
   SIZE,
   SIZE_VARIANTS,
   SIZE_VARIANTS_DEFAULT,
@@ -410,7 +408,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             // Empty: raised plate. Filled: sunk well for chips.
             values.length > 0
               ? 'border border-strong bg-field hover:border-control-hover'
-              : `${controlSurfaceShadows} ${raisedControlSurface}`,
+              : 'border-0 control-surface-shadows raised-control-surface',
             'placeholder:text-muted-foreground',
             'ring-border-control focus-ring',
             'disabled:cursor-not-allowed disabled:opacity-50',

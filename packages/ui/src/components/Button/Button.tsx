@@ -6,11 +6,7 @@ import { Slot } from 'radix-ui'
 import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
 import { SIZE_VARIANTS } from '../../lib/constants'
-import {
-  controlRadiusBySize,
-  controlSurfaceShadows,
-  raisedControlSurface,
-} from '../../lib/raised-control-surface'
+import { controlRadiusBySize } from '../../lib/raised-control-surface'
 import { cn } from '../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
 
@@ -29,7 +25,7 @@ const buttonVariants = cva(
   [&:not([aria-haspopup])]:motion-safe:active:scale-[0.97]
   focus-ring
   border
-  ${controlSurfaceShadows}
+  control-surface-shadows
   `,
   {
     variants: {
@@ -43,7 +39,7 @@ const buttonVariants = cva(
           hover:bg-[var(--primary-solid-hover)]
           data-[state=open]:bg-[var(--primary-solid-hover)]
           `,
-        default: raisedControlSurface,
+        default: 'border-0 raised-control-surface',
         secondary: `
           bg-foreground
           text-background

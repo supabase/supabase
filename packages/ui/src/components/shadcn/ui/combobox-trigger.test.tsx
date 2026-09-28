@@ -11,9 +11,9 @@ describe('ComboboxTrigger', () => {
     const trigger = screen.getByRole('combobox')
     expect(trigger).toHaveTextContent('Select publication')
     expect(trigger).toHaveClass(
-      'bg-card',
+      'control-surface-shadows',
+      'raised-control-surface',
       'border-0',
-      'shadow-[var(--button-shadow-default)]',
       'cursor-pointer',
       'focus-ring',
       'text-left'
@@ -31,9 +31,9 @@ describe('ComboboxTrigger', () => {
     )
 
     expect(screen.getByRole('combobox')).toHaveClass(
-      'bg-card',
-      'border-0',
-      'shadow-[var(--button-shadow-default)]'
+      'control-surface-shadows',
+      'raised-control-surface',
+      'border-0'
     )
   })
 

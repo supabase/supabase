@@ -56,7 +56,9 @@ describe('multi-select', () => {
     )
 
     expect(screen.getByRole('combobox')).toHaveClass(
-      'shadow-[var(--button-shadow-default)]',
+      'control-surface-shadows',
+      'raised-control-surface',
+      'border-0',
       'rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]',
       'pl-3',
       'pr-3',
@@ -78,7 +80,8 @@ describe('multi-select', () => {
       'pl-1.5',
       'pr-3'
     )
-    expect(screen.getByRole('combobox')).not.toHaveClass('shadow-[var(--button-shadow-default)]')
+    expect(screen.getByRole('combobox')).not.toHaveClass('raised-control-surface')
+    expect(screen.getByRole('combobox')).not.toHaveClass('control-surface-shadows')
   })
 
   it('supports the tiny control size', () => {
