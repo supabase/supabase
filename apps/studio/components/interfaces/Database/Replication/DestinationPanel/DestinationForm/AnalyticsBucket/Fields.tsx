@@ -26,6 +26,10 @@ import {
 } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
+  ANALYTICS_BUCKET_BUCKET_FIELD_COPY,
+  ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
+import {
   isMetadataListErrorVisible,
   isMetadataListLoading,
   useRefreshOnOpen,
@@ -155,9 +159,9 @@ export const AnalyticsBucketFields = ({
           name="warehouseName"
           render={({ field }) => (
             <FormItemLayout
-              label="Bucket"
+              label={ANALYTICS_BUCKET_BUCKET_FIELD_COPY.label}
               layout="horizontal"
-              description="The Analytics Bucket where data will be stored"
+              description={ANALYTICS_BUCKET_BUCKET_FIELD_COPY.description}
             >
               <FormControl>
                 <Select
@@ -207,9 +211,9 @@ export const AnalyticsBucketFields = ({
           name="namespace"
           render={({ field }) => (
             <FormItemLayout
-              label="Namespace"
+              label={ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.label}
               layout="horizontal"
-              description="The namespace within the bucket where tables will be organized"
+              description={ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.description}
             >
               <FormControl>
                 <Select
