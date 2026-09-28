@@ -18,7 +18,8 @@ import {
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 
 interface FormData {
-  name: string
+  firstName: string
+  lastName: string
   email: string
   company: string
   useCase: string
@@ -26,7 +27,8 @@ interface FormData {
 }
 
 const defaultFormValue: FormData = {
-  name: '',
+  firstName: '',
+  lastName: '',
   email: '',
   company: '',
   useCase: '',
@@ -58,7 +60,8 @@ export function WaitlistForm() {
 
   const validate = (): boolean => {
     const newErrors: { [key: string]: string } = {}
-    if (!formData.name) newErrors.name = 'This field is required'
+    if (!formData.firstName) newErrors.firstName = 'This field is required'
+    if (!formData.lastName) newErrors.lastName = 'This field is required'
     if (!formData.email) newErrors.email = 'This field is required'
     else if (!isValidEmail(formData.email)) newErrors.email = 'Invalid email address'
     setErrors(newErrors)
@@ -79,7 +82,7 @@ export function WaitlistForm() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('/api-v2/submit-form-workers-waitlist', {
+      const response = await fetch('/api-v2/submit-form-compute-waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, honeypot }),
@@ -114,18 +117,43 @@ export function WaitlistForm() {
       onSubmit={handleSubmit}
       className="border border-border rounded-lg bg-surface-75 p-6 md:p-8 w-full max-w-lg flex flex-col gap-4 text-left"
     >
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="name" className="text-foreground-light flex justify-between text-left">
-          Name
-          {errors.name && <span className="text-foreground-muted text-xs">{errors.name}</span>}
-        </Label>
-        <Input
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Jane Doe"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="firstName"
+            className="text-foreground-light flex justify-between text-left"
+          >
+            First name
+            {errors.firstName && (
+              <span className="text-foreground-muted text-xs">{errors.firstName}</span>
+            )}
+          </Label>
+          <Input
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="Jane"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="lastName"
+            className="text-foreground-light flex justify-between text-left"
+          >
+            Last name
+            {errors.lastName && (
+              <span className="text-foreground-muted text-xs">{errors.lastName}</span>
+            )}
+          </Label>
+          <Input
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder="Doe"
+          />
+        </div>
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="email" className="text-foreground-light flex justify-between text-left">
