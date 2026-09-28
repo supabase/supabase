@@ -1,35 +1,12 @@
-import { MoreVertical } from 'lucide-react'
-import {
-  Badge,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  TableCell,
-  TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { TableCell, TableRow } from 'ui'
 
-import type { OAuthAppOverviewItem } from '@/data/oauth-apps/types'
+import type { OAuthApprovalItem } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsAuthorizedRowProps {
-  app: OAuthAppOverviewItem
-  canRevoke: boolean
-  onSelectViewGrants: () => void
-  onSelectRevoke: () => void
+  app: OAuthApprovalItem
 }
 
-export const OAuthAppsAuthorizedRow = ({
-  app,
-  canRevoke,
-  onSelectViewGrants,
-  onSelectRevoke,
-}: OAuthAppsAuthorizedRowProps) => {
-  const showRevoke = canRevoke && app.status === 'active'
-
+export const OAuthAppsAuthorizedRow = ({ app }: OAuthAppsAuthorizedRowProps) => {
   return (
     <TableRow>
       <TableCell>
@@ -45,41 +22,7 @@ export const OAuthAppsAuthorizedRow = ({
           </p>
         </div>
       </TableCell>
-      <TableCell>
-        <Badge variant={getStatusVariant(app.status)}>{app.status.toUpperCase()}</Badge>
-      </TableCell>
-      <TableCell>{getGrantsLabel(app)}</TableCell>
-      <TableCell className="text-right">
-        <DropdownMenu>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <Button icon={<MoreVertical />} className="px-1" aria-label="Actions" />
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent>Actions</TooltipContent>
-          </Tooltip>
-          <DropdownMenuContent align="end" side="bottom" className="w-40">
-            <DropdownMenuItem onClick={onSelectViewGrants}>View grants</DropdownMenuItem>
-            {showRevoke && (
-              <DropdownMenuItem className="text-destructive" onClick={onSelectRevoke}>
-                Revoke
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
+      <TableCell>{app.org_grant ? 'Organization' : 'Members'}</TableCell>
     </TableRow>
   )
-}
-
-function getStatusVariant(status: OAuthAppOverviewItem['status']) {
-  if (status === 'active') return 'success' as const
-  return 'warning' as const
-}
-
-function getGrantsLabel(app: OAuthAppOverviewItem) {
-  if (app.status === 'legacy') return 'Authorized before project controls'
-  if (app.member_grant_count === 1) return '1 member grant'
-  return `${app.member_grant_count} member grants`
 }
