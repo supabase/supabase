@@ -1,7 +1,17 @@
-import { getToolName, isToolUIPart, type UIMessage } from 'ai'
+import {
+  getToolName,
+  isToolUIPart,
+  type DynamicToolUIPart,
+  type ReasoningUIPart,
+  type ToolUIPart,
+  type UIMessage,
+} from 'ai'
 import isEqual from 'lodash/isEqual'
 
 type MessagePart = UIMessage['parts'][number]
+type ToolPart = ToolUIPart | DynamicToolUIPart
+/** A one-line row that folds into a tool group: reasoning, or a lookup tool call. */
+export type CompactPart = ReasoningUIPart | ToolPart
 
 export function areMessagePartsEqual(previous: MessagePart, next: MessagePart): boolean {
   if (previous === next) return true
@@ -26,146 +36,26 @@ export function areMessagePartsEqual(previous: MessagePart, next: MessagePart): 
   return isEqual(previous, next)
 }
 
-/**
- * - `compact`: a one-line tool row (reasoning, lookups) that gets folded into a tool group
- * - `block`: content that renders on its own (text, SQL results, notebooks, Edge Functions)
- * - `hidden`: renders nothing, so it neither breaks up nor joins a tool group
- */
-type MessagePartKind = 'compact' | 'block' | 'hidden'
-
-const COMPACT_TOOL_PART_TYPES = new Set<string>([
-  'tool-list_policies',
-  'tool-search_docs',
-  'tool-get_active_incidents',
-  'tool-load_knowledge',
-  'tool-list_reports',
-  'tool-get_report',
-  'tool-list_databases',
-  'tool-list_notebooks',
-  'tool-get_notebook',
-  // Self-hosted fallbacks
-  'tool-getSchemaTables',
-  'tool-getRlsKnowledge',
-  'tool-getFunctions',
-  'tool-getEdgeFunctionKnowledge',
-])
-
-const BLOCK_TOOL_PART_TYPES = new Set<string>([
-  'tool-execute_sql',
-  'tool-query_logs',
-  'tool-deploy_edge_function',
-  'tool-create_notebook',
-  'tool-update_notebook',
-  'tool-delete_notebook',
-  'tool-run_notebook',
-])
-
-export function getMessagePartKind(part: MessagePart): MessagePartKind {
-  if (part.type === 'reasoning') return 'compact'
-  if (part.type === 'dynamic-tool') return part.toolName === 'query_logs' ? 'block' : 'compact'
-  if (part.type === 'text') return part.text.trim().length > 0 ? 'block' : 'hidden'
-  if (COMPACT_TOOL_PART_TYPES.has(part.type)) return 'compact'
-  if (BLOCK_TOOL_PART_TYPES.has(part.type)) return 'block'
-  return 'hidden'
-}
-
-export type MessagePartItem =
-  | { type: 'part'; part: MessagePart; partIndex: number }
-  | { type: 'tool-group'; parts: MessagePart[]; groupIndex: number }
-
-/**
- * Folds each run of consecutive compact tool parts into a single tool group. Hidden parts
- * (step markers, tools without UI) are dropped so they don't split a run in two.
- */
-export function groupMessageParts(parts: MessagePart[]): MessagePartItem[] {
-  const items: MessagePartItem[] = []
-  let groupCount = 0
-
-  parts.forEach((part, partIndex) => {
-    const kind = getMessagePartKind(part)
-    if (kind === 'hidden') return
-
-    if (kind === 'block') {
-      items.push({ type: 'part', part, partIndex })
-      return
-    }
-
-    const lastItem = items.at(-1)
-    if (lastItem?.type === 'tool-group') {
-      lastItem.parts.push(part)
-    } else {
-      items.push({ type: 'tool-group', parts: [part], groupIndex: groupCount++ })
-    }
-  })
-
-  return items
-}
-
-export const INTERRUPTED_LABEL = 'Response interrupted'
-
-/**
- * Whether a block tool call is unfinished. `query_logs` runs on the server, so `input-available`
- * means it hasn't returned; other block tools wait in that state for the user to act.
- */
-export function isUnfinishedBlockPart(part: MessagePart): boolean {
-  if (!isToolUIPart(part)) return false
-  if (part.state === 'input-streaming') return true
-  return part.state === 'input-available' && getToolName(part) === 'query_logs'
-}
-
-/**
- * - `running`: still streaming or executing
- * - `done`: finished
- * - `failed`: the tool call errored or was denied
- * - `interrupted`: left unfinished because the response ended, e.g. a stop or timeout
- */
-export type CompactPartStatus = 'running' | 'done' | 'failed' | 'interrupted'
-
-/**
- * @param isStreaming whether the message holding the part is still streaming. Anything left
- * unfinished once it stops will never finish.
- */
-export function getCompactPartStatus(part: MessagePart, isStreaming: boolean): CompactPartStatus {
-  const unfinished = isStreaming ? 'running' : 'interrupted'
-
-  if (part.type === 'reasoning') return part.state === 'streaming' ? unfinished : 'done'
-  if (isToolUIPart(part)) {
-    if (part.state === 'output-available') return 'done'
-    if (part.state === 'output-error' || part.state === 'output-denied') return 'failed'
-    return unfinished
-  }
-  return 'done'
-}
-
 type ToolLabels = {
-  /** e.g. "Searching docs" */
   running: string
-  /** e.g. "Searched docs" */
   done: string
-  /** Completes "Unable to …", e.g. "search docs" */
-  base: string
-  /** Names what the call looks at, from its input, e.g. "in public" */
-  getDetail?: (input: unknown) => string | undefined
+  /** What the call looks at, from its input, e.g. "in public" */
+  detail?: (input: unknown) => string | undefined
 }
 
-function getInputField(input: unknown, field: string): unknown {
-  return typeof input === 'object' && input !== null
-    ? (input as Record<string, unknown>)[field]
-    : undefined
+const getField = (input: unknown, key: string): unknown =>
+  typeof input === 'object' && input !== null ? Reflect.get(input, key) : undefined
+
+function inSchemas(input: unknown) {
+  const schemas = getField(input, 'schemas')
+  return Array.isArray(schemas) && schemas.length > 0 ? `in ${schemas.join(', ')}` : undefined
 }
 
-function getSchemasDetail(input: unknown) {
-  const schemas = getInputField(input, 'schemas')
-  if (!Array.isArray(schemas)) return undefined
-  const names = schemas.filter((schema): schema is string => typeof schema === 'string' && !!schema)
-  return names.length > 0 ? `in ${names.join(', ')}` : undefined
-}
-
-function getDocsSearchDetail(input: unknown) {
-  const graphqlQuery = getInputField(input, 'graphql_query')
-  if (typeof graphqlQuery !== 'string') return undefined
+function forDocsQuery(input: unknown) {
   // e.g. { searchDocs(query: "row level security", limit: 5) { ... } }
-  const query = graphqlQuery.match(/searchDocs\s*\(\s*query\s*:\s*"((?:[^"\\]|\\.)+)"/)?.[1]
+  const query = String(getField(input, 'graphql_query')).match(
+    /searchDocs\s*\(\s*query\s*:\s*"((?:[^"\\]|\\.)+)"/
+  )?.[1]
   return query ? `for "${query}"` : undefined
 }
 
@@ -178,179 +68,151 @@ const KNOWLEDGE_TOPICS: Record<string, string> = {
   logs: 'logs',
 }
 
-function getKnowledgeDetail(input: unknown) {
-  const name = getInputField(input, 'name')
-  const topic = typeof name === 'string' ? KNOWLEDGE_TOPICS[name] : undefined
-  return topic ? `on ${topic}` : undefined
+function onKnowledgeTopic(input: unknown) {
+  const name = String(getField(input, 'name'))
+  return Object.hasOwn(KNOWLEDGE_TOPICS, name) ? `on ${KNOWLEDGE_TOPICS[name]}` : undefined
 }
 
-function getAdvisorsDetail(input: unknown) {
-  const type = getInputField(input, 'type')
+function forAdvisorType(input: unknown) {
+  const type = getField(input, 'type')
   return type === 'security' || type === 'performance' ? `for ${type} issues` : undefined
 }
 
 const TOOL_LABELS: Record<string, ToolLabels> = {
-  search_docs: {
-    running: 'Searching docs',
-    done: 'Searched docs',
-    base: 'search docs',
-    getDetail: getDocsSearchDetail,
-  },
-  load_knowledge: {
-    running: 'Reading up',
-    done: 'Read up',
-    base: 'read up',
-    getDetail: getKnowledgeDetail,
-  },
-  get_active_incidents: {
-    running: 'Checking Supabase status',
-    done: 'Checked Supabase status',
-    base: 'check Supabase status',
-  },
-  list_policies: {
-    running: 'Checking policies',
-    done: 'Checked policies',
-    base: 'check policies',
-    getDetail: getSchemasDetail,
-  },
-  list_tables: {
-    running: 'Listing tables',
-    done: 'Listed tables',
-    base: 'list tables',
-    getDetail: getSchemasDetail,
-  },
-  list_extensions: {
-    running: 'Listing extensions',
-    done: 'Listed extensions',
-    base: 'list extensions',
-  },
-  list_edge_functions: {
-    running: 'Listing Edge Functions',
-    done: 'Listed Edge Functions',
-    base: 'list Edge Functions',
-  },
-  list_branches: { running: 'Listing branches', done: 'Listed branches', base: 'list branches' },
-  get_advisors: {
-    running: 'Checking advisors',
-    done: 'Checked advisors',
-    base: 'check advisors',
-    getDetail: getAdvisorsDetail,
-  },
-  list_reports: { running: 'Listing reports', done: 'Listed reports', base: 'list reports' },
-  get_report: { running: 'Reading report', done: 'Read report', base: 'read report' },
-  list_databases: {
-    running: 'Listing databases',
-    done: 'Listed databases',
-    base: 'list databases',
-  },
-  list_notebooks: {
-    running: 'Listing notebooks',
-    done: 'Listed notebooks',
-    base: 'list notebooks',
-  },
-  get_notebook: { running: 'Reading notebook', done: 'Read notebook', base: 'read notebook' },
-  getSchemaTables: {
-    running: 'Listing tables',
-    done: 'Listed tables',
-    base: 'list tables',
-    getDetail: getSchemasDetail,
-  },
-  getRlsKnowledge: {
-    running: 'Checking policies',
-    done: 'Checked policies',
-    base: 'check policies',
-    getDetail: getSchemasDetail,
-  },
+  search_docs: { running: 'Searching docs', done: 'Searched docs', detail: forDocsQuery },
+  load_knowledge: { running: 'Reading up', done: 'Read up', detail: onKnowledgeTopic },
+  get_active_incidents: { running: 'Checking Supabase status', done: 'Checked Supabase status' },
+  list_policies: { running: 'Checking policies', done: 'Checked policies', detail: inSchemas },
+  list_tables: { running: 'Listing tables', done: 'Listed tables', detail: inSchemas },
+  list_extensions: { running: 'Listing extensions', done: 'Listed extensions' },
+  list_edge_functions: { running: 'Listing Edge Functions', done: 'Listed Edge Functions' },
+  list_branches: { running: 'Listing branches', done: 'Listed branches' },
+  get_advisors: { running: 'Checking advisors', done: 'Checked advisors', detail: forAdvisorType },
+  list_reports: { running: 'Listing reports', done: 'Listed reports' },
+  get_report: { running: 'Reading report', done: 'Read report' },
+  list_databases: { running: 'Listing databases', done: 'Listed databases' },
+  list_notebooks: { running: 'Listing notebooks', done: 'Listed notebooks' },
+  get_notebook: { running: 'Reading notebook', done: 'Read notebook' },
+  // Self-hosted fallbacks
+  getSchemaTables: { running: 'Listing tables', done: 'Listed tables', detail: inSchemas },
+  getRlsKnowledge: { running: 'Checking policies', done: 'Checked policies', detail: inSchemas },
   getFunctions: {
     running: 'Listing database functions',
     done: 'Listed database functions',
-    base: 'list database functions',
-    getDetail: getSchemasDetail,
+    detail: inSchemas,
   },
   getEdgeFunctionKnowledge: {
     running: 'Reading up',
     done: 'Read up',
-    base: 'read up',
-    getDetail: () => 'on Edge Functions',
+    detail: () => 'on Edge Functions',
   },
 }
 
 function getToolLabels(toolName: string): ToolLabels {
-  const known = TOOL_LABELS[toolName]
-  if (known) return known
+  if (Object.hasOwn(TOOL_LABELS, toolName)) return TOOL_LABELS[toolName]
+  const name = toolName.replaceAll('_', ' ')
+  return { running: `Running ${name}`, done: `Ran ${name}` }
+}
 
-  // e.g. get_logs or getSchemaTables -> "get logs", "get schema tables"
-  const name = toolName
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/_/g, ' ')
-    .toLowerCase()
-  return { running: `Running ${name}`, done: `Ran ${name}`, base: `run ${name}` }
+const BLOCK_TOOLS = new Set([
+  'execute_sql',
+  'query_logs',
+  'deploy_edge_function',
+  'create_notebook',
+  'update_notebook',
+  'delete_notebook',
+  'run_notebook',
+])
+
+/** Lookups get a compact row. Studio's own tools need a label; any MCP tool gets a generic one. */
+export function isCompactToolCall(part: ToolPart): boolean {
+  const toolName = getToolName(part)
+  return part.type === 'dynamic-tool'
+    ? toolName !== 'query_logs'
+    : Object.hasOwn(TOOL_LABELS, toolName)
+}
+
+const isBlockPart = (part: MessagePart) =>
+  part.type === 'text'
+    ? part.text.trim().length > 0
+    : isToolUIPart(part) && BLOCK_TOOLS.has(getToolName(part))
+
+export type MessagePartItem =
+  | { type: 'part'; part: MessagePart; partIndex: number }
+  | { type: 'tool-group'; parts: CompactPart[]; groupIndex: number }
+
+/**
+ * Folds each run of consecutive compact parts into a tool group. Parts that render nothing
+ * (step markers, empty text, tools without UI) are dropped so they don't split a run.
+ */
+export function groupMessageParts(parts: MessagePart[]): MessagePartItem[] {
+  const items: MessagePartItem[] = []
+  let groupCount = 0
+
+  parts.forEach((part, partIndex) => {
+    if (part.type === 'reasoning' || (isToolUIPart(part) && isCompactToolCall(part))) {
+      const lastItem = items.at(-1)
+      if (lastItem?.type === 'tool-group') lastItem.parts.push(part)
+      else items.push({ type: 'tool-group', parts: [part], groupIndex: groupCount++ })
+    } else if (isBlockPart(part)) {
+      items.push({ type: 'part', part, partIndex })
+    }
+  })
+
+  return items
+}
+
+export const INTERRUPTED_LABEL = 'Response interrupted'
+
+/** `running` covers any unfinished part. Once its message stops, it renders as interrupted. */
+export type CompactPartStatus = 'running' | 'done' | 'failed'
+
+export function getCompactPartStatus(part: CompactPart): CompactPartStatus {
+  if (part.type === 'reasoning') return part.state === 'streaming' ? 'running' : 'done'
+  if (part.state === 'output-available') return 'done'
+  if (part.state === 'output-error' || part.state === 'output-denied') return 'failed'
+  return 'running'
+}
+
+export const isRunningToolCall = (part: CompactPart) =>
+  part.type !== 'reasoning' && getCompactPartStatus(part) === 'running'
+
+export function getCompactPartLabel(
+  part: CompactPart,
+  status = getCompactPartStatus(part)
+): string {
+  if (part.type === 'reasoning') return status === 'running' ? 'Thinking...' : 'Reasoned'
+
+  const labels = getToolLabels(getToolName(part))
+  const detail = labels.detail?.(part.input)
+  const target = detail ? ` ${detail}` : ''
+  if (status === 'running') return `${labels.running}${target}...`
+  if (status === 'failed') return `${labels.running}${target} failed`
+  return `${labels.done}${target}`
 }
 
 const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1)
 
-/** The text of a compact tool row: what it did, plus what it looked at when known. */
-export type CompactPartLabel = { action: string; detail?: string }
-
-function withEllipsis({ action, detail }: CompactPartLabel): CompactPartLabel {
-  return detail ? { action, detail: `${detail}...` } : { action: `${action}...` }
-}
-
-export function getCompactPartLabel(
-  part: MessagePart,
-  status: CompactPartStatus
-): CompactPartLabel {
-  if (part.type === 'reasoning') {
-    if (status === 'running') return { action: 'Thinking...' }
-    if (status === 'interrupted') return { action: INTERRUPTED_LABEL }
-    return { action: 'Reasoned' }
-  }
-  if (!isToolUIPart(part)) return { action: 'Working...' }
-
-  const labels = getToolLabels(getToolName(part))
-  const detail = labels.getDetail?.(part.input)
-
-  switch (status) {
-    case 'running':
-      return withEllipsis({ action: labels.running, detail })
-    case 'failed':
-      return { action: `Unable to ${labels.base}`, detail }
-    case 'interrupted':
-      return { action: INTERRUPTED_LABEL }
-    case 'done':
-      return { action: labels.done, detail }
-  }
-}
-
-/**
- * The header of a running tool group. A tool call takes over the header only while it
- * executes; the rest of the time the model is working out its next step, however long
- * that takes.
- */
-export function getRunningToolGroupHeader(parts: MessagePart[]): CompactPartLabel {
-  const runningTool = parts.findLast(
-    (part) => isToolUIPart(part) && getCompactPartStatus(part, true) === 'running'
+/** A finished group's header: what its tool calls did, e.g. "Searched docs and checked policies". */
+export function getToolGroupSummary(parts: CompactPart[]): string {
+  const actions = new Set(
+    parts.flatMap((part) =>
+      part.type !== 'reasoning' && getCompactPartStatus(part) === 'done'
+        ? [getToolLabels(getToolName(part)).done]
+        : []
+    )
   )
-  return runningTool ? getCompactPartLabel(runningTool, 'running') : { action: 'Thinking...' }
-}
+  const [first, second, ...rest] = actions
 
-/** The header of a finished tool group: what its tool calls did, e.g. "Searched docs and checked policies". */
-export function getToolGroupSummary(parts: MessagePart[]): CompactPartLabel {
-  const actions = [
-    ...new Set(
-      parts
-        .filter((part) => isToolUIPart(part) && getCompactPartStatus(part, false) === 'done')
-        .map((part) => getCompactPartLabel(part, 'done').action)
-    ),
-  ].map((action, idx) => (idx === 0 ? action : lowerFirst(action)))
-
-  if (actions.length === 0) {
-    // Nothing finished, so describe how the group ended: reasoning, a failure or an interruption
+  if (!first) {
+    // Nothing finished: the group only reasoned, failed or was cut off
     const lastPart = parts.at(-1)
-    if (!lastPart) return { action: 'Reasoned' }
-    return { action: getCompactPartLabel(lastPart, getCompactPartStatus(lastPart, false)).action }
+    if (!lastPart) return 'Reasoned'
+    return getCompactPartStatus(lastPart) === 'running'
+      ? INTERRUPTED_LABEL
+      : getCompactPartLabel(lastPart)
   }
-  if (actions.length === 1) return { action: actions[0] }
-  if (actions.length === 2) return { action: `${actions[0]} and ${actions[1]}` }
-  return { action: `${actions[0]}, ${actions[1]}, and ${actions.length - 2} more` }
+  if (!second) return first
+  if (rest.length === 0) return `${first} and ${lowerFirst(second)}`
+  return `${first}, ${lowerFirst(second)}, and ${rest.length} more`
 }

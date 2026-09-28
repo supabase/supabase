@@ -1,36 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 
 /**
- * Returns `value`, but keeps each value on screen for at least `minimumMs` so quick changes
- * don't flash past. Values that arrive while one is held are skipped in favor of the latest.
- *
- * @param isEqual should be a stable reference, e.g. an imported function
+ * Returns `value`, keeping each one for at least `minimumMs` so quick changes don't flash past.
+ * Values that arrive in the meantime are skipped in favor of the latest.
  */
-export function useMinimumDisplayTime<T>(
-  value: T,
-  minimumMs: number,
-  isEqual: (a: T, b: T) => boolean = Object.is
-): T {
+export function useMinimumDisplayTime<T>(value: T, minimumMs: number): T {
   const [displayed, setDisplayed] = useState(value)
   const shownAtRef = useRef(Date.now())
 
   useEffect(() => {
-    if (isEqual(displayed, value)) return
-
-    const show = () => {
-      shownAtRef.current = Date.now()
-      setDisplayed(value)
-    }
+    if (Object.is(displayed, value)) return
 
     const remainingMs = minimumMs - (Date.now() - shownAtRef.current)
-    if (remainingMs <= 0) {
-      show()
-      return
-    }
-
-    const timeout = setTimeout(show, remainingMs)
+    const timeout = setTimeout(
+      () => {
+        shownAtRef.current = Date.now()
+        setDisplayed(value)
+      },
+      Math.max(0, remainingMs)
+    )
     return () => clearTimeout(timeout)
-  }, [value, displayed, minimumMs, isEqual])
+  }, [value, displayed, minimumMs])
 
   return displayed
 }
