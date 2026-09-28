@@ -1070,6 +1070,18 @@ export const examples: Registry = [
     files: ['example/toggle-group-outline.tsx'],
   },
   {
+    name: 'toggle-group-segmented',
+    type: 'components:example',
+    registryDependencies: ['toggle-group'],
+    files: ['example/toggle-group-segmented.tsx'],
+  },
+  {
+    name: 'toggle-group-segmented-filter',
+    type: 'components:example',
+    registryDependencies: ['toggle-group'],
+    files: ['example/toggle-group-segmented-filter.tsx'],
+  },
+  {
     name: 'toggle-group-sm',
     type: 'components:example',
     registryDependencies: ['toggle-group'],
