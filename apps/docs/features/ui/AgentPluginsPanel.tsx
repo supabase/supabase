@@ -1,12 +1,13 @@
 'use client'
 
+import { useSearchParamsShallow } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ClientSelectDropdown } from 'ui-patterns/McpUrlBuilder'
 
-import { PLUGIN_CLIENTS, type PluginClient } from './AgentPluginsPanel.data'
+import { AGENT_CLIENT_PARAM, PLUGIN_CLIENTS, type PluginClient } from './AgentPluginsPanel.data'
 
 function PluginInstructions({ client }: { client: PluginClient }) {
   if (client.key === 'claude-code') {
@@ -264,12 +265,21 @@ function PluginInstructions({ client }: { client: PluginClient }) {
 }
 
 export function AgentPluginsPanel() {
-  const [selectedClientKey, setSelectedClientKey] = useState(PLUGIN_CLIENTS[0].key)
   const { resolvedTheme } = useTheme()
+  const searchParams = useSearchParamsShallow()
+  const queryClientKey = searchParams.get(AGENT_CLIENT_PARAM)
+  const [pickedClientKey, setPickedClientKey] = useState<string | null>(null)
+  const [seenQueryClientKey, setSeenQueryClientKey] = useState(queryClientKey)
+
+  // an agent arriving in the url (e.g. from the top bar's agent menu) wins over an earlier pick
+  if (queryClientKey !== seenQueryClientKey) {
+    setSeenQueryClientKey(queryClientKey)
+    setPickedClientKey(null)
+  }
 
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light'
   const selectedClient =
-    PLUGIN_CLIENTS.find((c) => c.key === selectedClientKey) ?? PLUGIN_CLIENTS[0]
+    PLUGIN_CLIENTS.find((c) => c.key === (pickedClientKey ?? queryClientKey)) ?? PLUGIN_CLIENTS[0]
 
   return (
     <div className="not-prose">
@@ -277,7 +287,7 @@ export function AgentPluginsPanel() {
         theme={theme}
         clients={PLUGIN_CLIENTS}
         selectedClient={selectedClient}
-        onClientChange={setSelectedClientKey}
+        onClientChange={setPickedClientKey}
       />
       <div className="mt-4 rounded-lg border border-muted p-4">
         <PluginInstructions client={selectedClient} />

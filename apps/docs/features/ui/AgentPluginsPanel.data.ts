@@ -6,6 +6,8 @@ export interface PluginClient extends McpClient {
   docsLinkText?: string
 }
 
+export const AGENT_CLIENT_PARAM = 'client'
+
 export const PLUGIN_CLIENTS: PluginClient[] = [
   {
     key: 'claude-code',

@@ -5,7 +5,7 @@ import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn, useIsUserLoading, useSearchParamsShallow } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -26,11 +26,14 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   createMcpCopyHandler,
+  MCP_CLIENTS,
   MCP_HOSTED_AUTH_NOTE,
   McpConfigPanel as McpConfigPanelBase,
   type McpClient,
 } from 'ui-patterns/McpUrlBuilder'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { AGENT_CLIENT_PARAM } from './AgentPluginsPanel.data'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -269,6 +272,10 @@ export function McpConfigPanel() {
   const { resolvedTheme } = useTheme()
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { mcpServers } = getCustomContent(['mcp:servers'])
+  const searchParams = useSearchParamsShallow()
+  const queryClient = MCP_CLIENTS.find(
+    (client) => client.key === searchParams.get(AGENT_CLIENT_PARAM)
+  )
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
@@ -323,6 +330,8 @@ export function McpConfigPanel() {
             : 'Project selection is only available for the hosted platform.'}
         </p>
         <McpConfigPanelBase
+          key={queryClient?.key ?? 'default'}
+          initialSelectedClient={queryClient}
           className="mt-6"
           projectRef={project?.ref}
           theme={resolvedTheme as 'light' | 'dark'}

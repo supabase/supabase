@@ -1,4 +1,4 @@
-import { PLUGIN_CLIENTS } from '~/features/ui/AgentPluginsPanel.data'
+import { AGENT_CLIENT_PARAM, PLUGIN_CLIENTS } from '~/features/ui/AgentPluginsPanel.data'
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 import { MCP_CLIENT_DATA } from 'ui-patterns/McpUrlBuilder/clients.data'
 
@@ -56,6 +56,7 @@ const TAGLINES: Record<string, string> = {
 
 interface AgentEntry {
   key: string
+  mcpKey?: string
   label: string
   plugin: boolean
   mcp: boolean
@@ -72,6 +73,7 @@ function buildAgents(): AgentEntry[] {
     if (EXCLUDED_KEYS.has(key)) continue
     byKey.set(key, {
       key,
+      mcpKey: client.key,
       label: client.label,
       plugin: PLUGIN_KEYS.has(key),
       mcp: true,
@@ -98,9 +100,12 @@ function badgeFor(plugin: boolean, mcp: boolean): string {
   return 'MCP'
 }
 
-// Route to our own setup instructions rather than each vendor's external docs.
+// Route to our own setup instructions rather than each vendor's external docs, with the agent
+// preselected in that page's client picker
 function hrefFor(agent: AgentEntry): string {
-  return agent.plugin ? '/guides/ai-tools/plugins' : '/guides/ai-tools/mcp'
+  return agent.plugin
+    ? `/guides/ai-tools/plugins?${AGENT_CLIENT_PARAM}=${agent.key}`
+    : `/guides/ai-tools/mcp?${AGENT_CLIENT_PARAM}=${agent.mcpKey ?? agent.key}`
 }
 
 export const aiToolsSupportedAgents: ContentListingGroup = {
