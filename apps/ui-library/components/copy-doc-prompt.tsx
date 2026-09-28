@@ -23,9 +23,14 @@ export function CopyDocPrompt({ title, markdownPath, intent }: CopyDocPromptProp
     const url = new URL(markdownPath, window.location.origin).href
     const task =
       intent === 'create-app'
-        ? `Help me create a new application using ${title} from the Supabase UI Library. Inspect my workspace and create the app in a suitable directory.`
-        : `Help me add ${title} from the Supabase UI Library to my existing project. Inspect my project structure and reuse any Supabase client setup that is already in place.`
-    const prompt = `${task} Read ${url} for the complete guide before making changes. Follow its prerequisites, installation, and configuration steps, adapting them to my project. Verify that the setup works.`
+        ? `Help me create a new application using ${title} from Supabase Library. Inspect my workspace and create the app in a suitable directory.`
+        : `Help me add ${title} from Supabase Library to my existing project. Inspect my project structure and reuse any Supabase client setup that is already in place.`
+    const prompt = [
+      task,
+      `Read ${url} for the complete guide before making changes.`,
+      "To add the block's files, prefer the guide's shadcn install command over copying them from the registry JSON; the CLI also installs npm dependencies and related blocks.",
+      'Follow the rest of the guide, adapting it to my project, and verify that the setup works.',
+    ].join(' ')
 
     try {
       await navigator.clipboard.writeText(prompt)

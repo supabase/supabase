@@ -29,15 +29,15 @@ function LibraryCard({ block, framework }: { block: LibraryBlock; framework: str
         <div className="flex items-start justify-between gap-3">
           <h3 className="min-w-0 text-sm font-medium tracking-tight">{block.title}</h3>
           <span className="flex shrink-0 items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] leading-3 text-foreground-light">
-            <Box className="size-2.5" />
-            Block
+            <Box aria-hidden="true" className="size-2.5" />
+            {block.category === 'Starter apps' ? 'Starter' : 'Block'}
           </span>
         </div>
         <p className="max-w-sm text-sm leading-5 text-foreground-lighter">{block.description}</p>
         {block.external && (
           <span className="flex items-center gap-1 text-xs text-foreground-lighter">
             View starter on GitHub
-            <ArrowUpRight className="size-3" />
+            <ArrowUpRight aria-hidden="true" className="size-3" />
           </span>
         )}
       </div>

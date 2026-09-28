@@ -13,9 +13,7 @@ const CodeBlock = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div role="status" className="p-4 text-xs text-foreground-lighter">
-        Loading code preview...
-      </div>
+      <div className="p-4 text-xs text-foreground-lighter">Loading code preview...</div>
     ),
   }
 )

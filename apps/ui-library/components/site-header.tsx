@@ -146,7 +146,7 @@ export function SiteHeader() {
                                         </span>
                                         <ChevronRight
                                           strokeWidth={2}
-                                          className="h-3 w-3 text-foreground transition-all -translate-x-1 opacity-0 group-hover/menu-item:translate-x-0 group-hover/menu-item:opacity-100"
+                                          className="h-3 w-3 text-foreground transition-all -translate-x-1 opacity-0 group-hover/menu-item:translate-x-0 group-hover/menu-item:opacity-100 motion-reduce:transition-none motion-reduce:translate-x-0"
                                         />
                                       </span>
                                       <span className="text-xs leading-snug text-foreground-lighter group-hover/menu-item:text-foreground-light group-focus-visible/menu-item:text-foreground-light">
