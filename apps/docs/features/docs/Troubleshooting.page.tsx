@@ -1,9 +1,10 @@
+import Breadcrumbs from '~/components/Breadcrumbs'
+import { FeedbackControl } from '~/components/Feedback/Feedback'
+import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { Github } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
-import Breadcrumbs from '~/components/Breadcrumbs'
-import { Feedback } from '~/components/Feedback'
-import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
@@ -99,7 +100,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              <Feedback className="px-0 mb-6 lg:mb-8" />
+              <FeedbackControl className="mb-6 lg:mb-8" />
               {entry.data.github_url && (
                 <>
                   <hr className="my-6" aria-hidden />

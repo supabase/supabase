@@ -1,235 +1,106 @@
 'use client'
 
-import { createClient } from '@supabase/supabase-js'
-import { IS_PLATFORM } from '~/lib/constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { gotrueClient, useConstant, useIsLoggedIn, type Database } from 'common'
-import { Check, MessageSquareQuote, X } from 'lucide-react'
+import { Bug, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import {
-  forwardRef,
-  useReducer,
-  useRef,
-  useState,
-  type CSSProperties,
-  type MouseEventHandler,
-} from 'react'
+import { useId, type MouseEvent } from 'react'
 import { Button, cn } from 'ui'
 
-import { getSanitizedTabParams } from './Feedback.utils'
-import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
+import type { FeedbackTargetPage } from './feedback-dock.reducer'
+import type { FeedbackVote } from './feedback-schema'
+import { DockTooltip } from './FeedbackDockAttachments'
+import { useFeedbackDock } from './FeedbackDockProvider'
 
-const FeedbackButton = forwardRef<
-  HTMLButtonElement,
-  { isYes: boolean; onClick: MouseEventHandler; visible: boolean }
->(({ isYes, onClick, visible }, ref) => {
-  const isLoggedIn = useIsLoggedIn()
-  if (!isLoggedIn) return null
-
-  return (
-    <button
-      tabIndex={0}
-      ref={ref}
-      className={cn(
-        'mt-0',
-        'flex items-center gap-1',
-        'text-xs text-foreground-lighter',
-        'hover:text-foreground text-left',
-        !visible && 'opacity-0 invisible',
-        '[transition-property:opacity,color]',
-        '[transition-delay:700ms,0ms]'
-      )}
-      onClick={onClick}
-    >
-      {isYes ? <>What went well?</> : <>How can we improve?</>}
-      <MessageSquareQuote size={14} strokeWidth={1.5} />
-    </button>
-  )
-})
-FeedbackButton.displayName = 'FeedbackButton'
-
-type Response = 'yes' | 'no'
-
-enum StateType {
-  Unanswered = 'unanswered',
-  Followup = 'followup',
+export interface FeedbackControlProps {
+  className?: string
+  onVote?: (args: { vote: FeedbackVote; page: FeedbackTargetPage }) => void
 }
 
-type State = { type: StateType.Unanswered } | { type: StateType.Followup; response: Response }
+const BUG_REPORT_URL = 'https://github.com/supabase/supabase/issues/new/choose'
 
-type Action = { event: 'VOTED'; response: Response }
+const VOTE_PLACEHOLDER_CLASSES = cn(
+  'aria-pressed:border aria-pressed:border-dashed aria-pressed:border-foreground-muted',
+  'aria-pressed:bg-transparent aria-pressed:bg-none aria-pressed:opacity-25 aria-pressed:shadow-none'
+)
 
-const initialState = { type: StateType.Unanswered } satisfies State
+const COPY = {
+  yes: 'Yes, this page helped',
+  no: "No, this page didn't help",
+  bug: 'Report a bug on GitHub',
+} as const
 
-function reducer(state: State, action: Action) {
-  switch (action.event) {
-    case 'VOTED':
-      if (state.type === StateType.Unanswered)
-        return { type: StateType.Followup, response: action.response }
-    default:
-      return state
-  }
-}
-
-function Feedback({ className }: { className?: string }) {
-  const [state, dispatch] = useReducer(reducer, initialState)
-  const [modalOpen, setModalOpen] = useState(false)
-  const feedbackButtonRef = useRef<HTMLButtonElement>(null)
-
+export const FeedbackControl = ({ className, onVote }: FeedbackControlProps) => {
+  const headingId = useId()
   const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  const supabase = useConstant(() =>
-    IS_PLATFORM && supabaseUrl && supabaseAnonKey
-      ? createClient<Database>(supabaseUrl, supabaseAnonKey)
-      : undefined
-  )
+  const { state, actions, canSubmit, isEnabled } = useFeedbackDock()
 
-  const unanswered = state.type === 'unanswered'
-  const isYes = 'response' in state && state.response === 'yes'
-  const isNo = 'response' in state && state.response === 'no'
-  const showYes = unanswered || isYes
-  const showNo = unanswered || isNo
+  if (!isEnabled) return null
 
-  async function sendFeedbackVote(response: Response) {
-    if (!supabase) return
-    const { error } = await supabase
-      .from('feedback')
-      .insert({ vote: response, page: pathname, metadata: { query: getSanitizedTabParams() } })
-    if (error) console.error(error)
-  }
+  const isDockOnThisPage = state.isOpen && state.targetPage?.pathname === pathname
 
-  function handleVote(response: Response) {
-    sendTelemetryEvent({
-      action: 'docs_feedback_clicked',
-      properties: { response },
-    })
-    sendFeedbackVote(response)
-    dispatch({ event: 'VOTED', response })
-    // Focus so screen reader users are aware of the new element
-    setTimeout(() => {
-      feedbackButtonRef.current?.focus()
-      // Wait for element to show up first
-    }, 700)
-  }
-
-  function refocusButton() {
-    setTimeout(() => {
-      feedbackButtonRef.current?.focus()
-      // Wait for modal to disappear and button to become focusable again
-    }, 100)
-  }
-
-  async function handleSubmit({ comment, title }: FeedbackFields) {
-    if (supabase) {
-      const userId = (await gotrueClient.getSession()).data.session?.user?.id ?? null
-      const { error } = await supabase.from('feedback_comments').insert({
-        page: pathname,
-        // @ts-expect-error -- the comment modal only opens after a vote, so state.response is set
-        vote: state.response,
-        title,
-        comment,
-        user_id: userId,
-        metadata: { query: getSanitizedTabParams() },
-      })
-      if (error) console.error(error)
+  const handleVote = ({ vote, opener }: { vote: FeedbackVote; opener: HTMLElement }) => {
+    sendTelemetryEvent({ action: 'docs_feedback_clicked', properties: { response: vote } })
+    const args = { vote, page: { pathname } }
+    if (onVote) {
+      onVote(args)
+      return
     }
-    setModalOpen(false)
-    refocusButton()
+    // passed explicitly since safari doesn't focus a clicked button
+    actions.openDock({ ...args, opener })
   }
+  const handleYesClick = (event: MouseEvent<HTMLButtonElement>) =>
+    handleVote({ vote: 'yes', opener: event.currentTarget })
+  const handleNoClick = (event: MouseEvent<HTMLButtonElement>) =>
+    handleVote({ vote: 'no', opener: event.currentTarget })
+  const handleBugClick = () => sendTelemetryEvent({ action: 'docs_feedback_bug_report_clicked' })
 
   return (
-    <section className={cn('@container', className)} aria-labelledby="feedback-title">
-      <h2 id="feedback-title" className="block font-mono text-xs text-foreground-light mb-3">
-        Is this helpful?
-      </h2>
-      <div className="relative flex flex-col gap-2 @[12rem]:gap-4 @[12rem]:flex-row @[12rem]:items-center">
-        <div
-          style={{ '--container-flex-gap': '0.5rem' } as CSSProperties}
-          className="relative flex gap-2 items-center"
-        >
-          <Button
-            variant="outline"
-            rounded
-            className={cn(
-              'px-1 w-7 h-7',
-              'text-foreground-light',
-              '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
-              'motion-reduce:[transition-duration:150ms,1ms,300ms]',
-              '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
-              !isNo && 'hover:text-warning hover:border-warning-500',
-              isNo && `bg-warning text-warning-200 border-warning! disabled:opacity-100`,
-              !showNo && 'opacity-0 invisible'
-            )}
-            onClick={() => handleVote('no')}
-            disabled={state.type === StateType.Followup}
-          >
-            <X size={14} strokeWidth={2} className="text-current" />
-            <span className="sr-only">No</span>
-          </Button>
-          <Button
-            variant="outline"
-            rounded
-            className={cn(
-              'px-1 w-7 h-7',
-              'text-foreground-light',
-              '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
-              'motion-reduce:[transition-duration:150ms,1ms,300ms]',
-              '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
-              !isYes && 'hover:text-brand-600 hover:border-brand-500',
-              isYes &&
-                'bg-brand-default text-brand-200 border-brand-default! disabled:opacity-100 -translate-x-[calc(100%+var(--container-inline-flex-gap,0.5rem))]',
-              !showYes && 'opacity-0 invisible'
-            )}
-            onClick={() => handleVote('yes')}
-            disabled={state.type === StateType.Followup}
-          >
-            <Check size={14} strokeWidth={2} />
-            <span className="sr-only">Yes</span>
-          </Button>
-        </div>
-        <div
-          className={cn(
-            'flex flex-col gap-0.5',
-            '@[12rem]:absolute @[12rem]:left-9',
-            'text-xs',
-            'opacity-0 invisible',
-            'text-left',
-            '-translate-x-2',
-            '[transition-property:opacity,transform]',
-            '[transition-duration:450ms,300ms]',
-            '[transition-delay:200ms,0ms]',
-            '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
-            'motion-reduce:[transition-duration:150ms,1ms]',
-            'ease-out!',
-            state.type === StateType.Followup && 'opacity-100 visible translate-x-0'
-          )}
-        >
-          {state.type === StateType.Followup && (
-            <>
-              <span className="text-foreground-light">Thanks for your feedback!</span>
-              <FeedbackButton
-                ref={feedbackButtonRef}
-                onClick={() => setModalOpen(true)}
-                isYes={isYes}
-                visible={true}
+    <section
+      data-feedback-ui
+      aria-labelledby={headingId}
+      className={cn('flex flex-col gap-3', className)}
+    >
+      <h3 id={headingId} className="font-mono text-xs text-foreground-light">
+        Is this page helpful?
+      </h3>
+      <div className="flex items-center gap-2">
+        {canSubmit ? (
+          <>
+            <DockTooltip label={COPY.yes}>
+              <Button
+                variant="default"
+                aria-label={COPY.yes}
+                aria-pressed={isDockOnThisPage && state.vote === 'yes'}
+                className={cn('size-7 p-0', VOTE_PLACEHOLDER_CLASSES)}
+                icon={<ThumbsUp />}
+                onClick={handleYesClick}
               />
-            </>
-          )}
-        </div>
+            </DockTooltip>
+            <DockTooltip label={COPY.no}>
+              <Button
+                variant="default"
+                aria-label={COPY.no}
+                aria-pressed={isDockOnThisPage && state.vote === 'no'}
+                className={cn('size-7 p-0', VOTE_PLACEHOLDER_CLASSES)}
+                icon={<ThumbsDown />}
+                onClick={handleNoClick}
+              />
+            </DockTooltip>
+          </>
+        ) : null}
+        <DockTooltip label={COPY.bug}>
+          <Button asChild variant="default" className="size-7 p-0" icon={<Bug />}>
+            <a
+              href={BUG_REPORT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={COPY.bug}
+              onClick={handleBugClick}
+            />
+          </Button>
+        </DockTooltip>
       </div>
-      <FeedbackModal
-        visible={modalOpen}
-        page={pathname}
-        onCancel={() => {
-          setModalOpen(false)
-          refocusButton()
-        }}
-        onSubmit={handleSubmit}
-      />
     </section>
   )
 }
-
-export { Feedback }

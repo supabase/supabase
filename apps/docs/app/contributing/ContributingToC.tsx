@@ -1,11 +1,14 @@
 'use client'
 
-import { Feedback } from '~/components/Feedback'
+import { FeedbackControl, type FeedbackControlProps } from '~/components/Feedback/Feedback'
+import { useFeedbackDock } from '~/components/Feedback/FeedbackDockProvider'
 import { useBreakpoint } from 'common'
 import { Menu } from 'lucide-react'
 import type { HTMLAttributes } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn, Separator, Sheet, SheetContent, SheetHeader, SheetTrigger } from 'ui'
+
+type PendingVote = Parameters<NonNullable<FeedbackControlProps['onVote']>>[0]
 
 interface TocItem extends HTMLAttributes<HTMLElement> {
   label: string
@@ -18,9 +21,7 @@ export function ContributingToc({ className }: { className?: string }) {
 
   useEffect(() => {
     const headings = [
-      ...document.querySelectorAll(
-        'article.prose > h2:not(#feedback-title),h3:not(#feedback-title)'
-      ),
+      ...document.querySelectorAll('article.prose > h2, article.prose > h3'),
     ] as Array<HTMLHeadingElement>
     const tocItems = headings
       .filter((heading) => !!heading.id && heading.textContent)
@@ -49,6 +50,22 @@ export function ContributingToc({ className }: { className?: string }) {
 
 function MobileToc({ items, className }: { items: Array<TocItem>; className?: string }) {
   const [open, setOpen] = useState(false)
+  const { actions } = useFeedbackDock()
+  const pendingVoteRef = useRef<PendingVote | null>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  const handleVote = (vote: PendingVote) => {
+    pendingVoteRef.current = vote
+    setOpen(false)
+  }
+
+  const handleCloseAutoFocus = (event: Event) => {
+    const pendingVote = pendingVoteRef.current
+    if (!pendingVote) return
+    event.preventDefault()
+    pendingVoteRef.current = null
+    actions.openDock({ ...pendingVote, opener: triggerRef.current })
+  }
 
   useEffect(() => {
     const onHashChanged = () => setOpen(false)
@@ -62,6 +79,7 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
+        ref={triggerRef}
         className={cn(
           'fixed z-0 inset-0 top-auto w-full rounded-t-lg border border-b-0 p-4 bg-studio flex items-center gap-2 text-foreground-light text-sm',
           className
@@ -76,6 +94,7 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
       <SheetContent
         side="bottom"
         size="lg"
+        onCloseAutoFocus={handleCloseAutoFocus}
         className={cn(
           'w-full flex flex-col gap-0 p-0 rounded-t-lg overflow-hidden',
           !open && 'top-[calc(100vh-100px)]'
@@ -96,14 +115,22 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
           </SheetTrigger>
         </SheetHeader>
         <div className="w-full flex-1 p-4 pb-8 overflow-y-auto thin-scrollbar">
-          <TocBase items={items} />
+          <TocBase items={items} onVote={handleVote} />
         </div>
       </SheetContent>
     </Sheet>
   )
 }
 
-function TocBase({ items, className }: { items: Array<TocItem>; className?: string }) {
+function TocBase({
+  items,
+  className,
+  onVote,
+}: {
+  items: Array<TocItem>
+  className?: string
+  onVote?: FeedbackControlProps['onVote']
+}) {
   return (
     <nav aria-label="Table of contents" className={cn('text-foreground-lighter', className)}>
       <span className="hidden lg:block font-mono text-xs uppercase text-foreground px-5 mb-6">
@@ -117,7 +144,7 @@ function TocBase({ items, className }: { items: Array<TocItem>; className?: stri
         ))}
       </ul>
       <Separator className="lg:w-[calc(100%-2rem)] lg:ml-5 my-4 lg:my-8" />
-      <Feedback className="pl-0 lg:pl-5" />
+      <FeedbackControl className="pl-0 lg:pl-5" onVote={onVote} />
     </nav>
   )
 }

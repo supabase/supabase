@@ -1,8 +1,8 @@
 'use client'
 
-import { Feedback } from '~/components/Feedback'
+import { FeedbackControl } from '~/components/Feedback/Feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { askAiUrls, isFeatureEnabled, useCopyMarkdownFromUrl } from 'common'
+import { askAiUrls, useCopyMarkdownFromUrl } from 'common'
 import { Chatgpt, Claude } from 'icons'
 import { Check, Copy, Sparkles } from 'lucide-react'
 import Link from 'next/link'
@@ -119,27 +119,28 @@ const GuidesSidebar = ({
 }) => {
   const pathname = usePathname()
   const { toc } = useTocAnchors()
-  const showFeedback = isFeatureEnabled('feedback:docs')
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
-    <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
-      <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit">
+    <div
+      data-feedback-region="rail"
+      className={cn(
+        'thin-scrollbar overflow-y-auto h-fit flex flex-col min-h-0',
+        'px-px',
+        className
+      )}
+    >
+      <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit min-h-0">
         {video && (
           <div className="relative pl-5">
             <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} videoTitle={videoTitle} />
-          </div>
-        )}
-        {showFeedback && (
-          <div className="pl-5">
-            <Feedback key={pathname} />
           </div>
         )}
         <div className="pl-5">
           <AiTools key={pathname} />
         </div>
         {!hideToc && toc.length !== 0 && (
-          <Toc className="-ml-[calc(0.25rem+6px)]">
+          <Toc className="-ml-[calc(0.25rem+6px)] flex flex-col h-32 basis-[content]">
             <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
               On this page
             </h3>
@@ -148,6 +149,7 @@ const GuidesSidebar = ({
             </TOCScrollArea>
           </Toc>
         )}
+        <FeedbackControl className="pl-5 shrink-0" />
       </div>
     </div>
   )

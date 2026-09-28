@@ -1,3 +1,4 @@
+import { FeedbackDockProvider } from '~/components/Feedback/FeedbackDockProvider'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL } from '~/lib/constants'
 import { FeatureFlagProvider, IS_PLATFORM, ThemeProvider } from 'common'
@@ -26,15 +27,17 @@ function GlobalProviders({ children }: PropsWithChildren) {
             <ScrollRestoration />
             <ThemeProvider>
               <TooltipProvider delayDuration={0}>
-                <DocsCommandProvider>
-                  <div className="flex flex-col">
-                    <SiteLayout>
-                      {children}
-                      <DocsCommandMenu />
-                    </SiteLayout>
-                    <ThemeSandbox />
-                  </div>
-                </DocsCommandProvider>
+                <FeedbackDockProvider>
+                  <DocsCommandProvider>
+                    <div className="flex flex-col">
+                      <SiteLayout>
+                        {children}
+                        <DocsCommandMenu />
+                      </SiteLayout>
+                      <ThemeSandbox />
+                    </div>
+                  </DocsCommandProvider>
+                </FeedbackDockProvider>
                 <Toaster />
                 <DevToolbar />
               </TooltipProvider>
