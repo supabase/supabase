@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { MessageSquare } from 'lucide-react'
 import { Button } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -10,7 +11,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { PIPELINES_FEEDBACK_URL } from '@/components/interfaces/Database/Replication/Replication.constants'
@@ -22,17 +23,16 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabasePipelinesPage: NextPageWithLayout = () => {
-  const { data: selectedProject, isPending } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
+  const { ref: projectRef } = useParams()
+  const { isHighAvailability, isPending } = useHighAvailability()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
 
   if (!showPgReplicate) {
-    return <UnknownInterface urlBack={`/project/${selectedProject?.ref}/database/schemas`} />
+    return <UnknownInterface urlBack={`/project/${projectRef}/database/schemas`} />
   }
 
   if (isHighAvailability) {
@@ -81,16 +81,32 @@ const DatabasePipelinesPage: NextPageWithLayout = () => {
       </PageHeader>
 
       <PageContainer size="large">
-        {isPending ? (
-          <GenericSkeletonLoader />
-        ) : (
-          <PageSection>
-            <PageSectionContent className="flex flex-col gap-12">
-              <ReplicationDiagram />
-              <Destinations />
-            </PageSectionContent>
-          </PageSection>
-        )}
+        <PageSection>
+          <PageSectionContent className="flex flex-col gap-12">
+            {isPending ? (
+              <>
+                <p className="sr-only" role="status">
+                  Loading pipelines
+                </p>
+                <div
+                  className="flex h-[350px] items-center justify-center gap-8 rounded-md border border-muted"
+                  aria-hidden="true"
+                >
+                  <ShimmeringLoader className="h-14 w-36 py-0" />
+                  <ShimmeringLoader className="h-14 w-36 py-0" />
+                </div>
+                <GenericTableLoader
+                  headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]}
+                />
+              </>
+            ) : (
+              <>
+                <ReplicationDiagram />
+                <Destinations />
+              </>
+            )}
+          </PageSectionContent>
+        </PageSection>
       </PageContainer>
     </>
   )
