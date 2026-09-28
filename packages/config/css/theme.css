@@ -376,6 +376,12 @@
   --breakpoint-xs: 480px;
   --width-listbox: 320px;
   --radius-panel: 6px;
+  /* Radius for items nested inside a `rounded-md` overlay (menus, listboxes).
+   * Kept at a fraction of the shell's curve rather than the strict concentric
+   * `outer - padding`: an item is a borderless hover fill, whose corners read
+   * softer than a stroked edge, so concentric leaves it looking square. Derived
+   * so it tracks whatever `--radius-md` an app sets. */
+  --radius-item: calc(var(--radius-md) * 0.75);
   --spacing-content: 21px;
   --spacing-card: var(--card-padding-x);
   --transform-origin-dropdown: var(--radix-dropdown-menu-content-transform-origin);
