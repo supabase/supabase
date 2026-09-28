@@ -70,25 +70,22 @@ export const EnablePipelinesModal = ({
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-3">
-          <p className="text-sm text-foreground-light">
-            {hasAccess
-              ? 'Pipelines creates resources in this project to replicate database changes to external destinations.'
-              : 'Pipelines requires the Pro plan.'}
-          </p>
-          {hasAccess && (
+          {hasAccess ? (
             <>
               <p className="text-sm text-foreground-light">
-                Pipelines is in public alpha and may change as we refine it.
-              </p>
-              <p className="text-sm text-foreground-light">
-                You’ll be billed for configured pipeline hours and for Postgres row data processed
-                during initial sync and ongoing replication. Review{' '}
+                Pipelines bills for configured pipeline hours and Postgres row data processed during
+                initial sync and ongoing replication. Review{' '}
                 <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
                   Pipelines pricing
                 </InlineLink>{' '}
                 before enabling.
               </p>
+              <p className="text-sm text-foreground-light">
+                Pipelines is in public alpha and may change.
+              </p>
             </>
+          ) : (
+            <p className="text-sm text-foreground-light">Pipelines requires the Pro plan.</p>
           )}
         </DialogSection>
         <DialogFooter>
