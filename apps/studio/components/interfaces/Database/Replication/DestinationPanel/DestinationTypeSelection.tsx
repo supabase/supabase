@@ -127,18 +127,23 @@ export const DestinationTypeSelection = () => {
 
   const selectedOption = options.find((option) => option.value === destinationType)
 
-  const STAGE_DESCRIPTIONS: Record<NonNullable<DestinationTypeOption['stage']>, string> = {
-    'Public Alpha': 'In public alpha and may change.',
-    'Early Access': 'In early access and may change.',
-    Deprecated: 'This destination type is deprecated.',
+  const STAGE_DESCRIPTIONS: Record<
+    NonNullable<DestinationTypeOption['stage']>,
+    (type: DestinationType) => string
+  > = {
+    'Public Alpha': (type) => `${type} support is in public alpha.`,
+    'Early Access': (type) => `${type} support is in early access.`,
+    Deprecated: (type) => `${type} is deprecated.`,
   }
 
-  const stageDescription = selectedOption?.stage ? STAGE_DESCRIPTIONS[selectedOption.stage] : null
+  const stageDescription = selectedOption?.stage
+    ? STAGE_DESCRIPTIONS[selectedOption.stage](selectedOption.value)
+    : null
 
   const typeDescription =
     !editMode || stageDescription ? (
       <span>
-        {!editMode && 'Cannot be changed after creation.'}
+        {!editMode && 'Destination type cannot be changed after creation.'}
         {!editMode && stageDescription ? ' ' : null}
         {stageDescription}
       </span>

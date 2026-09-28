@@ -6,7 +6,6 @@ import {
   cn,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -43,7 +42,7 @@ export const EnablePipelinesModal = ({
   const { mutate: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation({
       onSuccess: () => {
-        toast.success('Pipelines has been successfully enabled!')
+        toast.success('Pipelines enabled')
         setOpen(false)
       },
       onError: (error) => {
@@ -68,16 +67,16 @@ export const EnablePipelinesModal = ({
       <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>Enable Pipelines</DialogTitle>
-          <DialogDescription>
-            {hasAccess
-              ? 'Enabling creates Pipelines resources for this project.'
-              : 'Upgrade to the Pro plan to replicate database changes to data warehouses and analytics platforms.'}
-          </DialogDescription>
         </DialogHeader>
-        {hasAccess && (
-          <>
-            <DialogSectionSeparator />
-            <DialogSection className="flex flex-col gap-y-3">
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-y-3">
+          <p className="text-sm text-foreground-light">
+            {hasAccess
+              ? 'Pipelines creates resources in this project to replicate database changes to external destinations.'
+              : 'Pipelines requires the Pro plan.'}
+          </p>
+          {hasAccess && (
+            <>
               <p className="text-sm text-foreground-light">
                 Pipelines is in public alpha and may change as we refine it.
               </p>
@@ -89,9 +88,9 @@ export const EnablePipelinesModal = ({
                 </InlineLink>{' '}
                 before enabling.
               </p>
-            </DialogSection>
-          </>
-        )}
+            </>
+          )}
+        </DialogSection>
         <DialogFooter>
           <Button disabled={creatingTenantSource} onClick={() => setOpen(false)}>
             Cancel
@@ -123,9 +122,9 @@ export const EnablePipelinesCallout = ({
       <div className="flex flex-col gap-y-1">
         <h4>Enable Pipelines</h4>
         <p className="text-sm text-foreground-light">
-          Supabase Pipelines replicates database changes to supported destination systems.{' '}
-          {hasAccess ? 'Enable Pipelines for your project' : 'Upgrade to the Pro plan'} to replicate
-          database changes to {type ?? 'data warehouses and analytics platforms'}.
+          Pipelines replicates database changes to{' '}
+          {type ?? 'data warehouses and analytics platforms'}.{' '}
+          {hasAccess ? 'Enable it for this project.' : 'Upgrade to Pro to get started.'}
         </p>
       </div>
       <div className="flex gap-x-2">

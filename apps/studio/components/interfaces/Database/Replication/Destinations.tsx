@@ -300,7 +300,7 @@ export const Destinations = () => {
                 aria-label="More actions"
                 variant="default"
                 icon={<MoreVertical />}
-                className="px-1.25"
+                className="w-6.5 hit-area-1"
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
