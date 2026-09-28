@@ -28,6 +28,7 @@ import {
 import { BigQueryFields } from './BigQuery/Fields'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from './ClickHouse/Fields'
+import { START_PIPELINE_ANYWAY_LABEL, START_PIPELINE_LABEL } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import {
   areValidationFailuresEqual,
@@ -202,7 +203,7 @@ export const DestinationForm = ({
             data.tableSyncCopyMode === 'skip_tables') &&
           data.tableSyncCopyTableIds.length === 0
         ) {
-          addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table')
+          addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table.')
         }
 
         if (selectedType === 'BigQuery') {
@@ -287,10 +288,10 @@ export const DestinationForm = ({
       return existingDestination?.enabled ? 'Apply and restart pipeline' : 'Apply changes'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Start pipeline anyway'
+        return START_PIPELINE_ANYWAY_LABEL
       }
 
-      return 'Start pipeline'
+      return START_PIPELINE_LABEL
     }
   }
 
@@ -335,7 +336,7 @@ export const DestinationForm = ({
       (data.tableSyncCopyMode === 'include_tables' || data.tableSyncCopyMode === 'skip_tables') &&
       data.tableSyncCopyTableIds.length === 0
     ) {
-      form.setError('tableSyncCopyTableIds', { message: 'Select at least one table' })
+      form.setError('tableSyncCopyTableIds', { message: 'Select at least one table.' })
       return
     }
 

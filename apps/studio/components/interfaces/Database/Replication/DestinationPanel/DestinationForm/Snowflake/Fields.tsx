@@ -17,9 +17,11 @@ import { MAX_PRIVATE_KEY_LENGTH, readPrivateKeyFile } from './Snowflake.utils'
 export const SnowflakeFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const [showPrivateKeyPassphrase, setShowPrivateKeyPassphrase] = useState(false)
   const privateKeyFileInputRef = useRef<HTMLInputElement>(null)
@@ -58,7 +60,7 @@ export const SnowflakeFields = ({
   }
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">Snowflake settings</p>
 
       <div className="flex flex-col gap-y-1">

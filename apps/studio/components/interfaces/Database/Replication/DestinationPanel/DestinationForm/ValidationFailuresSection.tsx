@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card } from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -9,11 +9,15 @@ import type { ValidationFailure } from '@/data/replication/validate-destination-
 interface ValidationFailuresSectionProps {
   destinationFailures: ValidationFailure[]
   pipelineFailures: ValidationFailure[]
+  className?: string
+  pipelineOptionsHint?: string
 }
 
 export const ValidationFailuresSection = ({
   destinationFailures,
   pipelineFailures,
+  className,
+  pipelineOptionsHint = 'Pipeline options are under Advanced settings above.',
 }: ValidationFailuresSectionProps) => {
   const { ref: projectRef } = useParams()
   const validationIssues = [...destinationFailures, ...pipelineFailures].sort((a, _b) =>
@@ -33,7 +37,7 @@ export const ValidationFailuresSection = ({
   return (
     <Admonition
       type={hasCriticalFailures ? 'warning' : 'default'}
-      className="px-5 rounded-none border-0"
+      className={cn('px-5 rounded-none border-0', className)}
       title="Configuration issues"
     >
       <p className="text-sm text-foreground-light mb-2!">
@@ -42,8 +46,7 @@ export const ValidationFailuresSection = ({
           : 'The following issues were identified. You may still continue after reviewing them.'}
       </p>
       <p className="text-sm text-foreground-light mb-2!">
-        Pipeline options are under <strong>Advanced settings</strong> above. Source database
-        settings are under{' '}
+        {pipelineOptionsHint} Source database settings are under{' '}
         {projectRef ? (
           <InlineLink href={`/project/${projectRef}/database/settings`}>
             Database settings

@@ -12,6 +12,7 @@ import { AdminStudioButton } from './AdminStudioButton'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HomeIcon } from './HomeIcon'
+import { IsolatedStudioFlowCloseButton } from './IsolatedStudioFlowClose'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
@@ -27,6 +28,7 @@ import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
 import { HelpButton } from '@/components/ui/HelpPanel/HelpButton'
 import { getResourcesExceededLimitsOrg } from '@/components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
+import { useIsolatedStudioFlow } from '@/hooks/misc/useHideSidebar'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -53,6 +55,30 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
   </span>
 )
 
+function IsolatedStudioFlowHeaderLeft({ title }: { title?: string }) {
+  return (
+    <div className="hidden md:flex items-center text-sm">
+      <HomeIcon />
+      <div className="flex items-center md:pl-2">
+        {IS_PLATFORM && (
+          <>
+            <LayoutHeaderDivider className="hidden md:block" />
+            <OrganizationDropdown />
+            <LayoutHeaderDivider />
+          </>
+        )}
+        <ProjectDropdown />
+      </div>
+      {title ? (
+        <>
+          <LayoutHeaderDivider />
+          <span className="text-foreground">{title}</span>
+        </>
+      ) : null}
+    </div>
+  )
+}
+
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
   breadcrumbs?: unknown[]
@@ -75,6 +101,8 @@ export const LayoutHeader = ({
   const commandMenuEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
 
   const isAccountPage = router.pathname.startsWith('/account')
+  const isolatedFlow = useIsolatedStudioFlow()
+  const displayTitle = headerTitle ?? (isolatedFlow ? 'New pipeline' : undefined)
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -96,8 +124,11 @@ export const LayoutHeader = ({
 
   const connectButtonVariant = isNewProject ? 'primary' : 'default'
 
-  // show org selection if we are on a project page or on a explicit org route
-  const showOrgSelection = slug || (selectedOrganization && projectRef)
+  // Isolated create flows keep logo, org, project, and the page title, then a
+  // close control on the right. Branch, Connect, and the rest of Studio stay
+  // off the canvas.
+  const showOrgSelection = !!(slug || (selectedOrganization && projectRef))
+  const showProjectChrome = !!projectRef
 
   return (
     <>
@@ -120,7 +151,7 @@ export const LayoutHeader = ({
         >
           <div className="flex md:hidden items-center text-sm not-sr-only">
             <AnimatePresence>
-              {headerTitle && (
+              {displayTitle && (
                 <motion.div
                   className="flex items-center -ml-1"
                   initial={{ opacity: 0, x: -20 }}
@@ -132,24 +163,65 @@ export const LayoutHeader = ({
                   }}
                 >
                   <LayoutHeaderDivider />
-                  <span className="text-foreground">{headerTitle}</span>
+                  <span className="text-foreground">{displayTitle}</span>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          <div className="hidden md:flex items-center text-sm">
-            <HomeIcon />
-            <div className="flex items-center md:pl-2">
-              {showOrgSelection && IS_PLATFORM ? (
-                <>
-                  <LayoutHeaderDivider className="hidden md:block" />
-                  <OrganizationDropdown />
-                </>
-              ) : null}
+          {isolatedFlow ? (
+            <IsolatedStudioFlowHeaderLeft title={displayTitle} />
+          ) : (
+            <div className="hidden md:flex items-center text-sm">
+              <HomeIcon />
+              <div className="flex items-center md:pl-2">
+                {showOrgSelection && IS_PLATFORM ? (
+                  <>
+                    <LayoutHeaderDivider className="hidden md:block" />
+                    <OrganizationDropdown />
+                  </>
+                ) : null}
+
+                <AnimatePresence>
+                  {showProjectChrome && (
+                    <motion.div
+                      className="flex items-center"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{
+                        duration: 0.15,
+                        ease: 'easeOut',
+                      }}
+                    >
+                      {IS_PLATFORM && <LayoutHeaderDivider />}
+
+                      <ProjectDropdown />
+
+                      {exceedingLimits && (
+                        <div className="ml-2">
+                          <Link
+                            href={`/org/${selectedOrganization?.slug}/usage`}
+                            onClick={() => track('header_exceeding_usage_badge_clicked')}
+                          >
+                            <Badge variant="destructive">Exceeding usage limits</Badge>
+                          </Link>
+                        </div>
+                      )}
+
+                      {selectedProject && IS_PLATFORM && (
+                        <>
+                          <LayoutHeaderDivider />
+                          <BranchDropdown />
+                        </>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
               <AnimatePresence>
-                {projectRef && (
+                {displayTitle && (
                   <motion.div
                     className="flex items-center"
                     initial={{ opacity: 0, x: -20 }}
@@ -160,73 +232,36 @@ export const LayoutHeader = ({
                       ease: 'easeOut',
                     }}
                   >
-                    {IS_PLATFORM && <LayoutHeaderDivider />}
-
-                    <ProjectDropdown />
-
-                    {exceedingLimits && (
-                      <div className="ml-2">
-                        <Link
-                          href={`/org/${selectedOrganization?.slug}/usage`}
-                          onClick={() => track('header_exceeding_usage_badge_clicked')}
-                        >
-                          <Badge variant="destructive">Exceeding usage limits</Badge>
-                        </Link>
-                      </div>
-                    )}
-
-                    {selectedProject && IS_PLATFORM && (
-                      <>
-                        <LayoutHeaderDivider />
-                        <BranchDropdown />
-                      </>
-                    )}
+                    <LayoutHeaderDivider />
+                    <span className="text-foreground">{displayTitle}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              <AnimatePresence>
+                {showProjectChrome && (
+                  <motion.div
+                    className="ml-3 items-center gap-x-2 flex"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{
+                      duration: 0.15,
+                      ease: 'easeOut',
+                    }}
+                  >
+                    {IS_PLATFORM && <MergeRequestButton />}
+                    <AdminStudioButton />
+                    <ConnectButton buttonVariant={connectButtonVariant} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <BreadcrumbsView defaultValue={breadcrumbs} />
             </div>
-
-            <AnimatePresence>
-              {headerTitle && (
-                <motion.div
-                  className="flex items-center"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{
-                    duration: 0.15,
-                    ease: 'easeOut',
-                  }}
-                >
-                  <LayoutHeaderDivider />
-                  <span className="text-foreground">{headerTitle}</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <AnimatePresence>
-              {projectRef && (
-                <motion.div
-                  className="ml-3 items-center gap-x-2 flex"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{
-                    duration: 0.15,
-                    ease: 'easeOut',
-                  }}
-                >
-                  {IS_PLATFORM && <MergeRequestButton />}
-                  <AdminStudioButton />
-                  <ConnectButton buttonVariant={connectButtonVariant} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <BreadcrumbsView defaultValue={breadcrumbs} />
-          </div>
+          )}
           <div className="flex items-center gap-x-2">
-            {customHeaderComponents && customHeaderComponents}
-            {IS_PLATFORM ? (
+            {isolatedFlow ? <IsolatedStudioFlowCloseButton /> : customHeaderComponents}
+            {!isolatedFlow && IS_PLATFORM && (
               <>
                 <FeedbackDropdown />
 
@@ -256,7 +291,8 @@ export const LayoutHeader = ({
                 </div>
                 <UserDropdown triggerClassName="hidden md:flex" />
               </>
-            ) : (
+            )}
+            {!isolatedFlow && !IS_PLATFORM && (
               <>
                 <LocalVersionPopover />
                 <div className="flex items-center gap-1 md:gap-2">
