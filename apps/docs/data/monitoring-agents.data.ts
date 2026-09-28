@@ -37,7 +37,7 @@ export const monitoringAgents = {
   },
   usage: {
     id: 'usage',
-    name: 'Capacity monitor',
+    name: 'Resource monitor',
     promptId: 'monitoring-agent-usage' as AiPromptId,
     schedule: {
       cadence: 'once each morning',

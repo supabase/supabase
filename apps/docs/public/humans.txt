@@ -114,6 +114,7 @@ Ferhat Elmas
 Filipe Cabaco
 Firas El Rachidi
 Francesco Sansalvadore
+Franek Richardson
 Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
@@ -221,6 +222,7 @@ Matthias Luft
 Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
+Michal Olszewski
 Michelle Jubrey
 Mike Podobnik
 Miranda Limonczenko

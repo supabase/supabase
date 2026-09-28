@@ -37,6 +37,23 @@ describe('ComboboxTrigger', () => {
     )
   })
 
+  it('shows the invalid border on a raised SelectTrigger', () => {
+    render(
+      <Select defaultValue="first">
+        <SelectTrigger aria-invalid="true">
+          <SelectValue />
+        </SelectTrigger>
+      </Select>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveClass(
+      'border-0',
+      'aria-[invalid=true]:border',
+      'aria-[invalid=true]:border-destructive-400',
+      'aria-[invalid=true]:bg-destructive-200'
+    )
+  })
+
   it('matches Button radius at the same size', () => {
     render(
       <>

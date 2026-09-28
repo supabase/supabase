@@ -8,6 +8,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -250,6 +251,25 @@ export const AdvancedSettings = ({
                   <TableOptions control={form.control} />
                 </div>
               </>
+            )}
+
+            {type === 'Snowflake' && (
+              <FormField
+                control={form.control}
+                name="snowflakeRole"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Role"
+                    labelOptional="Optional"
+                    layout="horizontal"
+                    description="Role for SQL requests. Leave blank to use the service user’s default role."
+                  >
+                    <FormControl>
+                      <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
             )}
           </AccordionContent>
         </AccordionItem>

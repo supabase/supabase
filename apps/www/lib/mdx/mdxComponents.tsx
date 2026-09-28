@@ -18,7 +18,6 @@ import BlogCollapsible from '~/components/Blog/BlogCollapsible'
 import DeveloperGrowthChart from '~/components/Charts/DeveloperGrowthChart'
 import Chart from '~/components/Charts/PGCharts'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import { NamedCodeBlock } from '~/components/CodeTabs'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ImageGrid from '~/components/ImageGrid'
 import InlineCodeTag from '~/components/InlineCode'
@@ -68,7 +67,6 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     CodeBlock,
     Tabs,
     TabPanel,
-    NamedCodeBlock,
     CH,
     h1: (props: any) => <Heading {...props} tag="h1" />,
     h2: (props: any) => <Heading {...props} tag="h2" />,
