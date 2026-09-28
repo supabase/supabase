@@ -95,6 +95,39 @@ limit 100;
 
 Combine predicates with `and`, `or`, and `not`. Select only the fields needed for the investigation. To correlate sources, use an identifier present in both; a shared timestamp alone does not establish that events belong to the same request.
 
+## Correlate requests [#correlating-requests]
+
+Use a request ID or trace ID to join events across sources. These fields are potentially present on any source but are not guaranteed to be populated.
+
+### Correlating by request ID [#request-id]
+
+Every API Gateway response includes an `sb-request-id` header. The gateway unpacks that value into `log_attributes['request_id']` — there is no `log_attributes['request.headers.sb-request-id']` key. To find the edge log for a known request ID:
+
+```sql
+-- find the edge log for a given sb-request-id
+select timestamp, log_attributes
+from logs
+where source = 'edge_logs'
+  and log_attributes['request_id'] = '<sb-request-id>'
+limit 1;
+```
+
+If the response header `log_attributes['response.headers.cf_cache_status']` is `HIT`, the request was served from Cloudflare and never reached PostgREST, Auth, or Storage — no downstream logs exist for that `request_id`.
+
+### Fanning out by trace ID [#trace-id]
+
+If the client sends a `traceparent` header (W3C Trace Context), the gateway records it in `log_attributes['request.headers.traceparent']` and extracts the trace and span IDs into `log_attributes['trace_id']` and `log_attributes['span_id']`. Use the `trace_id` to correlate across all sources:
+
+```sql
+-- correlate across all sources by trace_id
+select source, timestamp, log_attributes
+from logs
+where log_attributes['trace_id'] = '<trace_id>'
+order by timestamp;
+```
+
+See [Client-side tracing](/docs/guides/observability/client-side-tracing) for how to attach trace context from Supabase client SDKs.
+
 ## Query limits [#limit-and-result-row-limitations]
 
 Use an explicit `limit` and narrow time range. The logs query surface rejects `select *` and `count(*)`; list columns and use `count()`. A result limit bounds returned rows, not the time range scanned.
