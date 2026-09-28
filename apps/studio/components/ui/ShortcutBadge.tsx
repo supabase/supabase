@@ -7,8 +7,6 @@ import { SHORTCUT_DEFINITIONS, type ShortcutId } from '@/state/shortcuts/registr
 interface ShortcutBadgeProps {
   shortcutId: ShortcutId
   className?: string
-  /** `'inline'` (default) is flat text; `'pill'` is a boxed badge. */
-  variant?: 'inline' | 'pill'
 }
 
 /**
@@ -25,11 +23,7 @@ interface ShortcutBadgeProps {
  *   <ShortcutBadge shortcutId={SHORTCUT_IDS.RESULTS_COPY_CSV} className="ml-auto" />
  * </DropdownMenuItem>
  */
-export const ShortcutBadge = ({
-  shortcutId,
-  className,
-  variant = 'inline',
-}: ShortcutBadgeProps) => {
+export const ShortcutBadge = ({ shortcutId, className }: ShortcutBadgeProps) => {
   const def = SHORTCUT_DEFINITIONS[shortcutId]
 
   return (
@@ -37,7 +31,7 @@ export const ShortcutBadge = ({
       {def.sequence.map((step, i) => (
         <Fragment key={i}>
           {i > 0 && <span className="text-foreground-lighter text-[11px]">then</span>}
-          <KeyboardShortcut keys={hotkeyToKeys(step)} variant={variant} />
+          <KeyboardShortcut keys={hotkeyToKeys(step)} variant="inline" />
         </Fragment>
       ))}
     </span>

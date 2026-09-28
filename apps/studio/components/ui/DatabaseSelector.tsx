@@ -41,7 +41,6 @@ interface DatabaseSelectorProps {
   buttonProps?: ButtonProps
   onSelectId?: (id: string) => void // Optional callback
   className?: string
-  align?: 'start' | 'end'
   isForm?: boolean
 }
 
@@ -51,7 +50,6 @@ export const DatabaseSelector = ({
   additionalOptions = [],
   onSelectId = noop,
   buttonProps,
-  align = 'end',
   className,
   isForm = false,
 }: DatabaseSelectorProps) => {
@@ -126,7 +124,7 @@ export const DatabaseSelector = ({
           </Button>
         </div>
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-64" side="bottom" align={align}>
+      <PopoverContent className="p-0 w-64" side="bottom" align="end">
         <Command>
           <CommandList>
             {additionalOptions.length > 0 && (

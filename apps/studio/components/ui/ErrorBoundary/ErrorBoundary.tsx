@@ -12,7 +12,6 @@ interface ErrorFallbackProps {
     label: string
     onClick: () => void
   }[]
-  sentryContext?: Record<string, any>
 }
 
 const ErrorFallback = ({
@@ -50,7 +49,6 @@ interface ErrorBoundaryProps {
     onClick: () => void
   }[]
   sentryContext?: Record<string, any>
-  onReset?: () => void
 }
 
 export const ErrorBoundary = ({
@@ -58,7 +56,6 @@ export const ErrorBoundary = ({
   message,
   actions,
   sentryContext,
-  onReset,
 }: ErrorBoundaryProps) => {
   const handleError = (error: Error, info: ErrorInfo) => {
     Sentry.withScope((scope) => {
@@ -72,10 +69,6 @@ export const ErrorBoundary = ({
     })
   }
 
-  const handleReset = () => {
-    onReset?.()
-  }
-
   return (
     <ReactErrorBoundary
       fallbackRender={({ error, resetErrorBoundary }) => (
@@ -87,7 +80,6 @@ export const ErrorBoundary = ({
         />
       )}
       onError={handleError}
-      onReset={handleReset}
     >
       {children}
     </ReactErrorBoundary>

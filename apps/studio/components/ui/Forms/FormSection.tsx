@@ -3,26 +3,17 @@ import { cn } from 'ui'
 
 export const FormSection = ({
   children,
-  id,
   header,
-  disabled,
   className,
 }: {
   children: React.ReactNode
-  id?: string
   header?: React.ReactNode
-  disabled?: boolean
-  visible?: boolean
   className?: string
 }) => {
-  const classes = [
-    'grid grid-cols-12 gap-6 px-card py-4 md:py-8',
-    `${disabled ? ' opacity-30' : ' opacity-100'}`,
-    `${className}`,
-  ]
+  const classes = ['grid grid-cols-12 gap-6 px-card py-4 md:py-8', ' opacity-100', `${className}`]
 
   return (
-    <div id={id} className={classes.join(' ')}>
+    <div className={classes.join(' ')}>
       {header}
       {children}
     </div>
@@ -66,13 +57,11 @@ const Shimmer = () => (
 export const FormSectionContent = ({
   children,
   loading = true,
-  loaders,
   fullWidth,
   className,
 }: {
   children: React.ReactNode | string
   loading?: boolean
-  loaders?: number
   fullWidth?: boolean
   className?: string
 }) => {
@@ -84,11 +73,7 @@ export const FormSectionContent = ({
         ${className}
       `}
     >
-      {loading
-        ? !!loaders
-          ? new Array(loaders).fill(0).map((_, idx) => <Shimmer key={idx} />)
-          : Children.map(children, (_, idx) => <Shimmer key={idx} />)
-        : children}
+      {loading ? Children.map(children, (_, idx) => <Shimmer key={idx} />) : children}
     </div>
   )
 }

@@ -18,11 +18,9 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 export const DisplayApiSettings = ({
   showTitle = true,
   showNotice = true,
-  showLegacyText = true,
 }: {
   showTitle?: boolean
   showNotice?: boolean
-  showLegacyText?: boolean
 }) => {
   const { ref: projectRef } = useParams()
 
@@ -160,35 +158,31 @@ export const DisplayApiSettings = ({
                   <>
                     This key has the ability to bypass Row Level Security. Never share it publicly.
                     If leaked, generate a new JWT secret immediately.{' '}
-                    {showLegacyText && (
-                      <span>
-                        Prefer using{' '}
-                        <Link
-                          href={`/project/${projectRef}/settings/api-keys/new`}
-                          className="text-link underline"
-                        >
-                          Secret API keys
-                        </Link>{' '}
-                        instead.
-                      </span>
-                    )}
+                    <span>
+                      Prefer using{' '}
+                      <Link
+                        href={`/project/${projectRef}/settings/api-keys/new`}
+                        className="text-link underline"
+                      >
+                        Secret API keys
+                      </Link>{' '}
+                      instead.
+                    </span>
                   </>
                 ) : (
                   <>
                     This key is safe to use in a browser if you have enabled Row Level Security for
                     your tables and configured policies.{' '}
-                    {showLegacyText && (
-                      <span>
-                        Prefer using{' '}
-                        <Link
-                          href={`/project/${projectRef}/settings/api-keys/new`}
-                          className="text-link underline"
-                        >
-                          Publishable API keys
-                        </Link>{' '}
-                        instead.
-                      </span>
-                    )}
+                    <span>
+                      Prefer using{' '}
+                      <Link
+                        href={`/project/${projectRef}/settings/api-keys/new`}
+                        className="text-link underline"
+                      >
+                        Publishable API keys
+                      </Link>{' '}
+                      instead.
+                    </span>
                   </>
                 )
               }

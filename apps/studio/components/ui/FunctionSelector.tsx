@@ -33,7 +33,6 @@ type DatabaseFunction = DatabaseFunctionsData[number]
 interface FunctionSelectorProps {
   className?: string
   size?: 'tiny' | 'small'
-  showError?: boolean
   schema?: string
   value: string
   onChange: (value: string) => void
@@ -46,7 +45,6 @@ interface FunctionSelectorProps {
 const FunctionSelector = ({
   className,
   size = 'tiny',
-  showError = true,
   disabled = false,
   schema,
   value,
@@ -83,7 +81,7 @@ const FunctionSelector = ({
         </Button>
       )}
 
-      {showError && isError && (
+      {isError && (
         <Alert variant="warning" className="px-3! py-3!">
           <AlertTitle className="text-xs text-amber-900">Failed to load functions</AlertTitle>
 

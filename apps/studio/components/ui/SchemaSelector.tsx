@@ -32,7 +32,6 @@ type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   size?: 'tiny' | 'small'
   showError?: boolean
   selectedSchemaName?: string
-  placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
   onSelectSchema: (name: string) => void
@@ -52,7 +51,6 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       size = 'tiny',
       showError = true,
       selectedSchemaName,
-      placeholderLabel = 'Choose a schema...',
       supportSelectAll = false,
       excludedSchemas = DEFAULT_EXCLUDED_SCHEMAS,
       onSelectSchema,
@@ -145,7 +143,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                 aria-label={
                   selectedSchemaName
                     ? `Schema ${selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}`
-                    : placeholderLabel
+                    : 'Choose a schema...'
                 }
                 aria-expanded={open}
                 data-state={open ? 'open' : 'closed'}
@@ -160,7 +158,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                   </span>
                 ) : (
                   <span className="flex w-full gap-1 text-foreground-lighter">
-                    {placeholderLabel}
+                    Choose a schema...
                   </span>
                 )}
               </ComboboxTrigger>

@@ -10,7 +10,6 @@ type SingleStatProps = {
   value: ReactNode
   className?: string
   href?: string
-  onClick?: () => void
   trackingProperties?: {
     stat_type: 'migrations' | 'backups' | 'branches'
     stat_value: number
@@ -23,7 +22,6 @@ export const SingleStat = ({
   value,
   className,
   href,
-  onClick,
   trackingProperties,
 }: SingleStatProps) => {
   const track = useTrack()
@@ -54,14 +52,6 @@ export const SingleStat = ({
       <Link className="group block" href={href} onClick={trackActivityStat}>
         {content}
       </Link>
-    )
-  }
-
-  if (onClick) {
-    return (
-      <button type="button" className="group" tabIndex={0} onClick={onClick}>
-        {content}
-      </button>
     )
   }
 

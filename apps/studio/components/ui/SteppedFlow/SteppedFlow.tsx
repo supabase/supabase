@@ -46,13 +46,9 @@ export interface SteppedFlowProps {
   steps: SteppedFlowStep[]
   currentStep: string
   onStepChange: (stepId: string) => void
-  nextDisabled?: boolean
-  nextLabel?: string
   onNext?: () => void
-  nextLoading?: boolean
   navigationDisabled?: boolean
   onCancel?: () => void
-  cancelLabel?: string
   finalAction?: SteppedFlowFinalAction
   children: ReactNode
 }
@@ -61,13 +57,9 @@ export const SteppedFlow = ({
   steps,
   currentStep,
   onStepChange,
-  nextDisabled = false,
-  nextLabel = 'Next',
   onNext,
-  nextLoading = false,
   navigationDisabled = false,
   onCancel,
-  cancelLabel = 'Cancel',
   finalAction,
   children,
 }: SteppedFlowProps) => {
@@ -123,7 +115,7 @@ export const SteppedFlow = ({
             ) : null}
             {currentIndex === 0 && showCancel ? (
               <Button type="button" disabled={navigationDisabled} onClick={onCancel}>
-                {cancelLabel}
+                Cancel
               </Button>
             ) : null}
             <div className="flex items-center gap-2">
@@ -142,11 +134,10 @@ export const SteppedFlow = ({
                 <Button
                   type="button"
                   variant="primary"
-                  disabled={navigationDisabled || nextDisabled || !nextStepId}
-                  loading={nextLoading}
+                  disabled={navigationDisabled || !nextStepId}
                   onClick={handleNext}
                 >
-                  {nextLabel}
+                  Next
                 </Button>
               )}
             </div>
