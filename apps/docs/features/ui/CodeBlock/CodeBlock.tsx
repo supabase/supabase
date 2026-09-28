@@ -1,23 +1,23 @@
 import { type PropsWithChildren } from 'react'
-import { bundledLanguages, createHighlighter, type BundledLanguage } from 'shiki'
+import { bundledLanguages, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
 import { CodeBlockControls, CodeBlockTokens, type CodeToken } from './CodeBlock.client'
-import { getCodeBlockLabel } from './CodeBlock.utils'
-import theme from './supabase-2.json' with { type: 'json' }
+import { highlightCode } from './CodeBlock.highlight'
+import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.utils'
 import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
 
-const twoslasher = createTwoslasher({ extraFiles })
+const twoslasher = createTwoslasher({
+  extraFiles,
+  // todo: remove once Twoslash stops using deprecated baseUrl and node10 resolution
+  compilerOptions: { ignoreDeprecations: '6.0' },
+})
 const TWOSLASHABLE_LANGS: ReadonlyArray<string> = ['js', 'ts', 'javascript', 'typescript']
 
 const BUNDLED_LANGUAGES = Object.keys(bundledLanguages)
-const highlighter = await createHighlighter({
-  themes: [theme],
-  langs: BUNDLED_LANGUAGES,
-})
 
 export async function CodeBlock({
   className,
@@ -52,17 +52,15 @@ export async function CodeBlock({
     }
   }
 
-  const { tokens } = highlighter.codeToTokens(code, {
-    lang: lang || undefined,
-    theme: 'Supabase Theme',
-  })
+  const { tokens } = await highlightCode(code, lang)
 
   return (
     <div
       className={cn(
         'shiki',
         'group',
-        'relative',
+        'relative has-[.code-scroll:focus-visible]:z-1',
+        'has-[.code-scroll:focus-visible]:outline-2 has-[.code-scroll:focus-visible]:outline-ring',
         'not-prose',
         'w-full',
         compact ? 'border-0 my-0!' : 'border border-default rounded-lg shadow-codeblock',
@@ -76,7 +74,7 @@ export async function CodeBlock({
           'code-scroll',
           'w-full overflow-x-auto overscroll-x-none',
           !compact && 'rounded-lg',
-          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
+          'focus-visible:outline-hidden'
         )}
         role="group"
         aria-roledescription="code block"
@@ -87,15 +85,15 @@ export async function CodeBlock({
           lineNumbers={lineNumbers}
           lines={tokens.map((line, lineIndex) => {
             let offset = 0
-            return line.map(({ content, color, fontStyle, htmlStyle }): CodeToken => {
+            return line.map(({ content, color, fontStyle }): CodeToken => {
               const annotations = twoslashed
                 ?.get(lineIndex)
                 ?.get(offset)
                 ?.map(({ text, docs, tags }) => ({ text, docs, tags }))
               offset += content.length
-              return annotations
-                ? [content, color, fontStyle || 0, { annotations, htmlStyle }]
-                : [content, color, fontStyle || 0]
+              const className = getTokenClassName(color, fontStyle)
+
+              return annotations ? [content, className, annotations] : [content, className]
             })
           })}
         />

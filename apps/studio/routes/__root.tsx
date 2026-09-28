@@ -398,6 +398,7 @@ function RootComponent() {
                               <Toaster />
                               <ToastErrorTracker />
                               <MonacoThemeProvider />
+                              <AppearanceSettingsScript />
                               <AppearanceSettingsProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
@@ -426,7 +427,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
     // prerendered shell can't know. Scoped to this element only.
     <html lang="en" suppressHydrationWarning>
       <head>
-        <AppearanceSettingsScript />
         <HeadContent />
       </head>
       <body>

@@ -124,7 +124,7 @@ const PricingComputeSection = () => {
             </p>
             <h3 className="text-foreground text-2xl ml-0.5 md:ml-0 mb-2 md:mb-0">
               Scale compute up to
-              <br className="hidden sm:block" /> 64 cores and 256 GB RAM
+              <br className="hidden sm:block" /> 64 vCPUs and 256 GB RAM
             </h3>
           </div>
 
@@ -164,7 +164,7 @@ const PricingComputeSection = () => {
                   <Link
                     href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     usage-based billing for compute
                   </Link>{' '}
@@ -172,7 +172,7 @@ const PricingComputeSection = () => {
                   <Link
                     href="https://supabase.com/docs/guides/platform/compute-add-ons"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     Compute Add-ons
                   </Link>

@@ -22,7 +22,7 @@ mockIntersectionObserver()
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 type OrganizationProjectsProject = OrganizationProjectsResponse['projects'][number]
-type SendFeedbackResponse = components['schemas']['SendFeedbackResponse']
+type SendFeedbackResponse = components['schemas']['SendFeedbackResponse_Output']
 
 // Builders that return shapes matching the OpenAPI contract for endpoints
 // the support form depends on. The test only exercises a few fields, but the

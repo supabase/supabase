@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "headless-app-tanstack",
-  "type": "registry:block",
   "title": "Headless App for TanStack Start",
   "description": "A backend with an agent as the primary interface, combining auth, OAuth consent, and an MCP server.",
   "dependencies": [
@@ -112,5 +111,6 @@
     "VITE_SUPABASE_URL": "",
     "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "Follow https://supabase.com/library/docs/tanstack/headless-app for setup. Merge `supabase/config.toml` with existing project settings. Open `/agents` to connect your agent and approve access, then try the example task tools.\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`."
+  "docs": "Follow https://supabase.com/library/docs/tanstack/headless-app for setup. Merge `supabase/config.toml` with existing project settings. Open `/agents` to connect your agent and approve access, then try the example task tools.\n\nYou'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+  "type": "registry:block"
 }

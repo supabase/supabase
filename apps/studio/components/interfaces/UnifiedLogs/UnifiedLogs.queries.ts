@@ -7,6 +7,7 @@ import {
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -38,12 +39,22 @@ const ATTR = {
 } as const
 
 // The HTTP status code lives under different OTEL attribute keys per service:
-// gateway rows (edge / postgrest / storage / edge function) expose it as
-// `response.status_code`, while auth-service rows expose it as `status`. This
-// normalizes the two so both the displayed status and the derived severity are
-// correct for auth logs (which would otherwise have an empty status and fall
+// gateway rows (edge / postgrest / edge function) expose it as
+// `response.status_code`, auth-service rows expose it as `status`, and
+// storage-service rows expose it as `res.statusCode`. This normalizes the
+// three so both the displayed status and the derived severity are correct
+// for those sources (which would otherwise have an empty status and fall
 // back to their `severity_text` of INFO, classifying every 4xx/5xx as success).
-const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', log_attributes['status'], ${ATTR.status})`
+const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
+      WHEN source = 'auth_logs' THEN log_attributes['status']
+      WHEN source = 'storage_logs' THEN log_attributes['res.statusCode']
+      ELSE ${ATTR.status}
+    END`
+
+// storage-service rows expose method/path under `req.method` / `req.url`
+// rather than the gateway's `request.method` / `request.path`.
+const HTTP_METHOD_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.method'], ${ATTR.method})`
+const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.url'], ${ATTR.path})`
 
 /**
  * Condition that matches rows belonging to a given log_type. Mirrors the
@@ -98,8 +109,8 @@ const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
       ELSE toString((${HTTP_STATUS_EXPR}))
     END`
 
-const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${ATTR.method})`
-const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${ATTR.path})`
+const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
+const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_PATH_EXPR})`
 const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, log_attributes, map())`
 
 // SQL expression for derived `level`. Used inline (not as alias reference)
@@ -173,17 +184,32 @@ const translateFilter = (
       // No simple raw column for level; reference the inline CASE expression.
       return safeSql`(${LEVEL_EXPR}) ${inOp} ${inList(values)}`
     case 'method':
-      return safeSql`${ATTR.method} ${inOp} ${inList(values)}`
+      // Match the displayed method: gateway rows read `request.method`,
+      // storage rows read `req.method`. Inline HTTP_METHOD_EXPR so filtering
+      // picks up storage rows too.
+      return safeSql`(${HTTP_METHOD_EXPR}) ${inOp} ${inList(values)}`
     case 'status':
       // Match the displayed status: HTTP response code for gateway rows,
       // Postgres SQLSTATE for postgres rows. Inline STATUS_EXPR so e.g.
       // filtering on '00000' picks up postgres success rows.
       return safeSql`(${STATUS_EXPR}) ${inOp} ${inList(values)}`
-    case 'pathname':
+    case 'pathname': {
+      // Match the displayed pathname: gateway rows read `request.path`,
+      // storage rows read `req.url`. Inline HTTP_PATH_EXPR so filtering
+      // picks up storage rows too.
+      if (operator === '~~*' || operator === '!~~*') {
+        const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
+        const join = operator === '!~~*' ? ' AND ' : ' OR '
+        return safeSql`(${joinSqlFragments(
+          values.map((v) => safeSql`(${HTTP_PATH_EXPR}) ${op} ${lit(wrapIlikePattern(v))}`),
+          join
+        )})`
+      }
       return safeSql`(${joinSqlFragments(
-        values.map((v) => safeSql`${ATTR.path} ${likeOp} ${lit('%' + v + '%')}`),
+        values.map((v) => safeSql`(${HTTP_PATH_EXPR}) ${likeOp} ${lit('%' + v + '%')}`),
         joinAndOr
       )})`
+    }
     case 'host':
       // Best-effort: use full request URL since `host` isn't a top-level field.
       return safeSql`(${joinSqlFragments(
@@ -199,9 +225,8 @@ const translateFilter = (
       if (operator === '~~*' || operator === '!~~*') {
         const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
         const join = operator === '!~~*' ? ' AND ' : ' OR '
-        const pattern = (v: string) => (v.includes('%') ? v : '%' + v + '%')
         return safeSql`(${joinSqlFragments(
-          values.map((v) => safeSql`event_message ${op} ${lit(pattern(v))}`),
+          values.map((v) => safeSql`event_message ${op} ${lit(wrapIlikePattern(v))}`),
           join
         )})`
       }
@@ -348,14 +373,8 @@ const userFilterValue = (search: QuerySearchParamsType): string =>
   typeof search.user === 'string' ? search.user.trim() : ''
 
 /**
- * Cross-cutting "attributable to one user" condition. Only the two sources that can
- * be positively tied to a user are eligible, each with its own match:
- *   - auth_logs: structured identity (`auth_event.actor_id`)
- *   - postgres_logs: the identifier appears verbatim in the error text (e.g. a 23502
- *     failing row echoing the id column).
- * edge_logs / storage_logs / realtime_logs carry no per-user field and can't satisfy
- * either branch, so they're auto-excluded while the filter is active — never guessed
- * at via IP or timestamp proximity.
+ * Matches structured user identifiers in Auth events and API Gateway JWT subjects.
+ * Sources without these fields cannot match the user filter.
  */
 const userAttributionCondition = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
   const value = userFilterValue(search)
@@ -372,12 +391,10 @@ const USER_ATTRIBUTABLE_SOURCES = new Set([LOG_TYPE_TO_SOURCE.auth, LOG_TYPE_TO_
 
 /**
  * True when the user filter is active but an explicit log_type filter restricts the
- * view to source(s) that can never satisfy `userAttributionCondition` (e.g. `edge`) —
+ * view to source(s) that can never satisfy `userAttributionCondition` (e.g. `postgres`) —
  * the combination is guaranteed to match zero rows. Consumed by the UI to show a
  * specific empty state instead of the generic "No results found".
  *
- * [Joshen] Basically filtering by user only works on Auth and Postgres logs atm
- * Refer to userAttributeCondition above
  */
 export const isUserFilterUnreachable = (search: QuerySearchParamsType): boolean => {
   if (!userFilterValue(search)) return false

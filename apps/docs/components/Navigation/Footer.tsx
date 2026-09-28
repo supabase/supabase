@@ -14,7 +14,7 @@ const Footer = ({ className }: { className?: string }) => (
               <p>{text}</p>
               <Link
                 href={url}
-                className="text-brand-link hover:underline"
+                className="text-primary hover:underline"
                 target="_blank"
                 rel="noreferrer noopener"
               >

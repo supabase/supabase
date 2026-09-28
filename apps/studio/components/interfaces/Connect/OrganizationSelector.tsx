@@ -210,11 +210,11 @@ const ConnectOrganizationButton = ({
         'pointer-events-none shadow-none transition-colors',
         !disabled && !selected && 'group-hover:border-default group-hover:bg-surface-200',
         selected &&
-          'border-brand bg-brand-200/20 dark:bg-brand-300 pr-10 group-hover:border-brand group-hover:bg-brand-200/20'
+          'border-primary-bright bg-primary-bright/10 pr-10 group-hover:border-primary-bright group-hover:bg-primary-bright/10'
       )}
     />
     {selected && (
-      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-primary-bright bg-primary-bright text-black dark:text-black" />
     )}
   </button>
 )

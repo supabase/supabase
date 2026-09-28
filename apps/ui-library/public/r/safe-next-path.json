@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "safe-next-path",
-  "type": "registry:lib",
   "title": "Safe next path",
   "description": "Validates same-origin paths before redirecting.",
   "dependencies": [],
@@ -13,5 +12,6 @@
       "type": "registry:lib",
       "target": "lib/safe-next-path.ts"
     }
-  ]
+  ],
+  "type": "registry:lib"
 }

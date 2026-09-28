@@ -31,6 +31,14 @@ import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
 
+const DESTINATION_DOCS_PATHS: Partial<Record<DestinationType, string>> = {
+  BigQuery: '/guides/database/replication/pipelines/bigquery#configure-bigquery-as-a-destination',
+  ClickHouse:
+    '/guides/database/replication/pipelines/clickhouse#configure-clickhouse-as-a-destination',
+  DuckLake: '/guides/database/replication/pipelines/ducklake#choose-a-configuration-mode',
+  Snowflake: '/guides/database/replication/pipelines/snowflake#prepare-snowflake-resources',
+}
+
 export const DestinationPanel = () => {
   const { ref: projectRef } = useParams()
   const enablePgReplicate = useIsETLPrivateAlpha()
@@ -97,10 +105,10 @@ export const DestinationPanel = () => {
     onClose,
   })
 
-  const docsUrl =
-    destinationType === 'BigQuery'
-      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
-      : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
+  const docsUrl = `${DOCS_URL}${
+    (destinationType && DESTINATION_DOCS_PATHS[destinationType]) ??
+    '/guides/database/replication/pipelines#step-3-configure-a-destination'
+  }`
 
   useEffect(() => {
     if (edit !== null && invalidExistingDestination) {
@@ -124,7 +132,7 @@ export const DestinationPanel = () => {
           <Admonition
             type="warning"
             title="Replication unavailable locally"
-            description="Configure the replication API to manage Pipelines destinations in local development."
+            description="Configure the replication API to manage pipelines in local development."
           />
         </SheetSection>
       )}
@@ -138,11 +146,11 @@ export const DestinationPanel = () => {
           <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
             <SheetHeader className="flex items-center justify-between">
               <div>
-                <SheetTitle>{editMode ? 'Edit destination' : 'Add destination'}</SheetTitle>
+                <SheetTitle>{editMode ? 'Edit pipeline' : 'Add pipeline'}</SheetTitle>
                 <SheetDescription>
                   {editMode
-                    ? 'Update the configuration for this destination.'
-                    : 'Connect an external destination for analytics workloads.'}
+                    ? 'Update how this pipeline sends data to its destination.'
+                    : 'Send tables to an external destination for analytics workloads.'}
                 </SheetDescription>
               </div>
               <DocsButton

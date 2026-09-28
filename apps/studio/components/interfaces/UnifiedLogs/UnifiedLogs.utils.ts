@@ -6,7 +6,6 @@ import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
-import type { UnifiedLogInspectionEntry } from '@/data/logs/unified-log-inspection-query'
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
@@ -83,11 +82,11 @@ export function getRowTimestampMs(
   return null
 }
 
-type ComputeRawLogData = Pick<ColumnSchema, 'id' | 'timestamp' | 'event_message' | 'metadata'>
+type ComputeRawLogData = Pick<ColumnSchema, 'id' | 'event_message' | 'metadata'> & {
+  timestamp: string | number
+}
 
-export function getRawLogData(
-  row: ColumnSchema | UnifiedLogInspectionEntry
-): ColumnSchema | UnifiedLogInspectionEntry | ComputeRawLogData {
+export function getRawLogData<T extends ComputeRawLogData>(row: T): T | ComputeRawLogData {
   if (!('log_type' in row) || row.log_type !== 'compute') return row
 
   return {
@@ -259,6 +258,15 @@ export function gateLogTypeOptions<T extends { value: string; options?: Option[]
       options: field.options.filter((option) => !hiddenLogTypes.has(option.value)),
     }
   })
+}
+
+/**
+ * Wraps a raw ILIKE/NOT ILIKE search term in `%...%` for a "contains" match,
+ * unless it already includes a `%` or `_` wildcard — in which case the user
+ * has crafted their own pattern and it's passed through unchanged.
+ */
+export function wrapIlikePattern(value: string): string {
+  return value.includes('%') || value.includes('_') ? value : `%${value}%`
 }
 
 export function gateLogTypeFilters(

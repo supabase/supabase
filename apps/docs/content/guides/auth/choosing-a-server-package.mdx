@@ -76,7 +76,9 @@ export default {
 }
 ```
 
-See the [`@supabase/server` reference](/docs/reference/server) for the full API.
+See the [`@supabase/server` reference](/docs/reference/server/introduction) for the full API.
+
+`@supabase/server` is also the package for MCP servers. Its `withOAuthProtectedResource` middleware handles OAuth discovery for MCP clients, and composed with `withSupabase({ auth: 'user' })` every tool call runs as the signed-in user. See [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp).
 
 <Admonition type="note">
 
@@ -91,5 +93,5 @@ In a cookie-based framework you can compose the two — let `@supabase/ssr` own 
 ## Next steps
 
 - [Server-side rendering](/guides/auth/server-side) — set up `@supabase/ssr` for your framework.
-- [`@supabase/server` reference](/docs/reference/server) — API for header-based server auth.
+- [`@supabase/server` reference](/docs/reference/server/introduction) — API for header-based server auth.
 - [`supabase-js` reference](/docs/reference/javascript/introduction) — the base JavaScript client.

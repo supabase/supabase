@@ -133,6 +133,40 @@ Ensure the middle border is shared rather than doubled-up. Do not use `border-l-
 
 Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions when `layout="responsive"`: also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary action.
 
+## Default fill and floating buttons
+
+The default variant is meant to read as raised chrome on whatever surface it sits on.
+
+- **Light:** opaque `bg-card` (a solid elevated plate). Opaque on purpose so the button can cover busy content underneath.
+- **Dark:** translucent `bg-muted` (a foreground wash). That adapts to the local surface, but content can show through the fill.
+
+Hover: light uses `hover:bg-muted`; dark uses `dark:hover:bg-accent`.
+
+### Floating over content
+
+If a default button is absolutely or sticky-positioned over code, tables, maps, or other busy UI, wrap it in [`FloatingPlate`](#floating-plate) so nothing bleeds through:
+
+<ComponentPreview name="button-floating-plate" peekCode />
+
+Keep positioning, z-index, and hover/focus reveal on the plate's `className`. Use `rounded="full"` when the child is a pill. For clusters (split toggles, parallel actions), wrap the group once.
+
+Do not override the button fill with `bg-popover` at the callsite. The plate owns occlusion; the button stays a normal default control.
+
+## Floating plate
+
+`FloatingPlate` is an opaque `bg-popover` shell for floating default buttons (and small clusters).
+
+```tsx
+import { Button, FloatingPlate } from 'ui'
+```
+
+| Prop        | Default | Notes                                                           |
+| ----------- | ------- | --------------------------------------------------------------- |
+| `rounded`   | `lg`    | `md`, `lg`, or `full`. Match or exceed the child button radius. |
+| `className` | —       | Positioning, opacity, gaps for clusters.                        |
+
+See [Floating over content](#floating-over-content) for when to use it.
+
 ## Accessibility
 
 [Keyboard focus](../accessibility#focus-management) is automatically handled:

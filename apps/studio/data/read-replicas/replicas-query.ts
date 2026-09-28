@@ -7,6 +7,7 @@ import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 /**
@@ -47,7 +48,7 @@ export async function getReadReplicas(
   })
 
   if (error) handleError(error)
-  return data
+  return Array.isArray(data) ? data : EMPTY_ARR
 }
 
 export type ReadReplicasData = Awaited<ReturnType<typeof getReadReplicas>>

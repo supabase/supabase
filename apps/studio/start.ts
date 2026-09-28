@@ -8,14 +8,11 @@ import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { isHostedSupportedApiPath } from '@/lib/hosted-api-allowlist'
 
 // Self-hosted-only API routes must 404 in platform (hosted) mode. Under the
-// Next pages router this lives in middleware (proxy.ts), but TanStack Start
-// has no middleware runtime, so the guard is migrated here as a global
-// request middleware sharing the same allowlist (lib/hosted-api-allowlist.ts).
-// On Vercel our `/api/*` (and `/_serverFn/*`) requests are rewritten to the
-// api/server.js function which runs the Start handler, so createStartHandler
-// runs this server-side for every API request — even though pages are served
-// as a static SPA shell. The guard therefore covers all API routes from a
-// single place.
+// Next pages router this lives in middleware (proxy.ts); TanStack Start has no
+// middleware runtime, so it's a global request middleware sharing the same
+// allowlist (lib/hosted-api-allowlist.ts). On Vercel every `/api/*` request
+// still reaches the function (pages are a static shell), so this covers all
+// API routes from one place.
 
 const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request, next }) => {
   const { pathname } = new URL(request.url)
@@ -34,6 +31,14 @@ const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request
   return next()
 })
 
+// Vercel's standard request pin keeps server functions compatible with the
+// current tab. Documents and the deployment check stay unpinned, so a reload
+// gets the latest version. Vite only defines the ID when protection is enabled.
+const deploymentMiddleware = createMiddleware({ type: 'function' }).client(({ next }) => {
+  const deploymentId = process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID
+  return next({ headers: deploymentId ? { 'x-deployment-id': deploymentId } : {} })
+})
+
 // Sentry's global middlewares go at the FRONT so they wrap the whole request /
 // server-function lifecycle — including errors that downstream code swallows
 // into a 500, which the manual `@sentry/nextjs` approach never sees. The SDK's
@@ -42,5 +47,5 @@ const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request
 // explicitly so the instrumentation is visible in source.
 export const startInstance = createStart(() => ({
   requestMiddleware: [sentryGlobalRequestMiddleware, platformApiGuard],
-  functionMiddleware: [sentryGlobalFunctionMiddleware],
+  functionMiddleware: [sentryGlobalFunctionMiddleware, deploymentMiddleware],
 }))

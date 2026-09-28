@@ -66,11 +66,9 @@ const createMockInvoice = (details: Partial<Invoice> = {}): Invoice => ({
 })
 
 const createMockInvoiceWithoutPdf = (): Invoice => {
-  const invoice = createMockInvoice()
-  // The API can return null for invoice_pdf. Not reflected in the generated schema yet, but
-  // will be soon — drop the cast once the type is nullable.
-  ;(invoice as any).invoice_pdf = null
-  return invoice
+  return createMockInvoice({
+    invoice_pdf: null,
+  })
 }
 
 describe('InvoicesSettings', () => {

@@ -85,6 +85,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref.tsx` — DefaultLayout only. **Delta vs plan:** ProjectLayoutWithAuth omitted from the shell because product layouts (DatabaseLayout, AuthLayout, StorageLayout, …) already render `withAuth(... ProjectLayout ...)` internally — adding it here would double-wrap. The home page (`/project/$ref/index.tsx`) wraps itself in `ProjectLayoutWithAuth` since it has no product layout.
 - [x] `routes/project/$ref/database.tsx` — DatabaseLayout (reads `databaseLayoutTitle` from leaf `staticData`)
 - [x] `routes/project/$ref/database/triggers.tsx` — sub-shell with `PageLayout` + permission gate + nav items, inlined from `DatabaseTriggersLayout`. **Delta vs plan:** the existing `DatabaseTriggersLayout` component wraps `<DatabaseLayout title="Triggers">` internally, so re-using it inside the database.tsx shell would double-wrap. Inlined the inner part instead; the Next-side component is left untouched (still used by the `pages/...` files we re-export).
+- [x] `routes/project/$ref/database/pipelines.tsx` — sub-shell providing `PipelineRequestStatusProvider`, mirrors `PipelinesLayout` on the Next side. Sets `databaseLayoutTitle: 'Pipelines'` for the whole subtree so the provider stays a single instance across navigation between the Pipelines list and detail routes. Legacy Replication routes are retained only for redirects, while the replica detail route redirects to Infrastructure.
 - [x] `routes/project/$ref/auth.tsx` — AuthLayout (reads `authLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours a `skipAuthLayout: true` opt-out in `staticData` for leaves whose own body or sub-layout already wraps in `AuthLayout` (`AuthProvidersLayout`, `AuthEmailsLayout`, `pages/.../auth/third-party.tsx`) — without it those routes would double-wrap (which also doubles `withAuth` + `ProjectLayout`).
 - ~~`routes/project/$ref/auth/templates.tsx` — AuthEmailsLayout~~ **Delta vs plan: not landed.** A unified `templates.tsx` sub-shell would force `templates/$templateId.tsx` (which uses plain `AuthLayout`, not `AuthEmailsLayout`) into the wrong wrapping. Instead `templates/index.tsx` and `auth/smtp.tsx` each set `skipAuthLayout: true` and wrap themselves in `AuthEmailsLayout`; `templates/$templateId.tsx` uses the standard auth shell with `authLayoutTitle: 'Emails'`.
 - [x] `routes/project/$ref/storage.tsx` — StorageLayout + StorageBucketsLayout (reads `storageLayoutTitle`, optional `skipStorageBucketsLayout`, `storageBucketsLayoutTitle`, `storageBucketsLayoutHideSubtitle` from leaf `staticData`). **Delta vs plan:** the shell wraps in BOTH StorageLayout and StorageBucketsLayout by default — every storage page except bucket-detail pages uses both. Bucket-detail pages set `skipStorageBucketsLayout: true`. `/storage/s3` uses `storageBucketsLayout{Title,HideSubtitle}` to override the inner header.
@@ -144,6 +145,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `LinkAwsMarketplaceLayout` and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [x] A `routes/claim-project.tsx` ← `pages/claim-project.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `<Head>` + `<main>` layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [x] A `routes/join.tsx` ← `pages/join.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses a centered-div layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
+- [x] A `routes/stripe-atlas-application.tsx` ← `pages/stripe-atlas-application.tsx` (no `withAuth` — reachable logged in and logged out; uses `InterstitialLayout`, so no `AppLayout` + `DefaultLayout` wrapping)
 - [x] `routes/_app/support/new.tsx` ← `pages/support/new.tsx` (sets `hideMobileMenu: true` staticData; existing page is `withAuth`-wrapped so no beforeLoad migration needed yet)
 - [x] `routes/_app/support/link.tsx` ← `pages/support/link.tsx`
 
@@ -180,8 +182,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/database/tables/$id.tsx` ← `pages/project/[ref]/database/tables/[id].tsx`
 - [x] A `routes/project/$ref/database/publications/index.tsx` ← `pages/project/[ref]/database/publications/index.tsx`
 - [x] A `routes/project/$ref/database/publications/$id.tsx` ← `pages/project/[ref]/database/publications/[id].tsx`
-- [x] A `routes/project/$ref/database/replication/index.tsx` ← `pages/project/[ref]/database/replication/index.tsx`
-- [x] A `routes/project/$ref/database/replication/$pipelineId.tsx` ← `pages/project/[ref]/database/replication/[pipelineId].tsx`
+- [x] A `routes/project/$ref/database/pipelines/index.tsx` ← `pages/project/[ref]/database/pipelines/index.tsx`
+- [x] A `routes/project/$ref/database/pipelines/$pipelineId.tsx` ← `pages/project/[ref]/database/pipelines/[pipelineId].tsx`
 - [x] A `routes/project/$ref/database/replication/replica/$replicaId.tsx` ← `pages/project/[ref]/database/replication/replica/[replicaId].tsx` (redirects to Infrastructure)
 - [x] A `routes/project/$ref/database/triggers/index.tsx` ← `pages/project/[ref]/database/triggers/index.tsx`
 - [x] A `routes/project/$ref/database/triggers/data.tsx` ← `pages/project/[ref]/database/triggers/data.tsx` (sub-shell at `database/triggers.tsx` provides PageLayout + nav, parent shell provides DatabaseLayout)
@@ -349,6 +351,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
 - [x] A `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
 - [x] A `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx` (page inlines SignInLayout)
+- [x] A `routes/_auth/sign-in-recovery-code.tsx` ← `pages/sign-in-recovery-code.tsx` (page inlines SignInLayout)
 - [x] A `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
 - [x] A `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx` (page inlines ForgotPasswordLayout)
 - [x] A `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx` (page default already withAuth-wrapped)

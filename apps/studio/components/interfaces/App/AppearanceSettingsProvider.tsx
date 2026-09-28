@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes'
 import { useTextSize } from '@/hooks/misc/useTextSize'
 import { useThemeOverrides } from '@/hooks/misc/useThemeOverrides'
 import { applyTextSize } from '@/lib/text-size'
-import { applyResolvedThemeOverrides } from '@/lib/theme-overrides'
+import { applyThemeOverrides } from '@/lib/theme-overrides'
 
 export const AppearanceSettingsProvider = () => {
   const { resolvedTheme } = useTheme()
@@ -13,7 +13,7 @@ export const AppearanceSettingsProvider = () => {
 
   useIsomorphicLayoutEffect(() => {
     if (resolvedTheme !== undefined) {
-      applyResolvedThemeOverrides(document.documentElement, resolvedTheme, mode, overrides)
+      applyThemeOverrides(document.documentElement, mode, overrides)
     }
     applyTextSize(document.documentElement, textSize)
   }, [mode, overrides, resolvedTheme, textSize])

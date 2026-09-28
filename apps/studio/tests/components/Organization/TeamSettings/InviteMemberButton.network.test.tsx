@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components, operations } from 'api-types'
 import { HttpResponse } from 'msw'
@@ -191,7 +191,7 @@ describe('InviteMemberButton (network)', () => {
     expect(screen.getByText('Read-only')).toBeInTheDocument()
 
     // The key safety message from the ticket: Administrator can delete projects
-    expect(screen.getByText(/including deleting projects/i)).toBeInTheDocument()
+    expect(screen.getByText('deleting projects')).toBeInTheDocument()
 
     // Roles documentation is one click away (the ticket's other complaint)
     const docsLink = screen.getByRole('link', { name: /roles and permissions/i })
@@ -231,6 +231,10 @@ describe('InviteMemberButton (network)', () => {
       target: { value: 'admin@example.com' },
     })
     fireEvent.click(screen.getByRole('button', { name: /send invitation/i }))
+
+    const confirmation = await screen.findByRole('dialog', { name: 'Invite as Administrator?' })
+    expect(invitePayloads).toHaveLength(0)
+    fireEvent.click(within(confirmation).getByRole('button', { name: /send invitation/i }))
 
     await waitFor(() => expect(invitePayloads).toHaveLength(1))
     expect(invitePayloads[0]).toEqual({

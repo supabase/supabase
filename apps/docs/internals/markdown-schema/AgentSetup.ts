@@ -3,6 +3,7 @@ import {
   getMonitoringAgentHarnesses,
   getMonitoringAgentPrompt,
 } from '~/data/monitoring-agents.utils'
+import { toMarkdown } from 'mdast-util-to-markdown'
 
 type HandlerContext = {
   props: Record<string, unknown>
@@ -18,7 +19,7 @@ export function AgentSetup({ props }: HandlerContext): string {
   const harnesses = getMonitoringAgentHarnesses(agent)
 
   const sections = [
-    `**Prompt**\n\n\`\`\`text\n${prompt}\n\`\`\``,
+    `**Prompt**\n\n${toMarkdown({ type: 'code', lang: 'text', value: prompt }).trimEnd()}`,
     ...harnesses.map((harness) => {
       const parts = [`**${harness.label}**`, harness.intro, renderMarkdownSteps(harness.steps)]
       if (harness.note) parts.push(harness.note)

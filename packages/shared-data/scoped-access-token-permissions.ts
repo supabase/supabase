@@ -89,6 +89,7 @@ interface ResourceMeta {
   riskReason: string
   allowsRead?: string[]
   allowsWrite?: string[]
+  dependencies?: string[]
 }
 
 /**
@@ -229,6 +230,15 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     riskReason: 'Read-write can create and edit saved SQL snippets.',
     allowsRead: ['Read project SQL snippets'],
     allowsWrite: ['Manage project SQL snippets'],
+  },
+  'project:notebooks': {
+    category: 'project',
+    name: 'Notebooks',
+    description: 'Notebooks shared with everyone on the project.',
+    risk: 'low',
+    riskReason: 'Read-write can create, edit, and delete notebooks shared across the project.',
+    allowsRead: ['Read project notebooks'],
+    allowsWrite: ['Manage project notebooks'],
   },
 
   // --- Database ---
@@ -371,6 +381,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     risk: 'high',
     riskReason: 'Read reveals the secret values of project API keys.',
     allowsRead: ['Reveal project API key secrets'],
+    dependencies: ['project:api_gateway_keys'],
   },
   'project:edge_functions': {
     category: 'appsvc',
@@ -442,6 +453,7 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     risk: 'high',
     riskReason: 'Read exposes the JWT secret, which can be used to mint tokens for any role.',
     allowsRead: ['Read Data API JWT secret'],
+    dependencies: ['project:data_api_config'],
   },
 
   // --- Infrastructure and delivery ---
@@ -545,6 +557,8 @@ const toPermissionLevel = (scope: string): PermissionLevel => {
   return match
 }
 
+type PermissionDependency = { key: string; label: string; permissions: 'read' | 'read-write' }
+
 export interface PermissionCatalogEntry {
   /** Derived resource key, e.g. "project:database" */
   key: string
@@ -563,6 +577,7 @@ export interface PermissionCatalogEntry {
   readScopes: FgaScopeId[]
   /** Additional FGA scope ids granted at Read-write (write / create / delete). */
   writeScopes: FgaScopeId[]
+  dependencies: Array<PermissionDependency>
 }
 
 /** Action classes an FGA permission key's suffix can map to. */
@@ -612,6 +627,17 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
   for (const [key, { level, title, readScopes, writeScopes }] of byResource.entries()) {
     const meta =
       RESOURCE_METADATA[key] ?? RESOURCE_METADATA_FALLBACK(key, title, writeScopes.length > 0)
+    const dependencies = (meta.dependencies ?? []).map((dependency) => {
+      return {
+        key: dependency,
+        label: RESOURCE_METADATA[dependency].name,
+        permissions:
+          RESOURCE_METADATA[dependency].allowsRead?.length &&
+          RESOURCE_METADATA[dependency].allowsWrite?.length
+            ? ('read-write' as const)
+            : ('read' as const),
+      }
+    })
     catalog.push({
       key,
       level,
@@ -626,6 +652,7 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
       writable: writeScopes.length > 0,
       readScopes: readScopes as FgaScopeId[],
       writeScopes: writeScopes as FgaScopeId[],
+      dependencies,
     })
   }
   return catalog

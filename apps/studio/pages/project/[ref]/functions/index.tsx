@@ -3,7 +3,7 @@ import { ExternalLink, RefreshCw, Search, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import React, { useMemo, useRef, type PropsWithChildren } from 'react'
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -35,6 +35,7 @@ import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFu
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
@@ -145,6 +146,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                               actions={[
                                 search && (
                                   <Button
+                                    aria-label="Clear search"
                                     key="clear"
                                     size="tiny"
                                     variant="text"
@@ -200,14 +202,10 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                                 <EdgeFunctionsListItem key={item.id} function={item} />
                               ))
                             ) : (
-                              <TableRow>
-                                <TableCell colSpan={showLastHourStats ? 8 : 6}>
-                                  <p className="text-sm text-foreground">No results found</p>
-                                  <p className="text-sm text-foreground-light">
-                                    Your search for "{search}" did not return any results
-                                  </p>
-                                </TableCell>
-                              </TableRow>
+                              <TableRowNoResults
+                                colSpan={showLastHourStats ? 8 : 6}
+                                search={search}
+                              />
                             )}
                           </>
                         </TableBody>

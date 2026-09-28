@@ -8,7 +8,9 @@ import { API_URL } from '@/lib/constants'
 export const mswServer = setupServer(...GlobalAPIMocks)
 
 mswServer.events.on('request:start', ({ request }) => {
-  console.log('[MSW] Outgoing:', request.method, request.url)
+  if (!process.env.CI) {
+    console.log('[MSW] Outgoing:', request.method, request.url)
+  }
 })
 
 // Recursively changes params in an endpoint path segment from {param}
@@ -69,7 +71,9 @@ export const addAPIMock = <P extends Endpoints | `${Endpoints}?${string}`, M ext
       response: SuccessResponse<TrimQueryParams<P>, M> | TypedResolver<TrimQueryParams<P>, M>
     }) => {
   const fullPath = `${API_URL}${path}`
-  console.log('[MSW] Adding mock:', method.toUpperCase(), fullPath)
+  if (!process.env.CI) {
+    console.log('[MSW] Adding mock:', method.toUpperCase(), fullPath)
+  }
 
   mswServer.use(
     http[method](
@@ -77,7 +81,9 @@ export const addAPIMock = <P extends Endpoints | `${Endpoints}?${string}`, M ext
       isResponseResolver(response)
         ? response
         : ({ request }) => {
-            console.log('[MSW] Handling request:', request.method, request.url, response)
+            if (!process.env.CI) {
+              console.log('[MSW] Handling request:', request.method, request.url, response)
+            }
             return HttpResponse.json(response ?? null)
           }
     )

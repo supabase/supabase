@@ -103,6 +103,18 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
 }
 
 const FRANKFURT = 'Central EU (Frankfurt)'
+const SAO_PAULO = 'South America (São Paulo)'
+
+const availableRegionsWithSaoPaulo = (status?: 'capacity' | 'other'): RegionsInfo => ({
+  ...DEFAULT_AVAILABLE_REGIONS,
+  all: {
+    ...DEFAULT_AVAILABLE_REGIONS.all,
+    specific: [
+      ...DEFAULT_AVAILABLE_REGIONS.all.specific,
+      { code: 'sa-east-1', name: SAO_PAULO, provider: 'AWS', type: 'specific', status },
+    ],
+  },
+})
 
 const AVAILABLE_REGIONS_WITH_FRANKFURT: RegionsInfo = {
   ...DEFAULT_AVAILABLE_REGIONS,
@@ -262,9 +274,10 @@ const DEFAULT_FLAGS = {
   newProjectInternalOnlyConfiguration: false,
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
+  projectCreationRestrictedRegions: false,
 }
 
-async function renderWizard(options: { flags?: Partial<typeof DEFAULT_FLAGS> } = {}) {
+async function renderWizard(options: { flags?: Record<string, boolean | string> } = {}) {
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
@@ -479,6 +492,80 @@ describe('project creation wizard', () => {
 
       await screen.findByText('Error loading available regions')
     })
+
+    describe('restricted regions', () => {
+      const CAPACITY_COPY = {
+        title: 'Selected region is at capacity',
+        notice:
+          'This region currently has capacity for Micro compute and above. Free plan projects run on Nano compute.',
+      }
+      const GENERIC_COPY = {
+        title: 'Selected region is unavailable',
+        notice: 'This region is temporarily unavailable for new projects.',
+      }
+
+      const expectSelectableRestrictedRegion = async (
+        onRequest: ReturnType<typeof vi.fn>,
+        copy: { title: string; notice: string }
+      ) => {
+        await fillProjectName('Restricted Region Project')
+        await generateAndWaitForStrongPassword()
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
+        expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
+        expect(within(saoPaulo).getByText('Unavailable')).toBeInTheDocument()
+        expect(
+          within(screen.getByRole('option', { name: /North Virginia/ })).queryByText('Unavailable')
+        ).not.toBeInTheDocument()
+        await user.click(saoPaulo)
+
+        expect(await screen.findByText(copy.title)).toBeInTheDocument()
+        expect(screen.getByText(copy.notice, { exact: false })).toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+        const message = `${copy.title}. Select a different region to continue.`
+        expect(await screen.findByText(message)).toBeInTheDocument()
+        expect(onRequest).not.toHaveBeenCalled()
+
+        await selectRegion(/Americas/)
+        await waitFor(() => expect(screen.queryByText(message)).not.toBeInTheDocument())
+        expect(screen.queryByText(copy.title)).not.toBeInTheDocument()
+      }
+
+      test('keeps a capacity-restricted region selectable, explains it, and blocks submission', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo('capacity') })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard()
+
+        await expectSelectableRestrictedRegion(onRequest, CAPACITY_COPY)
+      })
+
+      test('labels an "other" platform status with generic copy instead of greying it out silently', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo('other') })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard()
+
+        await expectSelectableRestrictedRegion(onRequest, GENERIC_COPY)
+      })
+
+      test('applies a flag-only restriction the same way when the platform reports no status', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo() })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard({
+          flags: { projectCreationRestrictedRegions: '{"sa-east-1":"unavailable"}' },
+        })
+
+        await expectSelectableRestrictedRegion(onRequest, GENERIC_COPY)
+      })
+    })
   })
 
   describe('compute size and spend confirmation', () => {
@@ -493,7 +580,7 @@ describe('project creation wizard', () => {
       await generateAndWaitForStrongPassword()
 
       await user.click(getSelectTriggerByLabel('Compute size'))
-      await user.click(await screen.findByText('4 GB RAM / 2-core CPU'))
+      await user.click(await screen.findByText('4 GB RAM / Shared compute'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 

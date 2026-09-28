@@ -64,7 +64,7 @@ describe('AssistantNotebookPreview', () => {
     expect(screen.getByRole('toolbar', { name: 'Notebook toolbar' })).toBeInTheDocument()
     expect(screen.getByText('2 cells')).toBeInTheDocument()
     expect(screen.getByText('New notebook')).toBeInTheDocument()
-    expect(container.firstElementChild).toHaveClass('max-w-6xl')
+    expect(container.firstElementChild).toHaveClass('max-w-3xl')
   })
 
   it('surfaces a metadata-only database change after resolving the target', async () => {

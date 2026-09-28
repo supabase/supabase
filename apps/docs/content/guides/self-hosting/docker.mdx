@@ -40,7 +40,6 @@ You need the following installed on your system:
   - **Linux desktop**: Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/linux/)
   - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
   - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
 ## System requirements
 
@@ -87,6 +86,8 @@ The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
 
 The shortened link points to [setup.sh](https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/docker/setup.sh) - you can inspect it before running. Use `-y` to run non-interactively with default values.
 
+When the script installs Docker for you, it also adds the user to the `docker` group. Log out and back in before continuing, otherwise the `docker` commands below need `sudo`.
+
 After the script finishes, start the stack:
 
 ```sh
@@ -122,7 +123,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 --branch self-hosted/v0.8.1 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.8.2 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -139,7 +140,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.8.1\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.2\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -153,7 +154,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.1 https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.2 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -175,7 +176,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.8.1\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.2\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -439,7 +440,6 @@ Everything beyond this point in the guide helps you understand how the system wo
 
 Supabase is built from open source tools, each chosen or developed for production use.
 
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, or equivalent open source license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves.
 
 <Image
@@ -459,7 +459,6 @@ If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, o
 - **[PostgREST](https://github.com/PostgREST/postgrest)** - Web server that turns your Postgres database directly into a RESTful API
 - **[Realtime](https://github.com/supabase/realtime)** - Elixir server that listens to Postgres database changes and broadcasts them to subscribed clients
 - **[Storage](https://github.com/supabase/storage)** - RESTful API for managing files in S3, with Postgres handling permissions
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 - **[imgproxy](https://github.com/imgproxy/imgproxy)** - Fast and secure image processing server
 - **[postgres-meta](https://github.com/supabase/postgres-meta)** - RESTful API for managing Postgres (fetch tables, add roles, run queries)
 - **[Postgres](https://github.com/supabase/postgres)** - Object-relational database with over 30 years of active development
@@ -522,7 +521,6 @@ The `generate-keys.sh` script sets the following secrets automatically. You can 
 - `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `S3_PROTOCOL_ACCESS_KEY_ID`: Access key ID (username-like) for [accessing](/docs/guides/self-hosting/self-hosted-s3) the S3 protocol endpoint in Storage. (Generate with `openssl rand -hex 16`)
 - `S3_PROTOCOL_ACCESS_KEY_SECRET`: Secret key (password-like) used with S3_PROTOCOL_ACCESS_KEY_ID. (Generate with `openssl rand -hex 32`)
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 - `MINIO_ROOT_PASSWORD`: Root administrator password for the [RustFS or MinIO server](/docs/guides/self-hosting/self-hosted-s3). (Must be 8+ characters; generate with `openssl rand -hex 16`)
 
 ### Configuring Supabase services
@@ -574,14 +572,12 @@ SMTP_SENDER_NAME=your-sender-name
 We recommend using [AWS SES](https://aws.amazon.com/ses/). It's affordable and reliable. Restart all services to pick up the new configuration.
 
 ### Configuring S3 Storage
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 By default, when using self-hosted Storage service, all files are stored locally on your server filesystem (via a bind mount in `docker-compose.yml`). You can connect Storage to an S3-compatible backend (AWS S3, RustFS, MinIO, Cloudflare R2), enable the S3 protocol endpoint for tools like `rclone`, or both. These are independent features.
 
 See the [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3) guide for detailed setup instructions.
 
 ### Using file backend in Storage on macOS
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly. Change the [bind mount](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L391) to a named Docker volume instead.
 
 ### Configuring Supabase AI Assistant

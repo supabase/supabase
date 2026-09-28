@@ -24,4 +24,4 @@ Complete the update only when `pnpm api:verify-types` passes after the productio
 
 ## Pull requests
 
-The `Verify production API types` CI job runs when `packages/api-types/types/**` changes and performs the same production comparison. It is currently observational, not a required merge check. The `api-deploy-required` label is informational only. Still run the local verifier before requesting review and treat a failed CI verification as production drift that must be resolved.
+The `Verify production API types` CI job runs when `packages/api-types/types/**` changes and performs the same production comparison. It is a required merge check. Run the local verifier before requesting review and treat a failed CI verification as production drift that must be resolved.

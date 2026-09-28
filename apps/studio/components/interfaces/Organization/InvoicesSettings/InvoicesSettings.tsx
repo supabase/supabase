@@ -95,8 +95,9 @@ export const InvoicesSettings = () => {
       } else {
         toast.error('Invoice PDF is not available yet. Please try again later.')
       }
-    } catch (error: any) {
-      toast.error(`Failed to fetch the selected invoice: ${error.message}`)
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'unknown error'
+      toast.error(`Failed to fetch the selected invoice: ${msg}`)
     }
   }
 
@@ -175,8 +176,6 @@ export const InvoicesSettings = () => {
           ) : (
             <>
               {invoices.map((x) => {
-                // invoice_pdf can be null. Not reflected in the generated schema yet, but will
-                // be soon
                 const hasInvoicePdf = Boolean(x.invoice_pdf)
 
                 return (

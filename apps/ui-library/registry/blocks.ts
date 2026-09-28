@@ -39,11 +39,6 @@ const combine = (component: RegistryItem) => {
   })
 }
 
-const withClientAndDocs = (component: RegistryItem, client: RegistryItem) => ({
-  ...registryItemAppend(component, [client]),
-  docs: [component.docs, client.docs].filter(Boolean).join('\n\n'),
-})
-
 const nextjsClient = clients.find((client) => client.name === 'supabase-client-nextjs')
 const reactClient = clients.find((client) => client.name === 'supabase-client-react')
 const tanstackClient = clients.find((client) => client.name === 'supabase-client-tanstack')
@@ -89,12 +84,12 @@ export const blocks = [
   mcpServer as RegistryItem,
 
   // Composes the auth, OAuth consent and MCP server blocks into one app.
-  withClientAndDocs(headlessApp, tanstackClient!),
+  registryItemAppend(headlessApp, [tanstackClient!]),
 
-  withClientAndDocs(oauthConsentNextjs as RegistryItem, nextjsClient!),
-  withClientAndDocs(oauthConsentReact as RegistryItem, reactClient!),
-  withClientAndDocs(oauthConsentReactRouter as RegistryItem, reactRouterClient!),
-  withClientAndDocs(oauthConsentTanstack as RegistryItem, tanstackClient!),
+  registryItemAppend(oauthConsentNextjs as RegistryItem, [nextjsClient!]),
+  registryItemAppend(oauthConsentReact as RegistryItem, [reactClient!]),
+  registryItemAppend(oauthConsentReactRouter as RegistryItem, [reactRouterClient!]),
+  registryItemAppend(oauthConsentTanstack as RegistryItem, [tanstackClient!]),
 
   // tanstack-db is served dynamically via API route, but we register it here for the static build
   registryItemAppend(tanstackDbNextjs as RegistryItem, [nextjsClient!]),

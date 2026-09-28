@@ -184,7 +184,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     <TimestampInfoTimezoneBridge>
                       <Head>
                         <title>{appTitle ?? 'Supabase'}</title>
-                        <AppearanceSettingsScript />
                         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                         <meta property="og:image" content={`${BASE_PATH}/img/supabase-og.png`} />
                         <meta name="googlebot" content="notranslate" />
@@ -227,6 +226,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                   </BannerStackProvider>
                                   <Toaster />
                                   <MonacoThemeProvider />
+                                  <AppearanceSettingsScript />
                                   <AppearanceSettingsProvider />
                                 </CommandProvider>
                               </AiAssistantStateContextProvider>

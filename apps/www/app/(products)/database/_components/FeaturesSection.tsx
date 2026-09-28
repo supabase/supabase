@@ -15,7 +15,7 @@ function SkeletonBar({ className }: { className?: string }) {
 const FEATURES = [
   {
     title: 'Just Postgres',
-    description: 'A dedicated Postgres database.',
+    description: 'A dedicated, standalone Postgres database.',
     detail: '100% portable. Bring your existing Postgres database, or migrate away at any time.',
     visual: PostgresSkeleton,
   },
@@ -248,7 +248,11 @@ function RLSSkeleton() {
                   >
                     <div className="flex items-center gap-1.5 overflow-hidden">
                       {col.isPrimaryKey && (
-                        <Key size={12} strokeWidth={2} className="text-brand rotate-45 shrink-0" />
+                        <Key
+                          size={12}
+                          strokeWidth={2}
+                          className="text-primary rotate-45 shrink-0"
+                        />
                       )}
                       <span className="text-foreground text-xs truncate font-medium">
                         {col.name}
@@ -442,7 +446,7 @@ function RealtimeSkeleton() {
               <tr className="bg-surface-200">
                 <th className="border-b border-r border-default px-3 py-1.5 text-left font-normal">
                   <div className="flex items-center gap-1.5 overflow-hidden">
-                    <Key size={12} strokeWidth={2} className="text-brand rotate-45 shrink-0" />
+                    <Key size={12} strokeWidth={2} className="text-primary rotate-45 shrink-0" />
                     <span className="text-foreground text-xs font-medium">id</span>
                     <span className="text-foreground-light text-xs">int8</span>
                   </div>
@@ -478,7 +482,9 @@ function RealtimeSkeleton() {
                     key={msg.id}
                     className={cn(
                       'transition-colors duration-500',
-                      tableFlashId === msg.id ? 'bg-brand/15 dark:bg-brand/5' : 'bg-surface-75'
+                      tableFlashId === msg.id
+                        ? 'bg-brand-default/15 dark:bg-brand-default/5'
+                        : 'bg-surface-75'
                     )}
                   >
                     <td className="border-b border-r border-default px-3 py-1.5 text-foreground-muted text-xs truncate max-w-0">
@@ -546,9 +552,9 @@ function RealtimeSkeleton() {
                     className={cn(
                       'max-w-[75%] px-3 py-1.5 rounded-xl text-xs leading-snug transition-colors duration-500',
                       isAlice
-                        ? 'bg-brand/15 text-foreground rounded-br-sm'
+                        ? 'bg-brand-default/15 text-foreground rounded-br-sm'
                         : 'bg-surface-300 text-foreground rounded-bl-sm',
-                      chatFlashId === msg.id && 'ring-1 ring-brand/30'
+                      chatFlashId === msg.id && 'ring-1 ring-brand-default/30'
                     )}
                   >
                     {msg.text}
@@ -574,8 +580,8 @@ export function FeaturesSection() {
           <span className="text-foreground">from your database</span>
         </h3>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          Every Supabase project is a full Postgres database with realtime functionality,
-          fine-grained access controls, and instant APIs — no extra configuration required.
+          Every Supabase project starts as a full Postgres database. Row Level Security, realtime
+          subscriptions, and auto-generated APIs are built in and optional. Use what you need.
         </p>
       </div>
 

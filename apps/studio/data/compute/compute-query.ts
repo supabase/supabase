@@ -12,7 +12,7 @@ export type ComputeError = ResponseError
 async function getComputeInstances({ projectRef }: ComputeVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get('/v2/projects/{ref}/workers', {
+  const { data, error } = await get('/v2/projects/{ref}/compute', {
     params: { path: { ref: projectRef } },
     signal,
   })
