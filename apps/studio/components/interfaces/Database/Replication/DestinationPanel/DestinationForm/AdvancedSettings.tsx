@@ -67,7 +67,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description="Maximum time before sending a partially filled batch. Default: 10,000 milliseconds."
+                  description="Maximum time before sending a partially filled batch."
                 >
                   <FormControl>
                     <InputGroup>
