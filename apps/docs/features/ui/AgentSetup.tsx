@@ -36,6 +36,9 @@ const handleInPageLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
   if (!target) return
 
   event.preventDefault()
+  const { hash } = event.currentTarget
+  if (window.location.hash !== hash) window.history.pushState(null, '', hash)
+
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' })
   target.focus({ preventScroll: true })
