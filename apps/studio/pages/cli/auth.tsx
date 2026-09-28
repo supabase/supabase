@@ -1,8 +1,6 @@
-// Demo route for the CLI device-auth interstitial. Everything is client-side: no API calls,
-// no token creation. Context: https://supabase.slack.com/archives/C088MLLE0KU/p1789542796124239
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import dayjs from 'dayjs'
 import { ArrowRightLeft, LogOut, Terminal } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -59,6 +57,7 @@ const FALLBACK_PROJECTS = [
 ]
 
 const ALLOWED_REDIRECT_HOSTS = ['127.0.0.1', 'localhost']
+const TOKEN_EXPIRY_DAYS = 90
 
 const CliLogo = () => (
   <LogoBox className="bg-black">
@@ -264,6 +263,7 @@ const CliAuthScreen = ({
     compute: (accessMode) => (accessMode === 'full' ? requestedScopes : readScopes),
   })
   const scopeGroups = toScopeGroups(grantedScopes)
+  const expiresAt = dayjs().add(TOKEN_EXPIRY_DAYS, 'days')
 
   if (!code || !redirectUri) {
     return (
@@ -281,7 +281,7 @@ const CliAuthScreen = ({
 
   const handleAuthorize = (_values: FormValues) => {
     window.location.assign(
-      `${redirectUri}?token=${generateDemoToken()}&scopes=${grantedScopes.join(',')}`
+      `${redirectUri}?token=${generateDemoToken()}&scopes=${grantedScopes.join(',')}&expires_at=${expiresAt.toISOString()}`
     )
   }
 
@@ -338,7 +338,14 @@ const CliAuthScreen = ({
                 <span className="min-w-0 truncate">{organizationName}</span>
               </DetailRow>
               <DetailRow label="Expires">
-                <span>Never</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>{TOKEN_EXPIRY_DAYS} days</span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    Expires on {expiresAt.format('D MMM YYYY')}
+                  </TooltipContent>
+                </Tooltip>
               </DetailRow>
               <DetailRow label="Device">
                 <span className="font-mono">{code}</span>
