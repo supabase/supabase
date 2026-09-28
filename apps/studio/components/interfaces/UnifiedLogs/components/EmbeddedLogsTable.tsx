@@ -1,5 +1,6 @@
 import { getCoreRowModel, useReactTable, type Row } from '@tanstack/react-table'
 import { useMemo, type ReactNode } from 'react'
+import { cn } from 'ui'
 
 import { useLogsTableColumns } from '../UnifiedLogs.hooks'
 import type { ColumnSchema } from '../UnifiedLogs.schema'
@@ -11,6 +12,9 @@ import type { ResponseError } from '@/types'
 
 const getRowClassName = (row: Row<ColumnSchema>) => getLogRowClassName(row.original)
 const noopFetchNextPage = async () => {}
+// The header takes the background of whatever the list sits in, e.g. a Card, rather than the
+// Logs page background. An embedded list is short enough that its sticky header never scrolls.
+const HEADER_CLASS_NAME = '[&_thead_tr]:bg-transparent! [&_thead_tr:hover]:bg-transparent!'
 
 interface EmbeddedLogsTableProps {
   /** Rows to show, e.g. `getUniqueLogRows(data.pages)` from `useUnifiedLogsInfiniteQuery` */
@@ -78,7 +82,7 @@ export const EmbeddedLogsTable = ({
     >
       <LogsTable
         columns={columns}
-        className={className}
+        className={cn(HEADER_CLASS_NAME, className)}
         fetchNextPage={noopFetchNextPage}
         hasNextPage={false}
         setColumnOrder={setColumnOrder}
