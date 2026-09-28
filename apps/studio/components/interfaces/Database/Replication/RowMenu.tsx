@@ -166,7 +166,7 @@ export const RowMenu = ({
             />
             {hasUpdate && (
               <span
-                className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary"
+                className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary-bright"
                 aria-hidden
               />
             )}
@@ -190,7 +190,10 @@ export const RowMenu = ({
               >
                 <ArrowUpCircle size={14} />
                 <p>Update available</p>
-                <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden />
+                <span
+                  className="ml-auto h-2 w-2 shrink-0 rounded-full bg-primary-bright"
+                  aria-hidden
+                />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </>
