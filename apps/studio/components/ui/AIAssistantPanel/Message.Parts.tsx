@@ -7,7 +7,7 @@ import {
   type ToolUIPart,
 } from 'ai'
 import isEqual from 'lodash/isEqual'
-import { BrainIcon, CheckIcon, CircleSlash, Loader2, XIcon } from 'lucide-react'
+import { BrainIcon, CheckIcon, CircleStop, Loader2, XIcon } from 'lucide-react'
 import { memo, useState, type ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -25,6 +25,8 @@ import {
   getMessagePartKind,
   getRunningToolGroupHeader,
   getToolGroupSummary,
+  INTERRUPTED_LABEL,
+  isUnfinishedBlockPart,
   type CompactPartLabel as CompactPartLabelText,
   type CompactPartStatus,
 } from './Message.Parts.utils'
@@ -74,24 +76,27 @@ function CompactPartLabel({ action, detail }: CompactPartLabelText) {
 }
 
 const RUNNING_ICON = <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />
+const INTERRUPTED_ICON = (
+  <CircleStop strokeWidth={1.5} size={12} className="text-foreground-muted" />
+)
 
 const TOOL_STATUS_ICONS: Record<CompactPartStatus, ReactNode> = {
   running: RUNNING_ICON,
   done: <CheckIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />,
   failed: <XIcon strokeWidth={1.5} size={12} className="text-destructive" />,
-  stopped: <CircleSlash strokeWidth={1.5} size={12} className="text-foreground-muted" />,
+  interrupted: INTERRUPTED_ICON,
 }
 
 function MessagePartTool({
   toolPart,
   isActive,
-  isRunning,
+  isStreaming,
 }: {
   toolPart: ToolUIPart | DynamicToolUIPart
   isActive?: boolean
-  isRunning: boolean
+  isStreaming: boolean
 }) {
-  const status = getCompactPartStatus(toolPart, isRunning)
+  const status = getCompactPartStatus(toolPart, isStreaming)
 
   return (
     <Tool
@@ -102,29 +107,25 @@ function MessagePartTool({
   )
 }
 
+const REASONING_ICON = <BrainIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />
+
 function MessagePartReasoning({
   reasoningPart,
   isActive,
-  isRunning,
+  isStreaming,
 }: {
   reasoningPart: ReasoningUIPart
   isActive?: boolean
-  isRunning: boolean
+  isStreaming: boolean
 }) {
-  const status = getCompactPartStatus(reasoningPart, isRunning)
+  const status = getCompactPartStatus(reasoningPart, isStreaming)
+
+  let icon = REASONING_ICON
+  if (status === 'running') icon = RUNNING_ICON
+  if (status === 'interrupted') icon = INTERRUPTED_ICON
 
   return (
-    <Tool
-      isActive={isActive}
-      icon={
-        status === 'running' ? (
-          RUNNING_ICON
-        ) : (
-          <BrainIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />
-        )
-      }
-      label={getCompactPartLabel(reasoningPart, status).action}
-    >
+    <Tool isActive={isActive} icon={icon} label={getCompactPartLabel(reasoningPart, status).action}>
       {reasoningPart.text}
     </Tool>
   )
@@ -356,27 +357,35 @@ export const MessagePartSwitcher = memo(
   function MessagePartSwitcher({
     part,
     isActive,
-    isRunning = false,
   }: {
     part: NonNullable<VercelMessage['parts']>[number]
     /** Marks the in-progress tool call within a running tool group. */
     isActive?: boolean
-    /** Whether the tool group holding the part is still streaming. */
-    isRunning?: boolean
   }) {
+    const { isLoading, isLastMessage } = useMessageInfoContext()
+    const isStreaming = isLoading && !!isLastMessage
     const kind = getMessagePartKind(part)
 
     const content = (() => {
       if (kind === 'compact') {
         if (part.type === 'reasoning') {
           return (
-            <MessagePart.Reasoning reasoningPart={part} isActive={isActive} isRunning={isRunning} />
+            <MessagePart.Reasoning
+              reasoningPart={part}
+              isActive={isActive}
+              isStreaming={isStreaming}
+            />
           )
         }
         if (isToolUIPart(part)) {
-          return <MessagePart.Tool toolPart={part} isActive={isActive} isRunning={isRunning} />
+          return <MessagePart.Tool toolPart={part} isActive={isActive} isStreaming={isStreaming} />
         }
         return null
+      }
+
+      // Stop the loading indicator of a call the response will never finish
+      if (!isStreaming && isUnfinishedBlockPart(part)) {
+        return <Tool icon={INTERRUPTED_ICON} label={INTERRUPTED_LABEL} />
       }
 
       switch (part.type) {
@@ -426,9 +435,7 @@ export const MessagePartSwitcher = memo(
     return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
   },
   (previous, next) =>
-    previous.isActive === next.isActive &&
-    previous.isRunning === next.isRunning &&
-    areMessagePartsEqual(previous.part, next.part)
+    previous.isActive === next.isActive && areMessagePartsEqual(previous.part, next.part)
 )
 
 // Long enough to read a short label before the next one replaces it
@@ -459,12 +466,12 @@ export function MessagePartToolGroup({
       {parts.map((part, idx) => {
         // While the group runs, its latest call is the one in progress
         const isActive = isRunning && idx === parts.length - 1
-        // Some models don't share their reasoning, leaving rows with nothing to expand
-        if (part.type === 'reasoning' && !part.text.trim() && !isActive) return null
+        // Some models don't share their reasoning, leaving finished rows with nothing to expand
+        const isEmptyReasoning =
+          part.type === 'reasoning' && part.state === 'done' && !part.text.trim()
+        if (isEmptyReasoning && !isActive) return null
 
-        return (
-          <MessagePartSwitcher key={idx} part={part} isActive={isActive} isRunning={isRunning} />
-        )
+        return <MessagePartSwitcher key={idx} part={part} isActive={isActive} />
       })}
     </ToolGroup>
   )

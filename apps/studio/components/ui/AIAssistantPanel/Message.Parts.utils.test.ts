@@ -9,6 +9,7 @@ import {
   getRunningToolGroupHeader,
   getToolGroupSummary,
   groupMessageParts,
+  isUnfinishedBlockPart,
 } from './Message.Parts.utils'
 
 const completedTool = {
@@ -240,17 +241,34 @@ describe('groupMessageParts', () => {
   })
 })
 
-describe('getCompactPartStatus', () => {
-  it('treats unfinished parts as running only while their group runs', () => {
-    const executing = executingTool('search_docs')
-    expect(getCompactPartStatus(executing, true)).toBe('running')
-    expect(getCompactPartStatus(executing, false)).toBe('stopped')
-    expect(getCompactPartStatus(inputStreamingTool('search_docs'), true)).toBe('running')
-    expect(getCompactPartStatus(streamingReasoning, true)).toBe('running')
-    expect(getCompactPartStatus(streamingReasoning, false)).toBe('stopped')
+describe('isUnfinishedBlockPart', () => {
+  it('flags block calls whose input is still streaming', () => {
+    expect(isUnfinishedBlockPart(inputStreamingTool('execute_sql'))).toBe(true)
+    expect(isUnfinishedBlockPart(inputStreamingTool('create_notebook'))).toBe(true)
   })
 
-  it('reports finished and failed calls whether or not the group runs', () => {
+  it('flags query_logs while it waits on the server', () => {
+    expect(isUnfinishedBlockPart(executingTool('query_logs'))).toBe(true)
+  })
+
+  it('leaves calls waiting on the user or already finished alone', () => {
+    expect(isUnfinishedBlockPart(executingTool('execute_sql'))).toBe(false)
+    expect(isUnfinishedBlockPart(tool('execute_sql'))).toBe(false)
+    expect(isUnfinishedBlockPart(text('Done'))).toBe(false)
+  })
+})
+
+describe('getCompactPartStatus', () => {
+  it('treats unfinished parts as running only while their message streams', () => {
+    const executing = executingTool('search_docs')
+    expect(getCompactPartStatus(executing, true)).toBe('running')
+    expect(getCompactPartStatus(executing, false)).toBe('interrupted')
+    expect(getCompactPartStatus(inputStreamingTool('search_docs'), true)).toBe('running')
+    expect(getCompactPartStatus(streamingReasoning, true)).toBe('running')
+    expect(getCompactPartStatus(streamingReasoning, false)).toBe('interrupted')
+  })
+
+  it('reports finished and failed calls whether or not the message streams', () => {
     expect(getCompactPartStatus(tool('search_docs'), true)).toBe('done')
     expect(getCompactPartStatus(reasoning(), true)).toBe('done')
     expect(getCompactPartStatus(failedTool('search_docs'), false)).toBe('failed')
@@ -261,8 +279,8 @@ describe('getCompactPartLabel', () => {
   it('labels reasoning by its status', () => {
     expect(getCompactPartLabel(streamingReasoning, 'running')).toEqual({ action: 'Thinking...' })
     expect(getCompactPartLabel(reasoning(), 'done')).toEqual({ action: 'Reasoned' })
-    expect(getCompactPartLabel(streamingReasoning, 'stopped')).toEqual({
-      action: 'Stopped thinking',
+    expect(getCompactPartLabel(streamingReasoning, 'interrupted')).toEqual({
+      action: 'Response interrupted',
     })
   })
 
@@ -271,7 +289,7 @@ describe('getCompactPartLabel', () => {
     expect(getCompactPartLabel(part, 'running')).toEqual({ action: 'Checking policies...' })
     expect(getCompactPartLabel(part, 'done')).toEqual({ action: 'Checked policies' })
     expect(getCompactPartLabel(part, 'failed')).toEqual({ action: 'Unable to check policies' })
-    expect(getCompactPartLabel(part, 'stopped')).toEqual({ action: 'Stopped checking policies' })
+    expect(getCompactPartLabel(part, 'interrupted')).toEqual({ action: 'Response interrupted' })
   })
 
   it('adds what the call looks at when its input says', () => {
@@ -384,7 +402,7 @@ describe('getToolGroupSummary', () => {
       action: 'Unable to check policies',
     })
     expect(getToolGroupSummary([reasoning(), executingTool('search_docs')])).toEqual({
-      action: 'Stopped searching docs',
+      action: 'Response interrupted',
     })
   })
 })

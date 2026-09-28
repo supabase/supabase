@@ -45,7 +45,7 @@ const ExplorerMobileMenu = ({ initialSection }: { initialSection: ExplorerResour
         <ExplorerNavHeader
           section={section}
           onBack={() => setSection(undefined)}
-          rootAction={<span>Switch to SQL Editor</span>}
+          rootAction={<span>Explorer preferences</span>}
         />
       }
     />
@@ -95,7 +95,7 @@ describe('Mobile product header', () => {
       screen.getByRole('button', { name: 'Explorer' }).focus()
       await user.keyboard('{Enter}')
       expect(screen.getByText('Home content')).toBeInTheDocument()
-      expect(screen.getByText('Switch to SQL Editor')).toBeInTheDocument()
+      expect(screen.getByText('Explorer preferences')).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: `New ${section}` })).not.toBeInTheDocument()
     }
   )

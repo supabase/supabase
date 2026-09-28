@@ -101,20 +101,32 @@ export function groupMessageParts(parts: MessagePart[]): MessagePartItem[] {
   return items
 }
 
+export const INTERRUPTED_LABEL = 'Response interrupted'
+
+/**
+ * Whether a block tool call is unfinished. `query_logs` runs on the server, so `input-available`
+ * means it hasn't returned; other block tools wait in that state for the user to act.
+ */
+export function isUnfinishedBlockPart(part: MessagePart): boolean {
+  if (!isToolUIPart(part)) return false
+  if (part.state === 'input-streaming') return true
+  return part.state === 'input-available' && getToolName(part) === 'query_logs'
+}
+
 /**
  * - `running`: still streaming or executing
  * - `done`: finished
  * - `failed`: the tool call errored or was denied
- * - `stopped`: left unfinished because the response ended, e.g. the user pressed stop
+ * - `interrupted`: left unfinished because the response ended, e.g. a stop or timeout
  */
-export type CompactPartStatus = 'running' | 'done' | 'failed' | 'stopped'
+export type CompactPartStatus = 'running' | 'done' | 'failed' | 'interrupted'
 
 /**
- * @param isRunning whether the tool group holding the part is still streaming. Anything left
- * unfinished outside a running group will never finish.
+ * @param isStreaming whether the message holding the part is still streaming. Anything left
+ * unfinished once it stops will never finish.
  */
-export function getCompactPartStatus(part: MessagePart, isRunning: boolean): CompactPartStatus {
-  const unfinished = isRunning ? 'running' : 'stopped'
+export function getCompactPartStatus(part: MessagePart, isStreaming: boolean): CompactPartStatus {
+  const unfinished = isStreaming ? 'running' : 'interrupted'
 
   if (part.type === 'reasoning') return part.state === 'streaming' ? unfinished : 'done'
   if (isToolUIPart(part)) {
@@ -290,7 +302,7 @@ export function getCompactPartLabel(
 ): CompactPartLabel {
   if (part.type === 'reasoning') {
     if (status === 'running') return { action: 'Thinking...' }
-    if (status === 'stopped') return { action: 'Stopped thinking' }
+    if (status === 'interrupted') return { action: INTERRUPTED_LABEL }
     return { action: 'Reasoned' }
   }
   if (!isToolUIPart(part)) return { action: 'Working...' }
@@ -303,8 +315,8 @@ export function getCompactPartLabel(
       return withEllipsis({ action: labels.running, detail })
     case 'failed':
       return { action: `Unable to ${labels.base}`, detail }
-    case 'stopped':
-      return { action: `Stopped ${lowerFirst(labels.running)}`, detail }
+    case 'interrupted':
+      return { action: INTERRUPTED_LABEL }
     case 'done':
       return { action: labels.done, detail }
   }
@@ -333,7 +345,7 @@ export function getToolGroupSummary(parts: MessagePart[]): CompactPartLabel {
   ].map((action, idx) => (idx === 0 ? action : lowerFirst(action)))
 
   if (actions.length === 0) {
-    // Nothing finished, so describe how the group ended: reasoning, a failure or a stop
+    // Nothing finished, so describe how the group ended: reasoning, a failure or an interruption
     const lastPart = parts.at(-1)
     if (!lastPart) return { action: 'Reasoned' }
     return { action: getCompactPartLabel(lastPart, getCompactPartStatus(lastPart, false)).action }
