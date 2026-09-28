@@ -26,6 +26,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { SuspensionNotice } from '../Settings/SuspensionNotice'
 import { AlertError } from '@/components/ui/AlertError'
 import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -67,9 +68,7 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data, error, isError, isPending } = useRealtimeConfigurationQuery({
-    projectRef,
-  })
+  const { data, error, isError, isPending } = useRealtimeConfigurationQuery({ projectRef })
 
   const { data: policies, isSuccess: isSuccessPolicies } = useDatabasePoliciesQuery({
     projectRef,
@@ -326,6 +325,8 @@ export const RealtimeSettings = () => {
 
   return (
     <>
+      {isAdminSuspended && <SuspensionNotice suspendedAt={data?.admin_suspended_at} />}
+
       <Form {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           {isError ? (
@@ -333,14 +334,6 @@ export const RealtimeSettings = () => {
           ) : (
             <Card>
               <CardContent className="space-y-4">
-                {isAdminSuspended && (
-                  <Admonition
-                    showIcon={false}
-                    type="destructive"
-                    title="Realtime has been suspended"
-                    description="Supabase has suspended Realtime for this project. Contact support if you believe this is a mistake."
-                  />
-                )}
                 <FormField
                   control={form.control}
                   name="suspend"
