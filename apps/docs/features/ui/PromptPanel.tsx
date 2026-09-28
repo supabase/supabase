@@ -1,5 +1,7 @@
 'use client'
 
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { type DocsAiPromptSource } from 'common/telemetry-constants'
 import { ChevronDown } from 'lucide-react'
 import { Children, isValidElement, useId, useState, type ReactElement, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -30,9 +32,21 @@ type PromptProps = {
   expandable?: boolean
 }
 
+type PromptPanelTelemetry = {
+  /** Surface the panel renders on. */
+  source: DocsAiPromptSource
+  /** Prompt identifier, when the panel wraps a known prompt. */
+  promptId?: string
+}
+
 type PromptPanelProps = {
   children: ReactNode
   className?: string
+  /**
+   * Sends `docs_ai_prompt_copied` on a successful copy. Omit to leave the panel
+   * untracked.
+   */
+  telemetry?: PromptPanelTelemetry
 }
 
 type CollectedPrompt = {
@@ -244,12 +258,13 @@ const tabTriggerClassName = cn(
  * </PromptPanel>
  * ```
  */
-function PromptPanel({ children, className }: PromptPanelProps) {
+function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
   const fallbackId = useId()
   const titleId = useId()
   const prompts = collectPrompts(children)
   const [activeTab, setActiveTab] = useState(prompts[0]?.value ?? fallbackId)
   const [shimmerEnabled, setShimmerEnabled] = useState(true)
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   if (prompts.length === 0) return null
 
@@ -258,6 +273,19 @@ function PromptPanel({ children, className }: PromptPanelProps) {
   const dismissShimmer = () => setShimmerEnabled(false)
 
   const copyTarget = typeof activePrompt.title === 'string' ? activePrompt.title : 'content'
+  const handleCopied = telemetry
+    ? () => {
+        sendTelemetryEvent({
+          action: 'docs_ai_prompt_copied',
+          properties: {
+            source: telemetry.source,
+            tab: activePrompt.value,
+            promptId: telemetry.promptId,
+          },
+        })
+      }
+    : undefined
+
   const header = (
     <div className="flex h-11 items-center justify-between pl-4 pr-2 shadow-[inset_0_-1px_0_0_var(--border-default)] [--btn-active:color-mix(in_srgb,var(--foreground)_4%,var(--background-200))]">
       {hasTabs ? (
@@ -285,6 +313,7 @@ function PromptPanel({ children, className }: PromptPanelProps) {
         content={activePrompt.copyValue}
         label={`Copy ${copyTarget}`}
         copiedLabel={`${copyTarget} copied`}
+        onCopied={handleCopied}
       />
     </div>
   )
@@ -347,4 +376,11 @@ function PromptPanel({ children, className }: PromptPanelProps) {
 }
 
 export { Prompt, PromptCode, PromptContent, PromptCopy, PromptMarkdown, PromptPanel, PromptTitle }
-export type { PromptContentProps, PromptCopyProps, PromptPanelProps, PromptProps, PromptTitleProps }
+export type {
+  PromptContentProps,
+  PromptCopyProps,
+  PromptPanelProps,
+  PromptPanelTelemetry,
+  PromptProps,
+  PromptTitleProps,
+}

@@ -101,15 +101,12 @@ const PITRSidePanel = () => {
   const selectedAddons = addons?.selected_addons ?? []
   const availableAddons = addons?.available_addons ?? []
 
-  const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
   const subscriptionPitr = selectedAddons.find((addon) => addon.type === 'pitr')
   const availableOptions = availableAddons.find((addon) => addon.type === 'pitr')?.variants ?? []
 
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
   const { hasAccess: hasAccessToPitrVariants } = useCheckEntitlements('pitr.available_variants')
   const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
-  const hasSufficientCompute =
-    !!subscriptionCompute && subscriptionCompute.variant.identifier !== 'ci_micro'
 
   // These are illegal states. If they are true, we should block the user from saving them.
   const blockDowngradeDueToHipaa =
@@ -153,7 +150,6 @@ const PITRSidePanel = () => {
         !hasChanges ||
         isSubmitting ||
         !canUpdatePitr ||
-        (!!selectedPitr && !hasSufficientCompute) ||
         (blockDowngradeDueToHipaa ?? undefined)
       }
       tooltip={
@@ -269,14 +265,6 @@ const PITRSidePanel = () => {
                   secondaryText="Upgrade your plan to change PITR for your project."
                   featureProposition="enable PITR"
                 />
-              ) : !hasSufficientCompute ? (
-                <UpgradeToPro
-                  className="mb-4"
-                  addon="computeSize"
-                  primaryText="Project needs to be at least on a Small compute size to enable PITR"
-                  secondaryText="This ensures enough resources to execute PITR successfully."
-                  featureProposition="enable PITR"
-                />
               ) : null}
 
               <label className="block text-sm text-foreground-light mb-4" htmlFor="pitr">
@@ -287,7 +275,7 @@ const PITRSidePanel = () => {
                 className="flex flex-wrap gap-3"
                 value={selectedOption}
                 onValueChange={(value) => setSelectedOption(value)}
-                disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
+                disabled={!hasAccessToPitrVariants}
               >
                 {availableOptions.map((option) => (
                   <RadioGroupCardItem

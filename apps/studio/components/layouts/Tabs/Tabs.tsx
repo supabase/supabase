@@ -41,6 +41,7 @@ interface EditorTabsProps {
   customTabs?: ReactNode
   newTabButton?: ReactNode
   isCollapseButtonHidden?: boolean
+  onTabChange?: (id: string) => void
 }
 
 // [Joshen] Will be adjusting this component to support Explorer
@@ -49,10 +50,12 @@ export const EditorTabs = ({
   customTabs,
   newTabButton,
   isCollapseButtonHidden,
+  onTabChange,
 }: EditorTabsProps) => {
   const { ref } = useParams()
   const router = useRouter()
-  const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
+  const { setLastVisitedSnippet, setLastVisitedTable, setLastVisitedExplorerTab } =
+    useDashboardHistory()
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
@@ -96,6 +99,9 @@ export const EditorTabs = ({
     }
     if (editor === 'sql') {
       setLastVisitedSnippet(undefined)
+    }
+    if (editor === 'explorer') {
+      setLastVisitedExplorerTab(undefined)
     }
   }
 
@@ -164,6 +170,7 @@ export const EditorTabs = ({
   }
 
   const handleTabChange = (id: string) => {
+    onTabChange?.(id)
     tabs.handleTabNavigation(id, router)
   }
 

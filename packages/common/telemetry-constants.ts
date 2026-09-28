@@ -449,6 +449,21 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * omitted = PostHog flags had not loaded at the time of project creation
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
+    /**
+     * Which region option was submitted. Only present when the "Best available region" option
+     * was shown to the user (see `showBestAvailableRegionOption` in RegionSelector.tsx); omitted
+     * entirely for users who never saw that option.
+     * 'best_available' = the "Best available region" shortcut was used
+     * otherwise = the name of the region that was directly selected (e.g. 'Americas', 'ap-southeast-1')
+     */
+    selectedRegionOption?: string
+    /**
+     * Which region list `selectedRegionOption` came from. Only present alongside `selectedRegionOption`.
+     * 'general' = picked from the "General regions" (smart group) list, or the "Best available
+     * region" shortcut was used (it always resolves to a general/smart region)
+     * 'specific' = picked from the "Specific regions" list
+     */
+    selectedRegionOptionType?: 'general' | 'specific'
   }
   groups: TelemetryGroups
 }
@@ -991,6 +1006,41 @@ export interface AskAiClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+  }
+}
+
+/**
+ * Surface that rendered the prompt panel a user copied from.
+ */
+export type DocsAiPromptSource = 'homepage' | 'guide' | 'agent_setup'
+
+/**
+ * User copied the contents of a docs prompt panel - the homepage setup card or an
+ * `AiPrompt` block - and the clipboard write succeeded. Fires on success only;
+ * failed clipboard writes are not counted.
+ *
+ * Distinct from `ai_prompt_copied`, which belongs to Studio's AI assistant.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs, /docs/guides
+ */
+export interface DocsAiPromptCopiedEvent {
+  action: 'docs_ai_prompt_copied'
+  properties: {
+    /**
+     * Surface the panel was rendered on.
+     */
+    source: DocsAiPromptSource
+    /**
+     * `value` of the pane that was active when the copy happened. Known panes
+     * are `prompt` and `cli`; other strings remain allowed for future panes.
+     */
+    tab: 'prompt' | 'cli' | (string & {})
+    /**
+     * Prompt identifier, set when the panel comes from an `AiPrompt` block.
+     */
+    promptId?: string
   }
 }
 
@@ -1561,8 +1611,8 @@ export interface ExplorerBannerCtaButtonClickedEvent {
 }
 
 /**
- * User clicked the button in the Explorer sidebar title bar to temporarily switch to the SQL
- * Editor for snippet access.
+ * User clicked the SQL Editor button in the Explorer sidebar footer to temporarily switch
+ * to the SQL Editor for snippet access.
  *
  * @group Events
  * @source studio
@@ -1574,8 +1624,8 @@ export interface ExplorerTempAccessSqlEditorClickedEvent {
 }
 
 /**
- * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
- * visit originated from the Explorer's temporary switch button.
+ * User clicked the Explorer sidebar nav item while on the SQL Editor page, navigating back
+ * to Explorer.
  *
  * @group Events
  * @source studio
@@ -3903,7 +3953,12 @@ export interface WarehouseEnabledEvent {
  */
 export interface WarehouseDisabledEvent {
   action: 'warehouse_disabled'
-  properties: {}
+  properties: {
+    /** Number of schemas that were replicated in full. Omitted when the replicated tables have not resolved. */
+    schemaTargetCount?: number
+    /** Number of tables that were replicated individually. Omitted when the replicated tables have not resolved. */
+    tableTargetCount?: number
+  }
   groups: TelemetryGroups
 }
 
@@ -3964,6 +4019,7 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | AskAiClickedEvent
+  | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent

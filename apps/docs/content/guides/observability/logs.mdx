@@ -18,18 +18,15 @@ Without a log type selection, Logs queries **Postgres** and **API Gateway**. Sel
 
 ## Filter events
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
-| Filter | Behavior |
+| Filter        | Behavior                                                                                                                                                      |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Log Type | Select API Gateway, Postgres, Auth, Storage, PostgREST, Edge Function, Realtime, or pooler events. |
-| Level | Match success, warning, or error. |
-| Status | Match an HTTP status or Postgres SQLSTATE. |
-| Method | Match an HTTP method. |
-| Pathname | Match a request path. |
+| Log Type      | Select API Gateway, Postgres, Auth, Storage, PostgREST, Edge Function, Realtime, or pooler events.                                                            |
+| Level         | Match success, warning, or error.                                                                                                                             |
+| Status        | Match an HTTP status or Postgres SQLSTATE.                                                                                                                    |
+| Method        | Match an HTTP method.                                                                                                                                         |
+| Pathname      | Match a request path.                                                                                                                                         |
 | Event message | Use **iLike** or **Not iLike** for case-insensitive text matching or exclusion. Plain text matches anywhere in the message; `%` specifies a wildcard pattern. |
-| User | Match the user's ID in Auth actor IDs or API Gateway JWT subjects. Other log types cannot match this filter. |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}
+| User          | Match the user's ID in Auth actor IDs or API Gateway JWT subjects. Other log types cannot match this filter.                                                  |
 
 Filters other than **Event message** and **User** support **Equals** and **Not equal**. **User** supports **Equals**. Included values within a field match any selected value; exclusions remove every selected value. Filters on different fields must all match.
 

@@ -27,7 +27,7 @@ const markdownComponents = {
     return (
       <a
         href={href}
-        className="text-brand-link hover:underline"
+        className="text-primary hover:underline"
         {...(external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
       >
         {children}
@@ -56,7 +56,7 @@ function HarnessBody({ harness }: { harness: MonitoringAgentHarnessSetup }) {
       <p>
         <a
           href={harness.docsUrl}
-          className="text-brand-link hover:underline"
+          className="text-primary hover:underline"
           target="_blank"
           rel="noreferrer noopener"
         >
@@ -82,7 +82,7 @@ function AgentSetup({ id }: AgentSetupProps) {
       queryGroup="agent-setup"
     >
       <TabPanel id="prompt" label="Prompt" icon={<Sparkles size={14} />}>
-        <AiPrompt id={agent.promptId} />
+        <AiPrompt id={agent.promptId} telemetry={{ source: 'agent_setup' }} />
       </TabPanel>
       {harnesses.map((harness) => (
         <TabPanel

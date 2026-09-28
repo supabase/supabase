@@ -1795,7 +1795,7 @@ export interface paths {
     get: operations['OAuthAppClientSecretsController_listClientSecrets']
     put?: never
     /** Create oauth app client secret */
-    post: operations['OAuthAppClientSecretsController_CreateClientSecret']
+    post: operations['OAuthAppClientSecretsController_createClientSecret']
     delete?: never
     options?: never
     head?: never
@@ -1813,7 +1813,7 @@ export interface paths {
     put?: never
     post?: never
     /** Remove oauth app client secret */
-    delete: operations['OAuthAppClientSecretsController_RemoveClientSecret']
+    delete: operations['OAuthAppClientSecretsController_removeClientSecret']
     options?: never
     head?: never
     patch?: never
@@ -3945,7 +3945,7 @@ export interface paths {
     put?: never
     /**
      * Rollback pipeline tables
-     * @description Rollback the replication state of tables in the pipeline. Supports rolling back a single table, all errored tables or all tables. Requires bearer auth and an active, healthy project.
+     * @description Reset tables to their initial replication state. Supports resetting a single table, all errored tables or all tables. Waits for shutdown before resetting state, then recreates an active pipeline. Stopped pipelines remain stopped. Requires bearer auth and an active, healthy project.
      */
     post: operations['PipelinesController_rollbackTables']
     delete?: never
@@ -4759,6 +4759,74 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/storage/{ref}/jwks': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists project storage jwks */
+    get: operations['StorageJwksController_listJwks']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/jwks/{kid}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Activates or deactivates a jwk */
+    put: operations['StorageJwksController_toggleJwk']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/jwks/url-signing/standby': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a standby url signing jwk */
+    post: operations['StorageJwksController_createStandbyJwk']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/jwks/url-signing/standby/{kid}/swap': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Swaps a standby url signing jwk into the active url signing jwk */
+    post: operations['StorageJwksController_swapStandbyJwk']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/storage/{ref}/vector-buckets': {
     parameters: {
       query?: never
@@ -4825,6 +4893,43 @@ export interface paths {
     post?: never
     /** Deletes bucket index */
     delete: operations['StorageVectorBucketIdIndexesController_deleteBucketIndex']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/atlas/application': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Will return the user data for the matching stripe application. */
+    post: operations['StripeAtlasPerkApplicationController_fetchAtlasApplication']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/atlas/application/complete': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Will verify that the stripe atlas token exists and create a credit code.
+     * @description If an unused credit code already exists for the stripe company, we will resend that code.
+     */
+    post: operations['StripeAtlasPerkApplicationController_completeStripeAtlasFlow']
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -5143,7 +5248,7 @@ export interface paths {
     put?: never
     /**
      * Set up Warehouse
-     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Schema targets include the currently eligible tables in that schema. An empty targets array stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in and ignored for an empty selection.
+     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. An empty targets array stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection.
      */
     post: operations['WarehouseController_setup']
     delete?: never
@@ -6221,6 +6326,10 @@ export interface components {
       branch_limit?: number
       installation_id: number
       new_branch_per_pr?: boolean
+      /**
+       * @description Project ref
+       * @example abcdefghijklmnopqrst
+       */
       project_ref: string
       repository_id: number
       supabase_changes_only?: boolean
@@ -6251,11 +6360,11 @@ export interface components {
           }[]
           require_sso?: boolean
           /**
-           * @description Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.
+           * @description Role name to assign. Must be on a Team, Platform, or Enterprise plan to use the read-only or no-access roles. no-access grants no project visibility until project-scoped roles are assigned separately.
            * @example developer
            * @enum {string}
            */
-          role?: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role?: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
           role_id?: number
         }
       }[]
@@ -6656,6 +6765,8 @@ export interface components {
         | 'platform_webhooks_projects_write'
         | 'workers_read'
         | 'workers_write'
+        | 'project_notebooks_read'
+        | 'project_notebooks_write'
       )[]
     }
     CreatePlatformAppResponse_Output: {
@@ -6709,6 +6820,8 @@ export interface components {
             | 'm8g.medium'
             | 'm9g.medium'
             | 'c6g.medium'
+            | 'c7g.medium'
+            | 'c8g.medium'
             | 'm6g.large'
             | 'm6a.large'
             | 'm6i.large'
@@ -6716,6 +6829,7 @@ export interface components {
             | 'm8i.large'
             | 'm7a.large'
             | 'm8a.large'
+            | 'c6a.large'
             | 'm6g.xlarge'
             | 'm6a.xlarge'
             | 'm6i.xlarge'
@@ -7611,6 +7725,8 @@ export interface components {
         | 'platform_webhooks_projects_write'
         | 'workers_read'
         | 'workers_write'
+        | 'project_notebooks_read'
+        | 'project_notebooks_write'
       )[]
       project_refs?: string[]
     }
@@ -7629,6 +7745,13 @@ export interface components {
     CreateSourceResponse_Output: {
       /** @description Source ID */
       id: number
+    }
+    CreateStandbyJwkBody: {
+      /** @enum {string} */
+      type: 'HS512' | 'ES256'
+    }
+    CreateStandbyJwkResponse_Output: {
+      kid: string
     }
     CreateStorageAnalyticsBucketBody: {
       bucketName: string
@@ -7735,6 +7858,10 @@ export interface components {
         metadata: {
           [key: string]: unknown
         }
+        /**
+         * @description Project ref
+         * @example abcdefghijklmnopqrst
+         */
         supabase_project_ref: string
       }
       organization_integration_id: string
@@ -7745,6 +7872,10 @@ export interface components {
       metadata: {
         [key: string]: unknown
       }
+      /**
+       * @description Organization slug
+       * @example tsrqponmlkjihgfedcba
+       */
       organization_slug: string
       source: string
       teamId?: string
@@ -9842,6 +9973,14 @@ export interface components {
         name: string
       }[]
     }
+    ListJwksResponse_Output: {
+      data: {
+        active: boolean
+        kid: string
+        kind: string
+        type: string
+      }[]
+    }
     ListNotificationExceptionsResponse_Output: {
       exceptions: {
         /** Format: uuid */
@@ -10269,7 +10408,7 @@ export interface components {
     }
     OrganizationRoleResponse_Output: {
       org_scoped_roles: {
-        base_role_id: number
+        base_role_id: number | null
         description: string | null
         id: number
         name: string
@@ -10283,7 +10422,7 @@ export interface components {
         }[]
       }[]
       project_scoped_roles: {
-        base_role_id: number
+        base_role_id: number | null
         description: string | null
         id: number
         name: string
@@ -10598,6 +10737,15 @@ export interface components {
     }
     PendingConfirmationResponse: {
       message: string
+    }
+    PerkApplicationDataResponse_Output: {
+      companyName?: string
+      firstname?: string
+      lastname?: string
+      stripeAtlasToken: string
+    }
+    PerkApplicationLookupBody: {
+      stripeAtlasToken: string
     }
     PgbouncerConfigResponse_Output: {
       connection_string: string
@@ -12145,6 +12293,11 @@ export interface components {
       }[]
     }
     RealtimeConfigResponse_Output: {
+      /**
+       * Format: date-time
+       * @description If set, the Realtime service has been suspended by an admin.
+       */
+      admin_suspended_at?: string | null
       /** @description Sets connection pool size for Realtime Authorization */
       connection_pool?: number | null
       /** @description Sets maximum number of bytes per second rate per channel limit */
@@ -12320,12 +12473,6 @@ export interface components {
       website: string
     }
     RollbackTablesBody: {
-      /**
-       * @description Rollback type
-       * @example individual
-       * @enum {string}
-       */
-      rollback_type: 'individual' | 'full'
       /** @description Rollback target */
       target:
         | {
@@ -12672,6 +12819,12 @@ export interface components {
         vectorBucketName: string
       }[]
     }
+    StripeAtlasCompleteApplicationRequestBody: {
+      companyName: string
+      firstname: string
+      lastname: string
+      stripeAtlasToken: string
+    }
     SupavisorConfigResponse_Output: {
       connection_string: string
       /** @description Use connection_string instead */
@@ -12786,6 +12939,12 @@ export interface components {
     }
     TemporaryApiKeyResponse_Output: {
       api_key: string
+    }
+    ToggleJwkBody: {
+      active: boolean
+    }
+    ToggleJwkResponse_Output: {
+      result: boolean
     }
     TransferProjectBody: {
       target_organization_slug: string
@@ -13926,7 +14085,7 @@ export interface components {
       message: string
     }
     UpdatePgbouncerConfigBody: {
-      default_pool_size?: number
+      default_pool_size?: number | null
       /**
        * @deprecated
        * @default options,extra_float_digits
@@ -14165,6 +14324,8 @@ export interface components {
         | 'platform_webhooks_projects_write'
         | 'workers_read'
         | 'workers_write'
+        | 'project_notebooks_read'
+        | 'project_notebooks_write'
       )[]
     }
     UpdatePlatformAppInstallationResponse_Output: {
@@ -15898,7 +16059,7 @@ export interface components {
         catalog_url: string
         /**
          * @description DuckLake object storage path
-         * @example s3://warehouse/
+         * @example s3://warehouse-abcjuqabhgwjjutfvtpa/
          */
         data_path: string
         /**
@@ -15925,6 +16086,11 @@ export interface components {
       enabled: boolean
     }
     WarehouseSetupBody: {
+      /**
+       * @description Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.
+       * @example zyxwvutsrqponmlkjihg
+       */
+      destination_project_ref?: string
       /**
        * @description Whether to configure and install the Warehouse FDW in the project database. Defaults to false. Ignored when targets is empty.
        * @example false
@@ -22234,7 +22400,7 @@ export interface operations {
       }
     }
   }
-  OAuthAppClientSecretsController_CreateClientSecret: {
+  OAuthAppClientSecretsController_createClientSecret: {
     parameters: {
       query?: never
       header?: never
@@ -22278,7 +22444,7 @@ export interface operations {
       }
     }
   }
-  OAuthAppClientSecretsController_RemoveClientSecret: {
+  OAuthAppClientSecretsController_removeClientSecret: {
     parameters: {
       query?: never
       header?: never
@@ -22870,7 +23036,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -22886,7 +23057,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -22939,7 +23115,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file: string
               /** Format: uri */
@@ -22955,7 +23136,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file?: string
               metadata_xml_url: string
@@ -22979,7 +23165,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -22995,7 +23186,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -23048,7 +23244,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file: string
               /** Format: uri */
@@ -23064,7 +23265,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file?: string
               metadata_xml_url: string
@@ -23088,7 +23294,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -23104,7 +23315,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -30570,7 +30786,7 @@ export interface operations {
     }
     responses: {
       /** @description New table states after rollback. */
-      201: {
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -30744,8 +30960,8 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      /** @description Pipeline stopped. */
-      200: {
+      /** @description Pipeline shutdown accepted. Resources may still be terminating. */
+      202: {
         headers: {
           [name: string]: unknown
         }
@@ -33800,6 +34016,237 @@ export interface operations {
       }
     }
   }
+  StorageJwksController_listJwks: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListJwksResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list project storage jwks */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageJwksController_toggleJwk: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage jwk id */
+        kid: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ToggleJwkBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ToggleJwkResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Jwk not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description The active url signing jwk cannot be toggled. Swap it with a standby jwk first. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to toggle project storage jwk */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageJwksController_createStandbyJwk: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStandbyJwkBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateStandbyJwkResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create project storage url signing standby jwk */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageJwksController_swapStandbyJwk: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage jwk id */
+        kid: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Standby jwk not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to swap project storage url signing standby jwk */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   StorageVectorBucketsController_getBuckets: {
     parameters: {
       query?: {
@@ -34153,6 +34600,71 @@ export interface operations {
       }
       /** @description Failed to delete bucket index */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StripeAtlasPerkApplicationController_fetchAtlasApplication: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PerkApplicationLookupBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PerkApplicationDataResponse_Output']
+        }
+      }
+      /** @description Will send a 400 when matching application is considered stale or when we have an invalid schema in our db. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Will send a 404 when no matching application was found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StripeAtlasPerkApplicationController_completeStripeAtlasFlow: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StripeAtlasCompleteApplicationRequestBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Will send a 400 when the matching stripe company id already has a redeemed credit code. */
+      400: {
         headers: {
           [name: string]: unknown
         }
@@ -34736,7 +35248,7 @@ export interface operations {
           'application/json': components['schemas']['WarehouseSetupResponse_Output']
         }
       }
-      /** @description A requested table or schema is not eligible for Warehouse replication. */
+      /** @description A requested table or schema is not eligible for Warehouse replication, or the destination project cannot be used or changed. */
       400: {
         headers: {
           [name: string]: unknown

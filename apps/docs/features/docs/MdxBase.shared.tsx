@@ -24,7 +24,7 @@ import Table from '~/components/Table'
 import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
 import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
-import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
+import { CodeTabs, NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
@@ -42,7 +42,7 @@ import SqlToRest from 'ui-patterns/SqlToRest'
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { AgentSetup } from '../ui/AgentSetup'
 import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
-import { AiPrompt } from '../ui/AiPrompt'
+import { AiPrompt, type AiPromptProps } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
@@ -74,7 +74,9 @@ const components = {
   AgentPluginsPanel,
   AgentSetup,
   AgentWatchSchedule,
-  AiPrompt,
+  AiPrompt: (props: Omit<AiPromptProps, 'telemetry'>) => (
+    <AiPrompt {...props} telemetry={{ source: 'guide' }} />
+  ),
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,
@@ -85,6 +87,7 @@ const components = {
   ButtonCard,
   CodeSampleDummy,
   CodeSampleWrapper,
+  CodeTabs,
   ComputeDiskLimitsTable,
   CustomContent,
   ContentListings,

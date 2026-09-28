@@ -48,6 +48,42 @@ function MultiSelectDemo() {
 }
 
 describe('multi-select', () => {
+  it('shares the raised trigger surface and radius when empty', () => {
+    render(
+      <MultiSelector size="small" values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveClass(
+      'control-surface-shadows',
+      'raised-control-surface',
+      'border-0',
+      'rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]',
+      'pl-3',
+      'pr-3',
+      'min-h-[34px]'
+    )
+    expect(screen.getByRole('combobox')).not.toHaveClass('pl-1.5')
+  })
+
+  it('keeps the selected-chip field surface and shared radius', () => {
+    render(
+      <MultiSelector size="small" values={['Apple']} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveClass(
+      'bg-field',
+      'rounded-[calc(var(--radius-md)*(1+(34/26-1)*0.35))]',
+      'pl-1.5',
+      'pr-3'
+    )
+    expect(screen.getByRole('combobox')).not.toHaveClass('raised-control-surface')
+    expect(screen.getByRole('combobox')).not.toHaveClass('control-surface-shadows')
+  })
+
   it('supports the tiny control size', () => {
     render(
       <MultiSelector size="tiny" values={['Apple']} onValuesChange={() => undefined}>
@@ -58,6 +94,18 @@ describe('multi-select', () => {
     const trigger = screen.getByRole('combobox')
     expect(screen.getByText('Apple')).toBeInTheDocument()
     expect(trigger.querySelector('.lucide-chevron-down')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('aligns the tiny empty label with the trigger inset', () => {
+    render(
+      <MultiSelector size="tiny" values={[]} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger label="Select fruits" />
+      </MultiSelector>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveClass('pl-2.5', 'pr-2.5')
+    expect(screen.getByRole('combobox')).not.toHaveClass('pl-0.5')
+    expect(screen.getByText('Select fruits')).not.toHaveClass('ml-2')
   })
 
   it('swaps the label for a badge when the first value is selected', () => {

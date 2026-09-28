@@ -166,7 +166,7 @@ export const ReplicationPipelineStatus = () => {
 
   const applyLagMetrics = replicationStatusData?.apply_lag
 
-  const [sort, setSort] = useState<TableSort>('status:asc')
+  const [sort, setSort] = useState<TableSort>('table:asc')
   const [sortColumn, sortDirection] = sort.split(':') as [TableSortColumn, 'asc' | 'desc']
 
   const getAriaSort = (column: TableSortColumn) => {

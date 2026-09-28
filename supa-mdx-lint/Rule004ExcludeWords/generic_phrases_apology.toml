@@ -1,6 +1,0 @@
-description = "Remove '%s' and state what happened directly. For example: 'Unable to connect to database' instead of 'Sorry, we couldn't connect'."
-level = "WARNING"
-words = [
-    "oops",
-    "sorry",
-]

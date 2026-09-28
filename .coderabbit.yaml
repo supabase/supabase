@@ -69,6 +69,14 @@ reviews:
           for both runtimes until the final cleanup pass (tracked in FE-3106).
         Keep this a reminder to verify, not a hard blocker: if no mirror is required,
         say so briefly rather than forcing a change.
+    - path: 'apps/docs/content/**/*.mdx'
+      instructions: |
+        Flag style, terminology, and structure issues as usual. When a page has two or
+        more of them, add one comment pointing the author at the `/write-the-docs` skill
+        for new content or `/edit-the-docs` for an existing page (canonical files in
+        `.agents/skills/`); both apply the docs style guide in
+        apps/docs/style-guide/. Skip that pointer on a single issue, so it stays a
+        signal that the author isn't using the skills rather than boilerplate.
     - path: '{apps,packages}/**/*.{tsx,jsx,css,mdx}'
       instructions: |
         When reviewing UI changes, flag these accessibility gaps. Comments are
@@ -117,6 +125,10 @@ reviews:
           "read more", or "learn more" when it does not describe the
           destination. Skip if aria-label or wrapping context already names
           where the link goes.
+        - Color contrast: flag non-large informative text below 4.5:1 and large informative
+          text (at least 24px regular or 18.5px bold) below 3:1. Skip logotypes and
+          decorative text. Treat expressive text at 40px or larger as advisory rather
+          than blocking.
 
 # Applies our internal engineering skills (.agents/skills/) as CodeRabbit review
 # guidelines. The skills are the single source of truth — they are consumed

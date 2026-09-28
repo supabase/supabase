@@ -1,5 +1,4 @@
 @import 'config/tailwind.config.css';
-@import './../../../packages/ui/build/css/themes/faux-classic-dark.css';
 @import './code-block.css';
 @import './reference.css';
 

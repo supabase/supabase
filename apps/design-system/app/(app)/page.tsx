@@ -30,7 +30,7 @@ export default function Home() {
 
           <Link href="/docs/icons" className="h-full flex">
             <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <div className="flex items-center justify-start min-h-[24px] gap-3 text-brand">
+              <div className="flex items-center justify-start min-h-[24px] gap-3 text-primary">
                 <Realtime className="w-5 h-5" strokeWidth={1.5} stroke="currentColor" />
                 <Database className="w-5 h-5 opacity-60" strokeWidth={1.5} stroke="currentColor" />
                 <Auth className="w-5 h-5 opacity-30" strokeWidth={1.5} stroke="currentColor" />
@@ -44,7 +44,7 @@ export default function Home() {
 
           <Link href="/docs/theming" className="h-full flex">
             <div className="p-6 gap-4 flex flex-col justify-between h-full w-full bg-surface-75 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <div className="flex items-center justify-start min-h-[24px] text-brand">
+              <div className="flex items-center justify-start min-h-[24px] text-primary">
                 <Paintbrush className="w-6 h-6" strokeWidth={1.5} stroke="currentColor" />
               </div>
               <div>

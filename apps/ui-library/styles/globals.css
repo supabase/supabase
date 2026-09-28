@@ -1,5 +1,4 @@
 @import 'config/tailwind.config.css';
-@import './../../../packages/ui/build/css/themes/classic-dark.css';
 
 @source '../app/**/*.{js,ts,jsx,tsx}';
 @source '../components/**/*.{js,ts,jsx,tsx}';
@@ -71,8 +70,7 @@
     --sidebar-ring: hsl(0 0% 70.8%);
   }
 
-  [data-theme='dark'],
-  [data-theme='classic-dark'] {
+  [data-theme='dark'] {
     --background: hsl(0 0% 14.5%);
     --foreground: hsl(0 0% 98.5%);
     --card: hsl(0 0% 0%);

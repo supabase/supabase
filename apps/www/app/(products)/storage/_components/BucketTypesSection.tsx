@@ -57,7 +57,7 @@ export function BucketTypesSection() {
                 <ul className="flex flex-col text-foreground-lighter text-sm gap-1.5">
                   {bucket.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-brand" />
+                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-primary" />
                       <span>{feature}</span>
                     </li>
                   ))}

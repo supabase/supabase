@@ -1,0 +1,189 @@
+---
+id: 'bigquery-destination'
+title: 'BigQuery destination'
+description: 'Configure BigQuery as a Supabase Pipelines destination.'
+subtitle: 'Replicate Supabase Postgres tables to BigQuery.'
+sidebar_label: 'BigQuery'
+---
+
+<$Partial path="pipelines-public-alpha.mdx" />
+
+Replicate Postgres tables to [BigQuery](https://cloud.google.com/bigquery) for analytics. [Prepare Google Cloud resources](#prepare-gcp-resources), [configure the destination](#configure-bigquery-as-a-destination), then [query replicated data](#query-replicated-data).
+
+## Source table requirements
+
+Each source table needs a primary key of at most 16 columns, all included in the publication. Pipelines declares it as a BigQuery `NOT ENFORCED` primary key so CDC can match upserts and deletes. Keep source keys unique and non-null.
+
+Check [replica identity and complete update rows](#replica-identity), especially for tables with large text or JSON values.
+
+## Prepare GCP resources
+
+Prepare these Google Cloud Platform (GCP) resources:
+
+1. **GCP account**: [Sign up for GCP](https://cloud.google.com/gcp) if you don't have one. In the destination project, make sure the [BigQuery API and BigQuery Storage API](https://cloud.google.com/bigquery/docs/service-dependencies) are enabled.
+
+2. **BigQuery dataset**: Create a [BigQuery dataset](https://docs.cloud.google.com/bigquery/docs/datasets) in your GCP project
+   - Use a dataset ID such as `supabase_replication`
+   - Choose a [dataset location](https://cloud.google.com/bigquery/docs/locations) near the [pipeline region](/docs/guides/database/replication/pipelines#region). You cannot change it after creation; it is independent of your Supabase project region.
+
+3. **GCP service account key**: Create a [service account](https://docs.cloud.google.com/iam/docs/service-accounts-create) with appropriate permissions
+   - Grant **BigQuery Data Editor** on the destination dataset
+   - Grant **BigQuery Job User** on the GCP project
+   - [Create and download the JSON key file](https://cloud.google.com/iam/docs/keys-create-delete)
+
+   Treat the downloaded JSON as a secret. Don't commit or share it, and [delete the key](https://cloud.google.com/iam/docs/keys-create-delete#deleting) if it is exposed.
+
+If you use a custom IAM role, see the [required permissions](#custom-iam-permissions).
+
+## Configure BigQuery as a destination
+
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) to enable Pipelines, select **BigQuery**, and configure the publication and initial sync. Then enter:
+
+| Field                   | Value                                                                            |
+| ----------------------- | -------------------------------------------------------------------------------- |
+| **Project ID**          | The Google Cloud project identifier                                              |
+| **Dataset ID**          | The dataset name without the project prefix: use `dataset` for `project.dataset` |
+| **Service account key** | The downloaded service account JSON                                              |
+
+Optionally adjust [destination settings](#destination-settings) and [table partitioning and clustering](#table-partitioning-and-clustering) before creation.
+
+Click **Create and start pipeline** and complete the validation and cost confirmations.
+
+Supabase Pipelines charges and Google Cloud charges are separate. BigQuery can charge for Storage Write API ingestion, storage, and the compute used to apply CDC changes. See [BigQuery CDC pricing](https://cloud.google.com/bigquery/docs/change-data-capture#CDC_pricing).
+
+## How it works
+
+Pipelines creates current-state BigQuery tables using destination-compatible names and types, then applies published inserts, updates, deletes, and truncates. These tables do not retain a history of row versions to query. Truncates and table restarts replace destination data.
+
+## Query replicated data
+
+Query the generated view for each source table. Its name combines the source schema and table with an underscore, doubling any existing underscores: `public.orders` becomes `public_orders`, and `my_schema.orders` becomes `my__schema_orders`. Pipelines manages versioned physical tables behind the view and updates its target after a truncate. Queries tied directly to a physical table version can become stale or fail when that version is removed.
+
+## Destination settings
+
+Expand **Advanced settings** for BigQuery-specific options:
+
+| Setting                  | Behavior                                                                                                                                                                                                                                                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Connection pool size** | Default: `4` connections. Storage Write API connections for destination writes. More connections can improve throughput but use more resources.                                                                                                                                     |
+| **Maximum staleness**    | Default: Freshest results. Maximum data age in whole minutes while BigQuery applies CDC changes. For example, `15` allows results up to 15 minutes stale and can reduce query-time merge cost. Unset gives the freshest results. Applies only when a table is created or recreated. |
+
+## Table partitioning and clustering
+
+You can configure BigQuery partitioning and clustering for individual replicated tables under **Advanced settings > Table layout** to control their physical layout and improve query performance and cost.
+
+The publication determines [which source partitions become destination tables](/docs/guides/database/replication/pipelines#partitioned-tables). BigQuery layout is configured separately; Pipelines does not copy Postgres partition keys or bounds.
+
+Layout settings apply only when a destination table is created or recreated, including after a table restart or source truncate. A pipeline restart that resumes a table's saved progress does not apply new layout settings. [Restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to apply them, which replaces its data.
+
+Set either option, both, or neither:
+
+- **Partitioning**: Partition by a `date`, `timestamp`, or `timestamptz` column with `hour`, `day`, `month`, or `year` granularity, by an integer range, or by ingestion time. Date columns cannot use hourly granularity; integer ranges need a start, end, and interval.
+- **Clustering**: Cluster by one to four ordered, distinct replicated columns. BigQuery validates whether the clustering column types are supported.
+
+See the BigQuery documentation for [partition expressions](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#partition_expression) and [clustering column requirements](https://cloud.google.com/bigquery/docs/creating-clustered-tables#clustered_column_requirements).
+
+## Replica identity
+
+Choose a supported Postgres replica identity:
+
+| Source table setting                          | Guidance                                                                                                                                                        |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `REPLICA IDENTITY DEFAULT` with a primary key | Recommended for most tables. BigQuery uses the replicated source primary key to apply upserts and deletes.                                                      |
+| `REPLICA IDENTITY FULL`                       | Recommended for tables with large `text`, `jsonb`, `bytea`, or other values that Postgres may store out-of-line using TOAST, especially when those rows update. |
+| `REPLICA IDENTITY USING INDEX`                | Supported only when the selected unique index contains exactly the source primary-key columns. An alternative unique-key identity is not supported.             |
+| `REPLICA IDENTITY NOTHING`                    | Insert-only. Inserts can be replicated, but updates and deletes do not include enough row identity for BigQuery to apply them safely.                           |
+
+### Complete update rows and TOAST
+
+BigQuery upserts require complete new rows. Postgres can omit unchanged out-of-line TOAST values; `REPLICA IDENTITY FULL` supplies the old row so Pipelines can reconstruct them.
+
+If replication fails on a partial update row, set full replica identity and restart the pipeline. The change affects only new WAL: incompatible retained updates can still require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+
+Check a table's current replica identity:
+
+```sql
+select
+  n.nspname as schema_name,
+  c.relname as table_name,
+  c.relreplident as replica_identity
+from
+  pg_class as c
+  join pg_namespace as n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relname = 'your_table';
+```
+
+The `replica_identity` value is `d` for default, `f` for full, `i` for index, and `n` for nothing.
+
+Set full replica identity when a table has toasted columns and update replication must be reliable:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+`REPLICA IDENTITY FULL` increases WAL volume by logging the complete old row for updates and deletes.
+
+## Column names
+
+Pipelines converts ASCII uppercase letters to lowercase and preserves other supported characters. For example, `Name` and `name` conflict; `Ä` and `ä` remain distinct. Avoid ASCII case-only differences.
+
+BigQuery supports [flexible column names](https://cloud.google.com/bigquery/docs/schemas#flexible-column-names), including spaces, Unicode letters, and selected punctuation. Its reserved prefixes and unsupported-character restrictions still apply.
+
+## Schema change support
+
+Pipelines supports:
+
+- Adding columns: scalar columns are nullable, and arrays are repeated fields
+- Removing or renaming columns, provided the primary key stays unchanged
+- Dropping `NOT NULL` from an existing scalar column
+- Adding, replacing, or removing supported literal defaults
+- Adding or removing published columns on tracked tables, provided the primary key stays unchanged and no existing array column is newly included
+
+New scalar columns leave historical BigQuery rows `NULL`; new array columns expose an empty array. Later row changes supply the source value. Pipelines does not backfill existing rows when adding a column.
+
+Removing a column from the publication also removes its destination values. Adding it again does not restore those values. To include a previously excluded array column, select the table for initial sync and [restart its replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+
+Adding `NOT NULL` keeps an existing destination column nullable. For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
+
+### Column defaults
+
+Pipelines supports literal defaults such as strings, numbers, dates, timestamps, JSON values, and UUIDs. It skips defaults that depend on when or where they run, including `now()`, sequences, `random()`, and generated UUID functions.
+
+Skipping a BigQuery default doesn't lose values from Postgres. Postgres evaluates the default, and Pipelines replicates the resulting value with future row changes. Pipelines adds a column before setting its default, so [defaults don't fill existing BigQuery rows](https://cloud.google.com/bigquery/docs/default-values#change_default_values).
+
+### Publication changes
+
+Column-list changes for tracked tables follow the [schema rules](#schema-change-support). Follow the guidance for [table membership](/docs/guides/database/replication/pipelines#adding-or-removing-tables) or [other publication changes](/docs/guides/database/replication/pipelines#other-publication-changes), including row filters and partition behavior.
+
+## Limitations
+
+- **Row size**: Each serialized row must fit within the Storage Write API's [20 MB append-request limit](https://cloud.google.com/bigquery/quotas#write-api-limits), including request metadata and encoding overhead.
+- **Columns**: BigQuery CDC supports at most 2,000 top-level columns
+- **Schema and table names**: Source schema and table names can't start or end with `_` or contain `"` or `;` when replicating to BigQuery
+- **Arrays**: Arrays can't contain `NULL` elements.
+- **Numeric and JSON values**: BigQuery applies its destination [data-type limits](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types). Values can be rounded or rejected when they exceed the supported precision or range; Postgres values are not guaranteed to retain their exact representation.
+- **BigQuery CDC tables**: While CDC is active, BigQuery doesn't support mutating DML such as `UPDATE`, `DELETE`, or `MERGE`, wildcard table queries, or search indexes on the destination table. See [BigQuery CDC limitations](https://cloud.google.com/bigquery/docs/change-data-capture#limitations) for the complete list.
+- **Managed objects**: Follow the [removal procedure](/docs/guides/database/replication/pipelines#removing-tables-from-replication) before deleting destination tables or views.
+
+## Custom IAM permissions
+
+Pipelines needs permission to inspect and manage destination tables, write data through the Storage Write API, and run BigQuery jobs. A custom IAM role must provide:
+
+- `bigquery.datasets.get`
+- `bigquery.jobs.create`
+- `bigquery.tables.create`
+- `bigquery.tables.delete`
+- `bigquery.tables.get`
+- `bigquery.tables.getData`
+- `bigquery.tables.list`
+- `bigquery.tables.update`
+- `bigquery.tables.updateData`
+
+## Troubleshooting
+
+Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors. For update failures, check [replica identity and TOAST](#complete-update-rows-and-toast). For schema failures, review [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
+
+## Additional resources
+
+- [BigQuery documentation](https://cloud.google.com/bigquery/docs)
+- [BigQuery change data capture](https://cloud.google.com/bigquery/docs/change-data-capture)

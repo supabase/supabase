@@ -160,13 +160,13 @@ export const RowMenu = ({
           <div className="relative">
             <Button
               variant="default"
-              className="px-1.25 hit-area-2"
+              className="w-6.5 hit-area-1"
               aria-label={hasUpdate ? 'Pipeline options, update available' : 'Pipeline options'}
               icon={<MoreVertical />}
             />
             {hasUpdate && (
               <span
-                className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full"
+                className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-primary-bright rounded-full"
                 aria-hidden
               />
             )}
@@ -175,7 +175,7 @@ export const RowMenu = ({
 
         <DropdownMenuContent side="bottom" align="end" className="w-44">
           <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
-            <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+            <Link href={`/project/${projectRef}/database/pipelines/${pipeline?.id}`}>
               <Eye size={14} />
               <p>View details</p>
             </Link>
