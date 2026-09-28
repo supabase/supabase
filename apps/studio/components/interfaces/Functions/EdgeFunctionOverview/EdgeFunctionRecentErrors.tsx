@@ -192,14 +192,17 @@ export const EdgeFunctionRecentErrors = ({
               skeletonRowCount={MAX_VISIBLE_ERRORS}
               footer={
                 hiddenErrorCount > 0 && (
-                  <Button
-                    variant="text"
-                    size="tiny"
-                    className="w-full justify-start rounded-none px-3 py-2 text-foreground-lighter"
-                    onClick={handleOpenLogs}
-                  >
-                    +{hiddenErrorCount.toLocaleString('en-US')} more
-                  </Button>
+                  // Sized to its label so the Button's press-scale stays centered on the text
+                  <div className="px-0.5 py-0.5">
+                    <Button
+                      variant="text"
+                      size="tiny"
+                      className="text-foreground-lighter"
+                      onClick={handleOpenLogs}
+                    >
+                      +{hiddenErrorCount.toLocaleString('en-US')} more
+                    </Button>
+                  </div>
                 )
               }
             />
