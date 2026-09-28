@@ -54,10 +54,7 @@ export async function GET() {
         )
       )
     } else {
-      console.error(
-        'Unexpected error fetching incident.io status page: %s',
-        JSON.stringify(error, null, 2)
-      )
+      console.error('Unexpected error fetching incident.io status page:', error)
     }
 
     return NextResponse.json(
