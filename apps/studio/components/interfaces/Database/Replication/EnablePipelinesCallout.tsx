@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -13,9 +12,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
@@ -115,23 +114,28 @@ export const EnablePipelinesCallout = ({
   const { hasAccess } = useCheckEntitlements('replication.etl')
 
   return (
-    <div className={cn('border rounded-md p-4 md:p-12 flex flex-col gap-y-4', className)}>
-      <div className="flex flex-col gap-y-1">
-        <h4>Enable Pipelines</h4>
-        <p className="text-sm text-foreground-light">
-          Pipelines replicates database changes to{' '}
-          {type ?? 'data warehouses and analytics platforms'}.{' '}
-          {hasAccess ? 'Enable it for this project.' : 'Upgrade to Pro to get started.'}
-        </p>
-      </div>
-      <div className="flex gap-x-2">
-        {hasAccess ? (
+    <Admonition
+      type="note"
+      layout="responsive"
+      className={className}
+      title="Enable Pipelines"
+      description={
+        <>
+          Replicate database changes from this project to {type ?? 'an external destination'}.{' '}
+          {!hasAccess && 'Requires the Pro plan. '}
+          <InlineLink href={`${DOCS_URL}/guides/database/replication#pipelines`}>
+            Learn more
+          </InlineLink>
+          .
+        </>
+      }
+      actions={
+        hasAccess ? (
           <EnablePipelinesModal />
         ) : (
           <UpgradePlanButton source="replication" featureProposition="use replication" />
-        )}
-        <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
-      </div>
-    </div>
+        )
+      }
+    />
   )
 }
