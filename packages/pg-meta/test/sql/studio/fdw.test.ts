@@ -123,7 +123,9 @@ test('updating a wrapper alters the server and FDW instead of dropping and recre
     tables: [],
   })
 
-  expect(sql).toContain("alter server bigquery_server\n          options (set project_id 'new-project')")
+  expect(sql).toContain(
+    "alter server bigquery_server\n          options (set project_id 'new-project')"
+  )
   expect(sql).not.toContain('drop server')
   expect(sql).not.toContain('drop foreign data wrapper')
   expect(sql).not.toContain('create foreign data wrapper')
