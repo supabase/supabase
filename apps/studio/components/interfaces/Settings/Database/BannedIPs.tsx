@@ -45,10 +45,7 @@ export const BannedIPs = () => {
     isFetching: isFetchingIPList,
     data: ipList,
     error: ipListError,
-  } = useBannedIPsQuery(
-    { projectRef: ref },
-    { enabled: !!project && !isHighAvailability && !isAwsK8s }
-  )
+  } = useBannedIPsQuery({ projectRef: ref })
 
   const { data: userIPAddress } = useUserIPAddressQuery()
 
