@@ -1,13 +1,12 @@
 import { Table } from '@tanstack/react-table'
-import { Filter, MoreVertical } from 'lucide-react'
 import { ReactNode } from 'react'
-import { Button, cn, Skeleton } from 'ui'
+import { cn, Skeleton } from 'ui'
 
+import { LogFieldRow } from '../../../components/LogFieldRow'
 import { type ColumnSchema } from '../../../UnifiedLogs.schema'
 import { type BlockFieldConfig } from '../../types'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { DataTableSheetRowAction } from '@/components/ui/DataTable/DataTableSheetRowAction'
 
 interface DetailRowProps {
   config: BlockFieldConfig
@@ -32,64 +31,28 @@ export const DetailRow = ({
   isLoading,
 }: DetailRowProps) => {
   const { id: filterId, label, wrap } = config
-  const isFilterable =
-    !!filterId && !!filterFields?.some((f) => f.value === filterId) && !!table && !isLoading
-  const resolvedFilterValue = filterValue ?? undefined
-
-  const isEmpty = value === null || value === undefined || value === ''
-
-  const labelEl = (
-    <span
-      className={cn(
-        'flex items-center gap-2 text-xs uppercase tracking-wide text-foreground-lighter',
-        wrap ? 'shrink-0' : 'min-w-0 truncate'
-      )}
-    >
-      <span className={cn('font-mono', !wrap && 'truncate')}>{label}</span>
-    </span>
-  )
-
-  const valueEl = isLoading ? (
-    <Skeleton className="h-4 w-24" />
-  ) : (
-    <FieldValue config={config} value={value} wrap={config.wrap} level={level ?? undefined} />
-  )
-
-  const rowClass = cn(
-    'flex items-start justify-between items-center gap-x-10 px-4',
-    wrap ? 'min-h-9 py-0' : 'h-9'
-  )
+  const resolvedValue = filterValue ?? value ?? ''
+  const hasValue = value !== null && value !== undefined && value !== ''
 
   return (
-    <div className={cn(rowClass, 'rounded-none group w-full')}>
-      <div className="flex items-center gap-x-2 pl-[22px]">
-        {labelEl}
-        {isFilterable && resolvedFilterValue !== undefined && (
-          <Filter size={12} className="text-foreground-lighter" />
-        )}
-      </div>
-      <div
-        className={cn('flex items-center gap-x-2 min-w-0 flex-1 justify-end', isEmpty && 'pr-2')}
-      >
-        {valueEl}
-        {!isEmpty && (
-          <DataTableSheetRowAction
-            fieldValue={filterId}
-            filterFields={filterFields}
-            value={resolvedFilterValue ?? ''}
-            table={table!}
-            label={label}
-          >
-            <Button
-              aria-label="More options"
-              variant="text"
-              className="px-1"
-              icon={<MoreVertical />}
-            />
-          </DataTableSheetRowAction>
-        )}
-      </div>
-    </div>
+    <LogFieldRow
+      label={label}
+      value={resolvedValue}
+      fieldValue={hasValue ? filterId : undefined}
+      filterFields={filterFields}
+      table={table}
+      disabled={isLoading}
+      truncateLabel={!wrap}
+      alignOffset={38}
+      // Indent past the section header icon
+      className="pl-[38px]"
+    >
+      {isLoading ? (
+        <Skeleton className="my-0.5 h-4 w-24" />
+      ) : (
+        <FieldValue config={config} value={value} wrap={wrap} level={level ?? undefined} />
+      )}
+    </LogFieldRow>
   )
 }
 
@@ -102,7 +65,7 @@ interface FieldValueProps {
 
 const FieldValue = ({ config, value, wrap, level }: FieldValueProps): ReactNode => {
   if (value === null || value === undefined || value === '') {
-    return <span className="font-mono text-xs text-foreground-muted">—</span>
+    return <span className="font-mono text-sm leading-5 text-foreground-muted">—</span>
   }
 
   if (config.id === 'status') {
@@ -110,7 +73,7 @@ const FieldValue = ({ config, value, wrap, level }: FieldValueProps): ReactNode 
       <DataTableColumnStatusCode
         value={value as string | number}
         level={level}
-        className="text-xs"
+        className="text-sm leading-5"
       />
     )
   }
@@ -119,7 +82,7 @@ const FieldValue = ({ config, value, wrap, level }: FieldValueProps): ReactNode 
     return (
       <span
         className={cn(
-          'font-mono text-xs text-foreground min-w-0',
+          'font-mono text-sm leading-5 text-foreground min-w-0',
           wrap ? 'break-all text-right' : 'truncate text-right'
         )}
       >

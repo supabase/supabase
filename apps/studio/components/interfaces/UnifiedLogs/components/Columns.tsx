@@ -5,9 +5,10 @@ import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { getEventMessageDisplay } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
+import { LogLevelDot } from './LogLevelDot'
 import { LogTypeIcon } from './LogTypeIcon'
-import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -40,18 +41,15 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
 
   const columns: ColumnDef<ColumnSchema>[] = [
     {
-      accessorKey: 'select',
+      accessorKey: 'level',
       header: '',
-      cell: ({ row }) => {
-        return (
-          <Checkbox
-            className="hit-area-2 hover:border-foreground-muted"
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            onClick={(e) => e.stopPropagation()}
-          />
-        )
-      },
+      cell: ({ row }) => (
+        <LogSelectionIndicator
+          id={row.id}
+          level={row.original.level}
+          isSelected={row.getIsSelected()}
+        />
+      ),
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
@@ -63,26 +61,6 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         // pl-3.5 → toggle-filter icon; pr-3 matches date pl-3 (equal gaps around the dot)
         cellClassName: 'w-[42px] min-w-[42px] pl-3.5 pr-3',
         headerClassName: 'w-[42px] min-w-[42px] pl-3.5 pr-3',
-      },
-    },
-    // Level column - always visible
-    {
-      accessorKey: 'level',
-      header: '',
-      cell: ({ row }) => {
-        const level = row.getValue<ColumnSchema['level']>('level')
-        return level ? <DataTableColumnLevelIndicator value={level} /> : null
-      },
-      enableHiding: false,
-      enableResizing: false,
-      enableSorting: false,
-      filterFn: () => true,
-      size: 8,
-      minSize: 8,
-      maxSize: 8,
-      meta: {
-        cellClassName: 'w-2 min-w-2 px-0',
-        headerClassName: 'w-2 min-w-2 px-0',
       },
     },
     // Date column - always visible
@@ -295,3 +273,45 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
 export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns({
   data: [],
 }).columns
+
+function LogSelectionIndicator({
+  id,
+  level,
+  isSelected,
+}: {
+  id: string
+  level: ColumnSchema['level']
+  isSelected: boolean
+}) {
+  const { onSelectRow } = useDataTable()
+  return (
+    <div className="relative flex h-4 w-4 items-center justify-center">
+      <div
+        className={cn(
+          'pointer-events-none group-hover/row:opacity-0 group-focus-within/row:opacity-0',
+          isSelected && 'opacity-0'
+        )}
+      >
+        <LogLevelDot level={level} />
+      </div>
+      <Checkbox
+        aria-label="Select log"
+        tabIndex={-1}
+        className={cn(
+          'absolute inset-0 cursor-pointer opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-visible:opacity-100',
+          isSelected && 'opacity-100'
+        )}
+        checked={isSelected}
+        onClick={(event) => {
+          event.stopPropagation()
+          onSelectRow?.(id, {
+            shiftKey: event.shiftKey,
+            metaKey: event.metaKey,
+            ctrlKey: event.ctrlKey,
+            toggle: true,
+          })
+        }}
+      />
+    </div>
+  )
+}

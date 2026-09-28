@@ -429,7 +429,7 @@ export const SQLEditorTreeViewItem = ({
                     size={14}
                     className={cn(
                       isFavorite
-                        ? 'fill-brand-default stroke-none'
+                        ? 'fill-primary-bright stroke-none'
                         : 'fill-none stroke-foreground-light'
                     )}
                   />

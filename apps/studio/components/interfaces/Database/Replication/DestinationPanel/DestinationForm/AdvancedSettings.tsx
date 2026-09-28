@@ -33,7 +33,7 @@ import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 export type AdvancedSettingsGroup = 'all' | 'connection' | 'data'
 
 const DATA_DESCRIPTION = 'Adjust initial sync and replication slot behavior.'
-const ALL_DESCRIPTION = 'Overrides for pipeline behavior.'
+const ALL_DESCRIPTION = 'Customize how the pipeline syncs and replicates data.'
 
 const getConnectionDescription = (type: DestinationType) => `Adjust how data is written to ${type}.`
 
@@ -196,7 +196,7 @@ export const AdvancedSettings = ({
                           <SelectTrigger>
                             {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent side="bottom" collisionPadding={16}>
                             <SelectItem value="error" className="[&>span]:top-2.5">
                               <p>Block startup</p>
                               <p className="text-foreground-lighter">
