@@ -27,21 +27,22 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
   const section = sectionsBySlug?.get(operationSlug)
   if (!section) notFound()
 
+  const navigationProps = {
+    libraryId: 'api',
+    name: 'Management API',
+    menuData: reference_api,
+    libPath: 'api',
+    version: 'latest',
+    isLatestVersion: true,
+    realNavigation: true,
+  }
+
   return (
     <ReferenceContentScrollHandler libPath="api" version="latest" isLatestVersion={true}>
       <SidebarSkeleton
         menuId={MenuId.RefApi}
-        NavigationMenu={
-          <ReferenceNavigation
-            libraryId="api"
-            name="Management API"
-            menuData={reference_api}
-            libPath="api"
-            version="latest"
-            isLatestVersion={true}
-            realNavigation
-          />
-        }
+        NavigationMenu={<ReferenceNavigation {...navigationProps} />}
+        rightRail={<ReferenceNavigation {...navigationProps} hasActiveCrumb />}
       >
         <LayoutMainContent>
           <article className="@container/article">

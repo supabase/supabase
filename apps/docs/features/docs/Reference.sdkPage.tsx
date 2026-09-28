@@ -20,6 +20,15 @@ export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkRef
 
   const menuData = NavItems[libraryMeta.meta[libVersion].libId]
 
+  const navigationProps = {
+    libraryId: sdkId,
+    name: menuData.title,
+    menuData: menuData,
+    libPath: libraryMeta.libPath,
+    version: libVersion,
+    isLatestVersion: isLatestVersion,
+  }
+
   return (
     <ReferenceContentScrollHandler
       libPath={libraryMeta.libPath}
@@ -28,16 +37,8 @@ export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkRef
     >
       <SidebarSkeleton
         menuId={libraryMeta.meta[libVersion].libId}
-        NavigationMenu={
-          <ReferenceNavigation
-            libraryId={sdkId}
-            name={menuData.title}
-            menuData={menuData}
-            libPath={libraryMeta.libPath}
-            version={libVersion}
-            isLatestVersion={isLatestVersion}
-          />
-        }
+        NavigationMenu={<ReferenceNavigation {...navigationProps} />}
+        rightRail={<ReferenceNavigation {...navigationProps} hasActiveCrumb />}
       >
         <LayoutMainContent>
           {!isLatestVersion && (

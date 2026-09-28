@@ -8,20 +8,21 @@ import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
 export async function CliReferencePage() {
+  const navigationProps = {
+    libraryId: 'cli',
+    name: 'Supabase CLI',
+    menuData: reference_cli,
+    libPath: 'cli',
+    version: 'latest',
+    isLatestVersion: true,
+  }
+
   return (
     <ReferenceContentScrollHandler libPath="cli" version="latest" isLatestVersion={true}>
       <SidebarSkeleton
         menuId={MenuId.RefCli}
-        NavigationMenu={
-          <ReferenceNavigation
-            libraryId="cli"
-            name="Supabase CLI"
-            menuData={reference_cli}
-            libPath="cli"
-            version="latest"
-            isLatestVersion={true}
-          />
-        }
+        NavigationMenu={<ReferenceNavigation {...navigationProps} />}
+        rightRail={<ReferenceNavigation {...navigationProps} hasActiveCrumb />}
       >
         <LayoutMainContent>
           <article className="@container/article">
