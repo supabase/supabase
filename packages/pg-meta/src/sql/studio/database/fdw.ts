@@ -8,10 +8,48 @@ import {
 } from '../../../pg-format'
 
 type SimplifiedWrapperMeta = {
+  name: string
   handlerName: string
   validatorName: string
   server: { options: { name: string; encrypted: boolean }[] }
 }
+
+// Old wrappers has an implicit dependency on pgsodium. For new wrappers we use Vault directly.
+const LEGACY_WRAPPER_EXTENSION_VERSIONS = [
+  '0.1.0',
+  '0.1.1',
+  '0.1.4',
+  '0.1.5',
+  '0.1.6',
+  '0.1.7',
+  '0.1.8',
+  '0.1.9',
+  '0.1.10',
+  '0.1.11',
+  '0.1.12',
+  '0.1.14',
+  '0.1.15',
+  '0.1.16',
+  '0.1.17',
+  '0.1.18',
+  '0.1.19',
+  '0.2.0',
+  '0.3.0',
+  '0.3.1',
+  '0.4.0',
+  '0.4.1',
+  '0.4.2',
+  '0.4.3',
+  '0.4.4',
+  '0.4.5',
+]
+
+const isUsingOldWrappersSql = safeSql`
+  (select extversion from pg_extension where extname = 'wrappers') in (${joinSqlFragments(
+    LEGACY_WRAPPER_EXTENSION_VERSIONS.map((version) => literal(version)),
+    ','
+  )})
+`
 
 export const getFDWsSql = (): SafeSqlFragment => {
   const sql = safeSql`
@@ -52,6 +90,16 @@ export const getFDWsSql = (): SafeSqlFragment => {
   return sql
 }
 
+export function getCreateForeignDataWrapperSql(
+  wrapperMeta: SimplifiedWrapperMeta
+): SafeSqlFragment {
+  return safeSql`
+    create foreign data wrapper ${ident(wrapperMeta.name)}
+    handler ${ident(wrapperMeta.handlerName)}
+    validator ${ident(wrapperMeta.validatorName)};
+  `
+}
+
 export function getCreateFDWSql({
   wrapperMeta,
   formState,
@@ -84,52 +132,17 @@ export function getCreateFDWSql({
     '\n'
   )
 
-  const createWrapperSql = safeSql`
-    create foreign data wrapper ${ident(formState.wrapper_name)}
-    handler ${ident(wrapperMeta.handlerName)}
-    validator ${ident(wrapperMeta.validatorName)};
-  `
-
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
   const unencryptedOptions = wrapperMeta.server.options.filter((option) => !option.encrypted)
 
   const createEncryptedKeysSqlArray = encryptedOptions.map((option) => {
-    const key = `${formState.wrapper_name}_${option.name}`
+    const key = `${formState.server_name}_${option.name}`
     const quotedValue = literal(formState[option.name] || '')
 
     return safeSql`
       do $$
       begin
-        -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
-        -- we use Vault directly.
-        if (select extversion from pg_extension where extname = 'wrappers') in (
-          '0.1.0',
-          '0.1.1',
-          '0.1.4',
-          '0.1.5',
-          '0.1.6',
-          '0.1.7',
-          '0.1.8',
-          '0.1.9',
-          '0.1.10',
-          '0.1.11',
-          '0.1.12',
-          '0.1.14',
-          '0.1.15',
-          '0.1.16',
-          '0.1.17',
-          '0.1.18',
-          '0.1.19',
-          '0.2.0',
-          '0.3.0',
-          '0.3.1',
-          '0.4.0',
-          '0.4.1',
-          '0.4.2',
-          '0.4.3',
-          '0.4.4',
-          '0.4.5'
-        ) then
+        if ${isUsingOldWrappersSql} then
           create extension if not exists pgsodium;
 
           perform pgsodium.create_key(
@@ -180,41 +193,14 @@ export function getCreateFDWSql({
         '\n'
       )}
     begin
-      is_using_old_wrappers := (select extversion from pg_extension where extname = 'wrappers') in (
-        '0.1.0',
-        '0.1.1',
-        '0.1.4',
-        '0.1.5',
-        '0.1.6',
-        '0.1.7',
-        '0.1.8',
-        '0.1.9',
-        '0.1.10',
-        '0.1.11',
-        '0.1.12',
-        '0.1.14',
-        '0.1.15',
-        '0.1.16',
-        '0.1.17',
-        '0.1.18',
-        '0.1.19',
-        '0.2.0',
-        '0.3.0',
-        '0.3.1',
-        '0.4.0',
-        '0.4.1',
-        '0.4.2',
-        '0.4.3',
-        '0.4.4',
-        '0.4.5'
-      );
+      is_using_old_wrappers := ${isUsingOldWrappersSql};
       ${joinSqlFragments(
         encryptedOptions.map(
           (option) => safeSql`
               if is_using_old_wrappers then
-                select id into ${ident(`v_${option.name}`)} from pgsodium.valid_key where name = ${literal(`${formState.wrapper_name}_${option.name}`)} limit 1;
+                select id into ${ident(`v_${option.name}`)} from pgsodium.valid_key where name = ${literal(`${formState.server_name}_${option.name}`)} limit 1;
               else
-                select id into ${ident(`v_${option.name}`)} from vault.secrets where name = ${literal(`${formState.wrapper_name}_${option.name}`)} limit 1;
+                select id into ${ident(`v_${option.name}`)} from vault.secrets where name = ${literal(`${formState.server_name}_${option.name}`)} limit 1;
               end if;
             `
         ),
@@ -282,8 +268,6 @@ export function getCreateFDWSql({
   const sql = safeSql`
     ${newSchemasSql}
 
-    ${createWrapperSql}
-
     ${createEncryptedKeysSql}
 
     ${createServerSql}
@@ -314,36 +298,7 @@ export const getDeleteFDWSql = ({
         if not exists (
           select 1 from pg_catalog.pg_foreign_data_wrapper where fdwname = ${literal(wrapper.name)}
         ) then
-          -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
-          -- we use Vault directly.
-          if (select extversion from pg_extension where extname = 'wrappers') in (
-            '0.1.0',
-            '0.1.1',
-            '0.1.4',
-            '0.1.5',
-            '0.1.6',
-            '0.1.7',
-            '0.1.8',
-            '0.1.9',
-            '0.1.10',
-            '0.1.11',
-            '0.1.12',
-            '0.1.14',
-            '0.1.15',
-            '0.1.16',
-            '0.1.17',
-            '0.1.18',
-            '0.1.19',
-            '0.2.0',
-            '0.3.0',
-            '0.3.1',
-            '0.4.0',
-            '0.4.1',
-            '0.4.2',
-            '0.4.3',
-            '0.4.4',
-            '0.4.5'
-          ) then
+          if ${isUsingOldWrappersSql} then
             delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = ${literal(key)});
 
             delete from pgsodium.key where name = ${literal(key)};
@@ -421,6 +376,7 @@ export const getUpdateFDWSql = ({
     end $$;
   `
   const deleteWrapperSql = getDeleteFDWSql({ wrapper, wrapperMeta })
+  const createForeignDataWrapperSql = getCreateForeignDataWrapperSql(wrapperMeta)
   const createWrapperSql = getCreateFDWSql({
     wrapperMeta,
     formState,
@@ -434,6 +390,8 @@ export const getUpdateFDWSql = ({
     ${ensureWrapperIsNotSharedSql}
 
     ${deleteWrapperSql}
+
+    ${createForeignDataWrapperSql}
 
     ${createWrapperSql}
   `
