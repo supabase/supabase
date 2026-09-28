@@ -103,14 +103,14 @@ const CustomIcon = ({ color }: CustomIconProps) => (
   </svg>
 )
 
-const MaxConnectionsIcon = ({ color }: { color?: string }) => (
+const MaxConnectionsIcon = () => (
   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
     <line
       x1="2"
       y1="6"
       x2="12"
       y2="6"
-      stroke={color ?? CHART_COLORS.REFERENCE_LINE}
+      stroke={CHART_COLORS.REFERENCE_LINE}
       strokeWidth="2"
       strokeDasharray="2 2"
     />
@@ -127,7 +127,6 @@ interface TooltipProps {
   isPercentage?: boolean
   format?: string | ((value: unknown) => string)
   valuePrecision?: number
-  showMaxValue?: boolean
   showTotal?: boolean
   isActiveHoveredChart?: boolean
 }
@@ -339,7 +338,6 @@ interface CustomLabelProps {
   payload?: any[]
   attributes?: MultiAttribute[]
   showMaxValue?: boolean
-  onLabelHover?: (label: string | null) => void
   onToggleAttribute?: (attribute: string, options?: { exclusive?: boolean }) => void
   hiddenAttributes?: Set<string>
 }
@@ -348,7 +346,6 @@ export const CustomLabel = ({
   payload,
   attributes,
   showMaxValue,
-  onLabelHover,
   onToggleAttribute,
   hiddenAttributes,
 }: CustomLabelProps) => {
@@ -358,12 +355,10 @@ export const CustomLabel = ({
 
   const handleMouseEnter = (label: string) => {
     setHoveredLabel(label)
-    onLabelHover?.(label)
   }
 
   const handleMouseLeave = () => {
     setHoveredLabel(null)
-    onLabelHover?.(null)
   }
 
   const getIcon = (name: string, color: string) => {

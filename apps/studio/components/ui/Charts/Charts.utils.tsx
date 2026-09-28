@@ -195,11 +195,9 @@ export function computeYAxisDomain({
 export function normalizeStackedSeriesData<T extends Record<string, unknown>>({
   data,
   attributeNames,
-  totalTarget = 100,
 }: {
   data: T[]
   attributeNames: string[]
-  totalTarget?: number
 }): T[] {
   return data.map((point) => {
     const values = attributeNames.map((name) => ({
@@ -220,12 +218,12 @@ export function normalizeStackedSeriesData<T extends Record<string, unknown>>({
     values.forEach(({ name, value }) => {
       if (name === largestEntry.name) return
 
-      const normalizedValue = (value / total) * totalTarget
+      const normalizedValue = (value / total) * 100
       nextPoint[name] = normalizedValue
       normalizedTotal += normalizedValue
     })
 
-    nextPoint[largestEntry.name] = Math.max(0, totalTarget - normalizedTotal)
+    nextPoint[largestEntry.name] = Math.max(0, 100 - normalizedTotal)
 
     return nextPoint as T
   })
@@ -235,21 +233,13 @@ export function normalizeStackedSeriesData<T extends Record<string, unknown>>({
  * Hook to create common wrapping components, perform data transformations
  * returns a Container component and the minHeight set
  */
-export const useChartSize = (
-  size: CommonChartProps<any>['size'] = 'normal',
-  sizeMap: {
-    tiny: number
-    small: number
-    normal: number
-    large: number
-  } = {
+export const useChartSize = (size: CommonChartProps<any>['size'] = 'normal') => {
+  const minHeight = {
     tiny: 76,
     small: 96,
     normal: 160,
     large: 280,
-  }
-) => {
-  const minHeight = sizeMap[size]
+  }[size]
   const Container: FC<{ children: ReactElement; className?: string }> = useMemo(
     () =>
       ({ className, children }) => (

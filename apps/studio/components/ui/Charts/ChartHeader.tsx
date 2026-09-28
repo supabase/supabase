@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
@@ -25,8 +25,6 @@ export interface ChartHeaderProps {
   highlightedLabel?: number | string | any | null
   highlightedValue?: number | string | any | null
   hideHighlightedValue?: boolean
-  hideHighlightedLabel?: boolean
-  hideHighlightArea?: boolean
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
@@ -53,8 +51,6 @@ export const ChartHeader = ({
   highlightedValue,
   highlightedLabel,
   hideHighlightedValue = false,
-  hideHighlightedLabel = false,
-  hideHighlightArea = false,
   title,
   minimalHeader = false,
   hideChartType = false,
@@ -244,14 +240,11 @@ export const ChartHeader = ({
 
   if (minimalHeader) {
     return (
-      <div
-        className={cn('flex flex-row items-center gap-x-4', hideHighlightArea && 'hidden')}
-        style={{ minHeight: '1.8rem' }}
-      >
+      <div className="flex flex-row items-center gap-x-4" style={{ minHeight: '1.8rem' }}>
         {title && chartTitle}
         <div className="flex flex-row items-baseline gap-x-2">
           {highlightedValue !== undefined && !hideHighlightedValue && highlighted}
-          {!hideHighlightedLabel && label}
+          {label}
         </div>
       </div>
     )
@@ -260,12 +253,7 @@ export const ChartHeader = ({
   const hasHighlightedValue = highlightedValue !== undefined && !hideHighlightedValue
 
   return (
-    <div
-      className={cn(
-        'grow flex justify-between items-start min-h-16',
-        hideHighlightArea && 'hidden'
-      )}
-    >
+    <div className="grow flex justify-between items-start min-h-16">
       <div className="flex flex-col">
         <div className="flex items-center gap-2">
           {title && chartTitle}
@@ -273,7 +261,7 @@ export const ChartHeader = ({
         </div>
         <div className="h-4">
           {hasHighlightedValue && highlighted}
-          {!hideHighlightedLabel && label}
+          {label}
         </div>
       </div>
       <div className="flex items-center gap-2">

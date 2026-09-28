@@ -9,7 +9,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { CategoricalChartState } from 'recharts/types/chart/types'
 
 import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
@@ -24,14 +23,11 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   xAxisKey: string
   customDateFormat?: string
   displayDateInUtc?: boolean
-  onBarClick?: (datum: D, tooltipData?: CategoricalChartState) => void
-  emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean
   XAxisProps?: ComponentProps<typeof XAxis>
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
-  syncId?: string
 }
 
 function BarChart<D extends Datum = Datum>({
@@ -48,17 +44,13 @@ function BarChart<D extends Datum = Datum>({
   valuePrecision,
   className = '',
   size = 'normal',
-  emptyStateMessage,
-  onBarClick,
   showLegend = false,
   xAxisIsDate = true,
   XAxisProps,
   YAxisProps,
   showGrid = false,
-  syncId,
 }: BarChartProps<D>) {
-  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } =
-    useChartHoverState('default')
+  const { setHover, clearHover } = useChartHoverState('default')
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -114,7 +106,6 @@ function BarChart<D extends Datum = Datum>({
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
-        message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
@@ -133,7 +124,6 @@ function BarChart<D extends Datum = Datum>({
         highlightedValue={resolvedHighlightedValue}
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
-        syncId={syncId}
         data={data}
         xAxisKey={xAxisKey}
         yAxisKey={yAxisKey}
@@ -158,10 +148,6 @@ function BarChart<D extends Datum = Datum>({
 
             clearHover()
           }}
-          onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
-          }}
         >
           {showLegend && <Legend />}
           {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
@@ -177,21 +163,7 @@ function BarChart<D extends Datum = Datum>({
             tickLine={{ stroke: CHART_COLORS.AXIS }}
             key={xAxisKey}
           />
-          <Tooltip
-            content={(_props) =>
-              syncId && isHovered && isCurrentChart && hoveredIndex !== null ? (
-                <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
-                  <div className="font-medium">
-                    {formatChartDate(data[hoveredIndex]?.[xAxisKey] as number | string)}
-                  </div>
-                  <div>
-                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
-                    {typeof format === 'string' ? format : ''}
-                  </div>
-                </div>
-              ) : null
-            }
-          />
+          <Tooltip content={(_props) => null} />
           <Bar
             dataKey={yAxisKey}
             fill={CHART_COLORS.GREEN_1}
@@ -201,7 +173,7 @@ function BarChart<D extends Datum = Datum>({
             {data?.map((_entry: D, index: number) => (
               <Cell
                 key={`cell-${index}`}
-                className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
+                className="transition-all duration-300"
                 fill={
                   focusDataIndex === index || focusDataIndex === null
                     ? CHART_COLORS.GREEN_1

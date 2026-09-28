@@ -15,7 +15,6 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   format?: string
   customDateFormat?: string
   displayDateInUtc?: boolean
-  syncId?: string
 }
 
 const AreaChart = ({
@@ -32,12 +31,9 @@ const AreaChart = ({
   className = '',
   valuePrecision,
   size = 'normal',
-  syncId,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
-  const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
-    syncId || 'default'
-  )
+  const { setHover, clearHover } = useChartHoverState('default')
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   // When `displayDateInUtc` is set the chart explicitly wants UTC labels (used
@@ -83,7 +79,6 @@ const AreaChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
-        syncId={syncId}
         data={data}
         xAxisKey={xAxisKey}
         yAxisKey={yAxisKey}
@@ -131,21 +126,7 @@ const AreaChart = ({
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
-          <Tooltip
-            content={(_props) =>
-              syncId && syncTooltip && hoveredIndex !== null ? (
-                <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
-                  <div className="font-medium">
-                    {formatChartDate(data[hoveredIndex]?.[xAxisKey] as number | string)}
-                  </div>
-                  <div>
-                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
-                    {format}
-                  </div>
-                </div>
-              ) : null
-            }
-          />
+          <Tooltip content={(_props) => null} />
           <Area
             type="monotone"
             dataKey={yAxisKey}
