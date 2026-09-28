@@ -84,7 +84,7 @@ export const OAuthAppsAuthorizedRow = ({ approval }: OAuthAppsAuthorizedRowProps
                   className="text-destructive"
                   onClick={() => setDialogContent('revoke')}
                 >
-                  Disconnect
+                  Revoke
                 </DropdownMenuItem>
               </DialogTrigger>
             </DropdownMenuContent>
