@@ -1,6 +1,7 @@
 @import 'config/tailwind.config.css';
 @import './code-block.css';
 @import './reference.css';
+@import './footer.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';
