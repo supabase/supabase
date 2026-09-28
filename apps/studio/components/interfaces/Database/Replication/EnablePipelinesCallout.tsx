@@ -58,9 +58,7 @@ export const EnablePipelinesModal = ({
     <Dialog open={open} onOpenChange={setOpen}>
       {!hideTrigger && (
         <DialogTrigger asChild>
-          <Button variant="primary" className="w-min">
-            Enable Pipelines
-          </Button>
+          <Button>Enable</Button>
         </DialogTrigger>
       )}
       <DialogContent size="small">
@@ -104,36 +102,28 @@ export const EnablePipelinesModal = ({
   )
 }
 
-export const EnablePipelinesCallout = ({
-  type,
-  className,
-}: {
-  type?: DestinationType | null
-  className?: string
-}) => {
+export const EnablePipelinesCallout = ({ type }: { type?: DestinationType | null }) => {
   const { hasAccess } = useCheckEntitlements('replication.etl')
 
   return (
     <Admonition
       type="note"
       layout="responsive"
-      className={className}
-      title="Enable Pipelines"
+      title={hasAccess ? 'Enable Pipelines' : 'Upgrade to Pro for Pipelines'}
       description={
-        <>
-          Replicate database changes from this project to {type ?? 'an external destination'}.{' '}
-          {!hasAccess && 'Requires the Pro plan. '}
-          <InlineLink href={`${DOCS_URL}/guides/database/replication#pipelines`}>
-            Learn more
-          </InlineLink>
-          .
-        </>
+        hasAccess
+          ? `Pipelines must be enabled before this project can replicate database changes to ${type ?? 'external destinations'}.`
+          : `The Pro plan is required to replicate database changes to ${type ?? 'external destinations'} with Pipelines.`
       }
       actions={
         hasAccess ? (
           <EnablePipelinesModal />
         ) : (
-          <UpgradePlanButton source="replication" featureProposition="use replication" />
+          <UpgradePlanButton
+            source="replication"
+            featureProposition="use replication"
+            variant="default"
+          />
         )
       }
     />

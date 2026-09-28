@@ -194,7 +194,7 @@ export const DestinationPanel = () => {
               <div className="grow overflow-auto min-h-0">
                 {pipelinesTypeSelection}
                 <SheetSection>
-                  <EnablePipelinesCallout className="p-6!" type={destinationType} />
+                  <EnablePipelinesCallout type={destinationType} />
                 </SheetSection>
               </div>
             ) : (
