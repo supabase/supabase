@@ -5,7 +5,7 @@ keywords = [ "cooldown", "disk resize" ]
 database_id = "6f6a34a6-ac3f-4fba-9c70-4f4b8c7aeda7"
 ---
 
-This cooldown period isn't a Supabase limitation. It's rooted in how Amazon EBS (the underlying storage instance for our databases) manages volume modifications. After modifying a volume (e.g. increasing size, changing type, or IOPS), Supabase enforces a mandatory 4-hour cooldown before allowing another modification on the same volume. This is to ensure data integrity and stability of the volume under load.
+This cooldown isn't an arbitrary Supabase restriction — it's rooted in how Amazon EBS (the underlying storage for our databases) limits volume modifications to up to four times within a rolling 24-hour window. To keep this predictable, Supabase enforces a 4-hour cooldown after each disk modification (e.g. increasing size, changing type, or IOPS) before allowing another one on the same volume. This helps ensure data integrity and stability of the volume under load.
 
 See the [**AWS docs**](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyVolume.html) for more on how Amazon EBS itself throttles volume modifications.
 
