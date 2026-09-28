@@ -9,13 +9,7 @@ import {
   ChartLoadingState,
   ChartMetric,
 } from 'ui-patterns/Chart'
-import {
-  PageSection,
-  PageSectionContent,
-  PageSectionMeta,
-  PageSectionSummary,
-  PageSectionTitle,
-} from 'ui-patterns/PageSection'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EdgeFunctionChartEmptyState } from './EdgeFunctionChartEmptyState'
@@ -64,13 +58,8 @@ export const EdgeFunctionInvocationsSection = ({
   )
 
   return (
+    // No section title: invocations are the Overview's headline metric, right below the page header
     <PageSection>
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle>Invocations</PageSectionTitle>
-        </PageSectionSummary>
-      </PageSectionMeta>
-
       <PageSectionContent className="flex flex-col gap-5">
         {isLoadingFunction && <GenericSkeletonLoader />}
         {isErrorFunction && (
