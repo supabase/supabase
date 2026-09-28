@@ -38,10 +38,9 @@ import {
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
-  title?: string
 }
 
-export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
+export const ExplorerLayout = ({ browserTitle, children }: ExplorerLayoutProps) => {
   const tabs = useTabsStateSnapshot()
   const { setLastVisitedExplorerTab } = useDashboardHistory()
   const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
@@ -56,7 +55,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
 
   const mergedBrowserTitle = {
     ...browserTitle,
-    section: title ?? browserTitle?.section,
+    section: browserTitle?.section,
     entity: browserTitle?.entity ?? activeTabLabel,
   }
 

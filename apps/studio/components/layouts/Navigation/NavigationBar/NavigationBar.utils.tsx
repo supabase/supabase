@@ -42,7 +42,6 @@ interface ProductFeatures {
 }
 
 interface OtherFeatures {
-  isPlatform?: boolean
   unifiedLogs?: boolean
   showReports?: boolean
   showLogs?: boolean

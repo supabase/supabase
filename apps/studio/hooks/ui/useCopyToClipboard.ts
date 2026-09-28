@@ -8,8 +8,7 @@ export function useCopyToClipboard() {
   const copy = useCallback(
     async (
       text: string,
-      { timeout, withToast }: { timeout?: number; withToast?: boolean } = {
-        timeout: 3000,
+      { withToast }: { withToast?: boolean } = {
         withToast: false,
       }
     ) => {
@@ -21,12 +20,6 @@ export function useCopyToClipboard() {
       try {
         await navigator.clipboard.writeText(text)
         setText(text)
-
-        if (timeout) {
-          setTimeout(() => {
-            setText(null)
-          }, timeout)
-        }
 
         if (withToast) {
           toast.success('Copied to clipboard')

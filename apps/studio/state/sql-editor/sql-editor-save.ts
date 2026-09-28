@@ -34,8 +34,6 @@ export interface SaveMechanismDeps {
   invalidate: (projectRef: string) => Promise<void>
   /** Surface success/error toasts. */
   notify: Notifier
-  /** Build the upsert payload. Injectable for testing; defaults to buildUpsertPayload. */
-  buildPayload?: typeof buildUpsertPayload
   /** Snippet save debounce in ms. Defaults to 1000. */
   debounceMs?: number
 }
@@ -77,7 +75,6 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
     updateSQLSnippetFolder,
     invalidate,
     notify,
-    buildPayload = buildUpsertPayload,
     debounceMs = 1000,
   } = deps
 
@@ -94,7 +91,7 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
     // PUT an empty content body and clobber the stored SQL.
     if (snippet === undefined || !isLoadedSnippet(snippet)) return { status: 'skipped' }
 
-    const payload = buildPayload(snippet, id)
+    const payload = buildUpsertPayload(snippet, id)
     try {
       snippet.status = statusOnSaveStart(snippet.status)
       await upsertContent({ projectRef, payload })

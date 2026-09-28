@@ -12,19 +12,16 @@ import { executeQuery } from '@/lib/api/self-hosted/query'
 export const getFallbackTools = ({
   projectRef,
   connectionString,
-  cookie,
   authorization,
   includeSchemaMetadata,
 }: {
   projectRef: string
   connectionString: string
-  cookie?: string
   authorization?: string
   includeSchemaMetadata: boolean
 }) => {
   const headers = {
     'Content-Type': 'application/json',
-    ...(cookie && { cookie }),
     ...(authorization && { Authorization: authorization }),
   }
 

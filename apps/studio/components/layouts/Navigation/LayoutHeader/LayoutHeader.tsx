@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ReactNode, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
@@ -54,18 +54,11 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
 )
 
 interface LayoutHeaderProps {
-  customHeaderComponents?: ReactNode
-  breadcrumbs?: unknown[]
   headerTitle?: string
   backToDashboardURL?: string
 }
 
-export const LayoutHeader = ({
-  customHeaderComponents,
-  breadcrumbs = [],
-  headerTitle,
-  backToDashboardURL,
-}: LayoutHeaderProps) => {
+export const LayoutHeader = ({ headerTitle, backToDashboardURL }: LayoutHeaderProps) => {
   const router = useRouter()
   const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
@@ -222,10 +215,9 @@ export const LayoutHeader = ({
                 </motion.div>
               )}
             </AnimatePresence>
-            <BreadcrumbsView defaultValue={breadcrumbs} />
+            <BreadcrumbsView defaultValue={[]} />
           </div>
           <div className="flex items-center gap-x-2">
-            {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />

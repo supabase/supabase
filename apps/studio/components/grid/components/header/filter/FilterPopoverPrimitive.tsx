@@ -8,13 +8,11 @@ import type { Filter } from '@/components/grid/types'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverPrimitiveProps {
-  buttonText?: string
   filters: Filter[]
   onApplyFilters: (filters: Filter[]) => void
 }
 
 export const FilterPopoverPrimitive = ({
-  buttonText,
   filters,
   onApplyFilters,
 }: FilterPopoverPrimitiveProps) => {
@@ -30,10 +28,9 @@ export const FilterPopoverPrimitive = ({
   }, [filters])
 
   const displayButtonText =
-    buttonText ??
-    (filters.length > 0
+    filters.length > 0
       ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
-      : 'Filter')
+      : 'Filter'
 
   const onAddFilter = () => {
     const column = snap.table.columns[0]?.name
