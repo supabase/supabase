@@ -1,9 +1,10 @@
-import type { ColumnFiltersState } from '@tanstack/react-table'
+import type { ColumnFiltersState, VisibilityState } from '@tanstack/react-table'
 import { useDebounce } from 'common'
 import { useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -24,6 +25,22 @@ export const useFilterSearchSync = ({
     debouncedApplyFilterSearch()
     return () => debouncedApplyFilterSearch.cancel()
   }, [columnFilters, debouncedApplyFilterSearch, enabled])
+}
+
+const DEFAULT_COLUMN_VISIBILITY: VisibilityState = { uuid: false }
+
+/** Column visibility and order for the logs table, saved and shared by every view that renders it */
+export const useLogsTableColumns = () => {
+  const [columnVisibility, setColumnVisibility] = useLocalStorageQuery<VisibilityState>(
+    'data-table-visibility',
+    DEFAULT_COLUMN_VISIBILITY
+  )
+  const [columnOrder, setColumnOrder] = useLocalStorageQuery<string[]>(
+    'data-table-column-order',
+    []
+  )
+
+  return { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder }
 }
 
 export const useResetFocus = () => {

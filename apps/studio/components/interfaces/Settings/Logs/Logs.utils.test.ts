@@ -155,6 +155,15 @@ describe('Logs.utils', () => {
       const result = buildLogsPrompt(rows)
       expect(result).toContain('2 Supabase log entries')
     })
+
+    test('notes logs left out of a preview after the entries', () => {
+      const rows: LogData[] = [createLog({ id: '1', event_message: 'latest error' })]
+      const result = buildLogsPrompt(rows, { queryType: 'functions', omittedCount: 45 })
+      expect(result).toContain('from the **Edge Functions** service')
+      expect(result.indexOf('latest error')).toBeLessThan(result.indexOf('+45 more'))
+      expect(result).toContain('+45 more matching log entries not included.')
+      expect(buildLogsPrompt(rows)).not.toContain('more matching log')
+    })
   })
 
   describe('extractEdgeFunctionName', () => {
