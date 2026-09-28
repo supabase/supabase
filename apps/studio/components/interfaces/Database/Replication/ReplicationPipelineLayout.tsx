@@ -258,9 +258,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
             <PageHeaderSummary>
               <PageHeaderTitle>
                 {isPipelineLoading ? (
-                  <span className="inline-flex items-center">
+                  <span className="flex h-8 items-center">
                     <span className="sr-only">Loading pipeline</span>
-                    <ShimmeringLoader className="h-8 w-40 py-0" />
+                    <ShimmeringLoader className="h-6 w-40 py-0" />
                   </span>
                 ) : (
                   (pipeline?.destination_name ?? 'Pipeline')
