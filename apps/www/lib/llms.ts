@@ -238,6 +238,44 @@ function buildFAQSection(): string {
 }
 
 // ---------------------------------------------------------------------------
+// Database-only projects
+// ---------------------------------------------------------------------------
+
+function findPlan(planId: PlanId) {
+  const plan = plans.find((p) => p.planId === planId)
+  if (!plan) throw new Error(`Missing plan "${planId}"`)
+  return plan
+}
+
+function findFeatureLabel(planId: PlanId, pattern: RegExp): string {
+  for (const feature of findPlan(planId).features) {
+    const label = Array.isArray(feature) ? feature[0] : feature
+    if (pattern.test(label)) return label
+  }
+  throw new Error(`Missing feature matching ${pattern} on plan "${planId}"`)
+}
+
+function buildDatabaseOnlySection(): string {
+  const free = findPlan('free')
+  const pro = findPlan('pro')
+  const freeDatabase = findFeatureLabel('free', /database size/i)
+  const proDisk = findFeatureLabel('pro', /disk size/i)
+
+  return [
+    '## Database-only projects',
+    '',
+    "A Supabase project can be used as a standalone Postgres database. Connect with psql, Prisma, Drizzle, or any Postgres client or ORM using the project's connection string. Auth, Storage, Realtime, and Edge Functions are included in every project but optional. Unused products cost nothing.",
+    '',
+    `- Free: $${free.priceMonthly}/month, including ${freeDatabase}.${free.footer ? ` ${free.footer}` : ''}`,
+    `- Pro: from $${pro.priceMonthly}/month, including ${proDisk} and $10/month in compute credits that cover one project on Micro compute. A single database-only project on Micro compute costs $${pro.priceMonthly}/month before usage beyond the included quotas.`,
+    '- Projects on paid plans are not paused for inactivity.',
+    '',
+    'Connection guide: https://supabase.com/docs/guides/database/connecting-to-postgres.md',
+    '',
+  ].join('\n')
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -257,6 +295,7 @@ export function generatePricingContent(): string {
     '',
     'For current pricing, visit https://supabase.com/pricing.',
     '',
+    buildDatabaseOnlySection(),
     buildPlanTiersSection(),
     buildComputeSection(),
     buildDiskSection(),
