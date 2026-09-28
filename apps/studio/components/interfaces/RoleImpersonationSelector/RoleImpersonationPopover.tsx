@@ -12,7 +12,6 @@ export interface RoleImpersonationPopoverProps {
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
-  disallowAuthenticatedOption?: boolean
 }
 
 export const RoleImpersonationPopover = ({
@@ -20,7 +19,6 @@ export const RoleImpersonationPopover = ({
   serviceRoleLabel,
   variant = 'regular',
   align = 'end',
-  disallowAuthenticatedOption = false,
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -60,11 +58,7 @@ export const RoleImpersonationPopover = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0 overflow-hidden w-min" side="bottom" align={align}>
-        <RoleImpersonationSelector
-          header={header}
-          serviceRoleLabel={serviceRoleLabel}
-          disallowAuthenticatedOption={disallowAuthenticatedOption}
-        />
+        <RoleImpersonationSelector header={header} serviceRoleLabel={serviceRoleLabel} />
       </PopoverContent>
     </Popover>
   )

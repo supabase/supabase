@@ -42,7 +42,6 @@ interface ChartBlockProps {
   interval?: AnalyticsInterval
   defaultChartStyle?: 'bar' | 'line'
   defaultLogScale?: boolean
-  isLoading?: boolean
   actions?: ReactNode
   maxHeight?: number
   onUpdateChartConfig?: ({
@@ -63,7 +62,6 @@ export const ChartBlock = ({
   interval = '1d',
   defaultChartStyle = 'bar',
   defaultLogScale = false,
-  isLoading = false,
   actions,
   maxHeight,
   onUpdateChartConfig,
@@ -140,13 +138,12 @@ export const ChartBlock = ({
         : false
 
   const loading =
-    isLoading ||
     attribute.startsWith('new_snippet_') ||
     (provider === 'infra-monitoring'
       ? isLoadingInfraMonitoring
       : provider === 'daily-stats'
         ? isLoadingDailyStats
-        : isLoading)
+        : false)
 
   const metric = METRICS.find((x) => x.key === attribute)
   const metricLabel = metric?.label ?? attribute

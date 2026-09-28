@@ -94,13 +94,9 @@ const csvParseErrorMessage =
 
 interface UseSpreadsheetImportParameters {
   markDirty?: (dirty: boolean) => void
-  debounceDuration?: number
 }
 
-export function useSpreadsheetImport({
-  markDirty = noop,
-  debounceDuration = 250,
-}: UseSpreadsheetImportParameters) {
+export function useSpreadsheetImport({ markDirty = noop }: UseSpreadsheetImportParameters) {
   const abortControllerRef = useRef<AbortController>(new AbortController())
   const resetAbortController = useCallback(function resetAbortController() {
     abortControllerRef.current.abort()
@@ -215,11 +211,8 @@ export function useSpreadsheetImport({
   const processTextRef = useLatest(processText)
   const processTextDebounced = useMemo(
     () =>
-      debounce(
-        (...args: Parameters<typeof processText>) => processTextRef.current(...args),
-        debounceDuration
-      ),
-    [debounceDuration, processTextRef]
+      debounce((...args: Parameters<typeof processText>) => processTextRef.current(...args), 250),
+    [processTextRef]
   )
 
   const cleanup = useEffectEvent(function cleanup() {

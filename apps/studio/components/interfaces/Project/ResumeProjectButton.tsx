@@ -42,13 +42,10 @@ const FormSchema = z.object({
 type ResumeProjectButtonProps = Pick<
   ComponentPropsWithoutRef<typeof ButtonTooltip>,
   'className' | 'size' | 'variant'
-> & {
-  label?: string
-}
+>
 
 export const ResumeProjectButton = ({
   className,
-  label = 'Resume project',
   size,
   variant = 'default',
 }: ResumeProjectButtonProps) => {
@@ -173,7 +170,7 @@ export const ResumeProjectButton = ({
           },
         }}
       >
-        {label}
+        Resume project
       </ButtonTooltip>
 
       <ConfirmationModal

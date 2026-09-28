@@ -23,19 +23,17 @@ export const SelectionDetailedTimestampRow = ({
 export const SelectionDetailedRow = ({
   label,
   value,
-  valueRender,
   hideCopy = false,
 }: {
   label: string
   value: string
-  valueRender?: React.ReactNode
   hideCopy?: boolean
 }) => {
   return (
     <div className="grid grid-cols-12 group">
       <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
       <span className="text-scale-1200 text-sm col-span-6 whitespace-pre-wrap break-all">
-        {valueRender ?? value}
+        {value}
       </span>
       {!hideCopy && (
         <CopyButton

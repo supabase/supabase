@@ -32,11 +32,7 @@ import {
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 
-export interface DiskSizeConfigurationProps {
-  disabled?: boolean
-}
-
-export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
+export const DiskSizeConfiguration = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -108,7 +104,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                         {!isAwsNimbus && (
                           <ButtonTooltip
                             className="w-min ml-auto"
-                            disabled={!canUpdateDiskSizeConfig || isHighAvailability || disabled}
+                            disabled={!canUpdateDiskSizeConfig || isHighAvailability}
                             onClick={() => setShowIncreaseDiskSizeModal(true)}
                             tooltip={{
                               content: {

@@ -109,8 +109,7 @@ const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[
 
 export const createPayloadsForAddPolicy = (
   bucketName = '',
-  policyFormFields: StoragePolicyFormField,
-  addSuffixToPolicyName = true
+  policyFormFields: StoragePolicyFormField
 ) => {
   const { name: policyName, definition, allowedOperations, roles } = policyFormFields
   const formattedDefinition = definition ? definition.replace(/\s+/g, ' ').trim() : ''
@@ -123,7 +122,7 @@ export const createPayloadsForAddPolicy = (
       formattedDefinition,
       operation,
       roles,
-      addSuffixToPolicyName
+      true
     )
   })
 }
@@ -190,11 +189,7 @@ const createSQLStatementForCreatePolicy = (
   return { description, statement }
 }
 
-export const createSQLPolicies = (
-  bucketName: string,
-  policyFormFields: StoragePolicyFormField,
-  addSuffixToPolicyName = true
-) => {
+export const createSQLPolicies = (bucketName: string, policyFormFields: StoragePolicyFormField) => {
   const { name: policyName, definition, allowedOperations, roles } = policyFormFields
   const policies = allowedOperations.map((operation: any, idx: number) =>
     createSQLStatementForCreatePolicy(
@@ -204,7 +199,7 @@ export const createSQLPolicies = (
       definition || '',
       operation,
       roles,
-      addSuffixToPolicyName
+      true
     )
   )
   return policies

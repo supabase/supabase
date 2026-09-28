@@ -22,15 +22,7 @@ export const SelectionDetailedTimestampRow = ({ value }: { value: string | numbe
     value={isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : String(value)}
   />
 )
-export const SelectionDetailedRow = ({
-  label,
-  value,
-  valueRender,
-}: {
-  label: string
-  value: string
-  valueRender?: React.ReactNode
-}) => {
+export const SelectionDetailedRow = ({ label, value }: { label: string; value: string }) => {
   return (
     <div className="group flex items-center gap-2 flex-wrap">
       <span className="text-foreground-lighter text-sm col-span-3 whitespace-pre-wrap">
@@ -40,7 +32,7 @@ export const SelectionDetailedRow = ({
         title={value}
         className="truncate font-mono text-foreground text-sm whitespace-pre-wrap break-all"
       >
-        {valueRender ?? value}
+        {value}
       </span>
       <CopyButton
         iconOnly

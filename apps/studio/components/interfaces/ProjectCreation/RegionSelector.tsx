@@ -44,7 +44,6 @@ import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
   instanceSize?: DesiredInstanceSize
-  layout?: 'vertical' | 'horizontal'
   showBestAvailableRegionOption: boolean
   isBestAvailableSelected: boolean
   onBestAvailableSelectedChange: (value: boolean) => void
@@ -85,7 +84,6 @@ const BestAvailableRegionIcon = () => (
 export const RegionSelector = ({
   form,
   instanceSize,
-  layout = 'horizontal',
   showBestAvailableRegionOption,
   isBestAvailableSelected,
   onBestAvailableSelectedChange,
@@ -258,7 +256,7 @@ export const RegionSelector = ({
             <>
               <FormItemLayout
                 id="region"
-                layout={layout}
+                layout="horizontal"
                 label="Region"
                 description={
                   restrictHighAvailabilityRegion ? (

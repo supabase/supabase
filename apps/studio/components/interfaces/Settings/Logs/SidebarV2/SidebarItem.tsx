@@ -1,6 +1,5 @@
 import { MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
-import { type MouseEventHandler } from 'react'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
 type Props = {
@@ -9,9 +8,8 @@ type Props = {
   dropdownItems?: React.ReactNode
   href: string
   isActive: boolean
-  onClick?: MouseEventHandler<HTMLAnchorElement>
 }
-export function LogsSidebarItem({ label, icon, dropdownItems, href, isActive, onClick }: Props) {
+export function LogsSidebarItem({ label, icon, dropdownItems, href, isActive }: Props) {
   return (
     <div
       className={cn(
@@ -21,11 +19,7 @@ export function LogsSidebarItem({ label, icon, dropdownItems, href, isActive, on
         'relative flex [&:has([data-state=open])]:bg-foreground-lighter/10 [&:has([data-state=open])]:text-foreground hover:text-foreground hover:bg-foreground-lighter/10 transition-all text-foreground-light group'
       )}
     >
-      <Link
-        onClick={onClick}
-        href={href}
-        className={'h-7 flex-1 text-sm px-4 flex items-center gap-2 truncate'}
-      >
+      <Link href={href} className={'h-7 flex-1 text-sm px-4 flex items-center gap-2 truncate'}>
         {icon && <span>{icon}</span>}
         <span className="truncate">{label}</span>
       </Link>

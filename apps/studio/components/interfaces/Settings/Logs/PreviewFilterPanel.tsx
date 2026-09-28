@@ -42,7 +42,6 @@ interface PreviewFilterPanelProps {
   newCount: number
   onRefresh?: () => void
   onSearch?: LogSearchCallback
-  onExploreClick?: () => void
   queryUrl: string
   onSelectTemplate: (template: LogTemplate) => void
   table: LogsTableName
@@ -68,7 +67,6 @@ export const PreviewFilterPanel = ({
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
-  onExploreClick,
   queryUrl,
   condensedLayout,
   isShowingEventChart,
@@ -299,7 +297,7 @@ export const PreviewFilterPanel = ({
           />
         </div>
       ) : (
-        <Button asChild onClick={onExploreClick}>
+        <Button asChild>
           <Link href={queryUrl}>Explore via query</Link>
         </Button>
       )}

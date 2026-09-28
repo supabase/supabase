@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -39,14 +39,11 @@ import {
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
 import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
   isLoading: boolean
   error?: string | null
-  currentSelectedQuery?: string | null
-  onCurrentSelectQuery?: (query: string) => void
   onRetry?: () => void
   onScroll?: (event: UIEvent<HTMLDivElement>) => void
 }
@@ -77,8 +74,6 @@ export const QueryPerformanceGrid = ({
   aggregatedData,
   isLoading,
   error,
-  currentSelectedQuery,
-  onCurrentSelectQuery,
   onRetry,
   onScroll,
 }: QueryPerformanceGridProps) => {
@@ -194,20 +189,6 @@ export const QueryPerformanceGrid = ({
                 value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
                 wrapLines={false}
               />
-              {onCurrentSelectQuery && (
-                <ButtonTooltip
-                  tooltip={{ content: { text: 'Query details' } }}
-                  icon={<ArrowRight size={14} />}
-                  size="tiny"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setSelectedRow(props.rowIdx)
-                    setView('details')
-                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
-                  }}
-                  className="p-1 shrink-0 -translate-x-2 group-hover:flex hidden"
-                />
-              )}
             </div>
           )
         }
@@ -514,8 +495,6 @@ export const QueryPerformanceGrid = ({
           onScroll={onScroll}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
-            const query = reportData[idx]?.query
-            const isCharted = currentSelectedQuery ? currentSelectedQuery === query : false
             const hasRecommendations = hasIndexRecommendations(
               reportData[idx]?.index_advisor_result,
               true
@@ -524,8 +503,6 @@ export const QueryPerformanceGrid = ({
             return [
               `${isSelected ? (hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-surface-300 dark:bg-surface-300') : hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
               `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground!') : ''}`,
-              `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
-              `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
               '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell.column-prop_total_time]:relative',
             ].join(' ')
@@ -540,20 +517,13 @@ export const QueryPerformanceGrid = ({
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      if (onCurrentSelectQuery) {
-                        const query = reportData[idx]?.query
-                        if (query) {
-                          onCurrentSelectQuery(query)
-                        }
-                      } else {
-                        setSelectedRow(idx)
-                        const hasRecommendations = hasIndexRecommendations(
-                          reportData[idx]?.index_advisor_result,
-                          true
-                        )
-                        setView(hasRecommendations ? 'suggestion' : 'details')
-                        gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                      }
+                      setSelectedRow(idx)
+                      const hasRecommendations = hasIndexRecommendations(
+                        reportData[idx]?.index_advisor_result,
+                        true
+                      )
+                      setView(hasRecommendations ? 'suggestion' : 'details')
+                      gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                     }
                   }}
                 />

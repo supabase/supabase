@@ -17,10 +17,6 @@ interface CreateEndpointOptions {
   signingSecret?: string
 }
 
-interface UpdateEndpointOptions {
-  headerIdFactory?: () => string
-}
-
 interface RetryDeliveryOptions {
   now?: string
 }
@@ -60,14 +56,10 @@ const generateSigningSecret = () => `whsec_${secureRandomHex(16)}`
 
 const deepClone = <T>(value: T): T => JSON.parse(JSON.stringify(value))
 
-const toHeaders = (
-  headers: UpsertWebhookEndpointInput['customHeaders'],
-  options?: UpdateEndpointOptions
-) => {
-  const headerIdFactory = options?.headerIdFactory ?? (() => randomId('header'))
+const toHeaders = (headers: UpsertWebhookEndpointInput['customHeaders']) => {
   return headers
     .map((header) => ({
-      id: headerIdFactory(),
+      id: randomId('header'),
       key: header.key.trim(),
       value: header.value.trim(),
     }))
@@ -139,8 +131,7 @@ export const createWebhookEndpoint = (
 export const updateWebhookEndpoint = (
   state: PlatformWebhooksState,
   endpointId: string,
-  input: UpsertWebhookEndpointInput,
-  options?: UpdateEndpointOptions
+  input: UpsertWebhookEndpointInput
 ) => {
   return {
     ...state,
@@ -153,7 +144,7 @@ export const updateWebhookEndpoint = (
             description: input.description.trim(),
             enabled: input.enabled,
             eventTypes: input.eventTypes.length > 0 ? input.eventTypes : ['*'],
-            customHeaders: toHeaders(input.customHeaders, options),
+            customHeaders: toHeaders(input.customHeaders),
           }
         : endpoint
     ),
@@ -184,15 +175,14 @@ export const toggleWebhookEndpoint = (
 
 export const regenerateWebhookEndpointSecret = (
   state: PlatformWebhooksState,
-  endpointId: string,
-  secret?: string
+  endpointId: string
 ) => {
   const endpointExists = state.endpoints.some((endpoint) => endpoint.id === endpointId)
   if (!endpointExists) return { state, signingSecret: null }
 
   return {
     state: { ...state },
-    signingSecret: secret ?? generateSigningSecret(),
+    signingSecret: generateSigningSecret(),
   }
 }
 

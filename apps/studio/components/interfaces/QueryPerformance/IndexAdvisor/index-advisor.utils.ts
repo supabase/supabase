@@ -47,7 +47,6 @@ interface CreateIndexParams {
   connectionString?: string | null
   indexStatements: SafeSqlFragment[]
   onSuccess?: () => void
-  onError?: (error: any) => void
 }
 
 /**
@@ -61,17 +60,14 @@ export async function createIndexes({
   connectionString,
   indexStatements,
   onSuccess,
-  onError,
 }: CreateIndexParams): Promise<void> {
   if (!projectRef) {
     const error = new Error('Project ref is required')
-    if (onError) onError(error)
     return Promise.reject(error)
   }
 
   if (indexStatements.length === 0) {
     const error = new Error('No index statements provided')
-    if (onError) onError(error)
     return Promise.reject(error)
   }
 
@@ -87,7 +83,6 @@ export async function createIndexes({
     return Promise.resolve()
   } catch (error: any) {
     toast.error(`Failed to create index: ${error.message}`)
-    if (onError) onError(error)
     return Promise.reject(error)
   }
 }

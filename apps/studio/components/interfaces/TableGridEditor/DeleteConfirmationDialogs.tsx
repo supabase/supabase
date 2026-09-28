@@ -35,8 +35,6 @@ const DeleteConfirmationDialogs = ({
     columnName,
   }: {
     ref?: string
-    tableName?: string
-    schema?: string
     columnName: string
   }) => {
     setFilters(filters.filter((filter) => filter.column !== columnName))

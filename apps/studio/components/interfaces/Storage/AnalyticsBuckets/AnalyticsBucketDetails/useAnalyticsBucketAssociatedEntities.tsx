@@ -22,10 +22,13 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
  * Returns all the data that's associated to a specified analytics bucket (e.g publications, S3 keys, etc)
  * Used for cleaning up analytics bucket after deletion
  */
-export const useAnalyticsBucketAssociatedEntities = (
-  { projectRef, bucketId }: { projectRef?: string; bucketId?: string },
-  options: { enabled: boolean } = { enabled: true }
-) => {
+export const useAnalyticsBucketAssociatedEntities = ({
+  projectRef,
+  bucketId,
+}: {
+  projectRef?: string
+  bucketId?: string
+}) => {
   const { can: canReadS3Credentials } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_READ,
     '*'
@@ -35,26 +38,23 @@ export const useAnalyticsBucketAssociatedEntities = (
     data: icebergWrapper,
     meta: icebergWrapperMeta,
     isLoading: isLoadingWrapperInstance,
-  } = useAnalyticsBucketWrapperInstance({ bucketId }, { enabled: options.enabled })
+  } = useAnalyticsBucketWrapperInstance({ bucketId })
 
   const { data: s3AccessKeys } = useStorageCredentialsQuery(
     { projectRef },
-    { enabled: canReadS3Credentials && options.enabled }
+    { enabled: canReadS3Credentials }
   )
   const s3AccessKey = (s3AccessKeys?.data ?? []).find(
     (x) => x.description === getAnalyticsBucketS3KeyName(bucketId ?? '')
   )
 
-  const { data: sourcesData } = useReplicationSourcesQuery(
-    { projectRef },
-    { enabled: options.enabled }
-  )
+  const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
   const publicationName = bucketId ? getAnalyticsBucketPublicationName(bucketId) : undefined
   const { data: publication } = useReplicationPublicationQuery(
     { projectRef, sourceId, publicationName },
-    { enabled: options.enabled && publicationName !== undefined }
+    { enabled: publicationName !== undefined }
   )
 
   const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })

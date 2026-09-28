@@ -19,7 +19,6 @@ interface ColumnDefaultValueProps {
   className?: string
   size?: 'small' | 'tiny' | 'medium' | 'large'
   showLabel?: boolean
-  layout?: 'horizontal' | 'vertical'
   'data-testid'?: string
   'aria-label'?: string
   onUpdateField: (changes: Partial<ColumnField>) => void
@@ -31,7 +30,6 @@ export const ColumnDefaultValue = ({
   className,
   size,
   showLabel = true,
-  layout = 'vertical',
   'data-testid': dataTestId,
   'aria-label': ariaLabel,
   onUpdateField = noop,
@@ -94,7 +92,7 @@ export const ColumnDefaultValue = ({
   return (
     <InputWithSuggestions
       label={showLabel ? 'Default Value' : undefined}
-      layout={layout}
+      layout="vertical"
       description={
         showLabel
           ? 'Can either be a literal or an expression. When using an expression wrap your expression in brackets, e.g. (gen_random_uuid())'

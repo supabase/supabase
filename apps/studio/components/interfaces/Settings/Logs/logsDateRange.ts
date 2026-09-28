@@ -23,30 +23,25 @@ const ensureEnd = (candidate: string | undefined, now: dayjs.Dayjs) => {
   return now.toISOString()
 }
 
-export const resolveLogDateRange = (
-  value: DatePickerValue,
-  helpers: DatetimeHelper[] = EXPLORER_DATEPICKER_HELPERS
-): ResolvedLogDateRange => {
+export const resolveLogDateRange = (value: DatePickerValue): ResolvedLogDateRange => {
   const now = dayjs()
   if (value.isHelper) {
-    const matchedHelper = findHelper(value, helpers) ?? getDefaultHelper(helpers)
+    const matchedHelper =
+      findHelper(value, EXPLORER_DATEPICKER_HELPERS) ??
+      getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
     const from = matchedHelper?.calcFrom() ?? value.from ?? ''
     const to = ensureEnd(matchedHelper?.calcTo() ?? value.to, now)
     return { from, to }
   }
 
-  const defaultHelper = getDefaultHelper(helpers)
+  const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const from = value.from || defaultHelper.calcFrom()
   const to = ensureEnd(value.to, now)
   return { from, to }
 }
 
-export const buildLogQueryParams = (
-  value: DatePickerValue,
-  sql: string,
-  helpers: DatetimeHelper[] = EXPLORER_DATEPICKER_HELPERS
-): ResolvedLogParams => {
-  const range = resolveLogDateRange(value, helpers)
+export const buildLogQueryParams = (value: DatePickerValue, sql: string): ResolvedLogParams => {
+  const range = resolveLogDateRange(value)
   return {
     sql,
     from: range.from,

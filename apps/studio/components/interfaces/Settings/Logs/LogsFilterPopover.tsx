@@ -9,7 +9,6 @@ interface LogsFilterPopoverProps {
   onFiltersChange: (filters: Filters) => void
   buttonClassName: string
   align?: 'start' | 'end' | 'center'
-  isLoading?: boolean
 }
 
 const LogsFilterPopover = ({
@@ -18,7 +17,6 @@ const LogsFilterPopover = ({
   onFiltersChange,
   buttonClassName,
   align = 'start',
-  isLoading = false,
 }: LogsFilterPopoverProps) => {
   const filterKey = options.key
   const [open, setOpen] = useState(false)
@@ -110,7 +108,7 @@ const LogsFilterPopover = ({
             <Button size="tiny" onClick={handleReset} type="button">
               Clear
             </Button>
-            <Button loading={isLoading} variant="primary" type="submit">
+            <Button variant="primary" type="submit">
               Apply
             </Button>
           </div>

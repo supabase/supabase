@@ -24,7 +24,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 interface TableSelectorProps {
   className?: string
   size?: 'tiny' | 'small'
-  showError?: boolean
   selectedSchemaName: string
   selectedTableName: string
   onSelectTable: (name: string, id: number | undefined) => void
@@ -33,7 +32,6 @@ interface TableSelectorProps {
 const TableSelector = ({
   className,
   size = 'tiny',
-  showError = true,
   selectedSchemaName,
   selectedTableName,
   onSelectTable,
@@ -111,7 +109,7 @@ const TableSelector = ({
                 </div>
               )}
 
-              {showError && isError && (
+              {isError && (
                 <Alert variant="warning" className="px-3! py-3! border-0! rounded-none">
                   <AlertTitle className="text-xs text-amber-900">Failed to load tables</AlertTitle>
                   <AlertDescription className="text-xs mb-2">
