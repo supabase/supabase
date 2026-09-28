@@ -70,6 +70,7 @@ The Supabase MCP server provides tools organized into feature groups. All groups
 - `list_edge_functions` - List all Edge Functions
 - `get_edge_function` - Get a specific Edge Function
 - `deploy_edge_function` - Deploy an Edge Function
+- `create_edge_function_secret` - When available, request secret entry in the Supabase Dashboard. See [Edge Function secrets](#edge-function-secrets) for requirements.
 
 ### Account management
 
@@ -82,7 +83,7 @@ Disabled when using project-scoped mode (`project_ref` parameter).
 - `list_projects` / `get_project` - List or get project details
 - `create_project` / `pause_project` / `restore_project` - Manage projects
 - `list_organizations` / `get_organization` - Organization management
-- `get_cost` / `confirm_cost` - Cost information for clients that don't support [cost confirmation](#cost-confirmation)
+- `get_cost` / `confirm_cost` - Cost information for tools that use the [legacy cost confirmation workflow](#cost-confirmation)
 
 ### Docs
 
@@ -104,43 +105,79 @@ Requires a paid plan.
 - `list_storage_buckets` - List storage buckets
 - `get_storage_config` / `update_storage_config` - Storage configuration
 
-## Cost confirmation
+## Elicitations
 
-Before your agent takes an action that incurs additional charges, the Supabase MCP server sends an _elicitation_: your MCP client shows the expected cost, and the action proceeds only on explicit approval. [Elicitations](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation) are the MCP standard's way for a server to pause a tool call and request your input.
+[Elicitation](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation) lets an MCP server pause a tool call to ask you for input or confirmation. These flows require both server availability and an MCP client that supports the appropriate elicitation mode: forms for [cost confirmation](#cost-confirmation) and [SQL confirmations](#destructive-sql-confirmations), or URLs for [secret entry](#edge-function-secrets).
 
-Cost confirmation applies to `create_project` and `create_branch`. When your agent calls one of these tools, the tool call pauses and your client displays the resource, the standard rate, and the billing interval, along with controls to accept or decline. The exact labels vary by client.
+Server elicitation is separate from your MCP client's own approval of tool calls. It does not replace manual approval or the [security recommendations](#recommendations).
 
-- Accepting resumes the same tool call and creates exactly one resource.
-- Declining or dismissing the confirmation creates nothing, and the agent receives a result that it can relay to you.
-- Confirmations are valid for a short time. If one expires, nothing is created. The agent can call the tool again to request a fresh confirmation.
-- The rate is checked again immediately before creation. If it has changed since you confirmed, nothing is created at the confirmed rate. Instead, you receive a fresh confirmation that shows the updated cost.
-
-If a creation has no cost, for example a project that is covered by your plan, no confirmation is requested.
+Treat elicitations as a guardrail, not a guarantee of human review or approval. Some clients support hooks or rules that answer elicitations automatically.
 
 ### Client support
 
-Clients that connect using MCP specification revision [2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) or later, and that support form elicitations, receive cost confirmations. Clients on older revisions of the specification use the `get_cost` and `confirm_cost` flow instead: the agent quotes the cost in chat before creating the resource.
+Elicitations require your MCP client to support the corresponding mode for the request.
 
-{/* Verify this table against the launch verification results before publishing. */}
+| Mode | Supabase use                                                                                                |
+| ---- | ----------------------------------------------------------------------------------------------------------- |
+| Form | [Cost confirmation](#cost-confirmation) and [destructive SQL confirmations](#destructive-sql-confirmations) |
+| URL  | [Edge Function secret entry](#edge-function-secrets) in the Supabase Dashboard                              |
 
-| Client                               | Cost confirmation                |
-| ------------------------------------ | -------------------------------- |
-| Claude Code version 2.1.232 or later | Confirmation dialog              |
-| Other clients                        | `get_cost` / `confirm_cost` flow |
+Support for one mode does not imply support for the other. Check your client's documentation for the modes it supports. The MCP specification revision alone does not determine which flows your connection uses.
 
-To check which flow your connection uses, ask your client to list the available Supabase tools. If `get_cost` and `confirm_cost` are in the list, your connection uses that flow. On connections that support cost confirmation, these two tools are hidden and a supplied `confirm_cost_id` is ignored.
+### Cost confirmation
+
+When your connection uses form-based cost confirmation, your MCP client shows the expected cost before your agent takes an action that incurs additional charges. The action proceeds only on explicit approval.
+
+Cost confirmation applies to `create_project` and `create_branch`. When your agent calls one of these tools, the tool call pauses and your client displays the resource, the standard rate, and the billing interval, along with controls to accept or decline. The exact labels vary by client.
+
+- Accepting resumes the same tool call to create the resource.
+- Declining or dismissing the confirmation creates nothing, and the agent receives a result that it can relay to you.
+- Confirmations are valid for a short time. If one expires, nothing is created. The agent can call the tool again to request a fresh confirmation.
+- The cost is checked again immediately before creation. If it has changed to a different nonzero amount since you confirmed, you receive a fresh confirmation that shows the updated cost.
+
+Project creation with a zero-cost quote does not trigger a cost confirmation prompt. When branch creation uses form-based cost confirmation, it asks you to confirm the standard rate before any allowances or exemptions are applied.
+
+If form-based cost confirmation is unavailable, unsupported by your client, or [skipped for the tool](#skip-form-confirmations), the legacy cost confirmation workflow applies: the agent quotes the cost in chat, uses `get_cost` and `confirm_cost`, and passes the returned `confirm_cost_id` to `create_project` or `create_branch`. These helpers are account tools and are not exposed in project-scoped connections. Skipping the form does not approve the cost or avoid charges.
+
+To check which flow a creation tool uses, ask your client to list the available Supabase tools and the resource types accepted by `get_cost` and `confirm_cost`. The resource types accepted by these helpers use the legacy cost confirmation workflow; another resource type can use form-based cost confirmation on the same connection. Their absence does not prove that form-based cost confirmation is active: project scoping, account feature settings, or server availability can also hide them.
 
 Your MCP client controls how the confirmation is collected. Some clients support hooks or rules that answer elicitations automatically, so treat cost confirmation as a guardrail rather than proof that a person approved each action.
 
+Troubleshooting: If you expect a dialog and don't see one, see [Cost confirmations do not appear in your MCP client](/docs/guides/troubleshooting/cost-confirmations-do-not-appear-in-your-mcp-client-mVq3Lp).
+
+### Destructive SQL confirmations
+
+When SQL elicitation is available and your client supports forms, `execute_sql` and `apply_migration` ask for confirmation when they detect destructive SQL. The `execute_sql` confirmation applies only outside read-only mode. SQL not classified as destructive proceeds without this additional warning. Treat this elicitation as a guardrail - it may not catch every destructive operation and is not a security guarantee.
+
+If SQL elicitation is unavailable, unsupported by your client, or skipped with [`skip_elicitations`](#skip-form-confirmations), SQL follows the existing execution path without an additional MCP confirmation. Read-only restrictions and permissions still apply. Keep the [security recommendations](#recommendations) in place.
+
+Troubleshooting: If you expect a dialog and don't see one, see [SQL confirmations do not appear in your MCP client](/docs/guides/troubleshooting/sql-confirmations-do-not-appear-in-your-mcp-client-sQf7Kp).
+
+### Edge Function secrets
+
+`create_edge_function_secret` is available only when the server offers it, your client supports URL elicitation, Edge Functions tools are enabled, and the connection is not read-only. You also need permission to read and write Edge Function secrets for the project.
+
+Enter secret values only in the Supabase Dashboard, never in chat, model input, or MCP tool arguments. The tool requests the secret name and project, not the secret value.
+
+1. Ask your AI assistant to add an Edge Function secret, specifying the project and secret name without providing the value.
+2. Open the Supabase Dashboard URL presented by your MCP client.
+3. Enter and save the secret value in the Dashboard.
+4. Return to your MCP client and confirm that you saved it.
+
+Save the secret in the Dashboard before confirming in your MCP client. If you cancel the request, this does not undo a secret you already saved in the Dashboard.
+
+Troubleshooting: If the tool is unavailable or the Dashboard flow is incomplete, see [Edge Function secret collection is unavailable or incomplete](/docs/guides/troubleshooting/edge-function-secret-collection-is-unavailable-or-incomplete-eFs4Nx).
+
 ## Configuration options
 
-The [configuration panel above](#configure-your-ai-tool) can set these options for you. If you prefer to configure manually, the following URL query parameters are available:
+The [configuration panel](#configure-your-ai-tool) can set project scope, read-only mode, and feature groups. For hosted connections, you can also set `skip_elicitations` in the panel or edit your MCP server URL manually. The following URL query parameters are available:
 
-| Parameter           | Description                                          | Example                   |
-| ------------------- | ---------------------------------------------------- | ------------------------- |
-| `read_only=true`    | Execute all queries as a read-only Postgres user     | `?read_only=true`         |
-| `project_ref=<id>`  | Scope to a specific project (disables account tools) | `?project_ref=abc123`     |
-| `features=<groups>` | Enable only specific tool groups (comma-separated)   | `?features=database,docs` |
+| Parameter                   | Description                                                                                           | Example                                          |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `read_only=true`            | Execute all queries as a read-only Postgres user                                                      | `?read_only=true`                                |
+| `project_ref=<id>`          | Scope to a specific project (disables account tools)                                                  | `?project_ref=abc123`                            |
+| `features=<groups>`         | Enable only specific tool groups (comma-separated)                                                    | `?features=database,docs`                        |
+| `skip_elicitations=<tools>` | Skip form confirmations for the named tools. See [Skip form confirmations](#skip-form-confirmations). | `?skip_elicitations=execute_sql,apply_migration` |
 
 Parameters can be combined: <code><CustomContent data="mcp:servers">remote</CustomContent>?project_ref=abc123&read_only=true</code>
 
@@ -149,6 +186,20 @@ Parameters can be combined: <code><CustomContent data="mcp:servers">remote</Cust
 When using [Supabase CLI](/docs/guides/local-development) for local development, the MCP server is available at <code><CustomContent data="mcp:servers">local</CustomContent></code>.
 
 </Admonition>
+
+### Skip form confirmations
+
+Use one `skip_elicitations` parameter with a comma-separated list of tool names: `create_project`, `create_branch`, `execute_sql`, or `apply_migration`.
+
+Names are case-sensitive. Omit the parameter or leave it empty to skip none; this does not enable confirmations that the server does not offer. Invalid names are rejected. There is no boolean or `all` switch, and `create_edge_function_secret` is not supported by this parameter.
+
+In the panel, skip choices are hidden for read-only and local connections. Cost confirmation choices require a connection not scoped to a project with account helpers enabled; `create_branch` also requires branching. SQL-confirmation choices require the database feature group. These limits apply to the panel, not to manually supplied URL parameters.
+
+Skip cost confirmation: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=create_project,create_branch</code>
+
+Skip SQL confirmations: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=execute_sql,apply_migration</code>
+
+Skipping cost confirmations retains the [legacy cost confirmation workflow](#cost-confirmation). Skipping SQL confirmations uses the existing SQL execution path without an additional MCP confirmation. Neither option bypasses authentication, permissions, read-only restrictions, or charges.
 
 ## Manual authentication
 
@@ -221,7 +272,7 @@ We recommend the following best practices to mitigate security risks when using 
 - **Read-only mode**: Set unattended monitoring and diagnostic routines to [read-only](#configuration-options) mode, which executes SQL queries as a read-only Postgres user.
 - **Project scoping**: Scope your MCP server to a [specific project](#configuration-options), limiting access to only that project's resources. This prevents LLMs from accessing data from other projects in your Supabase account.
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
-- **Cost confirmation**: The server asks for [confirmation through your client](#cost-confirmation) before it creates resources that incur charges. This is a guardrail on top of authentication and authorization, not a replacement for them.
+- **Cost confirmation**: When your connection uses cost confirmation dialogs, the server asks for [confirmation through your client](#cost-confirmation) before it creates resources that incur charges. This is a guardrail on top of authentication and authorization, not a replacement for them.
 - **Feature groups**: Restrict which [tool groups](#available-tools) are available using the `features` [configuration option](#configuration-options). This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
 
 ## On GitHub
