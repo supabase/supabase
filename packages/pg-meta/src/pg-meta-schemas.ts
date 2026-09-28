@@ -95,7 +95,7 @@ function update(
   { name: newName, owner }: SchemaUpdateParams
 ): { sql: SafeSqlFragment } {
   const sql = safeSql`
-do $$
+do $pgmeta$
 declare
   id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
@@ -116,7 +116,7 @@ begin
     execute(format('alter schema %I rename to %I;', old.nspname, new_name));
   end if;
 end
-$$;
+$pgmeta$;
 `
   return { sql }
 }
@@ -137,7 +137,7 @@ function remove(
   { cascade = false }: SchemaRemoveParams = {}
 ): { sql: SafeSqlFragment } {
   const sql = safeSql`
-do $$
+do $pgmeta$
 declare
   id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
@@ -150,7 +150,7 @@ begin
 
   execute(format('drop schema %I %s;', old.nspname, case when cascade then 'cascade' else 'restrict' end));
 end
-$$;
+$pgmeta$;
 `
   return { sql }
 }
