@@ -95,6 +95,7 @@ function FeedMessage({
       id={message.id}
       message={message}
       isLoading={isLoading}
+      isLastMessage
       isAfterEditedMessage={false}
       isBeingEdited={false}
       addToolApprovalResponse={addToolApprovalResponse}
