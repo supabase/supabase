@@ -1,13 +1,15 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
 import { useTrack } from '@/lib/telemetry/track'
 
 export interface AlertErrorProps {
   projectRef?: string
+  orgSlug?: string
   subject?: string
   description?: string
   error?: { message: string } | null
@@ -22,19 +24,22 @@ export interface AlertErrorProps {
 
 export const ContactSupportButton = ({
   projectRef,
+  orgSlug,
   subject,
   error,
 }: {
   projectRef?: string
+  orgSlug?: string
   subject?: string
   error?: { message: string } | null
 }) => {
   return (
-    <Button asChild variant="default" className="w-min">
+    <Button asChild className="w-min">
       <SupportLink
         queryParams={{
           category: SupportCategories.DASHBOARD_BUG,
           projectRef,
+          orgSlug,
           subject,
           error: error?.message,
         }}
@@ -48,6 +53,7 @@ export const ContactSupportButton = ({
 // [Joshen] To standardize the language for all error UIs
 export const AlertError = ({
   projectRef,
+  orgSlug,
   subject,
   description = 'Try refreshing your browser, but if the issue persists for more than a few minutes, please reach out to us via support.',
   error,
@@ -70,7 +76,7 @@ export const AlertError = ({
   useEffect(() => {
     if (!hasTrackedRef.current) {
       hasTrackedRef.current = true
-      if (Math.random() < 0.1) {
+      if (isDashboardErrorSampled()) {
         track('dashboard_error_created', {
           source: 'admonition',
         })
@@ -97,16 +103,19 @@ export const AlertError = ({
         </>
       }
       actions={
-        hideContactSupport ? (
-          (additionalActions ?? null)
-        ) : additionalActions ? (
+        additionalActions || !hideContactSupport ? (
           <>
             {additionalActions}
-            <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
+            {!hideContactSupport && (
+              <ContactSupportButton
+                projectRef={projectRef}
+                orgSlug={orgSlug}
+                subject={subject}
+                error={error}
+              />
+            )}
           </>
-        ) : (
-          <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
-        )
+        ) : null
       }
       className={className}
     />

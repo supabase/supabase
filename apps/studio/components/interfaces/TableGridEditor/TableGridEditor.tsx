@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
@@ -130,7 +130,6 @@ export const TableGridEditor = ({
             >
               {!!tabId ? (
                 <Button
-                  variant="default"
                   className="mt-2"
                   onClick={() => {
                     tabs.handleTabClose({
@@ -144,23 +143,13 @@ export const TableGridEditor = ({
                   Close tab
                 </Button>
               ) : openTabs.length > 0 ? (
-                <Button
-                  asChild
-                  variant="default"
-                  className="mt-2"
-                  onClick={() => setLastVisitedTable(undefined)}
-                >
+                <Button asChild className="mt-2" onClick={() => setLastVisitedTable(undefined)}>
                   <Link href={`/project/${projectRef}/editor/${openTabs[0].split('-')[1]}`}>
                     Close tab
                   </Link>
                 </Button>
               ) : (
-                <Button
-                  asChild
-                  variant="default"
-                  className="mt-2"
-                  onClick={() => setLastVisitedTable(undefined)}
-                >
+                <Button asChild className="mt-2" onClick={() => setLastVisitedTable(undefined)}>
                   <Link href={`/project/${projectRef}/editor`}>Head back</Link>
                 </Button>
               )}

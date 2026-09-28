@@ -16,7 +16,7 @@ export const LogDrainsCard = ({
   onClick,
 }: LogDrainsCardProps) => {
   return (
-    <button className="w-full h-full text-left" onClick={onClick}>
+    <button type="button" tabIndex={0} className="w-full h-full text-left" onClick={onClick}>
       <Card className="p-6 cursor-pointer hover:bg-surface-200 hover:border-strong transition-colors h-48">
         <div className="flex flex-col gap-5">
           <div className="flex items-start justify-between w-full">

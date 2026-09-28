@@ -349,6 +349,38 @@ withTestDatabase('create function with various config_params values', async ({ e
   await executeQuery(removeSql1)
 })
 
+withTestDatabase('update function with empty string search_path', async ({ executeQuery }) => {
+  const { sql: createSql } = pgMeta.functions.create({
+    name: 'test_func_empty_search_path',
+    schema: 'public',
+    definition: 'select 1',
+    return_type: safeSql`integer`,
+    language: 'sql',
+    config_params: { search_path: safeSql`''` },
+  })
+  await executeQuery(createSql)
+
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+    name: 'test_func_empty_search_path',
+    schema: 'public',
+    args: [],
+  })
+  const result = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+  expect(result!.config_params).toEqual({ search_path: '""' })
+
+  const { sql: updateSql } = pgMeta.functions.update(asSavedFunction(result!), {
+    definition: 'select 2',
+  })
+  await executeQuery(updateSql)
+
+  const resultUpdated = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+  expect(resultUpdated!.definition).toBe('select 2')
+  expect(resultUpdated!.config_params).toEqual({ search_path: '""' })
+
+  const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(resultUpdated!))
+  await executeQuery(removeSql)
+})
+
 withTestDatabase(
   'create function with namespaced custom GUC config_params',
   async ({ executeQuery }) => {

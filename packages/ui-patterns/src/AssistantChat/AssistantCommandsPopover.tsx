@@ -12,6 +12,7 @@ import {
   useRef,
 } from 'react'
 import {
+  cn,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -19,9 +20,10 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from 'ui/src/components/shadcn/ui/command'
-import { Popover, PopoverAnchor, PopoverContent } from 'ui/src/components/shadcn/ui/popover'
-import { cn } from 'ui/src/lib/utils/cn'
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from 'ui'
 
 const AssistantCommandsPopover = forwardRef<
   ComponentRef<typeof Popover>,
@@ -208,7 +210,7 @@ const AssistantCommandsPopover = forwardRef<
                         // closing of the popover is handled by the keydown event in AssistantChatForm
                       }}
                     >
-                      <span className="text-brand">/</span>
+                      <span className="text-primary">/</span>
                       <span className="text-default">{command}</span>
                     </CommandItem>
                   ))}

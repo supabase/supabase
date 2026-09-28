@@ -255,6 +255,8 @@ export function getCreateFDWSql({
                 ([key, value]) =>
                   key !== 'table_name' &&
                   key !== 'schema_name' &&
+                  key !== 'schema' &&
+                  key !== 'id' &&
                   key !== 'columns' &&
                   key !== 'index' &&
                   key !== 'is_new_schema' &&
@@ -298,7 +300,7 @@ export const getDeleteFDWSql = ({
   wrapper,
   wrapperMeta,
 }: {
-  wrapper: { name: string }
+  wrapper: { id: number; name: string; server_name: string }
   wrapperMeta: SimplifiedWrapperMeta
 }): SafeSqlFragment => {
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
@@ -309,41 +311,45 @@ export const getDeleteFDWSql = ({
     return safeSql`
       do $$
       begin
-        -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
-        -- we use Vault directly.
-        if (select extversion from pg_extension where extname = 'wrappers') in (
-          '0.1.0',
-          '0.1.1',
-          '0.1.4',
-          '0.1.5',
-          '0.1.6',
-          '0.1.7',
-          '0.1.8',
-          '0.1.9',
-          '0.1.10',
-          '0.1.11',
-          '0.1.12',
-          '0.1.14',
-          '0.1.15',
-          '0.1.16',
-          '0.1.17',
-          '0.1.18',
-          '0.1.19',
-          '0.2.0',
-          '0.3.0',
-          '0.3.1',
-          '0.4.0',
-          '0.4.1',
-          '0.4.2',
-          '0.4.3',
-          '0.4.4',
-          '0.4.5'
+        if not exists (
+          select 1 from pg_catalog.pg_foreign_data_wrapper where fdwname = ${literal(wrapper.name)}
         ) then
-          delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = ${literal(key)});
+          -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
+          -- we use Vault directly.
+          if (select extversion from pg_extension where extname = 'wrappers') in (
+            '0.1.0',
+            '0.1.1',
+            '0.1.4',
+            '0.1.5',
+            '0.1.6',
+            '0.1.7',
+            '0.1.8',
+            '0.1.9',
+            '0.1.10',
+            '0.1.11',
+            '0.1.12',
+            '0.1.14',
+            '0.1.15',
+            '0.1.16',
+            '0.1.17',
+            '0.1.18',
+            '0.1.19',
+            '0.2.0',
+            '0.3.0',
+            '0.3.1',
+            '0.4.0',
+            '0.4.1',
+            '0.4.2',
+            '0.4.3',
+            '0.4.4',
+            '0.4.5'
+          ) then
+            delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = ${literal(key)});
 
-          delete from pgsodium.key where name = ${literal(key)};
-        else
-          delete from vault.secrets where name = ${literal(key)};
+            delete from pgsodium.key where name = ${literal(key)};
+          else
+            delete from vault.secrets where name = ${literal(key)};
+          end if;
         end if;
       end $$;
     `
@@ -351,8 +357,37 @@ export const getDeleteFDWSql = ({
 
   const deleteEncryptedSecretsSql = joinSqlFragments(deleteEncryptedSecretsSqlArray, '\n')
 
+  const ensureSelectedServerSql = safeSql`
+    begin
+      if not exists (
+        select 1
+        from pg_catalog.pg_foreign_server s
+        join pg_catalog.pg_foreign_data_wrapper w on w.oid = s.srvfdw
+        where s.oid = ${literal(wrapper.id)}
+          and s.srvname = ${literal(wrapper.server_name)}
+          and w.fdwname = ${literal(wrapper.name)}
+      ) then
+        raise exception 'The selected foreign server no longer belongs to this wrapper.';
+      end if;
+    end
+  `
+
   const sql = safeSql`
-    drop foreign data wrapper if exists ${ident(wrapper.name)} cascade;
+    do ${literal(ensureSelectedServerSql)};
+
+    drop server if exists ${ident(wrapper.server_name)} cascade;
+
+    do $$
+    begin
+      if not exists (
+        select 1
+        from pg_catalog.pg_foreign_server s
+        join pg_catalog.pg_foreign_data_wrapper w on w.oid = s.srvfdw
+        where w.fdwname = ${literal(wrapper.name)}
+      ) then
+        execute format('drop foreign data wrapper if exists %I cascade', ${literal(wrapper.name)});
+      end if;
+    end $$;
 
     ${deleteEncryptedSecretsSql}
   `
@@ -366,11 +401,25 @@ export const getUpdateFDWSql = ({
   formState,
   tables,
 }: {
-  wrapper: { name: string }
+  wrapper: { id: number; name: string; server_name: string }
   wrapperMeta: SimplifiedWrapperMeta
   formState: { [k: string]: string }
   tables: any[]
 }): SafeSqlFragment => {
+  const ensureWrapperIsNotSharedSql = safeSql`
+    do $$
+    begin
+      if exists (
+        select 1
+        from pg_catalog.pg_foreign_server s
+        join pg_catalog.pg_foreign_data_wrapper w on w.oid = s.srvfdw
+        where w.fdwname = ${literal(wrapper.name)}
+          and s.srvname <> ${literal(wrapper.server_name)}
+      ) then
+        raise exception 'This wrapper is used by another server and cannot be edited here.';
+      end if;
+    end $$;
+  `
   const deleteWrapperSql = getDeleteFDWSql({ wrapper, wrapperMeta })
   const createWrapperSql = getCreateFDWSql({
     wrapperMeta,
@@ -382,6 +431,8 @@ export const getUpdateFDWSql = ({
   })
 
   const sql = safeSql`
+    ${ensureWrapperIsNotSharedSql}
+
     ${deleteWrapperSql}
 
     ${createWrapperSql}

@@ -49,7 +49,7 @@ export type HTTPHeader = { name: string; value: string }
 
 export type HTTPParameter = { name: string; value: string }
 
-type CronTableColumn = {
+export type CronTableColumn = {
   id: string
   name: string
   width?: number

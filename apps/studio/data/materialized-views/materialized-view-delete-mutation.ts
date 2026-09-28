@@ -60,7 +60,7 @@ export const useMaterializedViewDeleteMutation = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, id) }),
         queryClient.invalidateQueries({
-          queryKey: materializedViewKeys.listBySchema(projectRef, schema),
+          queryKey: materializedViewKeys.listBySchema(projectRef, [schema]),
         }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
       ])

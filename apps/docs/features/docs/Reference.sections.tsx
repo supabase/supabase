@@ -275,10 +275,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
-  const endpointFgaPermissionGroups =
-    endpointDetails.security
-      ?.filter((sec) => 'fga_permissions' in sec)
-      .map((sec) => sec.fga_permissions) ?? []
+  const endpointFgaPermissionGroups = endpointDetails['x-fga-permissions'] ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =
@@ -551,7 +548,15 @@ async function FunctionSection({
               </TabsList>
               {examples.map((example) => (
                 <TabsContent key={example.id} value={example.id}>
-                  <MDXRemoteRefs source={example.code} />
+                  <div
+                    className={cn(
+                      'prose wrap-break-word max-w-none',
+                      '[&_.shiki]:!my-0 [&_.shiki:not(:last-child)]:!mb-4',
+                      '[&_p]:!whitespace-normal'
+                    )}
+                  >
+                    <MDXRemoteRefs source={example.code} />
+                  </div>
                   <div className="flex flex-col gap-2 mt-2">
                     {'data' in example && !!example.data?.sql && (
                       <CollapsibleDetails title="Data source" content={example.data.sql} />

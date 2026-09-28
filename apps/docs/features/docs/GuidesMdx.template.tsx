@@ -6,6 +6,7 @@ import type { WithRequired } from '~/features/helpers.types'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { type GuideFrontmatter } from '~/lib/docs'
 import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
+import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { ExternalLink } from 'lucide-react'
 import { type ReactNode } from 'react'
@@ -95,6 +96,7 @@ const GuideTemplate = ({
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
+            data-testid="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
             <header className="mb-8">
@@ -102,9 +104,9 @@ const GuideTemplate = ({
                 <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
               </h1>
               {meta?.subtitle && (
-                <h2 className="mt-1 text-xl text-foreground-light [&>p]:m-0">
+                <div className="mt-3 not-prose [&_p]:text-xl [&_p]:leading-7 text-foreground-light [&>p]:m-0">
                   <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-                </h2>
+                </div>
               )}
             </header>
 
@@ -121,7 +123,7 @@ const GuideTemplate = ({
                 className={cn(
                   'w-fit',
                   'flex items-center gap-1',
-                  'text-sm text-scale-1000 hover:text-scale-1200',
+                  'text-sm text-tertiary-foreground hover:text-foreground',
                   'transition-colors'
                 )}
                 target="_blank"
@@ -134,6 +136,7 @@ const GuideTemplate = ({
         </div>
         <GuidesSidebar
           video={meta?.tocVideo}
+          videoTitle={meta?.title ? mdToPlainText(meta.title) : undefined}
           hideToc={hideToc}
           className={cn(
             'hidden md:flex',
@@ -142,10 +145,9 @@ const GuideTemplate = ({
             'sticky',
             /**
              * --header-height: height of nav
-             * 1px: height of nav border
              * 3rem: content padding
              */
-            'top-[calc(var(--header-height)+1px+3rem)]',
+            'top-[calc(var(--header-height)+3rem)]',
             // 4rem accounts for 3rem of top padding + 1rem of extra breathing room
             'max-h-[calc(100vh-var(--header-height)-4rem)]'
           )}

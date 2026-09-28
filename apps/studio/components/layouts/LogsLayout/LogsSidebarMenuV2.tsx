@@ -24,6 +24,7 @@ import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useShowPostgresUpgradeLogs } from '@/hooks/misc/useShowPostgresUpgradeLogs'
 
 export function SidebarCollapsible({
   children,
@@ -87,6 +88,7 @@ export function LogsSidebarMenuV2() {
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const showMultigresLogs = useShowMultigresLogs()
+  const showPostgresUpgradeLogs = useShowPostgresUpgradeLogs()
 
   const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -190,16 +192,17 @@ export function LogsSidebarMenuV2() {
       : null,
   ].filter((x) => x !== null)
 
-  const OPERATIONAL_COLLECTIONS = IS_PLATFORM
-    ? [
-        {
-          name: 'Postgres Version Upgrade',
-          key: 'pg-upgrade-logs',
-          url: `/project/${ref}/logs/pg-upgrade-logs`,
-          items: [],
-        },
-      ]
-    : []
+  const OPERATIONAL_COLLECTIONS =
+    IS_PLATFORM && showPostgresUpgradeLogs
+      ? [
+          {
+            name: 'Postgres Version Upgrade',
+            key: 'pg-upgrade-logs',
+            url: `/project/${ref}/logs/pg-upgrade-logs`,
+            items: [],
+          },
+        ]
+      : []
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
     return collection?.name.toLowerCase().includes(searchText.toLowerCase())
@@ -214,7 +217,7 @@ export function LogsSidebarMenuV2() {
 
       <div
         className={cn(
-          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-1 px-4',
+          'flex gap-x-2 items-center sticky top-0 bg-dash-sidebar z-1 px-4',
           !templatesEnabled ? 'pt-4' : 'py-4'
         )}
       >
@@ -230,7 +233,6 @@ export function LogsSidebarMenuV2() {
 
         <ButtonTooltip
           asChild
-          variant="default"
           icon={<Plus className="text-foreground" />}
           className="w-[26px]"
           tooltip={{ content: { text: 'New query', side: 'bottom' } }}
@@ -298,7 +300,7 @@ export function LogsSidebarMenuV2() {
               IS_PLATFORM ? 'Create and save your queries to use them in the explorer' : undefined
             }
             actions={
-              <Button asChild variant="default">
+              <Button asChild>
                 <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
               </Button>
             }
@@ -325,7 +327,7 @@ export function LogsSidebarMenuV2() {
           </div>
         }
         actions={
-          <Button asChild variant="default">
+          <Button asChild>
             <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
           </Button>
         }

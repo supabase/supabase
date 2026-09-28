@@ -6,7 +6,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
@@ -139,7 +139,7 @@ function SupportFormHeader() {
       </div>
 
       <div className="flex items-center gap-x-3">
-        <Button asChild variant="default" icon={<Wrench />}>
+        <Button asChild icon={<Wrench />}>
           <Link
             href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
             target="_blank"
@@ -152,13 +152,15 @@ function SupportFormHeader() {
           <TooltipTrigger asChild>
             <Button
               asChild
-              variant="default"
               icon={
                 isLoading ? (
                   <Loader2 className="animate-spin" />
                 ) : (
                   <div
-                    className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')}
+                    className={cn(
+                      'h-2 w-2 rounded-full',
+                      isIncident ? 'bg-warning' : 'bg-brand-default'
+                    )}
                   />
                 )
               }

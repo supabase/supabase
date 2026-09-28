@@ -45,7 +45,7 @@ const page: GoPageInput = {
             <li>Complete these steps by Monday, March 30, 2026 at 12:00 PM PST</li>
           </ol>
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Button asChild variant="default" size="medium">
+            <Button asChild size="medium">
               <Link href="https://supabase.com/dashboard">Create your Supabase account</Link>
             </Button>
             <Button asChild variant="outline" size="medium">

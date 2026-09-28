@@ -60,7 +60,6 @@ export const IntegrationCard = ({
                 src={image}
                 alt={`${name} integration`}
                 className="w-full h-full object-cover"
-                objectFit="cover"
               />
             ) : (
               <div className="w-12 h-12 text-foreground relative">
@@ -93,8 +92,8 @@ export const IntegrationCard = ({
             </div>
             {isInstalled && (
               <div className="flex items-center gap-x-1">
-                <BadgeCheck size={14} className="text-brand-link" />
-                <span className="text-brand-link text-xs">Installed</span>
+                <BadgeCheck size={14} className="text-primary" />
+                <span className="text-primary text-xs">Installed</span>
               </div>
             )}
           </div>

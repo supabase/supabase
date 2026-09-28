@@ -2,8 +2,7 @@ import { type FetchNextPageOptions } from '@tanstack/react-query'
 import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
-import { useQueryState } from 'nuqs'
-import { Fragment, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, KeyboardEvent, MouseEvent, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -14,7 +13,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const TableRowClassName = 'border-b group data-[state=selected]:bg-muted hover:bg-surface-200'
-const TableCellClassName = 'text-xs py-1! p-2 *:[[role=checkbox]]:translate-y-[2px] truncate'
+const TableCellClassName = 'text-xs py-1! p-2 truncate'
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
@@ -27,9 +26,10 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
   setColumnOrder: (columnOrder: string[]) => void
   setColumnVisibility: (columnVisibility: VisibilityState) => void
-
-  // [Joshen] See if we can type this properly
-  searchParamsParser: any
+  /** Overrides the "No results found" copy shown when the current filters can't match any row. */
+  emptyStateMessage?: string | ReactNode
+  /** Overrides the subject shown in the error state, e.g. "Failed to retrieve X" */
+  errorSubject?: string
 }
 
 // [Joshen] JFYI this component is NOT virtualized and hence will struggle handling many data points
@@ -43,10 +43,12 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   totalRowsFetched = 0,
   setColumnOrder,
   setColumnVisibility,
-  searchParamsParser,
+  emptyStateMessage = 'No results found',
+  errorSubject = 'Failed to retrieve data',
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const tableRef = useRef<HTMLTableElement>(null)
-  const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId } = useDataTable()
+  const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId, onSelectRow } =
+    useDataTable()
 
   const headerGroups = table.getHeaderGroups()
   const headers = headerGroups[0].headers
@@ -105,7 +107,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                     'w-full text-xs! font-normal! text-foreground-lighter font-mono',
                     'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
                     'text-muted-foreground h-9 px-2 text-left align-middle',
-                    '[&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]',
                     headerClassName
                   )}
                   aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}
@@ -141,14 +142,15 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         >
           {rows.length ? (
             rows.map((row) => (
-              // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
               <DataTableRow
                 key={row.id}
                 row={row}
                 table={table}
-                searchParamsParser={searchParamsParser}
-                selected={row.id === openRowId}
-                onSelect={() => setOpenRowId(row.id === openRowId ? undefined : row.id)}
+                selected={onSelectRow ? row.getIsSelected() : row.id === openRowId}
+                onSelect={(event) => {
+                  if (onSelectRow) onSelectRow(row.id, event)
+                  else setOpenRowId(row.id === openRowId ? undefined : row.id)
+                }}
               />
             ))
           ) : isLoading ? (
@@ -177,11 +179,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                   className={cn(TableCellClassName, 'text-center')}
                 >
                   <div className="flex flex-col items-start justify-start h-full gap-3 px-4 pt-4">
-                    <AlertError
-                      error={error}
-                      className="text-left"
-                      subject="Failed to retrieve logs"
-                    />
+                    <AlertError error={error} className="text-left" subject={errorSubject} />
                   </div>
                 </TableCell>
               </TableRow>
@@ -194,7 +192,11 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                   className={cn(TableCellClassName, 'text-center')}
                 >
                   <div className="flex flex-col items-center justify-center h-full gap-3">
-                    <p className="text-foreground-light text-sm">No results found</p>
+                    {typeof emptyStateMessage === 'string' ? (
+                      <p className="text-foreground-light text-sm">{emptyStateMessage}</p>
+                    ) : (
+                      emptyStateMessage
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -217,7 +219,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                         disabled={isFetching}
                         onClick={() => fetchNextPage()}
                         size="tiny"
-                        variant="default"
                         icon={
                           isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
                         }
@@ -271,16 +272,13 @@ function DataTableRow<TData>({
   row,
   table,
   selected,
-  searchParamsParser,
   onSelect,
 }: {
   row: Row<TData>
   table: TTable<TData>
   selected?: boolean
-  searchParamsParser: any
-  onSelect: () => void
+  onSelect: (event: MouseEvent<HTMLTableRowElement> | KeyboardEvent<HTMLTableRowElement>) => void
 }) {
-  useQueryState('live', searchParamsParser.live)
   const rowClassName = cn('group/row', (table.options.meta as any)?.getRowClassName?.(row))
   const cells = row.getVisibleCells()
 
@@ -289,14 +287,19 @@ function DataTableRow<TData>({
       id={row.id}
       tabIndex={0}
       data-state={selected && 'selected'}
+      aria-selected={!!selected}
       onClick={onSelect}
+      onMouseDown={(event) => {
+        if (event.shiftKey) event.preventDefault()
+      }}
       onKeyDown={(event) => {
-        if (event.key === 'Enter') {
+        if (event.target !== event.currentTarget) return
+        if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
-          onSelect()
+          onSelect(event)
         }
       }}
-      className={cn(TableRowClassName, rowClassName)}
+      className={cn(TableRowClassName, 'cursor-pointer', rowClassName)}
     >
       {cells.map((cell) => {
         const cellClassName = (cell.column.columnDef.meta as any)?.cellClassName

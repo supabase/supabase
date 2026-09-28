@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { BarChart2, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
@@ -29,12 +29,16 @@ import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
   fetchTopResponseErrors,
+  parseAuthErrorCodes,
+  parseResponseErrors,
   ResponseErrorRow,
 } from './OverviewErrors.constants'
+import { formatMetricChange, formatMetricValue } from './OverviewMetrics.utils'
 import { OverviewTable } from './OverviewTable'
 import {
   AuthMetricsResponse,
   calculatePercentageChange,
+  calculatePercentagePointChange,
   getApiSuccessRates,
   getAuthSuccessRates,
   getMetricValues,
@@ -49,29 +53,21 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 const StatCard = ({
   title,
   current,
-  previous,
+  change,
   loading,
   suffix = '',
   href,
   tooltip,
 }: {
   title: string
-  current: number
-  previous: number
+  current: number | null
+  change: number | null
   loading: boolean
   suffix?: string
-  invert?: boolean
   href?: string
   tooltip?: string
 }) => {
   const router = useRouter()
-  const formattedCurrent =
-    suffix === 'ms'
-      ? current.toFixed(2)
-      : suffix === '%'
-        ? current.toFixed(1)
-        : Math.round(current).toLocaleString()
-  // const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
   const actions = [
     {
@@ -89,8 +85,8 @@ const StatCard = ({
             className="pb-4"
             label={title}
             tooltip={tooltip}
-            diffValue={`${previous.toFixed(1)}%`}
-            value={`${formattedCurrent}${suffix}`}
+            diffValue={formatMetricChange(change, suffix)}
+            value={formatMetricValue(current, suffix)}
           />
           <ChartActions actions={actions} />
         </ChartHeader>
@@ -117,23 +113,6 @@ const LogsLink = ({ href }: { href: string }) => (
   </Tooltip>
 )
 
-function isResponseErrorRow(row: unknown): row is ResponseErrorRow {
-  if (!row || typeof row !== 'object') return false
-  const r = row as Record<string, unknown>
-  return (
-    typeof r.method === 'string' &&
-    typeof r.path === 'string' &&
-    typeof r.status_code === 'number' &&
-    typeof r.count === 'number'
-  )
-}
-
-function isAuthErrorCodeRow(row: unknown): row is AuthErrorCodeRow {
-  if (!row || typeof row !== 'object') return false
-  const r = row as Record<string, unknown>
-  return typeof r.error_code === 'string' && typeof r.count === 'number'
-}
-
 interface OverviewMetricsProps {
   metrics?: AuthMetricsResponse
   isLoading: boolean
@@ -142,6 +121,7 @@ interface OverviewMetricsProps {
 
 export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsProps) => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelLegacyLogs')
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -165,32 +145,42 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
   const { current: authSuccessRateCurrent, previous: authSuccessRatePrevious } =
     getAuthSuccessRates(metrics)
 
-  const apiSuccessRateChange = calculatePercentageChange(
+  const apiSuccessRateChange = calculatePercentagePointChange(
     apiSuccessRateCurrent,
     apiSuccessRatePrevious
   )
-  const authSuccessRateChange = calculatePercentageChange(
+  const authSuccessRateChange = calculatePercentagePointChange(
     authSuccessRateCurrent,
     authSuccessRatePrevious
   )
 
-  const { data: respErrData, isPending: isLoadingResp } = useQuery({
-    queryKey: ['auth-overview', ref, 'top-response-errors'],
-    queryFn: () => fetchTopResponseErrors(ref as string),
+  const {
+    data: respErrData,
+    isPending: isLoadingResp,
+    isError: isResponseError,
+    error: responseError,
+  } = useQuery({
+    queryKey: ['auth-overview', ref, 'top-response-errors', { otel: useOtel }],
+    queryFn: () => fetchTopResponseErrors(ref as string, useOtel),
     enabled: !!ref,
   })
 
-  const { data: codeErrData, isPending: isLoadingCodes } = useQuery({
-    queryKey: ['auth-overview', ref, 'top-auth-error-codes'],
-    queryFn: () => fetchTopAuthErrorCodes(ref as string),
+  const {
+    data: codeErrData,
+    isPending: isLoadingCodes,
+    isError: isCodeError,
+    error: codeError,
+  } = useQuery({
+    queryKey: ['auth-overview', ref, 'top-auth-error-codes', { otel: useOtel }],
+    queryFn: () => fetchTopAuthErrorCodes(ref as string, useOtel),
     enabled: !!ref,
   })
 
   const responseErrors: ResponseErrorRow[] = Array.isArray(respErrData?.result)
-    ? (respErrData?.result as unknown[]).filter(isResponseErrorRow)
+    ? parseResponseErrors(respErrData.result)
     : []
   const errorCodes: AuthErrorCodeRow[] = Array.isArray(codeErrData?.result)
-    ? (codeErrData?.result as unknown[]).filter(isAuthErrorCodeRow)
+    ? parseAuthErrorCodes(codeErrData.result)
     : []
 
   const errorCodesActions = [
@@ -239,7 +229,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Auth Activity"
               current={activeUsersCurrent}
-              previous={activeUsersChange}
+              change={activeUsersChange}
               loading={isLoading}
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
               tooltip="Users who generated any Auth event in this period. This metric tracks authentication activity, not total product usage. Some active users won't appear here if their session stayed valid."
@@ -247,7 +237,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Sign ups"
               current={signUpsCurrent}
-              previous={signUpsChange}
+              change={signUpsChange}
               loading={isLoading}
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
             />
@@ -266,23 +256,25 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Auth API Success Rate"
               current={apiSuccessRateCurrent}
-              previous={apiSuccessRateChange}
+              change={apiSuccessRateChange}
               loading={isLoading}
               suffix="%"
+              tooltip="Change from the previous period in percentage points (pp); no data means no requests were recorded."
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#monitoring`}
             />
             <StatCard
               title="Auth Server Success Rate"
               current={authSuccessRateCurrent}
-              previous={authSuccessRateChange}
+              change={authSuccessRateChange}
               loading={isLoading}
               suffix="%"
+              tooltip="Change from the previous period in percentage points (pp); no data means no requests were recorded."
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#monitoring`}
             />
           </div>
 
           <div className="grid grid-cols-1 gap-4">
-            <Chart isLoading={isLoadingResp}>
+            <Chart isLoading={isLoadingResp} isErrored={isResponseError}>
               <ChartCard>
                 <ChartHeader>
                   <ChartTitle>Auth API Errors</ChartTitle>
@@ -290,6 +282,15 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                 <ChartContent
                   className="p-0!"
                   isEmpty={responseErrors.length === 0}
+                  errorState={
+                    <div className="p-6">
+                      <AlertError
+                        projectRef={ref}
+                        subject="Failed to retrieve Auth API errors"
+                        error={responseError}
+                      />
+                    </div>
+                  }
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
@@ -344,7 +345,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
               </ChartCard>
             </Chart>
 
-            <Chart isLoading={isLoadingCodes}>
+            <Chart isLoading={isLoadingCodes} isErrored={isCodeError}>
               <ChartCard>
                 <ChartHeader>
                   <ChartTitle>Auth Server Errors</ChartTitle>
@@ -353,6 +354,15 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                 <ChartContent
                   className="p-0!"
                   isEmpty={errorCodes.length === 0}
+                  errorState={
+                    <div className="p-6">
+                      <AlertError
+                        projectRef={ref}
+                        subject="Failed to retrieve Auth server errors"
+                        error={codeError}
+                      />
+                    </div>
+                  }
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState

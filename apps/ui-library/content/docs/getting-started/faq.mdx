@@ -9,7 +9,7 @@ description: Frequently asked questions
     <AccordionContent>
       You run a command in a new or existing project that looks something like this:
       ```bash
-      npx shadcn@latest add http://supabase.com/ui/r/password-based-auth-nextjs.json
+      npx shadcn@latest add https://supabase.com/library/r/password-based-auth-nextjs.json
       ```
         This will add all of the files to your project and install the dependencies.
       After you've run the command, you can start using the components. In the case of Auth, you should be up and running with user sign in/sign up with just this one command.
@@ -55,7 +55,7 @@ description: Frequently asked questions
       <AccordionContent>
         No. You don't need to start with one of our framework quickstarts.
 
-        If you already have an existing project, you can just add the components in this library to your project. If you're starting from scratch, you should use one of the shadcn/ui setup guides for your framework of choice via the [Quickstart](/ui/docs/getting-started/quickstart) page.
+        If you already have an existing project, you can just add the components in this library to your project. If you're starting from scratch, you should use one of the shadcn/ui setup guides for your framework of choice via the [Quickstart](/library/docs/getting-started/quickstart) page.
       </AccordionContent>
     </AccordionItem>
     <AccordionItem value="ai-builder">
@@ -67,13 +67,13 @@ description: Frequently asked questions
       </AccordionContent>
     </AccordionItem>
     <AccordionItem value="react-only">
-      <AccordionTrigger>Why is this library React-only?</AccordionTrigger>
+      <AccordionTrigger>Why are many UI blocks React-only?</AccordionTrigger>
       <AccordionContent>
         Several reasons.
 
-        First, we use React ourselves and know the ecosystem really well. That makes this ui library easy for us to build and maintain.
+        First, we use React ourselves and know the ecosystem really well. That makes these UI blocks easy for us to build and maintain.
 
-        Second, this library is really just stitching together a bunch of existing shadcn/ui and internal components into Supabase-specific workflows. It's not technically a brand new, from the ground up ui library—it's using an established tool in shadcn/ui.
+        Second, the UI portion of the library stitches together existing shadcn/ui and internal components into Supabase-specific workflows. It builds on an established tool rather than creating a new UI framework from the ground up.
 
         Last, it's a way for us to better distribute components that we already had out there in different places (our docs and guides, different framework quickstarts, etc)
 

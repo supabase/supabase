@@ -17,10 +17,15 @@ On managed Supabase platform, Edge Functions are deployed across multiple region
 The default `hello` function is located at `volumes/functions/hello/index.ts`. You can invoke it immediately after starting your stack:
 
 ```sh
-curl http://<your-domain>/functions/v1/hello
+curl http://<your-domain>/functions/v1/hello \
+   --header 'apiKey: <sb_publishable/sb_secret key>'
 ```
 
-This returns `"Hello from Edge Functions!"`.
+This returns:
+
+```json
+{ "message": "Hello from Edge Functions!" }
+```
 
 ## Create a new function
 
@@ -34,20 +39,24 @@ touch volumes/functions/my-function/index.ts
 Add the following code to `index.ts`:
 
 ```typescript
-Deno.serve(async (req: Request) => {
-  const { name } = await req.json()
-  const message = `Hello, ${name}!`
+import { withSupabase } from '@supabase/server'
 
-  return new Response(JSON.stringify({ message }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    const { name } = await req.json()
+    const message = `Hello, ${name}!`
+
+    return Response.json({ message })
+  }),
+}
 ```
+
+The `auth` option controls who can call the function: `'none'` accepts every request, `'user'` requires a valid user JWT, and `'publishable'` / `'secret'` require an API key. See the [Edge Functions auth guide](/docs/guides/functions/auth) for details.
 
 ### Step 2: Restart the functions service to pick up the new function
 
 ```sh
-docker compose restart functions --no-deps
+sh run.sh restart functions
 ```
 
 ### Step 3: Invoke your function
@@ -81,8 +90,7 @@ functions:
   env_file:
     - .env.functions
   environment:
-    JWT_SECRET: ${JWT_SECRET}
-    SUPABASE_URL: http://kong:8000
+    # ... existing variables ...
 ```
 
 <Admonition type="caution">
@@ -94,7 +102,7 @@ Don't commit `.env.functions` to version control if it contains secrets. Add it 
 Restart the functions service:
 
 ```sh
-docker compose up -d --force-recreate --no-deps functions
+sh run.sh recreate functions
 ```
 
 ### Using inline environment variables
@@ -106,9 +114,7 @@ functions:
   environment:
     # Custom variables
     MY_CUSTOM_VAR: ${MY_CUSTOM_VAR}
-    # Required variables
-    JWT_SECRET: ${JWT_SECRET}
-    SUPABASE_URL: http://kong:8000
+    # ... existing variables ...
 ```
 
 Then define `MY_CUSTOM_VAR` in your main `.env` file, or specify the value directly.
@@ -127,7 +133,7 @@ The functions service is pre-configured with the following environment variables
 
 | Variable                    | Value                             | Purpose                                           |
 | --------------------------- | --------------------------------- | ------------------------------------------------- |
-| `SUPABASE_URL`              | `http://kong:8000`                | Internal API gateway URL                          |
+| `SUPABASE_URL`              | `http://api-gw:8000`              | Internal API gateway URL                          |
 | `SUPABASE_PUBLIC_URL`       | `http(s)://<your-domain>`         | Base URL for accessing Supabase from the Internet |
 | `JWT_SECRET`                | `your-jwt-secret`                 | Legacy symmetric encryption key for JWTs          |
 | `SUPABASE_ANON_KEY`         | `your-anon-key`                   | Client-side API key (`anon` role).                |
@@ -135,25 +141,31 @@ The functions service is pre-configured with the following environment variables
 | `SUPABASE_DB_URL`           | `postgresql://...`                | Postgres connection string                        |
 | `SUPABASE_PUBLISHABLE_KEYS` | `{"default":"sb_publishable_...}` | New publishable API key                           |
 | `SUPABASE_SECRET_KEYS`      | `{"default":"sb_secret_...}`      | New secret API key                                |
+| `SUPABASE_JWKS`             | `{"keys":[{...}]}`                | JWKS used to verify JWTs issued by Auth           |
 
-Here's an example function that queries a table using `@supabase/supabase-js`:
+Here's an example function that queries a table using the admin client provided by `@supabase/server`:
 
 ```typescript
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { withSupabase } from '@supabase/server'
 
-Deno.serve(async () => {
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  )
+export default {
+  fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
+    // ctx.supabaseAdmin bypasses RLS. This function requires a secret
+    // API key, so only server-to-server callers can reach it.
+    const { data, error } = await ctx.supabaseAdmin.from('todos').select('*')
 
-  const { data, error } = await supabase.from('todos').select('*')
-
-  return new Response(JSON.stringify({ data, error }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+    return Response.json({ data, error })
+  }),
+}
 ```
+
+`withSupabase` reads `SUPABASE_URL`, the API keys, and `SUPABASE_JWKS` from the environment variables above. You don't need to wire up `createClient` yourself.
+
+<Admonition type="note">
+
+`auth: 'user'` verifies caller JWTs against `SUPABASE_JWKS`. If you're on a legacy setup without it configured, see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
+
+</Admonition>
 
 ### Internal vs external URLs
 
@@ -178,7 +190,7 @@ scp -r ./my-function user@<your-domain>:/path/to/self-hosted/volumes/functions/
 Then restart the functions service on the remote host:
 
 ```sh
-ssh user@<your-domain> 'cd /path/to/self-hosted && docker compose restart functions --no-deps'
+ssh user@<your-domain> 'cd /path/to/self-hosted && sh run.sh restart functions'
 ```
 
 ## Copying functions from Supabase platform
@@ -221,7 +233,7 @@ Common causes: syntax errors in your function code, invalid imports, or missing 
 Restart the functions service:
 
 ```sh
-docker compose restart functions --no-deps
+sh run.sh restart functions
 ```
 
 ### Custom env vars not available in functions
@@ -233,7 +245,7 @@ docker compose restart functions --no-deps
 Use the following command to recreate the container:
 
 ```sh
-docker compose up -d --force-recreate --no-deps functions
+sh run.sh recreate functions
 ```
 
 ### Memory or timeout errors

@@ -1,6 +1,6 @@
-import { Check, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
-import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SuccessCheck } from 'ui'
 
 import {
   CreateOrganizationCard,
@@ -193,6 +193,7 @@ const ConnectOrganizationButton = ({
 }) => (
   <button
     type="button"
+    tabIndex={disabled ? -1 : 0}
     disabled={disabled}
     onClick={onClick}
     aria-pressed={selected}
@@ -209,13 +210,11 @@ const ConnectOrganizationButton = ({
         'pointer-events-none shadow-none transition-colors',
         !disabled && !selected && 'group-hover:border-default group-hover:bg-surface-200',
         selected &&
-          'border-brand bg-brand-200/20 dark:bg-brand-300 pr-10 group-hover:border-brand group-hover:bg-brand-200/20'
+          'border-primary-bright bg-primary-bright/10 pr-10 group-hover:border-primary-bright group-hover:bg-primary-bright/10'
       )}
     />
     {selected && (
-      <span className="pointer-events-none absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-brand-500 dark:bg-brand-200 text-white dark:text-brand">
-        <Check className="size-3.5" strokeWidth={2} />
-      </span>
+      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-primary-bright bg-primary-bright text-black dark:text-black" />
     )}
   </button>
 )

@@ -10,7 +10,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useBucketEmptyMutation } from '@/data/storage/bucket-empty-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
@@ -70,7 +70,7 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
           </p>
         </DialogSection>
         <DialogFooter>
-          <Button variant="default" disabled={isPending} onClick={onClose}>
+          <Button disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
           <Button variant="danger" loading={isPending} onClick={onEmptyBucket}>

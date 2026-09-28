@@ -10,6 +10,10 @@ export type SubmittedSupportRequest = Pick<
   projectRef: string | undefined
   library?: string
   dashboardLogs?: string
+  // Front conversation created at submit + the thread_ref used to create it, so the
+  // AI support chat can append to the same conversation if the user engages it.
+  threadRef?: string
+  frontConversationId?: string
 }
 
 export type SupportFormState =

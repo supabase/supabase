@@ -116,6 +116,7 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
             const Icon = ICONS[example.icon]
             return (
               <button
+                tabIndex={0}
                 key={example.title}
                 onClick={() => handleTabClick(index)}
                 className={cn(

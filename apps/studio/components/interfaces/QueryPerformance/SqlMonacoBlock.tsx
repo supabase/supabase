@@ -1,6 +1,6 @@
 import { Check, Copy } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Button, cn, copyToClipboard } from 'ui'
+import { Button, cn, copyToClipboard, FloatingPlate } from 'ui'
 
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
@@ -9,6 +9,10 @@ type SqlMonacoBlockProps = {
   wrapperClassName?: string
 }
 
+// [Joshen] This is technically a duplicate of CodeBlock from `ui-patterns`
+// Should decide which is the preferred and consolidate - although rendering CodeEditor
+// is much heavier due to Monaco Editor. I'd rather we use CodeBlock (or improve that)
+// for read-only rendering of code contents
 export const SqlMonacoBlock = ({ value, wrapperClassName }: SqlMonacoBlockProps) => {
   const [copied, setCopied] = useState(false)
 
@@ -32,16 +36,15 @@ export const SqlMonacoBlock = ({ value, wrapperClassName }: SqlMonacoBlockProps)
         options={{ padding: { top: 12, bottom: 12 } }}
       />
 
-      <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <FloatingPlate className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
         <Button
-          variant="default"
           className="px-1.5"
           icon={copied ? <Check /> : <Copy />}
           onClick={() => handleCopy(content)}
         >
           {copied ? 'Copied' : ''}
         </Button>
-      </div>
+      </FloatingPlate>
     </div>
   )
 }

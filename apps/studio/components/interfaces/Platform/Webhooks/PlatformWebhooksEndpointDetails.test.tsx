@@ -27,7 +27,7 @@ vi.mock('@/components/ui/ButtonTooltip', () => ({
     type: _type,
     ...props
   }: any) => (
-    <button type="button" {...props}>
+    <button tabIndex={0} type="button" {...props}>
       {icon}
       {children}
     </button>

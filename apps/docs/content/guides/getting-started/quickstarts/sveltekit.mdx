@@ -4,15 +4,21 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="sveltekit" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a SvelteKit app
+## 3. Create a SvelteKit app
 
-Create a SvelteKit app using the `npm create` command.
+Create a SvelteKit app using the `sv` CLI.
 
 ```bash
 npx sv create my-app
 ```
+
+## 4. Set up AI tooling (optional)
+
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client library
 
@@ -24,11 +30,9 @@ Navigate to the SvelteKit app and install `supabase-js`.
 cd my-app && npm install @supabase/supabase-js
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "sveltekit", "tab": "frameworks" }} />
-
 ## 6. Declare Supabase environment variables
 
-Create a `.env` file at the root of your project and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=sveltekit&tab=frameworks):
+Create a `.env` file at the root of your project and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=sveltekit&connectTab=frameworks):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=sveltekit">
@@ -40,6 +44,8 @@ Create a `.env` file at the root of your project and populate with your Supabase
 PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "sveltekit", "tab": "frameworks" }} />
 
 ## 7. Create the Supabase client
 
@@ -75,9 +81,16 @@ Create `+page.server.js` file in the `src/routes` directory with the following c
 import { supabase } from '$lib/supabaseClient'
 
 export async function load() {
-  const { data } = await supabase.from('instruments').select()
+  const { data, error } = await supabase.from('instruments').select()
+
+  if (error) {
+    console.error('Error loading instruments:', error.message)
+    return { instruments: [], error: error.message }
+  }
+
   return {
     instruments: data ?? [],
+    error: null,
   }
 }
 ```
@@ -93,15 +106,16 @@ type Instrument = {
 }
 
 export const load: PageServerLoad = async () => {
-  const { data, error } = await supabase.from('instruments').select<'instruments', Instrument>()
+  const { data, error } = await supabase.from('instruments').select<'*', Instrument>()
 
   if (error) {
     console.error('Error loading instruments:', error.message)
-    return { instruments: [] }
+    return { instruments: [], error: error.message }
   }
 
   return {
     instruments: data ?? [],
+    error: null,
   }
 }
 ```
@@ -115,11 +129,15 @@ Replace the existing content in your `+page.svelte` file in the `src/routes` dir
   let { data } = $props();
 </script>
 
-<ul>
-  {#each data.instruments as instrument}
-    <li>{instrument.name}</li>
-  {/each}
-</ul>
+{#if data.error}
+  <p>Error loading instruments: {data.error}</p>
+{:else}
+  <ul>
+    {#each data.instruments as instrument}
+      <li>{instrument.name}</li>
+    {/each}
+  </ul>
+{/if}
 ```
 
 ## 9. Start the app
@@ -129,6 +147,8 @@ Start the app and go to http://localhost:5173 in a browser and you should see th
 ```bash
 npm run dev
 ```
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

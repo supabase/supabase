@@ -6,7 +6,7 @@ import { PanelLeft } from 'lucide-react'
 import { Separator as _SeparatorPrimitive, Slot as SlotPrimitive } from 'radix-ui'
 import * as React from 'react'
 
-import { cn } from './../../../lib/utils'
+import { cn, getExplicitTabIndex } from './../../../lib/utils'
 import { useIsMobile } from './../../hooks/use-mobile'
 import { Button } from './button'
 import { Input } from './input'
@@ -445,8 +445,9 @@ SidebarGroupLabel.displayName = 'SidebarGroupLabel'
 const SidebarGroupAction = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<'button'> & { asChild?: boolean }
->(({ className, asChild = false, ...props }, ref) => {
+>(({ className, asChild = false, disabled, tabIndex, ...props }, ref) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <Comp
@@ -460,6 +461,8 @@ const SidebarGroupAction = React.forwardRef<
         className
       )}
       {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
     />
   )
 })
@@ -563,13 +566,9 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const Comp = asChild ? SlotPrimitive.Slot : 'button'
     const { isMobile, state } = useSidebar()
-    const { disabled, tabIndex } = props
+    const { disabled, tabIndex, ...rest } = props
 
-    // Set default tabIndex for proper Safari focus handling
-    // - Explicit tabIndex prop takes precedence
-    // - If disabled, default to -1 (unless explicitly set)
-    // - Otherwise, default to 0 for keyboard accessibility
-    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+    const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
     const button = (
       <Comp
@@ -578,9 +577,10 @@ const SidebarMenuButton = React.forwardRef<
         data-size={size}
         data-active={isActive}
         data-has-icon={hasIcon}
-        tabIndex={computedTabIndex}
         className={cn(sidebarMenuButtonVariants({ variant, size, hasIcon, isLoading }), className)}
-        {...props}
+        {...rest}
+        disabled={disabled}
+        tabIndex={computedTabIndex}
       />
     )
 
@@ -615,8 +615,9 @@ const SidebarMenuAction = React.forwardRef<
     asChild?: boolean
     showOnHover?: boolean
   }
->(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
+>(({ className, asChild = false, showOnHover = false, disabled, tabIndex, ...props }, ref) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <Comp
@@ -635,6 +636,8 @@ const SidebarMenuAction = React.forwardRef<
         className
       )}
       {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
     />
   )
 })

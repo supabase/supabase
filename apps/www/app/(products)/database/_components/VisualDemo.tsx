@@ -450,11 +450,17 @@ export function VisualDemo() {
           >
             {/* Toolbar */}
             <div className="flex items-center gap-2 px-1.5 h-10 border-b border-default bg-surface-200 shrink-0">
-              <button className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-foreground-light hover:text-foreground transition-colors">
+              <button
+                tabIndex={0}
+                className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-foreground-light hover:text-foreground transition-colors"
+              >
                 <Filter size={14} strokeWidth={1.5} />
                 <span>Filter</span>
               </button>
-              <button className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-foreground-light hover:text-foreground transition-colors">
+              <button
+                tabIndex={0}
+                className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-foreground-light hover:text-foreground transition-colors"
+              >
                 <List size={14} strokeWidth={1.5} />
                 <span>Sort</span>
               </button>
@@ -493,7 +499,7 @@ export function VisualDemo() {
                               <Key
                                 size={12}
                                 strokeWidth={2}
-                                className="text-brand rotate-45 shrink-0"
+                                className="text-primary rotate-45 shrink-0"
                               />
                             )}
                             <span className="text-foreground text-xs truncate font-medium">

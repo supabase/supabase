@@ -73,6 +73,7 @@ import {
   FixWithAITroubleshootingSection,
   TroubleshootingGuideSection,
 } from '../TroubleshootingSections'
+import { DOCS_URL } from '@/lib/constants'
 
 const ERROR_TYPE = 'your-error'
 const BUILD_PROMPT = () => `Describe the issue for the AI assistant.`
@@ -89,7 +90,7 @@ export function YourErrorTroubleshooting() {
       <TroubleshootingGuideSection
         number={1}
         errorType={ERROR_TYPE}
-        href="https://supabase.com/docs/guides/..."
+        href={`${DOCS_URL}/guides/...`}
       />
       <FixWithAITroubleshootingSection
         number={2}

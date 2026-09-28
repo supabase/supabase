@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
+import { StartYourProjectButton } from '@/components/StartYourProjectButton'
+
 const TERMINAL_LINES = [
   { text: '$ supabase functions new hello-world', delay: 0 },
   { text: 'Created function: supabase/functions/hello-world/index.ts', delay: 0.3, dim: true },
@@ -51,7 +53,11 @@ function TerminalAnimation() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
               className={
-                line.accent ? 'text-brand' : line.dim ? 'text-foreground-light' : 'text-foreground'
+                line.accent
+                  ? 'text-primary'
+                  : line.dim
+                    ? 'text-foreground-light'
+                    : 'text-foreground'
               }
             >
               {line.text || '\u00A0'}
@@ -80,10 +86,8 @@ export function CTASection() {
         <TerminalAnimation />
 
         <div className="flex items-center gap-2">
+          <StartYourProjectButton />
           <Button asChild size="medium">
-            <Link href="https://supabase.com/dashboard">Start your project</Link>
-          </Button>
-          <Button asChild size="medium" variant="default">
             <Link href="/docs/guides/functions/quickstart">Quickstart guide</Link>
           </Button>
         </div>

@@ -40,11 +40,11 @@ const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.LIST, name: 'As list' },
 ]
 
+// list-v2 only supports sorting by name, created_at, or updated_at
 const SORT_BY_OPTIONS = [
   { key: STORAGE_SORT_BY.NAME, name: 'Name' },
   { key: STORAGE_SORT_BY.CREATED_AT, name: 'Time created' },
   { key: STORAGE_SORT_BY.UPDATED_AT, name: 'Time modified' },
-  { key: STORAGE_SORT_BY.LAST_ACCESSED_AT, name: 'Time last accessed' },
 ]
 
 const SORT_ORDER_OPTIONS = [
@@ -97,6 +97,7 @@ const HeaderBreadcrumbs = ({
             ) : (
               <button
                 type="button"
+                tabIndex={0}
                 className="max-w-24 truncate border-0 bg-transparent p-0 text-left text-sm text-foreground-lighter transition-colors hover:text-foreground focus-visible:text-foreground"
                 onClick={() => selectBreadcrumb(crumb.index)}
               >
@@ -267,7 +268,7 @@ export const BucketFilePickerHeader = () => {
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {view === option.key && (
-                          <Check size={16} className="text-brand" strokeWidth={2} />
+                          <Check size={16} className="text-primary" strokeWidth={2} />
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -281,7 +282,7 @@ export const BucketFilePickerHeader = () => {
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortBy === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
+                              <Check size={16} className="text-primary" strokeWidth={2} />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -299,7 +300,7 @@ export const BucketFilePickerHeader = () => {
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
+                              <Check size={16} className="text-primary" strokeWidth={2} />
                             )}
                           </div>
                         </DropdownMenuItem>

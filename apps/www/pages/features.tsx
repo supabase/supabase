@@ -6,7 +6,17 @@ import { useRouter } from 'next/compat/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
-import { Badge, Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  ToggleGroup,
+  ToggleGroupItem,
+} from 'ui'
 
 import {
   FeaturesMatrix,
@@ -22,6 +32,40 @@ import { breadcrumbs } from '@/lib/breadcrumbs'
 import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 
 type ViewMode = 'grid' | 'matrix'
+
+// Relevance weights used to rank search results. Title matches are considered
+// far more important than body content, so a feature whose title matches the
+// query surfaces above features where the term only appears in the description.
+// Title weights are deliberately larger than the maximum combined body score
+// (SUBTITLE_INCLUDES + DESCRIPTION_INCLUDES), so any title match always ranks
+// above a feature that only matches in its subtitle and/or description.
+const SEARCH_WEIGHT = {
+  TITLE_STARTS_WITH: 5,
+  TITLE_INCLUDES: 4,
+  SUBTITLE_INCLUDES: 2,
+  DESCRIPTION_INCLUDES: 1,
+} as const
+
+// Score a feature against a (lowercased) search term. Higher is more relevant.
+// Returns 0 when nothing matches.
+function getSearchScore(feature: (typeof features)[number], term: string): number {
+  if (!term) return 0
+
+  const title = feature.title.toLowerCase()
+  const subtitle = feature.subtitle.toLowerCase()
+  const description = feature.description.toLowerCase()
+
+  let score = 0
+  if (title.startsWith(term)) {
+    score += SEARCH_WEIGHT.TITLE_STARTS_WITH
+  } else if (title.includes(term)) {
+    score += SEARCH_WEIGHT.TITLE_INCLUDES
+  }
+  if (subtitle.includes(term)) score += SEARCH_WEIGHT.SUBTITLE_INCLUDES
+  if (description.includes(term)) score += SEARCH_WEIGHT.DESCRIPTION_INCLUDES
+
+  return score
+}
 
 function FeaturesPage() {
   const router = useRouter()
@@ -89,20 +133,31 @@ function FeaturesPage() {
   }
 
   // Filter features based on search term and selected products
-  const filteredFeatures = features.filter((feature) => {
-    const matchesSearch =
-      feature.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feature.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feature.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const normalizedSearchTerm = searchTerm.toLowerCase()
+  const filteredFeatures = features
+    .filter((feature) => {
+      const matchesSearch =
+        !normalizedSearchTerm || getSearchScore(feature, normalizedSearchTerm) > 0
 
-    const matchesProduct =
-      selectedProducts.length === 0 ||
-      feature.products.some((product) => selectedProducts.includes(product))
+      const matchesProduct =
+        selectedProducts.length === 0 ||
+        feature.products.some((product) => selectedProducts.includes(product))
 
-    const matchesSelfHosted = !showSelfHostedOnly || feature.status?.availableOnSelfHosted === true
+      const matchesSelfHosted =
+        !showSelfHostedOnly || feature.status?.availableOnSelfHosted === true
 
-    return matchesSearch && matchesProduct && matchesSelfHosted
-  })
+      return matchesSearch && matchesProduct && matchesSelfHosted
+    })
+    // When searching, rank by relevance (title matches weigh more than body
+    // content), falling back to alphabetical order for ties and no search.
+    .sort((a, b) => {
+      if (normalizedSearchTerm) {
+        const scoreDiff =
+          getSearchScore(b, normalizedSearchTerm) - getSearchScore(a, normalizedSearchTerm)
+        if (scoreDiff !== 0) return scoreDiff
+      }
+      return a.title > b.title ? 1 : -1
+    })
 
   const meta = {
     title: 'Supabase Features',
@@ -147,7 +202,7 @@ function FeaturesPage() {
         </SectionContainer>
         <SectionContainer className="relative grid md:grid-cols-4 md:gap-4 pt-0!">
           <div className="relative w-full h-full">
-            <div className="mb-4 flex flex-col gap-4 sticky top-20">
+            <aside aria-label="Filters" className="mb-4 flex flex-col gap-4 sticky top-20">
               <InputGroup className="w-full">
                 <InputGroupAddon>
                   <Search />
@@ -162,99 +217,105 @@ function FeaturesPage() {
                 />
               </InputGroup>
               <div className="hidden md:flex flex-col gap-2.5">
-                <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors">
+                <label className="flex cursor-pointer items-center gap-2 text-foreground-light hover:text-foreground transition-colors">
                   <Checkbox
-                    id="self-hosted-filter"
                     checked={showSelfHostedOnly}
                     onCheckedChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
                     className="[&_input]:m-0"
                   />
-                  <label
-                    htmlFor="self-hosted-filter"
-                    className="text-sm leading-none! flex-1 text-left"
-                  >
+                  <span className="text-sm leading-none! flex-1 text-left">
                     Show only self-hosted features
-                  </label>
-                </div>
+                  </span>
+                </label>
               </div>
               <div className="hidden md:flex flex-col gap-4">
-                <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
-                <div className="flex flex-col gap-2.5">
+                <h2 id="feature-tag-filters" className="text-sm text-foreground-lighter">
+                  Filter by tags:
+                </h2>
+                <div
+                  role="group"
+                  aria-labelledby="feature-tag-filters"
+                  className="flex flex-col gap-2.5"
+                >
                   {products
                     .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
                     .map((product) => (
-                      <div
+                      <label
                         key={product}
-                        className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors"
+                        className="flex cursor-pointer items-center gap-2 text-foreground-light hover:text-foreground transition-colors"
                       >
                         <Checkbox
-                          id={product}
                           checked={selectedProducts.includes(product)}
                           onCheckedChange={() => handleProductChange(product)}
                           className="[&_input]:m-0"
                         />
-                        <label
-                          htmlFor={product}
-                          className="text-sm leading-none! capitalize flex-1 text-left"
-                        >
+                        <span className="text-sm leading-none! capitalize flex-1 text-left">
                           {product}
-                        </label>
-                      </div>
+                        </span>
+                      </label>
                     ))}
                 </div>
-                <div className="text-foreground-muted text-xs">
-                  Features selected: {filteredFeatures.length}
+                <div
+                  aria-live="polite"
+                  aria-atomic="true"
+                  className="text-foreground-muted text-xs"
+                >
+                  {`${filteredFeatures.length} features selected`}
                 </div>
               </div>
-              <Button
-                tabIndex={HAS_ACTIVE_FILTERS ? 0 : -1}
-                block
-                variant="dashed"
-                onClick={() => {
-                  setSelectedProducts([])
-                  setSearchTerm('')
-                  setShowSelfHostedOnly(false)
-                }}
-                className={cn(
-                  'opacity-0 transition-opacity hidden md:block',
-                  HAS_ACTIVE_FILTERS && 'block! opacity-100'
-                )}
-              >
-                Clear all filters
-              </Button>
-            </div>
+              {HAS_ACTIVE_FILTERS && (
+                <Button
+                  block
+                  variant="dashed"
+                  onClick={() => {
+                    setSelectedProducts([])
+                    setSearchTerm('')
+                    setShowSelfHostedOnly(false)
+                  }}
+                  className="hidden md:block"
+                >
+                  Clear all filters
+                </Button>
+              )}
+            </aside>
           </div>
           <div className="md:col-span-3 min-w-0 flex flex-col gap-4 md:gap-6">
             <div className="flex items-center justify-between gap-2">
               <span className="text-foreground-muted text-xs">
                 {filteredFeatures.length} feature{filteredFeatures.length !== 1 ? 's' : ''}
               </span>
-              <div className="flex items-center rounded-lg border border-muted">
-                <button
+              <ToggleGroup
+                type="single"
+                value={viewMode}
+                onValueChange={(value) => value && setViewMode(value as ViewMode)}
+                aria-label="Feature layout"
+                className="flex items-center gap-0 rounded-lg border border-muted"
+              >
+                <ToggleGroupItem
+                  value="grid"
                   title="Grid view"
-                  onClick={() => setViewMode('grid')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 transition-colors rounded-l-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background',
-                    viewMode === 'grid'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-l-lg focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <LayoutGrid size={14} />
-                </button>
-                <button
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="matrix"
                   title="Matrix view"
-                  onClick={() => setViewMode('matrix')}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 transition-colors border-l border-muted rounded-r-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background',
-                    viewMode === 'matrix'
-                      ? 'bg-surface-300 text-foreground'
-                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                    'relative flex items-center justify-center w-8 h-8 p-0 rounded-none rounded-r-lg border-l border-muted focus-visible:z-10 focus-ring',
+                    'cursor-pointer bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200',
+                    'data-[state=on]:cursor-default data-[state=on]:bg-surface-400 data-[state=on]:text-foreground',
+                    'aria-checked:bg-surface-400 aria-checked:text-foreground'
                   )}
                 >
                   <Table2 size={14} />
-                </button>
-              </div>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             {viewMode === 'matrix' ? (
@@ -264,14 +325,12 @@ function FeaturesPage() {
                 No features found with these filters
               </p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
-                {filteredFeatures
-                  .sort((a, b) => (a.title > b.title ? 1 : -1))
-                  .map((feature) => (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
+                {filteredFeatures.map((feature) => (
+                  <li key={`feat-${feature.title}`} className="flex">
                     <Link
-                      key={`feat-${feature.title}`}
                       href={`/features/${feature.slug}`}
-                      className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+                      className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring w-full"
                     >
                       <Panel
                         hasActiveOnHover
@@ -319,8 +378,9 @@ function FeaturesPage() {
                         </div>
                       </Panel>
                     </Link>
-                  ))}
-              </div>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </SectionContainer>

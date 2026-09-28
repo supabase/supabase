@@ -16,7 +16,7 @@
   --foreground-light: var(--muted-foreground);
   --foreground-lighter: var(--tertiary-foreground);
   --foreground-muted: var(--tertiary-foreground);
-  --foreground-contrast: var(--primary-foreground);
+  /* --foreground-contrast lives in semantic.css — do not remap to --primary-foreground */
 
   /* Legacy background aliases */
   --background-default: var(--background);

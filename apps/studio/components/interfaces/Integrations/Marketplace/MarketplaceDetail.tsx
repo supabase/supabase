@@ -1,7 +1,7 @@
 import { ArrowUpRight, BookOpen, Gauge, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MarketplaceDetailBreadrumbs } from './MarketplaceDetailBreadcrumbs'

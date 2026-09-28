@@ -4,12 +4,13 @@ import '../styles/globals.css'
 import '../pages/launch-week/launchWeek.css'
 
 import { inter, manrope, sourceCodePro } from '~/lib/fonts'
+import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
 
 import Providers from './providers'
 import { APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
-const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
+const site_title = `${APP_NAME} | The Postgres Development Platform`
 
 export const metadata: Metadata = {
   title: site_title,
@@ -32,11 +33,8 @@ export const metadata: Metadata = {
     site: '@supabase',
     card: 'summary_large_image',
   },
-  icons: {
-    icon: '/favicon/favicon.ico',
-    shortcut: '/favicon/favicon.ico',
-    apple: '/favicon/favicon.ico',
-  },
+  // www serves from the site root (`basePath: ''` in next.config.mjs)
+  icons: genFaviconData(''),
 }
 
 export const viewport: Viewport = {

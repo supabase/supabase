@@ -37,12 +37,14 @@ function CopyableId({ id, label }: { id: string; label: string }) {
 
   return (
     <button
+      type="button"
+      tabIndex={0}
       onClick={handleCopy}
       className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-light px-1 -ml-1"
     >
       <span className="truncate">{id}</span>
       {isCopied ? (
-        <Check size={12} strokeWidth={1.25} className="text-brand shrink-0" />
+        <Check size={12} strokeWidth={1.25} className="text-primary shrink-0" />
       ) : (
         <Copy
           size={12}

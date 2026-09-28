@@ -41,22 +41,33 @@ export interface ImageProps extends Omit<NextImageProps, 'src'> {
  * making sure it doesn't affect other projects consuming the component.
  *
  */
-const Image = ({ src, alt = '', ...props }: ImageProps) => {
+const Image = ({
+  src,
+  alt = '',
+  className,
+  style,
+  containerClassName,
+  caption,
+  // MDX can pass whitespace-only children (e.g. a blank line before `/>`);
+  // never forward those to next/image.
+  children: _children,
+  ...rest
+}: ImageProps) => {
   const { resolvedTheme } = useTheme()
   const source =
     typeof src === 'string' ? src : resolvedTheme?.includes('dark') ? src.dark : src.light
 
   return (
-    <figure className={props.containerClassName}>
+    <figure className={containerClassName}>
       <NextImage
         key={resolvedTheme}
         alt={alt}
         src={source}
-        className={props.className}
-        style={props.style}
-        {...props}
+        className={className}
+        style={style}
+        {...rest}
       />
-      {props.caption && <figcaption className="text-center">{props.caption}</figcaption>}
+      {caption && <figcaption className="text-center">{caption}</figcaption>}
     </figure>
   )
 }

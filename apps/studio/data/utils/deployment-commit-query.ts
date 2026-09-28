@@ -5,15 +5,11 @@ import { BASE_PATH } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getDeploymentCommit() {
-  // `credentials: 'omit'` drops cookies for this one request — including the
-  // `__vdpl` skew-protection pin (TanStack, see router.tsx). With no pin cookie,
-  // Vercel's edge routes it to the LATEST deployment, so this check can detect a
-  // newer version even while the rest of the session stays pinned. The endpoint
-  // is public (no auth needed), and we keep the basePath URL so it still routes
-  // to studio in production (root `/api/*` there is the marketing site).
-  const response = await fetchHandler(`${BASE_PATH}/api/get-deployment-commit`, {
-    credentials: 'omit',
-  })
+  // Deliberately unpinned: TanStack only adds x-deployment-id to server-function
+  // calls (start.ts), and Nitro's session cookie is disabled. This API request
+  // sees the latest deployment while older assets stay in the immutable store.
+  // Keep the basePath so www routes this request to Studio in production.
+  const response = await fetchHandler(`${BASE_PATH}/api/get-deployment-commit`)
   return (await response.json()) as { commitSha: string; commitTime: string }
 }
 

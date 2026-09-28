@@ -76,6 +76,7 @@ const LocalDXImage = ({ isHovered = false }: { isHovered?: boolean }) => {
       />
       <CopyToClipboard text="supabase functions serve <function-name>">
         <button
+          tabIndex={0}
           onClick={handleCopy}
           className="p-3 relative z-10 w-full group hover:border-strong flex gap-2 items-center bg-alternative-200 rounded-xl border overflow-hidden"
         >
@@ -120,7 +121,7 @@ const LocalDXImage = ({ isHovered = false }: { isHovered?: boolean }) => {
 
           <div className="text-foreground rounded p-1.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             {copied ? (
-              <span className="text-brand">
+              <span className="text-primary">
                 <Check className="w-3.5 h-3.5" />
               </span>
             ) : (

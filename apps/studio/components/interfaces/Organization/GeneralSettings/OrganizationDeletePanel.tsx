@@ -1,4 +1,4 @@
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'

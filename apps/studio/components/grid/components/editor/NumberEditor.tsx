@@ -31,6 +31,7 @@ export function NumberEditor<TRow, TSummaryRow = unknown>({
       onChange={onChange}
       onBlur={onBlur}
       type="number"
+      aria-label={`${column.name} value`}
     />
   )
 }

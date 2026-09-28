@@ -1,4 +1,5 @@
 import { parseSchemaComment } from '@stripe/sync-engine/supabase'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
 import { type WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -19,6 +20,7 @@ import {
   usePartnerIntegrationsQuery,
 } from '@/data/partners/integration-status-query'
 import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { ResponseError } from '@/types'
 
@@ -67,12 +69,32 @@ export const useProjectOAuthIntegrationData = (
   isSuccess: boolean
 } => {
   const { data: org } = useSelectedOrganizationQuery({ enabled })
+
+  // Any error here has to be terminal on mount. An errored query holds no data, so it never counts
+  // as fresh and refetches on every consumer mount — and consumers that gate rendering on
+  // `isLoading` remount on each refetch, which loops. Transient failures still recover: the retry
+  // policy gives 5xx three attempts, and refetch-on-focus/reconnect are staleness-driven, so they
+  // are unaffected by this.
+  const { can: canReadOAuthApps } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'oauth_apps',
+    undefined,
+    {
+      organizationSlug: org?.slug,
+      projectRef: null,
+    }
+  )
+
+  const sharedOptions = { enabled, retryOnMount: false }
   const queries = {
-    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, { enabled }),
-    edgeFunctionSecrets: useSecretsQuery({ projectRef }, { enabled }),
-    authConfig: useAuthConfigQuery({ projectRef }, { enabled }),
-    partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, { enabled }),
-    oauthApps: useAuthorizedAppsQuery({ slug: org?.slug }, { enabled: enabled && !!org }),
+    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, sharedOptions),
+    edgeFunctionSecrets: useSecretsQuery({ projectRef }, sharedOptions),
+    authConfig: useAuthConfigQuery({ projectRef }, sharedOptions),
+    partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, sharedOptions),
+    oauthApps: useAuthorizedAppsQuery(
+      { slug: org?.slug },
+      { ...sharedOptions, enabled: canReadOAuthApps && enabled && !!org }
+    ),
   }
 
   const data = useMemo(() => {
@@ -169,7 +191,7 @@ export const isOAuthInstalled = ({
     )
   }
 
-  if (integration.id === 'grafana') {
+  if (integration.id === 'grafana' || integration.id === 'grafana-cloud') {
     // Grafana is not yet sending integration status, so just use presence of API key.
     return (
       isOAuthAppAuthorized(projectData, integration) ||

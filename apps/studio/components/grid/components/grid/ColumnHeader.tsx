@@ -85,6 +85,7 @@ export function ColumnHeader<R>({
               <TooltipTrigger asChild>
                 <button
                   className="flex items-center"
+                  tabIndex={0}
                   onClick={() => openSheet(column.name as string)}
                 >
                   <span className="sr-only">View {column.name} index suggestion</span>

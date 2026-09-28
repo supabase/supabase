@@ -3,11 +3,12 @@ import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
-import { parseAuthLogEventMessage } from '../UnifiedLogs.utils'
+import { getEventMessageDisplay } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
+import { LogLevelDot } from './LogLevelDot'
 import { LogTypeIcon } from './LogTypeIcon'
-import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -40,49 +41,26 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
 
   const columns: ColumnDef<ColumnSchema>[] = [
     {
-      accessorKey: 'select',
-      header: '',
-      cell: ({ row }) => {
-        return (
-          <div className="flex items-center justify-center">
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        )
-      },
-      enableHiding: false,
-      enableResizing: false,
-      enableSorting: false,
-      filterFn: () => true,
-      size: 48,
-      minSize: 48,
-      maxSize: 48,
-      meta: {
-        cellClassName: 'w-[32px]',
-        headerClassName: 'w-[32px]',
-      },
-    },
-    // Level column - always visible
-    {
       accessorKey: 'level',
       header: '',
-      cell: ({ row }) => {
-        const level = row.getValue<ColumnSchema['level']>('level')
-        return <DataTableColumnLevelIndicator value={level} />
-      },
+      cell: ({ row }) => (
+        <LogSelectionIndicator
+          id={row.id}
+          level={row.original.level}
+          isSelected={row.getIsSelected()}
+        />
+      ),
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
       filterFn: () => true,
-      size: 48,
-      minSize: 48,
-      maxSize: 48,
+      size: 42,
+      minSize: 42,
+      maxSize: 42,
       meta: {
-        cellClassName: 'w-[32px]',
-        headerClassName: 'w-[32px]',
+        // pl-3.5 → toggle-filter icon; pr-3 matches date pl-3 (equal gaps around the dot)
+        cellClassName: 'w-[42px] min-w-[42px] pl-3.5 pr-3',
+        headerClassName: 'w-[42px] min-w-[42px] pl-3.5 pr-3',
       },
     },
     // Date column - always visible
@@ -100,8 +78,8 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 140,
       maxSize: 140,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[140px]',
-        headerClassName: 'w-[140px]',
+        cellClassName: 'font-mono tracking-tight w-[140px] pl-3',
+        headerClassName: 'w-[140px] pl-3',
         dataType: 'date',
       },
     },
@@ -113,7 +91,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         const logType = row.getValue<ColumnSchema['log_type']>('log_type')
         return (
           <div className="flex items-center justify-end gap-1">
-            <LogTypeIcon type={logType} size={16} className="text-foreground/70" />
+            <LogTypeIcon type={logType} size={14} className="text-foreground-lighter" />
           </div>
         )
       },
@@ -153,8 +131,8 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
                 <TooltipTrigger asChild>
                   <span>
                     <DataTableColumnStatusCode
-                      value={value}
-                      level={row.getValue<ColumnSchema['level']>('level')}
+                      value={value ?? undefined}
+                      level={row.getValue<ColumnSchema['level']>('level') ?? undefined}
                     />
                   </span>
                 </TooltipTrigger>
@@ -162,8 +140,8 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
               </Tooltip>
             ) : (
               <DataTableColumnStatusCode
-                value={value}
-                level={row.getValue<ColumnSchema['level']>('level')}
+                value={value ?? undefined}
+                level={row.getValue<ColumnSchema['level']>('level') ?? undefined}
               />
             )}
           </div>
@@ -198,8 +176,11 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 64,
       maxSize: 64,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[64px]',
-        headerClassName: 'w-[64px]',
+        // Hidden on narrow viewports so the table fits mobile without horizontal
+        // overflow; revealed from `sm` up. Full row detail is still available via
+        // the ServiceFlow panel on row click.
+        cellClassName: 'font-mono tracking-tight w-[64px] hidden sm:table-cell',
+        headerClassName: 'w-[64px] hidden sm:table-cell',
       },
     },
     // Pathname column - controlled by columnVisibility
@@ -213,8 +194,9 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 250,
       maxSize: 250,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[250px]',
-        headerClassName: 'w-[250px]',
+        // Hidden until `md` — wider than method, so it earns space one step later.
+        cellClassName: 'font-mono tracking-tight w-[250px] hidden md:table-cell',
+        headerClassName: 'w-[250px] hidden md:table-cell',
       },
       cell: ({ row }) => {
         const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
@@ -234,7 +216,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
         const logType = row.original.log_type
         const logCount = row.original.log_count
-        const displayMessage = logType === 'auth' ? parseAuthLogEventMessage(value) : value
+        const { message: displayMessage, capitalize: capitalizeMessage } = getEventMessageDisplay(
+          logType,
+          value
+        )
 
         return (
           <div className="flex flex-row gap-2 items-center">
@@ -252,7 +237,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
             )}
             {displayMessage && (
               <span
-                className={cn('text-muted-foreground', logType === 'auth' && 'capitalize-sentence')}
+                className={cn('text-muted-foreground', capitalizeMessage && 'capitalize-sentence')}
               >
                 {displayMessage}
               </span>
@@ -266,7 +251,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 200,
       maxSize: 400,
       meta: {
-        cellClassName: 'font-mono tracking-tight',
+        // Widest column — hidden until `lg`. No width class so it keeps flexing to
+        // fill remaining space once shown.
+        cellClassName: 'font-mono tracking-tight hidden lg:table-cell',
+        headerClassName: 'hidden lg:table-cell',
       },
     },
   ]
@@ -285,3 +273,45 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
 export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns({
   data: [],
 }).columns
+
+function LogSelectionIndicator({
+  id,
+  level,
+  isSelected,
+}: {
+  id: string
+  level: ColumnSchema['level']
+  isSelected: boolean
+}) {
+  const { onSelectRow } = useDataTable()
+  return (
+    <div className="relative flex h-4 w-4 items-center justify-center">
+      <div
+        className={cn(
+          'pointer-events-none group-hover/row:opacity-0 group-focus-within/row:opacity-0',
+          isSelected && 'opacity-0'
+        )}
+      >
+        <LogLevelDot level={level} />
+      </div>
+      <Checkbox
+        aria-label="Select log"
+        tabIndex={-1}
+        className={cn(
+          'absolute inset-0 cursor-pointer opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100 focus-visible:opacity-100',
+          isSelected && 'opacity-100'
+        )}
+        checked={isSelected}
+        onClick={(event) => {
+          event.stopPropagation()
+          onSelectRow?.(id, {
+            shiftKey: event.shiftKey,
+            metaKey: event.metaKey,
+            ctrlKey: event.ctrlKey,
+            toggle: true,
+          })
+        }}
+      />
+    </div>
+  )
+}

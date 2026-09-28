@@ -47,7 +47,7 @@ const colorClassMap: Record<string, string> = {
   muted: 'bg-gray-500',
   destructive: 'bg-destructive',
   warning: 'bg-warning',
-  brand: 'bg-brand',
+  brand: 'bg-brand-default',
 }
 
 const LEVEL_CHART_CONFIG: ChartConfig = {
@@ -127,6 +127,7 @@ const ServiceCell = ({
               <TooltipTrigger asChild>
                 <button
                   type="button"
+                  tabIndex={0}
                   className="relative z-10 text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
                   aria-label={`About ${service.name}`}
                 >

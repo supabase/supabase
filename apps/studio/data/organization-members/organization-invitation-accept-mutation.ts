@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
@@ -28,7 +27,6 @@ type OrganizationMemberUpdateData = Awaited<ReturnType<typeof acceptOrganization
 
 export const useOrganizationAcceptInvitationMutation = ({
   onSuccess,
-  onError,
   ...options
 }: Omit<
   UseCustomMutationOptions<
@@ -54,13 +52,6 @@ export const useOrganizationAcceptInvitationMutation = ({
         invalidatePermissionsQuery(queryClient),
       ])
       await onSuccess?.(data, variables, context)
-    },
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to accept invitation: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
     },
     ...options,
   })

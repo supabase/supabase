@@ -6,7 +6,7 @@
  * value flowing from URL parameters, UI inputs, or LLM output must pass through
  * a sanitization helper in safe-analytics-sql.ts before reaching the wire.
  *
- * See .claude/skills/safe-sql-execution/SKILL.md for the full security model.
+ * See .agents/skills/safe-sql-execution/SKILL.md for the full security model.
  */
 import type { SafeLogSqlFragment } from './safe-analytics-sql'
 import { get, handleError, post } from '@/data/fetchers'

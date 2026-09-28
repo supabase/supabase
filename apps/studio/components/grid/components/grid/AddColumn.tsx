@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ADD_COLUMN_KEY } from '../../constants'
 import { DefaultFormatter } from '../formatter/DefaultFormatter'
@@ -32,7 +32,18 @@ const AddColumnHeader = () => {
 
   return (
     <div className="flex h-full w-full py-1.5 flex items-center">
-      <Button block variant="text" onClick={tableEditorSnap.onAddColumn} icon={<Plus />} />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            block
+            variant="text"
+            onClick={tableEditorSnap.onAddColumn}
+            icon={<Plus />}
+            aria-label="Add new column"
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Add new column</TooltipContent>
+      </Tooltip>
     </div>
   )
 }

@@ -54,7 +54,7 @@ export const CronJobPage = () => {
   const { data: edgeFunctions = [] } = useEdgeFunctionsQuery({ projectRef: project?.ref })
 
   // Parse the cron job command to check if it's an edge function
-  const cronJobValues = parseCronJobCommand(job?.command || '', project?.ref!)
+  const cronJobValues = parseCronJobCommand(job?.command || '', project?.ref!, project?.restUrl)
   const edgeFunction =
     cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
   const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()

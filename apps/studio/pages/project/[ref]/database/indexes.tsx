@@ -12,7 +12,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { Indexes } from '@/components/interfaces/Database/Indexes/Indexes'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
@@ -34,7 +34,7 @@ const IndexesPage: NextPageWithLayout = () => {
               className="no-underline"
               href={`${DOCS_URL}/guides/database/query-optimization`}
             />
-            <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
               <a
                 target="_blank"
                 rel="noreferrer"

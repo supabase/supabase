@@ -28,9 +28,13 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 
 interface OrganizationSelectorProps {
   form: UseFormReturn<CreateProjectForm>
+  disableOrganizationSelection: boolean
 }
 
-export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
+export const OrganizationSelector = ({
+  form,
+  disableOrganizationSelection,
+}: OrganizationSelectorProps) => {
   const router = useRouter()
   const { slug } = useParams()
   const queryClient = useQueryClient()
@@ -63,6 +67,7 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
                 }}
                 value={field.value}
                 defaultValue={field.value}
+                disabled={disableOrganizationSelection}
               >
                 <FormControl>
                   <SelectTrigger>

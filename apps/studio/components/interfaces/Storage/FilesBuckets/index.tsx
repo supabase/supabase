@@ -12,7 +12,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -144,7 +144,7 @@ export const FilesBuckets = () => {
                         </ShortcutTooltip>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="default" icon={<ArrowDownNarrowWide />}>
+                            <Button icon={<ArrowDownNarrowWide />}>
                               Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
                             </Button>
                           </DropdownMenuTrigger>
@@ -167,7 +167,6 @@ export const FilesBuckets = () => {
                           side="bottom"
                         >
                           <Button
-                            variant="default"
                             icon={<RefreshCw />}
                             loading={isFetchingBuckets}
                             onClick={handleRefresh}

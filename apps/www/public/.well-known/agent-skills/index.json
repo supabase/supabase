@@ -4,16 +4,16 @@
     {
       "name": "supabase",
       "type": "archive",
-      "description": "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector).",
-      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.5/supabase.tar.gz",
-      "digest": "sha256:5acb0974e54db43ac66fcb55170dee2059b423d5253a9c1f14a51df44358f07a"
+      "description": "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, declarative schemas, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector); debugging and troubleshooting errors or unexpected behavior on Supabase projects (HTTP errors, Postgres errors, RLS surprises, permission denied, schema cache issues, timeouts, Edge Function crashes, Realtime drops, Storage failures) and reading or querying logs (Logs Explorer, ClickHouse).",
+      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.8/supabase.tar.gz",
+      "digest": "sha256:d90b81c17612ee62372e47f628cc20056ab1a3cb1711780511cefc41113b86ad"
     },
     {
       "name": "supabase-postgres-best-practices",
       "type": "archive",
-      "description": "Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations.",
-      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.5/supabase-postgres-best-practices.tar.gz",
-      "digest": "sha256:2db40cf84865e73c908ff080d101ab1ca60829cd379f4e6c15d7287d33ce61e5"
+      "description": "Postgres best practices maintained by Supabase, for Postgres running anywhere. Load this skill BEFORE writing or changing anything that lives in a Postgres database: creating or altering tables and columns (including choosing column types), schema design, migrations and declarative schema files, RLS policies and the tests that verify them, indexes, triggers, database functions, queues and scheduled jobs (pg_cron, pgmq), vector/semantic search (pgvector), and restoring dumps (pg_restore) or importing data. Also load it when diagnosing slow queries, high CPU, timeouts, EXPLAIN plans, connection exhaustion, locking, bloat, or rows visible to the wrong user or tenant. This is not just a performance guide — schema, migration, security, and SQL authoring tasks need these rules too, even for a one-column change or a single query.",
+      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.8/supabase-postgres-best-practices.tar.gz",
+      "digest": "sha256:b7fc538bc4319134b295f2e8c01f9b1ccca7e63e4666f11b81de8b7f944cf187"
     }
   ]
 }

@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { PublicationTablesSkeleton } from './PublicationSkeleton'

@@ -260,7 +260,7 @@ function _generateCreateFunctionSql(
           Object.entries(config_params).map(([param, value]) =>
             value === 'FROM CURRENT'
               ? safeSql`SET ${qualifiedIdent(param)} FROM CURRENT`
-              : safeSql`SET ${qualifiedIdent(param)} TO ${value}`
+              : safeSql`SET ${qualifiedIdent(param)} TO ${value === '""' ? literal('') : value}`
           ),
           '\n'
         )

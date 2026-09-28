@@ -78,13 +78,14 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/_app/account.tsx` — AccountLayout (reads `accountLayoutTitle` from leaf `staticData`)
 - [x] `routes/_app/org.tsx` — OrganizationLayout (reads `orgLayoutTitle` from leaf `staticData`). **Delta vs plan:** placed at `_app/org.tsx` (wraps both `/org/` index and `/org/$slug/*`) instead of `_app/org/$slug.tsx`. PageLayout stays inline on `/org/$slug/index.tsx` since only that one route uses it.
 - [x] `routes/_app/new.tsx` — skipped; only `_app/new/index.tsx` lives under \_app (inlines WizardLayout). `new/$slug` is top-level (no AppLayout) so a sub-shell would not actually share state.
-- [x] `routes/integrations/vercel.tsx` — VercelIntegrationWindowLayout. **Delta vs plan:** placed at top-level rather than under `_app/` — Next getLayout for all three leaves wraps only in VercelIntegrationWindowLayout, no AppLayout/DefaultLayout.
+- [x] `routes/integrations/vercel.tsx` — passthrough `Outlet` only (no shared window layout). **Delta vs plan:** placed at top-level rather than under `_app/`. All three Vercel leaves (install, marketplace choose-project, deploy-button new-project) render their own `InterstitialLayout` inline; the old `VercelIntegrationWindowLayout` was removed.
 
 ### Project shell
 
 - [x] `routes/project/$ref.tsx` — DefaultLayout only. **Delta vs plan:** ProjectLayoutWithAuth omitted from the shell because product layouts (DatabaseLayout, AuthLayout, StorageLayout, …) already render `withAuth(... ProjectLayout ...)` internally — adding it here would double-wrap. The home page (`/project/$ref/index.tsx`) wraps itself in `ProjectLayoutWithAuth` since it has no product layout.
 - [x] `routes/project/$ref/database.tsx` — DatabaseLayout (reads `databaseLayoutTitle` from leaf `staticData`)
 - [x] `routes/project/$ref/database/triggers.tsx` — sub-shell with `PageLayout` + permission gate + nav items, inlined from `DatabaseTriggersLayout`. **Delta vs plan:** the existing `DatabaseTriggersLayout` component wraps `<DatabaseLayout title="Triggers">` internally, so re-using it inside the database.tsx shell would double-wrap. Inlined the inner part instead; the Next-side component is left untouched (still used by the `pages/...` files we re-export).
+- [x] `routes/project/$ref/database/pipelines.tsx` — sub-shell providing `PipelineRequestStatusProvider`, mirrors `PipelinesLayout` on the Next side. Sets `databaseLayoutTitle: 'Pipelines'` for the whole subtree so the provider stays a single instance across navigation between the Pipelines list and detail routes. Legacy Replication routes are retained only for redirects, while the replica detail route redirects to Infrastructure.
 - [x] `routes/project/$ref/auth.tsx` — AuthLayout (reads `authLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours a `skipAuthLayout: true` opt-out in `staticData` for leaves whose own body or sub-layout already wraps in `AuthLayout` (`AuthProvidersLayout`, `AuthEmailsLayout`, `pages/.../auth/third-party.tsx`) — without it those routes would double-wrap (which also doubles `withAuth` + `ProjectLayout`).
 - ~~`routes/project/$ref/auth/templates.tsx` — AuthEmailsLayout~~ **Delta vs plan: not landed.** A unified `templates.tsx` sub-shell would force `templates/$templateId.tsx` (which uses plain `AuthLayout`, not `AuthEmailsLayout`) into the wrong wrapping. Instead `templates/index.tsx` and `auth/smtp.tsx` each set `skipAuthLayout: true` and wrap themselves in `AuthEmailsLayout`; `templates/$templateId.tsx` uses the standard auth shell with `authLayoutTitle: 'Emails'`.
 - [x] `routes/project/$ref/storage.tsx` — StorageLayout + StorageBucketsLayout (reads `storageLayoutTitle`, optional `skipStorageBucketsLayout`, `storageBucketsLayoutTitle`, `storageBucketsLayoutHideSubtitle` from leaf `staticData`). **Delta vs plan:** the shell wraps in BOTH StorageLayout and StorageBucketsLayout by default — every storage page except bucket-detail pages uses both. Bucket-detail pages set `skipStorageBucketsLayout: true`. `/storage/s3` uses `storageBucketsLayout{Title,HideSubtitle}` to override the inner header.
@@ -93,6 +94,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. Hoisted `BranchesPageWrapper` and `MergeRequestsPageWrapper` to top-level exports in their respective `pages/...` files so the route files can import + re-use the same wrapping.
 - [x] `routes/project/$ref/logs.tsx` — LogsLayout (reads `logsLayoutTitle` from leaf staticData). Honours `skipLogsLayout: true` for `logs/index` (page handles its own ProjectLayout-wrapped content for the UnifiedLogs / no-permission cases). Refactored `pages/.../logs/index.tsx` to move the inline `<DefaultLayout>` into `getLayout` so it isn't duplicated when the TanStack project shell already provides DefaultLayout.
 - [x] `routes/project/$ref/observability.tsx` — ObservabilityLayout (reads `observabilityLayoutTitle` from leaf staticData)
+- [x] `routes/project/$ref/compute.tsx` — ComputeLayout (reads `computeLayoutTitle` from leaf `staticData`). Flag-gated: `ComputeLayout` itself redirects to the project home when `useFlag('compute')` is off, so the shell needs no extra guard.
 - [x] `routes/project/$ref/advisors.tsx` — AdvisorsLayout (reads `advisorsLayoutTitle` from leaf staticData). Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own AdvisorsLayout-less-DefaultLayout wrap. Scans whole match chain (same pattern as functions.tsx).
 - [x] `routes/project/$ref/advisors/rules.tsx` — sub-shell that inlines the inner body of `AdvisorRulesLayout` (AdvisorsLayout + PageLayout with title/tabs/feature-preview badge), minus the outer DefaultLayout (already provided by the parent project shell). Sets `skipAdvisorsLayout: true` on its own staticData. **Delta vs plan:** the existing `AdvisorRulesLayout` component wraps in DefaultLayout + AdvisorsLayout internally, so reusing it as-is would double-wrap both. Inlined the inner part; the Next-side component is untouched.
 - [x] `routes/project/$ref/settings.tsx` — SettingsLayout (reads `settingsLayoutTitle` from leaf staticData). Honours `skipSettingsLayout: true` for `settings/api` (redirect-only page). Adds a sub-shell at `routes/project/$ref/settings/api-keys.tsx` providing `ApiKeysLayout` for both api-keys leaves; `jwt/index` wraps in `JWTKeysLayout` inline since `jwt/legacy` doesn't share it.
@@ -121,6 +123,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/_app/org/$slug/index.tsx` ← `pages/org/[slug]/index.tsx`
 - [x] A `routes/_app/org/$slug/apps.tsx` ← `pages/org/[slug]/apps.tsx`
 - [x] A `routes/_app/org/$slug/audit.tsx` ← `pages/org/[slug]/audit.tsx`
+- [x] A `routes/_app/org/$slug/audit-log-drains.tsx` ← `pages/org/[slug]/audit-log-drains.tsx` (wraps in OrganizationSettingsLayout inline)
 - [x] A `routes/_app/org/$slug/billing.tsx` ← `pages/org/[slug]/billing.tsx`
 - [x] A `routes/_app/org/$slug/documents.tsx` ← `pages/org/[slug]/documents.tsx`
 - [x] A `routes/_app/org/$slug/general.tsx` ← `pages/org/[slug]/general.tsx`
@@ -142,6 +145,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `LinkAwsMarketplaceLayout` and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [x] A `routes/claim-project.tsx` ← `pages/claim-project.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `<Head>` + `<main>` layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [x] A `routes/join.tsx` ← `pages/join.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses a centered-div layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
+- [x] A `routes/stripe-atlas-application.tsx` ← `pages/stripe-atlas-application.tsx` (no `withAuth` — reachable logged in and logged out; uses `InterstitialLayout`, so no `AppLayout` + `DefaultLayout` wrapping)
 - [x] `routes/_app/support/new.tsx` ← `pages/support/new.tsx` (sets `hideMobileMenu: true` staticData; existing page is `withAuth`-wrapped so no beforeLoad migration needed yet)
 - [x] `routes/_app/support/link.tsx` ← `pages/support/link.tsx`
 
@@ -156,6 +160,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] A `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
 - [x] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
+- [x] `routes/project/$ref/explorer.tsx` — converted from a leaf into a shell (`ExplorerLayout` + `Outlet`) to host the new `/explorer/notebook/$id` leaf; parent `project/$ref.tsx` shell still provides DefaultLayout.
 
 ### Project shell — `/api/*`
 
@@ -168,6 +173,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/database/functions.tsx` ← `pages/project/[ref]/database/functions.tsx`
 - [x] A `routes/project/$ref/database/indexes.tsx` ← `pages/project/[ref]/database/indexes.tsx`
 - [x] A `routes/project/$ref/database/migrations.tsx` ← `pages/project/[ref]/database/migrations.tsx`
+- [x] A `routes/project/$ref/database/policies.tsx` ← `pages/project/[ref]/database/policies.tsx`
 - [x] A `routes/project/$ref/database/roles.tsx` ← `pages/project/[ref]/database/roles.tsx`
 - [x] A `routes/project/$ref/database/settings.tsx` ← `pages/project/[ref]/database/settings.tsx`
 - [x] A `routes/project/$ref/database/types.tsx` ← `pages/project/[ref]/database/types.tsx`
@@ -176,9 +182,9 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/database/tables/$id.tsx` ← `pages/project/[ref]/database/tables/[id].tsx`
 - [x] A `routes/project/$ref/database/publications/index.tsx` ← `pages/project/[ref]/database/publications/index.tsx`
 - [x] A `routes/project/$ref/database/publications/$id.tsx` ← `pages/project/[ref]/database/publications/[id].tsx`
-- [x] A `routes/project/$ref/database/replication/index.tsx` ← `pages/project/[ref]/database/replication/index.tsx`
-- [x] A `routes/project/$ref/database/replication/$pipelineId.tsx` ← `pages/project/[ref]/database/replication/[pipelineId].tsx`
-- [x] A `routes/project/$ref/database/replication/replica/$replicaId.tsx` ← `pages/project/[ref]/database/replication/replica/[replicaId].tsx`
+- [x] A `routes/project/$ref/database/pipelines/index.tsx` ← `pages/project/[ref]/database/pipelines/index.tsx`
+- [x] A `routes/project/$ref/database/pipelines/$pipelineId.tsx` ← `pages/project/[ref]/database/pipelines/[pipelineId].tsx`
+- [x] A `routes/project/$ref/database/replication/replica/$replicaId.tsx` ← `pages/project/[ref]/database/replication/replica/[replicaId].tsx` (redirects to Infrastructure)
 - [x] A `routes/project/$ref/database/triggers/index.tsx` ← `pages/project/[ref]/database/triggers/index.tsx`
 - [x] A `routes/project/$ref/database/triggers/data.tsx` ← `pages/project/[ref]/database/triggers/data.tsx` (sub-shell at `database/triggers.tsx` provides PageLayout + nav, parent shell provides DatabaseLayout)
 - [x] A `routes/project/$ref/database/triggers/event.tsx` ← `pages/project/[ref]/database/triggers/event.tsx` (same as data)
@@ -190,7 +196,6 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] A `routes/project/$ref/auth/overview.tsx` ← `pages/project/[ref]/auth/overview.tsx`
 - [x] A `routes/project/$ref/auth/users.tsx` ← `pages/project/[ref]/auth/users.tsx`
-- [x] A `routes/project/$ref/auth/policies.tsx` ← `pages/project/[ref]/auth/policies.tsx`
 - [x] A `routes/project/$ref/auth/providers.tsx` ← `pages/project/[ref]/auth/providers.tsx` (sets `skipAuthLayout: true`, wraps in `AuthProvidersLayout` directly)
 - [x] A `routes/project/$ref/auth/mfa.tsx` ← `pages/project/[ref]/auth/mfa.tsx`
 - [x] A `routes/project/$ref/auth/hooks.tsx` ← `pages/project/[ref]/auth/hooks.tsx`
@@ -226,6 +231,12 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/realtime/policies.tsx` ← `pages/project/[ref]/realtime/policies.tsx`
 - [x] A `routes/project/$ref/realtime/settings.tsx` ← `pages/project/[ref]/realtime/settings.tsx`
 
+### Project shell — `/compute/*`
+
+- [x] A `routes/project/$ref/compute/index.tsx` ← `pages/project/[ref]/compute/index.tsx`
+- [x] A `routes/project/$ref/compute/$name.tsx` ← `pages/project/[ref]/compute/[name].tsx`
+- [x] A `routes/project/$ref/compute/secrets.tsx` ← `pages/project/[ref]/compute/secrets.tsx`
+
 ### Project shell — `/functions/*`
 
 - [x] A `routes/project/$ref/functions/index.tsx` ← `pages/project/[ref]/functions/index.tsx` (route wraps in exported `EdgeFunctionsIndexPageWrapper` for the inline PageHeader + actions)
@@ -250,6 +261,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/logs/dedicated-pooler-logs.tsx` ← `pages/project/[ref]/logs/dedicated-pooler-logs.tsx`
 - [x] A `routes/project/$ref/logs/edge-functions-logs.tsx` ← `pages/project/[ref]/logs/edge-functions-logs.tsx`
 - [x] A `routes/project/$ref/logs/edge-logs.tsx` ← `pages/project/[ref]/logs/edge-logs.tsx`
+- [x] A `routes/project/$ref/logs/multigres-logs.tsx` ← `pages/project/[ref]/logs/multigres-logs.tsx`
 - [x] A `routes/project/$ref/logs/pg-upgrade-logs.tsx` ← `pages/project/[ref]/logs/pg-upgrade-logs.tsx`
 - [x] A `routes/project/$ref/logs/pgcron-logs.tsx` ← `pages/project/[ref]/logs/pgcron-logs.tsx`
 - [x] A `routes/project/$ref/logs/pooler-logs.tsx` ← `pages/project/[ref]/logs/pooler-logs.tsx`
@@ -270,6 +282,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/observability/auth.tsx` ← `pages/project/[ref]/observability/auth.tsx`
 - [x] A `routes/project/$ref/observability/database.tsx` ← `pages/project/[ref]/observability/database.tsx`
 - [x] A `routes/project/$ref/observability/api-overview.tsx` ← `pages/project/[ref]/observability/api-overview.tsx`
+- [x] A `routes/project/$ref/observability/connections.tsx` ← `pages/project/[ref]/observability/connections.tsx`
 - [x] A `routes/project/$ref/observability/edge-functions.tsx` ← `pages/project/[ref]/observability/edge-functions.tsx`
 - [x] A `routes/project/$ref/observability/postgrest.tsx` ← `pages/project/[ref]/observability/postgrest.tsx`
 - [x] A `routes/project/$ref/observability/query-insights.tsx` ← `pages/project/[ref]/observability/query-insights.tsx`
@@ -279,6 +292,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/advisors/*`
 
+- [x] A `routes/project/$ref/advisors/health.tsx` ← `pages/project/[ref]/advisors/health.tsx`
 - [x] A `routes/project/$ref/advisors/performance.tsx` ← `pages/project/[ref]/advisors/performance.tsx`
 - [x] A `routes/project/$ref/advisors/security.tsx` ← `pages/project/[ref]/advisors/security.tsx`
 - [x] A `routes/project/$ref/advisors/rules/performance.tsx` ← `pages/project/[ref]/advisors/rules/performance.tsx`
@@ -289,9 +303,10 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/settings/general.tsx` ← `pages/project/[ref]/settings/general.tsx`
 - [x] A `routes/project/$ref/settings/addons.tsx` ← `pages/project/[ref]/settings/addons.tsx`
 - [x] A `routes/project/$ref/settings/api.tsx` ← `pages/project/[ref]/settings/api.tsx` (sets `skipSettingsLayout: true` — page is a useEffect redirect)
-- [x] A `routes/project/$ref/settings/compute-and-disk.tsx` ← `pages/project/[ref]/settings/compute-and-disk.tsx`
 - [x] A `routes/project/$ref/settings/dashboard.tsx` ← `pages/project/[ref]/settings/dashboard.tsx`
-- [x] A `routes/project/$ref/settings/infrastructure.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
+- [x] A `routes/project/$ref/settings/code-configuration.tsx` ← `pages/project/[ref]/settings/code-configuration.tsx`
+- [x] A `routes/project/$ref/settings/infrastructure/index.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
+- [x] A `routes/project/$ref/settings/infrastructure/replica/$replicaId.tsx` ← `pages/project/[ref]/settings/infrastructure/replica/[replicaId].tsx`
 - [x] A `routes/project/$ref/settings/integrations.tsx` ← `pages/project/[ref]/settings/integrations.tsx`
 - [x] A `routes/project/$ref/settings/log-drains.tsx` ← `pages/project/[ref]/settings/log-drains.tsx`
 - [x] A `routes/project/$ref/settings/api-keys/index.tsx` ← `pages/project/[ref]/settings/api-keys/index.tsx` (under `api-keys.tsx` sub-shell with ApiKeysLayout)
@@ -314,13 +329,20 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/sql/index.tsx` ← `pages/project/[ref]/sql/index.tsx`
 - [x] A `routes/project/$ref/sql/$id.tsx` ← `pages/project/[ref]/sql/[id].tsx`
 - [x] A `routes/project/$ref/sql/templates.tsx` ← `pages/project/[ref]/sql/templates.tsx`
-- [x] A `routes/project/$ref/sql/quickstarts.tsx` ← `pages/project/[ref]/sql/quickstarts.tsx`
+- [x] A `routes/project/$ref/sql/examples.tsx` ← `pages/project/[ref]/sql/examples.tsx`
 
 ### Project shell — `/editor/*`
 
 - [x] A `routes/project/$ref/editor/index.tsx` ← `pages/project/[ref]/editor/index.tsx`
 - [x] A `routes/project/$ref/editor/$id.tsx` ← `pages/project/[ref]/editor/[id].tsx`
 - [x] A `routes/project/$ref/editor/new.tsx` ← `pages/project/[ref]/editor/new.tsx`
+
+### Project shell — `/explorer/*`
+
+- [x] A `routes/project/$ref/explorer/index.tsx` ← `pages/project/[ref]/explorer/index.tsx`
+- [x] A `routes/project/$ref/explorer/notebook/$id.tsx` ← `pages/project/[ref]/explorer/notebook/[id].tsx`
+- [x] A `routes/project/$ref/explorer/chat/$id.tsx` ← `pages/project/[ref]/explorer/chat/[id].tsx`
+- [x] A `routes/project/$ref/explorer/query/$id.tsx` ← `pages/project/[ref]/explorer/query/[id].tsx`
 
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 
@@ -329,6 +351,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
 - [x] A `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
 - [x] A `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx` (page inlines SignInLayout)
+- [x] A `routes/_auth/sign-in-recovery-code.tsx` ← `pages/sign-in-recovery-code.tsx` (page inlines SignInLayout)
 - [x] A `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
 - [x] A `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx` (page inlines ForgotPasswordLayout)
 - [x] A `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx` (page default already withAuth-wrapped)
@@ -342,6 +365,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
 - [x] A `routes/logout.tsx` ← `pages/logout.tsx`
 - [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
+- [x] A `routes/verify-email.tsx` ← `pages/verify-email.tsx`
+- [x] A `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 
 ### Error pages (handled at root)
 
@@ -417,8 +442,9 @@ per-file items only when a subtree has special cases.
 - [x] `routes/api/v1/**` — except `body.ts` (streaming rewrite)
 - [x] `routes/api/v1/projects/$ref/functions/$slug/body.ts` — Web-streams rewrite. Returns a `Response` whose body is a `ReadableStream`; each artifact file is converted via `Readable.toWeb(createReadStream(...))` and pulled chunk-by-chunk into the multipart stream. Skips the `apiWrapper` since `getFunctionsArtifactStore` already asserts self-hosted mode (the pages-router `withAuth` was a no-op outside `IS_PLATFORM`).
 - [x] `routes/api/mcp/index.ts` — uses `WebStandardStreamableHTTPServerTransport` from `@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js`. Takes a Web `Request`, returns a `Response` directly — no shim needed. Query parsing pulled from `request.url`'s search params; headers passed through unchanged.
-- [x] `routes/api/incident-banner.ts`, `routes/api/incident-status.ts` — App
-      Router routes under `app/api/**` (already Web-native, direct re-export)
+- [x] `routes/api/incident-banner.ts`, `routes/api/incident-status.ts`,
+      `routes/api/status-page.ts` — App Router routes under `app/api/**`
+      (already Web-native, direct re-export)
 
 ---
 
@@ -494,12 +520,86 @@ Keep this plugin even after migration — it's not a Next-related shim,
 it's general protection against this entire class of bug. Just clear
 the allowlist when the underlying cycle is gone.
 
+### `@sentry/nextjs` → `@sentry/react` alias
+
+`resolve.alias` in `vite.config.ts` rewrites the bare `@sentry/nextjs`
+import to `compat/sentry-nextjs.ts`, which re-exports `@sentry/react`
+(the same-version package `@sentry/nextjs` wraps on the client) plus
+explicit stand-ins for the Next-only APIs (`captureRouterTransitionStart`,
+`captureRequestError`, `withSentryConfig`).
+
+Why: `@sentry/nextjs`'s client entry imports
+`next/dist/shared/lib/constants`, whose module scope evaluates
+`...(process?.features?.typescript ? ['next.config.mts'] : [])`.
+Optional chaining does **not** guard an undeclared `process` identifier,
+so every built client chunk containing it (table editor was the canary)
+threw `ReferenceError: process is not defined` at module load. Dev was
+unaffected (dev pipeline shims `process`), so it only surfaced in the
+production/test build.
+
+The alias also made the previous `@sentry/nextjs` SSR workarounds
+(`ssr.noExternal` entry + `ssr.optimizeDeps.include`) obsolete — the id
+is rewritten before SSR resolution, and `@sentry/react` ships real ESM.
+App source keeps importing `@sentry/nextjs` so the Next build
+(`build:next`) is untouched; drop the alias + shim together with the
+Next build when the migration is done (switch imports to
+`@sentry/react` directly).
+
+### GraphiQL Monaco workers: `setup-workers/webpack` → `setup-workers/vite`
+
+App source (`GraphiQLTab.tsx`) imports `graphiql/setup-workers/webpack`,
+which registers `MonacoEnvironment.getWorker` using
+`new Worker(new URL('monaco-editor/...', import.meta.url))` — the URL form
+webpack/turbopack rewrites at build time. Vite doesn't rewrite bare module
+specifiers inside `new URL(..., import.meta.url)`, so under the TanStack
+build the worker URLs 404'd and Monaco fell back to running the `json`,
+`editorWorkerService` and `graphql` workers on the main thread ("Could not
+create web worker(s). Falling back to loading web worker code in main
+thread" in the console).
+
+The `graphiqlViteWorkers` plugin in `vite.config.ts` resolves that import
+to graphiql's own `setup-workers/vite` variant (same three workers via
+Vite `?worker` imports) in client builds; SSR resolution is untouched. The
+import specifier stays `.../webpack` in app source so the Next build keeps
+working. The whole setup-workers chain is also in `optimizeDeps.exclude` —
+the Rolldown dep optimizer can't load `?worker` ids
+(`UNLOADABLE_DEPENDENCY`), so the modules go through the normal transform
+pipeline where Vite's built-in worker plugin handles them. Drop the plugin
+and the exclude, and switch the import to `graphiql/setup-workers/vite`,
+when the Next build goes away.
+
+### Raw-text imports: `*.md` + `public/deno/*.d.ts` (`rawTextLoader`)
+
+Next's raw-loader rules (next.config.ts `turbopack.rules`) serve `*.md`
+files and the Deno typings `public/deno/edge-runtime.d.ts` /
+`public/deno/lib.deno.d.ts` as JS modules whose default export is the
+file's text. The `rawTextLoader` plugin in `vite.config.ts` mirrors that
+for the Vite pipeline:
+
+- `*.md` — plain `transform` (used by
+  `static-data/integrations/*/overview.md` via the literal-import registry
+  in `static-data/integrations/overviews.ts`).
+- The two Deno `.d.ts` files (used by `components/ui/AIEditor` as Monaco
+  extra libs for edge-function editors) — an exact-specifier allowlist
+  resolved to `\0`-virtual ids and served from a `load` hook. They can't go
+  through `transform`: Rolldown's native dep scanner skips JS plugin hooks
+  and hard-fails parsing TS _declaration_ syntax (`get stdin(): ...;`) as
+  runtime TS, which killed dependency pre-bundling wholesale. The previous
+  `/* @vite-ignore */` hack kept the scanner away but also meant the
+  imports failed at runtime, silently dropping Deno type hints in the
+  TanStack build. Do NOT widen the allowlist to `*.d.ts` — hijacking
+  declaration-file resolution globally would corrupt packages that ship
+  `.d.ts` next to their JS. The `as string` casts on the import specifiers
+  in `AIEditor/index.tsx` keep tsc from resolving the `.d.ts` files as
+  declaration files (TS2846) while erasing to plain literals both bundlers
+  statically analyze.
+
 ### Other build-side migration changes
 
 - `pnpm-workspace.yaml` catalog now includes `@tanstack/react-router`,
   `@tanstack/react-start`, `@tanstack/react-table` so studio and
-  ui-library stay aligned. `react-query` is **not** in the catalog yet
-  — three consumers (studio, docs, ui-library) sit on different 5.x
+  library stay aligned. `react-query` is **not** in the catalog yet
+  — three consumers (studio, docs, library) sit on different 5.x
   ranges and unifying them is a separate decision.
 - `NODE_OPTIONS=--max-old-space-size=8192` is set on the studio
   `dev` script — Vite's Rolldown-RC frontend hits the default 4 GB
@@ -525,4 +625,5 @@ the allowlist when the underlying cycle is gone.
 - Delete `pages/_app.tsx`, `pages/_document.tsx`, `pages/_error.jsx`, `pages/500.tsx`, `pages/404.tsx` (Next-only catch-alls; TanStack equivalents on `__root.tsx`).
 - Drop the `dev:next` / `build:next` / `start:next` scripts from `apps/studio/package.json` once we're committed to TanStack.
 - Remove the `apps/studio/pages/**` `path_instructions` guardrail entry from `.coderabbit.yaml` (added in FE-3423; remove it as part of this FE-3106 cleanup) — it's only useful while both runtimes coexist.
+- Remove the "TanStack Start migration" section from `apps/studio/AGENTS.md` — it only applies while both runtimes coexist.
 - Delete this file.

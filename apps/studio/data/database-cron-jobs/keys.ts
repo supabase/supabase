@@ -4,6 +4,8 @@ export const databaseCronJobsKeys = {
   create: () => ['cron-jobs', 'create'] as const,
   delete: () => ['cron-jobs', 'delete'] as const,
   alter: () => ['cronjobs', 'alter'] as const,
+  /** Prefix of job, listInfinite, count, run, and runsInfinite — but not listInfiniteMinimal */
+  jobs: (projectRef: string | undefined) => ['projects', projectRef, 'cron-jobs'] as const,
   job: (projectRef: string | undefined, identifier: number | string | undefined) =>
     ['projects', projectRef, 'cron-jobs', identifier] as const,
   listInfinite: (projectRef: string | undefined, searchTerm: string | undefined) =>

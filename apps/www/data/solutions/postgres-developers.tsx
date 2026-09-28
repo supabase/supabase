@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { useBreakpoint } from 'common'
 import {
   Check,
@@ -85,7 +86,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -391,7 +392,7 @@ const data: () => {
           ),
         },
         {
-          id: 'row-level-security',
+          id: 'full-sql-access',
           title: 'Full SQL access',
           icon: '',
           subheading: (
@@ -411,7 +412,7 @@ const data: () => {
                 dark: '/images/solutions/postgres-developers/sql-editor-dark.jpg',
                 light: '/images/solutions/postgres-developers/sql-editor-light.jpg',
               }}
-              alt="Row Level Security"
+              alt="SQL Editor"
               width={100}
               height={100}
               quality={100}

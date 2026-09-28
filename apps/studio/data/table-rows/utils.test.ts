@@ -12,9 +12,9 @@ const table = {
   ],
 }
 
-const makeFilter = (column: string, value: any): Filter => ({
+const makeFilter = (column: string, value: any, operator: Filter['operator'] = '='): Filter => ({
   column,
-  operator: '=',
+  operator,
   value,
 })
 
@@ -56,4 +56,20 @@ describe('formatFilterValue', () => {
       Number.MIN_SAFE_INTEGER
     )
   })
+
+  it.each(['~~', '~~*', '!~~', '!~~*'] as const)(
+    'wraps the value in %%...%% for the %s operator when no wildcard is present',
+    (operator) => {
+      expect(formatFilterValue(table, makeFilter('name', 'al', operator))).toBe('%al%')
+    }
+  )
+
+  it.each(['~~', '~~*', '!~~', '!~~*'] as const)(
+    'leaves the value untouched for the %s operator when it already contains a % or _ wildcard',
+    (operator) => {
+      expect(formatFilterValue(table, makeFilter('name', 'al%', operator))).toBe('al%')
+      expect(formatFilterValue(table, makeFilter('name', '%al', operator))).toBe('%al')
+      expect(formatFilterValue(table, makeFilter('name', 'j_hn', operator))).toBe('j_hn')
+    }
+  )
 })

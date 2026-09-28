@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   getInitialMigrationSQLFromGitHubRepo,
@@ -16,10 +16,6 @@ vi.mock('@/data/fetchers', () => ({
 }))
 
 describe('integration-utils', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('getInitialMigrationSQLFromGitHubRepo', () => {
     it('should return null when no externalId is provided', async () => {
       const result = await getInitialMigrationSQLFromGitHubRepo()

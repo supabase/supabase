@@ -22,7 +22,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { analyticsKeys } from '@/data/analytics/keys'
-import { useContentQuery } from '@/data/content/content-query'
+import { ContentOfType, useContentQuery } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
@@ -73,7 +73,9 @@ const Reports = () => {
   })
   const track = useTrack()
 
-  const currentReport = userContents?.content.find((report) => report.id === reportId)
+  const currentReport = userContents?.content.find(
+    (report): report is ContentOfType<'report'> => report.id === reportId
+  )
   const currentReportContent = currentReport?.content as Dashboards.Content
 
   const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -256,7 +258,11 @@ const Reports = () => {
     if (config === undefined) return console.error('Config is required')
     upsertContent({
       projectRef: ref,
-      payload: { ...currentReport, content: config },
+      payload: {
+        ...currentReport,
+        description: currentReport.description ?? undefined,
+        content: config,
+      },
     })
   }
 
@@ -380,11 +386,7 @@ const Reports = () => {
           </div>
           {hasEdits && (
             <div className="flex items-center gap-x-2">
-              <Button
-                variant="default"
-                disabled={isSaving}
-                onClick={() => setConfig(currentReportContent)}
-              >
+              <Button disabled={isSaving} onClick={() => setConfig(currentReportContent)}>
                 Cancel
               </Button>
               <Button
@@ -421,7 +423,6 @@ const Reports = () => {
           <div className="flex items-center gap-x-2">
             <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} topic={reportTitle} />
             <ButtonTooltip
-              variant="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
@@ -431,7 +432,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" icon={<Plus />}>
+                  <Button icon={<Plus />}>
                     <span>Add block</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -442,7 +443,6 @@ const Reports = () => {
             ) : (
               <ButtonTooltip
                 disabled
-                variant="default"
                 icon={<Plus />}
                 tooltip={{
                   content: {
@@ -472,9 +472,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" iconRight={<Plus size={14} />}>
-                    Add your first chart
-                  </Button>
+                  <Button iconRight={<Plus size={14} />}>Add your first chart</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="center">
                   <MetricOptions config={config} handleChartSelection={handleChartSelection} />

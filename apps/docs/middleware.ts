@@ -17,10 +17,7 @@ export function middleware(request: NextRequest) {
     const isMdSuffix = pathname.endsWith('.md')
     const slug = pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
     const decision = negotiateMarkdown(
-      {
-        acceptHeader: request.headers.get('accept') ?? '',
-        userAgent: request.headers.get('user-agent') ?? '',
-      },
+      { acceptHeader: request.headers.get('accept') ?? '' },
       { hasMarkdownVariant: GUIDES_MARKDOWN_SLUGS.has(slug), isMarkdownSuffix: isMdSuffix }
     )
 
@@ -66,7 +63,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
 
-  if (lib === 'api') {
+  // Spike (DOCS-1268): only the bare /reference/api needs normalizing now.
+  // /reference/api/<slug> has its own statically generated page — don't
+  // collapse it back to the monolith.
+  if (lib === 'api' && !maybeVersion) {
     const rewritePath = [REFERENCE_PATH, 'api'].join('/')
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }

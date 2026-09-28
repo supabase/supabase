@@ -54,10 +54,12 @@ export function McpConfigPanel({
   nonPlatformUrl,
 }: McpConfigPanelProps) {
   const [readonly, setReadonly] = useState(false)
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
+  const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(() =>
+    supportedFeatures.filter((group) => group.id !== 'storage').map((group) => group.id)
+  )
   const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
 
-  const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
   const selectedFeaturesSupported = useMemo(() => {
     return selectedFeatures.filter((feature) =>
       supportedFeatures.some((group) => group.id === feature)

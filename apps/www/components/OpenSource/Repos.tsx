@@ -16,6 +16,7 @@ interface TabProps {
 
 const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
   <button
+    tabIndex={0}
     onClick={onClick}
     className={`rounded-full px-4 md:px-3 py-2 md:py-1 nowrap flex group gap-1 transition-all ${
       isActive ? 'bg-surface-300' : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'
@@ -31,7 +32,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={cn('text-foreground-light shrink-0', isActive && 'text-brand')}
+          className={cn('text-foreground-light shrink-0', isActive && 'text-primary')}
         >
           <path
             d={icon}

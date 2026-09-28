@@ -1,5 +1,5 @@
 import { act, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { GlobalShortcuts } from './GlobalShortcuts'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -24,10 +24,6 @@ vi.mock('./ShortcutsReferenceSheet', () => ({
 }))
 
 describe('GlobalShortcuts', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('registers the shortcuts reference action in the command palette', () => {
     render(<GlobalShortcuts />)
 

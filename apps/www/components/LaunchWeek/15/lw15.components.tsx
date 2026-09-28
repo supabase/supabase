@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
-import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn } from 'ui'
 import { Music } from 'lucide-react'
-
-import Link from 'next/link'
-import { StepLink } from './data/lw15_data'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { cn, IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+
+import { StepLink } from './data/lw15_data'
 
 export const LWSVG = (props: React.SVGProps<SVGSVGElement>) => {
   return (
@@ -59,6 +59,7 @@ export const LW15ThemeSwitcher = ({
   return (
     <div className={cn('flex items-center justify-start gap-2', className)} {...props}>
       <button
+        tabIndex={0}
         onClick={() => setTheme('dark')}
         className={cn(isDarkMode ? 'text-foreground' : 'text-foreground-lighter')}
       >
@@ -66,6 +67,7 @@ export const LW15ThemeSwitcher = ({
       </button>{' '}
       /
       <button
+        tabIndex={0}
         onClick={() => setTheme('light')}
         className={cn(!isDarkMode ? 'text-foreground' : 'text-foreground-lighter')}
       >

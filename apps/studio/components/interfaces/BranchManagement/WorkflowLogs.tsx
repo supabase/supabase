@@ -70,7 +70,6 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="default"
           icon={
             showStatusIcon ? (
               <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
@@ -115,6 +114,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
                       <li key={workflowRun.id} className="flex justify-between px-4 py-3 gap-2">
                         <button
                           type="button"
+                          tabIndex={workflowRun.id === projectRef ? -1 : 0}
                           disabled={workflowRun.id === projectRef}
                           onClick={() => setSelectedWorkflowRun(workflowRun)}
                           className="flex items-center gap-2 w-full justify-between"

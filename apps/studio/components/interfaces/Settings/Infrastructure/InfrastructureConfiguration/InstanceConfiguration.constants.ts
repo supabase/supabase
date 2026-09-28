@@ -2,9 +2,6 @@ import { ReadReplicaSetupError, ReadReplicaSetupProgress } from '@supabase/share
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
 
-import { components } from '@/data/api'
-import { PROJECT_STATUS } from '@/lib/constants'
-
 export interface Region {
   key: AWS_REGIONS_KEYS
   name: string
@@ -47,8 +44,21 @@ export type EdgeData = {
 export const NODE_WIDTH = 660
 export const NODE_SEP = 20
 
+// Rendered width of the node cards; dagre lays out with NODE_WIDTH / 2 so
+// cards get a little breathing room between columns.
+export const NODE_CARD_WIDTH = NODE_WIDTH / 2 - 10
+
 // The region wrapper is a static, non-measured sibling node with a fixed size.
 export const REGION_NODE_HEIGHT = 162
+
+// The shard wrapper is a static, non-measured background node sized around its
+// children, with room reserved above them for the group header pill.
+export const SHARD_NODE_PADDING = 16
+export const SHARD_HEADER_HEIGHT = 42
+
+// dagre rank separation for the High Availability layout — leaves room for the
+// shard group header between the gateway row and the primary row.
+export const HA_RANKSEP = 96
 
 // First-paint fallback heights for the dagre layout, only used before React
 // Flow has measured the real nodes. Subsequent layouts use node.measured.height.
@@ -57,14 +67,9 @@ export const NODE_HEIGHT_FALLBACKS: Record<string, number> = {
   PRIMARY: 140,
   READ_REPLICA: 140,
   REGION: REGION_NODE_HEIGHT,
-}
-
-export const REPLICA_STATUS: {
-  [key: string]: components['schemas']['DatabaseStatusResponse']['status']
-} = {
-  ...PROJECT_STATUS,
-  INIT_READ_REPLICA: 'INIT_READ_REPLICA',
-  INIT_READ_REPLICA_FAILED: 'INIT_READ_REPLICA_FAILED',
+  HA_GATEWAY: 64,
+  HA_PRIMARY: 150,
+  HA_REPLICA: 90,
 }
 
 // [Joshen] Coordinates from https://github.com/tobilg/aws-edge-locations/blob/main/data/aws-edge-locations.json
@@ -89,12 +94,7 @@ export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   WEST_EU_3: [2.35, 48.86],
 }
 
-export const FLY_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
-  SOUTHEAST_ASIA: [103.8, 1.37],
-}
-
 // [Joshen] Just to make sure that we just depend on AWS_REGIONS to determine available
-// regions for replicas. Just FYI - might need to update this if we support Fly in future
 export const AVAILABLE_REPLICA_REGIONS: Region[] = Object.keys(AWS_REGIONS)
   .map((key) => {
     return {

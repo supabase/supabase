@@ -5,6 +5,7 @@ import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../CreateBucket
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
+import { BASE_PATH } from '@/lib/constants'
 import type { StorageExplorerState } from '@/state/storage-explorer'
 
 type UploadProgress = {
@@ -45,6 +46,19 @@ export function getPathAlongFoldersToIndex(
     .slice(0, index)
     .map((folder) => folder.name)
     .join('/')
+}
+
+/**
+ * Splits a `?path` query param value into folder segments.
+ */
+export function parseStoragePath(value: string | null | undefined): string[] {
+  if (!value) return []
+  return value.split('/').filter((segment) => segment.length > 0)
+}
+
+/** Joins folder segments into `?path`; empty at the root so nuqs' `clearOnDefault` strips it. */
+export function serializeStoragePath(paths: string[]): string {
+  return paths.filter((segment) => segment.length > 0).join('/')
 }
 
 /**
@@ -117,14 +131,60 @@ export function sanitizeNameForDuplicateInColumn(
   return name
 }
 
-export const copyPathToFolder = (
-  openedFolders: StorageItem[],
+/** Bucket-relative path to an item */
+export function getStoragePathForItem(
+  openedFolders: readonly StorageItem[],
+  item: StorageItem & { columnIndex: number }
+): string {
+  const folders = openedFolders.slice(0, item.columnIndex).map((folder) => folder.name)
+  return folders.length > 0 ? `${folders.join('/')}/${item.name}` : item.name
+}
+
+/** Absolute dashboard URL that reopens the item in the storage explorer */
+export function getStorageExplorerUrlForItem({
+  openedFolders,
+  item,
+  projectRef,
+  bucketId,
+}: {
+  openedFolders: readonly StorageItem[]
+  item: StorageItem & { columnIndex: number }
+  projectRef: string
+  bucketId: string
+}): string {
+  const folders = openedFolders.slice(0, item.columnIndex).map((folder) => folder.name)
+  const isFolder = item.type === STORAGE_ROW_TYPES.FOLDER
+
+  const url = new URL(
+    `${BASE_PATH}/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId)}`,
+    location.origin
+  )
+  const path = serializeStoragePath(isFolder ? [...folders, item.name] : folders)
+  if (path.length > 0) url.searchParams.set('path', path)
+  if (!isFolder) url.searchParams.set('preview', item.name)
+
+  return url.toString()
+}
+
+export const copyStoragePath = (
+  openedFolders: readonly StorageItem[],
   item: StorageItem & { columnIndex: number }
 ) => {
-  const folders = openedFolders.slice(0, item.columnIndex).map((folder) => folder.name)
-  const path = folders.length > 0 ? `${folders.join('/')}/${item.name}` : item.name
-  copyToClipboard(path)
-  toast.success(`Copied path to folder "${item.name}"`)
+  // Toast from the callback: the write is async and reports its own failures.
+  copyToClipboard(getStoragePathForItem(openedFolders, item), () =>
+    toast.success(`Copied relative path for "${item.name}"`)
+  )
+}
+
+export const copyStorageExplorerUrl = (params: {
+  openedFolders: readonly StorageItem[]
+  item: StorageItem & { columnIndex: number }
+  projectRef: string
+  bucketId: string
+}) => {
+  copyToClipboard(getStorageExplorerUrlForItem(params), () =>
+    toast.success(`Copied URL for "${params.item.name}"`)
+  )
 }
 
 export const formatTime = (seconds: number) => {

@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -173,7 +173,7 @@ export const EmailTemplates = () => {
                 }
                 layout="horizontal"
                 actions={
-                  <Button asChild variant="default">
+                  <Button asChild>
                     <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
                   </Button>
                 }
@@ -276,9 +276,7 @@ export const EmailTemplates = () => {
                     )}
                     <CardFooter className="justify-end space-x-2">
                       {notificationsForm.formState.isDirty && (
-                        <Button variant="default" onClick={() => notificationsForm.reset()}>
-                          Cancel
-                        </Button>
+                        <Button onClick={() => notificationsForm.reset()}>Cancel</Button>
                       )}
                       <Button
                         variant="primary"

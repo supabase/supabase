@@ -1,53 +1,11 @@
-import { FilesBucket as FilesBucketIcon } from 'icons'
-import { AlertCircle, File, Film, FolderOpen, Image, LoaderCircle, Music } from 'lucide-react'
+import { AlertCircle, LoaderCircle } from 'lucide-react'
 import type { CSSProperties, MouseEvent } from 'react'
 import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { type StorageItem } from '../Storage.types'
+import { StorageRowIcon } from '../StorageRowIcon'
 import { formatBytes } from '@/lib/helpers'
-
-const RowIcon = ({
-  view,
-  status,
-  fileType,
-  isOpened = false,
-  mimeType,
-}: {
-  view: STORAGE_VIEWS
-  status: STORAGE_ROW_STATUS
-  fileType: string
-  isOpened?: boolean
-  mimeType: string | undefined
-}) => {
-  if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
-    return (
-      <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
-    )
-  }
-
-  if (fileType === STORAGE_ROW_TYPES.FOLDER) {
-    return isOpened ? (
-      <FolderOpen size={16} strokeWidth={2} className="text-foreground-lighter" />
-    ) : (
-      <FilesBucketIcon size={16} strokeWidth={2} className="text-foreground-lighter" />
-    )
-  }
-
-  if (mimeType?.includes('image')) {
-    return <Image size={16} className="text-foreground-lighter" />
-  }
-
-  if (mimeType?.includes('audio')) {
-    return <Music size={16} strokeWidth={2} className="text-foreground-lighter" />
-  }
-
-  if (mimeType?.includes('video')) {
-    return <Film size={16} strokeWidth={2} className="text-foreground-lighter" />
-  }
-
-  return <File size={16} strokeWidth={2} className="text-foreground-lighter" />
-}
 
 interface BucketFilePickerRowProps {
   item: StorageItem
@@ -114,7 +72,7 @@ export const BucketFilePickerRow = ({
                 hidden: isSelected,
               })}
             >
-              <RowIcon
+              <StorageRowIcon
                 view={view}
                 status={item.status}
                 fileType={item.type}

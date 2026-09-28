@@ -2,6 +2,7 @@ import { useFlag, useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -13,6 +14,7 @@ export const useGenerateSettingsMenu = () => {
   const { data: project, isPending } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const showDashboardPreferences = useFlag('dashboardPreferences')
+  const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
 
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
@@ -106,19 +108,20 @@ export const useGenerateSettingsMenu = () => {
           items: [],
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
         },
-        {
-          name: 'Compute and Disk',
-          key: 'compute-and-disk',
-          url: `/project/${ref}/settings/compute-and-disk`,
-          items: [],
-          disabled: !isProjectActive,
-          isLoading: isPending,
-          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK,
-        },
+        ...(showConfigDrift
+          ? [
+              {
+                name: 'Code configuration',
+                key: 'code-configuration',
+                url: `/project/${ref}/settings/code-configuration`,
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'Infrastructure',
           key: 'infrastructure',
-          url: `/project/${ref}/settings/infrastructure`,
+          url: getInfrastructurePath(ref),
           items: [],
           disabled: !isProjectActive,
           isLoading: isPending,

@@ -59,13 +59,13 @@
   }
 
   .rdg-cell {
-    border-left-color: hsl(var(--brand-default));
-    color: hsl(var(--brand-link));
+    border-left-color: var(--primary-bright);
+    color: var(--primary);
   }
 
   /* First cell gets a stronger left border to indicate new row */
   .rdg-cell:first-child {
-    box-shadow: inset 2px 0 0 0 hsl(var(--brand-default));
+    box-shadow: inset 2px 0 0 0 var(--primary-bright);
   }
 }
 
@@ -150,7 +150,7 @@
   @apply text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark;
 }
 .rdg-header-row .rdg-checkbox {
-  @apply bg-surface-200 border-default rounded-xs border;
+  @apply bg-200 border-default rounded-xs border;
 }
 .rdg-header-row .rdg-checkbox-input:checked + .rdg-checkbox {
   @apply border-default border-4 bg-green-900;
@@ -171,7 +171,7 @@
 
 .rdg-row {
   @apply bg-dash-sidebar transition-colors;
-  @apply hover:bg-surface-200;
+  @apply hover:bg-200;
 }
 
 /* edit button */
@@ -188,7 +188,7 @@
 
 /* select row */
 .rdg-row[aria-selected='true'] {
-  @apply bg-surface-200;
+  @apply bg-200;
 }
 
 .tab-cursor {
@@ -329,7 +329,7 @@
 }
 
 .sb-grid-column-header__inner svg {
-  @apply border-brand text-brand;
+  @apply border-primary-bright text-primary;
 }
 
 /*
@@ -345,6 +345,5 @@
 }
 
 .sb-grid-select-cell__header__input {
-  /* @apply focus:ring-brand-300; */
   @apply border-background-surface-100;
 }

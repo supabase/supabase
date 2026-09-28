@@ -22,7 +22,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const schema = z.object({
-  SITE_URL: z.string().min(1, 'Must have a Site URL'),
+  SITE_URL: z.string().trim().min(1, 'Must have a Site URL'),
 })
 
 const SiteUrl = () => {
@@ -125,11 +125,7 @@ const SiteUrl = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {isDirty && (
-                  <Button variant="default" onClick={() => siteUrlForm.reset()}>
-                    Cancel
-                  </Button>
-                )}
+                {isDirty && <Button onClick={() => siteUrlForm.reset()}>Cancel</Button>}
                 <Button
                   variant="primary"
                   type="submit"

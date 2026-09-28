@@ -80,6 +80,11 @@ verify_jwt = true
 [functions.simple-mcp-server]
 verify_jwt = false
 entrypoint = "./functions/mcp/simple-mcp-server/index.ts"
+import_map = "./functions/mcp/simple-mcp-server/deno.json"
+[functions.authenticated-mcp-server]
+verify_jwt = false
+entrypoint = "./functions/mcp/authenticated-mcp-server/index.ts"
+import_map = "./functions/mcp/authenticated-mcp-server/deno.json"
 [functions.read-storage]
 [functions.restful-tasks]
 [functions.select-from-table-with-auth-rls]

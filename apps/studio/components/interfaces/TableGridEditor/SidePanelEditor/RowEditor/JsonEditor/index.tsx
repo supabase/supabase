@@ -17,6 +17,8 @@ import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface JsonEditProps {
   row?: { [key: string]: any }
@@ -60,6 +62,7 @@ export const JsonEditor = ({
   const isTruncated = isValueTruncated(jsonString, columnFormat)
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const validateJSON = useCallback(
     async (nextValue: string, resolve: () => void) => {
@@ -117,6 +120,7 @@ export const JsonEditor = ({
         pkMatch,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       },
       {
         onSuccess: (data: unknown | undefined) => {
@@ -159,7 +163,6 @@ export const JsonEditor = ({
             <div className="flex items-center gap-x-2">
               {view === 'edit' && (
                 <ButtonTooltip
-                  variant="default"
                   icon={<AlignLeft />}
                   className="px-1"
                   onClick={() => prettify()}
@@ -218,7 +221,7 @@ export const JsonEditor = ({
                 performance issues
               </p>
             </div>
-            <Button variant="default" loading={isPending} onClick={loadFullValue}>
+            <Button loading={isPending} onClick={loadFullValue}>
               Load full JSON data
             </Button>
           </div>

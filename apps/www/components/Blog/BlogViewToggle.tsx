@@ -16,6 +16,7 @@ export default function BlogViewToggle({
     <div className="flex items-center border border-border rounded-md p-0.5 gap-0.5 bg-surface-100">
       {(['list', 'grid'] as BlogView[]).map((v) => (
         <button
+          tabIndex={0}
           key={v}
           onClick={() => {
             setView(v)

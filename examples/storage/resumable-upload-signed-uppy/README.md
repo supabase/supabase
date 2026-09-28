@@ -1,6 +1,6 @@
 ## Resumable Uploads with Supabase Storage and Uppy
 
-This example shows how to use signed urls from [Supabase Storage](https://supabase.io/docs/reference/javascript/storage) with [Uppy](https://uppy.io/) to upload files to Supabase Storage using the TUS protocol (signed resumable uploads).
+This example shows how to use signed urls from [Supabase Storage](https://supabase.com/docs/reference/javascript/storage) with [Uppy](https://uppy.io/) to upload files to Supabase Storage using the TUS protocol (signed resumable uploads).
 
 This works by calling `createSignedUploadUrl()` to get a token for each file, and passing that token via the `x-signature` header when uploading the files
 

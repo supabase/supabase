@@ -1,5 +1,4 @@
 import '@/styles/code.css'
-import '@/styles/focus.css'
 import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'
@@ -13,7 +12,6 @@ import '@/styles/ui.css'
 import 'react-data-grid/lib/styles.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 
-import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -40,14 +38,17 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { clearBootTimeoutFallback } from '@/components/ui/BootTimeoutFallback/BootTimeoutFallback'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
@@ -56,6 +57,7 @@ import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
+import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { ProfileProvider } from '@/lib/profile'
@@ -81,8 +83,17 @@ const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ProjectStatusTab').then((m) => m.ProjectStatusTab)
+    )
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
-  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  ? [
+      { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
+      { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
+    ]
   : []
 
 const FeatureFlagProviderWithOrgContext = ({
@@ -118,14 +129,7 @@ const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }
   return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
 }
 
-// [Ivan] Serve the Monaco assets locally from the public folder. The worker bootstrap
-// (vs/base/worker/workerMain.js) loads the language workers (e.g. tsWorker.js) via fetch()
-// from inside the web worker. A root-relative path fails to resolve there in some browsers
-// (Firefox throws "... is not a valid URL"), so we point `vs` at an absolute URL including
-// the origin. Guarded on `window` since this module is also evaluated during SSR.
-if (typeof window !== 'undefined') {
-  loader.config({ paths: { vs: `${window.location.origin}${BASE_PATH}/monaco-editor/vs` } })
-}
+configureMonacoLoader()
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
 // a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
@@ -153,6 +157,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   }
 
   useThemeSandbox()
+
+  useEffect(() => {
+    clearBootTimeoutFallback()
+  }, [])
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
@@ -217,10 +225,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
+                                      <IndirectTaxDeclarationModal />
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
                                   <MonacoThemeProvider />
+                                  <AppearanceSettingsProvider />
                                 </CommandProvider>
                               </AiAssistantStateContextProvider>
                               <DevToolbar extraTabs={devToolbarExtraTabs} />

@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
 
@@ -40,8 +40,12 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
     try {
       if (!projectRef) throw new Error('Project ref is required')
       await deleteReplicationTenant({ projectRef })
-    } catch (error: any) {
-      setError(error.message ?? 'An unknown error occurred')
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'An unknown error occurred while disabling Pipelines'
+      )
       throw error
     }
   }
@@ -51,13 +55,9 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
       <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>Disable Pipelines</AlertDialogTitle>
-          <AlertDialogDescription className="space-y-2 text-sm">
-            <p>
-              This will remove the <code className="text-code-inline">etl</code> schema and all
-              connected resources from your database. Any active replication pipelines sending
-              changes to external destinations will stop.
-            </p>
-            <p>Read replicas are not affected.</p>
+          <AlertDialogDescription>
+            This removes the etl schema and all Pipelines-managed resources from your database. Data
+            already at destinations is kept. Read replicas are not affected.
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error && (
@@ -72,7 +72,7 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="danger" loading={isSubmitting} onClick={onConfirm}>
-            Disable
+            Disable Pipelines
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

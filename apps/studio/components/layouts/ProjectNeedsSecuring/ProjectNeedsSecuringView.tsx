@@ -54,7 +54,7 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 const StatusCell = ({ enabled, label }: { enabled: boolean; label: string }) => (
   <div className="flex items-center gap-2 text-sm">
     {enabled ? (
-      <Check size={14} className="text-brand" aria-hidden="true" />
+      <Check size={14} className="text-primary" aria-hidden="true" />
     ) : (
       <X size={14} className="text-destructive" aria-hidden="true" />
     )}
@@ -195,7 +195,7 @@ export const ProjectNeedsSecuringView = ({
                       return (
                         <TableRow
                           key={getTableKey(table)}
-                          className="relative cursor-pointer inset-focus"
+                          className="relative cursor-pointer focus-inset"
                           onClick={(event) => {
                             trackViewPolicies()
                             handleNavigation(event)

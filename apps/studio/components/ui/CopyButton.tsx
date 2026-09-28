@@ -57,12 +57,12 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
         }}
         {...props}
         variant={variant}
-        className={cn({ 'px-1': iconOnly }, className)}
+        className={cn({ 'px-1.5': iconOnly }, className)}
         icon={
           showCopied ? (
             <Check
               strokeWidth={2}
-              className={cn(variant === 'primary' ? 'text-inherit' : 'text-brand')}
+              className={cn(variant === 'primary' ? 'text-inherit' : 'text-primary')}
             />
           ) : (
             (icon ?? <Copy />)

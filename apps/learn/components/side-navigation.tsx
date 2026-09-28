@@ -45,7 +45,7 @@ function SideNavigation({ internalPaths }: SideNavigationProps) {
     ],
     [
       {
-        label: 'Logout',
+        label: 'Sign out',
         type: 'button',
         icon: LogOut,
         onClick: async () => {

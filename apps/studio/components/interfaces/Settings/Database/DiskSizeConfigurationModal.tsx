@@ -162,7 +162,7 @@ const DiskSizeConfigurationModal = ({
                     You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
                     need more than this, contact us via support for help.
                   </p>
-                  <Button asChild variant="default" className="mt-3">
+                  <Button asChild className="mt-3">
                     <SupportLink
                       queryParams={{
                         projectRef,
@@ -191,7 +191,7 @@ const DiskSizeConfigurationModal = ({
                               'DD MMM YYYY, HH:mm (ZZ)'
                             )}. You've reached the disk modification limit for now — you can resize again in approximately ${formattedTimeTillNextAvailableResize}.`}
                       </div>
-                      <Button asChild variant="default" iconRight={<ExternalLink size={14} />}>
+                      <Button asChild iconRight={<ExternalLink size={14} />}>
                         <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
                           Read more about disk management
                         </Link>
@@ -225,9 +225,7 @@ const DiskSizeConfigurationModal = ({
                   </Form>
                 </DialogSection>
                 <DialogFooter>
-                  <Button variant="default" onClick={() => hideModal(false)}>
-                    Cancel
-                  </Button>
+                  <Button onClick={() => hideModal(false)}>Cancel</Button>
                   <Button
                     form={formId}
                     type="submit"
@@ -261,7 +259,7 @@ const DiskSizeConfigurationModal = ({
                   disable your spend cap.
                 </p>
               )}
-              <Button asChild variant="default" className="mt-3">
+              <Button asChild className="mt-3">
                 <Link
                   href={`/org/${organization?.slug}/billing?panel=${
                     hasAccessToDiskModifications === false ? 'subscriptionPlan' : 'costControl'

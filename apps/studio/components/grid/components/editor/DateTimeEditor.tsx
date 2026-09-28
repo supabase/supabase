@@ -12,6 +12,9 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns/TimestampInfo'
@@ -77,7 +80,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   return (
     <Popover open>
       <PopoverTrigger>
-        <div className={cn('px-[8px]', value === null ? 'text-foreground-lighter' : '')}>
+        <div className={cn('px-2', value === null ? 'text-foreground-lighter' : '')}>
           {value === null ? 'NULL' : value}
         </div>
       </PopoverTrigger>
@@ -141,30 +144,29 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           <div className="flex">
             {isNullable ? (
               <>
-                <Button
-                  variant="default"
-                  className="rounded-r-none"
-                  onClick={() => saveChanges(null)}
-                >
+                <Button className="rounded-r-none" onClick={() => saveChanges(null)}>
                   Set NULL
                 </Button>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="default"
-                      icon={<ChevronDown />}
-                      className="px-1 rounded-l-none border-l-0"
-                    />
-                  </DropdownMenuTrigger>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          aria-label="Date options"
+                          icon={<ChevronDown />}
+                          className="px-1 rounded-l-none border-l-0"
+                        />
+                      </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Date options</TooltipContent>
+                  </Tooltip>
                   <DropdownMenuContent className="w-20" align="end">
                     <DropdownMenuItem onClick={setToNow}>Set to NOW</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             ) : (
-              <Button variant="default" onClick={setToNow}>
-                Set to NOW
-              </Button>
+              <Button onClick={setToNow}>Set to NOW</Button>
             )}
           </div>
         </div>

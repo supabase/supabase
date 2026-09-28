@@ -86,6 +86,7 @@ export const FirstLevelNav = (): ReactNode => {
           return (
             <Fragment key={item.key}>
               <button
+                tabIndex={0}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
                   'w-full px-3 py-2 rounded-md',
@@ -168,6 +169,7 @@ const Subsections = ({ category }: SubsectionsProps): ReactNode => {
       {snippets.map((snippet) => (
         <button
           key={snippet.key}
+          tabIndex={0}
           className={MENU_BUTTON_CLASSES}
           onClick={() => {
             navigateToSection(snippet.key)
@@ -197,6 +199,7 @@ const TablesSubsections = (): ReactNode => {
       {tables.map((table) => (
         <button
           key={table.name}
+          tabIndex={0}
           className={MENU_BUTTON_CLASSES}
           onClick={() => snap.setActiveDocsSection([API_DOCS_CATEGORIES.ENTITIES, table.name])}
         >
@@ -226,6 +229,7 @@ const DbFunctionsSubsections = (): ReactNode => {
       {functions.map((fn) => (
         <button
           key={fn.name}
+          tabIndex={0}
           className={MENU_BUTTON_CLASSES}
           onClick={() =>
             snap.setActiveDocsSection([API_DOCS_CATEGORIES.STORED_PROCEDURES, fn.name])
@@ -250,6 +254,7 @@ const BucketButton = ({ item: bucket, style }: RowComponentBaseProps<Bucket>) =>
   return (
     <button
       key={bucket.name}
+      tabIndex={0}
       className={cn(MENU_BUTTON_CLASSES, 'py-1')}
       style={style}
       onClick={() => snap.setActiveDocsSection([API_DOCS_CATEGORIES.STORAGE, bucket.name])}
@@ -301,6 +306,7 @@ const EdgeFunctionsSubsections = (): ReactNode => {
       {(edgeFunctions ?? []).map((fn) => (
         <button
           key={fn.name}
+          tabIndex={0}
           className={MENU_BUTTON_CLASSES}
           onClick={() => snap.setActiveDocsSection([API_DOCS_CATEGORIES.EDGE_FUNCTIONS, fn.name])}
         >
