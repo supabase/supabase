@@ -9,19 +9,15 @@ export type UpdateSQLSnippetFolderVariables = {
   projectRef: string
   id: string
   name: string
-  parentId?: string
 }
 
 export async function updateSQLSnippetFolder(
-  { projectRef, id, name, parentId }: UpdateSQLSnippetFolderVariables,
+  { projectRef, id, name }: UpdateSQLSnippetFolderVariables,
   signal?: AbortSignal
 ) {
-  const body: { name: string; parentId?: string } = { name }
-  if (parentId) body.parentId = parentId
-
   const { data, error } = await patch('/platform/projects/{ref}/content/folders/{id}', {
     params: { path: { ref: projectRef, id } },
-    body,
+    body: { name },
     signal,
   })
 
@@ -34,7 +30,6 @@ export type UpdateSQLSnippetFolderData = Awaited<ReturnType<typeof updateSQLSnip
 export const useSQLSnippetFolderCreateMutation = ({
   onError,
   onSuccess,
-  invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
   UseCustomMutationOptions<
@@ -43,18 +38,14 @@ export const useSQLSnippetFolderCreateMutation = ({
     UpdateSQLSnippetFolderVariables
   >,
   'mutationFn'
-> & {
-  invalidateQueriesOnSuccess?: boolean
-} = {}) => {
+> = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<UpdateSQLSnippetFolderData, ResponseError, UpdateSQLSnippetFolderVariables>({
     mutationFn: (args) => updateSQLSnippetFolder(args),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      if (invalidateQueriesOnSuccess) {
-        await queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) })
-      }
+      await queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

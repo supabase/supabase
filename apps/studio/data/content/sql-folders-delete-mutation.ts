@@ -29,7 +29,6 @@ export type DeleteSQLSnippetFoldersData = Awaited<ReturnType<typeof deleteSQLSni
 export const useSQLSnippetFoldersDeleteMutation = ({
   onError,
   onSuccess,
-  invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
   UseCustomMutationOptions<
@@ -38,18 +37,14 @@ export const useSQLSnippetFoldersDeleteMutation = ({
     DeleteSQLSnippetFoldersVariables
   >,
   'mutationFn'
-> & {
-  invalidateQueriesOnSuccess?: boolean
-} = {}) => {
+> = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<DeleteSQLSnippetFoldersData, ResponseError, DeleteSQLSnippetFoldersVariables>({
     mutationFn: (args) => deleteSQLSnippetFolders(args),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      if (invalidateQueriesOnSuccess) {
-        await queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) })
-      }
+      await queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

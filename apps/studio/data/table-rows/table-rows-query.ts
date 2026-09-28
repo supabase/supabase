@@ -92,8 +92,7 @@ function getRetryAfter(error: any): number | undefined {
 
 export async function executeWithRetry<T>(
   fn: () => Promise<T>,
-  maxRetries: number = 3,
-  baseDelay: number = 1000
+  maxRetries: number = 3
 ): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -103,7 +102,7 @@ export async function executeWithRetry<T>(
       if (errorCode === 429 && attempt < maxRetries) {
         // Get retry delay from headers or use exponential backoff (1s, then 2s, then 4s)
         const retryAfter = getRetryAfter(error)
-        const delayMs = retryAfter ? retryAfter * 1000 : baseDelay * Math.pow(2, attempt)
+        const delayMs = retryAfter ? retryAfter * 1000 : 1000 * Math.pow(2, attempt)
 
         await timeout(delayMs)
         continue

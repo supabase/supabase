@@ -48,7 +48,7 @@ export const useProjectAddonUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>,
   'mutationFn'
-> & { suppressToast?: boolean } = {}) => {
+> = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>({
