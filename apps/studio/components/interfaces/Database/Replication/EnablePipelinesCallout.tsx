@@ -58,7 +58,7 @@ export const EnablePipelinesModal = ({
     <Dialog open={open} onOpenChange={setOpen}>
       {!hideTrigger && (
         <DialogTrigger asChild>
-          <Button>Enable</Button>
+          <Button variant="primary">Enable</Button>
         </DialogTrigger>
       )}
       <DialogContent size="small">
@@ -119,11 +119,7 @@ export const EnablePipelinesCallout = ({ type }: { type?: DestinationType | null
         hasAccess ? (
           <EnablePipelinesModal />
         ) : (
-          <UpgradePlanButton
-            source="replication"
-            featureProposition="use replication"
-            variant="default"
-          />
+          <UpgradePlanButton source="replication" featureProposition="use replication" />
         )
       }
     />
