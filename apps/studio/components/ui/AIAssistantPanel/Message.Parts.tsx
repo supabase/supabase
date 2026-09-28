@@ -3,6 +3,7 @@ import { isToolUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, CircleStop, Loader2, XIcon } from 'lucide-react'
 import { memo, type ReactNode } from 'react'
 import { cn } from 'ui'
+import { Markdown } from 'ui-patterns/Markdown'
 
 import { AssistantQueryCell } from './AssistantQueryCell'
 import { toAssistantQueryResult } from './AssistantQueryCell.utils'
@@ -80,7 +81,11 @@ function MessagePartCompact({ part, isActive }: { part: CompactPart; isActive?: 
       }
       label={getCompactPartLabel(part)}
     >
-      {isReasoning ? part.text : undefined}
+      {isReasoning ? (
+        <Markdown className="text-xs text-foreground-lighter [&>p]:m-0 flex flex-col gap-y-1">
+          {part.text}
+        </Markdown>
+      ) : undefined}
     </Tool>
   )
 }

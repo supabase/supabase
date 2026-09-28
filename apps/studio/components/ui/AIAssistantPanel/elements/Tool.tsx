@@ -35,7 +35,7 @@ export function Tool({ className, label, icon, isActive = false, children }: Too
 
         {isCollapsible && (
           <CollapsibleContent
-            className={cn('pl-6 py-2 text-xs leading-normal', 'max-h-64 overflow-y-auto')}
+            className={cn('pl-5 py-2 text-xs leading-normal', 'max-h-64 overflow-y-auto')}
           >
             {children}
           </CollapsibleContent>
