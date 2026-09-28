@@ -140,6 +140,7 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_ORG: 'docs.ui.user.selected.org',
   SAVED_PROJECT: 'docs.ui.user.selected.project',
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
+  FEEDBACK_DOCK_CORNER: 'docs.ui.feedback.dock-corner',
 
   HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',
 
@@ -177,6 +178,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.EXPLORER_PREFERENCES,
   LOCAL_STORAGE_KEYS.UI_TIMEZONE,
   LOCAL_STORAGE_KEYS.UI_THEME_OVERRIDES,
+  LOCAL_STORAGE_KEYS.FEEDBACK_DOCK_CORNER,
 ]
 
 export function clearLocalStorage() {
