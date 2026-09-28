@@ -47,6 +47,7 @@ const PopoverContent = React.forwardRef<
         className={cn(
           sameWidthAsTrigger ? styles['popover-trigger-width'] : '',
           'z-50 w-72 rounded-md border border-overlay bg-overlay p-4 text-popover-foreground shadow-md outline-hidden animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+          'max-h-[var(--radix-popover-content-available-height)] overflow-y-auto',
           className
         )}
         {...props}
