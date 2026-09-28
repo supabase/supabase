@@ -32,6 +32,8 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { toResourceLabel, type ParsedScope } from './auth.utils'
+import { useRequestedScopes } from './useRequestedScopes'
 import {
   InterstitialLayout,
   LogoBox,
@@ -159,22 +161,20 @@ const ScopeGroupCard = ({
   </section>
 )
 
-function toResourceName(scope: string) {
-  const name = scope.split(':').slice(1).join(':') || scope
-  return name.charAt(0).toUpperCase() + name.slice(1)
-}
-
-function toScopeGroups(scopes: string[]): ScopeGroup[] {
-  const readOnly = scopes.filter((scope) => scope.startsWith('read:')).map(toResourceName)
-  const readWrite = scopes.filter((scope) => !scope.startsWith('read:')).map(toResourceName)
-  const readOnlyExclusive = readOnly.filter((name) => !readWrite.includes(name))
+function toScopeGroups(scopes: ParsedScope[]): ScopeGroup[] {
+  const readWrite = scopes
+    .filter((scope) => scope.action === 'write')
+    .map((scope) => toResourceLabel(scope.resource))
+  const readOnly = scopes
+    .filter((scope) => scope.action === 'read')
+    .map((scope) => toResourceLabel(scope.resource))
 
   const groups: ScopeGroup[] = []
-  if (readOnlyExclusive.length > 0) {
-    groups.push({ name: readOnlyExclusive.join(', '), level: 'read' })
-  }
   if (readWrite.length > 0) {
     groups.push({ name: readWrite.join(', '), level: 'read_write' })
+  }
+  if (readOnly.length > 0) {
+    groups.push({ name: readOnly.join(', '), level: 'read' })
   }
   return groups
 }
@@ -196,7 +196,7 @@ function generateDemoToken() {
 
 const CliAuthPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { code, redirect_uri, scopes, project_ref } = useParams()
+  const { code, redirect_uri, project_ref } = useParams()
 
   if (!router.isReady) return null
 
@@ -205,12 +205,7 @@ const CliAuthPage: NextPageWithLayout = () => {
       <Head>
         <title>{PAGE_TITLE}</title>
       </Head>
-      <CliAuthScreen
-        code={code}
-        redirectUri={redirect_uri}
-        scopesParam={scopes}
-        projectRef={project_ref}
-      />
+      <CliAuthScreen code={code} redirectUri={redirect_uri} projectRef={project_ref} />
     </>
   )
 }
@@ -222,15 +217,13 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-const CliAuthScreen = ({
+export const CliAuthScreen = ({
   code,
   redirectUri,
-  scopesParam,
   projectRef,
 }: {
   code?: string
   redirectUri?: string
-  scopesParam?: string
   projectRef?: string
 }) => {
   const router = useRouter()
@@ -243,8 +236,8 @@ const CliAuthScreen = ({
   const liveProjects = (orgProjectsData?.pages ?? []).flatMap((page) => page.projects)
   const projects = liveProjects.length > 0 ? liveProjects : FALLBACK_PROJECTS
 
-  const requestedScopes = (scopesParam ?? '').split(',').filter(Boolean)
-  const readScopes = requestedScopes.filter((scope) => scope.startsWith('read:'))
+  const { scopes: requestedScopes } = useRequestedScopes()
+  const readOnlyScopes = requestedScopes.filter((scope) => scope.action === 'read')
 
   const email = profile?.primary_email ?? FALLBACK_EMAIL
   const hasValidRedirect = redirectUri !== undefined && isAllowedRedirectUri(redirectUri)
@@ -260,7 +253,7 @@ const CliAuthScreen = ({
   const grantedScopes = useWatch({
     name: 'accessMode',
     control: form.control,
-    compute: (accessMode) => (accessMode === 'full' ? requestedScopes : readScopes),
+    compute: (accessMode) => (accessMode === 'full' ? requestedScopes : readOnlyScopes),
   })
   const scopeGroups = toScopeGroups(grantedScopes)
   const expiresAt = dayjs().add(TOKEN_EXPIRY_DAYS, 'days')
@@ -281,7 +274,7 @@ const CliAuthScreen = ({
 
   const handleAuthorize = (_values: FormValues) => {
     window.location.assign(
-      `${redirectUri}?token=${generateDemoToken()}&scopes=${grantedScopes.join(',')}&expires_at=${expiresAt.toISOString()}`
+      `${redirectUri}?token=${generateDemoToken()}&scopes=${grantedScopes.map((scope) => scope.scope).join(',')}&expires_at=${expiresAt.toISOString()}`
     )
   }
 
