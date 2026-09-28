@@ -1,9 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Globe } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Card, CardContent, Skeleton } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
@@ -23,17 +24,19 @@ import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from '@/data/misc/user-ip-address-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const HA_DISABLED_TITLE = 'Network bans unavailable on High Availability projects'
 const HA_DISABLED_DESCRIPTION =
   "We're working to bring network bans to High Availability projects. Contact support if this is blocking your work."
+const V3_DISABLED_TITLE = 'Network bans unavailable on v3 projects'
 
 export const BannedIPs = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability } = useHighAvailability()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
 
@@ -42,9 +45,10 @@ export const BannedIPs = () => {
     isFetching: isFetchingIPList,
     data: ipList,
     error: ipListError,
-  } = useBannedIPsQuery({
-    projectRef: ref,
-  })
+  } = useBannedIPsQuery(
+    { projectRef: ref },
+    { enabled: !!project && !isHighAvailability && !isAwsK8s }
+  )
 
   const { data: userIPAddress } = useUserIPAddressQuery()
 
@@ -59,10 +63,12 @@ export const BannedIPs = () => {
     },
   })
 
-  const isSectionDisabled = isHighAvailability || !canUnbanNetworks
-  const sectionDisabledReason = isHighAvailability
-    ? HA_DISABLED_TITLE
-    : 'You need additional permissions to unban networks'
+  const isSectionDisabled = isHighAvailability || isAwsK8s || !canUnbanNetworks
+  const sectionDisabledReason = useMemo(() => {
+    if (isHighAvailability) return HA_DISABLED_TITLE
+    if (isAwsK8s) return V3_DISABLED_TITLE
+    return 'You need additional permissions to unban networks'
+  }, [isHighAvailability, isAwsK8s])
 
   const { mutate: unbanIPs, isPending: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
@@ -110,7 +116,15 @@ export const BannedIPs = () => {
               />
             </div>
           )}
+          {!isHighAvailability && isAwsK8s && (
+            <Admonition
+              type="default"
+              title={V3_DISABLED_TITLE}
+              description="Fail2Ban is not supported on v3 projects."
+            />
+          )}
           {!isHighAvailability &&
+            !isAwsK8s &&
             (ipListLoading ? (
               <Card>
                 <CardContent className="space-y-4">
