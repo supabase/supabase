@@ -1,12 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-<<<<<<< HEAD
 import { Fragment, useEffect } from 'react'
-||||||| parent of c1e7536a0a (Refactor following types changes + remove app actions)
-import { useState } from 'react'
-=======
->>>>>>> c1e7536a0a (Refactor following types changes + remove app actions)
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import {
   PageSection,
@@ -32,7 +27,6 @@ export const OAuthAppsAuthorizedList = () => {
     'approved_oauth_apps'
   )
 
-<<<<<<< HEAD
   const {
     data,
     isPending,
@@ -55,11 +49,6 @@ export const OAuthAppsAuthorizedList = () => {
       fetchNextPage()
     }
   }, [hasNextPage, entry?.isIntersecting, fetchNextPage])
-||||||| parent of c1e7536a0a (Refactor following types changes + remove app actions)
-  const { data: apps, isPending, isSuccess, isError, error } = useOAuthAuthorizedAppsQuery({ slug })
-=======
-  const { data: apps, isPending, isSuccess, isError, error } = useOAuthApprovalsQuery({ slug })
->>>>>>> c1e7536a0a (Refactor following types changes + remove app actions)
 
   return (
     <PageSection id="authorized-apps">
@@ -77,6 +66,7 @@ export const OAuthAppsAuthorizedList = () => {
           <div className="space-y-2">
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
           </div>
         )}
 
@@ -93,19 +83,21 @@ export const OAuthAppsAuthorizedList = () => {
                 <TableRow>
                   <TableHead>App</TableHead>
                   <TableHead>Access</TableHead>
+                  <TableHead className="text-right">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.pages.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
-                    <TableCell colSpan={2}>
+                    <TableCell colSpan={3}>
                       <p className="text-sm text-foreground-lighter">
                         No apps have been authorized in this organization yet.
                       </p>
                     </TableCell>
                   </TableRow>
                 ) : (
-<<<<<<< HEAD
                   <>
                     {data.pages.map((page, pageIndex) => (
                       <Fragment key={pageIndex}>
@@ -115,26 +107,13 @@ export const OAuthAppsAuthorizedList = () => {
                       </Fragment>
                     ))}
                     <TableRow ref={sentinelRef} className="[&>td]:hover:bg-inherit">
-                      <TableCell colSpan={2} className={isFetchingNextPage ? '' : 'p-0 hidden'}>
+                      <TableCell colSpan={3} className={isFetchingNextPage ? '' : 'p-0 hidden'}>
                         <p aria-live="polite" className="text-sm text-foreground-lighter">
                           {isFetchingNextPage ? 'Loading...' : ''}
                         </p>
                       </TableCell>
                     </TableRow>
                   </>
-||||||| parent of c1e7536a0a (Refactor following types changes + remove app actions)
-                  apps.data.map((app) => (
-                    <OAuthAppsAuthorizedRow
-                      key={app.id}
-                      app={app}
-                      canRevoke={canRevokeOAuthApps}
-                      onSelectViewGrants={() => setSelectedAppForGrants(app)}
-                      onSelectRevoke={() => setSelectedAppToRevoke(app)}
-                    />
-                  ))
-=======
-                  apps.data.map((app) => <OAuthAppsAuthorizedRow key={app.id} app={app} />)
->>>>>>> c1e7536a0a (Refactor following types changes + remove app actions)
                 )}
               </TableBody>
             </Table>
