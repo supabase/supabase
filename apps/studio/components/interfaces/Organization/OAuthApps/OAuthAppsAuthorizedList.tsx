@@ -71,6 +71,7 @@ export const OAuthAppsAuthorizedList = () => {
           <div className="space-y-2">
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
           </div>
         )}
 
