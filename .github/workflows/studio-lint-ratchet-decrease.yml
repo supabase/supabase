@@ -99,7 +99,7 @@ jobs:
         if: steps.decrease-baselines.outputs.changed == 'true'
         env:
           PR_URL: ${{ steps.decrease-baselines.outputs.pr_url }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_TEAM_FRONTEND_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
         run: |
           set -euo pipefail
 
@@ -111,7 +111,7 @@ jobs:
           fi
 
           if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
-            echo "::warning::SLACK_TEAM_FRONTEND_WEBHOOK_URL secret is not set; skipping Slack notification for zero-baseline rules: $zero_rules"
+            echo "::warning::SLACK_DASHBOARD_WEBHOOK_URL secret is not set; skipping Slack notification for zero-baseline rules: $zero_rules"
             exit 0
           fi
 
