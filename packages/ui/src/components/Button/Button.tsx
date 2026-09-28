@@ -38,12 +38,12 @@ const buttonVariants = cva(
       variant: {
         primary: `
           border-0
-          bg-primary
+          bg-primary-solid
           bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
-          text-primary-foreground
+          text-primary-solid-foreground
           shadow-[var(--button-shadow-raised)]
-          hover:bg-[var(--primary-hover)]
-          data-[state=open]:bg-[var(--primary-hover)]
+          hover:bg-[var(--primary-solid-hover)]
+          data-[state=open]:bg-[var(--primary-solid-hover)]
           `,
         default: `
           text-foreground
@@ -76,12 +76,12 @@ const buttonVariants = cva(
           data-[state=open]:border-control-hover
         `,
         link: `
-          text-brand-600
+          text-primary
           border
           border-transparent/0
-          hover:bg-brand-400
+          hover:bg-primary-bright/15
           shadow-none
-          data-[state=open]:bg-brand-400
+          data-[state=open]:bg-primary-bright/15
         `,
         text: `
           text-foreground
@@ -155,13 +155,13 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
     },
     variant: {
-      primary: 'text-primary-foreground/50',
+      primary: 'text-primary-solid-foreground/50',
       default: 'text-foreground-lighter',
       secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
-      link: 'text-brand-600',
+      link: 'text-primary',
       text: 'text-foreground-lighter',
       danger: 'text-destructive-foreground/50',
       warning: 'text-warning-foreground/50',
@@ -173,13 +173,13 @@ export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
   variants: {
     variant: {
-      primary: 'text-primary-foreground/50',
+      primary: 'text-primary-solid-foreground/50',
       default: 'text-foreground-lighter',
       secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
-      link: 'text-brand-600',
+      link: 'text-primary',
       text: 'text-foreground-muted',
       danger: 'text-destructive-foreground/50',
       warning: 'text-warning-foreground/50',

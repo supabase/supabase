@@ -8,6 +8,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -54,7 +55,7 @@ export const AdvancedSettings = ({
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional settings to control the pipeline in more depth
+                Customize how the pipeline syncs and replicates data.
               </span>
             </div>
           </AccordionTrigger>
@@ -66,7 +67,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description="How long the pipeline waits before sending a partially filled batch."
+                  description="Maximum time before sending a partially filled batch."
                 >
                   <FormControl>
                     <InputGroup>
@@ -77,7 +78,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
+                        placeholder={String(DEFAULT_MAX_FILL_MS)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>
@@ -250,6 +251,25 @@ export const AdvancedSettings = ({
                   <TableOptions control={form.control} />
                 </div>
               </>
+            )}
+
+            {type === 'Snowflake' && (
+              <FormField
+                control={form.control}
+                name="snowflakeRole"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Role"
+                    labelOptional="Optional"
+                    layout="horizontal"
+                    description="Role for SQL requests. Leave blank to use the service user’s default role."
+                  >
+                    <FormControl>
+                      <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
             )}
           </AccordionContent>
         </AccordionItem>

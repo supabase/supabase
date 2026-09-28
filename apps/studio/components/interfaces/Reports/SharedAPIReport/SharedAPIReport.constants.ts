@@ -13,26 +13,16 @@ import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql
 import { reportKeys } from '@/data/reports/keys'
 import { IS_PLATFORM } from '@/lib/constants'
 
-const SOURCE_TABLE: Record<string, SafeLogSqlFragment> = {
-  edge_logs: safeSql`edge_logs`,
-  function_edge_logs: safeSql`function_edge_logs`,
-}
-
-/** Returns a branded source table fragment, falling back to `edge_logs`. */
-function sourceTable(src: string): SafeLogSqlFragment {
-  return SOURCE_TABLE[src] ?? SOURCE_TABLE.edge_logs
-}
-
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         --reports-api-total-requests
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
-        FROM ${sourceTable(src)} t
+        FROM edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
@@ -45,7 +35,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   topRoutes: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-top-routes
         select
@@ -54,7 +44,7 @@ export const SHARED_API_REPORT_SQL = {
           request.search as search,
           response.status_code as status_code,
           count(t.id) as count
-        from ${sourceTable(src)} t
+        from edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
@@ -69,13 +59,13 @@ export const SHARED_API_REPORT_SQL = {
   },
   errorCounts: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-error-counts
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
-        FROM ${sourceTable(src)} t
+        FROM edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
@@ -91,7 +81,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   topErrorRoutes: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-top-error-routes
         select
@@ -100,7 +90,7 @@ export const SHARED_API_REPORT_SQL = {
           request.search as search,
           response.status_code as status_code,
           count(t.id) as count
-        from ${sourceTable(src)} t
+        from edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
@@ -117,14 +107,14 @@ export const SHARED_API_REPORT_SQL = {
   },
   responseSpeed: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-response-speed
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           avg(response.origin_time) as avg
         FROM
-          ${sourceTable(src)} t
+          edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
@@ -138,7 +128,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   topSlowRoutes: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-top-slow-routes
         select
@@ -148,7 +138,7 @@ export const SHARED_API_REPORT_SQL = {
           response.status_code as status_code,
           count(t.id) as count,
           avg(response.origin_time) as avg
-        from ${sourceTable(src)} t
+        from edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
@@ -163,7 +153,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   networkTraffic: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-network-traffic
         select
@@ -187,7 +177,7 @@ export const SHARED_API_REPORT_SQL = {
             0
           ) as egress_mb,
         FROM
-          ${sourceTable(src)} t
+          edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
@@ -204,13 +194,7 @@ export const SHARED_API_REPORT_SQL = {
 
 export type SharedAPIReportKey = keyof typeof SHARED_API_REPORT_SQL
 
-export type SharedAPIReportFilterBy =
-  | 'auth'
-  | 'realtime'
-  | 'storage'
-  | 'graphql'
-  | 'functions'
-  | 'postgrest'
+export type SharedAPIReportFilterBy = 'auth' | 'realtime' | 'postgrest'
 
 type SharedAPIReportParams = {
   filterBy: SharedAPIReportFilterBy
@@ -230,20 +214,8 @@ export const useSharedAPIReport = ({
   const queryClient = useQueryClient()
   const flagUseOtel = useFlag('otelReports')
   const { hasLoaded: hasLoadedFlags } = useContext(FeatureFlagContext)
-  const filterByMapSource = {
-    functions: 'function_edge_logs',
-    realtime: 'edge_logs',
-    storage: 'edge_logs',
-    graphql: 'edge_logs',
-    postgrest: 'edge_logs',
-    auth: 'edge_logs',
-  }
-
-  const filterByMapValue = {
-    functions: '/functions',
+  const filterByMapValue: Record<SharedAPIReportFilterBy, string> = {
     realtime: '/realtime',
-    storage: '/storage',
-    graphql: '/graphql',
     postgrest: '/rest',
     auth: '/auth',
   }
@@ -255,15 +227,14 @@ export const useSharedAPIReport = ({
   }
 
   const allFilters = [baseFilter, ...filters]
-  const source = filterByMapSource[filterBy]
-  const isDataApiReport = filterBy === 'postgrest'
-  const useOtel = IS_PLATFORM && isDataApiReport && Boolean(flagUseOtel)
-  const isQueryModeReady = !IS_PLATFORM || !isDataApiReport || hasLoadedFlags === true
+  const source = 'edge_logs'
+  const useOtel = IS_PLATFORM && Boolean(flagUseOtel)
+  const isQueryModeReady = !IS_PLATFORM || hasLoadedFlags === true
   const keys = Object.keys(SHARED_API_REPORT_SQL) as SharedAPIReportKey[]
   const getQuerySql = (queryName: SharedAPIReportKey) =>
     useOtel
       ? getLogsSql(PRESET_CONFIG.api.queries[queryName], allFilters, true)
-      : SHARED_API_REPORT_SQL[queryName].safeSql(allFilters, source)
+      : SHARED_API_REPORT_SQL[queryName].safeSql(allFilters)
   const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
     totalRequests: getQuerySql('totalRequests'),
     topRoutes: getQuerySql('topRoutes'),
