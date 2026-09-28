@@ -188,7 +188,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 label="IOPS"
                 description={
                   anyDiskAttributeChange && !hasTotalSizeChanges && !hasStorageTypeChanges
-                    ? 'Disk attributes, including IOPS and disk size, may only be modified 4 times in any 24-hour window, starting from the first modification.'
+                    ? 'Disk attributes, including IOPS and disk size, will be locked for 4 hours after this change.'
                     : undefined
                 }
               >
