@@ -160,7 +160,7 @@ export const RowMenu = ({
           <div className="relative">
             <Button
               variant="default"
-              className="px-1.25 hit-area-2"
+              className="w-6.5 hit-area-1"
               aria-label={hasUpdate ? 'Pipeline options, update available' : 'Pipeline options'}
               icon={<MoreVertical />}
             />
