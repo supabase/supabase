@@ -52,6 +52,10 @@ export function getLogTypeVisibility(
   )
 }
 
+/** Whether a view offers a filter by this name: every filter unless it lists the ones it offers */
+export const isOfferedFilter = (name: string, offeredFilters?: readonly string[]) =>
+  !offeredFilters || offeredFilters.includes(name)
+
 const loadUnifiedLogsSearchParams = createLoader(SEARCH_PARAMS_PARSER)
 
 /** Writes unified logs search state to URL params, the same way the Logs page reads them. */

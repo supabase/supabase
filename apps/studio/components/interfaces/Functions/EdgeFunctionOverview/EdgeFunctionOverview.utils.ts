@@ -5,6 +5,8 @@ import sumBy from 'lodash/sumBy'
 import type { ChartConfig } from 'ui'
 
 import { calculateBarClickTimeRange } from '@/components/interfaces/Settings/Logs/LogsBarChart.utils'
+import type { UnifiedLogsScope } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { serializeUnifiedLogsSearchParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import type { ChartIntervals } from '@/types'
 
 export type EdgeFunctionChartRawDatum = {
@@ -162,10 +164,57 @@ export const getInvocationChartNavigationUrl = ({
   clickedTimestamp: string
 }) => {
   const { start, end } = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTimestamp)
-  const destination = isUnifiedLogsEnabled ? 'logs' : 'invocations'
 
-  return `/project/${projectRef}/functions/${functionSlug}/${destination}?its=${encodeURIComponent(start)}&ite=${encodeURIComponent(end)}`
+  if (isUnifiedLogsEnabled) {
+    return getEdgeFunctionLogsUrl({ projectRef, functionSlug, start, end })
+  }
+
+  return `/project/${projectRef}/functions/${functionSlug}/invocations?its=${encodeURIComponent(start)}&ite=${encodeURIComponent(end)}`
 }
+
+/** Narrows unified logs to one edge function: its invocations and the runtime output they produce */
+export const getEdgeFunctionLogsScope = (functionId: string): UnifiedLogsScope => ({
+  filters: [
+    { column: 'log_type', operator: '=', value: 'edge function' },
+    { column: 'log_type', operator: '=', value: 'edge function runtime' },
+    { column: 'function_id', operator: '=', value: functionId },
+  ],
+})
+
+/** How an edge function's unified logs views show its logs, on top of its scope */
+export const EDGE_FUNCTION_LOGS_VIEW = {
+  // The time range, message search and severity the old Invocations and Logs tabs had, plus log
+  // type to tell invocations and runtime output apart. No user filter, since no function row has
+  // a user.
+  offeredFilters: ['date', 'log_type', 'level', 'event_message'],
+  // Shared by the Logs tab and the Overview errors, apart from the project Logs page
+  columnPreferencesKey: 'edge-function',
+} as const
+
+/**
+ * Links to an edge function's unified Logs tab, optionally focused on a time range, filters
+ * (e.g. `level:eq:error`) and a selected log. Uses the same URL params as the project-wide Logs page.
+ */
+export const getEdgeFunctionLogsUrl = ({
+  projectRef,
+  functionSlug,
+  start,
+  end,
+  filters,
+  logId,
+}: {
+  projectRef: string
+  functionSlug: string
+  start?: string
+  end?: string
+  filters?: readonly string[]
+  logId?: string
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/functions/${functionSlug}/logs`, {
+    filter: filters?.length ? [...filters] : null,
+    date: start && end ? [new Date(start), new Date(end)] : null,
+    id: logId ?? null,
+  })
 
 export const formatChartTimestamp = (value: Date | string | number | undefined, format: string) => {
   return dayjs(value === undefined ? '' : value).format(format)

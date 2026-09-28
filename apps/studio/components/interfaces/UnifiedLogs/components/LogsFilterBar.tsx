@@ -10,6 +10,7 @@ import {
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
+import { isOfferedFilter } from '../UnifiedLogs.utils'
 import {
   buildColumnFilterValues,
   buildFilterGroup,
@@ -40,7 +41,12 @@ const TimeRangeOption = ({ onChange }: CustomOptionProps) => (
   />
 )
 
-export const LogsFilterBar = () => {
+interface LogsFilterBarProps {
+  /** Filters to offer, by name (field values, plus `user`). Every filter by default. */
+  offeredFilters?: readonly string[]
+}
+
+export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { table, filterFields, columnFilters, isFetching } = useDataTable()
@@ -71,7 +77,7 @@ export const LogsFilterBar = () => {
     fields: filterFields,
     userOptions: searchUserOptions,
     timeRangeOptions: { component: TimeRangeOption },
-  })
+  }).filter((property) => isOfferedFilter(property.name, offeredFilters))
 
   const withUserCondition = (group: FilterGroup): FilterGroup => {
     if (!user) return group

@@ -48,6 +48,7 @@ import {
 } from './UnifiedLogs.hooks'
 import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
+import { UnifiedLogsScope } from './UnifiedLogs.types'
 import {
   gateLogTypeFilters,
   gateLogTypeOptions,
@@ -56,6 +57,7 @@ import {
   getLogRowClassName,
   getLogTypeVisibility,
   getUniqueLogRows,
+  isOfferedFilter,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
@@ -95,7 +97,26 @@ export const CHART_CONFIG = {
   },
 } satisfies ChartConfig
 
-export const UnifiedLogs = () => {
+interface UnifiedLogsProps {
+  /**
+   * Narrows every query, count and filter to one resource, e.g. on an edge function's Logs tab.
+   * Pass a stable object (e.g. from `useMemo`), since the queries rebuild when it changes.
+   */
+  scope?: UnifiedLogsScope
+  /** Shows the facet sidebar beside the logs. Without it, filters live in the filter bar only. */
+  hasFilterSideBar?: boolean
+  /** Filters the view offers, by name (field values, plus `user`). Every filter by default. */
+  offeredFilters?: readonly string[]
+  /** Saves column visibility and order under this view's key instead of the Logs page's */
+  columnPreferencesKey?: string
+}
+
+export const UnifiedLogs = ({
+  scope,
+  hasFilterSideBar = true,
+  offeredFilters,
+  columnPreferencesKey,
+}: UnifiedLogsProps) => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
@@ -111,10 +132,13 @@ export const UnifiedLogs = () => {
   })
   const visibleSearchFilters = gateLogTypeFilters(
     search.filter,
-    getLogTypeVisibility({
-      multigres: showMultigresLogs,
-      compute: computeAvailability.preserveComputeFilter,
-    })
+    getLogTypeVisibility(
+      {
+        multigres: showMultigresLogs,
+        compute: computeAvailability.preserveComputeFilter,
+      },
+      scope
+    )
   )
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
@@ -147,27 +171,30 @@ export const UnifiedLogs = () => {
   )
 
   const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
-    useLogsTableColumns()
+    useLogsTableColumns(columnPreferencesKey)
 
   // Log types the queries, filters and facets may use
   const queryLogTypeVisibility = useMemo(
     () =>
-      getLogTypeVisibility({
-        multigres: showMultigresLogs,
-        compute: computeAvailability.canQueryCompute,
-      }),
-    [showMultigresLogs, computeAvailability.canQueryCompute]
+      getLogTypeVisibility(
+        {
+          multigres: showMultigresLogs,
+          compute: computeAvailability.canQueryCompute,
+        },
+        scope
+      ),
+    [showMultigresLogs, computeAvailability.canQueryCompute, scope]
   )
 
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = useMemo(() => {
-    const parameters = toQuerySearchParams(search)
+    const parameters = toQuerySearchParams(search, scope)
     if (parameters.filter) {
       parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? null
     }
     return parameters
-  }, [search, queryLogTypeVisibility])
+  }, [search, scope, queryLogTypeVisibility])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
 
   useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
@@ -303,7 +330,10 @@ export const UnifiedLogs = () => {
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
-    const gatedFields = gateLogTypeOptions(defaultFilterFields, queryLogTypeVisibility)
+    const gatedFields = gateLogTypeOptions(
+      defaultFilterFields.filter((field) => isOfferedFilter(field.value, offeredFilters)),
+      queryLogTypeVisibility
+    )
 
     return gatedFields.map((field) => {
       const facetsField = facets?.[field.value]
@@ -331,7 +361,7 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, queryLogTypeVisibility])
+  }, [facets, offeredFilters, queryLogTypeVisibility])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)
@@ -374,6 +404,7 @@ export const UnifiedLogs = () => {
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
+    enabled: hasFilterSideBar,
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, () => table.resetColumnFilters(), {
@@ -413,39 +444,55 @@ export const UnifiedLogs = () => {
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
-        <ResizablePanelGroup orientation="horizontal" autoSaveId="logs-layout">
-          <FilterSideBar
-            isFilterBarOpen={isFilterBarOpen}
-            setIsFilterBarOpen={setIsFilterBarOpen}
-            dateRangeDisabled={{ after: new Date() }}
-          />
-          <ResizableHandle withHandle />
+        <ResizablePanelGroup
+          orientation="horizontal"
+          autoSaveId={hasFilterSideBar ? 'logs-layout' : 'scoped-logs-layout'}
+        >
+          {hasFilterSideBar && (
+            <>
+              <FilterSideBar
+                isFilterBarOpen={isFilterBarOpen}
+                setIsFilterBarOpen={setIsFilterBarOpen}
+                dateRangeDisabled={{ after: new Date() }}
+              />
+              <ResizableHandle withHandle />
+            </>
+          )}
           <ResizablePanel
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
             <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
               <div className="flex flex-wrap items-center gap-2 px-2 border-b">
-                <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
-                  <Button
-                    size="tiny"
-                    variant="text"
-                    icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
-                    onClick={() => setIsFilterBarOpen((prev) => !prev)}
-                    className="hidden w-[26px] sm:flex"
-                    aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
-                  />
-                </ShortcutTooltip>
+                {hasFilterSideBar && (
+                  <>
+                    <ShortcutTooltip
+                      shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS}
+                      side="bottom"
+                    >
+                      <Button
+                        size="tiny"
+                        variant="text"
+                        icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
+                        onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                        className="hidden w-[26px] sm:flex"
+                        aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
+                      />
+                    </ShortcutTooltip>
 
-                <div className="h-full border-r" />
+                    <div className="h-full border-r" />
+                  </>
+                )}
 
                 <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
-                  <LogsFilterBar />
+                  <LogsFilterBar offeredFilters={offeredFilters} />
                 </div>
 
-                <div className="block sm:hidden">
-                  <DataTableFilterControlsDrawer />
-                </div>
+                {hasFilterSideBar && (
+                  <div className="block sm:hidden">
+                    <DataTableFilterControlsDrawer />
+                  </div>
+                )}
 
                 <div className="ml-auto flex items-center gap-x-2">
                   <RefreshButton

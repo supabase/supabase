@@ -10,6 +10,8 @@ import {
   getBucketedTimeRange,
   getChartEmptyStateCopy,
   getChartTimeRangeLabels,
+  getEdgeFunctionLogsScope,
+  getEdgeFunctionLogsUrl,
   getExecutionMetrics,
   getInvocationChartData,
   getInvocationChartNavigationUrl,
@@ -22,6 +24,8 @@ import {
   toEdgeFunctionChartData,
   type EdgeFunctionChartRawDatum,
 } from './EdgeFunctionOverview.utils'
+import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { createUnifiedLogsSearch } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 
 describe('EdgeFunctionOverview.utils', () => {
   it('builds invocation chart data and totals from combined stats', () => {
@@ -233,11 +237,18 @@ describe('EdgeFunctionOverview.utils', () => {
   })
 
   it.each([
-    { isUnifiedLogsEnabled: true, destination: 'logs' },
-    { isUnifiedLogsEnabled: false, destination: 'invocations' },
+    {
+      isUnifiedLogsEnabled: true,
+      expected: `/project/project-ref/functions/function-slug/logs?date=${Date.parse('2026-03-20T10:27:30.000Z')}-${Date.parse('2026-03-20T10:32:30.000Z')}`,
+    },
+    {
+      isUnifiedLogsEnabled: false,
+      expected:
+        '/project/project-ref/functions/function-slug/invocations?its=2026-03-20T10%3A27%3A30.000Z&ite=2026-03-20T10%3A32%3A30.000Z',
+    },
   ])(
-    'builds a focused $destination URL from the clicked bar',
-    ({ isUnifiedLogsEnabled, destination }) => {
+    'builds a focused URL from the clicked bar (unified logs: $isUnifiedLogsEnabled)',
+    ({ isUnifiedLogsEnabled, expected }) => {
       const url = getInvocationChartNavigationUrl({
         projectRef: 'project-ref',
         functionSlug: 'function-slug',
@@ -247,11 +258,36 @@ describe('EdgeFunctionOverview.utils', () => {
         clickedTimestamp: '2026-03-20T10:30:00.000Z',
       })
 
-      expect(url).toBe(
-        `/project/project-ref/functions/function-slug/${destination}?its=2026-03-20T10%3A27%3A30.000Z&ite=2026-03-20T10%3A32%3A30.000Z`
-      )
+      expect(url).toBe(expected)
     }
   )
+
+  it('links to the unified function logs tab with an optional range and selected log', () => {
+    const base = { projectRef: 'project-ref', functionSlug: 'function-slug' }
+
+    expect(getEdgeFunctionLogsUrl(base)).toBe('/project/project-ref/functions/function-slug/logs')
+    expect(
+      getEdgeFunctionLogsUrl({
+        ...base,
+        start: '2026-03-20T10:00:00.000Z',
+        end: '2026-03-20T11:00:00.000Z',
+        filters: ['level:eq:error'],
+        logId: 'log-id',
+      })
+    ).toBe(
+      `/project/project-ref/functions/function-slug/logs?filter=level:eq:error&date=${Date.parse('2026-03-20T10:00:00.000Z')}-${Date.parse('2026-03-20T11:00:00.000Z')}&id=log-id`
+    )
+  })
+
+  it("scopes unified logs to the function's invocations and runtime logs", () => {
+    const sql = getUnifiedLogsQuery(createUnifiedLogsSearch({}, getEdgeFunctionLogsScope('fn-1')))
+    const where = sql.split(/\bWHERE\b/)[1] ?? ''
+
+    expect(where).toContain(
+      `((source = 'function_edge_logs') OR (source = 'function_logs')) AND log_attributes['function_id'] IN ('fn-1')`
+    )
+    expect(where).not.toContain(`source = 'postgres_logs'`)
+  })
 
   it('formats metric, rate, and reference deltas consistently', () => {
     expect(formatMetric(12.34, 'MB')).toBe('12.3MB')
