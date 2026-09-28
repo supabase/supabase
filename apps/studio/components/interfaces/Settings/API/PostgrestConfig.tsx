@@ -43,6 +43,7 @@ import { ExposedTableSelector } from '@/components/interfaces/Settings/API/Expos
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { authenticatorRoleConfigQueryOptions } from '@/data/database/authenticator-role-config-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { privilegeKeys } from '@/data/privileges/keys'
@@ -111,6 +112,13 @@ export const PostgrestConfig = () => {
     isSuccess: isSuccessDefaultPrivileges,
   } = useQuery(
     defaultPrivilegesQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
+  )
+
+  const { data: authenticatorDbSchemasOverride } = useQuery(
+    authenticatorRoleConfigQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     })
@@ -285,6 +293,15 @@ export const PostgrestConfig = () => {
     [watchedDbSchema]
   )
 
+  const isAuthenticatorRoleOverridingSchemas = useMemo(() => {
+    if (authenticatorDbSchemasOverride === undefined) return false
+    const selected = new Set(watchedDbSchema)
+    const overridden = new Set(authenticatorDbSchemasOverride)
+    return (
+      selected.size !== overridden.size || [...selected].some((schema) => !overridden.has(schema))
+    )
+  }, [authenticatorDbSchemasOverride, watchedDbSchema])
+
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
@@ -340,6 +357,35 @@ export const PostgrestConfig = () => {
                         </p>
                       ) : null}
                     </FormItemLayout>
+
+                    {isAuthenticatorRoleOverridingSchemas && (
+                      <Admonition
+                        type="warning"
+                        title="Exposed schemas are being overridden"
+                        description={
+                          <>
+                            The <code>authenticator</code> role has <code>pgrst.db_schemas</code>{' '}
+                            set to{' '}
+                            {authenticatorDbSchemasOverride?.map((schema, i) => (
+                              <span key={schema}>
+                                {i > 0 && ', '}
+                                <code>{schema}</code>
+                              </span>
+                            ))}
+                            , which overrides this setting. See the{' '}
+                            <a
+                              href="https://supabase.com/docs/guides/troubleshooting/pgrst106-the-schema-must-be-one-of-the-following-error-when-querying-an-exposed-schema"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline"
+                            >
+                              PGRST106 troubleshooting guide
+                            </a>{' '}
+                            to check or reset it.
+                          </>
+                        }
+                      />
+                    )}
 
                     <FormItemLayout
                       isReactForm={false}
