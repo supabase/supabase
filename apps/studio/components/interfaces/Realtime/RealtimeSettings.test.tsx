@@ -284,13 +284,17 @@ describe('RealtimeSettings', () => {
 
     customRender(<RealtimeSettings />)
 
-    expect(await screen.findByText('Realtime has been suspended')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Supabase has suspended Realtime for this project')
+    ).toBeInTheDocument()
   })
 
   test('does not show a suspension banner when Realtime has not been admin-suspended', async () => {
     customRender(<RealtimeSettings />)
 
     await screen.findByLabelText('Postgres Changes connection pool size')
-    expect(screen.queryByText('Realtime has been suspended')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Supabase has suspended Realtime for this project')
+    ).not.toBeInTheDocument()
   })
 })
