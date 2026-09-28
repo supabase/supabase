@@ -33,6 +33,7 @@ import {
   NewTable,
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import {
   FormSection,
@@ -152,6 +153,11 @@ export const EditWrapperSheet = ({
   const wrapper_name = useWatch({ name: 'wrapper_name', control: form.control })
 
   const [isLoadingSecrets, setIsLoadingSecrets] = useState(false)
+  // Encrypted fields are seeded with their secret UUID until the decrypted value loads.
+  // Save must stay blocked until then, otherwise submitting saves the UUID itself as
+  // the new secret value (see getUpdateFDWSql, which treats any changed field value as
+  // a new plaintext secret to store).
+  const [secretsReady, setSecretsReady] = useState(false)
   useEffect(() => {
     const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
@@ -162,6 +168,13 @@ export const EditWrapperSheet = ({
       })
     ).filter((x) => UUID_REGEX.test(x))
     // [Joshen] ^ Validate UUID to filter out already decrypted values
+
+    if (encryptedIdsToFetch.length === 0) {
+      setSecretsReady(true)
+      return
+    }
+
+    setSecretsReady(false)
 
     const fetchEncryptedValues = async (ids: string[]) => {
       try {
@@ -178,6 +191,7 @@ export const EditWrapperSheet = ({
 
           resetField(option.name, { defaultValue: decryptedValues[encryptedId] })
         })
+        setSecretsReady(true)
       } catch (error) {
         toast.error('Failed to fetch encrypted values')
       } finally {
@@ -185,9 +199,7 @@ export const EditWrapperSheet = ({
       }
     }
 
-    if (encryptedIdsToFetch.length > 0) {
-      fetchEncryptedValues(encryptedIdsToFetch)
-    }
+    fetchEncryptedValues(encryptedIdsToFetch)
   }, [initialValues, wrapperMeta, resetField, project?.ref, project?.connectionString])
 
   return (
@@ -336,16 +348,22 @@ export const EditWrapperSheet = ({
               <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button
+              <ButtonTooltip
                 size="tiny"
                 variant="primary"
                 form={FORM_ID}
                 type="submit"
-                disabled={isSubmitting || !isDirty}
+                disabled={isSubmitting || !isDirty || !secretsReady}
                 loading={isSubmitting}
+                tooltip={{
+                  content: {
+                    side: 'top',
+                    text: !secretsReady ? 'Waiting for encrypted values to load' : undefined,
+                  },
+                }}
               >
                 Save wrapper
-              </Button>
+              </ButtonTooltip>
             </SheetFooter>
           </form>
         </Form>
@@ -377,9 +395,7 @@ export const EditWrapperSheet = ({
         }}
       >
         <p className="text-sm text-foreground-light">
-          <p className="text-sm text-foreground-light">
-            Removing a table or retyping a column may break views or functions that reference it.
-          </p>
+          Removing a table or retyping a column may break views or functions that reference it.
         </p>
         <p className="text-sm text-foreground-light mt-2">Are you sure you want to continue?</p>
       </ConfirmationModal>
