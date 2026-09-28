@@ -23,27 +23,6 @@ export function SiteFooter() {
           </a>
           .
         </p>
-        <p className="text-balance text-center text-sm leading-loose text-foreground-muted">
-          Site inspired by{' '}
-          <a
-            href="https://www.radix-ui.com/themes/docs/overview/getting-started"
-            target="_blank"
-            rel="noreferrer"
-            className="font-medium underline underline-offset-4 hover:text-foreground-lighter"
-          >
-            Radix
-          </a>
-          ,{' '}
-          <a
-            href="https://ui.shadcn.com"
-            target="_blank"
-            rel="noreferrer"
-            className="font-medium underline underline-offset-4 hover:text-foreground-lighter"
-          >
-            shadcn/ui
-          </a>
-          .
-        </p>
       </div>
     </footer>
   )
