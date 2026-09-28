@@ -135,7 +135,7 @@ const buttonVariants = cva(
         true: 'rounded-full',
       },
       iconOnly: {
-        true: 'hit-area-2 w-6.5',
+        true: 'hit-area-1 w-6.5',
       },
     },
     // Match <Button size="tiny"> so raw buttonVariants({ variant }) keeps sizing.
