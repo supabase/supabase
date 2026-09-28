@@ -1235,7 +1235,7 @@ export interface components {
            * @example developer
            * @enum {string}
            */
-          role: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
         }
         /**
          * @description Resource type.
@@ -1428,11 +1428,11 @@ export interface components {
           }[]
           require_sso?: boolean
           /**
-           * @description Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.
+           * @description Role name to assign. Must be on an Enterprise plan to use the read-only or no-access roles. no-access grants no project visibility until project-scoped roles are assigned separately.
            * @example developer
            * @enum {string}
            */
-          role: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
         }
         /**
          * @description Resource type.

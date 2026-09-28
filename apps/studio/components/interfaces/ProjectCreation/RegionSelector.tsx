@@ -147,7 +147,7 @@ export const RegionSelector = ({
 
   // Keeps dbRegion following the recommendation while "Best available" is active, so a
   // recommendation change (e.g. after a refetch) doesn't leave the form submitting a stale
-  // region behind a label that still reads "Best available region".
+  // region behind a label that still reads "Auto".
   useEffect(() => {
     if (!isBestAvailableSelected || !recommendedSmartRegion) return
     if (dbRegion !== recommendedSmartRegion.name) {
@@ -238,7 +238,7 @@ export const RegionSelector = ({
           const triggerLabel = isLoading
             ? 'Loading available regions...'
             : isBestAvailableActive
-              ? 'Best available region'
+              ? 'Auto'
               : selectedRegionLabel
 
           const affectingIncidents = incidents.filter((incident) => {
@@ -261,31 +261,26 @@ export const RegionSelector = ({
                 layout={layout}
                 label="Region"
                 description={
-                  <>
-                    <p>Select the region closest to your users for the best performance.</p>
-                    {restrictHighAvailabilityRegion ? (
-                      <div className="mt-2 text-warning">
-                        High Availability projects are currently limited to{' '}
-                        {regionOptions[0]?.name ?? highAvailabilityRegionCode}.
-                      </div>
-                    ) : (
-                      showNonProdFields && (
-                        <div className="mt-2 text-warning">
-                          <p>Only these regions are supported for local/staging projects:</p>
-                          <ul className="list-disc list-inside mt-1">
-                            <li>East US (North Virginia)</li>
-                            <li>Central EU (Frankfurt)</li>
-                            <li>Southeast Asia (Singapore)</li>
-                          </ul>
-                          {isLocalEnvironment && (
-                            <p className="mt-1">
-                              Use Central EU (Frankfurt) unless you're on a personal dev stack.
-                            </p>
-                          )}
-                        </div>
-                      )
-                    )}
-                  </>
+                  restrictHighAvailabilityRegion ? (
+                    <div className="text-warning">
+                      High Availability projects are currently limited to{' '}
+                      {regionOptions[0]?.name ?? highAvailabilityRegionCode}.
+                    </div>
+                  ) : showNonProdFields ? (
+                    <div className="text-warning">
+                      <p>Only these regions are supported for local/staging projects:</p>
+                      <ul className="list-disc list-inside mt-1">
+                        <li>East US (North Virginia)</li>
+                        <li>Central EU (Frankfurt)</li>
+                        <li>Southeast Asia (Singapore)</li>
+                      </ul>
+                      {isLocalEnvironment && (
+                        <p className="mt-1">
+                          Use Central EU (Frankfurt) unless you're on a personal dev stack.
+                        </p>
+                      )}
+                    </div>
+                  ) : undefined
                 }
               >
                 <FormControl>
@@ -344,8 +339,11 @@ export const RegionSelector = ({
                               <div className="flex flex-row items-center justify-between w-full">
                                 <div className="flex items-center gap-x-3">
                                   <BestAvailableRegionIcon />
-                                  <span className="text-foreground">Best available region</span>
+                                  <span className="text-foreground">Auto</span>
                                 </div>
+                                <Badge variant="success" className="mr-1">
+                                  Recommended
+                                </Badge>
                               </div>
                             </SelectItem>
                           </SelectGroup>

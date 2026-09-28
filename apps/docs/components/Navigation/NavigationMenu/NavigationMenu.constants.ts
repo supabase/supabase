@@ -3102,7 +3102,7 @@ export const telemetry: NavMenuConstant = {
           name: 'Performance monitor',
           url: '/guides/observability/automate-with-agents/performance',
         },
-        { name: 'Capacity monitor', url: '/guides/observability/automate-with-agents/usage' },
+        { name: 'Resource monitor', url: '/guides/observability/automate-with-agents/usage' },
       ],
     },
     {
