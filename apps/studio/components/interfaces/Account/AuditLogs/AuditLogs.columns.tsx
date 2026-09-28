@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Box, Boxes } from 'lucide-react'
-import type { MutableRefObject } from 'react'
+import type { RefObject } from 'react'
 import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TanStackTableHeadSort } from 'ui-patterns/Table'
@@ -13,11 +13,12 @@ import {
   TIMESTAMP_MICROS_PER_MS,
   type AuditLog,
 } from '@/data/organizations/organization-audit-logs-query'
+import { getShiftClickRowSelection } from '@/lib/shift-click-selection'
 
 interface AuditLogColumnsOptions {
   projects: { ref?: string; name: string }[]
   organizations: { slug?: string; name: string }[]
-  lastSelectedRowId: MutableRefObject<string | null>
+  lastSelectedRowId: RefObject<string | null>
   isLoadingProjects: boolean
   isLoadingOrganizations: boolean
 }
@@ -48,33 +49,26 @@ export function getAuditLogColumns({
           onClick={(e) => {
             e.stopPropagation()
 
-            const nextSelected = !row.getIsSelected()
-            const rows = table.getRowModel().rows
-            const lastIndex = lastSelectedRowId.current
-              ? rows.findIndex((r) => r.id === lastSelectedRowId.current)
-              : -1
-            const currentIndex = rows.findIndex((r) => r.id === row.id)
-            const canSelectRange = e.shiftKey && lastIndex !== -1 && currentIndex !== -1
+            const currentSelection = table.getState().rowSelection
+            const hasSelection = Object.values(currentSelection).some(Boolean)
+            const anchorRowId = hasSelection ? lastSelectedRowId.current : null
 
-            if (canSelectRange) {
-              const [start, end] =
-                lastIndex < currentIndex ? [lastIndex, currentIndex] : [currentIndex, lastIndex]
-              table.setRowSelection((prev) => {
-                const next = { ...prev }
-                for (let i = start; i <= end; i++) {
-                  if (nextSelected) {
-                    next[rows[i].id] = true
-                  } else {
-                    delete next[rows[i].id]
-                  }
-                }
-                return next
+            let next: typeof currentSelection
+            if (e.shiftKey) {
+              next = getShiftClickRowSelection({
+                orderedRowIds: table.getRowModel().rows.map((r) => r.id),
+                rowSelection: currentSelection,
+                anchorRowId,
+                targetRowId: row.id,
               })
             } else {
-              row.toggleSelected(nextSelected)
+              next = { ...currentSelection }
+              if (next[row.id]) delete next[row.id]
+              else next[row.id] = true
             }
 
-            lastSelectedRowId.current = row.id
+            table.setRowSelection(next)
+            lastSelectedRowId.current = Object.values(next).some(Boolean) ? row.id : null
           }}
         />
       ),
