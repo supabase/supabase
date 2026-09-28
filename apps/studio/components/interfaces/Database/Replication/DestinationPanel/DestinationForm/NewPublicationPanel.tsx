@@ -25,7 +25,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
-import { PARTITION_HANDLING_OPTIONS } from './PartitionHandling.constants'
 import {
   isMetadataListErrorVisible,
   isMetadataListLoading,
@@ -43,6 +42,11 @@ interface NewPublicationPanelProps {
 }
 
 const FORM_ID = 'publication-editor'
+
+const PARTITION_HANDLING_OPTIONS = {
+  parent: 'Use parent table identity',
+  partition: 'Replicate each partition separately',
+} as const
 
 const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -215,7 +219,7 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                             onValueChange={(value) => field.onChange(value === 'parent')}
                           >
                             <SelectTrigger aria-label="Postgres partition handling">
-                              <span className="min-w-0 truncate whitespace-nowrap">
+                              <span className="min-w-0">
                                 {field.value
                                   ? PARTITION_HANDLING_OPTIONS.parent
                                   : PARTITION_HANDLING_OPTIONS.partition}
