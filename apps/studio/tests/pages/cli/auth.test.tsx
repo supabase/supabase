@@ -132,24 +132,4 @@ describe('CliAuthScreen requested scopes', () => {
     expect(await screen.findByText('No permissions requested.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Authorize CLI' })).not.toBeDisabled()
   })
-
-  test('switching to Read-only restricts the granted scopes to the read-only ones', async () => {
-    mockQuery = { scopes: 'database:write,storage:read' }
-    const assign = mockLocationAssign()
-
-    renderCliAuthScreen()
-
-    await screen.findByText('Database')
-    fireEvent.click(screen.getByRole('radio', { name: /Read-only/i }))
-
-    expect(screen.queryByText('Database')).not.toBeInTheDocument()
-    expect(screen.getByText('Storage')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Authorize CLI' }))
-
-    await waitFor(() => expect(assign).toHaveBeenCalled())
-    const redirectUrl = assign.mock.calls[0][0] as string
-    expect(redirectUrl).toContain('scopes=storage:read')
-    expect(redirectUrl).not.toContain('database:write')
-  })
 })

@@ -5,7 +5,7 @@ import { ArrowRightLeft, LogOut, Terminal } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { type ReactNode } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import {
   Badge,
   Button,
@@ -17,8 +17,6 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  RadioGroupStacked,
-  RadioGroupStackedItem,
   Select,
   SelectContent,
   SelectItem,
@@ -212,7 +210,6 @@ const CliAuthPage: NextPageWithLayout = () => {
 
 const formSchema = z.object({
   projectRef: z.string({ message: 'Please select a project' }),
-  accessMode: z.enum(['full', 'readonly']),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -237,7 +234,6 @@ export const CliAuthScreen = ({
   const projects = liveProjects.length > 0 ? liveProjects : FALLBACK_PROJECTS
 
   const { scopes: requestedScopes } = useRequestedScopes()
-  const readOnlyScopes = requestedScopes.filter((scope) => scope.action === 'read')
 
   const email = profile?.primary_email ?? FALLBACK_EMAIL
   const hasValidRedirect = redirectUri !== undefined && isAllowedRedirectUri(redirectUri)
@@ -245,17 +241,11 @@ export const CliAuthScreen = ({
   const form = useForm<FormValues>({
     defaultValues: {
       projectRef,
-      accessMode: 'full',
     },
     resolver: zodResolver(formSchema),
   })
 
-  const grantedScopes = useWatch({
-    name: 'accessMode',
-    control: form.control,
-    compute: (accessMode) => (accessMode === 'full' ? requestedScopes : readOnlyScopes),
-  })
-  const scopeGroups = toScopeGroups(grantedScopes)
+  const scopeGroups = toScopeGroups(requestedScopes)
   const expiresAt = dayjs().add(TOKEN_EXPIRY_DAYS, 'days')
 
   if (!code || !redirectUri) {
@@ -274,7 +264,7 @@ export const CliAuthScreen = ({
 
   const handleAuthorize = (_values: FormValues) => {
     window.location.assign(
-      `${redirectUri}?token=${generateDemoToken()}&scopes=${grantedScopes.map((scope) => scope.scope).join(',')}&expires_at=${expiresAt.toISOString()}`
+      `${redirectUri}?token=${generateDemoToken()}&scopes=${requestedScopes.map((scope) => scope.scope).join(',')}&expires_at=${expiresAt.toISOString()}`
     )
   }
 
@@ -388,27 +378,6 @@ export const CliAuthScreen = ({
                     </SelectContent>
                   </Select>
                 )}
-              </FormItemLayout>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="accessMode"
-            render={({ field }) => (
-              <FormItemLayout layout="vertical" label="Access">
-                <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
-                  <RadioGroupStackedItem
-                    value="full"
-                    label="Full CLI access"
-                    description="Every scope the CLI requested, including writes"
-                  />
-                  <RadioGroupStackedItem
-                    value="readonly"
-                    label="Read-only"
-                    description="Only the read scopes. Deploys and migrations will fail"
-                  />
-                </RadioGroupStacked>
               </FormItemLayout>
             )}
           />
