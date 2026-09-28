@@ -189,15 +189,17 @@ describe('MessagePartToolGroup', () => {
     expect(trigger.querySelector('.shimmer')).toBeNull()
   })
 
-  it('moves the shimmer to each new row as it arrives', async () => {
-    const { container, rerender } = customRender(toolGroup([reasoning(), tool], true))
-    await userEvent.click(screen.getByRole('button', { name: 'Thinking...' }))
+  it('shimmers every row still in progress', async () => {
+    const { container, rerender } = customRender(
+      toolGroup([reasoning(), runningTool, tool, runningTool], true)
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Reading up...' }))
 
     const shimmeringRows = () =>
       [...container.querySelectorAll('.tool-item')].map((row) => !!row.querySelector('.shimmer'))
-    expect(shimmeringRows()).toEqual([false, true])
+    expect(shimmeringRows()).toEqual([false, true, false, true])
 
-    rerender(toolGroup([reasoning(), tool, streamingReasoning], true))
-    expect(shimmeringRows()).toEqual([false, false, true])
+    rerender(toolGroup([reasoning(), tool, tool, tool, streamingReasoning], true))
+    expect(shimmeringRows()).toEqual([false, false, false, false, true])
   })
 })

@@ -414,13 +414,11 @@ export function MessagePartToolGroup({
   return (
     <ToolGroup label={header} isActive={isRunning}>
       {parts.map((part, idx) => {
-        // While the group runs, its latest call is the one in progress
-        const isActive = isRunning && idx === parts.length - 1
         // Some models don't share their reasoning, leaving finished rows with nothing to expand
-        const isEmptyReasoning =
-          part.type === 'reasoning' && part.state === 'done' && !part.text.trim()
-        if (isEmptyReasoning && !isActive) return null
+        if (part.type === 'reasoning' && part.state === 'done' && !part.text.trim()) return null
 
+        // Parallel calls can leave several rows in progress at once
+        const isActive = isRunning && getCompactPartStatus(part) === 'running'
         return <MessagePartSwitcher key={idx} part={part} isActive={isActive} />
       })}
     </ToolGroup>

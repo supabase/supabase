@@ -4,7 +4,7 @@ import { cn } from 'ui'
 
 import { useMessageInfoContext } from './Message.Context'
 import { MessagePartSwitcher, MessagePartToolGroup } from './Message.Parts'
-import { groupMessageParts } from './Message.Parts.utils'
+import { groupMessageParts, isRunningToolCall } from './Message.Parts.utils'
 import { MessageMarkdown } from './MessageMarkdown'
 import { ProfileImage as ProfileImageDisplay } from '@/components/ui/ProfileImage'
 import { useProfileNameAndPicture } from '@/lib/profile'
@@ -70,8 +70,10 @@ const MessageDisplayContent = memo(function MessageDisplayContent({
               <MessagePartToolGroup
                 key={`tool-group-${item.groupIndex}`}
                 parts={item.parts}
-                // Only the trailing group can still grow while the response streams
-                isRunning={isStreaming && idx === items.length - 1}
+                // The trailing group can still grow, and a parallel call can outlast a later block
+                isRunning={
+                  isStreaming && (idx === items.length - 1 || item.parts.some(isRunningToolCall))
+                }
               />
             )
           })

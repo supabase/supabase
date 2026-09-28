@@ -199,6 +199,20 @@ describe('assistant feed rendering', () => {
     expect(screen.getAllByText('Reasoned')).toHaveLength(2)
   })
 
+  it('keeps a tool group running while a call in it outlasts a later block', () => {
+    const message: UIMessage = {
+      id: 'parallel-1',
+      role: 'assistant',
+      parts: [
+        { type: 'tool-search_docs', toolCallId: 'docs-1', state: 'input-available', input: {} },
+        { type: 'text', text: 'Checking your schema' },
+      ],
+    }
+    render(<FeedMessage message={message} />)
+
+    expect(screen.getByRole('button', { name: 'Searching docs...' })).toBeInTheDocument()
+  })
+
   it('updates text when the SDK mutates the first streamed part', () => {
     const text = { type: 'text' as const, text: 'First token', state: 'streaming' as const }
     const message: UIMessage = { id: 'text-1', role: 'assistant', parts: [text] }
