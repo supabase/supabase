@@ -311,7 +311,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                       type="horizontal"
                       value={stagePercent * 100}
                       max={100}
-                      barClass="bg-brand-default"
+                      barClass="bg-primary-bright"
                     />
                   </div>
                 </TooltipTrigger>

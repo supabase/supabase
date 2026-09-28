@@ -105,7 +105,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const hasUpdate = Boolean(versionData?.new_version)
 
   const handleNavigation = pipeline
-    ? createNavigationHandler(`/project/${projectRef}/database/replication/${pipeline.id}`, router)
+    ? createNavigationHandler(`/project/${projectRef}/database/pipelines/${pipeline.id}`, router)
     : undefined
 
   const onDeleteClick = async () => {

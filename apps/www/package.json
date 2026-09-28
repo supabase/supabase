@@ -17,8 +17,10 @@
     "typecheck": "pnpm run content:build:core && tsc --noEmit",
     "content:build:core": "node scripts/generateStaticContent.mjs && node scripts/generateMdContent.mjs",
     "content:build": "pnpm run content:build:core && node scripts/fetchAgentSkills.mjs",
+    "sync:partner-form": "node scripts/syncPartnerIntakeForm.mjs",
     "test": "vitest --run",
     "test:watch": "vitest watch",
+    "test:partner-form-sync": "vitest run --config vitest.sync.config.ts",
     "postbuild": "./../../scripts/upload-static-assets.sh"
   },
   "dependencies": {

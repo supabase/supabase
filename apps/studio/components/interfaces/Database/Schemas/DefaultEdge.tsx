@@ -53,7 +53,7 @@ const DefaultEdgeComponent = ({
         id={id}
         path={edgePath}
         className={cn(
-          selected ? 'stroke-brand-default!' : isDownloading ? 'stroke-black!' : undefined
+          selected ? 'stroke-primary-bright!' : isDownloading ? 'stroke-black!' : undefined
         )}
         stroke="#000000"
         {...props}
@@ -143,7 +143,7 @@ const EdgeRelationInfo = ({
       <Badge
         ref={checkIfShouldBeDisplayed}
         className={cn(
-          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-1 outline-brand-default',
+          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-1 outline-primary-bright',
           show ? 'opacity-100' : 'opacity-0'
         )}
         style={{
