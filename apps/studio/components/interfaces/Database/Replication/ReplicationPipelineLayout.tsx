@@ -335,7 +335,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="default"
-                      className="px-1.25 hit-area-2"
+                      className="w-6.5 hit-area-1"
                       aria-label="Pipeline options"
                       icon={<MoreVertical />}
                       disabled={isPipelineRequestPending || isTransitioning}

@@ -43,6 +43,10 @@ module.exports = defineConfig([
   { files: ['**/*.ts', '**/*.tsx'] },
   supabaseConfig,
   {
+    files: ['components/ui/PartnerIcon.tsx'],
+    rules: { 'shadcn/no-raw-colors': 'off' },
+  },
+  {
     files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
     plugins: {
       'barrel-files': barrelFiles,
