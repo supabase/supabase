@@ -22,13 +22,15 @@ export function Tool({ className, label, icon, isActive = false, children }: Too
         className
       )}
     >
-      <Collapsible>
+      <Collapsible className="min-w-0 flex-1">
         <CollapsibleTrigger
-          className={cn('flex items-center gap-2 w-full text-left')}
+          className="flex items-center gap-2 w-full min-w-0 text-left [&>svg]:shrink-0"
           disabled={!children}
         >
           {icon}
-          <span className={cn('text-foreground-lighter', isActive && 'shimmer')}>{label}</span>
+          <span className={cn('min-w-0 truncate text-foreground-lighter', isActive && 'shimmer')}>
+            {label}
+          </span>
         </CollapsibleTrigger>
 
         {isCollapsible && (

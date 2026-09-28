@@ -4,8 +4,10 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   areMessagePartsEqual,
   getCompactPartLabel,
+  getCompactPartStatus,
   getMessagePartKind,
-  getToolGroupHeader,
+  getRunningToolGroupHeader,
+  getToolGroupSummary,
   groupMessageParts,
 } from './Message.Parts.utils'
 
@@ -96,19 +98,39 @@ const reasoning = (text = 'Thinking about it'): MessagePart => ({
 })
 const text = (value: string): MessagePart => ({ type: 'text', text: value })
 const stepStart: MessagePart = { type: 'step-start' }
-const tool = (name: string): MessagePart => ({
+const tool = (name: string, input: unknown = {}): MessagePart => ({
   type: `tool-${name}`,
   toolCallId: `${name}-1`,
   state: 'output-available',
-  input: {},
+  input,
   output: {},
 })
-const dynamicTool = (toolName: string): MessagePart => ({
+const inputStreamingTool = (name: string): MessagePart => ({
+  type: `tool-${name}`,
+  toolCallId: `${name}-1`,
+  state: 'input-streaming',
+  input: undefined,
+})
+const executingTool = (name: string): MessagePart => ({
+  type: `tool-${name}`,
+  toolCallId: `${name}-1`,
+  state: 'input-available',
+  input: {},
+})
+const failedTool = (name: string): MessagePart => ({
+  type: `tool-${name}`,
+  toolCallId: `${name}-1`,
+  state: 'output-error',
+  input: {},
+  errorText: 'Boom',
+})
+const streamingReasoning: MessagePart = { type: 'reasoning', state: 'streaming', text: '' }
+const dynamicTool = (toolName: string, input: unknown = {}): MessagePart => ({
   type: 'dynamic-tool',
   toolName,
   toolCallId: `${toolName}-1`,
   state: 'output-available',
-  input: {},
+  input,
   output: {},
 })
 
@@ -120,6 +142,15 @@ describe('getMessagePartKind', () => {
     expect(getMessagePartKind(tool('get_active_incidents'))).toBe('compact')
     expect(getMessagePartKind(tool('load_knowledge'))).toBe('compact')
     expect(getMessagePartKind(dynamicTool('list_tables'))).toBe('compact')
+  })
+
+  it('treats report, notebook and self-hosted lookups as compact', () => {
+    expect(getMessagePartKind(tool('list_notebooks'))).toBe('compact')
+    expect(getMessagePartKind(tool('get_notebook'))).toBe('compact')
+    expect(getMessagePartKind(tool('list_reports'))).toBe('compact')
+    expect(getMessagePartKind(tool('get_report'))).toBe('compact')
+    expect(getMessagePartKind(tool('list_databases'))).toBe('compact')
+    expect(getMessagePartKind(tool('getSchemaTables'))).toBe('compact')
   })
 
   it('treats text and rich tool results as blocks', () => {
@@ -209,67 +240,151 @@ describe('groupMessageParts', () => {
   })
 })
 
-describe('getCompactPartLabel', () => {
-  it('labels reasoning by whether it is still streaming', () => {
-    expect(getCompactPartLabel({ type: 'reasoning', state: 'streaming', text: '' })).toEqual({
-      action: 'Thinking...',
-    })
-    expect(getCompactPartLabel(reasoning())).toEqual({ action: 'Reasoned' })
+describe('getCompactPartStatus', () => {
+  it('treats unfinished parts as running only while their group runs', () => {
+    const executing = executingTool('search_docs')
+    expect(getCompactPartStatus(executing, true)).toBe('running')
+    expect(getCompactPartStatus(executing, false)).toBe('stopped')
+    expect(getCompactPartStatus(inputStreamingTool('search_docs'), true)).toBe('running')
+    expect(getCompactPartStatus(streamingReasoning, true)).toBe('running')
+    expect(getCompactPartStatus(streamingReasoning, false)).toBe('stopped')
   })
 
-  it('labels tool calls with the tool name', () => {
-    expect(getCompactPartLabel(tool('search_docs'))).toEqual({
-      action: 'Ran',
-      toolName: 'search_docs',
-    })
-    expect(getCompactPartLabel(dynamicTool('list_tables'))).toEqual({
-      action: 'Ran',
-      toolName: 'list_tables',
-    })
-  })
-
-  it('labels a tool call whose input is still streaming as running', () => {
-    const part: MessagePart = {
-      type: 'tool-search_docs',
-      toolCallId: 'search_docs-1',
-      state: 'input-streaming',
-      input: undefined,
-    }
-    expect(getCompactPartLabel(part)).toEqual({ action: 'Running', toolName: 'search_docs' })
+  it('reports finished and failed calls whether or not the group runs', () => {
+    expect(getCompactPartStatus(tool('search_docs'), true)).toBe('done')
+    expect(getCompactPartStatus(reasoning(), true)).toBe('done')
+    expect(getCompactPartStatus(failedTool('search_docs'), false)).toBe('failed')
   })
 })
 
-describe('getToolGroupHeader', () => {
-  const parts = [reasoning(), tool('search_docs'), reasoning(), tool('list_policies')]
-
-  it('mirrors the latest tool call while running collapsed', () => {
-    expect(getToolGroupHeader({ parts, isRunning: true, isOpen: false })).toEqual({
-      action: 'Ran',
-      toolName: 'list_policies',
+describe('getCompactPartLabel', () => {
+  it('labels reasoning by its status', () => {
+    expect(getCompactPartLabel(streamingReasoning, 'running')).toEqual({ action: 'Thinking...' })
+    expect(getCompactPartLabel(reasoning(), 'done')).toEqual({ action: 'Reasoned' })
+    expect(getCompactPartLabel(streamingReasoning, 'stopped')).toEqual({
+      action: 'Stopped thinking',
     })
   })
 
-  it('shows a generic label while running expanded', () => {
-    expect(getToolGroupHeader({ parts, isRunning: true, isOpen: true })).toEqual({
-      action: 'Working...',
+  it('describes what a tool call does in each status', () => {
+    const part = tool('list_policies')
+    expect(getCompactPartLabel(part, 'running')).toEqual({ action: 'Checking policies...' })
+    expect(getCompactPartLabel(part, 'done')).toEqual({ action: 'Checked policies' })
+    expect(getCompactPartLabel(part, 'failed')).toEqual({ action: 'Unable to check policies' })
+    expect(getCompactPartLabel(part, 'stopped')).toEqual({ action: 'Stopped checking policies' })
+  })
+
+  it('adds what the call looks at when its input says', () => {
+    const part = tool('list_policies', { schemas: ['public', 'auth'] })
+    expect(getCompactPartLabel(part, 'done')).toEqual({
+      action: 'Checked policies',
+      detail: 'in public, auth',
+    })
+    // The ellipsis follows the detail so the label reads as one phrase
+    expect(getCompactPartLabel(part, 'running')).toEqual({
+      action: 'Checking policies',
+      detail: 'in public, auth...',
     })
   })
 
-  it('shows a generic label while running without parts', () => {
-    expect(getToolGroupHeader({ parts: [], isRunning: true, isOpen: false })).toEqual({
-      action: 'Working...',
+  it('pulls the search phrase out of a docs query', () => {
+    const part = dynamicTool('search_docs', {
+      graphql_query: '{ searchDocs(query: "row level security", limit: 5) { nodes { title } } }',
+    })
+    expect(getCompactPartLabel(part, 'done')).toEqual({
+      action: 'Searched docs',
+      detail: 'for "row level security"',
+    })
+    expect(
+      getCompactPartLabel(dynamicTool('search_docs', { graphql_query: '{ schema }' }), 'done')
+    ).toEqual({ action: 'Searched docs' })
+  })
+
+  it('names the knowledge topic being loaded', () => {
+    expect(getCompactPartLabel(tool('load_knowledge', { name: 'rls' }), 'done')).toEqual({
+      action: 'Read up',
+      detail: 'on RLS',
     })
   })
 
-  it('summarizes the tool count once finished, open or not', () => {
-    const summary = { action: 'Worked across 4 tools' }
-    expect(getToolGroupHeader({ parts, isRunning: false, isOpen: false })).toEqual(summary)
-    expect(getToolGroupHeader({ parts, isRunning: false, isOpen: true })).toEqual(summary)
+  it('falls back to a readable tool name for unknown tools', () => {
+    expect(getCompactPartLabel(dynamicTool('get_project_url'), 'done')).toEqual({
+      action: 'Ran get project url',
+    })
+    expect(getCompactPartLabel(tool('getSomethingNew'), 'running')).toEqual({
+      action: 'Running get something new...',
+    })
+  })
+})
+
+describe('getRunningToolGroupHeader', () => {
+  it('shows a tool call while it executes', () => {
+    const parts = [reasoning(), executingTool('list_policies')]
+    expect(getRunningToolGroupHeader(parts)).toEqual({ action: 'Checking policies...' })
   })
 
-  it('uses the singular for a single tool', () => {
-    expect(getToolGroupHeader({ parts: [reasoning()], isRunning: false, isOpen: false })).toEqual({
-      action: 'Worked across 1 tool',
+  it('goes back to thinking once the call finishes', () => {
+    expect(getRunningToolGroupHeader([reasoning(), tool('list_policies')])).toEqual({
+      action: 'Thinking...',
+    })
+    expect(
+      getRunningToolGroupHeader([reasoning(), tool('list_policies'), streamingReasoning])
+    ).toEqual({ action: 'Thinking...' })
+  })
+
+  it('keeps showing a parallel call that is still executing', () => {
+    const parts = [executingTool('list_policies'), tool('search_docs')]
+    expect(getRunningToolGroupHeader(parts)).toEqual({ action: 'Checking policies...' })
+  })
+
+  it('shows thinking before anything has arrived', () => {
+    expect(getRunningToolGroupHeader([])).toEqual({ action: 'Thinking...' })
+  })
+})
+
+describe('getToolGroupSummary', () => {
+  it('lists what the tool calls did, without repeats', () => {
+    expect(
+      getToolGroupSummary([
+        reasoning(),
+        tool('search_docs'),
+        reasoning(),
+        tool('search_docs'),
+        tool('list_policies'),
+      ])
+    ).toEqual({ action: 'Searched docs and checked policies' })
+  })
+
+  it('names a single tool call', () => {
+    expect(getToolGroupSummary([reasoning(), tool('search_docs')])).toEqual({
+      action: 'Searched docs',
+    })
+  })
+
+  it('counts the rest after two', () => {
+    expect(
+      getToolGroupSummary([
+        tool('search_docs'),
+        tool('list_policies'),
+        tool('get_active_incidents'),
+        dynamicTool('list_tables'),
+      ])
+    ).toEqual({ action: 'Searched docs, checked policies, and 2 more' })
+  })
+
+  it('leaves out calls that did not finish', () => {
+    expect(getToolGroupSummary([tool('search_docs'), failedTool('list_policies')])).toEqual({
+      action: 'Searched docs',
+    })
+  })
+
+  it('describes how the group ended when no call finished', () => {
+    expect(getToolGroupSummary([reasoning()])).toEqual({ action: 'Reasoned' })
+    expect(getToolGroupSummary([failedTool('list_policies')])).toEqual({
+      action: 'Unable to check policies',
+    })
+    expect(getToolGroupSummary([reasoning(), executingTool('search_docs')])).toEqual({
+      action: 'Stopped searching docs',
     })
   })
 })

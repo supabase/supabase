@@ -183,21 +183,22 @@ describe('assistant feed rendering', () => {
   it('finishes reasoning when the SDK mutates the first streamed part before publishing a snapshot', () => {
     const reasoning = {
       type: 'reasoning' as const,
-      text: '',
+      text: 'Looking at the schema',
       state: 'streaming' as 'streaming' | 'done',
     }
     const message: UIMessage = { id: 'reasoning-1', role: 'assistant', parts: [reasoning] }
     const { rerender } = render(<FeedMessage message={message} isLastMessage />)
     // Expand the tool group so the reasoning row itself is rendered
     fireEvent.click(screen.getByRole('button', { name: 'Thinking...' }))
-    expect(screen.getByText('Thinking...')).toBeInTheDocument()
+    // The group header and the reasoning row
+    expect(screen.getAllByText('Thinking...')).toHaveLength(2)
 
     // Chat.pushMessage exposes the initial object; subsequent replaceMessage calls clone it.
     reasoning.state = 'done'
     rerender(<FeedMessage message={structuredClone(message)} isLoading={false} isLastMessage />)
 
     expect(screen.queryByText('Thinking...')).not.toBeInTheDocument()
-    expect(screen.getByText('Reasoned')).toBeInTheDocument()
+    expect(screen.getAllByText('Reasoned')).toHaveLength(2)
   })
 
   it('updates text when the SDK mutates the first streamed part', () => {

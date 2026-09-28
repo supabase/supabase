@@ -29,6 +29,7 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
+import { groupMessageParts } from './Message.Parts.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
@@ -288,6 +289,13 @@ export const AssistantChat = ({
     error &&
     (error.message?.includes('context_length_exceeded') ||
       error.message?.includes('exceeds the context window'))
+
+  const lastMessage = chatMessages.at(-1)
+  // A running tool group shimmers already, so the cursor would be a second loading indicator
+  const isToolGroupRunning =
+    isChatLoading &&
+    lastMessage?.role === 'assistant' &&
+    groupMessageParts(lastMessage.parts).at(-1)?.type === 'tool-group'
 
   const editedMessageIndex = editingMessageId
     ? chatMessages.findIndex((message) => message.id === editingMessageId)
@@ -613,7 +621,7 @@ export const AssistantChat = ({
                     }
                   />
                 )}
-                {isChatLoading && (
+                {isChatLoading && !isToolGroupRunning && (
                   <motion.span
                     animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [1, 0] }}
                     transition={
