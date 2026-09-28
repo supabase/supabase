@@ -306,13 +306,13 @@ export const formatRate = (count: number, total: number) =>
     maximumFractionDigits: 1,
   }).format(total === 0 ? 0 : count / total)
 
-export const formatReferenceDelta = (value: number, reference: number, label = 'average') => {
+export const formatReferenceDelta = (value: number, reference: number) => {
   const difference = value - reference
-  if (Math.abs(difference) < Number.EPSILON) return `At ${label}`
-  if (reference === 0) return `${difference > 0 ? 'Above' : 'Below'} ${label}`
+  if (Math.abs(difference) < Number.EPSILON) return 'At average'
+  if (reference === 0) return `${difference > 0 ? 'Above' : 'Below'} average`
 
   const percentDifference = Math.round(Math.abs((difference / reference) * 100))
-  return `${percentDifference}% ${difference > 0 ? 'above' : 'below'} ${label}`
+  return `${percentDifference}% ${difference > 0 ? 'above' : 'below'} average`
 }
 
 export const getMemoryTooltipDetail = (heapMemory: number, externalMemory: number) => {

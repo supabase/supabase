@@ -18,13 +18,9 @@ const TAB_DIGIT_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const
  */
 export interface IntegrationDetailTabShortcutsProps {
   tabs: IntegrationTab[]
-  enabled?: boolean
 }
 
-export const IntegrationDetailTabShortcuts = ({
-  tabs,
-  enabled = true,
-}: IntegrationDetailTabShortcutsProps) => {
+export const IntegrationDetailTabShortcuts = ({ tabs }: IntegrationDetailTabShortcutsProps) => {
   const router = useRouter()
 
   return (
@@ -36,7 +32,7 @@ export const IntegrationDetailTabShortcuts = ({
           sequence={[TAB_DIGIT_KEYS[index]]}
           label={`Go to ${tab.label}`}
           referenceGroup={SHORTCUT_REFERENCE_GROUPS.NAVIGATION_INTEGRATIONS_DETAIL}
-          enabled={enabled && !tab.active}
+          enabled={!tab.active}
           registerInCommandMenu
           callback={() => router.push(tab.href)}
         />

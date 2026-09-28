@@ -39,7 +39,6 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
   onSelectPaymentMethod: (id: string) => void
-  layout?: 'vertical' | 'horizontal'
   readOnly: boolean
   onAddressChange?: (address: CustomerAddress) => void
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
@@ -52,7 +51,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   {
     selectedPaymentMethod,
     onSelectPaymentMethod,
-    layout = 'vertical',
     readOnly,
     onAddressChange,
     onTaxIdChange,
@@ -320,7 +318,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
           <FormItemLayout
             id="payment-method"
             isReactForm={false}
-            layout={layout}
+            layout="vertical"
             label="Payment method"
             className="gap-[2px]"
             size="tiny"

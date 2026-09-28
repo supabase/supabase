@@ -14,14 +14,12 @@ export const OrganizationCard = ({
   href,
   isLink = true,
   className,
-  onClick,
   description,
 }: {
   organization: Organization
   href?: string
   isLink?: boolean
   className?: string
-  onClick?: () => void
   description?: ReactNode
 }) => {
   const isUserMFAEnabled = useIsMFAEnabled()
@@ -43,7 +41,6 @@ export const OrganizationCard = ({
       )}
       icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
       title={organization.name}
-      onClick={onClick}
       description={
         shouldRenderDefaultDescription ? (
           <div className="flex items-center justify-between text-xs text-foreground-light font-sans">

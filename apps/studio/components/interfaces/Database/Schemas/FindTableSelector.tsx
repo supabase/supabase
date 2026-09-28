@@ -22,8 +22,6 @@ type FindTableSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> 
   projectRef?: string
   connectionString?: string | null
   schema?: string
-  disabled?: boolean
-  size?: 'tiny' | 'small'
   open: boolean
   onOpenChange: (open: boolean) => void
   onSelect: (table: SafePostgresTable) => void
@@ -31,18 +29,7 @@ type FindTableSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> 
 
 export const FindTableSelector = forwardRef<HTMLDivElement, FindTableSelectorProps>(
   (
-    {
-      className,
-      projectRef,
-      connectionString,
-      schema,
-      disabled = false,
-      size = 'tiny',
-      open,
-      onOpenChange,
-      onSelect,
-      ...rest
-    },
+    { className, projectRef, connectionString, schema, open, onOpenChange, onSelect, ...rest },
     ref
   ) => {
     const [search, setSearch] = useState('')
@@ -74,8 +61,7 @@ export const FindTableSelector = forwardRef<HTMLDivElement, FindTableSelectorPro
         <Popover open={open} onOpenChange={handleOpenChange} modal={false}>
           <PopoverTrigger asChild>
             <Button
-              size={size}
-              disabled={disabled}
+              size="tiny"
               data-testid="find-table-selector"
               icon={<Search size={14} strokeWidth={1.5} className="text-foreground-muted" />}
             >

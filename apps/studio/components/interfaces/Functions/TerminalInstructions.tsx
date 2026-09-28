@@ -16,13 +16,12 @@ import { DOCS_URL } from '@/lib/constants'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible> {
   closable?: boolean
-  removeBorder?: boolean
 }
 
 export const TerminalInstructions = forwardRef<
   ElementRef<typeof Collapsible>,
   TerminalInstructionsProps
->(({ closable = false, removeBorder = false, ...props }, ref) => {
+>(({ closable = false, ...props }, ref) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showInstructions, setShowInstructions] = useState(!closable)

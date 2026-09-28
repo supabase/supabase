@@ -64,9 +64,7 @@ interface UsePrivilegesStateOptions {
 
 function addOrRemoveOperation(
   operations: PrivilegeOperation[],
-  operation: PrivilegeOperation,
-  /** removes old operations and always adds the new one */
-  forceAdd = false
+  operation: PrivilegeOperation
 ): PrivilegeOperation[] {
   let state = [...operations]
 
@@ -84,10 +82,7 @@ function addOrRemoveOperation(
 
   if (existing !== undefined) {
     state = state.filter((op) => op !== existing)
-
-    if (!forceAdd) {
-      return state
-    }
+    return state
   }
 
   state.push(operation)

@@ -7,15 +7,9 @@ import { loadIntegrationOverview } from '@/static-data/integrations/overviews'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
 
-export const MarkdownContent = ({
-  integrationId,
-  initiallyExpanded,
-}: {
-  integrationId: string
-  initiallyExpanded?: boolean
-}) => {
+export const MarkdownContent = ({ integrationId }: { integrationId: string }) => {
   const [content, setContent] = useState<string>('')
-  const [isExpanded, setIsExpanded] = useState(initiallyExpanded ?? false)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     let cancelled = false

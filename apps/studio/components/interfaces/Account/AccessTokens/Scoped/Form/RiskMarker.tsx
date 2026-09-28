@@ -8,22 +8,15 @@ import {
 
 interface RiskMarkerProps {
   entry: PermissionCatalogEntry
-  /** When false, renders the dot + label without the explanatory tooltip (used in the review list). */
-  withTooltip?: boolean
   className?: string
 }
 
-export const RiskMarker = ({ entry, withTooltip = true, className }: RiskMarkerProps) => {
+export const RiskMarker = ({ entry, className }: RiskMarkerProps) => {
   const marker = (
-    <Badge
-      variant={RISK_TONE_VARIANT[entry.risk]}
-      className={cn(withTooltip && 'cursor-help', className)}
-    >
+    <Badge variant={RISK_TONE_VARIANT[entry.risk]} className={cn('cursor-help', className)}>
       {RISK_LEVEL_LABEL[entry.risk]}
     </Badge>
   )
-
-  if (!withTooltip) return marker
 
   return (
     <Tooltip>

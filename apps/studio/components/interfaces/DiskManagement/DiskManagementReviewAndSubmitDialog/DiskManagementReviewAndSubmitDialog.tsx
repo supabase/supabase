@@ -5,7 +5,6 @@ import {
   Alert,
   AlertTitle,
   Button,
-  ButtonProps,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -41,7 +40,6 @@ interface DiskManagementReviewAndSubmitDialogProps {
   disabled?: boolean
   setIsDialogOpen: (isOpen: boolean) => void
   onSubmit: (values: DiskStorageSchemaType) => Promise<void>
-  buttonSize?: ButtonProps['size']
   message?: DiskManagementMessage | null
 }
 
@@ -54,7 +52,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
   loading,
   onSubmit,
   message,
-  buttonSize = 'medium',
 }: DiskManagementReviewAndSubmitDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
 
@@ -93,7 +90,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          size={buttonSize}
+          size="medium"
           type="submit"
           variant="primary"
           onClick={async (e) => {

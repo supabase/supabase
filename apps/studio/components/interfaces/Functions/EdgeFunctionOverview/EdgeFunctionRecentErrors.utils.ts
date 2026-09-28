@@ -130,13 +130,12 @@ export const toIsoTimestamp = (value?: string | number) => {
 
 export const SINCE_LAST_DEPLOY_MAX_RANGE_MS = 24 * 60 * 60 * 1000
 
-export const getSinceLastDeployLogRange = (updatedAt?: string | number, now: Date = new Date()) => {
+export const getSinceLastDeployLogRange = (updatedAt?: string | number) => {
   const isoTimestampStart = toIsoTimestamp(updatedAt)
   if (!isoTimestampStart) return {}
 
   const startDate = new Date(isoTimestampStart)
-  const normalizedNow = new Date(now)
-  const nowDate = Number.isNaN(normalizedNow.valueOf()) ? new Date() : normalizedNow
+  const nowDate = new Date()
   const endDate = new Date(Math.max(startDate.valueOf(), nowDate.valueOf()))
   const earliestAllowedStart = endDate.valueOf() - SINCE_LAST_DEPLOY_MAX_RANGE_MS
 

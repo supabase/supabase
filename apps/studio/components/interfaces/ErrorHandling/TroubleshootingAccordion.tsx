@@ -11,8 +11,6 @@ interface TroubleshootingAccordionProps {
   errorType: string
   /** Step titles keyed by step number — used for telemetry */
   stepTitles?: Record<number, string>
-  /** Which step to expand by default (1-indexed), defaults to 1 */
-  defaultExpandedStep?: number
   className?: string
 }
 
@@ -20,17 +18,15 @@ export function TroubleshootingAccordion({
   children,
   errorType,
   stepTitles,
-  defaultExpandedStep = 1,
   className,
 }: TroubleshootingAccordionProps) {
   const track = useTrack()
-  const defaultValue = defaultExpandedStep > 0 ? `step-${defaultExpandedStep}` : undefined
 
   return (
     <Accordion
       type="single"
       collapsible
-      defaultValue={defaultValue}
+      defaultValue="step-1"
       className={cn('w-full', className)}
       onValueChange={(value) => {
         const expanded = Boolean(value)

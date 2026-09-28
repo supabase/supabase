@@ -1,20 +1,7 @@
-import {
-  Calendar,
-  Check,
-  ChevronsUpDown,
-  ExternalLink,
-  Hash,
-  ListPlus,
-  ToggleRight,
-  Type,
-} from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useId, useState } from 'react'
+import { Calendar, Check, ChevronsUpDown, Hash, ListPlus, ToggleRight, Type } from 'lucide-react'
+import { useId, useState } from 'react'
 import { Control } from 'react-hook-form'
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
   Button,
   cn,
   Command,
@@ -24,7 +11,6 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CriticalIcon,
   FormControl,
   FormField,
   FormItem,
@@ -40,7 +26,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   POSTGRES_DATA_TYPE_OPTIONS,
   POSTGRES_DATA_TYPES,
-  RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
@@ -49,18 +34,10 @@ interface ColumnTypeProps {
   name: string
   className?: string
   enumTypes: EnumeratedType[]
-  description?: ReactNode
-  showRecommendation?: boolean
   control: Control
 }
 
-export const ColumnType = ({
-  className,
-  name,
-  enumTypes = [],
-  showRecommendation = false,
-  control,
-}: ColumnTypeProps) => {
+export const ColumnType = ({ className, name, enumTypes = [], control }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
   const listboxId = useId()
   const availableTypes = POSTGRES_DATA_TYPES.concat(
@@ -112,7 +89,6 @@ export const ColumnType = ({
       name={name}
       render={({ field }) => {
         const isAvailableType = field.value ? availableTypes.includes(field.value) : true
-        const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[field.value]
 
         if (!isAvailableType) {
           return (
@@ -258,36 +234,6 @@ export const ColumnType = ({
                 </Command>
               </PopoverContent>
             </Popover>
-            {showRecommendation && recommendation !== undefined && (
-              <Alert variant="warning" className="mt-2">
-                <CriticalIcon />
-                <AlertTitle>
-                  {' '}
-                  It is recommended to use{' '}
-                  <code className="text-code-inline">{recommendation.alternative}</code> instead
-                </AlertTitle>
-                <AlertDescription>
-                  <p>
-                    Postgres recommends against using the data type{' '}
-                    <code className="text-code-inline">{field.value}</code> unless you have a very
-                    specific use case.
-                  </p>
-                  <div className="flex items-center space-x-2 mt-3">
-                    <Button asChild icon={<ExternalLink />}>
-                      <Link href={recommendation.reference} target="_blank" rel="noreferrer">
-                        Read more
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="primary"
-                      onClick={() => field.onChange(recommendation.alternative)}
-                    >
-                      Use {recommendation.alternative}
-                    </Button>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            )}
           </FormItem>
         )
       }}

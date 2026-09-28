@@ -40,7 +40,6 @@ interface FormFieldProps {
   properties: any
   control: Control
   hasAccess: boolean
-  disabled?: boolean
   readOnly?: boolean
 }
 
@@ -51,7 +50,6 @@ const FormField = ({
   organizationSlug,
   control,
   hasAccess,
-  disabled: disabledProp,
   readOnly,
 }: FormFieldProps) => {
   const { setValue } = useFormContext()
@@ -72,8 +70,7 @@ const FormField = ({
       : ''
     description = originalDescription ? `${originalDescription} ${planMessage}` : planMessage
   }
-  const disabled =
-    disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
+  const disabled = properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess
 
   const showValue = useWatch({
     control,

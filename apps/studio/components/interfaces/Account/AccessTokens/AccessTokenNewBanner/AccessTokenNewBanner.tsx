@@ -12,8 +12,6 @@ interface AccessTokenNewBannerProps<T> {
   onClose: () => void
   getTokenValue: (token: T) => string
   getTokenPermissions?: (token: T) => string[] | undefined
-  title?: string
-  description?: string
 }
 
 export const AccessTokenNewBanner = <T,>({
@@ -21,8 +19,6 @@ export const AccessTokenNewBanner = <T,>({
   onClose,
   getTokenValue,
   getTokenPermissions,
-  title = 'Successfully generated a new token!',
-  description = 'Copy this access token and store it in a secure place. You will not be able to see it again.',
 }: AccessTokenNewBannerProps<T>) => {
   const tokenPermissions = getTokenPermissions?.(token)
   const { groupedPermissions, totalCount } = useGroupedPermissions(tokenPermissions)
@@ -30,7 +26,7 @@ export const AccessTokenNewBanner = <T,>({
   return (
     <Admonition
       type="note"
-      title={title}
+      title="Successfully generated a new token!"
       className="mb-6 relative"
       actions={
         <Tooltip>
@@ -48,7 +44,10 @@ export const AccessTokenNewBanner = <T,>({
       }
     >
       <div className="space-y-4">
-        <p className="text-sm text-foreground-light">{description}</p>
+        <p className="text-sm text-foreground-light">
+          Copy this access token and store it in a secure place. You will not be able to see it
+          again.
+        </p>
         <div className="w-full pb-2">
           <Input
             copy

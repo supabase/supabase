@@ -23,13 +23,7 @@ import { ProfileImage } from '@/components/ui/ProfileImage'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
-export const LocalDropdown = ({
-  triggerClassName,
-  contentClassName,
-}: {
-  triggerClassName?: string
-  contentClassName?: string
-}) => {
+export const LocalDropdown = ({ triggerClassName }: { triggerClassName?: string }) => {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
@@ -51,7 +45,7 @@ export const LocalDropdown = ({
           <span className="sr-only">Settings</span>
         </ButtonTooltip>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className={cn('w-44', contentClassName)}>
+      <DropdownMenuContent side="bottom" align="end" className="w-44">
         <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
           <Link
             href="/account/me"

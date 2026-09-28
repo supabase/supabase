@@ -22,7 +22,6 @@ export const OrganizationSelector = ({
   unavailableOrganizations = [],
   selectedSlug,
   disabled = false,
-  description,
   createLabel,
   createHrefParams,
   onCreate,
@@ -35,7 +34,6 @@ export const OrganizationSelector = ({
   unavailableOrganizations?: Organization[]
   selectedSlug?: string | null
   disabled?: boolean
-  description?: ReactNode
   createLabel?: string
   createHrefParams?: { [key: string]: string }
   onCreate?: () => void
@@ -93,7 +91,6 @@ export const OrganizationSelector = ({
         <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
           Organization
         </p>
-        {description && <p className="text-xs text-foreground-lighter pr-4">{description}</p>}
       </div>
       <div className="space-y-2">
         {visibleOrganizations.map((organization) => (

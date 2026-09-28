@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
+import { forwardRef, HTMLAttributes, ReactNode } from 'react'
 import { Badge, Button, cn } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -18,10 +18,9 @@ import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
 
-interface IntegrationInstallationProps extends RefAttributes<HTMLLIElement> {
+interface IntegrationInstallationProps {
   title: string
   integration: Integration
-  disabled?: boolean
 }
 
 type HandleIconType = Integration['integration']['name'] | 'Supabase'
@@ -81,7 +80,7 @@ const IntegrationIconBlock = ({ integration }: { integration: Integration }) => 
 }
 
 export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallationProps>(
-  ({ integration, disabled, ...props }, ref) => {
+  ({ integration, ...props }, ref) => {
     return (
       <li
         ref={ref}
@@ -118,18 +117,14 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
           </div>
         </div>
 
-        <Button asChild disabled={disabled} iconRight={<ExternalLink />}>
-          {disabled ? (
-            <p>Manage</p>
-          ) : (
-            <Link
-              href={getIntegrationConfigurationUrl(integration)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Manage
-            </Link>
-          )}
+        <Button asChild iconRight={<ExternalLink />}>
+          <Link
+            href={getIntegrationConfigurationUrl(integration)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Manage
+          </Link>
         </Button>
       </li>
     )
@@ -342,22 +337,16 @@ export const EmptyIntegrationConnection = forwardRef<
 )
 
 interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElement> {
-  name?: string
   markdown?: string
-  showNode?: boolean
 }
 
 export const IntegrationConnectionHeader = forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
-  ({ className, markdown = '', showNode = true, ...props }, ref) => {
+  ({ className, markdown = '', ...props }, ref) => {
     return (
       <div
         {...props}
         ref={ref}
-        className={cn(
-          showNode && 'border-l border-muted ml-6 pl-8',
-          'py-4 prose text-sm',
-          className
-        )}
+        className={cn('border-l border-muted ml-6 pl-8', 'py-4 prose text-sm', className)}
       >
         {props.title && <h5 className="text-foreground">{props.title}</h5>}
         <Markdown content={markdown} className="[&>p]:my-0" />

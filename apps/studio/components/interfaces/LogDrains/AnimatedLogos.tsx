@@ -5,13 +5,13 @@ import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
 interface AnimatedLogosProps {
-  iconSize?: number
   className?: string
 }
 
-export const AnimatedLogos = ({ iconSize = 36, className }: AnimatedLogosProps) => {
+export const AnimatedLogos = ({ className }: AnimatedLogosProps) => {
   const [currIndex, setCurrIndex] = useState(0)
   const timer = 2500
+  const iconSize = 36
 
   const centerWrapperSize = Math.round(iconSize * 2.67)
   const sideWrapperSize = Math.round(iconSize * 2.22)

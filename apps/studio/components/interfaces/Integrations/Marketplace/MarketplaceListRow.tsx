@@ -70,16 +70,10 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
   )
 }
 
-interface MarketplaceListHeaderProps {
-  integrationsLabel?: string
-}
-
-export const MarketplaceListHeader = ({
-  integrationsLabel = 'Integration',
-}: MarketplaceListHeaderProps) => (
+export const MarketplaceListHeader = () => (
   <TableRow>
     <TableHead className="w-10 pr-0 @lg:w-12" />
-    <TableHead>{integrationsLabel}</TableHead>
+    <TableHead>Integration</TableHead>
     <TableHead className={`w-28 ${HIDE_BELOW_XL}`}>Category</TableHead>
     <TableHead className={`w-40 ${HIDE_BELOW_4XL}`}>Type</TableHead>
     <TableHead className={`w-40 ${HIDE_BELOW_4XL}`}>Built by</TableHead>

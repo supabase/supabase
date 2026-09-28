@@ -29,14 +29,11 @@ function StepTrigger({ number, title }: StepTriggerProps) {
 interface RestartDatabaseTroubleshootingSectionProps {
   number: number
   errorType: string
-  /** Override the restart handler. If not provided, opens the restart dialog internally. */
-  onRestartProject?: () => void
 }
 
 export function RestartDatabaseTroubleshootingSection({
   number,
   errorType,
-  onRestartProject,
 }: RestartDatabaseTroubleshootingSectionProps) {
   const track = useTrack()
   const [showDialog, setShowDialog] = useState(false)
@@ -46,11 +43,7 @@ export function RestartDatabaseTroubleshootingSection({
       errorType,
       ctaType: 'restart_db',
     })
-    if (onRestartProject) {
-      onRestartProject()
-    } else {
-      setShowDialog(true)
-    }
+    setShowDialog(true)
   }
 
   return (
@@ -85,7 +78,6 @@ interface TroubleshootingGuideSectionProps {
   number: number
   errorType: string
   href: string
-  title?: string
   description?: string
 }
 
@@ -93,7 +85,6 @@ export function TroubleshootingGuideSection({
   number,
   errorType,
   href,
-  title = 'Try our troubleshooting guide',
   description,
 }: TroubleshootingGuideSectionProps) {
   const track = useTrack()
@@ -103,7 +94,7 @@ export function TroubleshootingGuideSection({
       value={`step-${number}`}
       className="border-b border-default last:border-b-0 px-3 py-2"
     >
-      <StepTrigger number={number} title={title} />
+      <StepTrigger number={number} title="Try our troubleshooting guide" />
       <AccordionContent className="pt-1">
         <div className="px-2">
           {description && <p className="text-sm text-foreground-light mb-3">{description}</p>}
@@ -131,7 +122,6 @@ export function TroubleshootingGuideSection({
 interface FixWithAITroubleshootingSectionProps {
   number: number
   errorType: string
-  description?: string
   onDebugWithAI?: (prompt: string) => void
   buildPrompt: () => string
 }
@@ -139,7 +129,6 @@ interface FixWithAITroubleshootingSectionProps {
 export function FixWithAITroubleshootingSection({
   number,
   errorType,
-  description = 'Let our AI assistant help diagnose and suggest solutions.',
   onDebugWithAI,
   buildPrompt,
 }: FixWithAITroubleshootingSectionProps) {
@@ -153,7 +142,9 @@ export function FixWithAITroubleshootingSection({
       <StepTrigger number={number} title="Debug with AI" />
       <AccordionContent className="pt-1">
         <div className="px-2">
-          <p className="text-sm text-foreground-light mb-3">{description}</p>
+          <p className="text-sm text-foreground-light mb-3">
+            Let our AI assistant help diagnose and suggest solutions.
+          </p>
           <AiAssistantDropdown
             label="Debug with AI"
             buildPrompt={buildPrompt}

@@ -6,29 +6,26 @@ import { BASE_PATH } from '@/lib/constants'
 
 interface ConnectionIconProps {
   icon: string
-  iconFolder?: string
-  supportsDarkMode?: boolean
   size?: number
   className?: string
 }
 
-export const ConnectionIcon = ({
-  icon,
-  iconFolder,
-  supportsDarkMode,
-  size = 14,
-  className,
-}: ConnectionIconProps) => {
+export const ConnectionIcon = ({ icon, size = 14, className }: ConnectionIconProps) => {
   const { resolvedTheme } = useTheme()
 
-  const imageFolder =
-    iconFolder || (['ionic-angular'].includes(icon) ? 'icons/frameworks' : 'libraries')
+  const imageFolder = ['ionic-angular'].includes(icon) ? 'icons/frameworks' : 'libraries'
 
   const imageExtension = imageFolder === 'icons/frameworks' ? '' : '-icon'
 
-  const shouldUseDarkMode =
-    supportsDarkMode ||
-    ['expo', 'nextjs', 'prisma', 'drizzle', 'astro', 'remix', 'refine'].includes(icon.toLowerCase())
+  const shouldUseDarkMode = [
+    'expo',
+    'nextjs',
+    'prisma',
+    'drizzle',
+    'astro',
+    'remix',
+    'refine',
+  ].includes(icon.toLowerCase())
 
   const iconImgSrc = icon.startsWith('http')
     ? icon

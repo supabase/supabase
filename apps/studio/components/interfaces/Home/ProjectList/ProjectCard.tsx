@@ -23,12 +23,10 @@ import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinit
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from '@/lib/constants'
-import type { Organization } from '@/types'
 
 export interface ProjectCardProps {
   slug?: string
   project: OrgProject
-  organization?: Organization
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection

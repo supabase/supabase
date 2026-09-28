@@ -27,7 +27,6 @@ export const ProjectLinker = ({
   choosePrompt = 'Choose a project',
   onSkip,
   loadingForeignProjects,
-  showNoEntitiesState = true,
   defaultSupabaseProject,
   defaultForeignProjectId,
   mode,
@@ -133,7 +132,7 @@ export const ProjectLinker = ({
             <p className="text-sm text-foreground-light">Loading projects</p>
             <ShimmerLine active />
           </div>
-        ) : showNoEntitiesState && (noSupabaseProjects || noForeignProjects) ? (
+        ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-sm text-foreground-lighter text-balance">
             No {missingEntity} projects found. Create a {missingEntity} project to link to a{' '}
             {oppositeMissingEntity} project
@@ -183,7 +182,7 @@ export const ProjectLinker = ({
             slug={slug}
             mode={mode}
             variant={variant}
-            showCreateProject={showNoEntitiesState && noSupabaseProjects}
+            showCreateProject={noSupabaseProjects}
             connectDisabled={connectDisabled}
             foreignProjectId={foreignProjectId}
             isLoading={isLoading}
@@ -209,7 +208,7 @@ export const ProjectLinker = ({
             <p className="text-sm text-foreground text-center">Loading projects</p>
             <ShimmerLine active />
           </div>
-        ) : showNoEntitiesState && (noSupabaseProjects || noForeignProjects) ? (
+        ) : noSupabaseProjects || noForeignProjects ? (
           <div className="text-center">
             <h5 className="text-foreground">No {missingEntity} Projects found</h5>
             <p className="text-foreground-light text-sm">
@@ -272,7 +271,7 @@ export const ProjectLinker = ({
           slug={slug}
           mode={mode}
           variant={variant}
-          showCreateProject={showNoEntitiesState && noSupabaseProjects}
+          showCreateProject={noSupabaseProjects}
           connectDisabled={connectDisabled}
           foreignProjectId={foreignProjectId}
           isLoading={isLoading}

@@ -16,11 +16,10 @@ interface SidebarLinkProps {
   active?: boolean
   icon?: React.ReactNode
   label: React.ReactNode
-  count?: number | string
   className?: string
 }
 
-const SidebarLink = ({ href, active, icon, label, count, className }: SidebarLinkProps) => (
+const SidebarLink = ({ href, active, icon, label, className }: SidebarLinkProps) => (
   <Link
     href={href}
     className={cn(
@@ -34,9 +33,6 @@ const SidebarLink = ({ href, active, icon, label, count, className }: SidebarLin
       <span className="text-foreground-lighter">{icon}</span>
       {label}
     </span>
-    {count !== undefined && (
-      <span className="font-mono text-xs text-foreground-lighter">{count}</span>
-    )}
   </Link>
 )
 

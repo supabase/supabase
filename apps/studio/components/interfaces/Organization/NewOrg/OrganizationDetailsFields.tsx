@@ -62,25 +62,19 @@ export type OrganizationDetailsFormValues = z.infer<typeof organizationDetailsSc
 interface OrganizationDetailsFieldsProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>
   kind: string
-  nameField?: FieldPath<TFieldValues>
-  kindField?: FieldPath<TFieldValues>
-  sizeField?: FieldPath<TFieldValues>
   renderFieldWrapper?: (children: ReactNode, field: 'name' | 'kind' | 'size') => ReactNode
 }
 
 export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
   control,
   kind,
-  nameField = 'name' as FieldPath<TFieldValues>,
-  kindField = 'kind' as FieldPath<TFieldValues>,
-  sizeField = 'size' as FieldPath<TFieldValues>,
   renderFieldWrapper = (children) => children,
 }: OrganizationDetailsFieldsProps<TFieldValues>) => (
   <>
     {renderFieldWrapper(
       <FormField
         control={control}
-        name={nameField}
+        name={'name' as FieldPath<TFieldValues>}
         render={({ field }) => (
           <FormItemLayout
             label="Name"
@@ -107,7 +101,7 @@ export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
     {renderFieldWrapper(
       <FormField
         control={control}
-        name={kindField}
+        name={'kind' as FieldPath<TFieldValues>}
         render={({ field }) => (
           <FormItemLayout
             label="Type"
@@ -139,7 +133,7 @@ export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
       renderFieldWrapper(
         <FormField
           control={control}
-          name={sizeField}
+          name={'size' as FieldPath<TFieldValues>}
           render={({ field }) => (
             <FormItemLayout
               label="Company size"

@@ -6,8 +6,6 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface CopyPromptButtonProps {
   stepsContainerRef: RefObject<HTMLDivElement | null>
-  /** When set, the Copy prompt button uses this verbatim instead of scraping the steps. */
-  customPrompt?: string
 }
 
 const normalizeTextLines = (value: string) => {
@@ -128,7 +126,7 @@ export const buildConnectPrompt = (stepsContainer: HTMLElement | null) => {
   return promptContent
 }
 
-export function CopyPromptButton({ stepsContainerRef, customPrompt }: CopyPromptButtonProps) {
+export function CopyPromptButton({ stepsContainerRef }: CopyPromptButtonProps) {
   const [showCopied, setShowCopied] = useState(false)
 
   useEffect(() => {
@@ -142,7 +140,7 @@ export function CopyPromptButton({ stepsContainerRef, customPrompt }: CopyPrompt
       <ButtonTooltip
         icon={showCopied ? <Check strokeWidth={2} className="text-primary" /> : <Copy />}
         onClick={() => {
-          const textToCopy = customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
+          const textToCopy = buildConnectPrompt(stepsContainerRef.current)
           copyToClipboard(textToCopy, () => setShowCopied(true))
         }}
         tooltip={{

@@ -23,7 +23,6 @@ export interface UsageBarChartProps {
   name: string // Used within the tooltip
   attributes: Attribute[]
   unit: 'bytes' | 'absolute' | 'percentage' | 'hours' | 'gigabytes'
-  yLimit?: number
   yMin?: number
   yLeftMargin?: number
   yFormatter?: (value: number | string) => string
@@ -35,13 +34,12 @@ const UsageBarChart = ({
   name,
   attributes,
   unit,
-  yLimit,
   yLeftMargin = 10,
   yFormatter,
   yMin,
   tooltipFormatter,
 }: UsageBarChartProps) => {
-  const yDomain = [yMin ?? 0, Math.max(yMin ?? 0, yLimit ?? 0)]
+  const yDomain = [yMin ?? 0, Math.max(yMin ?? 0, 0)]
 
   return (
     <div className="w-full h-[200px]">

@@ -24,7 +24,7 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useMemo } from 'react'
-import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
+import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
   useRegisterCommands,
@@ -49,7 +49,7 @@ const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucke
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
-export function useCreateCommands(options?: CommandOptions) {
+export function useCreateCommands() {
   const setIsOpen = useSetCommandMenuOpen()
   const {
     ref,
@@ -467,7 +467,6 @@ export function useCreateCommands(options?: CommandOptions) {
       },
     ],
     {
-      ...options,
       orderSection: (sections) => sections,
       sectionMeta: { priority: 3 },
       enabled: true,

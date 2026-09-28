@@ -151,13 +151,11 @@ const MappingFieldArray = ({
   fieldName,
   label,
   required,
-  placeholder,
 }: {
   form: UseFormReturn<SSOConfigFormSchema>
   fieldName: ProviderAttribute
   label: string
   required: boolean
-  placeholder?: string
 }) => {
   return (
     <div className="w-full min-w-0 space-y-1">
@@ -170,7 +168,7 @@ const MappingFieldArray = ({
         name={fieldName}
         valueFieldName="value"
         createEmptyRow={() => ({ value: '' })}
-        placeholder={placeholder ?? ''}
+        placeholder=""
         addLabel="Add another"
         removeLabel={`Remove ${label} mapping`}
         minimumRows={1}
