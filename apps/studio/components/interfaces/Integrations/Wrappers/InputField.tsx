@@ -28,7 +28,7 @@ const InputField = <
       defaultValue={(option.defaultValue ?? '') as any}
       render={({ field }) => (
         <FormItemLayout
-          layout="vertical"
+          layout="horizontal"
           label={
             <div className="flex items-center space-x-2">
               <p>{option.label}</p>

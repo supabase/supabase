@@ -19,7 +19,7 @@ const tableSchema = z
 export const getWrapperCreationFormSchema = (wrapperMeta: WrapperMeta) => {
   let wrapperSchema = {
     // Common validation for all wrappers
-    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+    server_name: z.string().min(1, 'Please provide a name for your server'),
   } as Record<string, any>
 
   // Add wrapper specific options

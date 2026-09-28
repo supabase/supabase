@@ -243,7 +243,7 @@ export const CreateIcebergWrapperSheet = ({
             <SheetHeader>
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
-            <SheetSection className="grow overflow-y-auto">
+            <SheetSection className="grow overflow-y-auto p-0">
               <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField

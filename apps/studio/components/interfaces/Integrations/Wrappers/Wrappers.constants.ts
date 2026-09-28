@@ -1527,13 +1527,6 @@ export const WRAPPERS: WrapperMeta[] = [
     server: {
       options: [
         {
-          name: 'sa_key_id',
-          label: 'Service Account Key',
-          required: true,
-          encrypted: true,
-          secureEntry: true,
-        },
-        {
           name: 'project_id',
           label: 'Project ID',
           required: true,
@@ -1546,6 +1539,13 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: false,
           secureEntry: false,
+        },
+        {
+          name: 'sa_key_id',
+          label: 'Service Account Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
         },
       ],
     },

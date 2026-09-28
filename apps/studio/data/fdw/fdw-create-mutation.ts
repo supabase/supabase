@@ -1,4 +1,9 @@
-import { getCreateFDWSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import {
+  getCreateFDWSql,
+  getCreateForeignDataWrapperSql,
+  joinSqlFragments,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -24,10 +29,26 @@ export type FDWCreateVariables = {
   sourceSchema: string
   targetSchema: string
   schemaOptions?: SafeSqlFragment[]
+  // Set when adding another connection to a wrapper type that already has a foreign data
+  // wrapper registered - only the server (and its tables) needs to be created in that case.
+  hasExistingWrapper?: boolean
 }
 
-export async function createFDW({ projectRef, connectionString, ...rest }: FDWCreateVariables) {
-  const sql = wrapWithTransaction(getCreateFDWSql(rest))
+export async function createFDW({
+  projectRef,
+  connectionString,
+  hasExistingWrapper,
+  ...rest
+}: FDWCreateVariables) {
+  const createServerSql = getCreateFDWSql(rest)
+  const sql = wrapWithTransaction(
+    hasExistingWrapper
+      ? createServerSql
+      : joinSqlFragments(
+          [getCreateForeignDataWrapperSql(rest.wrapperMeta), createServerSql],
+          '\n\n'
+        )
+  )
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

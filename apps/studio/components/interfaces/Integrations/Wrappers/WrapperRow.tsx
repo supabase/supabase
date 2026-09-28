@@ -48,10 +48,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
   return (
     <TableRow>
       <TableCell className="gap-2 align-top py-3! min-w-80">
-        {wrapper.name}
-        <p className="text-sm text-foreground-light">
-          Connection: <code className="text-code-inline">{wrapper.server_name}</code>
-        </p>
+        <p className="text-sm">{wrapper.server_name}</p>
         {isShared && (
           <p className="text-sm text-foreground-light">
             This wrapper is shared. To edit this connection, use <code>ALTER SERVER</code> on{' '}
@@ -99,7 +96,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
 
           return (
             <div key={table.id} className="flex items-center">
-              <Badge className="bg-surface-300 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
+              <Badge className="bg-surface-300 gap-2 font-mono text-xs tracking-tight h-6 text-foreground rounded-r-none">
                 <div className="relative w-3 h-3 flex items-center justify-center">
                   {integration.icon({ className: 'p-0' })}
                 </div>
@@ -116,7 +113,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
               </Badge>
 
               <Link href={`/project/${ref}/editor/${table.id}`}>
-                <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-[0.75rem] border-l-0">
+                <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-xs tracking-tight border-l-0">
                   <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                   <Tooltip>
                     <TooltipTrigger className="truncate max-w-28">

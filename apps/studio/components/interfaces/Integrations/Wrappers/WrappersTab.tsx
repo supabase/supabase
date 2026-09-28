@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
 
 import { AddWrapperButton } from './AddWrapperButton'
+import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
@@ -44,10 +45,10 @@ export const WrappersTab = () => {
 
   const wrappers = data ?? []
   const wrapperMeta = WRAPPERS.find((w) => w.name === id)
-
   const createdWrappers = wrapperMeta
     ? wrappers.filter((w) => wrapperMetaComparator(wrapperMeta, w))
     : []
+  const hasExistingForeignDataWrapper = createdWrappers.some((x) => x.name === wrapperMeta?.name)
 
   const [isDirty, setIsDirty] = useState(false)
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
@@ -57,6 +58,14 @@ export const WrappersTab = () => {
       setIsDirty(false)
     }, [setIsCreating]),
   })
+
+  const CreateWrapperSheetComponent = !wrapperMeta
+    ? null
+    : wrapperMeta.customComponent
+      ? wrapperMeta.name === 'iceberg_wrapper'
+        ? CreateIcebergWrapperSheet
+        : null
+      : CreateWrapperSheet
 
   if (!wrapperMeta) {
     return <div>Missing integration.</div>
@@ -85,9 +94,10 @@ export const WrappersTab = () => {
 
       <Sheet open={!!isCreating} onOpenChange={handleOpenChange}>
         <SheetContent size="lg">
-          {wrapperMeta && (
-            <CreateWrapperSheet
+          {wrapperMeta && CreateWrapperSheetComponent && (
+            <CreateWrapperSheetComponent
               wrapperMeta={wrapperMeta}
+              hasExistingWrapper={hasExistingForeignDataWrapper}
               onDirty={setIsDirty}
               onClose={() => {
                 setIsCreating(null)
