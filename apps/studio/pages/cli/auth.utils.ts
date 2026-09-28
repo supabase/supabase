@@ -56,39 +56,3 @@ export function toResourceLabel(resource: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 }
-
-export const KNOWN_CLI_COMMANDS = [
-  'db push',
-  'db pull',
-  'db diff',
-  'db dump',
-  'db reset',
-  'db lint',
-  'migration up',
-  'migration new',
-  'migration list',
-  'functions deploy',
-  'functions new',
-  'link',
-  'init',
-  'start',
-  'stop',
-  'status',
-  'login',
-  'branches create',
-  'branches list',
-  'projects list',
-  'projects create',
-] as const
-
-const MAX_COMMAND_LENGTH = 64
-
-export function parseRequestedCommand(raw: string | string[] | undefined): string | undefined {
-  const value = Array.isArray(raw) ? raw[0] : raw
-  if (!value) return undefined
-
-  const trimmed = value.trim()
-  if (trimmed.length === 0 || trimmed.length > MAX_COMMAND_LENGTH) return undefined
-
-  return (KNOWN_CLI_COMMANDS as readonly string[]).includes(trimmed) ? trimmed : undefined
-}

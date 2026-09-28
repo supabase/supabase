@@ -1,11 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import {
-  KNOWN_CLI_COMMANDS,
-  parseRequestedCommand,
-  parseRequestedScopes,
-  toResourceLabel,
-} from './auth.utils'
+import { parseRequestedScopes, toResourceLabel } from './auth.utils'
 
 describe('parseRequestedScopes', () => {
   test('parses valid comma-separated scopes', () => {
@@ -93,23 +88,5 @@ describe('toResourceLabel', () => {
 
   test('applies the override for acronym-style resources', () => {
     expect(toResourceLabel('rest')).toBe('PostgREST')
-  })
-})
-
-describe('parseRequestedCommand', () => {
-  test('returns the command when it matches the known list', () => {
-    expect(parseRequestedCommand(KNOWN_CLI_COMMANDS[0])).toBe(KNOWN_CLI_COMMANDS[0])
-  })
-
-  test('ignores an unrecognised command', () => {
-    expect(parseRequestedCommand('rm -rf /')).toBeUndefined()
-  })
-
-  test('ignores a missing command', () => {
-    expect(parseRequestedCommand(undefined)).toBeUndefined()
-  })
-
-  test('ignores a command longer than the length cap', () => {
-    expect(parseRequestedCommand('db push'.padEnd(100, ' x'))).toBeUndefined()
   })
 })
