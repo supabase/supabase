@@ -6,11 +6,11 @@ description: "A storage extension for Postgres which uses Postgres's pluggable s
 
 The [OrioleDB](https://www.orioledb.com/) Postgres extension provides a drop-in replacement storage engine for the default heap storage method. It is designed to improve Postgres' scalability and performance.
 
-OrioleDB addresses Postgres's scalability limitations by removing bottlenecks in the shared memory cache under high concurrency. It also optimizes write-ahead-log (WAL) insertion through row-level WAL logging. These changes lead to significant improvements in the industry standard TPC-C benchmark, which approximates a real-world transactional workload. The following benchmark was performed on a c7g.metal instance and shows OrioleDB's performance outperforming the default Postgres heap method with a 3.3x speedup.
+OrioleDB addresses Postgres's scalability limitations by removing bottlenecks in the shared memory cache under high concurrency. It also optimizes write-ahead-log (WAL) insertion through row-level WAL logging. These changes lead to significant improvements in the industry standard TPC-C benchmark, which approximates a real-world transactional workload. The following benchmark was performed on a 8xlarge instance and shows OrioleDB's performance outperforming the default Postgres heap method with a 1.8x speedup.
 
 <Image
-  alt="Line chart of TPC-C throughput at 500 warehouses, in transactions per minute (tpmC), from 0 to 320 connections. OrioleDB rises to about 350,000 tpmC by 20 connections and holds between about 400,000 and 490,000 from 80 connections onward. Heap stays between about 30,000 and 90,000 across the whole range."
-  src="/docs/img/database/orioledb-tpc-c-500-warehouse.png"
+  alt="Line chart of TPC-C throughput at 5120 warehouses, in transactions per minute (tpmC), from 32 to 256 connections. OrioleDB rises to about 112,800 tpmC by 128 connections and holds between about 110,000 and 112,000 from 128 connections onward. Heap stays between about 37,000 and 65,000 across the whole range."
+  src="/docs/img/database/orioledb-tpc-c-5120-warehouse.png"
   className="max-w-[550px] mx-auto! border rounded-md"
   width={1000}
   height={609}
