@@ -182,8 +182,12 @@ export const FeedbackDockProvider = ({ children }: PropsWithChildren) => {
   return (
     <FeedbackDockContext value={value}>
       {children}
-      {state.isOpen ? (
-        <ErrorBoundary fallbackRender={renderNothing} onError={handleDockError}>
+      {state.isOpen || value.isEnabled ? (
+        <ErrorBoundary
+          key={String(state.isOpen)}
+          fallbackRender={renderNothing}
+          onError={handleDockError}
+        >
           <FeedbackDock />
           {state.isPicking ? (
             <ErrorBoundary fallbackRender={renderNothing} onError={handlePickerError}>
