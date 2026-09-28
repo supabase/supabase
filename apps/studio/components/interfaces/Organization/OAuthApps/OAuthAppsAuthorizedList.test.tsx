@@ -1,7 +1,6 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockIntersectionObserver } from 'jsdom-testing-mocks'
-import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizedList } from '@/components/interfaces/Organization/OAuthApps/OAuthAppsAuthorizedList'
