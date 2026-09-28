@@ -95,9 +95,18 @@ const DatabasePipelinesPage: NextPageWithLayout = () => {
                   <ShimmeringLoader className="h-14 w-36 py-0" />
                   <ShimmeringLoader className="h-14 w-36 py-0" />
                 </div>
-                <GenericTableLoader
-                  headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]}
-                />
+                <div className="w-full space-y-4" aria-hidden="true">
+                  <div className="flex items-center justify-between">
+                    <ShimmeringLoader className="h-8 w-52 py-0" />
+                    <div className="flex items-center gap-x-2">
+                      <ShimmeringLoader className="h-8 w-8 py-0" />
+                      <ShimmeringLoader className="h-8 w-32 py-0" />
+                    </div>
+                  </div>
+                  <GenericTableLoader
+                    headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]}
+                  />
+                </div>
               </>
             ) : (
               <>
