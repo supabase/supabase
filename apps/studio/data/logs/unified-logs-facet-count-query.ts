@@ -52,7 +52,7 @@ export async function getUnifiedLogsFacetCount(
   const sql = useOtel
     ? getFacetCountQuery({ search, facet, facetSearch })
     : safeSql`
-${getUnifiedLogsCTE(getEffectiveLogTypes(search))},
+${getUnifiedLogsCTE(getEffectiveLogTypes(search), search.scope)},
 ${getFacetCountCTE({ search, facet, facetSearch, cteName })}
 SELECT dimension, value, count from ${cteName};
 `

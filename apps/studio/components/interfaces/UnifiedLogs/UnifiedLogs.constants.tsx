@@ -23,6 +23,7 @@ export const LOG_TYPES_LABELS = {
   auth: 'Auth',
   storage: 'Storage',
   'edge function': 'Edge Function',
+  'edge function runtime': 'Edge Function runtime',
   realtime: 'Realtime',
   supavisor: 'Supavisor',
   pgbouncer: 'PgBouncer',
@@ -33,6 +34,12 @@ export const LOG_TYPES_LABELS = {
 type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
 export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
+// An edge function's invocations plus the runtime output (console, boot, shutdown) they produce.
+// These are the only log types a function-scoped view queries.
+export const EDGE_FUNCTION_LOG_TYPES = [
+  'edge function',
+  'edge function runtime',
+] as const satisfies readonly LogType[]
 
 export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   edge: 'edge_logs',
@@ -40,6 +47,7 @@ export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   storage: 'storage_logs',
   postgres: 'postgres_logs',
   'edge function': 'function_edge_logs',
+  'edge function runtime': 'function_logs',
   auth: 'auth_logs',
   realtime: 'realtime_logs',
   supavisor: 'supavisor_logs',
