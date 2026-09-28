@@ -77,6 +77,8 @@ describe('PublicationSelection', () => {
     mockPublicationRequests(true)
     customRender(<PublicationSelectionHarness />)
 
+    expect(screen.getByRole('status')).toHaveTextContent('Loading partition handling...')
+
     await waitFor(() =>
       expect(
         screen.getByText(

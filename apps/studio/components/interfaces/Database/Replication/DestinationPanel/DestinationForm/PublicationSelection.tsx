@@ -73,7 +73,9 @@ export const PublicationSelection = ({
           description={publicationDescription}
         >
           <span role="status" className="sr-only">
-            {partitionHandlingMessage}
+            {isPartitionHandlingLoading
+              ? 'Loading partition handling...'
+              : partitionHandlingMessage}
           </span>
           <FormControl>
             <PublicationsComboBox
