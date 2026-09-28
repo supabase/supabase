@@ -3,7 +3,9 @@ import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
+import { EdgeFunctionIntervalSelector } from './EdgeFunctionIntervalSelector'
 import { EdgeFunctionInvocationsSection } from './EdgeFunctionInvocationsSection'
 import {
   EDGE_FUNCTION_CHART_INTERVALS,
@@ -18,6 +20,7 @@ import {
   toEdgeFunctionChartData,
 } from './EdgeFunctionOverview.utils'
 import type { EdgeFunctionChartRawDatum } from './EdgeFunctionOverview.utils'
+import { EdgeFunctionOverviewHeader } from './EdgeFunctionOverviewHeader'
 import { EdgeFunctionPerformanceSection } from './EdgeFunctionPerformanceSection'
 import { EdgeFunctionRecentErrors } from './EdgeFunctionRecentErrors'
 import { EdgeFunctionUsageSection } from './EdgeFunctionUsageSection'
@@ -187,68 +190,73 @@ export const EdgeFunctionOverview = () => {
 
   return (
     <>
-      <EdgeFunctionInvocationsSection
-        interval={interval}
-        onIntervalChange={setInterval}
-        selectedInterval={selectedInterval}
-        actions={invocationActions}
-        totalInvocationCount={totalInvocationCount}
-        totalErrorCount={totalErrorCount}
-        totalWarningCount={totalWarningCount}
-        isLoadingFunction={isLoadingFunction}
-        isErrorFunction={isErrorFunction}
-        functionError={functionError}
-        isLoadingChart={combinedStatsResults.isLoading}
-        isErrorChart={isErrorCombinedStats}
-        chartErrorMessage={combinedStatsError?.message ?? 'Unknown error'}
-        chartData={invocationChartData}
-        onChartClick={(timestamp) => {
-          if (!projectRef || !functionSlug) return
-
-          router.push(
-            getInvocationChartNavigationUrl({
-              projectRef,
-              functionSlug,
-              isUnifiedLogsEnabled,
-              rangeStart: startDate.toISOString(),
-              rangeEnd: endDate.toISOString(),
-              clickedTimestamp: timestamp,
-            })
-          )
-        }}
-        updateAnnotation={invocationUpdateAnnotation}
+      <EdgeFunctionOverviewHeader
+        actions={
+          <EdgeFunctionIntervalSelector interval={interval} onIntervalChange={setInterval} />
+        }
       />
+      <PageContainer size="default">
+        <EdgeFunctionInvocationsSection
+          dateTimeFormat={dateTimeFormat}
+          actions={invocationActions}
+          totalInvocationCount={totalInvocationCount}
+          totalErrorCount={totalErrorCount}
+          totalWarningCount={totalWarningCount}
+          isLoadingFunction={isLoadingFunction}
+          isErrorFunction={isErrorFunction}
+          functionError={functionError}
+          isLoadingChart={combinedStatsResults.isLoading}
+          isErrorChart={isErrorCombinedStats}
+          chartErrorMessage={combinedStatsError?.message ?? 'Unknown error'}
+          chartData={invocationChartData}
+          onChartClick={(timestamp) => {
+            if (!projectRef || !functionSlug) return
 
-      <EdgeFunctionRecentErrors
-        functionId={id}
-        functionSlug={functionSlug as string}
-        projectRef={projectRef as string}
-        updatedAt={selectedFunction?.updated_at}
-      />
+            router.push(
+              getInvocationChartNavigationUrl({
+                projectRef,
+                functionSlug,
+                isUnifiedLogsEnabled,
+                rangeStart: startDate.toISOString(),
+                rangeEnd: endDate.toISOString(),
+                clickedTimestamp: timestamp,
+              })
+            )
+          }}
+          updateAnnotation={invocationUpdateAnnotation}
+        />
 
-      <EdgeFunctionPerformanceSection
-        data={chartData}
-        dateTimeFormat={dateTimeFormat}
-        isLoading={combinedStatsResults.isLoading}
-        isError={isErrorCombinedStats}
-        errorMessage={combinedStatsError?.message ?? 'Unknown error'}
-        averageExecutionTime={averageExecutionTime}
-        maxExecutionTime={maxExecutionTime}
-      />
+        <EdgeFunctionRecentErrors
+          functionId={id}
+          functionSlug={functionSlug as string}
+          projectRef={projectRef as string}
+          updatedAt={selectedFunction?.updated_at}
+        />
 
-      <EdgeFunctionUsageSection
-        data={chartData}
-        dateTimeFormat={dateTimeFormat}
-        isLoading={combinedStatsResults.isLoading}
-        isError={isErrorCombinedStats}
-        errorMessage={combinedStatsError?.message ?? 'Unknown error'}
-        averageCpuTime={averageCpuTime}
-        maxCpuTime={maxCpuTime}
-        averageMemoryUsage={averageMemoryUsage}
-        totalHeapMemory={totalHeapMemory}
-        totalExternalMemory={totalExternalMemory}
-        totalMemoryByType={totalMemoryByType}
-      />
+        <EdgeFunctionPerformanceSection
+          data={chartData}
+          dateTimeFormat={dateTimeFormat}
+          isLoading={combinedStatsResults.isLoading}
+          isError={isErrorCombinedStats}
+          errorMessage={combinedStatsError?.message ?? 'Unknown error'}
+          averageExecutionTime={averageExecutionTime}
+          maxExecutionTime={maxExecutionTime}
+        />
+
+        <EdgeFunctionUsageSection
+          data={chartData}
+          dateTimeFormat={dateTimeFormat}
+          isLoading={combinedStatsResults.isLoading}
+          isError={isErrorCombinedStats}
+          errorMessage={combinedStatsError?.message ?? 'Unknown error'}
+          averageCpuTime={averageCpuTime}
+          maxCpuTime={maxCpuTime}
+          averageMemoryUsage={averageMemoryUsage}
+          totalHeapMemory={totalHeapMemory}
+          totalExternalMemory={totalExternalMemory}
+          totalMemoryByType={totalMemoryByType}
+        />
+      </PageContainer>
     </>
   )
 }
