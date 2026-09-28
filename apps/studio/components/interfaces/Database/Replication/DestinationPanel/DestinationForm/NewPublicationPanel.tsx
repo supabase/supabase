@@ -5,11 +5,14 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox,
   Form,
   FormControl,
   FormField,
   Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -22,6 +25,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
+import { PARTITION_HANDLING_OPTIONS } from './PartitionHandling.constants'
 import {
   isMetadataListErrorVisible,
   isMetadataListLoading,
@@ -201,17 +205,31 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
                     name="publishViaPartitionRoot"
                     render={({ field }) => (
                       <FormItemLayout
-                        hideMessage
-                        label="Publish partitions as the parent table"
-                        description="Changes from partitioned tables appear in one destination table. Turn off to create a table for each partition."
-                        layout="flex"
+                        label="Postgres partition handling"
+                        description="Determines whether changes use the parent table or each partition."
+                        layout="horizontal"
                       >
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            aria-label="Publish partitions as the parent table"
-                            onCheckedChange={(checked) => field.onChange(checked === true)}
-                          />
+                          <Select
+                            value={field.value ? 'parent' : 'partition'}
+                            onValueChange={(value) => field.onChange(value === 'parent')}
+                          >
+                            <SelectTrigger aria-label="Postgres partition handling">
+                              <span className="min-w-0 truncate whitespace-nowrap">
+                                {field.value
+                                  ? PARTITION_HANDLING_OPTIONS.parent
+                                  : PARTITION_HANDLING_OPTIONS.partition}
+                              </span>
+                            </SelectTrigger>
+                            <SelectContent className="w-max">
+                              <SelectItem value="parent" className="whitespace-nowrap">
+                                {PARTITION_HANDLING_OPTIONS.parent}
+                              </SelectItem>
+                              <SelectItem value="partition" className="whitespace-nowrap">
+                                {PARTITION_HANDLING_OPTIONS.partition}
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}

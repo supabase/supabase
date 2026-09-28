@@ -26,16 +26,28 @@ export const PublicationSelection = ({
 
   const { data: publications, isSuccess: isSuccessPublications } =
     useReplicationPublicationNamesQuery({ projectRef, sourceId })
-  const { data: selectedPublication } = useReplicationPublicationQuery({
-    projectRef,
-    sourceId,
-    publicationName,
-  })
-
+  const { data: selectedPublication, isError: isPublicationError } = useReplicationPublicationQuery(
+    { projectRef, sourceId, publicationName }
+  )
   const isSelectedPublicationMissing =
     isSuccessPublications &&
     !!publicationName &&
     !(publications ?? []).some((publication) => publication.name === publicationName)
+
+  let publicationDescription =
+    'Tables in the selected publication will be replicated to this destination.'
+
+  if (publicationName && !isSelectedPublicationMissing) {
+    if (selectedPublication?.name === publicationName) {
+      publicationDescription += selectedPublication.config.publish_via_partition_root
+        ? ' Partitioned tables use the parent table identity.'
+        : ' Each partition is replicated separately.'
+    } else if (isPublicationError) {
+      publicationDescription += ' Partition handling could not be loaded.'
+    } else {
+      publicationDescription += ' Loading partition handling...'
+    }
+  }
 
   return (
     <FormField
@@ -45,7 +57,7 @@ export const PublicationSelection = ({
         <FormItemLayout
           layout="horizontal"
           label="Publication"
-          description="Tables in the selected publication will be replicated to this destination."
+          description={publicationDescription}
         >
           <FormControl>
             <PublicationsComboBox
@@ -77,14 +89,6 @@ export const PublicationSelection = ({
               onNewPublicationClick={() => onSelectNewPublication()}
             />
           </FormControl>
-          {selectedPublication !== undefined && (
-            <p className="mt-2 text-xs text-foreground-lighter">
-              <span className="font-medium text-foreground-light">Partitioned tables: </span>
-              {selectedPublication.config.publish_via_partition_root
-                ? 'Publish changes as the parent table.'
-                : 'Publish changes as individual partitions.'}
-            </p>
-          )}
           {isSelectedPublicationMissing && (
             <Admonition
               type="warning"

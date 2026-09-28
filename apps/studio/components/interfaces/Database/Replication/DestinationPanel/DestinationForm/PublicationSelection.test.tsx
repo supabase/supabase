@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { useForm } from 'react-hook-form'
@@ -73,19 +73,30 @@ const PublicationSelectionHarness = () => {
 }
 
 describe('PublicationSelection', () => {
-  it('shows when partition changes use the parent table', async () => {
+  it('includes parent-table partition handling in the publication description', async () => {
     mockPublicationRequests(true)
-
     customRender(<PublicationSelectionHarness />)
 
-    expect(await screen.findByText('Publish changes as the parent table.')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(
+        screen.getByText(
+          'Tables in the selected publication will be replicated to this destination. Partitioned tables use the parent table identity.'
+        )
+      ).toBeInTheDocument()
+    )
+    expect(screen.queryByRole('textbox', { name: 'Postgres partition handling' })).toBeNull()
   })
 
-  it('shows when partition changes use individual partitions', async () => {
+  it('includes separate-partition handling in the publication description', async () => {
     mockPublicationRequests(false)
-
     customRender(<PublicationSelectionHarness />)
 
-    expect(await screen.findByText('Publish changes as individual partitions.')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(
+        screen.getByText(
+          'Tables in the selected publication will be replicated to this destination. Each partition is replicated separately.'
+        )
+      ).toBeInTheDocument()
+    )
   })
 })
