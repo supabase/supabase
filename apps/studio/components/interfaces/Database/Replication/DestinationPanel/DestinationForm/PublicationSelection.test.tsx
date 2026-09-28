@@ -12,7 +12,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
-type PublicationNamesResponse = components['schemas']['PublicationNamesResponse_Output']
+type PublicationNamesResponse = components['schemas']['ReadPublicationsResponse_Output']
 
 const mockSources: ReplicationSourcesResponse = {
   sources: [
@@ -47,7 +47,7 @@ const mockPublicationRequests = (publishViaPartitionRoot: boolean) => {
     path: '/platform/replication/v2/:ref/sources/:source_id/publications',
     response: () =>
       HttpResponse.json<PublicationNamesResponse>({
-        publications: [{ name: 'analytics', tables: [] }],
+        publications: [{ name: 'analytics' }],
       }),
   })
   addAPIMock({
@@ -85,6 +85,9 @@ describe('PublicationSelection', () => {
       ).toBeInTheDocument()
     )
     expect(screen.queryByRole('textbox', { name: 'Postgres partition handling' })).toBeNull()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Partitioned tables use the parent table identity.'
+    )
   })
 
   it('includes separate-partition handling in the publication description', async () => {
@@ -98,5 +101,6 @@ describe('PublicationSelection', () => {
         )
       ).toBeInTheDocument()
     )
+    expect(screen.getByRole('status')).toHaveTextContent('Each partition is replicated separately.')
   })
 })

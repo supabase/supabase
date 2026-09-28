@@ -34,20 +34,27 @@ export const PublicationSelection = ({
     !!publicationName &&
     !(publications ?? []).some((publication) => publication.name === publicationName)
 
-  let publicationDescription =
-    'Tables in the selected publication will be replicated to this destination.'
+  let partitionHandlingMessage = ''
+  let isPartitionHandlingLoading = false
 
   if (publicationName && !isSelectedPublicationMissing) {
     if (selectedPublication?.name === publicationName) {
-      publicationDescription += selectedPublication.config.publish_via_partition_root
-        ? ' Partitioned tables use the parent table identity.'
-        : ' Each partition is replicated separately.'
+      partitionHandlingMessage = selectedPublication.config.publish_via_partition_root
+        ? 'Partitioned tables use the parent table identity.'
+        : 'Each partition is replicated separately.'
     } else if (isPublicationError) {
-      publicationDescription += ' Partition handling could not be loaded.'
+      partitionHandlingMessage = 'Partition handling could not be loaded.'
     } else {
-      publicationDescription += ' Loading partition handling...'
+      isPartitionHandlingLoading = true
     }
   }
+
+  const publicationDescription = [
+    'Tables in the selected publication will be replicated to this destination.',
+    isPartitionHandlingLoading ? 'Loading partition handling...' : partitionHandlingMessage,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
     <FormField
@@ -59,6 +66,9 @@ export const PublicationSelection = ({
           label="Publication"
           description={publicationDescription}
         >
+          <span role="status" className="sr-only">
+            {partitionHandlingMessage}
+          </span>
           <FormControl>
             <PublicationsComboBox
               field={{
