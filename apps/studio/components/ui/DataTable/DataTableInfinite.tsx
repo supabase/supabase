@@ -18,7 +18,6 @@ const TableCellClassName = 'text-xs py-1! p-2 truncate'
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   columns: ColumnDef<TData, TValue>[]
-  defaultColumnVisibility?: VisibilityState
   totalRows?: number
   filterRows?: number
   totalRowsFetched?: number
@@ -35,7 +34,6 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
 // [Joshen] JFYI this component is NOT virtualized and hence will struggle handling many data points
 export function DataTableInfinite<TData, TValue, TMeta>({
   columns,
-  defaultColumnVisibility = {},
   fetchNextPage,
   hasNextPage,
   totalRows = 0,
@@ -73,7 +71,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS,
     () => {
       setColumnOrder([])
-      setColumnVisibility(defaultColumnVisibility)
+      setColumnVisibility({})
     },
     { registerInCommandMenu: true }
   )

@@ -15,18 +15,12 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import {
-  restrictToHorizontalAxis,
-  restrictToParentElement,
-  restrictToVerticalAxis,
-} from '@dnd-kit/modifiers'
+import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import {
   arrayMove,
-  horizontalListSortingStrategy,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-  type SortableContextProps,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Slot } from 'radix-ui'
@@ -35,21 +29,6 @@ import { createPortal } from 'react-dom'
 import { Button, cn, type ButtonProps } from 'ui'
 
 import { composeRefs } from '../hooks/useComposedRefs'
-
-const orientationConfig = {
-  vertical: {
-    modifiers: [restrictToVerticalAxis, restrictToParentElement],
-    strategy: verticalListSortingStrategy,
-  },
-  horizontal: {
-    modifiers: [restrictToHorizontalAxis, restrictToParentElement],
-    strategy: horizontalListSortingStrategy,
-  },
-  mixed: {
-    modifiers: [restrictToParentElement],
-    strategy: undefined,
-  },
-}
 
 interface SortableProps<TData extends { id: UniqueIdentifier }> extends DndContextProps {
   /**
@@ -71,16 +50,6 @@ interface SortableProps<TData extends { id: UniqueIdentifier }> extends DndConte
   onValueChange?: (items: TData[]) => void
 
   /**
-   * An optional callback function that is called when an item is moved.
-   * It receives an event object with `activeIndex` and `overIndex` properties, representing the original and new positions of the moved item.
-   * This will override the default behavior of updating the order of the data items.
-   * @type (event: { activeIndex: number; overIndex: number }) => void
-   * @example
-   * onMove={(event) => console.log(`Item moved from index ${event.activeIndex} to index ${event.overIndex}`)}
-   */
-  onMove?: (event: { activeIndex: number; overIndex: number }) => void
-
-  /**
    * A collision detection strategy that will be used to determine the closest sortable item.
    * @default closestCenter
    * @type DndContextProps["collisionDetection"]
@@ -94,20 +63,6 @@ interface SortableProps<TData extends { id: UniqueIdentifier }> extends DndConte
    * @type Modifier[]
    */
   modifiers?: DndContextProps['modifiers']
-
-  /**
-   * A sorting strategy that will be used to determine the new order of the data items.
-   * @default verticalListSortingStrategy
-   * @type SortableContextProps["strategy"]
-   */
-  strategy?: SortableContextProps['strategy']
-
-  /**
-   * Specifies the axis for the drag-and-drop operation. It can be "vertical", "horizontal", or "both".
-   * @default "vertical"
-   * @type "vertical" | "horizontal" | "mixed"
-   */
-  orientation?: 'vertical' | 'horizontal' | 'mixed'
 
   /**
    * An optional React node that is rendered on top of the sortable component.
@@ -128,9 +83,6 @@ export function Sortable<TData extends { id: UniqueIdentifier }>({
   onDragCancel,
   collisionDetection = closestCenter,
   modifiers,
-  strategy,
-  onMove,
-  orientation = 'vertical',
   overlay,
   children,
   ...props
@@ -142,11 +94,9 @@ export function Sortable<TData extends { id: UniqueIdentifier }>({
     useSensor(KeyboardSensor)
   )
 
-  const config = orientationConfig[orientation]
-
   return (
     <DndContext
-      modifiers={modifiers ?? config.modifiers}
+      modifiers={modifiers ?? [restrictToVerticalAxis, restrictToParentElement]}
       sensors={sensors}
       onDragStart={(event) => {
         setActiveId(event.active.id)
@@ -158,11 +108,7 @@ export function Sortable<TData extends { id: UniqueIdentifier }>({
           const activeIndex = value.findIndex((item) => item.id === active.id)
           const overIndex = value.findIndex((item) => item.id === over.id)
 
-          if (onMove) {
-            onMove({ activeIndex, overIndex })
-          } else {
-            onValueChange?.(arrayMove(value, activeIndex, overIndex))
-          }
+          onValueChange?.(arrayMove(value, activeIndex, overIndex))
         }
         setActiveId(null)
         onDragEnd?.(event)
@@ -174,7 +120,7 @@ export function Sortable<TData extends { id: UniqueIdentifier }>({
       collisionDetection={collisionDetection}
       {...props}
     >
-      <SortableContext items={value} strategy={strategy ?? config.strategy}>
+      <SortableContext items={value} strategy={verticalListSortingStrategy}>
         {children}
       </SortableContext>
       {overlay
@@ -248,13 +194,6 @@ interface SortableItemProps extends Slot.SlotProps {
   value: UniqueIdentifier
 
   /**
-   * Specifies whether the item should act as a trigger for the drag-and-drop action.
-   * @default false
-   * @type boolean | undefined
-   */
-  asTrigger?: boolean
-
-  /**
    * Merges the item's props into its immediate child.
    * @default false
    * @type boolean | undefined
@@ -263,7 +202,7 @@ interface SortableItemProps extends Slot.SlotProps {
 }
 
 export const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
-  ({ value, asTrigger, asChild, className, ...props }, ref) => {
+  ({ value, asChild, className, ...props }, ref) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
       id: value,
     })
@@ -288,15 +227,9 @@ export const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
       <SortableItemContext.Provider value={context}>
         <Comp
           data-state={isDragging ? 'dragging' : undefined}
-          className={cn(
-            'data-[state=dragging]:cursor-grabbing',
-            { 'cursor-grab': !isDragging && asTrigger },
-            className
-          )}
+          className={cn('data-[state=dragging]:cursor-grabbing', className)}
           ref={composeRefs(ref, setNodeRef as React.Ref<HTMLDivElement>)}
           style={style}
-          {...(asTrigger ? attributes : {})}
-          {...(asTrigger ? listeners : {})}
           {...props}
         />
       </SortableItemContext.Provider>
@@ -305,11 +238,7 @@ export const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
 )
 SortableItem.displayName = 'SortableItem'
 
-interface SortableDragHandleProps extends ButtonProps {
-  withHandle?: boolean
-}
-
-export const SortableDragHandle = forwardRef<HTMLButtonElement, SortableDragHandleProps>(
+export const SortableDragHandle = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, ...props }, ref) => {
     const { attributes, listeners, isDragging } = useSortableItem()
 
