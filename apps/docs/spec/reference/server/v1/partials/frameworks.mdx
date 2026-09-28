@@ -33,6 +33,16 @@ If you only read `supabase` inside a handler, every row works for you. Ignore th
 
 Each bridge folds the entry array once, when you call it, so entries keep their state across requests. Each bridge also checks the array at compile time. Two entries that contribute the same key, or an entry whose prerequisite is missing, fail to compile at the call site.
 
+A gated group of routes takes `withRequiredClaims()` and a public group takes `withClaims()`. The two cannot share an array, because both contribute `jwtClaims`. Each framework scopes an array to a group of routes in its own way.
+
+| Framework      | One array per route group                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
+| Hono           | One sub-app per array, mounted with `app.route()`. A second `app.use()` statement is not enough.              |
+| H3 / Nuxt      | `app.use('/path', toH3(entries))` before the routes under that path                                           |
+| Elysia         | One Elysia instance per array, each wrapped with `wrapElysia`, behind a fetch handler that dispatches by path |
+| NestJS         | `@UseGuards()` on the controller or the handler                                                               |
+| TanStack Start | `.middleware([...])` on each server function or server route                                                  |
+
 The bridge files for the four frameworks that had adapters live in the server repository under [`examples/frameworks`](https://github.com/supabase/server/tree/main/examples/frameworks), next to a minimal app for each. The TanStack Start bridge is on this page. Copy the file for your framework as is, comments included. Some lines look redundant and are not. The comments say why.
 
 ### Hono
@@ -41,6 +51,8 @@ The bridge files for the four frameworks that had adapters live in the server re
   <RefSubLayout.Details>
 
     Copy [`hono/supabase-middleware.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/hono/supabase-middleware.ts) into your project. `toHono` returns Hono middleware. Register it with `.use()` in a chain, and the contributed keys type through to `c.var` with no `Env` declaration of your own. Register it before the routes it gates. Hono applies middleware only to routes added after it, so a route added first runs with no gate and no error. `withSupabaseClient<Database>()` threads the generic through, so `c.var.supabase` is a `SupabaseClient<Database>`.
+
+    Hono carries the contributed keys through the return value of a chained call. `app.use(...)` on one line and `app.get(...)` on the next typecheck the middleware but leave `c.var` untyped. The gate still runs, so a failing typecheck is the only signal. A second array for other routes goes in its own sub-app, mounted with `app.route()`. Each sub-app chains its own `.use()` into its routes.
 
     One line in the bridge looks redundant: `c.res` is cleared before it is assigned. When a response-phase entry returns a new `Response`, Hono's `res` setter copies the previous response's headers onto it, which reverts any header the entry rewrote. Clearing first makes the assignment final. Keep the line and its comment.
 
@@ -67,6 +79,20 @@ The bridge files for the four frameworks that had adapters live in the server re
       .get('/me', (c) => c.json({ id: c.var.jwtClaims.sub }))
 
     export default { fetch: app.fetch }
+    ```
+
+    ```ts
+    import { withClaims } from '@supabase/server/middleware/claims'
+
+    const me = new Hono()
+      .use('*', toHono([withRequiredClaims(), withSupabaseClient()]))
+      .get('/', (c) => c.json({ id: c.var.jwtClaims.sub }))
+
+    const feed = new Hono()
+      .use('*', toHono([withClaims(), withSupabaseClient()]))
+      .get('/', (c) => c.json({ anonymous: c.var.jwtClaims === null }))
+
+    const app = new Hono().route('/me', me).route('/feed', feed)
     ```
 
   </RefSubLayout.Examples>
@@ -118,7 +144,7 @@ The bridge files for the four frameworks that had adapters live in the server re
 
     Copy [`elysia/supabase-middleware.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/elysia/supabase-middleware.ts) into your project. Elysia's lifecycle hooks run in the request phase only. A `.resolve()` hook has no `next()` and never sees the outgoing response. So `wrapElysia` composes the entries around `app.handle`, and `supabaseCtx()` is a plugin that hands the context back to your routes per request.
 
-    `supabaseCtx<typeof entries>()` types the route context. Pass the same tuple type that `wrapElysia` receives. Because the entries wrap the whole app, they apply app-wide. For per-route scoping, use Elysia's `.group()` with a separately wrapped sub-app.
+    `supabaseCtx<typeof entries>()` types the route context. Pass the same tuple type that `wrapElysia` receives. Because the entries wrap the whole app, they apply app-wide. A second array for other routes needs its own Elysia instance, wrapped separately, with a fetch handler in front that dispatches by path to the wrapped apps.
 
     The two functions work only as a pair. If you serve the app without `wrapElysia`, with `app.listen()` or `export default app`, the entries never run and `supabaseCtx()` throws on every route.
 
@@ -156,9 +182,9 @@ The bridge files for the four frameworks that had adapters live in the server re
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    Copy [`nestjs/supabase.guard.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/nestjs/supabase.guard.ts) into your project. `toNestGuard` returns a guard class. A guard covers context and short-circuit. The response phase is not available: Nest's interceptors receive the controller's return value, not a `Response`, so an entry's `yield` has nothing to act on. For CORS, use `app.enableCors()`.
+    Copy [`nestjs/supabase.guard.ts`](https://github.com/supabase/server/blob/main/examples/frameworks/nestjs/supabase.guard.ts) into your project. `toNestGuard` returns a guard class. A guard covers context and short-circuit. The response phase is not available: Nest's interceptors receive the controller's return value, not a `Response`, so an entry's `yield` has nothing to act on. `withCors` in the array stamps a short-circuit only: the 401 carries the headers and a successful response does not. A preflight never reaches a guard either. Guards run after routing, and no `OPTIONS` route exists, so the preflight 404s. CORS on Nest is `app.enableCors()`. Leave `withCors` out of the guard's array.
 
-    Call `toNestGuard` once and reuse the class on every route, so the pipeline folds once. On a short-circuit the guard copies the entry's headers onto the response, then throws an `HttpException` with the entry's status and its `{ message, code }` body. The bridge builds a Web `Request` from Nest's request with the headers and method. The body is not forwarded, so entries that read it do not work through this bridge. A contribution whose key matches a property Nest's request already has, such as `body` or `query`, throws instead of overwriting it. `Injectable()` is applied as a call, so the file works without a decorator transform.
+    Call `toNestGuard` once and reuse the class on every route, so the pipeline folds once. On a short-circuit the guard copies the entry's headers onto the response, then throws an `HttpException` with the entry's status and its `{ message, code }` body. The bridge builds a Web `Request` from Nest's request with the headers and method. The body is not forwarded. An entry that reads it sees an empty body and runs as if that were the payload, so a signature check or a body audit in the array passes with nothing checked. Put those in Nest middleware. A contribution whose key matches a property Nest's request already has, such as `body` or `query`, throws instead of overwriting it. `Injectable()` is applied as a call, so the file works without a decorator transform. The controller does not. Nest is built on decorators, so running the example needs swc, ts-node, or a build step. Node's built-in type stripping rejects the `@Controller()` line. Nest also answers a `POST` with 201 by default, where the other frameworks answer 200.
 
   </RefSubLayout.Details>
 
@@ -199,11 +225,15 @@ The bridge files for the four frameworks that had adapters live in the server re
 
     `request` is already a Web `Request`, and `next()` resolves to an object carrying the downstream `Response`, so the fit is close. Two details in the bridge carry the typing. `.server<Contributions<Entries>>` is what types `context` downstream; the generic has no constraint, so leaving it off types the context as `undefined`. And `<const Entries>` keeps the tuple, so every `context.*` read stays typed.
 
+    The engine buffers a request body only when it seeds the context itself. The bridge seeds, so it buffers too, and it does so in place. `next()` accepts `context` only, so the bridge cannot hand a different `Request` downstream, and Start gives the route handler the same object the middleware saw. The bridge installs cached readers on that object, and an entry and the handler read the same body.
+
     `createMiddleware({ type: 'request' })` is the right kind here. Its server function may return a `Response`, which is what lets an entry short-circuit, and `createServerFn().middleware([...])` accepts request middleware.
 
-    On a server function, Start's fetcher returns any `application/json` body as the call's value without checking the status. A 401 from `withRequiredClaims()` would resolve the caller's promise with `{ message, code }` where it expects its own result type: the same silent-200 class of failure as the auth trap, one layer further out. So when an entry short-circuits on a server function, the bridge rethrows it as an error carrying `status` and `code`. Server routes get the `Response` back unchanged.
+    On a server function, Start's fetcher returns any `application/json` body as the call's value without checking the status. It checks `response.ok` only when the body is not JSON. A 401 from `withRequiredClaims()` would resolve the caller's promise with `{ message, code }` where it expects its own result type: the same silent-200 class of failure as the auth trap, one layer further out. So when an entry short-circuits on a server function, the bridge rethrows it as an error carrying `status` and `code`. Server routes get the `Response` back unchanged.
 
     The file that calls `.middleware([...])` ships to the client, so the entry modules it references are client-reachable. Read configuration through `getEnv` per request and keep secrets out of module scope.
+
+    Vite's dev server answers CORS on its own. A route with no `withCors` entry works in development and fails once the app is built and served. Compose `withCors` on every route a browser calls, and check the preflight against a production build.
 
   </RefSubLayout.Details>
 
@@ -235,6 +265,38 @@ The bridge files for the four frameworks that had adapters live in the server re
     interface Handoff {
       next: (options: { context: Record<string, unknown> }) => unknown
       ran: boolean
+    }
+
+    /**
+     * Makes the body of `request` readable more than once, in place.
+     *
+     * The first reader drains the stream into a cache and every later reader is
+     * served from it, so an entry and the route handler both see the body. The
+     * engine's `bufferRequest` returns a wrapped `Request` instead, which does
+     * not fit here: a request middleware's `next()` accepts `context` only, and
+     * Start hands the route handler the same `Request` the middleware saw, so
+     * the readers go onto that object.
+     */
+    function bufferInPlace(request: Request): void {
+      if (!request.body) return
+      const readOnce = request.arrayBuffer.bind(request)
+      let buffer: Promise<ArrayBuffer> | undefined
+      const arrayBuffer = () => (buffer ??= readOnce())
+      const text = async () => new TextDecoder().decode(await arrayBuffer())
+      const readers = {
+        arrayBuffer,
+        text,
+        json: async () => JSON.parse(await text()) as unknown,
+        bytes: async () => new Uint8Array(await arrayBuffer()),
+        blob: async () => new Blob([await arrayBuffer()]),
+        formData: async () =>
+          new Response(await arrayBuffer(), { headers: request.headers }).formData(),
+        // Every reader is cached, so the request is its own clone.
+        clone: () => request,
+      }
+      for (const [name, value] of Object.entries(readers)) {
+        Object.defineProperty(request, name, { value, configurable: true })
+      }
     }
 
     /**
@@ -272,6 +334,9 @@ The bridge files for the four frameworks that had adapters live in the server re
 
       return createMiddleware({ type: 'request' }).server<Contributions<Entries>>(
         async ({ request, next, handlerType }) => {
+          // The engine buffers a request body only when it seeds the context
+          // itself. This bridge seeds, so it buffers too.
+          bufferInPlace(request)
           const handoff: Handoff = { next, ran: false }
           const response = await run(request, {
             ...seedContext(),
@@ -382,7 +447,7 @@ No composable gate exists for `publishable` or `secret`. Those endpoints stay on
 
 The adapters emitted none of these. Each rejected in its own framework-native shape. Hono threw an `HTTPException`, which renders as `text/plain` with no `code`. H3 threw an `HTTPError`. Elysia surfaced a `SupabaseError` through your `onError` handler. Only the NestJS adapter threw `HttpException({ message, code }, status)`. A client that branches on the 401 status is fine. A client that parses the body needs rechecking.
 
-Neither entry answers a CORS preflight, and the short-circuits carry no CORS headers. For browser callers, compose `withCors` from `@supabase/middleware/cors` ahead of the gate.
+Neither entry answers a CORS preflight, and the short-circuits carry no CORS headers. For browser callers, compose `withCors` from `@supabase/middleware/cors` ahead of the gate. CORS is an entry like any other, so a route that composes no entries has no CORS. A public route a browser calls, such as a health check, needs its own array with `withCors` in it. Under `curl` the response is an ordinary 200; only a browser refuses it.
 
 ### Keep `withSupabase` where it fits
 
@@ -712,6 +777,10 @@ CONSTRAINTS
   It looks redundant and is not: when a response-phase entry returns a new
   Response, Hono merges the previous response's headers over it, reverting
   anything the entry rewrote.
+- On Hono, put a second entry array in its own sub-app mounted with
+  app.route(). A second app.use() statement leaves c.var untyped.
+- On NestJS, do not put withCors in the guard's array. CORS is
+  app.enableCors().
 
 REPORT, as a table: every adapter registration you found, its old `auth` value,
 and whether the migrated version still rejects anonymous requests. Then list
