@@ -656,7 +656,7 @@ export const getUpdateFDWSql = ({
   )
   const createTablesSql = joinSqlFragments(
     tablesToCreate.map((table) => buildCreateForeignTableSql(table, wrapper.server_name)),
-    '\n\n'
+    '\n'
   )
   const dropTablesSql = joinSqlFragments(
     tablesToDrop.map((table) =>
@@ -677,19 +677,12 @@ export const getUpdateFDWSql = ({
 
   const sql = safeSql`
     ${ensureWrapperIsNotSharedSql}
-
     ${renameWrapperSql}
-
     ${alterServerOptionsSql}
-
     ${encryptedOptionsSql}
-
     ${newSchemasSql}
-
     ${dropTablesSql}
-
     ${createTablesSql}
-
     ${alterTablesSql}
   `
 
