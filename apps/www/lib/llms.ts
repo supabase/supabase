@@ -247,7 +247,7 @@ export function generatePricingContent(): string {
     '',
     '> Start for free, scale as you grow. Pay only for what you use.',
     '',
-    'Supabase offers four plans: Free, Pro, Team, and Enterprise. All plans include unlimited API requests. Projects on paid plans never pause.',
+    "Supabase offers four plans: Free, Pro, Team, and Enterprise. All plans include unlimited API requests. Projects on paid plans aren't paused for inactivity.",
     '',
     '## How billing works',
     '',
