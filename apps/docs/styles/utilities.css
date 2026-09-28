@@ -1,0 +1,21 @@
+@property --dock-glow {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@utility dock-discard-glow {
+  transition: --dock-glow 200ms ease-out;
+  background-image: linear-gradient(
+    to top,
+    var(--dock-glow),
+    color-mix(in oklab, var(--dock-glow) 55%, transparent) 14px,
+    color-mix(in oklab, var(--dock-glow) 25%, transparent) 28px,
+    color-mix(in oklab, var(--dock-glow) 7%, transparent) 42px,
+    transparent 56px
+  );
+}
+
+@utility shadow-codeblock {
+  box-shadow: var(--shadow-codeblock, none);
+}

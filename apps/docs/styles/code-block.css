@@ -109,10 +109,6 @@
   overflow-wrap: anywhere !important;
 }
 
-.shadow-codeblock {
-  box-shadow: var(--shadow-codeblock, none);
-}
-
 .shiki-wrapper {
   --tab-flare-ring:
     transparent 6.75px, var(--border-color-default) 7.25px, var(--border-color-default) 7.75px,
