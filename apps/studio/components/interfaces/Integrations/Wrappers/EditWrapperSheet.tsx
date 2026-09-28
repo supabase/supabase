@@ -70,10 +70,11 @@ export const EditWrapperSheet = ({
   const { mutate: updateFDW, isPending: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated ${wrapperMeta?.label} foreign data wrapper`)
-
       const { tables } = getValues()
       const hasNewSchema = (tables as Record<string, any>[]).some((table) => table.is_new_schema)
       if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
+
+      onClose()
     },
   })
 
@@ -353,7 +354,7 @@ export const EditWrapperSheet = ({
       <ConfirmationModal
         visible={isUpdateConfirmationOpen}
         title="Save wrapper changes?"
-        size="medium"
+        size="small"
         variant="warning"
         confirmLabel="Save changes"
         confirmLabelLoading="Saving changes"
@@ -376,9 +377,9 @@ export const EditWrapperSheet = ({
         }}
       >
         <p className="text-sm text-foreground-light">
-          Removed foreign tables and retyped columns will be dropped and, if re-added, recreated.
-          Dependent objects like functions or views that reference those tables may need to be
-          updated manually afterwards.
+          <p className="text-sm text-foreground-light">
+            Removing a table or retyping a column may break views or functions that reference it.
+          </p>
         </p>
         <p className="text-sm text-foreground-light mt-2">Are you sure you want to continue?</p>
       </ConfirmationModal>
