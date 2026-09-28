@@ -76,19 +76,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      delete_error_codes_except: {
-        Args: {
-          skip_codes: Json
-        }
-        Returns: number
-      }
+      delete_error_codes_except: { Args: { skip_codes: Json }; Returns: number }
       update_error_code: {
         Args: {
           code: string
-          service: string
           http_status_code?: number
           message?: string
           metadata?: Json
+          service: string
         }
         Returns: boolean
       }
@@ -110,10 +105,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
+          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
-          extensions?: Json
         }
         Returns: Json
       }
@@ -156,9 +151,12 @@ export type Database = {
           comment: string
           created_at: string
           id: number
+          images: string[] | null
           metadata: Json | null
           page: string
+          pins: Json | null
           title: string | null
+          user_agent: string | null
           user_id: string | null
           vote: Database['public']['Enums']['feedback_vote'] | null
         }
@@ -166,9 +164,12 @@ export type Database = {
           comment: string
           created_at?: string
           id?: never
+          images?: string[] | null
           metadata?: Json | null
           page: string
+          pins?: Json | null
           title?: string | null
+          user_agent?: string | null
           user_id?: string | null
           vote?: Database['public']['Enums']['feedback_vote'] | null
         }
@@ -176,11 +177,74 @@ export type Database = {
           comment?: string
           created_at?: string
           id?: never
+          images?: string[] | null
           metadata?: Json | null
           page?: string
+          pins?: Json | null
           title?: string | null
+          user_agent?: string | null
           user_id?: string | null
           vote?: Database['public']['Enums']['feedback_vote'] | null
+        }
+        Relationships: []
+      }
+      incident_status_cache: {
+        Row: {
+          affected_regions: string[] | null
+          affects_project_creation: boolean
+          id: number
+          incident_id: string
+          shortlink: string
+          updated_at: string
+        }
+        Insert: {
+          affected_regions?: string[] | null
+          affects_project_creation?: boolean
+          id?: never
+          incident_id: string
+          shortlink: string
+          updated_at?: string
+        }
+        Update: {
+          affected_regions?: string[] | null
+          affects_project_creation?: boolean
+          id?: never
+          incident_id?: string
+          shortlink?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      interfaces_feedback: {
+        Row: {
+          created_at: string
+          delete_token: string
+          feedback: string
+          id: number
+          metadata: Json | null
+          project_ref: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          delete_token?: string
+          feedback: string
+          id?: never
+          metadata?: Json | null
+          project_ref?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          delete_token?: string
+          feedback?: string
+          id?: never
+          metadata?: Json | null
+          project_ref?: string | null
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -289,39 +353,39 @@ export type Database = {
         Row: {
           checksum: string | null
           content: string | null
-          fts_tokens: unknown | null
+          fts_tokens: unknown
           id: number
           last_refresh: string | null
           meta: Json | null
           path: string
           source: string | null
-          title_tokens: unknown | null
+          title_tokens: unknown
           type: string | null
           version: string | null
         }
         Insert: {
           checksum?: string | null
           content?: string | null
-          fts_tokens?: unknown | null
+          fts_tokens?: unknown
           id?: number
           last_refresh?: string | null
           meta?: Json | null
           path: string
           source?: string | null
-          title_tokens?: unknown | null
+          title_tokens?: unknown
           type?: string | null
           version?: string | null
         }
         Update: {
           checksum?: string | null
           content?: string | null
-          fts_tokens?: unknown | null
+          fts_tokens?: unknown
           id?: number
           last_refresh?: string | null
           meta?: Json | null
           path?: string
           source?: string | null
-          title_tokens?: unknown | null
+          title_tokens?: unknown
           type?: string | null
           version?: string | null
         }
@@ -331,39 +395,39 @@ export type Database = {
         Row: {
           checksum: string | null
           content: string | null
-          fts_tokens: unknown | null
+          fts_tokens: unknown
           id: number
           last_refresh: string | null
           meta: Json | null
           path: string
           source: string | null
-          title_tokens: unknown | null
+          title_tokens: unknown
           type: string | null
           version: string | null
         }
         Insert: {
           checksum?: string | null
           content?: string | null
-          fts_tokens?: unknown | null
+          fts_tokens?: unknown
           id?: never
           last_refresh?: string | null
           meta?: Json | null
           path: string
           source?: string | null
-          title_tokens?: unknown | null
+          title_tokens?: unknown
           type?: string | null
           version?: string | null
         }
         Update: {
           checksum?: string | null
           content?: string | null
-          fts_tokens?: unknown | null
+          fts_tokens?: unknown
           id?: never
           last_refresh?: string | null
           meta?: Json | null
           path?: string
           source?: string | null
-          title_tokens?: unknown | null
+          title_tokens?: unknown
           type?: string | null
           version?: string | null
         }
@@ -508,24 +572,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'public_tickets_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
-          {
             foreignKeyName: 'tickets_launch_week_fkey'
             columns: ['launch_week']
             isOneToOne: false
             referencedRelation: 'launch_weeks'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'tickets_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'users'
             referencedColumns: ['id']
           },
         ]
@@ -622,131 +672,84 @@ export type Database = {
       }
     }
     Functions: {
-      cleanup_last_changed_pages: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      cleanup_last_changed_pages: { Args: never; Returns: number }
       docs_search_embeddings: {
-        Args: {
-          embedding: string
-          match_threshold: number
-        }
+        Args: { embedding: string; match_threshold: number }
         Returns: {
-          id: number
-          path: string
-          type: string
-          title: string
-          subtitle: string
           description: string
           headings: string[]
+          id: number
+          path: string
           slugs: string[]
+          subtitle: string
+          title: string
+          type: string
         }[]
       }
       docs_search_embeddings_nimbus: {
-        Args: {
-          embedding: string
-          match_threshold: number
-        }
+        Args: { embedding: string; match_threshold: number }
         Returns: {
-          id: number
-          path: string
-          type: string
-          title: string
-          subtitle: string
           description: string
           headings: string[]
+          id: number
+          path: string
           slugs: string[]
+          subtitle: string
+          title: string
+          type: string
         }[]
       }
       docs_search_fts: {
-        Args: {
-          query: string
-        }
+        Args: { query: string }
         Returns: {
+          description: string
           id: number
           path: string
-          type: string
-          title: string
           subtitle: string
-          description: string
+          title: string
+          type: string
         }[]
       }
       docs_search_fts_nimbus: {
-        Args: {
-          query: string
-        }
+        Args: { query: string }
         Returns: {
+          description: string
           id: number
           path: string
-          type: string
-          title: string
           subtitle: string
-          description: string
+          title: string
+          type: string
         }[]
       }
       get_full_content_url: {
-        Args: {
-          type: string
-          path: string
-          slug: string
-        }
+        Args: { path: string; slug: string; type: string }
         Returns: string
       }
       get_last_revalidation_for_tags: {
-        Args: {
-          tags: string[]
-        }
+        Args: { tags: string[] }
         Returns: {
-          tag: string
           created_at: string
+          tag: string
         }[]
       }
-      hnswhandler: {
-        Args: {
-          '': unknown
-        }
-        Returns: unknown
-      }
       ipv6_active_status: {
-        Args: {
-          project_ref: string
-        }
+        Args: { project_ref: string }
         Returns: {
           pgbouncer_active: boolean
           vercel_active: boolean
         }[]
       }
-      ivfflathandler: {
-        Args: {
-          '': unknown
-        }
-        Returns: unknown
-      }
       json_matches_schema: {
-        Args: {
-          schema: Json
-          instance: Json
-        }
+        Args: { instance: Json; schema: Json }
         Returns: boolean
       }
       jsonb_matches_schema: {
-        Args: {
-          schema: Json
-          instance: Json
-        }
+        Args: { instance: Json; schema: Json }
         Returns: boolean
       }
-      jsonschema_is_valid: {
-        Args: {
-          schema: Json
-        }
-        Returns: boolean
-      }
+      jsonschema_is_valid: { Args: { schema: Json }; Returns: boolean }
       jsonschema_validation_errors: {
-        Args: {
-          schema: Json
-          instance: Json
-        }
+        Args: { instance: Json; schema: Json }
         Returns: string[]
       }
       match_embedding: {
@@ -765,6 +768,12 @@ export type Database = {
           slug: string | null
           token_count: number | null
         }[]
+        SetofOptions: {
+          from: '*'
+          to: 'page_section'
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       match_embedding_nimbus: {
         Args: {
@@ -782,6 +791,12 @@ export type Database = {
           slug: string | null
           token_count: number | null
         }[]
+        SetofOptions: {
+          from: '*'
+          to: 'page_section_nimbus'
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       match_page_sections_v2: {
         Args: {
@@ -799,6 +814,12 @@ export type Database = {
           slug: string | null
           token_count: number | null
         }[]
+        SetofOptions: {
+          from: '*'
+          to: 'page_section'
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       match_page_sections_v2_nimbus: {
         Args: {
@@ -816,6 +837,12 @@ export type Database = {
           slug: string | null
           token_count: number | null
         }[]
+        SetofOptions: {
+          from: '*'
+          to: 'page_section_nimbus'
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       search_content: {
         Args: {
@@ -825,55 +852,55 @@ export type Database = {
           max_result?: number
         }
         Returns: {
-          id: number
-          page_title: string
-          type: string
-          href: string
           content: string
+          href: string
+          id: number
           metadata: Json
+          page_title: string
           subsections: Json[]
+          type: string
         }[]
       }
       search_content_hybrid: {
         Args: {
-          query_text: string
-          query_embedding: string
-          max_result?: number
           full_text_weight?: number
-          semantic_weight?: number
-          rrf_k?: number
-          match_threshold?: number
           include_full_content?: boolean
+          match_threshold?: number
+          max_result?: number
+          query_embedding: string
+          query_text: string
+          rrf_k?: number
+          semantic_weight?: number
         }
         Returns: {
-          id: number
-          page_title: string
-          type: string
-          href: string
           content: string
+          href: string
+          id: number
           metadata: Json
+          page_title: string
           subsections: Json[]
+          type: string
         }[]
       }
       search_content_hybrid_nimbus: {
         Args: {
-          query_text: string
-          query_embedding: string
-          max_result?: number
           full_text_weight?: number
-          semantic_weight?: number
-          rrf_k?: number
-          match_threshold?: number
           include_full_content?: boolean
+          match_threshold?: number
+          max_result?: number
+          query_embedding: string
+          query_text: string
+          rrf_k?: number
+          semantic_weight?: number
         }
         Returns: {
-          id: number
-          page_title: string
-          type: string
-          href: string
           content: string
+          href: string
+          id: number
           metadata: Json
+          page_title: string
           subsections: Json[]
+          type: string
         }[]
       }
       search_content_nimbus: {
@@ -884,66 +911,38 @@ export type Database = {
           max_result?: number
         }
         Returns: {
-          id: number
-          page_title: string
-          type: string
-          href: string
           content: string
+          href: string
+          id: number
           metadata: Json
+          page_title: string
           subsections: Json[]
+          type: string
         }[]
+      }
+      submit_interfaces_feedback: {
+        Args: {
+          feedback: string
+          metadata?: Json
+          project_ref?: string
+          user_agent?: string
+          user_id?: string
+        }
+        Returns: string
       }
       update_last_changed_checksum: {
         Args: {
-          new_parent_page: string
-          new_heading: string
-          new_checksum: string
-          git_update_time: string
           check_time: string
+          git_update_time: string
+          new_checksum: string
+          new_heading: string
+          new_parent_page: string
         }
         Returns: string
       }
       validate_troubleshooting_errors: {
-        Args: {
-          errors: Json[]
-        }
+        Args: { errors: Json[] }
         Returns: boolean
-      }
-      vector_avg: {
-        Args: {
-          '': number[]
-        }
-        Returns: string
-      }
-      vector_dims: {
-        Args: {
-          '': string
-        }
-        Returns: number
-      }
-      vector_norm: {
-        Args: {
-          '': string
-        }
-        Returns: number
-      }
-      vector_out: {
-        Args: {
-          '': string
-        }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: {
-          '': string
-        }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: {
-          '': unknown[]
-        }
-        Returns: number
       }
     }
     Enums: {
@@ -966,6 +965,7 @@ export type Database = {
           owner: string | null
           owner_id: string | null
           public: boolean | null
+          type: Database['storage']['Enums']['buckettype']
           updated_at: string | null
         }
         Insert: {
@@ -978,6 +978,7 @@ export type Database = {
           owner?: string | null
           owner_id?: string | null
           public?: boolean | null
+          type?: Database['storage']['Enums']['buckettype']
           updated_at?: string | null
         }
         Update: {
@@ -990,9 +991,156 @@ export type Database = {
           owner?: string | null
           owner_id?: string | null
           public?: boolean | null
+          type?: Database['storage']['Enums']['buckettype']
           updated_at?: string | null
         }
         Relationships: []
+      }
+      buckets_analytics: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          format: string
+          id: string
+          name: string
+          type: Database['storage']['Enums']['buckettype']
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          format?: string
+          id?: string
+          name: string
+          type?: Database['storage']['Enums']['buckettype']
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          format?: string
+          id?: string
+          name?: string
+          type?: Database['storage']['Enums']['buckettype']
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      buckets_vectors: {
+        Row: {
+          created_at: string
+          id: string
+          type: Database['storage']['Enums']['buckettype']
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          type?: Database['storage']['Enums']['buckettype']
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          type?: Database['storage']['Enums']['buckettype']
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      iceberg_namespaces: {
+        Row: {
+          bucket_name: string
+          catalog_id: string
+          created_at: string
+          id: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_name: string
+          catalog_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_name?: string
+          catalog_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'iceberg_namespaces_catalog_id_fkey'
+            columns: ['catalog_id']
+            isOneToOne: false
+            referencedRelation: 'buckets_analytics'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      iceberg_tables: {
+        Row: {
+          bucket_name: string
+          catalog_id: string
+          created_at: string
+          id: string
+          location: string
+          name: string
+          namespace_id: string
+          remote_table_id: string | null
+          shard_id: string | null
+          shard_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          bucket_name: string
+          catalog_id: string
+          created_at?: string
+          id?: string
+          location: string
+          name: string
+          namespace_id: string
+          remote_table_id?: string | null
+          shard_id?: string | null
+          shard_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bucket_name?: string
+          catalog_id?: string
+          created_at?: string
+          id?: string
+          location?: string
+          name?: string
+          namespace_id?: string
+          remote_table_id?: string | null
+          shard_id?: string | null
+          shard_key?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'iceberg_tables_catalog_id_fkey'
+            columns: ['catalog_id']
+            isOneToOne: false
+            referencedRelation: 'buckets_analytics'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'iceberg_tables_namespace_id_fkey'
+            columns: ['namespace_id']
+            isOneToOne: false
+            referencedRelation: 'iceberg_namespaces'
+            referencedColumns: ['id']
+          },
+        ]
       }
       migrations: {
         Row: {
@@ -1027,6 +1175,7 @@ export type Database = {
           owner_id: string | null
           path_tokens: string[] | null
           updated_at: string | null
+          user_metadata: Json | null
           version: string | null
         }
         Insert: {
@@ -1040,6 +1189,7 @@ export type Database = {
           owner_id?: string | null
           path_tokens?: string[] | null
           updated_at?: string | null
+          user_metadata?: Json | null
           version?: string | null
         }
         Update: {
@@ -1053,6 +1203,7 @@ export type Database = {
           owner_id?: string | null
           path_tokens?: string[] | null
           updated_at?: string | null
+          user_metadata?: Json | null
           version?: string | null
         }
         Relationships: [
@@ -1065,68 +1216,282 @@ export type Database = {
           },
         ]
       }
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          in_progress_size: number
+          key: string
+          metadata: Json | null
+          owner_id: string | null
+          upload_signature: string
+          user_metadata: Json | null
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id: string
+          in_progress_size?: number
+          key: string
+          metadata?: Json | null
+          owner_id?: string | null
+          upload_signature: string
+          user_metadata?: Json | null
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          in_progress_size?: number
+          key?: string
+          metadata?: Json | null
+          owner_id?: string | null
+          upload_signature?: string
+          user_metadata?: Json | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 's3_multipart_uploads_bucket_id_fkey'
+            columns: ['bucket_id']
+            isOneToOne: false
+            referencedRelation: 'buckets'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          etag: string
+          id: string
+          key: string
+          owner_id: string | null
+          part_number: number
+          size: number
+          upload_id: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          etag: string
+          id?: string
+          key: string
+          owner_id?: string | null
+          part_number: number
+          size?: number
+          upload_id: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          etag?: string
+          id?: string
+          key?: string
+          owner_id?: string | null
+          part_number?: number
+          size?: number
+          upload_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 's3_multipart_uploads_parts_bucket_id_fkey'
+            columns: ['bucket_id']
+            isOneToOne: false
+            referencedRelation: 'buckets'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 's3_multipart_uploads_parts_upload_id_fkey'
+            columns: ['upload_id']
+            isOneToOne: false
+            referencedRelation: 's3_multipart_uploads'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      vector_indexes: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id: string
+          metadata_configuration: Json | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id?: string
+          metadata_configuration?: Json | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          data_type?: string
+          dimension?: number
+          distance_metric?: string
+          id?: string
+          metadata_configuration?: Json | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'vector_indexes_bucket_id_fkey'
+            columns: ['bucket_id']
+            isOneToOne: false
+            referencedRelation: 'buckets_vectors'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      allow_any_operation: {
+        Args: { expected_operations: string[] }
+        Returns: boolean
+      }
+      allow_only_operation: {
+        Args: { expected_operation: string }
+        Returns: boolean
+      }
       can_insert_object: {
-        Args: {
-          bucketid: string
-          name: string
-          owner: string
-          metadata: Json
-        }
+        Args: { bucketid: string; metadata: Json; name: string; owner: string }
         Returns: undefined
       }
-      extension: {
-        Args: {
-          name: string
-        }
+      extension: { Args: { name: string }; Returns: string }
+      filename: { Args: { name: string }; Returns: string }
+      foldername: { Args: { name: string }; Returns: string[] }
+      get_common_prefix: {
+        Args: { p_delimiter: string; p_key: string; p_prefix: string }
         Returns: string
-      }
-      filename: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      foldername: {
-        Args: {
-          name: string
-        }
-        Returns: string[]
       }
       get_size_by_bucket: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
-          size: number
           bucket_id: string
+          size: number
         }[]
       }
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string
+          delimiter_param: string
+          max_keys?: number
+          next_key_token?: string
+          next_upload_token?: string
+          prefix_param: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+        }[]
+      }
+      list_objects_with_delimiter: {
+        Args: {
+          _bucket_id: string
+          delimiter_param: string
+          max_keys?: number
+          next_token?: string
+          prefix_param: string
+          sort_order?: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      operation: { Args: never; Returns: string }
       search: {
         Args: {
-          prefix: string
           bucketname: string
-          limits?: number
           levels?: number
+          limits?: number
           offsets?: number
+          prefix: string
           search?: string
           sortcolumn?: string
           sortorder?: string
         }
         Returns: {
-          name: string
-          id: string
-          updated_at: string
           created_at: string
+          id: string
           last_accessed_at: string
           metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_by_timestamp: {
+        Args: {
+          p_bucket_id: string
+          p_level: number
+          p_limit: number
+          p_prefix: string
+          p_sort_column: string
+          p_sort_column_after: string
+          p_sort_order: string
+          p_start_after: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_v2: {
+        Args: {
+          bucket_name: string
+          levels?: number
+          limits?: number
+          prefix: string
+          sort_column?: string
+          sort_column_after?: string
+          sort_order?: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
         }[]
       }
     }
     Enums: {
-      [_ in never]: never
+      buckettype: 'STANDARD' | 'ANALYTICS' | 'VECTOR'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1134,25 +1499,31 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, 'public'>]
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-        Database[PublicTableNameOrOptions['schema']]['Views'])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-      Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-    ? (PublicSchema['Tables'] & PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1160,18 +1531,24 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema['Tables']
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1179,18 +1556,24 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema['Tables']
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1198,12 +1581,54 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends keyof PublicSchema['Enums'] | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema['Enums']
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema['CompositeTypes']
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  content: {
+    Enums: {},
+  },
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      feedback_vote: ['yes', 'no'],
+    },
+  },
+  storage: {
+    Enums: {
+      buckettype: ['STANDARD', 'ANALYTICS', 'VECTOR'],
+    },
+  },
+} as const
