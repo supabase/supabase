@@ -1,4 +1,5 @@
 import { fireEvent, screen, within } from '@testing-library/react'
+import { Button } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { ColumnSchema } from '../UnifiedLogs.schema'
@@ -40,7 +41,7 @@ describe('EmbeddedLogsTable', () => {
 
   it('renders the footer below the rows instead of pagination', () => {
     customRender(
-      <EmbeddedLogsTable rows={logs} isLoading={false} footer={<button>View all logs</button>} />
+      <EmbeddedLogsTable rows={logs} isLoading={false} footer={<Button>View all logs</Button>} />
     )
 
     expect(screen.getByRole('button', { name: 'View all logs' })).toBeInTheDocument()
