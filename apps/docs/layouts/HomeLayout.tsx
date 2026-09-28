@@ -8,8 +8,8 @@ import { SidebarSkeleton } from './MainSkeleton'
 
 const HomeLayout = ({ children }: PropsWithChildren) => {
   return (
-    <SidebarSkeleton hideSideNav>
-      <article>
+    <SidebarSkeleton isMenuMobileOnly>
+      <article className="@container">
         <HomePageCover
           title="Supabase Documentation"
           cliCode={
