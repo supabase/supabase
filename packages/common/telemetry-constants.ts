@@ -427,7 +427,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
     useApiSchema?: boolean
     /**
      * Postgres engine type selection.
-     * true = "Postgres with OrioleDB" (alpha)
+     * true = "Postgres with OrioleDB" (beta)
      * false = "Postgres" (default)
      */
     useOrioleDb?: boolean

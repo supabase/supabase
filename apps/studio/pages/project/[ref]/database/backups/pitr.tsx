@@ -97,7 +97,7 @@ const PITR = () => {
       <Admonition
         type="default"
         title="Database backups are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+        description="OrioleDB is currently in public beta and Point-in-Time Recovery is unavailable on OrioleDB projects"
       >
         <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
       </Admonition>
