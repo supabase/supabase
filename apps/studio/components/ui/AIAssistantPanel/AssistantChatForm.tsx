@@ -1,7 +1,7 @@
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
-import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, ReactNode, useRef } from 'react'
+import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
 import { Button, cn, ExpandingTextArea } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -40,8 +40,6 @@ export interface FormProps {
   sqlSnippets?: SqlSnippet[]
   /* Function to handle removing a SQL snippet */
   onRemoveSnippet?: (index: number) => void
-  /* Additional class name for the snippets container */
-  snippetsClassName?: string
   /* Additional class name for the form wrapper */
   className?: string
   /* If currently editing an existing message */
@@ -50,10 +48,6 @@ export interface FormProps {
   selectedModel?: AssistantModelId
   /* Callback when a model is chosen */
   onSelectModel?: (model: AssistantModelId) => void
-  /* Icon for the submit button when not loading, defaults to an up arrow */
-  submitIcon?: ReactNode
-  /* Label for the submit button when not loading, used for both aria-label and tooltip text, defaults to "Send message" */
-  submitLabel?: string
   /**
    * An additional action shown beside the main submit button, transitioned in/out with
    * framer-motion. Pass undefined to hide it (e.g. when the input doesn't match its condition).
@@ -77,14 +71,11 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       placeholder,
       sqlSnippets,
       onRemoveSnippet,
-      snippetsClassName,
       includeSnippetsInMessage = false,
       className,
       isEditing = false,
       selectedModel,
       onSelectModel,
-      submitIcon = <ArrowUp />,
-      submitLabel = 'Send message',
       secondaryAction,
       ...props
     },
@@ -199,14 +190,14 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
                 <ButtonTooltip
                   type="submit"
                   variant={canSubmit ? 'primary' : 'default'}
-                  aria-label={submitLabel}
-                  icon={submitIcon}
+                  aria-label="Send message"
+                  icon={<ArrowUp />}
                   disabled={!canSubmit}
                   className={cn(
                     'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
                     !canSubmit ? 'opacity-50' : 'opacity-100'
                   )}
-                  tooltip={{ content: { side: 'top', text: submitLabel } }}
+                  tooltip={{ content: { side: 'top', text: 'Send message' } }}
                 />
               )}
             </div>

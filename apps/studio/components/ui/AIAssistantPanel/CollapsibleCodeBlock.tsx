@@ -1,12 +1,8 @@
-import { Code, X } from 'lucide-react'
-import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { Code } from 'lucide-react'
+import { cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { CodeBlock, type CodeBlockProps } from 'ui-patterns/CodeBlock'
 
-interface CollapsibleCodeBlockProps extends CodeBlockProps {
-  onRemove?: () => void
-}
-
-export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBlockProps) => {
+export const CollapsibleCodeBlock = (props: CodeBlockProps) => {
   const codeString = (props.value || props.children) as string
   const firstLine = codeString?.substring(0, codeString.indexOf('\n')) || codeString
 
@@ -34,16 +30,6 @@ export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBloc
             />
           </HoverCardContent>
         </HoverCard>
-
-        {onRemove && (
-          <Button
-            variant="text"
-            size="tiny"
-            className="shrink-0 w-6 h-6"
-            onClick={onRemove}
-            icon={<X size={14} />}
-          />
-        )}
       </div>
     </div>
   )

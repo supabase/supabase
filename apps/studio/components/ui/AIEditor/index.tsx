@@ -18,10 +18,8 @@ import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIEditorProps {
-  id?: string
   language: ValidLanguages
   value?: string
-  defaultValue?: string
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
@@ -30,7 +28,6 @@ interface AIEditorProps {
     language?: string
   }
   initialPrompt?: string
-  readOnly?: boolean
   autoFocus?: boolean
   className?: string
   options?: monacoEditor.IStandaloneEditorConstructionOptions
@@ -49,11 +46,9 @@ interface AIEditorProps {
 export const AIEditor = ({
   language = 'javascript',
   value,
-  defaultValue = '',
   aiEndpoint,
   aiMetadata,
   initialPrompt,
-  readOnly = false,
   autoFocus = false,
   className = '',
   options = {},
@@ -77,7 +72,7 @@ export const AIEditor = ({
   const commandMenuHotkeyEnabledRef = useLatest(isCommandMenuHotkeyEnabled)
   const setCommandMenuOpenRef = useLatest(setCommandMenuOpen)
 
-  const [currentValue, setCurrentValue] = useState(value || defaultValue)
+  const [currentValue, setCurrentValue] = useState(value || '')
   const [isDiffMode, setIsDiffMode] = useState(false)
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
   const [diffValue, setDiffValue] = useState({ original: '', modified: '' })
@@ -309,8 +304,8 @@ export const AIEditor = ({
   }
 
   useEffect(() => {
-    setCurrentValue(value || defaultValue)
-  }, [value, defaultValue])
+    setCurrentValue(value || '')
+  }, [value])
 
   useEffect(() => {
     if (initialPrompt) {
@@ -388,7 +383,6 @@ export const AIEditor = ({
             language={language}
             autofocus={autoFocus}
             className={className}
-            isReadOnly={readOnly}
             options={options}
             value={currentValue}
             onInputChange={(value) => {

@@ -11,7 +11,7 @@ import { MessageDisplay } from './Message.Display'
 
 function AssistantMessage({ message }: { message: VercelMessage }) {
   const { onBranch, onCancelEdit, onRate } = useMessageActionsContext()
-  const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
+  const { id, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
 
   const handleRate = (newRating: 'positive' | 'negative', reason?: string) => {
     onRate?.(id, newRating, reason)
@@ -28,7 +28,6 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
   return (
     <MessageDisplay.Container
       className={cn(
-        variant === 'warning' && 'bg-warning-200',
         state === 'predecessor-editing' && 'opacity-50 transition-opacity cursor-pointer'
       )}
       onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
@@ -57,7 +56,7 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
 }
 
 function UserMessage({ message }: { message: VercelMessage }) {
-  const { id, variant, state } = useMessageInfoContext()
+  const { id, state } = useMessageInfoContext()
   const { onCancelEdit, onEdit, onDelete } = useMessageActionsContext()
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
 
@@ -66,7 +65,6 @@ function UserMessage({ message }: { message: VercelMessage }) {
       <MessageDisplay.Container
         className={cn(
           'mt-6 text-foreground',
-          variant === 'warning' && 'bg-warning-200',
           state === 'predecessor-editing' && 'opacity-50 transition-opacity cursor-pointer'
         )}
         onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
@@ -101,7 +99,6 @@ interface MessageProps {
   message: VercelMessage
   isLoading: boolean
   readOnly?: boolean
-  variant?: 'default' | 'warning'
   addToolApprovalResponse?: AddToolApprovalResponse
   onDelete: (id: string) => void
   onEdit: (id: string) => void
@@ -127,7 +124,6 @@ export const Message = memo(function Message(props: MessageProps) {
       id: props.id,
       isLoading: props.isLoading,
       readOnly: props.readOnly,
-      variant: props.variant,
       isUserMessage,
       state: messageState,
       isLastMessage: props.isLastMessage,
@@ -137,7 +133,6 @@ export const Message = memo(function Message(props: MessageProps) {
       props.id,
       props.isLoading,
       props.readOnly,
-      props.variant,
       isUserMessage,
       messageState,
       props.isLastMessage,

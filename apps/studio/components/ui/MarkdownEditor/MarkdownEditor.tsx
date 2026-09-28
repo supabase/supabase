@@ -11,7 +11,6 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import type { LexicalEditor } from 'lexical'
@@ -23,10 +22,8 @@ import { MARKDOWN_EDITOR_NODES, MARKDOWN_TRANSFORMERS } from './MarkdownEditor.u
 
 interface MarkdownEditorProps {
   value: string
-  onChange?: (markdown: string) => void
   onBlur?: (markdown: string) => void
   placeholder?: string
-  autoFocus?: boolean
   className?: string
 }
 
@@ -103,14 +100,7 @@ const SyncExternalValuePlugin = ({
  * Can shift to packages/ui if deem necessary (e.g if a second consumer needs it - e.g
  * TextEditor in the side panel for the table editor when editing a text cell)
  */
-export const MarkdownEditor = ({
-  value,
-  onChange,
-  onBlur,
-  placeholder,
-  autoFocus,
-  className,
-}: MarkdownEditorProps) => {
+export const MarkdownEditor = ({ value, onBlur, placeholder, className }: MarkdownEditorProps) => {
   const isFocusedRef = useRef(false)
   const editorRef = useRef<LexicalEditor | null>(null)
   const lastKnownValueRef = useRef(value)
@@ -153,7 +143,6 @@ export const MarkdownEditor = ({
         <RichTextPlugin
           contentEditable={
             <ContentEditable
-              autoFocus={autoFocus}
               className={cn(MarkdownClassName, className)}
               onFocus={() => {
                 isFocusedRef.current = true
@@ -174,17 +163,6 @@ export const MarkdownEditor = ({
           isFocused={() => isFocusedRef.current}
           lastKnownValueRef={lastKnownValueRef}
         />
-        {onChange && (
-          <OnChangePlugin
-            onChange={(editorState) =>
-              editorState.read(() => {
-                const markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS)
-                lastKnownValueRef.current = markdown
-                onChange(markdown)
-              })
-            }
-          />
-        )}
       </div>
     </LexicalComposer>
   )
