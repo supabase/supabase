@@ -41,6 +41,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
 
   const _tables = formatWrapperTables(wrapper, integration?.meta)
   const canEdit = canManageWrappers && !isShared
+
   let editTooltip = 'Edit wrapper'
   if (!canManageWrappers) editTooltip = 'You need additional permissions to edit wrappers'
   else if (isShared) editTooltip = 'Shared wrappers cannot be edited in the dashboard'

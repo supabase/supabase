@@ -352,11 +352,11 @@ export const EditWrapperSheet = ({
 
       <ConfirmationModal
         visible={isUpdateConfirmationOpen}
-        title="Recreate wrapper?"
+        title="Save wrapper changes?"
         size="medium"
         variant="warning"
-        confirmLabel="Recreate wrapper"
-        confirmLabelLoading="Recreating wrapper"
+        confirmLabel="Save changes"
+        confirmLabelLoading="Saving changes"
         loading={isSaving}
         onCancel={() => {
           setIsUpdateConfirmationOpen(false)
@@ -376,9 +376,9 @@ export const EditWrapperSheet = ({
         }}
       >
         <p className="text-sm text-foreground-light">
-          Saving changes will drop the existing wrapper and recreate it. Foreign servers and tables
-          will be recreated, and dependent objects like functions or views that reference those
-          tables may need to be updated manually afterwards.
+          Removed foreign tables and retyped columns will be dropped and, if re-added, recreated.
+          Dependent objects like functions or views that reference those tables may need to be
+          updated manually afterwards.
         </p>
         <p className="text-sm text-foreground-light mt-2">Are you sure you want to continue?</p>
       </ConfirmationModal>
