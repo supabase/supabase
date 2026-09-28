@@ -132,6 +132,9 @@ export const CreateWrapperSheet = ({
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
     undefined
   )
+  const [selectedTableFieldIndex, setSelectedTableFieldIndex] = useState<number | undefined>(
+    undefined
+  )
 
   const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation({ onError: () => {} })
   const { mutateAsync: createSchema } = useSchemaCreateMutation({ onError: () => {} })
@@ -159,13 +162,14 @@ export const CreateWrapperSheet = ({
   }
 
   const onUpdateTable = (values: FormattedWrapperTable) => {
-    if (values.index !== undefined) {
-      removeTable(values.index)
-      insertTable(values.index, values)
+    if (selectedTableFieldIndex !== undefined) {
+      removeTable(selectedTableFieldIndex)
+      insertTable(selectedTableFieldIndex, values)
     } else {
       appendTable(values)
     }
     setSelectedTableToEdit(undefined)
+    setSelectedTableFieldIndex(undefined)
   }
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
@@ -436,7 +440,10 @@ export const CreateWrapperSheet = ({
                               <div className="flex items-center space-x-2">
                                 <ButtonTooltip
                                   icon={<Edit />}
-                                  onClick={() => setSelectedTableToEdit(table)}
+                                  onClick={() => {
+                                    setSelectedTableFieldIndex(tableIndex)
+                                    setSelectedTableToEdit(table)
+                                  }}
                                   tooltip={{
                                     content: {
                                       side: 'bottom',
@@ -460,7 +467,12 @@ export const CreateWrapperSheet = ({
                         })}
 
                         <div className="flex justify-end">
-                          <Button onClick={() => setSelectedTableToEdit(NewTable)}>
+                          <Button
+                            onClick={() => {
+                              setSelectedTableFieldIndex(undefined)
+                              setSelectedTableToEdit(NewTable)
+                            }}
+                          >
                             Add foreign table
                           </Button>
                         </div>
@@ -550,6 +562,7 @@ export const CreateWrapperSheet = ({
         tables={wrapperMeta.tables}
         onCancel={() => {
           setSelectedTableToEdit(undefined)
+          setSelectedTableFieldIndex(undefined)
         }}
         onSave={onUpdateTable}
         initialData={selectedTableToEdit}
