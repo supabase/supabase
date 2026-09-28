@@ -1,20 +1,28 @@
 'use client'
 
 import type { NavMenuSection } from '~/components/Navigation/Navigation.types'
+import { DocsSidebarTree } from '~/components/Navigation/NavigationMenu/DocsSidebarTree'
 import DefaultNavigationMenu, {
   type MenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
-import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import TopNavBar, { DocsSearchTrigger } from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
+import { HeadingSlotProvider } from '~/layouts/HeadingSlot'
+import { RightRailProvider } from '~/layouts/RightRail'
+import { SidebarTopSlotProvider, useSidebarTopSlot } from '~/layouts/SidebarTopSlot'
 // End of third-party imports
 
 import { isFeatureEnabled } from 'common'
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
-import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
+import { memo, useEffect, useState, type PropsWithChildren, type ReactNode } from 'react'
 import { cn } from 'ui'
+
+interface NavContainerProps extends PropsWithChildren {
+  isMenuMobileOnly?: boolean
+}
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
 
@@ -311,16 +319,21 @@ const Container = memo(function Container({
   )
 })
 
-const NavContainer = memo(function NavContainer({ children }: PropsWithChildren) {
+const NavContainer = memo(function NavContainer({
+  children,
+  isMenuMobileOnly = false,
+}: NavContainerProps) {
   const mobileMenuOpen = useMenuMobileOpen()
+  const { setTarget: setTopSlot } = useSidebarTopSlot()
 
   return (
     <nav
       aria-labelledby="main-nav-title"
+      data-docs-sidebar
       className={cn(
         'fixed lg:relative z-40 lg:z-auto',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
-        'lg:w-[420px] !lg:left-0',
+        'lg:w-70 lg:shrink-0',
         'lg:top-(--header-height) lg:sticky',
         'h-screen lg:h-[calc(100vh-var(--header-height))]',
         // desktop override any left styles
@@ -328,17 +341,20 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
         'transition-all',
         'top-0 bottom-0',
         'flex flex-col ml-0',
-        'border-r',
-        'lg:overflow-y-auto'
+        'border-r lg:border-dashed'
       )}
     >
+      <div ref={setTopSlot} className="hidden lg:block shrink-0" />
+      <div className="hidden lg:block shrink-0 p-4 pb-2 bg-background">
+        <DocsSearchTrigger className="w-full min-w-0 max-w-none rounded-md border-default bg-200 shadow-codeblock hover:bg-surface-200 hover:border-default pl-1.75 md:pl-1.75 [&>div>svg]:hidden" />
+      </div>
       <div
         className={cn(
           'top-0',
           'h-full',
           'relative',
           'w-full lg:w-auto',
-          'h-fit lg:h-full overflow-y-scroll lg:overflow-auto',
+          'h-fit lg:h-auto lg:min-h-0 lg:flex-1 overflow-y-scroll lg:overflow-auto thin-scrollbar',
           'overscroll-contain',
           'backdrop-blur-sm backdrop-filter bg-background',
           'flex flex-col grow'
@@ -357,11 +373,21 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
             'px-5 pl-5 pt-6 pb-16 lg:pb-32',
             'bg-background',
             // desktop styles
-            'lg:relative lg:left-0 lg:pb-10 lg:px-10 lg:flex',
+            'lg:relative lg:left-0 lg:pb-10 lg:px-4 lg:pt-2 lg:flex lg:flex-col',
             'lg:opacity-100 lg:visible'
           )}
         >
-          {children}
+          <div className="hidden lg:flex flex-col pl-2">
+            <DocsSidebarTree />
+          </div>
+          <div
+            aria-hidden
+            className={cn(
+              'hidden my-4 ml-2 border-t border-dashed',
+              !isMenuMobileOnly && 'lg:block'
+            )}
+          />
+          <div className={cn('lg:pl-2', isMenuMobileOnly && 'lg:hidden')}>{children}</div>
         </div>
       </div>
     </nav>
@@ -372,6 +398,9 @@ interface SkeletonProps extends PropsWithChildren {
   menuId?: MenuId
   menuName?: string
   hideSideNav?: boolean
+  hasRightRail?: boolean
+  isMenuMobileOnly?: boolean
+  rightRail?: ReactNode
   NavigationMenu?: ReactNode
   hideFooter?: boolean
   className?: string
@@ -379,13 +408,19 @@ interface SkeletonProps extends PropsWithChildren {
 }
 
 function TopNavSkeleton({ children }) {
+  const [headingSlot, setHeadingSlot] = useState<HTMLElement | null>(null)
+
   return (
-    <div className="flex flex-col h-full w-full">
-      <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
-        <TopNavBar />
-      </div>
-      {children}
-    </div>
+    <HeadingSlotProvider value={headingSlot}>
+      <SidebarTopSlotProvider>
+        <div className="group/docs flex flex-col h-full w-full">
+          <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
+            <TopNavBar headingSlotRef={setHeadingSlot} />
+          </div>
+          {children}
+        </div>
+      </SidebarTopSlotProvider>
+    </HeadingSlotProvider>
   )
 }
 
@@ -397,52 +432,71 @@ function SidebarSkeleton({
   hideFooter = !footerEnabled,
   className,
   hideSideNav,
+  hasRightRail = false,
+  rightRail,
+  isMenuMobileOnly = !!rightRail,
   additionalNavItems,
 }: SkeletonProps) {
   const pathname = usePathname()
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()
+  const [rightRailTarget, setRightRailTarget] = useState<HTMLElement | null>(null)
 
   return (
-    <div className={cn('flex flex-row h-full relative', className)}>
-      {!hideSideNav && (
-        <NavContainer>
-          {NavigationMenu ?? (
-            <DefaultNavigationMenu menuId={menuId} additionalNavItems={additionalNavItems} />
-          )}
-        </NavContainer>
-      )}
-      <Container>
-        <div
-          className={cn(
-            'flex lg:hidden w-full top-0 left-0 right-0 z-50',
-            hideSideNav && 'sticky',
-            mobileMenuOpen && 'z-10'
-          )}
-        >
-          <TopNavBar />
-        </div>
-        <div
-          className={cn(
-            'sticky',
-            'transition-all top-0 z-10',
-            'backdrop-blur-sm backdrop-filter bg-background'
-          )}
-        >
-          {hideSideNav ? null : menuName ? (
-            <MobileHeader menuName={menuName} />
-          ) : (
-            <MobileHeader menuId={menuId} />
-          )}
-        </div>
-        <div className="grow">
-          {children}
-          {!hideFooter && <Footer />}
-        </div>
-        <MobileMenuBackdrop />
-      </Container>
-    </div>
+    <RightRailProvider value={rightRailTarget}>
+      <div className={cn('flex flex-row h-full relative', className)}>
+        {!hideSideNav && (
+          <NavContainer isMenuMobileOnly={isMenuMobileOnly}>
+            {NavigationMenu ?? (
+              <DefaultNavigationMenu menuId={menuId} additionalNavItems={additionalNavItems} />
+            )}
+          </NavContainer>
+        )}
+        <Container>
+          <div
+            className={cn(
+              'flex lg:hidden w-full top-0 left-0 right-0 z-50',
+              hideSideNav && 'sticky',
+              mobileMenuOpen && 'z-10'
+            )}
+          >
+            <TopNavBar />
+          </div>
+          <div
+            className={cn(
+              'sticky',
+              'transition-all top-0 z-10',
+              'backdrop-blur-sm backdrop-filter bg-background'
+            )}
+          >
+            {hideSideNav ? null : menuName ? (
+              <MobileHeader menuName={menuName} />
+            ) : (
+              <MobileHeader menuId={menuId} />
+            )}
+          </div>
+          <div className="grow">
+            {children}
+            {!hideFooter && <Footer />}
+          </div>
+          <MobileMenuBackdrop />
+        </Container>
+        {hasRightRail || rightRail ? (
+          <aside
+            data-docs-right-rail
+            className="hidden lg:block w-70 shrink-0 border-l border-dashed"
+          >
+            <div
+              ref={setRightRailTarget}
+              className="sticky top-(--header-height) max-h-[calc(100vh-var(--header-height))] overflow-y-auto thin-scrollbar px-6 py-8"
+            >
+              {rightRail}
+            </div>
+          </aside>
+        ) : null}
+      </div>
+    </RightRailProvider>
   )
 }
 
