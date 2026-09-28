@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { PublicationSelection } from './PublicationSelection'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
@@ -102,5 +102,43 @@ describe('PublicationSelection', () => {
       ).toBeInTheDocument()
     )
     expect(screen.getByRole('status')).toHaveTextContent('Each partition is replicated separately.')
+  })
+
+  it('shows unavailable when no source matches the project', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources',
+      response: () =>
+        HttpResponse.json<ReplicationSourcesResponse>({
+          sources: [{ ...mockSources.sources[0], name: 'another-project' }],
+        }),
+    })
+    customRender(<PublicationSelectionHarness />)
+
+    expect(
+      await screen.findByText(
+        'Tables in the selected publication will be replicated to this destination. Partition handling could not be loaded.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Partition handling could not be loaded.')
+  })
+
+  it('shows unavailable when the sources query fails', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources',
+      response: () =>
+        HttpResponse.json<APIErrorBody>(
+          { message: 'replication API URL is not configured' },
+          { status: 503 }
+        ),
+    })
+    customRender(<PublicationSelectionHarness />)
+
+    expect(
+      await screen.findByText(
+        'Tables in the selected publication will be replicated to this destination. Partition handling could not be loaded.'
+      )
+    ).toBeInTheDocument()
   })
 })

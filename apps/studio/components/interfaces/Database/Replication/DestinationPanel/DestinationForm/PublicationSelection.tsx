@@ -8,7 +8,7 @@ import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { PublicationsComboBox } from './PublicationsComboBox'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
-import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
@@ -22,7 +22,13 @@ export const PublicationSelection = ({
   const { ref: projectRef } = useParams()
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
-  const sourceId = useReplicationSourceId({ projectRef })
+  const {
+    data: sourcesData,
+    isError: isSourcesError,
+    isSuccess: isSourcesSuccess,
+  } = useReplicationSourcesQuery({ projectRef })
+  const sourceId = sourcesData?.sources.find((source) => source.name === projectRef)?.id
+  const isSourceUnavailable = isSourcesError || (isSourcesSuccess && sourceId === undefined)
 
   const { data: publications, isSuccess: isSuccessPublications } =
     useReplicationPublicationNamesQuery({ projectRef, sourceId })
@@ -42,7 +48,7 @@ export const PublicationSelection = ({
       partitionHandlingMessage = selectedPublication.config.publish_via_partition_root
         ? 'Partitioned tables use the parent table identity.'
         : 'Each partition is replicated separately.'
-    } else if (isPublicationError) {
+    } else if (isPublicationError || isSourceUnavailable) {
       partitionHandlingMessage = 'Partition handling could not be loaded.'
     } else {
       isPartitionHandlingLoading = true
