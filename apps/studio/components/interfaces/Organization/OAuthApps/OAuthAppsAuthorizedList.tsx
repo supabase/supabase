@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
+import { Fragment, useEffect } from 'react'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import {
   PageSection,
@@ -25,7 +27,28 @@ export const OAuthAppsAuthorizedList = () => {
     'approved_oauth_apps'
   )
 
-  const { data: apps, isPending, isSuccess, isError, error } = useOAuthApprovalsQuery({ slug })
+  const {
+    data,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useOAuthApprovalsQuery({ slug })
+
+  const [sentinelRef, entry] = useIntersectionObserver({
+    root: null,
+    threshold: 0,
+    rootMargin: '0px',
+  })
+
+  useEffect(() => {
+    if (hasNextPage && entry?.isIntersecting) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, entry?.isIntersecting, fetchNextPage])
 
   return (
     <PageSection id="authorized-apps">
@@ -62,7 +85,7 @@ export const OAuthAppsAuthorizedList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {apps.data.length === 0 ? (
+                {data.pages.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
                     <TableCell colSpan={2}>
                       <p className="text-sm text-foreground-lighter">
@@ -71,7 +94,22 @@ export const OAuthAppsAuthorizedList = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  apps.data.map((app) => <OAuthAppsAuthorizedRow key={app.id} app={app} />)
+                  <>
+                    {data.pages.map((page, pageIndex) => (
+                      <Fragment key={pageIndex}>
+                        {page.data.map((app) => (
+                          <OAuthAppsAuthorizedRow key={app.id} app={app} />
+                        ))}
+                      </Fragment>
+                    ))}
+                    <TableRow ref={sentinelRef} className="[&>td]:hover:bg-inherit">
+                      <TableCell colSpan={2} className={isFetchingNextPage ? '' : 'p-0 hidden'}>
+                        <p aria-live="polite" className="text-sm text-foreground-lighter">
+                          {isFetchingNextPage ? 'Loading...' : ''}
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  </>
                 )}
               </TableBody>
             </Table>
