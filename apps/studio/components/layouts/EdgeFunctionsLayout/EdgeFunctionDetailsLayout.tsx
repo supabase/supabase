@@ -27,6 +27,7 @@ import { PageNav } from 'ui-patterns/PageNav'
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -57,6 +58,9 @@ const EdgeFunctionDetailsLayout = ({
     PermissionAction.FUNCTIONS_READ,
     '*'
   )
+
+  // Unified logs merge invocations and runtime logs into a single Logs tab
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const [isOpen, setIsOpen] = useState(false)
   const [isDownloadOpen, setIsDownloadOpen] = useState(false)
@@ -102,10 +106,14 @@ const EdgeFunctionDetailsLayout = ({
                 label: 'Overview',
                 href: `/project/${ref}/functions/${functionSlug}`,
               },
-              {
-                label: 'Invocations',
-                href: `/project/${ref}/functions/${functionSlug}/invocations`,
-              },
+              ...(isUnifiedLogsEnabled
+                ? []
+                : [
+                    {
+                      label: 'Invocations',
+                      href: `/project/${ref}/functions/${functionSlug}/invocations`,
+                    },
+                  ]),
               {
                 label: 'Logs',
                 href: `/project/${ref}/functions/${functionSlug}/logs`,
@@ -223,6 +231,7 @@ const EdgeFunctionDetailsLayout = ({
     functionSlug,
     canReadFunctions,
     isPlatform: IS_PLATFORM,
+    hasInvocationsTab: !isUnifiedLogsEnabled,
     onOpenTest: openTestSheet,
     onOpenDownload: () => setIsDownloadOpen((prev) => !prev),
     onCopyUrl: copyFunctionUrl,

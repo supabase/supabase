@@ -8,6 +8,8 @@ interface UseFunctionsDetailShortcutsParams {
   functionSlug: string | undefined
   canReadFunctions: boolean
   isPlatform: boolean
+  /** False once unified logs merge invocations into the Logs tab */
+  hasInvocationsTab: boolean
   onOpenTest: () => void
   onOpenDownload: () => void
   onCopyUrl: () => void
@@ -27,6 +29,7 @@ export function useFunctionsDetailShortcuts({
   functionSlug,
   canReadFunctions,
   isPlatform,
+  hasInvocationsTab,
   onOpenTest,
   onOpenDownload,
   onCopyUrl,
@@ -44,7 +47,7 @@ export function useFunctionsDetailShortcuts({
   useShortcut(
     SHORTCUT_IDS.NAV_FUNCTION_DETAIL_INVOCATIONS,
     () => router.push(`${base}/invocations`),
-    { enabled: shortcutsEnabled && isPlatform }
+    { enabled: shortcutsEnabled && isPlatform && hasInvocationsTab }
   )
 
   useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_LOGS, () => router.push(`${base}/logs`), {

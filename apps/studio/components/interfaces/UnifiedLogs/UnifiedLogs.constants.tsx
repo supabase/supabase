@@ -35,11 +35,14 @@ type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
 export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
 // An edge function's invocations plus the runtime output (console, boot, shutdown) they produce.
-// These are the only log types a function-scoped view queries.
+// These are the only log types a function-scoped view queries or offers as filters.
 export const EDGE_FUNCTION_LOG_TYPES = [
   'edge function',
   'edge function runtime',
 ] as const satisfies readonly LogType[]
+// Filters a function-scoped view offers: the time range, message search and severity its old
+// Invocations and Logs tabs had, plus log type to tell invocations and runtime output apart.
+export const EDGE_FUNCTION_FILTER_FIELDS = ['date', 'log_type', 'level', 'event_message'] as const
 
 export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   edge: 'edge_logs',
