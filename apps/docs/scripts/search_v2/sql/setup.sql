@@ -1,5 +1,5 @@
 
--- Run this in the Supabase SQL editor before `npm run ingest`.
+-- Run this in the Supabase SQL editor before `pnpm search-v2:ingest`.
 -- Safe to re-run: it uses IF NOT EXISTS / CREATE OR REPLACE.
 
 -- One row per markdown *section* (a heading + the text below it, up to the next heading).
