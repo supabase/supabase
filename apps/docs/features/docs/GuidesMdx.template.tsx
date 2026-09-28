@@ -83,7 +83,7 @@ const GuideTemplate = ({
             'relative',
             'transition-all ease-out',
             'duration-100',
-            'col-span-12 md:col-span-8'
+            'col-span-12 w-full max-w-[731px] mx-auto'
           )}
         >
           {breadcrumbJsonLd && (
@@ -92,7 +92,7 @@ const GuideTemplate = ({
               dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
             />
           )}
-          <Breadcrumbs className="mb-6" />
+          <Breadcrumbs className="mb-6 lg:hidden" />
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
@@ -138,19 +138,6 @@ const GuideTemplate = ({
           video={meta?.tocVideo}
           videoTitle={meta?.title ? mdToPlainText(meta.title) : undefined}
           hideToc={hideToc}
-          className={cn(
-            'hidden md:flex',
-            'md:col-span-3 md:col-start-10',
-            'self-start',
-            'sticky',
-            /**
-             * --header-height: height of nav
-             * 3rem: content padding
-             */
-            'top-[calc(var(--header-height)+3rem)]',
-            // 4rem accounts for 3rem of top padding + 1rem of extra breathing room
-            'max-h-[calc(100vh-var(--header-height)-4rem)]'
-          )}
         />
       </div>
     </TocAnchorsProvider>
