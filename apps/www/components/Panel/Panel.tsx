@@ -95,7 +95,7 @@ const Panel = ({
     >
       <div
         className={cn(
-          'relative z-10 w-full h-full rounded-[7px] md:rounded-[11px] bg-surface-75 overflow-hidden text-foreground-light',
+          'relative z-10 w-full h-full rounded-[9px] md:rounded-[15px] bg-surface-75 overflow-hidden text-foreground-light',
           innerClassName
         )}
         style={innerStyle}
