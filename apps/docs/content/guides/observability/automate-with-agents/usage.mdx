@@ -1,6 +1,6 @@
 ---
 id: 'automate-with-agents-usage'
-title: 'Capacity monitor'
+title: 'Resource monitor'
 subtitle: 'A read-only agent that tracks resource and request growth and estimates when a confirmed limit could be reached.'
 description: 'Daily monitoring for resource growth and approaching limits'
 ---
@@ -30,7 +30,7 @@ It uses read-only `execute_sql` and `query_logs` on project-scoped [Supabase MCP
 
 ## What it will output
 
-Capacity monitor reports new or changed request-growth signals and resource-limit risks. When saved measurements support a forecast within 14 days, it includes the estimated date, calculation, and scaling guide. If history or a matching limit is missing, it explains what it needs instead of inventing a date. See [what triggers a capacity report](/docs/guides/observability/detecting#usage).
+Resource monitor reports new or changed request-growth signals and resource-limit risks. When saved measurements support a forecast within 14 days, it includes the estimated date, calculation, and scaling guide. If history or a matching limit is missing, it explains what it needs instead of inventing a date. See [what triggers a resource report](/docs/guides/observability/detecting#usage).
 
 If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 

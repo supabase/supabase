@@ -15,7 +15,7 @@
     "@supabase/supabase-js": "catalog:",
     "@vueuse/core": "^14.1.0",
     "class-variance-authority": "^0.7.1",
-    "cn": "^0.2.4",
+    "cn": "catalog:",
     "h3": "^1.15.10",
     "lucide-vue-next": "^0.562.0",
     "nuxt": "^4.4.6",

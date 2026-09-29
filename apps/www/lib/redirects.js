@@ -17,6 +17,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/rss.xml',
+    destination: '/rss.xml',
+  },
+  {
+    permanent: true,
     source: '/blog/introducing-supabase-etl',
     destination: '/blog/introducing-supabase-pipelines',
   },
@@ -1735,6 +1740,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/cicd-workflow',
+    destination: '/docs/guides/functions/deploy',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
@@ -3362,6 +3372,16 @@ module.exports = [
     permanent: false,
     source: '/docs/guides/platform/org-based-billing#egress-dashboards',
     destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/manage-your-usage/log-ingest',
+    destination: '/docs/guides/platform/manage-your-usage/logs-ingest',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/manage-your-usage/log-query',
+    destination: '/docs/guides/platform/manage-your-usage/logs-query',
   },
   {
     permanent: false,

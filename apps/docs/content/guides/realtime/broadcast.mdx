@@ -506,10 +506,10 @@ You can send messages directly from your database using the `realtime.send()` fu
 ```sql
 select
   realtime.send(
-    payload => jsonb_build_object('hello', 'world'),
-    event   => 'event',
-    topic   => 'topic',
-    private => true -- true = private channel (default), false = public channel
+    jsonb_build_object('hello', 'world'), -- JSONB Payload
+    'event', -- Event name
+    'topic', -- Topic
+    false    -- Private flag - true: Private (default), false: Public
   );
 ```
 
@@ -527,10 +527,10 @@ To broadcast a binary payload from your database, use the `realtime.send_binary(
 ```sql
 select
   realtime.send_binary(
-    payload => '\x012345'::bytea,
-    event   => 'event',
-    topic   => 'topic',
-    private => true -- true = private channel (default), false = public channel
+    '\x012345'::bytea, -- bytea payload
+    'event',           -- Event name
+    'topic',           -- Topic
+    true               -- Private flag - true: Private (default), false: Public
   );
 ```
 
@@ -1019,6 +1019,8 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 Broadcast Changes allows you to trigger messages from your database. To achieve it, Realtime directly reads your Write-Ahead Log (WAL) file using a publication against the `realtime.messages` table. Whenever a new insert occurs, a message is sent to connected users.
 
 It uses partitioned tables per day, which allows performant deletion of your previous messages by dropping the physical tables of this partitioned table. Tables older than 3 days are deleted.
+
+A client connecting over WebSocket creates those daily partitions. `realtime.send` does not. With no partition for today, the insert fails and Postgres logs a `WarnSendingBroadcastMessage` warning, so connect a client before you broadcast from the database. See [Realtime: `WarnSendingBroadcastMessage`](/docs/guides/troubleshooting/realtime-warn-sending-broadcast-message) if you hit that warning.
 
 Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON payloads. [Realtime Authorization](/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
 
