@@ -129,6 +129,8 @@ docker network create -o 'com.docker.network.bridge.host_binding_ipv4=127.0.0.1'
 npx supabase start --network-id local-network
 ```
 
+On macOS, Docker runs inside a virtual machine, and your Docker provider—not the Docker Engine—controls which host interfaces a published port listens on. With Docker Desktop, ports can remain reachable from other devices on your network even though `docker ps` reports a `127.0.0.1` binding. After starting the stack, confirm from another device on the same network that Studio (`http://<your-lan-ip>:54323`) is not reachable. If it is, block incoming connections to Docker in the macOS firewall settings.
+
 You should never expose your local development stack publicly.
 
 </Admonition>
