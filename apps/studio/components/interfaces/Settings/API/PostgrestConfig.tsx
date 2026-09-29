@@ -295,12 +295,13 @@ export const PostgrestConfig = () => {
 
   const isAuthenticatorRoleOverridingSchemas = useMemo(() => {
     if (authenticatorDbSchemasOverride === undefined) return false
-    const selected = new Set(watchedDbSchema)
+    // Compared against the persisted config, not the live form selection, so the warning stays
+    // visible until the save actually succeeds rather than disappearing the moment the selector
+    // is edited to match.
+    const saved = new Set(configDbSchemas)
     const overridden = new Set(authenticatorDbSchemasOverride)
-    return (
-      selected.size !== overridden.size || [...selected].some((schema) => !overridden.has(schema))
-    )
-  }, [authenticatorDbSchemasOverride, watchedDbSchema])
+    return saved.size !== overridden.size || [...saved].some((schema) => !overridden.has(schema))
+  }, [authenticatorDbSchemasOverride, configDbSchemas])
 
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
