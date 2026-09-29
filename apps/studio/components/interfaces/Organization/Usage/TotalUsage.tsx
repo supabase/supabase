@@ -217,7 +217,10 @@ export const TotalUsage = ({
                 return (
                   <div
                     key={metric.key}
-                    className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
+                    className={cn(
+                      'col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4',
+                      i % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
+                    )}
                   >
                     <BillingMetric
                       idx={i}
@@ -226,7 +229,6 @@ export const TotalUsage = ({
                       usage={usage}
                       subscription={subscription!}
                       relativeToSubscription={showRelationToSubscription}
-                      className={cn(i % 2 === 0 ? 'md:pr-4' : 'md:pl-4')}
                     />
                   </div>
                 )

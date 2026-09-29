@@ -15,7 +15,7 @@ export const getIncidentTools = ({ baseUrl }: { baseUrl: string }) => ({
     description:
       'Check for active incidents. Use this tool when the user reports issues with any Supabase service, including the database, authentication, realtime, storage, and functions. Possible problems include, but are not limited to, connection issues, timeouts, service unavailability, authentication failures, or unexpected errors.',
     inputSchema: z.object({}),
-    execute: async () => {
+    execute: async (_input, { abortSignal }) => {
       if (!IS_PLATFORM) {
         return {
           incidents: [],
@@ -25,7 +25,9 @@ export const getIncidentTools = ({ baseUrl }: { baseUrl: string }) => ({
 
       try {
         const response = await fetch(`${baseUrl}/api/incident-status`, {
-          signal: AbortSignal.timeout(5_000),
+          signal: abortSignal
+            ? AbortSignal.any([abortSignal, AbortSignal.timeout(5_000)])
+            : AbortSignal.timeout(5_000),
         })
 
         if (!response.ok) {

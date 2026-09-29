@@ -29,6 +29,7 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
+import { groupMessageParts } from './Message.Parts.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
@@ -38,7 +39,11 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import type { AssistantMessageMetadata } from '@/lib/ai/assistant-message-metadata'
+import {
+  isTimedOutMessage,
+  type AssistantMessageMetadata,
+} from '@/lib/ai/assistant-message-metadata'
+import { ASSISTANT_TIMEOUT_MESSAGE } from '@/lib/ai/assistant-timeout'
 import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import { IS_PLATFORM } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
@@ -288,6 +293,18 @@ export const AssistantChat = ({
     error &&
     (error.message?.includes('context_length_exceeded') ||
       error.message?.includes('exceeds the context window'))
+
+  const lastMessage = chatMessages.at(-1)
+  // A running tool group shimmers already, so the cursor would be a second loading indicator
+  const isToolGroupRunning =
+    isChatLoading &&
+    lastMessage?.role === 'assistant' &&
+    groupMessageParts(lastMessage.parts).at(-1)?.type === 'tool-group'
+
+  const isTimedOut = !error && !isChatLoading && isTimedOutMessage(lastMessage)
+  let displayError = IS_PLATFORM ? ASSISTANT_ERRORS['default'] : error
+  if (isContextExceededError) displayError = ASSISTANT_ERRORS['context-exceeded']
+  if (isTimedOut) displayError = { message: ASSISTANT_TIMEOUT_MESSAGE }
 
   const editedMessageIndex = editingMessageId
     ? chatMessages.findIndex((message) => message.id === editingMessageId)
@@ -577,18 +594,16 @@ export const AssistantChat = ({
             <ConversationContent className="w-full py-8 mb-10">
               {renderedMessages}
               <div className="w-full max-w-3xl mx-auto">
-                {error && (
+                {(error || isTimedOut) && (
                   <AlertError
-                    error={
-                      isContextExceededError
-                        ? ASSISTANT_ERRORS['context-exceeded']
-                        : IS_PLATFORM
-                          ? ASSISTANT_ERRORS['default']
-                          : error
-                    }
+                    error={displayError}
                     showErrorPrefix={false}
                     showInstructions={false}
-                    subject="Sorry, I'm having trouble responding right now."
+                    subject={
+                      isTimedOut
+                        ? 'Assistant response timed out'
+                        : "Sorry, I'm having trouble responding right now."
+                    }
                     additionalActions={
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (
@@ -613,7 +628,7 @@ export const AssistantChat = ({
                     }
                   />
                 )}
-                {isChatLoading && (
+                {isChatLoading && !isToolGroupRunning && (
                   <motion.span
                     animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [1, 0] }}
                     transition={
