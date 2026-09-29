@@ -386,6 +386,26 @@ describe('ai/tools/incident-tools', () => {
       expect((result as any).message).toContain('status.supabase.com')
     })
 
+    it('describes maintenance-only results as maintenance, not as an incident', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () =>
+          statusPagePayload({
+            in_progress_maintenances: [{ ...baseMaintenance, visible: true, show_banner: true }],
+          }),
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
+
+      expect((result as any).incidents).toHaveLength(1)
+      expect((result as any).message).toContain('1 in-progress maintenance')
+      expect((result as any).message).not.toContain('active incident')
+    })
+
     it('returns the no-active-incidents message when nothing is visible', async () => {
       mockFetch.mockResolvedValue({
         ok: true,

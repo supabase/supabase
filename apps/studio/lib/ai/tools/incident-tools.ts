@@ -27,8 +27,22 @@ function formatAffectedComponents(affectedComponents: Array<AffectedComponent>):
   )
 }
 
-function buildActiveIncidentsMessage(count: number, statusPageUrl: string) {
-  return `There ${count === 1 ? 'is' : 'are'} ${count} active incident${count === 1 ? '' : 's'} on Supabase infrastructure. If the user's issue appears related, inform them about the ongoing incident(s) and direct them to ${statusPageUrl} for real-time updates.`
+function buildActiveIncidentsMessage(
+  incidentCount: number,
+  maintenanceCount: number,
+  statusPageUrl: string
+) {
+  const parts: Array<string> = []
+  if (incidentCount > 0) {
+    parts.push(`${incidentCount} active incident${incidentCount === 1 ? '' : 's'}`)
+  }
+  if (maintenanceCount > 0) {
+    parts.push(`${maintenanceCount} in-progress maintenance${maintenanceCount === 1 ? '' : 's'}`)
+  }
+
+  const totalCount = incidentCount + maintenanceCount
+
+  return `There ${totalCount === 1 ? 'is' : 'are'} ${parts.join(' and ')} on Supabase infrastructure. If the user's issue appears related, inform them about the ongoing issue(s) and direct them to ${statusPageUrl} for real-time updates.`
 }
 
 /**
@@ -117,7 +131,11 @@ export const getIncidentTools = ({
 
           return {
             incidents: combined,
-            message: buildActiveIncidentsMessage(combined.length, statusPageUrl),
+            message: buildActiveIncidentsMessage(
+              incidents.length,
+              maintenances.length,
+              statusPageUrl
+            ),
           }
         } catch (error) {
           console.warn('Failed to fetch status page:', error)
@@ -153,7 +171,7 @@ export const getIncidentTools = ({
 
         return {
           incidents: incidentSummaries,
-          message: buildActiveIncidentsMessage(incidents.length, DEFAULT_STATUS_PAGE_URL),
+          message: buildActiveIncidentsMessage(incidents.length, 0, DEFAULT_STATUS_PAGE_URL),
         }
       } catch (error) {
         console.warn('Failed to fetch incident status:', error)
