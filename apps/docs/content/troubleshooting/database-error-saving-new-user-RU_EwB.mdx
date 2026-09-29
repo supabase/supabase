@@ -52,7 +52,7 @@ error finding user: sql: Scan error on column index 8, name "confirmation_token"
 
 **Cause:**
 
-The `auth` schema is managed by Supabase and expects specific column formats. This error typically happens when users are inserted directly via SQL or using an AI tool that uses a direct SQL `INSERT`, rather than through the [Auth API](/docs/reference/javascript/auth-api). A direct insert can leave required columns as `NULL` when the Auth service expects an empty string.
+The `auth` schema is managed by Supabase and expects specific column formats. This error typically happens when users are inserted directly via SQL or using an AI tool that uses a direct SQL `INSERT`, rather than through the [Auth API](/docs/reference/javascript/auth). A direct insert can leave required columns as `NULL` when the Auth service expects an empty string.
 
 **Fix:**
 
