@@ -66,7 +66,15 @@ export const toLifecycleRules = (
   ]
 }
 
-/** A blind write would drop any rule `fromLifecycleRules` could not model. */
+type LifecycleRule = BucketLifecycle['rules'][number]
+
+const isModeledRule = (rule: LifecycleRule) =>
+  rule.status === 'Enabled' && rule.noncurrent_version_expiration !== undefined
+
+const isCappedRule = (rule: LifecycleRule) =>
+  rule.noncurrent_version_expiration?.newer_noncurrent_versions !== undefined
+
+/** Keeps a save that changed nothing from rewriting the policy. */
 export const hasLifecyclePolicyChanged = (
   stored: LifecycleFormPolicy,
   values: Pick<
@@ -83,22 +91,29 @@ export const hasLifecyclePolicyChanged = (
   return days !== null && versions !== null && stored.expirationMode !== values.expiration_mode
 }
 
+/**
+ * The update endpoint replaces the whole policy, so anything `fromLifecycleRules` had to
+ * skip would be dropped by a save. Splitting an age rule from a capped one is the only
+ * multi-rule shape the form writes; a policy set elsewhere can hold more.
+ */
+export const hasUnsupportedLifecycleRules = (lifecycle?: BucketLifecycle | null) => {
+  const rules = lifecycle?.rules ?? []
+
+  if (!rules.every(isModeledRule)) return true
+  if (rules.length <= 1) return false
+  return rules.length > 2 || rules.filter(isCappedRule).length !== 1
+}
+
 /** Rules this can't model — extra, disabled, or non-expiration — are ignored, not guessed at. */
 export const fromLifecycleRules = (lifecycle?: BucketLifecycle | null): LifecycleFormPolicy => {
-  const enabledRules = (lifecycle?.rules ?? []).filter(
-    (rule) => rule.status === 'Enabled' && rule.noncurrent_version_expiration !== undefined
-  )
+  const enabledRules = (lifecycle?.rules ?? []).filter(isModeledRule)
 
   if (enabledRules.length === 0) {
     return { versionExpiryDays: null, maxNoncurrentVersions: null, expirationMode: 'and' }
   }
 
-  const ageOnlyRule = enabledRules.find(
-    (rule) => rule.noncurrent_version_expiration?.newer_noncurrent_versions === undefined
-  )
-  const cappedRule = enabledRules.find(
-    (rule) => rule.noncurrent_version_expiration?.newer_noncurrent_versions !== undefined
-  )
+  const ageOnlyRule = enabledRules.find((rule) => !isCappedRule(rule))
+  const cappedRule = enabledRules.find(isCappedRule)
 
   if (ageOnlyRule !== undefined && cappedRule !== undefined) {
     return {
