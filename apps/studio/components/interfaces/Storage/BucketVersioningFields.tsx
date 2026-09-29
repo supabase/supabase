@@ -76,7 +76,9 @@ export const BucketVersioningFields = ({
             >
               <FormControl>
                 <Switch
-                  id="enable-versioning"
+                  // Matches the field name, which is what the layout's label points at.
+                  id="enable_versioning"
+                  aria-label="Object versioning"
                   size="large"
                   checked={field.value}
                   onCheckedChange={field.onChange}
