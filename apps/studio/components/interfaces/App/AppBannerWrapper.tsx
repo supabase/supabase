@@ -3,8 +3,9 @@ import dayjs from 'dayjs'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import {
+  SELECT_26_LIVESTREAM_STUDIO_DISMISSAL_KEY,
   SELECT_26_STUDIO_DISMISSAL_KEY,
-  useSelect26PromotionActive,
+  useSelect26PromotionPhase,
 } from 'ui-patterns/Banners/Select26Promotion'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
@@ -45,16 +46,22 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const [isSelect26BannerDismissed, , { isSuccess: isSelect26DismissalLoaded }] =
     useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
-  const isSelect26PromotionActive = useSelect26PromotionActive()
+  const [isSelect26LivestreamDismissed, , { isSuccess: isSelect26LivestreamDismissalLoaded }] =
+    useLocalStorageQuery(SELECT_26_LIVESTREAM_STUDIO_DISMISSAL_KEY, false)
+  const select26PromotionPhase = useSelect26PromotionPhase()
 
   useEffect(() => {
-    if (!isSelect26DismissalLoaded) return
+    const isLivestream = select26PromotionPhase === 'livestream'
+    const dismissalLoaded = isLivestream
+      ? isSelect26LivestreamDismissalLoaded
+      : isSelect26DismissalLoaded
+    if (!dismissalLoaded) return
 
     const shouldShow = shouldShowSelect26Banner({
       isPlatform: IS_PLATFORM,
-      dismissalLoaded: isSelect26DismissalLoaded,
-      isActive: isSelect26PromotionActive,
-      isDismissed: isSelect26BannerDismissed,
+      dismissalLoaded,
+      isActive: select26PromotionPhase !== 'ended',
+      isDismissed: isLivestream ? isSelect26LivestreamDismissed : isSelect26BannerDismissed,
     })
 
     if (shouldShow) {
@@ -69,8 +76,10 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     }
   }, [
     isSelect26DismissalLoaded,
-    isSelect26PromotionActive,
+    isSelect26LivestreamDismissalLoaded,
+    select26PromotionPhase,
     isSelect26BannerDismissed,
+    isSelect26LivestreamDismissed,
     addBanner,
     dismissBanner,
   ])
