@@ -176,6 +176,28 @@ for (const section of MDX_SECTIONS) {
   mdxEntries.push(...sectionEntries)
 }
 
+// /faqs.md lists every FAQ page, mirroring the /faqs HTML index.
+const faqEntries = mdxEntries.filter((entry) => entry.slug.startsWith('faqs/'))
+if (faqEntries.length > 0) {
+  const items = faqEntries
+    .map((entry) => ({ slug: entry.slug, data: matter(entry.content).data }))
+    .sort((a, b) => String(a.data.title).localeCompare(String(b.data.title)))
+    .map(
+      ({ slug, data }) => `- [${data.title}](https://supabase.com/${slug}.md): ${data.description}`
+    )
+  mdxEntries.push({
+    slug: 'faqs',
+    content: [
+      '# Supabase FAQs',
+      '',
+      '> Answers to common questions about using Postgres on Supabase.',
+      '',
+      ...items,
+      '',
+    ].join('\n'),
+  })
+}
+
 const allEntries = [...staticEntries, ...mdxEntries]
 
 const redirectedSlugs = new Set(
