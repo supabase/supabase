@@ -48,12 +48,18 @@ export const Usage = () => {
   const [selectedBranchRef, setSelectedBranchRef] = useQueryState('branchRef')
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
 
-  const { data: selectedProject, isPending: isLoadingSelectedProject } = useProjectDetailQuery({
+  const {
+    data: selectedProject,
+    isPending: isLoadingSelectedProject,
+    isError: isErrorSelectedProject,
+    error: selectedProjectError,
+  } = useProjectDetailQuery({
     ref: selectedProjectRef ?? undefined,
   })
   const isHighAvailability = resolveHighAvailability(selectedProject)
   const canLoadProjectUsage =
-    !selectedProjectRef || (!isLoadingSelectedProject && !isHighAvailability)
+    !selectedProjectRef ||
+    (!isLoadingSelectedProject && !isErrorSelectedProject && !isHighAvailability)
 
   const {
     data: branches,
@@ -77,11 +83,13 @@ export const Usage = () => {
   const selectedBranch = branchOptions.find(
     (branch) => branch.project_ref === usageProjectRef && branch.project_ref !== selectedProjectRef
   )
-  const isResolvingBranch = !!selectedProjectRef && !!selectedBranchRef && isPendingBranches
+  const isProjectLookupBlocked = !!selectedProjectRef && isErrorSelectedProject
+  const isResolvingBranch =
+    !!selectedProjectRef && !!selectedBranchRef && isPendingBranches && !isProjectLookupBlocked
   const isBranchLookupBlocked = !!selectedBranchRef && isErrorBranches
   const isBranchUnavailable =
     !!selectedBranchRef && isSuccessBranches && usageProjectRef !== selectedBranchRef
-  const canShowUsage = !isResolvingBranch && !isBranchLookupBlocked
+  const canShowUsage = !isResolvingBranch && !isBranchLookupBlocked && !isProjectLookupBlocked
   const canLoadUsage = canLoadProjectUsage && canShowUsage
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -317,6 +325,12 @@ export const Usage = () => {
               subject="Failed to retrieve usage statistics for organization"
             />
           </ScaffoldSection>
+        </ScaffoldContainer>
+      )}
+
+      {isProjectLookupBlocked && (
+        <ScaffoldContainer className="mt-5">
+          <AlertError subject="Failed to retrieve project" error={selectedProjectError} />
         </ScaffoldContainer>
       )}
 
