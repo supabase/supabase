@@ -279,21 +279,25 @@ export const ProjectCreationForm = ({
     }
   )
 
-  const { data: availableRegionsData, error: availableRegionsError } =
-    useOrganizationAvailableRegionsQuery(
-      {
-        slug: slug,
-        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
-        desiredInstanceSize: instanceSize as DesiredInstanceSize,
-      },
-      {
-        enabled: flagsLoaded && smartRegionEnabled && hasSelectedOrganization,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchInterval: false,
-        refetchOnReconnect: false,
-      }
-    )
+  const {
+    data: availableRegionsData,
+    error: availableRegionsError,
+    isFetching: isFetchingAvailableRegions,
+  } = useOrganizationAvailableRegionsQuery(
+    {
+      slug: slug,
+      cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
+      desiredInstanceSize: instanceSize as DesiredInstanceSize,
+      highAvailability,
+    },
+    {
+      enabled: flagsLoaded && smartRegionEnabled && hasSelectedOrganization,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+      refetchOnReconnect: false,
+    }
+  )
 
   const highAvailabilityRegion =
     highAvailability && highAvailabilityRegionCode !== undefined
@@ -339,6 +343,7 @@ export const ProjectCreationForm = ({
       cloudProvider: cloudProvider as CloudProvider,
       dbRegion: smartRegionEnabled ? dbRegionExact : (dbRegion ?? ''),
       organizationSlug: organization,
+      highAvailability,
     },
     { enabled: currentOrg !== null }
   )
@@ -749,6 +754,7 @@ export const ProjectCreationForm = ({
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
+              isLoadingAvailableRegions={isFetchingAvailableRegions}
               cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
