@@ -38,6 +38,8 @@ interface LifecyclePolicySectionProps {
   onModeChange: (mode: ExpirationMode) => void
   /** The stored policy is still in flight, so there is nothing truthful to show yet. */
   isLoading?: boolean
+  /** The stored policy holds rules these fields cannot represent, let alone round-trip. */
+  isUnsupported?: boolean
 }
 
 export const LifecyclePolicySection = ({
@@ -47,6 +49,7 @@ export const LifecyclePolicySection = ({
   mode,
   onModeChange,
   isLoading = false,
+  isUnsupported = false,
 }: LifecyclePolicySectionProps) => {
   const { setValue } = useFormContext<BucketVersioningFormValues>()
   const hasNoPolicy = !hasDays && !hasVersions
@@ -67,6 +70,19 @@ export const LifecyclePolicySection = ({
         <SectionHeading />
         <ShimmeringLoader className="h-9 py-0" />
         <ShimmeringLoader className="h-9 py-0" delayIndex={1} />
+      </div>
+    )
+  }
+
+  if (isUnsupported) {
+    return (
+      <div className="flex flex-col gap-y-2">
+        <SectionHeading />
+        <Admonition
+          type="default"
+          title="Lifecycle policy set outside the dashboard"
+          description="It uses rules the dashboard cannot show, so saving leaves the policy as it is. Manage it with the S3 or Storage API."
+        />
       </div>
     )
   }

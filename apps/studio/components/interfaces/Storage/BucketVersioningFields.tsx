@@ -21,6 +21,8 @@ interface BucketVersioningFieldsProps {
   isPublicBucket?: boolean
   /** The bucket's stored lifecycle policy is still being fetched. */
   isLoadingPolicy?: boolean
+  /** The stored policy holds rules these fields cannot represent, so it is left alone. */
+  isUnsupportedPolicy?: boolean
 }
 
 export const BucketVersioningFields = ({
@@ -29,6 +31,7 @@ export const BucketVersioningFields = ({
   initialMaxVersions,
   isPublicBucket = false,
   isLoadingPolicy = false,
+  isUnsupportedPolicy = false,
 }: BucketVersioningFieldsProps) => {
   const { control, setValue } = useFormContext<BucketVersioningFormValues>()
 
@@ -40,12 +43,14 @@ export const BucketVersioningFields = ({
   // Turning the switch off suspends rather than disables, so this is a heads-up.
   const isSuspending = !isVersioningEnabled && initialVersioningState !== 'disabled'
 
+  // A bound nobody has read, or that the fields only partly represent, can't be compared against.
+  const hasKnownBounds = !isLoadingPolicy && !isUnsupportedPolicy
+
   const tightening = getRetentionTightening({
     initialVersioningState,
     isVersioningEnabled,
-    // Undefined while loading: an unread bound can't be compared against.
-    initialRetentionDays: isLoadingPolicy ? undefined : initialRetentionDays,
-    initialMaxVersions: isLoadingPolicy ? undefined : initialMaxVersions,
+    initialRetentionDays: hasKnownBounds ? initialRetentionDays : undefined,
+    initialMaxVersions: hasKnownBounds ? initialMaxVersions : undefined,
     nextRetentionDays: toNullableNumber(retentionDays),
     nextMaxVersions: toNullableNumber(maxVersions),
   })
@@ -142,6 +147,7 @@ export const BucketVersioningFields = ({
                 mode={expirationMode}
                 onModeChange={handleModeChange}
                 isLoading={isLoadingPolicy}
+                isUnsupported={isUnsupportedPolicy}
               />
             </FormSectionCollapse>
           )}
