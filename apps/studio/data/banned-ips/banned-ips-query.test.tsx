@@ -56,7 +56,7 @@ describe('useBannedIPsQuery', () => {
     { name: 'v3', cloud_provider: 'AWS_K8S', high_availability: false },
     { name: 'HA', cloud_provider: 'AWS', high_availability: true },
     { name: 'v3 HA', cloud_provider: 'AWS_K8S', high_availability: true },
-  ])('does not retrieve bans for $name even with an enabled Advisor observer', async (project) => {
+  ])('does not retrieve bans for $name with Settings and Advisor enabled', async (project) => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -65,7 +65,7 @@ describe('useBannedIPsQuery', () => {
     const requests = mockBannedIPs()
     const { result } = customRenderHook(() => ({
       project: useProjectDetailQuery({ ref: 'default' }),
-      settings: useBannedIPsQuery({ projectRef: 'default' }, { enabled: false }),
+      settings: useBannedIPsQuery({ projectRef: 'default' }),
       advisor: useAdvisorSignals({ projectRef: 'default' }),
     }))
 
