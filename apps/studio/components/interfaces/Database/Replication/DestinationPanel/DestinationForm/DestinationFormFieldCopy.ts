@@ -72,11 +72,10 @@ export const CLICKHOUSE_URL_FIELD_COPY = {
 
 export const CLICKHOUSE_DATABASE_FIELD_COPY = {
   label: 'Database',
-  description: 'Database where Pipelines creates replicated tables.',
+  description: 'ClickHouse database where replicated tables are created.',
 } as const
 
 export const CLICKHOUSE_ENGINE_FIELD_COPY = {
   label: 'Table engine',
-  description:
-    'Use ReplacingMergeTree for current-state views. Use MergeTree for an append-only change history.',
+  description: 'Controls how ClickHouse stores and queries replicated changes.',
 } as const

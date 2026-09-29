@@ -84,7 +84,7 @@ export const ClickHouseFields = ({
               description={
                 editMode
                   ? 'Enter a new password to replace the stored one. The eye button shows only what you enter.'
-                  : 'Leave blank only if the ClickHouse user has no password.'
+                  : 'Leave blank if the ClickHouse user has no password.'
               }
             >
               <FormControl>
@@ -144,8 +144,16 @@ export const ClickHouseFields = ({
                     {field.value === 'merge_tree' ? 'MergeTree' : 'ReplacingMergeTree'}
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="replacing_merge_tree">ReplacingMergeTree</SelectItem>
-                    <SelectItem value="merge_tree">MergeTree</SelectItem>
+                    <SelectItem value="replacing_merge_tree" className="[&>span]:top-2.5">
+                      <p>ReplacingMergeTree</p>
+                      <p className="text-foreground-lighter">Creates current-state views.</p>
+                    </SelectItem>
+                    <SelectItem value="merge_tree" className="[&>span]:top-2.5">
+                      <p>MergeTree</p>
+                      <p className="text-foreground-lighter">
+                        Keeps an append-only history of changes.
+                      </p>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
