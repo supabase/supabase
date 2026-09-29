@@ -457,18 +457,10 @@ fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -d '{}')
 check "Call hello function" '{"message":"Hello from Edge Functions!"}' "$fn_resp"
 
-# Unauthenticated invocation must still reach the function (verify_jwt:false) -
-# Functions has no key-auth gate, so a request with no apikey passes through.
-fn_noauth_resp=$(http_body "$BASE_URL/functions/v1/hello" \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d '{}')
-check "Call hello function (no auth)" '"Hello from Edge Functions!"' "$fn_noauth_resp"
-
 # A non-sb_ value (typo / legacy / third-party JWT) is not rejected at the
-# gateway - it passes to the runtime.
+# gateway - it passes to the runtime but then rejected by Supabase Server SDK
 # (Detailed sb_-key translation/rejection is covered in test-auth-keys.sh.)
-check "Functions pass non-sb_ apikey" "200" \
+check "Functions pass non-sb_ apikey" "401" \
     "$(http_status "$BASE_URL/functions/v1/hello" \
         -X POST \
         -H "apikey: invalid-key" \
