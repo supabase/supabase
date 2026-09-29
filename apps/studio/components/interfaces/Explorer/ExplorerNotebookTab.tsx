@@ -134,7 +134,8 @@ export const ExplorerNotebookTab = () => {
   }>({
     onMutate: (variables) => ({
       isCreation:
-        currentNotebook?.status === 'new' &&
+        (currentNotebook?.status === 'new' ||
+          snap.serverDivergedWhileDirty.get(variables.id) === 'deleted') &&
         !confirmedCreatedNotebookIdsRef.current.has(variables.id),
     }),
     onSuccess: (data, variables, context) => {
