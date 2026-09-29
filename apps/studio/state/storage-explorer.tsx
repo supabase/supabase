@@ -1574,12 +1574,12 @@ export function createStorageExplorerState({
             }),
           }),
         ])
-      } catch (error: any) {
+      } catch (error) {
         const status =
           error instanceof tus.DetailedError ? error.originalResponse?.getStatus() : undefined
         const reason = describeUploadFailure({
           status,
-          fallback: error.message,
+          fallback: error instanceof Error ? error.message : 'the upload failed.',
           allowedMimeTypes: state.selectedBucket.allowed_mime_types,
         })
         toast.error(`Failed to upload a new version of ${item.name}: ${reason}`, { id: toastId })
