@@ -4,9 +4,8 @@ import { useMemo } from 'react'
 
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
-import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
+import { PermissionsV2Data, usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { PermissionV2 } from '@/types'
 import { permissions } from '@supabase/shared-types'
 
 type ExtractIds<T> = {
@@ -34,7 +33,7 @@ export type FgaPermissions = ExistingFgaPermissions | (string & {})
  * 2. org level permissions (org role applies to all projects in the org)
  */
  export function doPermissionsCheckV2(
-   data: PermissionV2 | undefined,
+   data: PermissionsV2Data | undefined,
    permission: FgaPermissions | FgaPermissions[],
    organizationSlug?: string,
    projectRef?: string | null
@@ -55,7 +54,7 @@ export type FgaPermissions = ExistingFgaPermissions | (string & {})
  }
 
 function useGetProjectPermissionsV2(
-  permissionsOverride?: PermissionV2,
+  permissionsOverride?: PermissionsV2Data,
   organizationSlugOverride?: string,
   projectRefOverride?: string | null,
   enabled = true
@@ -128,7 +127,7 @@ export function useAsyncCheckPermissionsV2(
   overrides?: {
     organizationSlug?: string
     projectRef?: string | null
-    permissions?: PermissionV2
+    permissions?: PermissionsV2Data
   }
 ) {
   const isLoggedIn = useIsLoggedIn()

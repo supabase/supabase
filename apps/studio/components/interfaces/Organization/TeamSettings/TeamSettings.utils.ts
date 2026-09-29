@@ -1,6 +1,6 @@
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
-import type {  PermissionV2, Role } from '@/types'
-import { RoleV2 } from '@/types/base'
+import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
+import type { Role } from '@/types'
 
 export const hasMultipleOwners = (members: OrganizationMember[] = [], roles: Role[] = []) => {
   const membersWhoAreOwners = members.filter((member) => {
@@ -11,7 +11,7 @@ export const hasMultipleOwners = (members: OrganizationMember[] = [], roles: Rol
   return membersWhoAreOwners.length > 1
 }
 
-export function getOrgRole(data: PermissionV2 | undefined, slug?: string): RoleV2 | null {
+export function getOrgRole(data: PermissionsV2Data | undefined, slug?: string): PermissionsV2Data['organizations'][number]['role'] | null {
   if (!data || !slug) return null
   return data.organizations.find((org) => org.slug === slug)?.role ?? null
 }
@@ -21,7 +21,7 @@ export function getOrgRole(data: PermissionV2 | undefined, slug?: string): RoleV
  * the Owner role can only be assigned by another owner.
  */
 export function getAssignableRoleIds(
-  orgRole: RoleV2 | null,
+  orgRole: PermissionsV2Data['organizations'][number]['role'] | null,
   orgScopedRoles: { id: number; name: string }[]
 ): number[] {
   if (orgRole !== 'administrator' && orgRole !== 'owner') return []
@@ -36,9 +36,8 @@ export function getAssignableRoleIds(
  * Same rule as assignment: administrators and owners can manage members,
  * but Owner role members can only be managed by another owner.
  */
- export function canManageRole(orgRole: RoleV2 | null, targetRoleName?: string): boolean {
+ export function canManageRole(orgRole: PermissionsV2Data['organizations'][number]['role'] | null, targetRoleName?: string): boolean {
    if (orgRole !== 'administrator' && orgRole !== 'owner') return false
-   // unknown target role, fail closed
    if (!targetRoleName) return false
    return targetRoleName !== 'Owner' || orgRole === 'owner'
  }

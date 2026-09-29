@@ -5,7 +5,8 @@ import type { OrganizationRolesResponse } from '@/data/organization-members/orga
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 import type { OrganizationBase } from '@/data/organizations/organizations-query'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
-import type { Permission, PermissionV2 } from '@/types'
+import type { Permission } from '@/types'
+import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 
 type TeamSettingsDataContextValue = {
   members: OrganizationMember[]
@@ -13,7 +14,7 @@ type TeamSettingsDataContextValue = {
   isLoadingRoles: boolean
   orgProjects: OrgProject[]
   permissions: Permission[] | undefined
-  permissionsV2: PermissionV2 | undefined
+  permissionsV2: PermissionsV2Data | undefined
   selectedOrganization: OrganizationBase | undefined
   organizationMembersDeletionEnabled: boolean
   onManageAccess: (member: OrganizationMember) => void

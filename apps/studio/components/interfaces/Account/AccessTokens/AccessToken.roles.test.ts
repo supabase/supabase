@@ -11,7 +11,7 @@ import {
   requiredRoleForEntry,
   type TokenRoleContextArgs,
 } from './AccessToken.roles'
-import type { PermissionV2, RoleV2 } from '@/types'
+import type { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 
 type EvaluateTokenAccessArgs = TokenRoleContextArgs & { selection: PermissionSelection }
 
@@ -23,20 +23,20 @@ const OTHER_ORG = { slug: 'globex' }
 const PROJECT = { ref: 'abcdefghij1234567890', organization_slug: 'acme' }
 const OTHER_PROJECT = { ref: 'klmnopqrst1234567890', organization_slug: 'acme' }
 
-/** v2 fixture: an org entry with a role, optionally with project-scoped role entries. */
 const orgEntry = (
   slug: string,
-  role: RoleV2,
-  projects: { ref: string; role: RoleV2 }[] = []
-): PermissionV2['organizations'][number] => ({
+  role: PermissionsV2Data['organizations'][number]['role'],
+  projects: { ref: string; role: PermissionsV2Data['organizations'][number]['role'] }[] = []
+): PermissionsV2Data['organizations'][number] => ({
   slug,
   role,
-  // permissions arrays are irrelevant to role resolution; empty keeps fixtures terse
   permissions: [],
   projects: projects.map((p) => ({ ...p, permissions: [] })),
 })
 
-const v2 = (...organizations: PermissionV2['organizations']): PermissionV2 => ({ organizations })
+const v2 = (...organizations: PermissionsV2Data['organizations']): PermissionsV2Data => ({
+  organizations,
+})
 
 const baseArgs: Omit<EvaluateTokenAccessArgs, 'permissions'> = {
   selection: {},

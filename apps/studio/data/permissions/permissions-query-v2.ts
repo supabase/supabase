@@ -1,14 +1,11 @@
 import { useQuery, type QueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn } from 'common'
-
 import { permissionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { PermissionV2, ResponseError, UseCustomQueryOptions } from '@/types'
-
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getPermissionsV2(signal?: AbortSignal) {
-  // @ts-expect-error - we need to update api type for studio
   const { data, error } = await get('/platform/profile/permissions/v2', { signal })
   if (error) {
     handleError(error, {
@@ -22,7 +19,7 @@ export async function getPermissionsV2(signal?: AbortSignal) {
       },
     })
   }
-  return data as unknown as PermissionV2
+  return data
 }
 
 export type PermissionsV2Data = Awaited<ReturnType<typeof getPermissionsV2>>

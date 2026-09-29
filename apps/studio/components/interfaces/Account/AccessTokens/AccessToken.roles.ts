@@ -1,3 +1,4 @@
+import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 import type {
   PermissionCatalogEntry,
   PermissionMode,
@@ -5,7 +6,6 @@ import type {
   ResourceAccessMode,
 } from './AccessToken.permissions'
 import { getCatalogEntry, getEntryScopes } from './AccessToken.permissions'
-import type {  PermissionV2 } from '@/types'
 
 /**
  * Client-side estimation of what a scoped token can actually do, given its owner's current role.
@@ -167,7 +167,7 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
  * Project entries are additive on top of the org-level role, so the project-level answer is the max of both.
  */
 export const getRoleLevel = (
-  data: PermissionV2,
+  data: PermissionsV2Data,
   organizationSlug: string,
   projectRef?: string
 ): TokenRoleLevel => {
@@ -184,7 +184,7 @@ export const getRoleLevel = (
 
 /** True when the user's access in the org is only through project scoped roles. */
 export const getIsProjectScopedOnly = (
-  data: PermissionV2,
+  data: PermissionsV2Data,
   organizationSlug: string
 ): boolean => {
   const org = data.organizations.find((o) => o.slug === organizationSlug)
@@ -273,7 +273,7 @@ export interface TokenRoleContextArgs {
   /** Token-bound project refs (project mode). */
   projectRefs: string[]
   /** The user's own ABAC permission rows; undefined while loading. */
-  permissions: PermissionV2 | undefined
+  permissions: PermissionsV2Data | undefined
   /** Organizations the user can currently access. */
   organizations: { slug: string; name?: string }[]
   /** Projects the user can currently access. */
