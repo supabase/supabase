@@ -153,7 +153,12 @@ export function useSqlEditorAi({
     try {
       setIsAcceptDiffLoading(true)
 
-      if (!sourceSqlDiff || !editor.isReady() || !diffController.isMounted()) {
+      if (!sourceSqlDiff) {
+        toast.error('No SQL modifications found to apply.')
+        return
+      }
+
+      if (!editor.isReady() || !diffController.isMounted()) {
         toast.error('The editor is not ready yet. Please wait a moment and try again.')
         return
       }
