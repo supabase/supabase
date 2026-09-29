@@ -12,6 +12,7 @@ import {
 } from './AppLayoutDropdown'
 import { OrganizationDropdownCommandContent } from './OrganizationDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { usePreviewNavManagedBy } from '@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -42,6 +43,7 @@ export const OrganizationDropdown = ({
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
+  const navManagedBy = usePreviewNavManagedBy(selectedOrganization?.managed_by)
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -87,7 +89,9 @@ export const OrganizationDropdown = ({
           >
             {orgName ?? 'Select an organization'}
           </span>
-          {!!selectedOrganization && <PartnerIcon organization={selectedOrganization} />}
+          {!!selectedOrganization && navManagedBy && (
+            <PartnerIcon organization={{ managed_by: navManagedBy }} />
+          )}
           {!!selectedOrganization && (
             <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
           )}
