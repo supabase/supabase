@@ -28,9 +28,7 @@ describe('UsageFilterNotice', () => {
 
   it('discloses organization totals on keyboard focus even without live branches', async () => {
     const user = userEvent.setup()
-    customRender(
-      <UsageFilterNotice hasBranches={false} onViewOrganizationUsage={vi.fn()} />
-    )
+    customRender(<UsageFilterNotice hasBranches={false} onViewOrganizationUsage={vi.fn()} />)
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     await user.tab()
