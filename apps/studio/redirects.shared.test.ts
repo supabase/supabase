@@ -62,7 +62,7 @@ describe('matchRedirect moved Studio routes', () => {
     [`/project/${ref}/settings/billing`, '/org/_/billing'],
     ['/account', '/account/me'],
     ['/org/my-org/projects', '/org/my-org'],
-    ['/project', '/projects'],
+    ['/project', '/organizations'],
   ])('redirects %s to %s', (pathname, destination) => {
     expect(matchRedirect({ pathname, search: {}, isPlatform: true })).toEqual({
       destination,

@@ -41,7 +41,7 @@ export const SELF_HOSTED_REDIRECTS: StudioRedirect[] = [
 ]
 
 export const SHARED_REDIRECTS: StudioRedirect[] = [
-  { source: '/project', destination: '/projects', permanent: true },
+  { source: '/project', destination: '/organizations', permanent: true },
   { source: '/account', destination: '/account/me', permanent: true },
   { source: '/org/:slug/projects', destination: '/org/:slug', permanent: true },
   {
