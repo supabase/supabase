@@ -2,16 +2,17 @@ import { describe, expect, it } from 'vitest'
 
 import { toObjectVersions } from './object-versions-query'
 
-const object = (overrides: Record<string, unknown>) =>
-  ({
-    name: 'folder/photo.jpg',
-    id: null,
-    updated_at: null,
-    created_at: null,
-    last_accessed_at: null,
-    metadata: { size: 100 },
-    ...overrides,
-  }) as any
+type StorageObject = Parameters<typeof toObjectVersions>[0][number]
+
+const object = (overrides: Partial<StorageObject>): StorageObject => ({
+  name: 'folder/photo.jpg',
+  id: null,
+  updated_at: null,
+  created_at: null,
+  last_accessed_at: null,
+  metadata: { size: 100 },
+  ...overrides,
+})
 
 describe('toObjectVersions', () => {
   it('returns newest first', () => {
