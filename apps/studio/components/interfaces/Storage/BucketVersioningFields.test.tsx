@@ -34,6 +34,7 @@ const Harness = ({
   initialMaxVersions?: number | null
   isPublicBucket?: boolean
   isLoadingPolicy?: boolean
+  isUnsupportedPolicy?: boolean
 }) => {
   const form = useForm<BucketVersioningFormValues>({
     resolver: zodResolver(FormSchema),
@@ -211,6 +212,32 @@ describe('BucketVersioningFields', () => {
     expect(screen.queryByLabelText('Loading lifecycle policy')).not.toBeInTheDocument()
     expect(getDaysInput()).toBeInTheDocument()
     expect(screen.getByText('No lifecycle policy')).toBeInTheDocument()
+  })
+
+  test('leaves a policy it cannot represent alone instead of offering to edit it', () => {
+    renderFields({
+      defaultValues: { enable_versioning: true },
+      initialVersioningState: 'enabled',
+      initialRetentionDays: 30,
+      initialMaxVersions: 10,
+      isUnsupportedPolicy: true,
+    })
+
+    expect(screen.getByText('Lifecycle policy set outside the dashboard')).toBeInTheDocument()
+    expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
+    expect(screen.queryByText('No lifecycle policy')).not.toBeInTheDocument()
+  })
+
+  test('does not warn about tightening a policy it only partly read', async () => {
+    renderFields({
+      defaultValues: { enable_versioning: true, version_expiry_days: 7 },
+      initialVersioningState: 'enabled',
+      initialRetentionDays: 30,
+      initialMaxVersions: 10,
+      isUnsupportedPolicy: true,
+    })
+
+    expect(screen.queryByText('Tightening retention expires some versions')).not.toBeInTheDocument()
   })
 
   test('does not warn about tightening when enabling versioning for the first time', async () => {
