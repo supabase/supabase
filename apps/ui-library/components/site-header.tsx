@@ -50,10 +50,10 @@ export function SiteHeader() {
             aria-label="Supabase Library home"
           >
             <Image src={supabaseLogoIcon} alt="" width={24} height={24} />
-            <span aria-hidden="true" className="hidden text-border sm:inline">
+            <span aria-hidden="true" className="text-border">
               /
             </span>
-            <span className="hidden text-foreground-light sm:inline">Library</span>
+            <span className="text-foreground-light">Library</span>
           </Link>
         </div>
         <nav aria-label="Main navigation" className="absolute left-1/2 -translate-x-1/2">
