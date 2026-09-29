@@ -7,12 +7,12 @@ import { customRender as render } from '@/tests/lib/custom-render'
 const {
   mockIsPlatform,
   mockUseAPIKeysQuery,
-  mockUseAsyncCheckPermissions,
+  mockUseAsyncCheckPermissionsV2,
   mockUseAPIKeyDeleteMutation,
 } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
   mockUseAPIKeysQuery: vi.fn(),
-  mockUseAsyncCheckPermissions: vi.fn(),
+  mockUseAsyncCheckPermissionsV2: vi.fn(),
   mockUseAPIKeyDeleteMutation: vi.fn(),
 }))
 
@@ -35,8 +35,9 @@ vi.mock('@/data/api-keys/api-key-delete-mutation', () => ({
   useAPIKeyDeleteMutation: mockUseAPIKeyDeleteMutation,
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissionsV2,
 }))
 
 vi.mock('./CreatePublishableAPIKeyDialog', () => ({
@@ -68,7 +69,7 @@ const secretKey = {
 describe('PublishableAPIKeys', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
-    mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isLoading: false })
+    mockUseAsyncCheckPermissionsV2.mockReturnValue({ can: true, isLoading: false, isSuccess: true })
     mockUseAPIKeyDeleteMutation.mockReturnValue({
       mutate: vi.fn(),
       isPending: false,

@@ -12,11 +12,12 @@ type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
 
 // Permissions are non-network global state — mock the hook (the skill's allowed
 // exception), matching the neighboring PublishableAPIKeys.test.tsx.
-const { mockUseAsyncCheckPermissions } = vi.hoisted(() => ({
-  mockUseAsyncCheckPermissions: vi.fn(),
+const { mockUseAsyncCheckPermissionsV2 } = vi.hoisted(() => ({
+  mockUseAsyncCheckPermissionsV2: vi.fn(),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissionsV2,
 }))
 
 // CopyButton writes via copyToClipboard from 'ui'. Stub just that export so we can
@@ -60,7 +61,7 @@ function mockRevealById() {
 
 describe('ApiKeyPill', () => {
   beforeEach(() => {
-    mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isLoading: false })
+    mockUseAsyncCheckPermissionsV2.mockReturnValue({ can: true, isLoading: false, isSuccess: true })
     mockCopyToClipboard.mockClear()
   })
 
