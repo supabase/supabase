@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { mock } from 'effect/Layer'
 import type { InputHTMLAttributes, ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
