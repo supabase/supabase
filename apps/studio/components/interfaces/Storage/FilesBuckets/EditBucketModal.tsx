@@ -81,7 +81,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  const { data: lifecycle } = useQuery({
+  const { data: lifecycle, isLoading: isLoadingLifecycle } = useQuery({
     ...bucketLifecycleQueryOptions({ projectRef: ref, bucketId: bucket?.id }),
     enabled: isStorageVersioningEnabled && visible && !!ref && !!bucket?.id,
   })
@@ -516,6 +516,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   initialRetentionDays={versioningSettings.versionExpiryDays}
                   initialMaxVersions={versioningSettings.maxNoncurrentVersions}
                   isPublicBucket={isPublicBucket}
+                  isLoadingPolicy={isLoadingLifecycle}
                 />
               )}
             </form>
@@ -525,7 +526,14 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
             <Button disabled={isUpdating} onClick={closeModal}>
               Cancel
             </Button>
-            <Button variant="primary" form={formId} type="submit" loading={isUpdating}>
+            <Button
+              variant="primary"
+              form={formId}
+              type="submit"
+              loading={isUpdating}
+              // Saving now would write the empty policy the form is still seeded with.
+              disabled={isLoadingLifecycle}
+            >
               Save
             </Button>
           </DialogFooter>
