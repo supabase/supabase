@@ -26,7 +26,7 @@ import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SelectionListState } from 'ui-patterns/SelectionListState'
 
-import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
+import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
   DUCKLAKE_BUCKET_FIELD_COPY,
@@ -58,13 +58,13 @@ const DUCKLAKE_MODE_OPTIONS = [
     icon: Database,
     label: 'Use Supabase',
     description:
-      'Create or use a DuckLake backed by your Supabase projects. Catalog and storage are managed for you.',
+      'Use Supabase projects for the catalog and storage. Pipelines creates the credentials.',
   },
   {
     value: DUCKLAKE_MODE_CUSTOM,
     icon: SlidersHorizontal,
     label: 'Custom parameters',
-    description: 'Bring your own Postgres catalog and S3-compatible object storage credentials.',
+    description: 'Enter a Postgres catalog URL and S3-compatible storage credentials.',
   },
 ] as const
 
@@ -76,11 +76,7 @@ const DuckLakeModeSelector = ({
   onChange: (value: DucklakeMode) => void
 }) => {
   return (
-    <div
-      role="radiogroup"
-      aria-label="DuckLake configuration mode"
-      className="grid grid-cols-2 gap-3"
-    >
+    <div role="radiogroup" aria-label="Configuration method" className="grid grid-cols-2 gap-3">
       {DUCKLAKE_MODE_OPTIONS.map((option) => {
         const Icon = option.icon
         const selected = value === option.value
@@ -194,7 +190,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          The selected project's Postgres database is used as the DuckLake catalog.
+          DuckLake metadata is stored in the selected project's Postgres database.
         </p>
       </div>
 
@@ -225,37 +221,12 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
 
       <FormField
         control={form.control}
-        name="ducklakePoolSize"
-        render={({ field }) => (
-          <FormItemLayout
-            layout="horizontal"
-            label="Pool size"
-            description="Number of concurrent DuckDB connections to the catalog."
-          >
-            <FormControl>
-              <Input
-                type="number"
-                min={1}
-                max={6}
-                value={field.value ?? ''}
-                placeholder={`Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}`}
-                onChange={(event) =>
-                  field.onChange(event.target.value === '' ? undefined : Number(event.target.value))
-                }
-              />
-            </FormControl>
-          </FormItemLayout>
-        )}
-      />
-
-      <FormField
-        control={form.control}
         name="ducklakeMetadataSchema"
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
             label="Metadata schema"
-            description="Schema used for DuckLake metadata tables in the catalog's Postgres."
+            description="Schema for DuckLake metadata tables in the catalog project's Postgres database."
           >
             <FormControl>
               <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
@@ -317,12 +288,14 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
               </div>
               <Button
                 type="button"
+                size="small"
                 icon={<Plus />}
+                aria-label="Create bucket"
+                title="Create bucket"
+                className="h-[34px] w-[34px] shrink-0 p-0"
                 disabled={!ducklakeStorageProjectRef}
                 onClick={() => setShowNewBucketDialog(true)}
-              >
-                New bucket
-              </Button>
+              />
             </div>
           </FormItemLayout>
         )}
@@ -417,6 +390,7 @@ const DuckLakeCustomFields = ({
                       <Button
                         className="w-7"
                         icon={showCatalogUrl ? <Eye /> : <EyeOff />}
+                        aria-label={showCatalogUrl ? 'Hide catalog URL' : 'Show catalog URL'}
                         onClick={() => setShowCatalogUrl(!showCatalogUrl)}
                       />
                     </div>
@@ -438,33 +412,6 @@ const DuckLakeCustomFields = ({
             >
               <FormControl>
                 <Input {...field} placeholder="s3://bucket/path" value={field.value ?? ''} />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="ducklakePoolSize"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="horizontal"
-              label="Pool size"
-              description="Number of concurrent DuckDB connections to use."
-            >
-              <FormControl>
-                <Input
-                  type="number"
-                  min={1}
-                  max={6}
-                  value={field.value ?? ''}
-                  placeholder={`Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}`}
-                  onChange={(event) =>
-                    field.onChange(
-                      event.target.value === '' ? undefined : Number(event.target.value)
-                    )
-                  }
-                />
               </FormControl>
             </FormItemLayout>
           )}
@@ -527,6 +474,9 @@ const DuckLakeCustomFields = ({
               </FormControl>
               <Button
                 icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                aria-label={
+                  showSecretAccessKey ? 'Hide S3 secret access key' : 'Show S3 secret access key'
+                }
                 className="w-7 absolute right-6 top-[4px]"
                 onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
               />
@@ -629,7 +579,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Metadata schema"
-              description="Schema used for DuckLake metadata tables in Postgres."
+              description="Schema for DuckLake metadata tables in Postgres."
             >
               <FormControl>
                 <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
@@ -658,20 +608,17 @@ export const DuckLakeFields = ({
 
   return (
     <div className="flex flex-col gap-y-6 p-5">
-      <p className="text-sm font-medium text-foreground">DuckLake settings</p>
+      <p className="text-sm font-medium text-foreground">
+        {editMode ? 'DuckLake settings' : 'Configuration method'}
+      </p>
 
       {!editMode && (
-        <div className="flex flex-col gap-y-3">
-          <p className="text-xs uppercase tracking-wider text-foreground-lighter">
-            How should this DuckLake be configured?
-          </p>
-          <DuckLakeModeSelector
-            value={effectiveMode}
-            onChange={(value) =>
-              form.setValue('ducklakeMode', value, { shouldValidate: true, shouldDirty: true })
-            }
-          />
-        </div>
+        <DuckLakeModeSelector
+          value={effectiveMode}
+          onChange={(value) =>
+            form.setValue('ducklakeMode', value, { shouldValidate: true, shouldDirty: true })
+          }
+        />
       )}
 
       {effectiveMode === DUCKLAKE_MODE_SUPABASE ? (

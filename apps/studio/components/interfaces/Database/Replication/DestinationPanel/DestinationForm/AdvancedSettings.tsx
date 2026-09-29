@@ -23,6 +23,7 @@ import { DestinationType } from '../DestinationPanel.types'
 import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_DUCKLAKE_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
   DEFAULT_MAX_FILL_MS,
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
@@ -55,11 +56,41 @@ export const AdvancedSettings = ({
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Customize how the pipeline syncs and replicates data.
+                {type === 'DuckLake'
+                  ? 'Adjust catalog connections and replication settings.'
+                  : 'Customize how the pipeline syncs and replicates data.'}
               </span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
+            {type === 'DuckLake' && (
+              <FormField
+                control={form.control}
+                name="ducklakePoolSize"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Pool size"
+                    description={`Number of concurrent DuckDB connections to the catalog. Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}.`}
+                  >
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={6}
+                        value={field.value ?? ''}
+                        onChange={(event) =>
+                          field.onChange(
+                            event.target.value === '' ? '' : Number(event.target.value)
+                          )
+                        }
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="maxFillMs"
