@@ -265,12 +265,15 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
 
     onRun?.()
+
     const querySnapshot = { sql: rawSql, source: query._tag }
     const runProperties = location
       ? { ...location, runId: crypto.randomUUID(), source: query._tag }
       : undefined
     const groups = { project: project.ref }
+
     if (runProperties) track('explorer_query_submitted', runProperties, groups)
+
     const trackRunResult = (
       failureReason?: 'logs_unavailable' | 'connection_unavailable' | 'execution_error'
     ) => {
@@ -281,6 +284,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         track('explorer_query_completed', runProperties, groups)
       }
     }
+
     // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
     // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)

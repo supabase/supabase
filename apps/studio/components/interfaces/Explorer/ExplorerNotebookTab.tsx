@@ -123,21 +123,30 @@ export const ExplorerNotebookTab = () => {
   } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const [isExportingPdf, setIsExportingPdf] = useState(false)
+
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
-  const pendingSaveWasCreationRef = useRef(false)
   const confirmedCreatedNotebookIdsRef = useRef(new Set<string>())
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: (data, variables) => {
-      const isCreation = pendingSaveWasCreationRef.current
+  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation<{
+    isCreation: boolean
+  }>({
+    onMutate: (variables) => ({
+      isCreation:
+        currentNotebook?.status === 'new' &&
+        !confirmedCreatedNotebookIdsRef.current.has(variables.id),
+    }),
+    onSuccess: (data, variables, context) => {
+      const { isCreation } = context
       if (isCreation) confirmedCreatedNotebookIdsRef.current.add(variables.id)
+
       track(
         isCreation ? 'explorer_notebook_created' : 'explorer_notebook_updated',
         { notebookId: variables.id },
         { project: variables.projectRef }
       )
+
       if (id && content === savedContentRef.current) {
         snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
@@ -267,8 +276,6 @@ export const ExplorerNotebookTab = () => {
     // incorrectly show the saved toast if it's subsequently then saved once again while
     // the initial save is midflight
     savedContentRef.current = content
-    pendingSaveWasCreationRef.current =
-      currentNotebook?.status === 'new' && !confirmedCreatedNotebookIdsRef.current.has(notebookId)
 
     updateNotebook({
       projectRef: ref,
