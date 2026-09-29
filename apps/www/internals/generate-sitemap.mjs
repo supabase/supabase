@@ -71,6 +71,7 @@ async function generate() {
     '_customers/*.mdx',
     '_events/*.mdx',
     '_alternatives/*.mdx',
+    '_faqs/*.mdx',
     '!pages/_*.js',
     '!pages/_*.tsx',
     '!pages/api',
@@ -108,6 +109,7 @@ async function generate() {
         .replace('_customers', `/${customerStoriesUrl}`)
         .replace('_events', `/${eventsUrl}`)
         .replace('_alternatives', '/alternatives')
+        .replace('_faqs', '/faqs')
         .replace('.tsx', '')
         .replace('.mdx', '')
         // replace /{directory}/index with /{directory}

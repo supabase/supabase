@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * Scans content/md/ + _blog/ + _customers/ + _events/ and emits a TypeScript
+ * Scans content/md/ + _blog/ + _customers/ + _events/ + _faqs/ and emits a TypeScript
  * module exporting MD_CONTENT (slug → markdown) and MD_PAGES (allowlist Set).
  * The static import keeps content traceable by @vercel/nft, no runtime fs reads.
  */
@@ -76,6 +76,12 @@ const MDX_SECTIONS = [
       'onDemand',
     ],
     skipIf: (data) => data.disable_page_build === true,
+  },
+  {
+    dir: '_faqs',
+    urlPrefix: 'faqs',
+    stripDatePrefix: false,
+    frontmatterFields: ['title', 'description', 'date'],
   },
 ]
 
