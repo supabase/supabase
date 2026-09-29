@@ -53,7 +53,7 @@ export const superRefineBucketVersioning = (
     ctx.addIssue({
       path: ['max_noncurrent_versions'],
       code: z.ZodIssueCode.custom,
-      message: 'Must be at least 1 version',
+      message: 'Must be at least 1 version or empty to disable',
     })
   } else if (versions > S3_MAX_NONCURRENT_VERSIONS) {
     ctx.addIssue({
