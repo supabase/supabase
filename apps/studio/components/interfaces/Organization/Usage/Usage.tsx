@@ -124,7 +124,10 @@ export const Usage = () => {
     isPending: isLoadingSubscription,
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canLoadProjectUsage })
+  } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions && !isHighAvailability }
+  )
 
   const billingCycleStart = useMemo(() => {
     return dayjs.unix(subscription?.current_period_start ?? 0).utc()
@@ -257,7 +260,7 @@ export const Usage = () => {
                           className="justify-between w-[180px]"
                           iconRight={<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
                         >
-                          {!selectedProject ? 'All projects' : selectedProject?.name}
+                          {selectedProject?.name ?? selectedProjectRef ?? 'All projects'}
                         </Button>
                       )
                     }}

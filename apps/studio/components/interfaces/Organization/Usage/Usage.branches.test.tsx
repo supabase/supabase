@@ -372,19 +372,56 @@ describe('Usage branch URLs', () => {
     })
   })
 
-  it('shows a project error without loading branch usage when the parent lookup fails', async () => {
+  it('keeps filters usable after a project lookup failure and recovers through All projects', async () => {
+    const user = userEvent.setup()
     const requests = captureUsageRequests()
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
-      response: () =>
-        HttpResponse.json<APIErrorBody>({ message: 'Project lookup failed' }, { status: 500 }),
+      response: ({ params }) =>
+        params.ref === parent.ref
+          ? HttpResponse.json<APIErrorBody>({ message: 'Project lookup failed' }, { status: 404 })
+          : HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>(branchDetail),
     })
-    renderUsage()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/projects',
+      response: () =>
+        HttpResponse.json<components['schemas']['OrganizationProjectsResponse_Output']>({
+          projects: [],
+          pagination: { count: 0, limit: 96, offset: 0 },
+        }),
+    })
+    const { onUrlUpdate } = renderUsage()
 
     expect(await screen.findByText('Failed to retrieve project')).toBeInTheDocument()
     expect(screen.queryByRole('status', { name: 'Loading branch usage' })).not.toBeInTheDocument()
     expect(screen.queryByText('Usage Summary')).not.toBeInTheDocument()
     expect(requests).toEqual({ usage: [], daily: [] })
+
+    await user.click(await screen.findByRole('button', { name: 'Current billing cycle' }))
+    expect(
+      await screen.findByRole('menuitemradio', { name: 'Current billing cycle' })
+    ).toBeInTheDocument()
+    await user.keyboard('{Escape}')
+
+    const projectPicker = screen.getByRole('combobox', { name: '' })
+    expect(projectPicker).toHaveTextContent(parent.ref)
+    await user.click(projectPicker)
+    const allProjects = await screen.findByRole('option', { name: 'All projects' })
+    expect(screen.getByText('Failed to retrieve project')).toBeInTheDocument()
+    expect(requests).toEqual({ usage: [], daily: [] })
+    await user.click(allProjects)
+
+    await waitFor(() => {
+      expect(requests).toEqual({ usage: [null], daily: [null] })
+      const searchParams = onUrlUpdate.mock.lastCall?.[0].searchParams
+      expect(searchParams).toBeDefined()
+      expect(searchParams?.has('projectRef')).toBe(false)
+      expect(searchParams?.has('branchRef')).toBe(false)
+    })
+    expect(screen.queryByText('Failed to retrieve project')).not.toBeInTheDocument()
+    expect(screen.getByText('Usage Summary')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: '' })).toHaveTextContent('All projects')
   })
 })
