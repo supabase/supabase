@@ -38,8 +38,7 @@ const page: GoPageInput = {
       type: 'feature-grid',
       className: 'border-y border-muted bg-surface-75 py-16 sm:py-24',
       title: 'Multi-node high availability for Postgres',
-      description:
-        'It works with Supabase Auth, Storage, and Edge Functions.',
+      description: 'It works with Supabase Auth, Storage, and Edge Functions.',
       columns: 3,
       items: [
         {
