@@ -13,10 +13,18 @@ export const SELECT_26_MESSAGE = 'Supabase Select 2026 is coming October 2'
 export const SELECT_26_DESCRIPTION =
   'A curated day of talks by the industry’s best builders. Join us on October 2nd in San Francisco.'
 export const SELECT_26_CTA = 'Apply to attend'
-export const SELECT_26_EXPIRY = '2026-10-03T00:00:00-07:00'
+export const SELECT_26_LIVESTREAM_MESSAGE = 'Supabase Select 2026 livestream'
+export const SELECT_26_LIVESTREAM_DESCRIPTION =
+  'Watch the Main Stage and Build Stage livestreams today.'
+export const SELECT_26_LIVESTREAM_CTA = 'Watch the livestream'
+export const SELECT_26_LIVESTREAM_START = '2026-10-02T08:00:00-07:00'
+export const SELECT_26_EXPIRY = '2026-10-02T17:30:00-07:00'
 export const SELECT_26_WWW_DISMISSAL_KEY = 'announcement_select_26_08'
 export const SELECT_26_STUDIO_DISMISSAL_KEY = 'select-2026-promotion-dismissed'
+export const SELECT_26_LIVESTREAM_WWW_DISMISSAL_KEY = 'announcement_select_26_livestream'
+export const SELECT_26_LIVESTREAM_STUDIO_DISMISSAL_KEY = 'select-2026-livestream-dismissed'
 
+const SELECT_26_LIVESTREAM_START_MS = new Date(SELECT_26_LIVESTREAM_START).getTime()
 const SELECT_26_EXPIRY_MS = new Date(SELECT_26_EXPIRY).getTime()
 const MAX_TIMEOUT_MS = 2_147_483_647
 
@@ -36,27 +44,47 @@ const FRAME_INTERVAL_MS = 70
 
 const positiveModulo = (value: number, modulo: number) => ((value % modulo) + modulo) % modulo
 
-export const isSelect26PromotionActive = (now = Date.now()) => now < SELECT_26_EXPIRY_MS
+export type Select26PromotionPhase = 'waitlist' | 'livestream' | 'ended'
 
-export const useSelect26PromotionActive = () => {
-  const [isActive, setIsActive] = useState(() => isSelect26PromotionActive())
+export const getSelect26PromotionPhase = (now = Date.now()): Select26PromotionPhase => {
+  if (now < SELECT_26_LIVESTREAM_START_MS) return 'waitlist'
+  if (now < SELECT_26_EXPIRY_MS) return 'livestream'
+  return 'ended'
+}
+
+export const useSelect26PromotionPhase = () => {
+  const [phase, setPhase] = useState<Select26PromotionPhase>(() => getSelect26PromotionPhase())
 
   useEffect(() => {
-    if (!isActive) return
     let timeoutId: ReturnType<typeof setTimeout> | undefined
-    const armExpiryTimer = () => {
-      const remainingMs = SELECT_26_EXPIRY_MS - Date.now()
-      if (remainingMs <= 0) {
-        setIsActive(false)
-        return
+    const refreshPhase = () => {
+      clearTimeout(timeoutId)
+      const now = Date.now()
+      const currentPhase = getSelect26PromotionPhase(now)
+      setPhase(currentPhase)
+      let nextBoundary: number | null = null
+      if (currentPhase === 'waitlist') nextBoundary = SELECT_26_LIVESTREAM_START_MS
+      if (currentPhase === 'livestream') nextBoundary = SELECT_26_EXPIRY_MS
+      if (nextBoundary !== null) {
+        timeoutId = setTimeout(refreshPhase, Math.min(nextBoundary - now, MAX_TIMEOUT_MS))
       }
-      timeoutId = setTimeout(armExpiryTimer, Math.min(remainingMs, MAX_TIMEOUT_MS))
     }
-    armExpiryTimer()
-    return () => clearTimeout(timeoutId)
-  }, [isActive])
+    const onVisibilityChange = () => {
+      if (!document.hidden) refreshPhase()
+    }
+    refreshPhase()
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('focus', refreshPhase)
+    window.addEventListener('pageshow', refreshPhase)
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      window.removeEventListener('focus', refreshPhase)
+      window.removeEventListener('pageshow', refreshPhase)
+    }
+  }, [])
 
-  return isActive
+  return phase
 }
 
 type FieldCell = {

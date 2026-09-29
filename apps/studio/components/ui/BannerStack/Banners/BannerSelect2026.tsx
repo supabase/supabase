@@ -4,10 +4,15 @@ import { Button } from 'ui'
 import {
   SELECT_26_CTA,
   SELECT_26_DESCRIPTION,
+  SELECT_26_LIVESTREAM_CTA,
+  SELECT_26_LIVESTREAM_DESCRIPTION,
+  SELECT_26_LIVESTREAM_STUDIO_DISMISSAL_KEY,
+  SELECT_26_LIVESTREAM_MESSAGE,
   SELECT_26_STUDIO_DISMISSAL_KEY,
   SELECT_26_TITLE,
   SELECT_26_URL,
   Select26Field,
+  useSelect26PromotionPhase,
 } from 'ui-patterns/Banners/Select26Promotion'
 
 import { BannerCard } from '../BannerCard'
@@ -15,13 +20,21 @@ import { BANNER_ID, useBannerStack } from '../BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 export const BannerSelect2026 = () => {
+  const phase = useSelect26PromotionPhase()
   const { dismissBanner } = useBannerStack()
-  const [, setIsDismissed] = useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
+  const [, setIsWaitlistDismissed] = useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
+  const [, setIsLivestreamDismissed] = useLocalStorageQuery(
+    SELECT_26_LIVESTREAM_STUDIO_DISMISSAL_KEY,
+    false
+  )
 
   const dismiss = () => {
-    setIsDismissed(true)
+    if (phase === 'livestream') setIsLivestreamDismissed(true)
+    else setIsWaitlistDismissed(true)
     dismissBanner(BANNER_ID.SELECT_26)
   }
+
+  if (phase === 'ended') return null
 
   return (
     <BannerCard
@@ -43,9 +56,11 @@ export const BannerSelect2026 = () => {
         {/* Forehead spacer so the field reads above the copy */}
         <div className="h-10" aria-hidden />
         <div className="relative z-[2] flex flex-col gap-y-1 mb-2">
-          <p className="text-sm font-medium text-balance">{SELECT_26_TITLE}</p>
+          <p className="text-sm font-medium text-balance">
+            {phase === 'livestream' ? SELECT_26_LIVESTREAM_MESSAGE : SELECT_26_TITLE}
+          </p>
           <p className="text-xs text-foreground-lighter text-balance dark:text-[#f8f3ef]/65">
-            {SELECT_26_DESCRIPTION}
+            {phase === 'livestream' ? SELECT_26_LIVESTREAM_DESCRIPTION : SELECT_26_DESCRIPTION}
           </p>
         </div>
         <Button
@@ -55,7 +70,7 @@ export const BannerSelect2026 = () => {
           iconRight={<ArrowUpRight size={14} strokeWidth={1.5} />}
         >
           <Link href={SELECT_26_URL} target="_blank" rel="noopener noreferrer" onClick={dismiss}>
-            {SELECT_26_CTA}
+            {phase === 'livestream' ? SELECT_26_LIVESTREAM_CTA : SELECT_26_CTA}
           </Link>
         </Button>
       </div>
