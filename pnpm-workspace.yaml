@@ -107,6 +107,8 @@ minimumReleaseAgeExclude:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
+  # Canceled history traversals must restore the full delta and retain unload protection.
+  '@tanstack/history@1.162.0': 1.162.4
   'monaco-editor': 'catalog:'
   '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
