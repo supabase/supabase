@@ -1,4 +1,5 @@
 import { useQueries } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -102,7 +103,6 @@ export const OAuthAppsAuthorizeScreen = ({
     slug: orgSlug,
     appId: request.app_id,
   })
-
   const seeded = useRef(false)
   useEffect(() => {
     if (seeded.current || !projects || !orgAppDetails || !orgResolutionSettled) return
@@ -269,14 +269,15 @@ export const OAuthAppsAuthorizeScreen = ({
           {canProceed && (
             <>
               <section className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm text-foreground">Permissions requested</p>
-                  <p className="text-xs text-foreground-lighter">
-                    Authorizing {request.name} grants it the following access permissions to{' '}
-                    {isProjectScopingModeEnabled ? 'the selected' : 'all'} projects.
-                  </p>
-                </div>
+                <p className="text-sm text-foreground">Permissions requested</p>
                 <ScopeGroupCard scopes={request.scopes} />
+                <p className="text-xs text-foreground-lighter">
+                  Authorizing {request.name} grants it access to the permissions
+                  {isProjectScopingModeEnabled && !allProjectsSelected
+                    ? ' and selected projects '
+                    : ' '}
+                  above.
+                </p>
               </section>
 
               {!isProjectScopingModeEnabled && (
@@ -291,10 +292,7 @@ export const OAuthAppsAuthorizeScreen = ({
                 <Admonition
                   type="default"
                   title={CONSENT_COPY.organizationBoundGrant.title}
-                  description={CONSENT_COPY.organizationBoundGrant.description(
-                    request.name,
-                    orgSlug
-                  )}
+                  description={CONSENT_COPY.organizationBoundGrant.description(request.name)}
                 />
               )}
             </>
