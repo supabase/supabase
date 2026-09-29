@@ -16,17 +16,22 @@ export const ProjectCreationStatusAdmonition = ({
   if (!data) return null
 
   const items = getItemsAffectingProjectCreation(data.items, selectedRegionCode)
-  if (items.length === 0) return null
+  const item = items[0]
+  if (!item) return null
+
+  const isMaintenance = item.kind === 'maintenance'
+  const isRegionSpecific = item.projectCreationScope?.type === 'regions'
 
   return (
     <FormItemLayout layout="horizontal">
       <Admonition
         type="warning"
-        title="Incident in progress for this region"
+        title={isMaintenance ? 'Maintenance in progress' : 'Incident in progress'}
         description={
           <>
-            We're currently investigating an issue that may impact projects in this region. Follow
-            updates on <InlineLink href={data.pageUrl}>status page</InlineLink>.
+            {isMaintenance ? 'Maintenance' : 'An incident'} may affect project creation
+            {isRegionSpecific ? ' in this region' : ''}. Follow updates on{' '}
+            <InlineLink href={data.pageUrl}>status page</InlineLink>.
           </>
         }
         className="mt-3"
