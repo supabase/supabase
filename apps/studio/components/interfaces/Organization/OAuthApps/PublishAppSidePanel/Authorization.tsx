@@ -120,17 +120,14 @@ export const AuthorizationSection = ({
         onConfirmedChange={onProjectScopingConfirmedChange}
       />
 
-      <div className="rounded-md border border-control bg-surface-200 px-4 py-3 space-y-2">
-        <p className="text-sm text-foreground">{AUTHORIZATION_COPY.previewTitle}</p>
-        <div className="space-y-2 text-sm text-foreground-light">
-          <p>{AUTHORIZATION_COPY.previewIntro}</p>
-          {explanation && <p>{explanation}</p>}
-        </div>
-        <p className="text-sm">
+      <Admonition type="note" layout="vertical" title={AUTHORIZATION_COPY.previewTitle}>
+        <p>{AUTHORIZATION_COPY.previewIntro}</p>
+        {explanation && <p>{explanation}</p>}
+        <p>
           <span className="text-foreground-lighter">{AUTHORIZATION_COPY.resultingGrantLabel} </span>
           <span className="text-foreground-light">{resultingGrant}</span>
         </p>
-      </div>
+      </Admonition>
     </div>
   )
 }
