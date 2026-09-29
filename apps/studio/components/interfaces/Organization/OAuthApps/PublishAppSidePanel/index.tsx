@@ -35,6 +35,8 @@ import * as z from 'zod'
 
 import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
+import { AuthorizationSection } from './Authorization'
+import { isAuthorizationConfirmationPending } from './Authorization.utils'
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -125,6 +127,14 @@ export const PublishAppSidePanel = ({
   const [iconUrl, setIconUrl] = useState<string>()
   const [scopes, setScopes] = useState<OAuthScope[]>([])
 
+  const [isMemberBoundGrant, setIsMemberBoundGrant] = useState(false)
+  const [isMemberBoundGrantLocked, setIsMemberBoundGrantLocked] = useState(false)
+  const [isMemberBoundGrantConfirmed, setIsMemberBoundGrantConfirmed] = useState(false)
+
+  const [isProjectScopingEnabled, setIsProjectScopingEnabled] = useState(false)
+  const [isProjectScopingLocked, setIsProjectScopingLocked] = useState(false)
+  const [isProjectScopingConfirmed, setIsProjectScopingConfirmed] = useState(false)
+
   useEffect(() => {
     if (visible) {
       setIconFile(undefined)
@@ -136,8 +146,28 @@ export const PublishAppSidePanel = ({
         setScopes([])
         setIconUrl(undefined)
       }
+
+      setIsMemberBoundGrant(false)
+      setIsMemberBoundGrantLocked(false)
+      setIsMemberBoundGrantConfirmed(false)
+      setIsProjectScopingEnabled(false)
+      setIsProjectScopingLocked(false)
+      setIsProjectScopingConfirmed(false)
     }
   }, [visible, selectedApp])
+
+  const isAuthorizationPendingConfirmation = isAuthorizationConfirmationPending(
+    {
+      checked: isMemberBoundGrant,
+      locked: isMemberBoundGrantLocked,
+      confirmed: isMemberBoundGrantConfirmed,
+    },
+    {
+      checked: isProjectScopingEnabled,
+      locked: isProjectScopingLocked,
+      confirmed: isProjectScopingConfirmed,
+    }
+  )
 
   const onFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.persist()
@@ -390,6 +420,24 @@ export const PublishAppSidePanel = ({
               )}
 
               <SidePanel.Separator />
+              <AuthorizationSection
+                memberBoundGrant={{
+                  checked: isMemberBoundGrant,
+                  locked: isMemberBoundGrantLocked,
+                  confirmed: isMemberBoundGrantConfirmed,
+                }}
+                onMemberBoundGrantChange={setIsMemberBoundGrant}
+                onMemberBoundGrantConfirmedChange={setIsMemberBoundGrantConfirmed}
+                projectScoping={{
+                  checked: isProjectScopingEnabled,
+                  locked: isProjectScopingLocked,
+                  confirmed: isProjectScopingConfirmed,
+                }}
+                onProjectScopingChange={setIsProjectScopingEnabled}
+                onProjectScopingConfirmedChange={setIsProjectScopingConfirmed}
+              />
+
+              <SidePanel.Separator />
               <div className="p-6 ">
                 <div className="flex items-start justify-between space-x-4 pb-4">
                   <div className="flex flex-col">
@@ -430,7 +478,7 @@ export const PublishAppSidePanel = ({
                       variant="primary"
                       type="submit"
                       loading={isSubmitting}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isAuthorizationPendingConfirmation}
                     >
                       Confirm
                     </Button>
