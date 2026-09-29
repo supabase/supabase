@@ -51,6 +51,44 @@ describe('preserveQueryAndHash', () => {
   })
 })
 
+describe('matchRedirect moved Studio routes', () => {
+  const ref = 'abcdefghijklmnopqrst'
+
+  it.each([
+    [`/project/${ref}/database/backups`, `/project/${ref}/database/backups/scheduled`],
+    [`/project/${ref}/auth/emails`, `/project/${ref}/auth/templates`],
+    [`/project/${ref}/logs/edge-functions`, `/project/${ref}/logs/edge-functions-logs`],
+    [`/project/${ref}/settings/vault`, `/project/${ref}/integrations/vault/secrets`],
+    [`/project/${ref}/settings/billing`, '/org/_/billing'],
+    ['/account', '/account/me'],
+    ['/org/my-org/projects', '/org/my-org'],
+    ['/project', '/projects'],
+  ])('redirects %s to %s', (pathname, destination) => {
+    expect(matchRedirect({ pathname, search: {}, isPlatform: true })).toEqual({
+      destination,
+      permanent: true,
+    })
+  })
+
+  it('preserves the incoming query and hash', () => {
+    expect(
+      matchRedirect({
+        pathname: `/project/${ref}/database/backups`,
+        search: { source: 'bookmark' },
+        hash: 'scheduled',
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: `/project/${ref}/database/backups/scheduled?source=bookmark#scheduled`,
+      permanent: true,
+    })
+  })
+
+  it('does not intercept the project selector', () => {
+    expect(matchRedirect({ pathname: '/project/_', search: {}, isPlatform: true })).toBeNull()
+  })
+})
+
 describe('matchRedirect query/hash preservation', () => {
   it('redirects the legacy compute and disk route while preserving query and hash', () => {
     expect(
