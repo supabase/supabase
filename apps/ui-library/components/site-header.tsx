@@ -173,7 +173,7 @@ export function SiteHeader() {
         </nav>
         {/* Below md the centered nav is hidden, so search can take the free space. */}
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2 md:flex-none">
-          <div className="min-w-0 max-w-xs flex-1 md:w-28 md:flex-none lg:w-48">
+          <div className="min-w-0 max-w-48 flex-1 md:w-28 md:flex-none lg:w-48">
             <CommandMenu />
           </div>
           <Button
