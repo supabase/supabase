@@ -88,7 +88,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
           >
             <span className="text-foreground-lighter text-nowrap">{metadata.label}:</span>
             <span className="truncate max-w-72" title={serverOptions[metadata.name]}>
-              {serverOptions[metadata.name]}
+              {serverOptions[metadata.name] ?? metadata.defaultValue}
             </span>
           </div>
         ))}

@@ -266,6 +266,7 @@ export const EditWrapperSheet = ({
                         key={option.name}
                         option={option}
                         control={form.control}
+                        placeholder={option.defaultValue}
                         loading={option.secureEntry ? isLoadingSecrets : undefined}
                       />
                     ))}
