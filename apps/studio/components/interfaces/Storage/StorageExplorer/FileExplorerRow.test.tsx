@@ -7,6 +7,10 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
 } from '@/components/interfaces/Storage/Storage.constants'
+import type {
+  StorageItem,
+  StorageItemMetadata,
+} from '@/components/interfaces/Storage/Storage.types'
 import { FileExplorerRow } from '@/components/interfaces/Storage/StorageExplorer/FileExplorerRow'
 import { customRender as render } from '@/tests/lib/custom-render'
 
@@ -41,21 +45,35 @@ vi.mock('@/components/interfaces/Storage/StorageExplorer/useCopyUrl', () => ({
   useCopyUrl: () => ({ onCopyUrl: vi.fn() }),
 }))
 
-const base = {
+const METADATA: StorageItemMetadata = {
+  cacheControl: 'max-age=3600',
+  contentLength: 10,
+  size: 10,
+  httpStatusCode: 200,
+  eTag: 'etag',
+  lastModified: '2024-01-01T00:00:00Z',
+  mimetype: 'image/png',
+}
+
+const item = (overrides: Partial<StorageItem>): StorageItem => ({
+  id: null,
+  name: 'photo.png',
+  type: STORAGE_ROW_TYPES.FILE,
   status: STORAGE_ROW_STATUS.READY,
-  metadata: { size: 10, mimetype: 'image/png' },
+  metadata: METADATA,
   isCorrupted: false,
   created_at: null,
   updated_at: null,
   last_accessed_at: null,
   path: 'photo.png',
-}
+  ...overrides,
+})
 
 describe('FileExplorerRow', () => {
   it('offers both the relative path and the dashboard URL for a file', async () => {
     render(
       <FileExplorerRow
-        item={{ ...base, id: 'f1', name: 'photo.png', type: STORAGE_ROW_TYPES.FILE } as any}
+        item={item({ id: 'f1' })}
         index={0}
         view={STORAGE_VIEWS.COLUMNS}
         columnIndex={0}
@@ -70,15 +88,7 @@ describe('FileExplorerRow', () => {
   it('offers both the relative path and the dashboard URL for a folder', async () => {
     render(
       <FileExplorerRow
-        item={
-          {
-            ...base,
-            id: null,
-            name: 'avatars',
-            type: STORAGE_ROW_TYPES.FOLDER,
-            metadata: null,
-          } as any
-        }
+        item={item({ name: 'avatars', type: STORAGE_ROW_TYPES.FOLDER, metadata: null })}
         index={0}
         view={STORAGE_VIEWS.COLUMNS}
         columnIndex={0}
@@ -94,15 +104,7 @@ describe('FileExplorerRow', () => {
   it('marks an archived file with an icon in the leading slot rather than a text badge', async () => {
     const { container } = render(
       <FileExplorerRow
-        item={
-          {
-            ...base,
-            id: 'f2',
-            name: 'gone.png',
-            type: STORAGE_ROW_TYPES.FILE,
-            archived: { archivedObjectId: 'a1' },
-          } as any
-        }
+        item={item({ id: 'f2', name: 'gone.png', archived: { archivedObjectId: 'a1' } })}
         index={0}
         view={STORAGE_VIEWS.COLUMNS}
         columnIndex={0}
@@ -133,16 +135,12 @@ describe('FileExplorerRow', () => {
   it('gives an archived folder the same actions, since its contents are what they act on', async () => {
     render(
       <FileExplorerRow
-        item={
-          {
-            ...base,
-            id: null,
-            name: 'matches',
-            type: STORAGE_ROW_TYPES.FOLDER,
-            metadata: null,
-            archived: {},
-          } as any
-        }
+        item={item({
+          name: 'matches',
+          type: STORAGE_ROW_TYPES.FOLDER,
+          metadata: null,
+          archived: {},
+        })}
         index={0}
         view={STORAGE_VIEWS.COLUMNS}
         columnIndex={0}
@@ -161,7 +159,7 @@ describe('FileExplorerRow', () => {
   it('keeps hiding the icon on hover for a live file, which does swap in a checkbox', () => {
     const { container } = render(
       <FileExplorerRow
-        item={{ ...base, id: 'f3', name: 'live.png', type: STORAGE_ROW_TYPES.FILE } as any}
+        item={item({ id: 'f3', name: 'live.png' })}
         index={0}
         view={STORAGE_VIEWS.COLUMNS}
         columnIndex={0}
