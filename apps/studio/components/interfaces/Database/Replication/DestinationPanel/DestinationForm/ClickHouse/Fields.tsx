@@ -30,6 +30,7 @@ export const ClickHouseFields = ({
   editMode: boolean
 }) => {
   const [showPassword, setShowPassword] = useState(false)
+  const passwordVisibilityLabel = showPassword ? 'Hide entered password' : 'Show entered password'
 
   return (
     <div className="flex flex-col gap-y-6 p-5">
@@ -63,10 +64,10 @@ export const ClickHouseFields = ({
             <FormItemLayout
               layout="horizontal"
               label="User"
-              description="ClickHouse user with permission to write to the target database."
+              description="Dedicated database user with access to the destination database."
             >
               <FormControl>
-                <Input {...field} value={field.value ?? ''} placeholder="default" />
+                <Input {...field} value={field.value ?? ''} placeholder="pipelines_user" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -82,8 +83,8 @@ export const ClickHouseFields = ({
               labelOptional="Optional"
               description={
                 editMode
-                  ? 'Stored password is hidden. Enter a new password to replace it.'
-                  : 'Leave blank for passwordless access.'
+                  ? 'Enter a new password to replace the stored one. The eye button shows only what you enter.'
+                  : 'Leave blank only if the ClickHouse user has no password.'
               }
             >
               <FormControl>
@@ -96,8 +97,8 @@ export const ClickHouseFields = ({
                     <div className="flex items-center justify-center">
                       <Button
                         className="w-7"
-                        title={showPassword ? 'Hide password' : 'Show password'}
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        title={passwordVisibilityLabel}
+                        aria-label={passwordVisibilityLabel}
                         icon={showPassword ? <Eye /> : <EyeOff />}
                         onClick={() => setShowPassword(!showPassword)}
                       />
@@ -119,7 +120,7 @@ export const ClickHouseFields = ({
               description={CLICKHOUSE_DATABASE_FIELD_COPY.description}
             >
               <FormControl>
-                <Input {...field} value={field.value ?? ''} placeholder="default" />
+                <Input {...field} value={field.value ?? ''} placeholder="pipelines" />
               </FormControl>
             </FormItemLayout>
           )}

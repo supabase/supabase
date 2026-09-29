@@ -66,16 +66,17 @@ export const SNOWFLAKE_SCHEMA_FIELD_COPY = {
 } as const
 
 export const CLICKHOUSE_URL_FIELD_COPY = {
-  label: 'HTTPS URL',
-  description: 'The HTTPS endpoint for your ClickHouse server, including port.',
+  label: 'HTTPS endpoint',
+  description: 'Public ClickHouse HTTPS endpoint, including port.',
 } as const
 
 export const CLICKHOUSE_DATABASE_FIELD_COPY = {
   label: 'Database',
-  description: 'The ClickHouse database where replicated tables will be created.',
+  description: 'Database where Pipelines creates replicated tables.',
 } as const
 
 export const CLICKHOUSE_ENGINE_FIELD_COPY = {
   label: 'Table engine',
-  description: 'Defaults to ReplacingMergeTree.',
+  description:
+    'Use ReplacingMergeTree for current-state views. Use MergeTree for an append-only change history.',
 } as const
