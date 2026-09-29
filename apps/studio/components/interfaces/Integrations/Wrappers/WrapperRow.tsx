@@ -41,6 +41,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
 
   const _tables = formatWrapperTables(wrapper, integration?.meta)
   const canEdit = canManageWrappers && !isShared
+
   let editTooltip = 'Edit wrapper'
   if (!canManageWrappers) editTooltip = 'You need additional permissions to edit wrappers'
   else if (isShared) editTooltip = 'Shared wrappers cannot be edited in the dashboard'
@@ -87,7 +88,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
           >
             <span className="text-foreground-lighter text-nowrap">{metadata.label}:</span>
             <span className="truncate max-w-72" title={serverOptions[metadata.name]}>
-              {serverOptions[metadata.name]}
+              {serverOptions[metadata.name] ?? metadata.defaultValue}
             </span>
           </div>
         ))}

@@ -34,6 +34,7 @@ import {
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import {
   FormSection,
   FormSectionContent,
@@ -70,10 +71,11 @@ export const EditWrapperSheet = ({
   const { mutate: updateFDW, isPending: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated ${wrapperMeta?.label} foreign data wrapper`)
-
       const { tables } = getValues()
       const hasNewSchema = (tables as Record<string, any>[]).some((table) => table.is_new_schema)
       if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
+
+      onClose()
     },
   })
 
@@ -151,7 +153,11 @@ export const EditWrapperSheet = ({
   const wrapper_name = useWatch({ name: 'wrapper_name', control: form.control })
 
   const [isLoadingSecrets, setIsLoadingSecrets] = useState(false)
+  const [secretsReady, setSecretsReady] = useState(false)
+
   useEffect(() => {
+    let isCurrent = true
+
     const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
     const encryptedIdsToFetch = compact(
@@ -160,7 +166,14 @@ export const EditWrapperSheet = ({
         return value ?? null
       })
     ).filter((x) => UUID_REGEX.test(x))
-    // [Joshen] ^ Validate UUID to filter out already decrypted values
+
+    if (encryptedIdsToFetch.length === 0) {
+      setSecretsReady(true)
+      setIsLoadingSecrets(false)
+      return
+    }
+
+    setSecretsReady(false)
 
     const fetchEncryptedValues = async (ids: string[]) => {
       try {
@@ -171,21 +184,26 @@ export const EditWrapperSheet = ({
           connectionString: project?.connectionString,
           ids: ids,
         })
+        if (!isCurrent) return
 
         encryptedOptions.forEach((option) => {
           const encryptedId = initialValues[option.name]
 
           resetField(option.name, { defaultValue: decryptedValues[encryptedId] })
         })
+        setSecretsReady(true)
       } catch (error) {
+        if (!isCurrent) return
         toast.error('Failed to fetch encrypted values')
       } finally {
-        setIsLoadingSecrets(false)
+        if (isCurrent) setIsLoadingSecrets(false)
       }
     }
 
-    if (encryptedIdsToFetch.length > 0) {
-      fetchEncryptedValues(encryptedIdsToFetch)
+    fetchEncryptedValues(encryptedIdsToFetch)
+
+    return () => {
+      isCurrent = false
     }
   }, [initialValues, wrapperMeta, resetField, project?.ref, project?.connectionString])
 
@@ -248,6 +266,7 @@ export const EditWrapperSheet = ({
                         key={option.name}
                         option={option}
                         control={form.control}
+                        placeholder={option.defaultValue}
                         loading={option.secureEntry ? isLoadingSecrets : undefined}
                       />
                     ))}
@@ -335,16 +354,22 @@ export const EditWrapperSheet = ({
               <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button
+              <ButtonTooltip
                 size="tiny"
                 variant="primary"
                 form={FORM_ID}
                 type="submit"
-                disabled={isSubmitting || !isDirty}
+                disabled={isSubmitting || !isDirty || !secretsReady}
                 loading={isSubmitting}
+                tooltip={{
+                  content: {
+                    side: 'top',
+                    text: !secretsReady ? 'Waiting for encrypted values to load' : undefined,
+                  },
+                }}
               >
                 Save wrapper
-              </Button>
+              </ButtonTooltip>
             </SheetFooter>
           </form>
         </Form>
@@ -352,11 +377,11 @@ export const EditWrapperSheet = ({
 
       <ConfirmationModal
         visible={isUpdateConfirmationOpen}
-        title="Recreate wrapper?"
-        size="medium"
+        title="Save wrapper changes?"
+        size="small"
         variant="warning"
-        confirmLabel="Recreate wrapper"
-        confirmLabelLoading="Recreating wrapper"
+        confirmLabel="Save changes"
+        confirmLabelLoading="Saving changes"
         loading={isSaving}
         onCancel={() => {
           setIsUpdateConfirmationOpen(false)
@@ -376,9 +401,7 @@ export const EditWrapperSheet = ({
         }}
       >
         <p className="text-sm text-foreground-light">
-          Saving changes will drop the existing wrapper and recreate it. Foreign servers and tables
-          will be recreated, and dependent objects like functions or views that reference those
-          tables may need to be updated manually afterwards.
+          Removing a table or retyping a column may break views or functions that reference it.
         </p>
         <p className="text-sm text-foreground-light mt-2">Are you sure you want to continue?</p>
       </ConfirmationModal>
