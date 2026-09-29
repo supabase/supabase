@@ -14,7 +14,8 @@ export type EdgeFunction = components['schemas']['FunctionSlugResponse_Output']
 
 export async function getEdgeFunction(
   { projectRef, slug }: EdgeFunctionVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
@@ -22,6 +23,7 @@ export async function getEdgeFunction(
   const { data, error } = await get(`/v1/projects/{ref}/functions/{function_slug}`, {
     params: { path: { ref: projectRef, function_slug: slug } },
     signal,
+    headers,
   })
 
   if (error) handleError(error)

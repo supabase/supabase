@@ -1,9 +1,15 @@
 import { safeSql } from '@supabase/pg-meta'
+import { components } from 'api-types'
+import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getStudioTools } from './studio-tools'
+import type { EdgeFunction } from '@/data/edge-functions/edge-function-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+
+type DeployFunctionResponse = components['schemas']['DeployFunctionResponse_Output']
 
 vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: vi.fn(),
@@ -235,6 +241,100 @@ describe('ai/tools/studio-tools', () => {
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'json',
         value: rows,
+      })
+    })
+
+    describe('deploy_edge_function execute', () => {
+      const existingFunction: EdgeFunction = {
+        id: 'func-id',
+        slug: 'my-function',
+        name: 'My Function',
+        status: 'ACTIVE',
+        version: 3,
+        created_at: 1700000000000,
+        updated_at: 1700000000000,
+        verify_jwt: false,
+        entrypoint_path: 'index.ts',
+      }
+
+      const mockDeploy = () => {
+        const deployedMetadata: Record<string, unknown>[] = []
+        addAPIMock({
+          method: 'post',
+          path: '/v1/projects/:ref/functions/deploy',
+          response: async ({ request }) => {
+            const formData = await request.formData()
+            deployedMetadata.push(JSON.parse(String(formData.get('metadata'))))
+            return HttpResponse.json<DeployFunctionResponse>({
+              id: 'func-id',
+              slug: 'my-function',
+              name: 'My Function',
+              status: 'ACTIVE',
+              version: 4,
+            })
+          },
+        })
+        return deployedMetadata
+      }
+
+      const executeDeploy = async () => {
+        const tools = getStudioTools({ projectRef: 'test-project', authorization: 'Bearer token' })
+        if (!tools.deploy_edge_function.execute) throw new Error('execute is undefined')
+        return await tools.deploy_edge_function.execute(
+          { name: 'my-function', code: 'Deno.serve(() => new Response("ok"))' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      }
+
+      it('should preserve verify_jwt and name when redeploying an existing function', async () => {
+        addAPIMock({
+          method: 'get',
+          path: '/v1/projects/:ref/functions/:function_slug',
+          response: existingFunction,
+        })
+        const deployedMetadata = mockDeploy()
+
+        const result = await executeDeploy()
+
+        expect(result).toEqual({ success: true })
+        expect(deployedMetadata).toHaveLength(1)
+        expect(deployedMetadata[0]).toMatchObject({
+          name: 'My Function',
+          verify_jwt: false,
+          entrypoint_path: 'index.ts',
+        })
+      })
+
+      it('should default verify_jwt to true for a new function', async () => {
+        addAPIMock({
+          method: 'get',
+          path: '/v1/projects/:ref/functions/:function_slug',
+          response: () =>
+            HttpResponse.json<APIErrorBody>({ message: 'Function not found' }, { status: 404 }),
+        })
+        const deployedMetadata = mockDeploy()
+
+        const result = await executeDeploy()
+
+        expect(result).toEqual({ success: true })
+        expect(deployedMetadata).toHaveLength(1)
+        expect(deployedMetadata[0]).toMatchObject({
+          name: 'my-function',
+          verify_jwt: true,
+        })
+      })
+
+      it('should not deploy when the existing function lookup fails', async () => {
+        addAPIMock({
+          method: 'get',
+          path: '/v1/projects/:ref/functions/:function_slug',
+          response: () =>
+            HttpResponse.json<APIErrorBody>({ message: 'Internal error' }, { status: 500 }),
+        })
+        const deployedMetadata = mockDeploy()
+
+        await expect(executeDeploy()).rejects.toThrow('Internal error')
+        expect(deployedMetadata).toHaveLength(0)
       })
     })
 
