@@ -94,7 +94,8 @@ export const AuditLogs = () => {
     {
       enabled: canReadAuditLogs,
       retry: false,
-      placeholderData: keepPreviousData,
+      placeholderData: (previousData, previousQuery) =>
+        previousQuery?.queryKey[1] === slug ? previousData : undefined,
       refetchOnWindowFocus: (query) => {
         return !query.state.error?.message.endsWith(logsUpgradeError)
       },
@@ -171,6 +172,11 @@ export const AuditLogs = () => {
   useShortcut(SHORTCUT_IDS.ORG_AUDIT_LOGS_REFRESH, () => refetch(), {
     enabled: !isLoading && !isRefetching && canReadAuditLogs,
   })
+
+  useEffect(() => {
+    setRowSelection({})
+    lastSelectedRowId.current = null
+  }, [filters.users, filters.projects])
 
   // This feature depends on the subscription tier of the user.
   // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
