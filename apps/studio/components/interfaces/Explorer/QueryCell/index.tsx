@@ -107,8 +107,6 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
   const handleRowLimitChange = (rowLimit: number) =>
     updateQueryCell((candidate) => setCellRowLimit(candidate, rowLimit))
 
-  if (!currentNotebook) return null
-
   return (
     <SortableSection
       id={cell._id}
@@ -120,11 +118,15 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
       <QueryEditor
         ref={ref}
         id={cell._id}
-        location={{
-          surface: 'notebook_cell',
-          notebookId: currentNotebook.notebook.id,
-          cellId: cell._id,
-        }}
+        location={
+          currentNotebook
+            ? {
+                surface: 'notebook_cell',
+                notebookId: currentNotebook.notebook.id,
+                cellId: cell._id,
+              }
+            : undefined
+        }
         variant="embedded"
         className="min-h-0"
         title={title}

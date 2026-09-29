@@ -444,7 +444,7 @@ describe('ExplorerNotebookTab', () => {
     await waitFor(() =>
       expect(testContext.track).toHaveBeenCalledWith(
         'explorer_notebook_created',
-        { notebookId: NOTEBOOK_ID, origin: 'manual' },
+        { notebookId: NOTEBOOK_ID },
         { project: 'default' }
       )
     )
@@ -454,7 +454,7 @@ describe('ExplorerNotebookTab', () => {
     await waitFor(() =>
       expect(testContext.track).toHaveBeenCalledWith(
         'explorer_notebook_updated',
-        { notebookId: NOTEBOOK_ID, origin: 'manual' },
+        { notebookId: NOTEBOOK_ID },
         { project: 'default' }
       )
     )

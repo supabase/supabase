@@ -271,18 +271,23 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       : undefined
     const groups = { project: project.ref }
     if (runProperties) track('explorer_query_submitted', runProperties, groups)
+    const trackRunResult = (
+      failureReason?: 'logs_unavailable' | 'connection_unavailable' | 'execution_error'
+    ) => {
+      if (!runProperties) return
+      if (failureReason) {
+        track('explorer_query_failed', { ...runProperties, failureReason }, groups)
+      } else {
+        track('explorer_query_completed', runProperties, groups)
+      }
+    }
     // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
     // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)
 
     if (query._tag === 'logs') {
       if (!isOtelLogsEnabled) {
-        if (runProperties)
-          track(
-            'explorer_query_failed',
-            { ...runProperties, failureReason: 'logs_unavailable' },
-            groups
-          )
+        trackRunResult('logs_unavailable')
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
           ...querySnapshot,
@@ -297,19 +302,14 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
       }).then(
         (data) => {
-          if (runProperties) track('explorer_query_completed', runProperties, groups)
+          trackRunResult()
           onResultChange({
             rows: data.rows as readonly Record<string, unknown>[],
             ...querySnapshot,
           })
         },
         (error) => {
-          if (runProperties)
-            track(
-              'explorer_query_failed',
-              { ...runProperties, failureReason: 'execution_error' },
-              groups
-            )
+          trackRunResult('execution_error')
           onResultChange({ error, ...querySnapshot })
         }
       )
@@ -320,12 +320,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
 
     if (!isValidConnString(connectionString)) {
-      if (runProperties)
-        track(
-          'explorer_query_failed',
-          { ...runProperties, failureReason: 'connection_unavailable' },
-          groups
-        )
+      trackRunResult('connection_unavailable')
       onResultChange({
         error: { message: 'Unable to run query: Connection string is missing' },
         ...querySnapshot,
@@ -343,16 +338,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     }).then(
       (data) => {
-        if (runProperties) track('explorer_query_completed', runProperties, groups)
+        trackRunResult()
         onResultChange({ rows: data.result, ...querySnapshot })
       },
       (error) => {
-        if (runProperties)
-          track(
-            'explorer_query_failed',
-            { ...runProperties, failureReason: 'execution_error' },
-            groups
-          )
+        trackRunResult('execution_error')
         onResultChange({ error, ...querySnapshot })
       }
     )

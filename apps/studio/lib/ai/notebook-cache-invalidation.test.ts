@@ -40,9 +40,7 @@ describe('collectNotebookCacheEffects', () => {
 
     const effects = collectNotebookCacheEffects(messages, new Set())
 
-    expect(effects).toEqual([
-      { _tag: 'upserted', toolCallId: 'call-notebook-1', id: 'notebook-1', operation: 'created' },
-    ])
+    expect(effects).toEqual([{ _tag: 'upserted', toolCallId: 'call-notebook-1', id: 'notebook-1' }])
   })
 
   it('collects an update_notebook output-available part', () => {
@@ -50,9 +48,7 @@ describe('collectNotebookCacheEffects', () => {
 
     const effects = collectNotebookCacheEffects(messages, new Set())
 
-    expect(effects).toEqual([
-      { _tag: 'upserted', toolCallId: 'call-notebook-1', id: 'notebook-1', operation: 'updated' },
-    ])
+    expect(effects).toEqual([{ _tag: 'upserted', toolCallId: 'call-notebook-1', id: 'notebook-1' }])
   })
 
   it('collects a delete_notebook output-available part', () => {
@@ -101,9 +97,7 @@ describe('collectNotebookCacheEffects', () => {
 
     const effects = collectNotebookCacheEffects(messages, new Set())
 
-    expect(effects).toEqual([
-      { _tag: 'upserted', toolCallId: 'call-earlier', id: 'notebook-1', operation: 'updated' },
-    ])
+    expect(effects).toEqual([{ _tag: 'upserted', toolCallId: 'call-earlier', id: 'notebook-1' }])
   })
 
   it('dedupes against the processed set', () => {
@@ -141,7 +135,7 @@ describe('applyNotebookCacheEffects', () => {
     await applyNotebookCacheEffects({
       queryClient,
       projectRef: PROJECT_REF,
-      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: NOTEBOOK.id, operation: 'updated' }],
+      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: NOTEBOOK.id }],
     })
 
     expect(queryClient.getQueryState(contentKeys.allContentLists(PROJECT_REF))?.isInvalidated).toBe(
@@ -184,7 +178,7 @@ describe('applyNotebookCacheEffects', () => {
     await applyNotebookCacheEffects({
       queryClient,
       projectRef: PROJECT_REF,
-      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: NOTEBOOK.id, operation: 'updated' }],
+      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: NOTEBOOK.id }],
     })
 
     expect(notebooksState.notebooks[NOTEBOOK.id]).toBeDefined()
@@ -217,9 +211,7 @@ describe('applyNotebookCacheEffects', () => {
     await applyNotebookCacheEffects({
       queryClient,
       projectRef: PROJECT_REF,
-      effects: [
-        { _tag: 'upserted', toolCallId: 'call-1', id: 'other-notebook', operation: 'updated' },
-      ],
+      effects: [{ _tag: 'upserted', toolCallId: 'call-1', id: 'other-notebook' }],
     })
 
     expect(notebooksState.serverDivergedWhileDirty.has(NOTEBOOK.id)).toBe(false)

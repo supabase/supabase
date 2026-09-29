@@ -3453,10 +3453,6 @@ export type ExplorerQueryRunProperties = ExplorerQueryLocation & {
   source: 'database' | 'logs'
 }
 
-export type ExplorerNotebookPersistenceProperties =
-  | { notebookId: string; origin: 'manual'; chatId?: never }
-  | { notebookId: string; origin: 'assistant'; chatId: string }
-
 type ExplorerGroups = Pick<TelemetryGroups, 'project'> &
   Partial<Pick<TelemetryGroups, 'organization'>>
 
@@ -3510,7 +3506,7 @@ export interface ExplorerQueryFailedEvent {
  */
 export interface ExplorerNotebookCreatedEvent {
   action: 'explorer_notebook_created'
-  properties: ExplorerNotebookPersistenceProperties
+  properties: { notebookId: string }
   groups: ExplorerGroups
 }
 
@@ -3523,7 +3519,7 @@ export interface ExplorerNotebookCreatedEvent {
  */
 export interface ExplorerNotebookUpdatedEvent {
   action: 'explorer_notebook_updated'
-  properties: ExplorerNotebookPersistenceProperties
+  properties: { notebookId: string }
   groups: ExplorerGroups
 }
 

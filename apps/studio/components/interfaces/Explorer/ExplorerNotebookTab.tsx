@@ -135,10 +135,7 @@ export const ExplorerNotebookTab = () => {
       if (isCreation) confirmedCreatedNotebookIdsRef.current.add(variables.id)
       track(
         isCreation ? 'explorer_notebook_created' : 'explorer_notebook_updated',
-        {
-          notebookId: variables.id,
-          origin: 'manual',
-        },
+        { notebookId: variables.id },
         { project: variables.projectRef }
       )
       if (id && content === savedContentRef.current) {
