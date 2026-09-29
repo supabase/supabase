@@ -43,7 +43,7 @@ export function SiteHeader() {
         Skip to content
       </a>
       <div className="relative mx-auto flex h-14 max-w-site items-center justify-between gap-4 px-4 md:px-8">
-        <div className="flex items-center gap-4 lg:gap-8">
+        <div className="flex shrink-0 items-center gap-4 lg:gap-8">
           <Link
             href="/"
             className="flex items-center gap-2 text-sm font-medium tracking-tight"
@@ -171,8 +171,9 @@ export function SiteHeader() {
             </NavigationMenuList>
           </NavigationMenu>
         </nav>
-        <div className="flex items-center gap-2">
-          <div className="w-20 sm:w-28 lg:w-36 xl:w-44">
+        {/* Below md the centered nav is hidden, so search can take the free space. */}
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2 md:flex-none">
+          <div className="min-w-0 max-w-xs flex-1 md:w-28 md:flex-none lg:w-48">
             <CommandMenu />
           </div>
           <Button
