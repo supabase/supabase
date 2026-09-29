@@ -5,6 +5,7 @@ import {
   findTimezoneByIana,
   formatTimezoneLabel,
   getTimezoneOptions,
+  getTimezoneOptionsWithSelection,
   TIMEZONES_BY_IANA,
 } from '@/lib/constants/timezones'
 
@@ -51,6 +52,41 @@ describe('getTimezoneOptions', () => {
   })
 })
 
+describe('getTimezoneOptionsWithSelection', () => {
+  const date = new Date('2026-01-10T12:00:00Z')
+
+  it('preserves a selected alias alongside its canonical option', () => {
+    const options = getTimezoneOptionsWithSelection('America/Vancouver', date)
+    const selected = options.find((option) => option.iana === 'America/Vancouver')
+
+    expect(selected?.label).toBe(
+      '(UTC-08:00) Pacific Standard Time (US & Canada) (America/Vancouver)'
+    )
+    expect(options.some((option) => option.iana === 'America/Los_Angeles')).toBe(true)
+    expect(new Set(options.map((option) => option.iana)).size).toBe(options.length)
+  })
+
+  it('appends a selected timezone that has no catalog option', () => {
+    const options = getTimezoneOptionsWithSelection('Etc/UTC', date)
+
+    expect(options.at(-1)).toEqual({
+      iana: 'Etc/UTC',
+      label: '(UTC+00:00) Etc/UTC',
+    })
+  })
+
+  it('does not duplicate an existing representative timezone', () => {
+    const options = getTimezoneOptionsWithSelection('Asia/Tokyo', date)
+
+    expect(options.filter((option) => option.iana === 'Asia/Tokyo')).toHaveLength(1)
+    expect(options).toHaveLength(getTimezoneOptions(date).length)
+  })
+
+  it('does not add an option for auto detection', () => {
+    expect(getTimezoneOptionsWithSelection('', date)).toEqual(getTimezoneOptions(date))
+  })
+})
+
 describe('findTimezoneByIana', () => {
   it('matches an entry by its primary IANA name', () => {
     expect(findTimezoneByIana('America/Danmarkshavn')?.text).toContain('Coordinated Universal Time')
@@ -58,6 +94,10 @@ describe('findTimezoneByIana', () => {
 
   it('matches an entry by any secondary IANA name', () => {
     expect(findTimezoneByIana('Asia/Tokyo')?.utc).toContain('Asia/Tokyo')
+  })
+
+  it('matches an alias found only on a discarded duplicate row', () => {
+    expect(findTimezoneByIana('Europe/Nicosia')?.utc).toContain('Europe/Nicosia')
   })
 
   it('returns undefined for an unknown IANA name', () => {

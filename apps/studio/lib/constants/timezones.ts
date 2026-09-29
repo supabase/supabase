@@ -1237,7 +1237,8 @@ const TIMEZONE_OPTION_ENTRIES = TIMEZONES_BY_IANA.map((entry) => ({
 
 export const findTimezoneByIana = (iana: string): Timezone | undefined =>
   TIMEZONE_OPTION_ENTRIES.find((option) => option.iana === iana)?.entry ??
-  TIMEZONES_BY_IANA.find((entry) => entry.utc.includes(iana))
+  TIMEZONES_BY_IANA.find((entry) => entry.utc.includes(iana)) ??
+  ALL_TIMEZONES.find((entry) => entry.utc.includes(iana))
 
 export const getTimezoneOffsetLabel = (iana: string, date = new Date()) => {
   try {
@@ -1266,3 +1267,26 @@ export const getTimezoneOptions = (date = new Date()) =>
     iana,
     label: formatTimezoneEntryLabel(entry, iana, date),
   }))
+
+export const getTimezoneOptionsWithSelection = (selectedTimezone: string, date = new Date()) => {
+  const options = getTimezoneOptions(date)
+  if (!selectedTimezone || options.some((option) => option.iana === selectedTimezone)) {
+    return options
+  }
+
+  const selectedOption = {
+    iana: selectedTimezone,
+    label: formatTimezoneLabel(selectedTimezone, date),
+  }
+  const hasMatchingLabel = options.some((option) => option.label === selectedOption.label)
+
+  return [
+    ...options,
+    {
+      ...selectedOption,
+      label: hasMatchingLabel
+        ? `${selectedOption.label} (${selectedOption.iana})`
+        : selectedOption.label,
+    },
+  ]
+}

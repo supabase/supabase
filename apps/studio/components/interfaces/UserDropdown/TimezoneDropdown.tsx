@@ -15,7 +15,7 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { formatTimezoneLabel, getTimezoneOptions } from '@/lib/constants/timezones'
+import { formatTimezoneLabel, getTimezoneOptionsWithSelection } from '@/lib/constants/timezones'
 import { useTimezone } from '@/lib/datetime'
 import { guessLocalTimezone } from '@/lib/dayjs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -36,7 +36,7 @@ export const TimezoneDropdown = () => {
     return formatTimezoneLabel(timezone)
   }, [timezone])
 
-  const options = useMemo(() => getTimezoneOptions(), [])
+  const options = useMemo(() => getTimezoneOptionsWithSelection(storedTimezone), [storedTimezone])
 
   const handleSelect = (nextStored: string) => {
     setTimezone(nextStored)
