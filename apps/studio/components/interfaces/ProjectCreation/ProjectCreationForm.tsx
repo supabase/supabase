@@ -122,6 +122,7 @@ export const ProjectCreationForm = ({
   const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
+  const hasSelectedOrganization = currentOrg !== undefined
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
@@ -283,7 +284,7 @@ export const ProjectCreationForm = ({
         desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
-        enabled: flagsLoaded && smartRegionEnabled,
+        enabled: flagsLoaded && smartRegionEnabled && hasSelectedOrganization,
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchInterval: false,
@@ -792,6 +793,7 @@ export const ProjectCreationForm = ({
 
                     <RegionSelector
                       form={form}
+                      hasSelectedOrganization={hasSelectedOrganization}
                       instanceSize={instanceSize as DesiredInstanceSize}
                       showBestAvailableRegionOption={showBestAvailableRegionOption}
                       isBestAvailableSelected={isBestAvailableSelected}
