@@ -25,11 +25,7 @@ export function useStatusBanner(): StatusBannerState {
   const isEmergencyOverride = useEmergencyIncidentOverride()
 
   const statusPageOptions = statusPageQueryOptions()
-  const {
-    data,
-    isPending: isStatusPagePending,
-    isError: isStatusPageError,
-  } = useQuery({
+  const { data } = useQuery({
     ...statusPageOptions,
     select: normalizeStatusPage,
     enabled: statusPageOptions.enabled && !isEmergencyOverride,
@@ -46,12 +42,7 @@ export function useStatusBanner(): StatusBannerState {
 
   if (isEmergencyOverride) return { type: 'override' }
 
-  if (
-    isStatusPagePending ||
-    isStatusPageError ||
-    userProjectRegions.status === 'loading' ||
-    !isDismissedKeysLoaded
-  ) {
+  if (data === undefined || userProjectRegions.status === 'loading' || !isDismissedKeysLoaded) {
     return HIDDEN
   }
 
