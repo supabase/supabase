@@ -133,6 +133,7 @@ export const ExplorerQueryTab = () => {
     <QueryEditor
       ref={queryEditorRef}
       id={id}
+      location={{ surface: 'query_tab', queryId: id }}
       variant="viewport"
       title={draft.name}
       query={query}
