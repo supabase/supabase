@@ -3364,6 +3364,16 @@ module.exports = [
     destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
   },
   {
+    permanent: true,
+    source: '/docs/guides/platform/manage-your-usage/log-ingest',
+    destination: '/docs/guides/platform/manage-your-usage/logs-ingest',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/manage-your-usage/log-query',
+    destination: '/docs/guides/platform/manage-your-usage/logs-query',
+  },
+  {
     permanent: false,
     source: '/docs/guides/platform/org-based-billing#disk-size',
     destination: '/docs/guides/platform/manage-your-usage/disk-size',
