@@ -237,7 +237,7 @@ export default (isMobile?: boolean) => ({
           <>
             Use the{' '}
             <Link
-              href="https://supabase.com/docs/guides/functions/cicd-workflow"
+              href="https://supabase.com/docs/guides/functions/deploy#cicd-deployment"
               className="underline hover:text-foreground-light transition-colors"
             >
               Supabase CLI with GitHub actions

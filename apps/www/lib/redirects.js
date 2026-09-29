@@ -17,6 +17,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/rss.xml',
+    destination: '/rss.xml',
+  },
+  {
+    permanent: true,
     source: '/blog/introducing-supabase-etl',
     destination: '/blog/introducing-supabase-pipelines',
   },
@@ -1732,6 +1737,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/functions/local-quickstart',
     destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/cicd-workflow',
+    destination: '/docs/guides/functions/deploy',
   },
   {
     permanent: true,
