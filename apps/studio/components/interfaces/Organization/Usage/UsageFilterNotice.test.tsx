@@ -14,10 +14,11 @@ describe('UsageFilterNotice', () => {
     ).toBeInTheDocument()
   })
 
-  it('omits the branch note for a project without branches', () => {
+  it('discloses deleted branch usage even when no live branches remain', () => {
     customRender(<UsageFilterNotice projectName="Marvo app" hasBranches={false} />)
 
     expect(screen.queryByText(/Each branch records its own usage/)).not.toBeInTheDocument()
+    expect(screen.getByText(/Usage from deleted branches still counts/)).toBeInTheDocument()
   })
 
   it('names the branch and drops the select-a-branch prompt once a branch is filtered', () => {

@@ -48,10 +48,13 @@ export const UsageFilterNotice = ({
             {!branchName && hasBranches && (
               <p>
                 Each branch records its own usage, so this view excludes the project's branches.
-                Select a branch above to see its usage. Usage from deleted branches still counts
-                toward the organization total.
+                Select a branch above to see its usage.
               </p>
             )}
+            <p>
+              Usage from deleted branches still counts toward the organization total, but deleted
+              branches are not available in the branch filter.
+            </p>
           </div>
         }
       />

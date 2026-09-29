@@ -62,7 +62,43 @@ describe('UsageBranchFilter', () => {
     expect(screen.getByLabelText('Filter by branch')).toHaveTextContent('marvo-app-dev')
 
     await userEvent.click(screen.getByLabelText('Filter by branch'))
+    expect(await screen.findAllByRole('option')).toHaveLength(2)
     await userEvent.click(await screen.findByRole('option', { name: 'main' }))
+
+    expect(onSelectBranch).toHaveBeenCalledWith(null)
+  })
+
+  it.each([
+    { branchOptions: [mainBranch, previewBranch], label: 'main' },
+    { branchOptions: [previewBranch], label: 'Main branch' },
+  ])('falls back to $label when the selected ref is absent', ({ branchOptions, label }) => {
+    customRender(
+      <UsageBranchFilter
+        branchOptions={branchOptions}
+        projectRef="parent-ref"
+        branchRef="deleted-branch-ref"
+        onSelectBranch={vi.fn()}
+      />
+    )
+
+    expect(screen.getByLabelText('Filter by branch')).toHaveTextContent(label)
+  })
+
+  it('returns to the parent when the options contain only a preview branch', async () => {
+    const onSelectBranch = vi.fn()
+    customRender(
+      <UsageBranchFilter
+        branchOptions={[previewBranch]}
+        projectRef="parent-ref"
+        branchRef="branch-ref"
+        onSelectBranch={onSelectBranch}
+      />
+    )
+
+    expect(screen.getByLabelText('Filter by branch')).toHaveTextContent('marvo-app-dev')
+
+    await userEvent.click(screen.getByLabelText('Filter by branch'))
+    await userEvent.click(await screen.findByRole('option', { name: 'Main branch' }))
 
     expect(onSelectBranch).toHaveBeenCalledWith(null)
   })

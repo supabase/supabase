@@ -5,6 +5,7 @@ import { ChartArea, Check, ChevronDown } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../BillingSettings/Restriction'
@@ -47,22 +48,41 @@ export const Usage = () => {
   const [selectedBranchRef, setSelectedBranchRef] = useQueryState('branchRef')
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
 
-  const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery({
-    projectRef: selectedProjectRef ?? undefined,
+  const { data: selectedProject, isPending: isLoadingSelectedProject } = useProjectDetailQuery({
+    ref: selectedProjectRef ?? undefined,
   })
+  const isHighAvailability = resolveHighAvailability(selectedProject)
+  const canLoadProjectUsage =
+    !selectedProjectRef || (!isLoadingSelectedProject && !isHighAvailability)
+
+  const {
+    data: branches,
+    isLoading: isLoadingBranches,
+    isPending: isPendingBranches,
+    isError: isErrorBranches,
+    isSuccess: isSuccessBranches,
+    error: branchesError,
+  } = useBranchesQuery(
+    {
+      projectRef: selectedProjectRef ?? undefined,
+    },
+    { enabled: !!selectedProject && !isHighAvailability }
+  )
   const branchOptions = useMemo(() => getUsageBranchOptions(branches), [branches])
   const usageProjectRef = resolveUsageProjectRef(
     selectedProjectRef,
     branchOptions,
     selectedBranchRef
   )
-  const selectedBranch = branchOptions.find((branch) => branch.project_ref === selectedBranchRef)
-
-  const { data: selectedProject, isPending: isLoadingSelectedProject } = useProjectDetailQuery({
-    ref: selectedProjectRef ?? undefined,
-  })
-  const isHighAvailability = resolveHighAvailability(selectedProject)
-  const canLoadUsage = !selectedProjectRef || (!isLoadingSelectedProject && !isHighAvailability)
+  const selectedBranch = branchOptions.find(
+    (branch) => branch.project_ref === usageProjectRef && branch.project_ref !== selectedProjectRef
+  )
+  const isResolvingBranch = !!selectedProjectRef && !!selectedBranchRef && isPendingBranches
+  const isBranchLookupBlocked = !!selectedBranchRef && isErrorBranches
+  const isBranchUnavailable =
+    !!selectedBranchRef && isSuccessBranches && usageProjectRef !== selectedBranchRef
+  const canShowUsage = !isResolvingBranch && !isBranchLookupBlocked
+  const canLoadUsage = canLoadProjectUsage && canShowUsage
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -75,7 +95,7 @@ export const Usage = () => {
     isPending: isLoadingSubscription,
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canLoadUsage })
+  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canLoadProjectUsage })
 
   const billingCycleStart = useMemo(() => {
     return dayjs.unix(subscription?.current_period_start ?? 0).utc()
@@ -179,7 +199,7 @@ export const Usage = () => {
 
             {isSuccessSubscription && (
               <div className="flex lg:items-center items-start gap-3 flex-col lg:flex-row lg:justify-between w-full">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <DateRangePicker
                     onChange={setDateRange}
                     value={TIME_PERIODS_BILLING[0].key}
@@ -252,7 +272,7 @@ export const Usage = () => {
                     <UsageBranchFilter
                       branchOptions={branchOptions}
                       projectRef={selectedProjectRef}
-                      branchRef={selectedBranchRef}
+                      branchRef={selectedBranch?.project_ref ?? null}
                       onSelectBranch={setSelectedBranchRef}
                     />
                   )}
@@ -300,92 +320,123 @@ export const Usage = () => {
         </ScaffoldContainer>
       )}
 
-      {selectedProject ? (
-        <UsageFilterNotice
-          projectName={selectedProject.name || (selectedProjectRef ?? '')}
-          branchName={selectedBranch?.name}
-          hasBranches={branchOptions.length > 0}
-        />
-      ) : (
-        <ScaffoldContainer id="restriction" className="mt-5">
-          <Restriction />
+      {isErrorBranches && (
+        <ScaffoldContainer className="mt-5">
+          <AlertError subject="Failed to retrieve branches" error={branchesError} />
         </ScaffoldContainer>
       )}
 
-      <TotalUsage
-        orgSlug={slug as string}
-        projectRef={usageProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-      />
-
-      {subscription?.plan.id !== 'free' && (
-        <Compute orgDailyStats={orgDailyStats} isLoadingOrgDailyStats={isLoadingOrgDailyStats} />
+      {isResolvingBranch && (
+        <ScaffoldContainer className="mt-5">
+          <div role="status" aria-label="Loading branch usage">
+            <ShimmeringLoader />
+          </div>
+        </ScaffoldContainer>
       )}
 
-      {subscription?.plan.id === 'platform' && (
-        <ActiveCompute
-          orgDailyStats={orgDailyStats}
-          isLoadingOrgDailyStats={isLoadingOrgDailyStats}
-        />
+      {isBranchUnavailable && (
+        <ScaffoldContainer className="mt-5">
+          <Admonition
+            type="warning"
+            title="Branch unavailable"
+            description="The selected branch could not be found for this project. Showing usage for the parent project. Usage from deleted branches still counts toward the organization total."
+          />
+        </ScaffoldContainer>
       )}
 
-      <Egress
-        orgSlug={slug as string}
-        projectRef={usageProjectRef}
-        subscription={subscription}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-        orgDailyStats={orgDailyStats}
-        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
-        startDate={startDate}
-        endDate={endDate}
-      />
+      {canShowUsage && (
+        <>
+          {selectedProject ? (
+            <UsageFilterNotice
+              projectName={selectedProject.name || (selectedProjectRef ?? '')}
+              branchName={selectedBranch?.name}
+              hasBranches={branchOptions.length > 0}
+            />
+          ) : (
+            <ScaffoldContainer id="restriction" className="mt-5">
+              <Restriction />
+            </ScaffoldContainer>
+          )}
 
-      <SizeAndCounts
-        orgSlug={slug as string}
-        projectRef={usageProjectRef}
-        subscription={subscription}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-        orgDailyStats={orgDailyStats}
-        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
-        startDate={startDate}
-        endDate={endDate}
-      />
+          <TotalUsage
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            startDate={startDate}
+            endDate={endDate}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+          />
 
-      <Activity
-        orgSlug={slug as string}
-        projectRef={usageProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-        orgDailyStats={orgDailyStats}
-        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
-      />
+          {subscription?.plan.id !== 'free' && (
+            <Compute
+              orgDailyStats={orgDailyStats}
+              isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+            />
+          )}
 
-      <OrgLogUsage
-        orgSlug={slug as string}
-        projectRef={usageProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-        orgDailyStats={orgDailyStats}
-        isLoadingOrgDailyStats={isLoadingOrgDailyStats || isLoadingSubscription}
-      />
+          {subscription?.plan.id === 'platform' && (
+            <ActiveCompute
+              orgDailyStats={orgDailyStats}
+              isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+            />
+          )}
 
-      <Pipelines
-        orgSlug={slug as string}
-        projectRef={usageProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-        orgDailyStats={orgDailyStats}
-        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
-      />
+          <Egress
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+            startDate={startDate}
+            endDate={endDate}
+          />
+
+          <SizeAndCounts
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+            startDate={startDate}
+            endDate={endDate}
+          />
+
+          <Activity
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            startDate={startDate}
+            endDate={endDate}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+          />
+
+          <OrgLogUsage
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            startDate={startDate}
+            endDate={endDate}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats || isLoadingSubscription}
+          />
+
+          <Pipelines
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            startDate={startDate}
+            endDate={endDate}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+          />
+        </>
+      )}
     </>
   )
 }

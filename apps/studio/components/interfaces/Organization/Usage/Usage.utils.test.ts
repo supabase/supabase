@@ -311,7 +311,7 @@ describe('resolveUsageProjectRef', () => {
   ]
 
   it('returns null when no project is selected', () => {
-    expect(resolveUsageProjectRef(null, [], 'branch-ref')).toBe(null)
+    expect(resolveUsageProjectRef(null, branchOptions, 'branch-ref')).toBe(null)
   })
 
   it('returns the selected branch ref', () => {
@@ -326,5 +326,9 @@ describe('resolveUsageProjectRef', () => {
 
   it('falls back to the project while its branches are still unknown', () => {
     expect(resolveUsageProjectRef('parent-ref', [], 'branch-ref')).toBe('parent-ref')
+  })
+
+  it('rejects a matching branch ref belonging to another parent', () => {
+    expect(resolveUsageProjectRef('other-parent', branchOptions, 'branch-ref')).toBe('other-parent')
   })
 })

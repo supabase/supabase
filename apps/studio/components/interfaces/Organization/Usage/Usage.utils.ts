@@ -19,7 +19,6 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
   })
 }
 
-// Usage is recorded against each branch's own project ref, so a branch is only visible when selected
 export function getUsageBranchOptions(branches: Branch[] | undefined) {
   const previewBranches = (branches ?? [])
     .filter((branch) => !branch.is_default)
@@ -37,7 +36,12 @@ export function resolveUsageProjectRef(
   branchOptions: Branch[],
   selectedBranchRef: string | null
 ) {
-  const selectedBranch = branchOptions.find((branch) => branch.project_ref === selectedBranchRef)
+  if (!selectedProjectRef) return null
+
+  const selectedBranch = branchOptions.find(
+    (branch) =>
+      branch.project_ref === selectedBranchRef && branch.parent_project_ref === selectedProjectRef
+  )
   return selectedBranch?.project_ref ?? selectedProjectRef
 }
 

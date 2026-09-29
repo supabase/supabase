@@ -17,9 +17,14 @@ export const UsageBranchFilter = ({
 }: UsageBranchFilterProps) => {
   if (branchOptions.length === 0) return null
 
+  const mainBranch = branchOptions.find((branch) => branch.project_ref === projectRef)
+  const selectedRef = branchOptions.some((branch) => branch.project_ref === branchRef)
+    ? branchRef
+    : projectRef
+
   return (
     <Select
-      value={branchRef ?? projectRef}
+      value={selectedRef ?? projectRef}
       onValueChange={(value) => onSelectBranch(value === projectRef ? null : value)}
     >
       <SelectTrigger
@@ -30,11 +35,14 @@ export const UsageBranchFilter = ({
         <SelectValue placeholder="Select branch" />
       </SelectTrigger>
       <SelectContent>
-        {branchOptions.map((branch) => (
-          <SelectItem key={branch.project_ref} value={branch.project_ref}>
-            {branch.name}
-          </SelectItem>
-        ))}
+        <SelectItem value={projectRef}>{mainBranch?.name ?? 'Main branch'}</SelectItem>
+        {branchOptions
+          .filter((branch) => branch.project_ref !== projectRef)
+          .map((branch) => (
+            <SelectItem key={branch.project_ref} value={branch.project_ref}>
+              {branch.name}
+            </SelectItem>
+          ))}
       </SelectContent>
     </Select>
   )
