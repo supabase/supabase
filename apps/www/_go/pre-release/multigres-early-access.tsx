@@ -88,8 +88,7 @@ const page: GoPageInput = {
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
         notion: {
-          // TODO: DO NOT MERGE. Replace with the Multigres waitlist Notion database ID.
-          database_id: '00000000000000000000000000000000',
+          database_id: 'e345167c699f459bad511549f6cb993a',
           columnMap: {
             email: 'Email',
             org_slug: 'Organization Slug',
