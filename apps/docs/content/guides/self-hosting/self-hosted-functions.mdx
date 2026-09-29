@@ -42,7 +42,7 @@ Add the following code to `index.ts`:
 import { withSupabase } from '@supabase/server'
 
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+  fetch: withSupabase({ auth: ['publishable', 'secret'] }, async (req) => {
     const { name } = await req.json()
     const message = `Hello, ${name}!`
 
@@ -51,7 +51,7 @@ export default {
 }
 ```
 
-The `auth` option controls who can call the function: `'none'` accepts every request, `'user'` requires a valid user JWT, and `'publishable'` / `'secret'` require an API key. See the [Edge Functions auth guide](/docs/guides/functions/auth) for details.
+The `auth` option controls who can call the function. This example matches the default `hello` function and requires a publishable or secret API key in the `apikey` header. `'none'` accepts every request, and `'user'` requires a valid user JWT. See the [Edge Functions auth guide](/docs/guides/functions/auth) for details.
 
 ### Step 2: Restart the functions service to pick up the new function
 
@@ -63,6 +63,7 @@ sh run.sh restart functions
 
 ```sh
 curl -X POST http://<your-domain>/functions/v1/my-function \
+  -H 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
   -H 'Content-Type: application/json' \
   -d '{"name": "World"}'
 ```
