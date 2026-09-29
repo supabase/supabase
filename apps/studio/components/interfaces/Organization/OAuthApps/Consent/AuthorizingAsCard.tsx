@@ -27,6 +27,8 @@ export const AuthorizingAsCard = ({
                   icon={<LogOut size={14} />}
                   className="shrink-0 size-6 px-0 text-foreground-light hover:text-foreground"
                   aria-label="Sign out"
+                  aria-describedby={undefined}
+                  // Tooltip repeats the label; screen readers would read it twice
                   onClick={onSignOut}
                 />
               </TooltipTrigger>
@@ -39,6 +41,9 @@ export const AuthorizingAsCard = ({
           <span className="min-w-0 truncate text-right text-foreground">{organizationSlug}</span>
         </div>
       </div>
+      <p className="text-xs text-foreground-lighter">
+        This grant acts as you, it can never do more than your role in this organization allows.
+      </p>
     </section>
   )
 }

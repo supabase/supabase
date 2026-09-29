@@ -7,9 +7,9 @@ export const CONSENT_COPY = {
   selectionRequired: 'Must select at least one project to authorize.',
   maxProjectsReached: 'Maximum reached. Deselect a project to choose a different one.',
   organizationBoundGrant: {
-    title: 'This grant is shared with the whole organization',
-    description: (appName: string, organizationSlug: string) =>
-      `${appName} acts with owner permissions for every member of ${organizationSlug}, and stays active if you leave.`,
+    title: 'Want this scoped to one member?',
+    description: (appName: string) =>
+      `Have them authorize ${appName} from their own  account. Authorizing here gives it your Administrator access on every project, including ones created later.`,
   },
   coversEveryProject: {
     title: 'This grant covers every project',
