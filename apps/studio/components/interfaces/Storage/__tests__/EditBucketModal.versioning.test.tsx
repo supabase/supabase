@@ -76,6 +76,26 @@ describe('EditBucketModal versioning', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).not.toBeDisabled())
   })
 
+  it('surfaces a failed policy fetch and holds the save', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/storage/:ref/buckets/:id/lifecycle',
+      response: () =>
+        Response.json({ message: 'Bucket lifecycle is unavailable' }, { status: 500 }),
+    })
+
+    render(
+      <ProjectContextProvider projectRef="default">
+        <EditBucketModal visible bucket={bucket} onClose={vi.fn()} />
+      </ProjectContextProvider>
+    )
+
+    expect(await screen.findByText('Failed to retrieve the lifecycle policy')).toBeInTheDocument()
+    // A 404 is the "no policy" answer; anything else leaves the real policy unknown.
+    expect(screen.queryByText('No lifecycle policy')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+  })
+
   it('leaves a policy it cannot model alone when versioning is switched on', async () => {
     // Two age rules: the form reads the first and has nowhere to put the second, and the
     // update endpoint replaces the whole policy, so writing the form's defaults loses it.
