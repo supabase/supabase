@@ -226,7 +226,8 @@ Common causes: syntax errors in your function code, invalid imports, or missing 
 ### 401 "invalid JWT"
 
 - Check that `FUNCTIONS_VERIFY_JWT` matches your intent (`true` or `false`) in `.env`
-- If verification is enabled, ensure you're passing a valid token: `Authorization: Bearer <anon_key or service_role_key>`
+- If verification is enabled, pass either a valid JWT in `Authorization: Bearer <token>` (a user session token or a legacy API key), or an `sb_publishable_*` or `sb_secret_*` key in the `apikey` header. The API gateway translates `sb_` keys to an internal JWT, which the functions service then verifies.
+- Verifying asymmetric JWTs, including translated `sb_` keys, requires `SUPABASE_JWKS` to be set for the `functions` service in `docker-compose.yml`. See [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
 
 ### Changes to function code not reflected after editing
 
