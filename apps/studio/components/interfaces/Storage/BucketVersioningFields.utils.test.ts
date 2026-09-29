@@ -47,9 +47,28 @@ describe('getRetentionTightening', () => {
     )
   })
 
-  it('does not warn when a bound is newly added where none existed', () => {
+  it('warns when a bound is newly added where none existed, which was keeping them forever', () => {
     expect(
       getRetentionTightening(params({ initialRetentionDays: null, nextRetentionDays: 7 }))
+    ).toBe('days')
+  })
+
+  it('warns when a cap is newly added where none existed', () => {
+    expect(getRetentionTightening(params({ initialMaxVersions: null, nextMaxVersions: 3 }))).toBe(
+      'versions'
+    )
+  })
+
+  it('does not warn when both bounds stay unbounded', () => {
+    expect(
+      getRetentionTightening(
+        params({
+          initialRetentionDays: null,
+          initialMaxVersions: null,
+          nextRetentionDays: null,
+          nextMaxVersions: null,
+        })
+      )
     ).toBe('none')
   })
 
