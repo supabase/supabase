@@ -6,7 +6,26 @@ import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
 import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { FgaPermission, PermissionV2 } from '@/types'
+import type { PermissionV2 } from '@/types'
+import { permissions } from '@supabase/shared-types'
+
+type ExtractIds<T> = {
+  [K in keyof T]: {
+    [P in keyof T[K]]: T[K][P] extends { id: infer I } ? I : never
+  }
+}
+
+export const FGA_PERMISSIONS = Object.fromEntries(
+  Object.entries(permissions.FgaPermissions).map(([group, permissions]) => [
+    group,
+    Object.fromEntries(Object.entries(permissions).map(([key, { id }]) => [key, id])),
+  ])
+) as ExtractIds<typeof permissions.FgaPermissions>
+
+type DeepValue<T> = T extends object ? DeepValue<T[keyof T]> : T
+export type ExistingFgaPermissions = DeepValue<typeof FGA_PERMISSIONS>
+// TODO(Hieu): migrate to shared type when every permissions are available there
+export type FgaPermissions = ExistingFgaPermissions | (string & {})
 
 /**
  * Checks an FGA permission against the v2 permissions response.
@@ -14,24 +33,26 @@ import type { FgaPermission, PermissionV2 } from '@/types'
  * 1. explicit project scoped role entry for projectRef (if provided)
  * 2. org level permissions (org role applies to all projects in the org)
  */
-export function doPermissionsCheckV2(
-  data: PermissionV2 | undefined,
-  permission: FgaPermission,
-  organizationSlug?: string,
-  projectRef?: string | null
-): boolean {
-  if (!data) return false
+ export function doPermissionsCheckV2(
+   data: PermissionV2 | undefined,
+   permission: FgaPermissions | FgaPermissions[],
+   organizationSlug?: string,
+   projectRef?: string | null
+ ): boolean {
+   if (!data) return false
 
-  const org = data.organizations.find((o) => o.slug === organizationSlug)
-  if (!org) return false
+   const org = data.organizations.find((o) => o.slug === organizationSlug)
+   if (!org) return false
 
-  if (projectRef) {
-    const project = org.projects.find((p) => p.ref === projectRef)
-    if (project?.permissions.includes(permission)) return true
-  }
+   const required = Array.isArray(permission) ? permission : [permission]
+   if (required.length === 0) return false // nothing requested: fail closed
 
-  return org.permissions.includes(permission)
-}
+   const project = projectRef ? org.projects.find((p) => p.ref === projectRef) : undefined
+
+   return required.every(
+     (p) => (project?.permissions.includes(p) ?? false) || org.permissions.includes(p)
+   )
+ }
 
 function useGetProjectPermissionsV2(
   permissionsOverride?: PermissionV2,
@@ -103,7 +124,7 @@ function useGetProjectPermissionsV2(
 
 // Useful when you want to avoid layout changes while waiting for permissions to load
 export function useAsyncCheckPermissionsV2(
-  permission: FgaPermission,
+  permission: FgaPermissions | FgaPermissions[],
   overrides?: {
     organizationSlug?: string
     projectRef?: string | null

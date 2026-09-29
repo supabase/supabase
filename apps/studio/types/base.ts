@@ -95,11 +95,8 @@ export interface ProjectPermissions {
 }
 export interface OrganizationPermissions {
   slug: string
-  /** null when the user only has project-scoped roles in this organization */
   role: RoleV2 | null
-  /** applies to all projects in the organization; project entries below are additive overrides */
   permissions: FgaPermission[]
-  /** only projects with an explicit project-scoped role; org-level roles are not expanded here */
   projects: ProjectPermissions[]
 }
 export interface PermissionV2 {
