@@ -18,7 +18,7 @@ Insert-only tables don't require a primary key or replica identity. Updates and 
 
 ## Prepare DuckLake resources [#understand-the-ducklake-components]
 
-Prepare a Postgres catalog, object storage, and a compatible query engine:
+DuckLake uses a Postgres catalog and object storage. **Use Supabase** lets you select projects and a Storage bucket in the destination form; Pipelines provisions the connection credentials. **Custom parameters** requires your own catalog and storage credentials. You also need a compatible query engine to read the replicated data.
 
 | Component        | Purpose                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -30,9 +30,7 @@ You can query replicated tables, but treat them and their underlying catalog and
 
 ## Configure DuckLake as a destination [#choose-a-configuration-mode]
 
-Choose a mode below for its resource requirements and configuration steps.
-
-Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview), select **DuckLake**, then choose **Use Supabase** or **Custom parameters** for the catalog and storage.
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). In **Add pipeline**, select **DuckLake**, enter a **Pipeline name**, choose a **Publication**, and set **Initial sync**. Then choose **Use Supabase** or **Custom parameters** for the catalog and storage.
 
 ### Use Supabase
 
@@ -42,16 +40,17 @@ Before you begin:
 
 - Choose active, healthy, non-branch projects from the same organization for the catalog and storage. You can use the same project for both.
 - Make sure your organization role can administer SQL in the catalog project and Storage in the storage project.
-- Create a private standard Storage bucket, or create one from the destination form.
-- Choose a metadata schema unique to this DuckLake. Use only letters, numbers, and underscores.
+- Choose a private standard Storage bucket. You can create one from the destination form.
+- Choose a metadata schema unique to this DuckLake. Use only letters, numbers, and underscores. If the catalog project already uses the default `ducklake` schema for Warehouse, enter a different name.
 - Keep catalog and storage in the same region when possible, near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
 To configure the destination:
 
 1. Select **Use Supabase**.
-2. Choose the **Catalog project**, **Pool size**, and **Metadata schema**. Pool size allows `1` to `6` concurrent DuckDB connections; the default is `4`.
-3. Choose the **Storage project** and private **Bucket**.
-4. Click **Create and start pipeline** and complete the validation and cost confirmations.
+2. Choose the **Catalog project** and **Metadata schema**.
+3. Choose the **Storage project** and private **Bucket**. Use **Create bucket** beside the bucket field if you haven't created one yet.
+4. Optionally adjust **Pool size** under **Advanced settings**. It allows `1` to `6` concurrent DuckDB connections; the default is `4`.
+5. Click **Start pipeline**. Review any validation warnings, then confirm the estimated cost with **Create and start pipeline**.
 
 Credential-provisioning warnings are expected before creation: catalog and Storage credentials are provisioned when you save the destination. Review the selected resources before proceeding.
 
@@ -71,7 +70,6 @@ Configure these fields in the destination form:
 
 - **Catalog URL**: A `postgres://` or `postgresql://` connection URL, including credentials and an `sslmode` appropriate for your provider
 - **Data path**: An `s3://<bucket>/<prefix>` URL
-- **Pool size**: From `1` to `6`; the default is `4`
 - **S3 access key ID** and **S3 secret access key**: A credential pair for the data path
 - **S3 region**: The storage provider's region
 - **S3 endpoint**: The provider endpoint without `http://` or `https://`
@@ -79,7 +77,7 @@ Configure these fields in the destination form:
 - **Use SSL**: Keep enabled for production endpoints
 - **Metadata schema**: A unique Postgres schema for DuckLake metadata, using only letters, numbers, and underscores
 
-Click **Create and start pipeline** and complete the validation and cost confirmations.
+Optionally adjust **Pool size** under **Advanced settings**. It allows `1` to `6` concurrent DuckDB connections; the default is `4`. Click **Start pipeline**, review the validation results, then confirm the estimated cost with **Create and start pipeline**.
 
 The catalog URL and storage credentials are stored as secrets and aren't returned after creation. When editing the destination, leave a secret field empty to keep its stored value, or enter a new value to replace it.
 
