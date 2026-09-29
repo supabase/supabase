@@ -32,7 +32,7 @@ export async function getOrganizationAvailableRegions(
         cloud_provider: cloudProvider,
         organization_slug: slug,
         desired_instance_size: desiredInstanceSize,
-        high_availability: highAvailability ? 'true' : 'false',
+        high_availability: highAvailability?.toString(),
       },
     },
     signal,
