@@ -153,11 +153,18 @@ export function useSqlEditorAi({
     try {
       setIsAcceptDiffLoading(true)
 
-      // TODO: show error if undefined
-      if (!sourceSqlDiff || !editor.isReady() || !diffController.isMounted()) return
+      if (!sourceSqlDiff || !editor.isReady() || !diffController.isMounted()) {
+        toast.error('The editor is not ready yet. Please wait a moment and try again.')
+        setIsAcceptDiffLoading(false)
+        return
+      }
 
       const sql = diffController.getModifiedValue()
-      if (sql === undefined) return
+      if (sql === undefined) {
+        toast.error('Failed to retrieve the generated SQL.')
+        setIsAcceptDiffLoading(false)
+        return
+      }
 
       if (selectedDiffType === DiffType.NewSnippet) {
         const { title } = await generateSqlTitle({ sql })
