@@ -5,6 +5,7 @@ import {
   COUNT_RULE_ID,
   fromLifecycleRules,
   hasLifecyclePolicyChanged,
+  hasUnsupportedLifecycleRules,
   toLifecycleRules,
 } from './BucketVersioningFields.lifecycle'
 
@@ -193,5 +194,48 @@ describe('hasLifecyclePolicyChanged', () => {
         expiration_mode: 'or',
       })
     ).toBe(false)
+  })
+})
+
+describe('hasUnsupportedLifecycleRules', () => {
+  const ageRule = {
+    id: AGE_RULE_ID,
+    status: 'Enabled',
+    filter: {},
+    noncurrent_version_expiration: { noncurrent_days: 30 },
+  }
+  const cappedRule = {
+    id: COUNT_RULE_ID,
+    status: 'Enabled',
+    filter: {},
+    noncurrent_version_expiration: { noncurrent_days: 1, newer_noncurrent_versions: 10 },
+  }
+
+  it('is false when there is no policy at all', () => {
+    expect(hasUnsupportedLifecycleRules(null)).toBe(false)
+    expect(hasUnsupportedLifecycleRules({ rules: [] })).toBe(false)
+  })
+
+  it('is false for either shape the form writes', () => {
+    expect(hasUnsupportedLifecycleRules({ rules: toLifecycleRules(form) })).toBe(false)
+    expect(
+      hasUnsupportedLifecycleRules({ rules: toLifecycleRules({ ...form, expiration_mode: 'or' }) })
+    ).toBe(false)
+    expect(hasUnsupportedLifecycleRules({ rules: [cappedRule] })).toBe(false)
+  })
+
+  it('is true for a rule the form would drop on a save', () => {
+    expect(
+      hasUnsupportedLifecycleRules({ rules: [{ id: 'other', status: 'Enabled', filter: {} }] })
+    ).toBe(true)
+    expect(
+      hasUnsupportedLifecycleRules({ rules: [ageRule, { ...cappedRule, status: 'Disabled' }] })
+    ).toBe(true)
+  })
+
+  it('is true for more rules than the two the form can hold', () => {
+    expect(hasUnsupportedLifecycleRules({ rules: [ageRule, cappedRule, cappedRule] })).toBe(true)
+    expect(hasUnsupportedLifecycleRules({ rules: [ageRule, ageRule] })).toBe(true)
+    expect(hasUnsupportedLifecycleRules({ rules: [cappedRule, cappedRule] })).toBe(true)
   })
 })

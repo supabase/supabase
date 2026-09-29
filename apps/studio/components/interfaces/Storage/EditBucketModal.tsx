@@ -34,6 +34,7 @@ import { BucketVersioningFields } from './BucketVersioningFields'
 import {
   fromLifecycleRules,
   hasLifecyclePolicyChanged,
+  hasUnsupportedLifecycleRules,
   toLifecycleRules,
 } from './BucketVersioningFields.lifecycle'
 import {
@@ -106,6 +107,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     enabled: isStorageVersioningEnabled && visible && !!ref && !!bucket?.id,
   })
   const storedPolicy = fromLifecycleRules(lifecycle)
+  const isUnsupportedPolicy = hasUnsupportedLifecycleRules(lifecycle)
 
   const versioningSettings: BucketVersioningSettings = {
     versioning: getBucketVersioningState(bucket),
@@ -224,10 +226,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       ? toVersioningStatusUpdate(nextVersioningState)
       : undefined
 
-    // Saved first, so a rejected policy leaves the bucket untouched.
+    // Saved first, so a rejected policy leaves the bucket untouched. Skipped for a policy
+    // the form only partly read, since the update endpoint replaces the whole of it.
     if (
       isStorageVersioningEnabled &&
       nextVersioningState !== 'disabled' &&
+      !isUnsupportedPolicy &&
       hasLifecyclePolicyChanged(storedPolicy, values)
     ) {
       try {
@@ -537,6 +541,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   initialMaxVersions={versioningSettings.maxNoncurrentVersions}
                   isPublicBucket={isPublicBucket}
                   isLoadingPolicy={isLoadingLifecycle}
+                  isUnsupportedPolicy={isUnsupportedPolicy}
                 />
               )}
             </form>
