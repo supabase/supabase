@@ -38,7 +38,7 @@ export const BannedIPs = () => {
   const { isHighAvailability } = useHighAvailability()
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
-  const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
+  const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null)
 
   const {
     isPending: isLoadingIPList,
@@ -52,9 +52,6 @@ export const BannedIPs = () => {
 
   const ipListLoading = isLoadingIPList || isFetchingIPList
 
-  const [showUnban, setShowUnban] = useState(false)
-  const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
-
   const { can: canUnbanNetworks } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
@@ -62,6 +59,11 @@ export const BannedIPs = () => {
   })
 
   const isSectionDisabled = isHighAvailability || isAwsK8s || !canUnbanNetworks
+
+  if (isSectionDisabled && selectedIPToUnban !== null) {
+    setSelectedIPToUnban(null)
+  }
+
   const sectionDisabledReason = useMemo(() => {
     if (isHighAvailability) return HA_DISABLED_TITLE
     if (isAwsK8s) return V3_DISABLED_TITLE
@@ -71,8 +73,7 @@ export const BannedIPs = () => {
   const { mutate: unbanIPs, isPending: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
       toast.success('IP address successfully unbanned')
-      setSelectedIPToUnban(null) // Reset the selected IP for unban
-      setShowUnban(false)
+      setSelectedIPToUnban(null)
     },
     onError: (error) => {
       toast.error(`Failed to unban IP: ${error?.message}`)
@@ -80,17 +81,11 @@ export const BannedIPs = () => {
   })
 
   const onConfirmUnbanIP = () => {
-    if (confirmingIP == null || !ref) return
+    if (selectedIPToUnban === null || !ref || isSectionDisabled) return
     unbanIPs({
       projectRef: ref,
-      ips: [confirmingIP], // Pass the IP as an array
+      ips: [selectedIPToUnban], // Pass the IP as an array
     })
-  }
-
-  const openConfirmationModal = (ip: string) => {
-    setSelectedIPToUnban(ip) // Set the selected IP for unban
-    setConfirmingIP(ip) // Set the IP being confirmed for unban
-    setShowUnban(true)
   }
 
   return (
@@ -157,7 +152,7 @@ export const BannedIPs = () => {
                         </div>
                         <ButtonTooltip
                           disabled={isSectionDisabled}
-                          onClick={() => openConfirmationModal(ip)}
+                          onClick={() => setSelectedIPToUnban(ip)}
                           tooltip={{
                             content: {
                               side: 'bottom',
@@ -185,11 +180,11 @@ export const BannedIPs = () => {
         variant="destructive"
         size="medium"
         loading={isUnbanning}
-        visible={showUnban}
+        visible={selectedIPToUnban !== null && !isSectionDisabled}
         title="Confirm Unban IP"
         confirmLabel="Confirm Unban"
         confirmLabelLoading="Unbanning..."
-        onCancel={() => setShowUnban(false)}
+        onCancel={() => setSelectedIPToUnban(null)}
         onConfirm={onConfirmUnbanIP}
         alert={{
           title: 'This action cannot be undone',

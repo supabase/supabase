@@ -53,7 +53,6 @@ export const useBannedIPsQuery = <TData = IPData>(
     isFetching: query.isFetching,
     isSuccess: query.isSuccess,
     fetchStatus: query.fetchStatus,
-    refetch: query.refetch,
     projectError: project ? null : projectError,
   }
 }
