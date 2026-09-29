@@ -6,7 +6,8 @@ import { HttpResponse } from 'msw'
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest'
 
 import { PITRSelection } from './PITRSelection'
-import type { components } from '@/data/api'
+import type { BackupsData } from '@/data/database/backups-query'
+import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -21,8 +22,7 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 mockAnimationsApi()
 dayjs.extend(customParseFormat)
 
-type BackupsResponse = components['schemas']['BackupsResponse']
-type DatabaseResponse = components['schemas']['DatabaseDetailResponse_Output']
+type BackupsResponse = NonNullable<BackupsData>
 
 beforeAll(() => {
   vi.stubEnv('TZ', 'UTC')
@@ -52,7 +52,7 @@ describe('PITRSelection', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref/databases',
-      response: () => HttpResponse.json<DatabaseResponse[]>([]),
+      response: () => HttpResponse.json<ReadReplicasData>([]),
     })
 
     customRender(<PITRSelection />)
