@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { getOrgUsage } from './org-usage-query'
 
 vi.mock('@/data/fetchers', () => ({
+  assertResponseHasBody: vi.fn(),
   get: vi.fn(),
   handleError: vi.fn((error) => {
     throw error

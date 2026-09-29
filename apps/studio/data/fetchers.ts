@@ -92,6 +92,33 @@ export async function normalizeEmptyBodyResponse(response: Response): Promise<Re
   })
 }
 
+/**
+ * openapi-fetch resolves a success response it treats as empty (status 204, or a
+ * `Content-Length: 0` header, which `normalizeEmptyBodyResponse` adds when the transport omits
+ * it) with `data: {}`. That `{}` is typed as the endpoint's full response body, so consumers
+ * reading required fields (`data.features.x`, `data.some(...)`) crash on it.
+ *
+ * Call this in fetchers whose endpoint schema declares a JSON body. An empty body then surfaces
+ * as a retryable query error, and is reported to Sentry so the upstream cause can be traced.
+ */
+export function assertResponseHasBody(response: Response, endpoint: string): void {
+  if (response.status !== 204 && response.headers.get('Content-Length') !== '0') return
+
+  const error = new ResponseError(
+    'The server returned an empty response. Please try again.',
+    response.status,
+    undefined,
+    undefined,
+    endpoint
+  )
+  Sentry.captureException(error, {
+    level: 'warning',
+    fingerprint: ['empty-response-body', endpoint],
+    tags: { endpoint },
+  })
+  throw error
+}
+
 function pgMetaGuard(request: Request) {
   // Only check for /platform/pg-meta/ endpoints
   if (request.url.includes('/platform/pg-meta/')) {

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
 import { components } from '@/data/api'
-import { get, handleError } from '@/data/fetchers'
+import { assertResponseHasBody, get, handleError } from '@/data/fetchers'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -19,7 +19,7 @@ export async function getProjectStorageConfig(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get('/platform/projects/{ref}/config/storage', {
+  const { data, error, response } = await get('/platform/projects/{ref}/config/storage', {
     params: { path: { ref: projectRef } },
     signal,
   })
@@ -33,6 +33,7 @@ export async function getProjectStorageConfig(
       handleError(error)
     }
   }
+  assertResponseHasBody(response, '/platform/projects/{ref}/config/storage')
   return data
 }
 

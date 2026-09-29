@@ -1,14 +1,16 @@
 import { waitFor } from '@testing-library/react'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
   useIsVectorBucketsEnabled,
+  useProjectStorageConfigQuery,
   type ProjectStorageConfigData,
 } from './project-storage-config-query'
 import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { API_URL } from '@/lib/constants'
 import { customRenderHook } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 
 const { mockIsPlatform, mockUseDeploymentMode } = vi.hoisted(() => ({
   mockIsPlatform: { value: false },
@@ -92,6 +94,28 @@ describe('useIsVectorBucketsEnabled', () => {
 
     await waitFor(() => expect(configRequested).toBe(true))
     expect(result.current).toBe(false)
+  })
+
+  test('platform + empty 200 body: query errors instead of crashing on missing features', async () => {
+    mockIsPlatform.value = true
+    mockUseDeploymentMode.mockReturnValue(deploymentMode({ isPlatform: true }))
+    // No body and no Content-Length, as seen over HTTP/3. Without the empty-body assertion this
+    // resolves as `data: {}` and `data.features.vectorBuckets` throws during render.
+    mswServer.use(
+      http.get(
+        `${API_URL}/platform/projects/:ref/config/storage`,
+        () => new HttpResponse(null, { status: 200 })
+      )
+    )
+
+    const { result } = customRenderHook(() => ({
+      isVectorBucketsEnabled: useIsVectorBucketsEnabled({ projectRef: 'default' }),
+      query: useProjectStorageConfigQuery({ projectRef: 'default' }),
+    }))
+
+    await waitFor(() => expect(result.current.query.isError).toBe(true))
+    expect(result.current.query.data).toBeUndefined()
+    expect(result.current.isVectorBucketsEnabled).toBe(false)
   })
 
   test('CLI: true regardless of the storage config flag', () => {

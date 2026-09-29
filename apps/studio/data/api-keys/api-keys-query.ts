@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
 import { apiKeysKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { assertResponseHasBody, get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type LegacyKeys = {
@@ -54,12 +54,13 @@ export type APIKey = LegacyKeys | SecretKeys | PublishableKeys
 async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
+  const { data, error, response } = await get(`/v1/projects/{ref}/api-keys`, {
     params: { path: { ref: projectRef }, query: { reveal: reveal ? 'true' : 'false' } },
     signal,
   })
 
   if (error) handleError(error)
+  assertResponseHasBody(response, '/v1/projects/{ref}/api-keys')
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
   return data as unknown as APIKey[]
