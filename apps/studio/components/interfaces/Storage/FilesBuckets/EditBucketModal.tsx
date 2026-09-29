@@ -82,12 +82,19 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  const { data: lifecycle, isLoading: isLoadingLifecycle } = useQuery({
+  const {
+    data: lifecycle,
+    isLoading: isLoadingLifecycle,
+    error: lifecycleError,
+  } = useQuery({
     ...bucketLifecycleQueryOptions({ projectRef: ref, bucketId: bucket?.id }),
     enabled: isStorageVersioningEnabled && visible && !!ref && !!bucket?.id,
   })
   const storedPolicy = fromLifecycleRules(lifecycle)
   const isUnsupportedPolicy = hasUnsupportedLifecycleRules(lifecycle)
+  // Still loading, or the fetch failed: either way the form is seeded from a policy
+  // nobody has read, and the update endpoint would replace the real one with it.
+  const hasUnreadPolicy = isLoadingLifecycle || !!lifecycleError
 
   const versioningSettings: BucketVersioningSettings = {
     versioning: getBucketVersioningState(bucket),
@@ -207,11 +214,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       : undefined
 
     // Saved first, so a rejected policy leaves the bucket untouched. Skipped for a policy
-    // the form only partly read, since the update endpoint replaces the whole of it.
+    // the form never fully read, since the update endpoint replaces the whole of it.
     if (
       isStorageVersioningEnabled &&
       nextVersioningState !== 'disabled' &&
       !isUnsupportedPolicy &&
+      !hasUnreadPolicy &&
       hasLifecyclePolicyChanged(storedPolicy, values)
     ) {
       try {
@@ -522,6 +530,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   isPublicBucket={isPublicBucket}
                   isLoadingPolicy={isLoadingLifecycle}
                   isUnsupportedPolicy={isUnsupportedPolicy}
+                  policyError={lifecycleError}
                 />
               )}
             </form>
@@ -537,7 +546,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
               type="submit"
               loading={isUpdating}
               // Saving now would write the empty policy the form is still seeded with.
-              disabled={isLoadingLifecycle}
+              disabled={hasUnreadPolicy}
             >
               Save
             </Button>
