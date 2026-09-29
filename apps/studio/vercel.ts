@@ -49,6 +49,9 @@ function headersFor(prefix: string) {
     // favicon: max-age=86400 = 1 day).
     routes.cacheControl(`${prefix}/img/(.*)`, { public: true, maxAge: '30days' }),
     routes.cacheControl(`${prefix}/favicon/(.*)`, { public: true, maxAge: '1day' }),
+    // Deno declarations are public TypeScript assets. Keep this override
+    // scoped to /deno so dynamic response types remain handler-owned.
+    routes.header(`${prefix}/deno/(.*)\\.ts`, [{ key: 'content-type', value: 'text/typescript' }]),
   ]
 }
 
