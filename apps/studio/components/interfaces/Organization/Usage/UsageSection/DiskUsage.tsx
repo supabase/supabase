@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button, cn, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -33,14 +33,22 @@ export const DiskUsage = ({
   usage,
   currentBillingCycleSelected,
 }: DiskUsageProps) => {
-  const {
-    data,
-    isError,
-    isPending: isLoading,
-    isSuccess,
-    error,
-  } = useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
+  const { data, isError, isPending, isFetching, isSuccess, error, hasNextPage, fetchNextPage } =
+    useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
+  const shouldFindSelectedProject =
+    currentBillingCycleSelected &&
+    !!projectRef &&
+    !projects.some((project) => project.ref === projectRef) &&
+    hasNextPage &&
+    !isError
+  const isLoading = isPending || shouldFindSelectedProject
+
+  useEffect(() => {
+    if (shouldFindSelectedProject && !isFetching) {
+      void fetchNextPage()
+    }
+  }, [shouldFindSelectedProject, isFetching, fetchNextPage])
 
   const relevantProjects = useMemo(() => {
     return isSuccess
@@ -92,7 +100,7 @@ export const DiskUsage = ({
           </div>
         )}
         {isError && <AlertError subject="Failed to retrieve usage data" error={error} />}
-        {isSuccess && (
+        {isSuccess && !isLoading && (
           <div className="space-y-4">
             {currentBillingCycleSelected &&
               subscription?.usage_billing_enabled === false &&
