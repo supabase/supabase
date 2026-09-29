@@ -1,0 +1,48 @@
+---
+title: 'How do I connect SvelteKit, Nuxt, Astro, or TanStack Start to Postgres?'
+description: 'Query Postgres only from server-side code, through a pooled connection string kept in an environment variable, and use the Data API with Row Level Security for anything the browser reads directly.'
+date: '2026-09-28'
+---
+
+Query Postgres only from code that runs on the server, such as server routes, loaders, and server functions, using a connection string kept in an environment variable. Anything that runs in the browser should use the Data API with Row Level Security instead.
+
+Full-stack JavaScript frameworks mix server and browser code in one project, so the main job is keeping the database connection on the server side.
+
+## 1. Choose the connection string by where you deploy
+
+- **Serverless or edge deployments:** the shared pooler in transaction mode, on port `6543`.
+- **A Node.js server that stays running:** the direct connection, or the shared pooler in session mode if the host only supports IPv4.
+
+Copy it from **Connect** in the Supabase dashboard and store it as a private environment variable, never one your framework exposes to the client. See [Connect to your database](/docs/guides/database/connecting-to-postgres).
+
+## 2. Create one client for the server
+
+```ts
+import postgres from 'postgres'
+
+export const sql = postgres(process.env.DATABASE_URL!, {
+  max: 1,
+  prepare: false,
+  ssl: 'require',
+})
+```
+
+Put this in a server-only module and import it only from server code. The settings above suit serverless deployments. On a long-running server with a direct or session mode connection, you can raise `max` and leave prepared statements on.
+
+Drizzle and Prisma work the same way. See [Can I use Supabase with Drizzle or Prisma without supabase-js?](/faqs/can-i-use-supabase-with-drizzle-or-prisma-without-supabase-js)
+
+## 3. Handle browser-side data separately
+
+If a component fetches data in the browser, call the Data API with the publishable key and protect the tables with Row Level Security. See [How do I query Postgres from a frontend app without a backend?](/faqs/how-do-i-query-postgres-from-a-frontend-app-without-a-backend)
+
+## Framework guides
+
+The quickstarts show a full setup with Supabase for each framework:
+
+- [SvelteKit](/docs/guides/getting-started/quickstarts/sveltekit)
+- [Nuxt](/docs/guides/getting-started/quickstarts/nuxtjs)
+- [Astro](/docs/guides/getting-started/quickstarts/astrojs)
+- [TanStack Start](/docs/guides/getting-started/quickstarts/tanstack)
+- [Hono](/docs/guides/getting-started/quickstarts/hono)
+
+For Next.js, see [Which Postgres database works for a Next.js app on Vercel?](/faqs/which-postgres-database-works-for-a-nextjs-app-on-vercel)

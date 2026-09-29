@@ -1,0 +1,35 @@
+---
+title: 'How do I migrate an existing Postgres database to Supabase?'
+description: 'Dump the database with pg_dump and restore it into your Supabase project, or use logical replication to keep downtime to a minimum.'
+date: '2026-09-28'
+---
+
+Dump your existing database with `pg_dump` and restore it into your Supabase project. If you can't afford much downtime, use logical replication to copy the data while the old database keeps serving traffic, then switch over.
+
+## Option 1: Dump and restore
+
+This works for every Postgres version and is the simplest approach.
+
+1. Create a Supabase project, and get the direct connection string, or the session pooler string on an IPv4-only network, from **Connect**.
+2. Dump the source database with `pg_dump`.
+3. Restore the dump into Supabase with `psql` or `pg_restore`.
+4. Point your app at the new connection string.
+
+Plan a maintenance window. Writes to the old database after the dump won't be in the new one.
+
+## Option 2: Logical replication
+
+Logical replication streams changes from the source database to Supabase continuously. Once the new database has caught up, you switch your app over with little downtime. It requires Postgres 10 or later on the source.
+
+## Option 3: A guided notebook
+
+The migration guide includes a notebook that walks through the dump and restore with copy-paste steps.
+
+See [Migrate from Postgres to Supabase](/docs/guides/platform/migrating-to-supabase/postgres) for the commands for each option.
+
+## After the move
+
+- Check that extensions your schema uses are enabled. See [Postgres extensions](/docs/guides/database/extensions).
+- Recreate custom roles and their passwords, and review their grants.
+- Pick the right connection mode for each part of your app. See [Connect to your database](/docs/guides/database/connecting-to-postgres).
+- If clients will query tables through the Data API, enable Row Level Security first.

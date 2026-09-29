@@ -1,0 +1,52 @@
+---
+title: 'How do I connect to Postgres from serverless and edge functions?'
+description: 'Use a pooler in transaction mode, create the client once per instance with a pool of 1, and turn off prepared statements.'
+date: '2026-09-28'
+---
+
+Connect through a connection pooler in transaction mode, create the database client once per function instance with a pool size of 1, and turn off prepared statements.
+
+Serverless platforms run many short-lived copies of your function. If each copy opens its own direct connections, the database quickly runs out of them. A pooler in transaction mode lends a database connection to a function only for the length of each transaction.
+
+## 1. Use the transaction mode connection string
+
+In the Supabase dashboard, click **Connect** and choose **Transaction pooler**. The string uses port `6543` and connects over IPv4:
+
+```txt
+postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres
+```
+
+Copy the host from the dialog. You can't work it out from your region.
+
+## 2. Configure the client
+
+1. Create the client at module scope, not inside the handler, so warm invocations reuse it.
+2. Set the pool to 1 connection. Library defaults, such as 10 for Postgres.js, multiply across every warm instance.
+3. Turn off prepared statements, which transaction mode doesn't support.
+4. Require SSL.
+
+```ts
+import postgres from 'postgres'
+
+export const sql = postgres(process.env.DATABASE_URL!, {
+  max: 1,
+  prepare: false,
+  ssl: 'require',
+})
+```
+
+For Prisma, add `pgbouncer=true` to the connection string instead of `prepare: false`.
+
+## 3. Know what transaction mode can't do
+
+Your connection returns to the pool after each transaction, so session state doesn't carry over:
+
+- No prepared statements or query pipelining
+- No `set` or session-level advisory locks outside a transaction
+- No `listen` and `notify`, or temporary tables across transactions
+
+If you need these, use a direct connection or session mode from a long-running server. See [Connect to your database](/docs/guides/database/connecting-to-postgres).
+
+## Functions that run next to the database
+
+[Edge Functions](/docs/guides/functions) run on Supabase and follow the same rules when they connect to Postgres. The [serverless drivers guide](/docs/guides/database/connecting-to-postgres/serverless-drivers) covers drivers built for these environments.

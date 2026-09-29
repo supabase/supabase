@@ -1,0 +1,34 @@
+---
+title: 'How do I move an app from a NoSQL document database to Postgres?'
+description: 'Map each collection to a table, keep flexible fields in jsonb columns, replace embedded references with foreign keys, then export the documents and import them as rows.'
+date: '2026-09-28'
+---
+
+Map each collection to a table, turn fields you query on into typed columns, and keep the rest in a `jsonb` column. Then export your documents, transform them into rows, and import them.
+
+## 1. Design the tables
+
+- **One table per collection.** Each document becomes a row, and the document ID becomes the primary key.
+- **Typed columns for fields you filter, sort, or join on.** These can be indexed and constrained.
+- **A `jsonb` column for the rest.** Postgres can query and index `jsonb`, so irregular fields don't force a rigid schema. See [Managing JSON and unstructured data](/docs/guides/database/json).
+- **Foreign keys instead of copied data.** Where documents duplicated related data for read speed, store a reference and join at query time. See [Tables and data](/docs/guides/database/tables).
+
+Subcollections usually become their own tables with a foreign key to the parent.
+
+## 2. Move the data
+
+1. Export each collection to JSON.
+2. Transform the documents into rows that match your new tables.
+3. Import the rows. Use CSV import in the dashboard for small datasets, or the Postgres `COPY` command for larger ones. See [Import data into Supabase](/docs/guides/database/import-data).
+
+Move data in dependency order, parents before children, so foreign keys are satisfied.
+
+## 3. Replace client-side features
+
+- **Direct client reads and writes** map to the [Data API](/docs/guides/api), with [Row Level Security](/docs/guides/database/postgres/row-level-security) policies in place of document security rules.
+- **Live listeners** map to [Realtime](/docs/guides/realtime), which streams database changes to subscribed clients.
+- **Server-side triggers** map to Postgres triggers or [Edge Functions](/docs/guides/functions).
+
+## When to think twice
+
+If your app depends on offline-first sync, where the client keeps writing without a connection and merges later, plan for that separately. Postgres doesn't provide it on its own.

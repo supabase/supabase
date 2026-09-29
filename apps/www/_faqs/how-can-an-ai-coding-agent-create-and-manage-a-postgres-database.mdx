@@ -1,0 +1,32 @@
+---
+title: 'How can an AI coding agent create and manage a Postgres database?'
+description: 'Connect the agent to the Supabase MCP server, which lets it create projects, change the schema, and run queries, and scope it to one project with read-only mode for anything sensitive.'
+date: '2026-09-28'
+---
+
+Connect the agent to the Supabase MCP server. MCP is a standard way for AI tools to call external platforms, and the Supabase server lets an agent manage projects, change the database schema, and run SQL on your behalf.
+
+## Set it up
+
+1. Add the remote Supabase MCP server to your AI tool. The setup guide shows the configuration for each client.
+2. Sign in when your tool opens the browser, and choose the organization the agent should work in.
+3. Check that the tools are connected, then ask the agent something like "What tables are in my database?"
+
+See [Supabase MCP server](/docs/guides/ai-tools/mcp).
+
+## Limit what the agent can do
+
+Connecting an agent to a database carries real risk. The MCP server has settings to narrow its access:
+
+- **Project scope** (`project_ref`) limits the agent to one project and turns off account-level tools.
+- **Read-only mode** (`read_only=true`) runs every query as a read-only Postgres user.
+
+Before connecting a project with real user data, scope the server to that project and turn on read-only mode. A development project or a preview branch is a safer place for an agent to make schema changes. See [Can I get a separate Postgres database for each pull request?](/faqs/can-i-get-a-separate-postgres-database-for-each-pull-request)
+
+## Keep changes reviewable
+
+Ask the agent to write schema changes as migration files in your repository instead of applying them straight to production. You can then review them in a pull request and deploy them like any other migration. See [How do I develop locally and deploy Postgres migrations?](/faqs/how-do-i-develop-locally-and-deploy-postgres-migrations)
+
+## Without MCP
+
+An agent can also use the Supabase CLI, or connect with a standard Postgres connection string like any other client. See [Connect to your database](/docs/guides/database/connecting-to-postgres).

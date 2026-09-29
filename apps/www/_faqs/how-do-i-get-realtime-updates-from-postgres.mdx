@@ -1,0 +1,38 @@
+---
+title: 'How do I get realtime updates when rows change in Postgres?'
+description: 'Add the table to the supabase_realtime publication and subscribe from the client, so inserts, updates, and deletes stream to connected users over WebSockets.'
+date: '2026-09-28'
+---
+
+In Supabase, add the table to the `supabase_realtime` publication, then subscribe to it from your app. Inserts, updates, and deletes stream to connected clients over WebSockets.
+
+## 1. Turn it on for specific tables
+
+Realtime change streaming is opt-in per table. Either toggle the table on under `supabase_realtime` in the dashboard's Publications settings, or run:
+
+```sql
+alter publication supabase_realtime add table messages;
+```
+
+Only add tables whose changes clients need. Every published table adds work for the database.
+
+## 2. Subscribe from the client
+
+Use a Supabase client library to subscribe to changes on a table, optionally filtered to specific rows. Clients receive each changed row as an event. See [Postgres Changes](/docs/guides/realtime/postgres-changes).
+
+## 3. Secure what clients can receive
+
+Enable Row Level Security on published tables and write policies for who can read them. See [Row Level Security](/docs/guides/database/postgres/row-level-security).
+
+## Other realtime patterns
+
+Not every live feature needs database changes. Supabase Realtime also supports:
+
+- **Broadcast,** for sending messages between clients, such as cursor positions.
+- **Presence,** for tracking who is online.
+
+See [Realtime](/docs/guides/realtime).
+
+## What about LISTEN and NOTIFY?
+
+Postgres `listen` and `notify` work over a direct connection or session mode, from a server that keeps its connection open. They don't work through the pooler's transaction mode, because the connection returns to the pool after each transaction. For pushing changes to browsers and mobile apps, Realtime is simpler.

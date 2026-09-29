@@ -1,0 +1,34 @@
+---
+title: 'How many connections can a Supabase Postgres database handle?'
+description: 'It depends on the compute size, and a connection pooler lets many more clients share those database connections, for example up to 200 pooler clients on Micro.'
+date: '2026-09-28'
+---
+
+It depends on the project's compute size. Each size has a maximum number of direct database connections and a larger maximum number of clients the connection pooler accepts. The pooler lets many clients share a small number of database connections.
+
+## Limits for the smaller sizes
+
+- **Nano (Free) and Micro:** 60 database connections, 200 pooler clients
+- **Small:** 90 database connections, 400 pooler clients
+- **Medium:** 120 database connections, 600 pooler clients
+
+Larger compute sizes allow more. See the full table in [Compute and disk](/docs/guides/platform/compute-and-disk).
+
+## Why the pooler matters
+
+A Postgres connection stays open until the client disconnects, even while it sits idle. Without a pooler, every server process or function instance holds its own connections, and the database can run out even when traffic is light.
+
+- **Serverless and edge functions:** always connect through the pooler in transaction mode, which lends a connection only for each transaction.
+- **Long-running servers:** a small application-side pool, often a handful of connections per process, over a direct or session mode connection is usually enough.
+
+## Pool size
+
+The pool size setting controls how many connections the pooler may open to Postgres. Change it in the database settings in the dashboard. Supabase's shared and dedicated poolers read the same setting.
+
+See [Connection pooling and limits](/docs/guides/database/connecting-to-postgres/pooling-and-limits).
+
+## Running out of connections?
+
+1. Check that serverless code uses transaction mode and a pool of 1 per instance. See [How do I connect to Postgres from serverless and edge functions?](/faqs/how-do-i-connect-to-postgres-from-serverless-and-edge-functions)
+2. Look for connections that are opened per request and never closed.
+3. If you've done both, a larger compute size raises the limits. See [How do I scale a Supabase Postgres database?](/faqs/how-do-i-scale-a-supabase-postgres-database)

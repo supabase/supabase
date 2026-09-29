@@ -1,0 +1,50 @@
+---
+title: 'How do I add full text search to Postgres?'
+description: "Use Postgres's built-in full text search: convert text to a tsvector, match it against a tsquery, and add a GIN index to keep searches fast."
+date: '2026-09-28'
+---
+
+Postgres has full text search built in. Convert your text to a `tsvector`, match it against a search query, and add an index so searches stay fast as the table grows. You don't need a separate search service for most apps.
+
+## 1. Search with to_tsvector and a query
+
+```sql
+select title
+from books
+where to_tsvector('english', title || ' ' || description)
+  @@ websearch_to_tsquery('english', 'postgres performance');
+```
+
+`websearch_to_tsquery` accepts the kind of input people type into a search box, including quoted phrases and `-` to exclude a word.
+
+## 2. Store the search vector and index it
+
+Computing the vector on every query gets slow. Store it in a generated column and index it:
+
+```sql
+alter table books
+  add column fts tsvector
+  generated always as (to_tsvector('english', title || ' ' || description)) stored;
+
+create index books_fts on books using gin (fts);
+```
+
+Then query `where fts @@ websearch_to_tsquery('english', $1)`.
+
+## 3. Rank the results
+
+Order matches by relevance with `ts_rank`:
+
+```sql
+select title, ts_rank(fts, query) as rank
+from books, websearch_to_tsquery('english', $1) as query
+where fts @@ query
+order by rank desc
+limit 20;
+```
+
+See [Full text search](/docs/guides/database/full-text-search).
+
+## Combine it with semantic search
+
+Keyword search finds exact terms. Vector search finds similar meaning. Many apps run both and merge the results. See [How do I add vector search to Postgres?](/faqs/how-do-i-add-vector-search-to-postgres)

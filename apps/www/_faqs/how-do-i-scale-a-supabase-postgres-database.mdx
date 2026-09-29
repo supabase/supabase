@@ -1,0 +1,35 @@
+---
+title: 'How do I scale a Supabase Postgres database?'
+description: 'Optimize queries first, then move to a larger compute size, and add read replicas when you need to spread read traffic or serve other regions.'
+date: '2026-09-28'
+---
+
+Optimize your queries and indexes first, then move to a larger compute size. Add read replicas when reads dominate, when you've reached the largest compute size, or when you need copies of the data in other regions.
+
+## 1. Make sure the queries are efficient
+
+Hardware won't fix a missing index. Look at slow queries with `explain analyze` and add indexes where they help. Supabase recommends not scaling until CPU is sustained above 70%, and checking queries before adding hardware. See [Query optimization](/docs/guides/database/query-optimization).
+
+## 2. Increase compute
+
+Every project runs on its own compute instance, from Micro upward. A larger size adds CPU and memory and raises connection limits. Compute is billed hourly. Changing size usually takes less than 2 minutes of downtime.
+
+See [Compute and disk](/docs/guides/platform/compute-and-disk).
+
+## 3. Add read replicas
+
+Read replicas are extra databases kept in sync with your primary. Use them to:
+
+- **Spread load,** for example by running analytical queries on a replica
+- **Reduce latency** for users in other regions
+- **Add redundancy**
+
+Replicas only serve reads, so they won't help a write-heavy workload. If your workload is mostly reads, they become the right choice once you reach the largest compute size, or earlier when you need isolation or geographic distribution. Each replica has its own connection pooler. See [Read replicas](/docs/guides/platform/read-replicas).
+
+## 4. Manage connections
+
+As traffic grows, connection limits often become the bottleneck before CPU does. Route serverless traffic through the pooler in transaction mode. See [How many connections can a Supabase Postgres database handle?](/faqs/how-many-connections-can-my-supabase-database-handle)
+
+## Disk grows with you
+
+On paid plans, the disk expands automatically when the database reaches 90% of its allocated size. It grows by 50%, for example from 8 GB to 12 GB. See [Database size](/docs/guides/platform/database-size).

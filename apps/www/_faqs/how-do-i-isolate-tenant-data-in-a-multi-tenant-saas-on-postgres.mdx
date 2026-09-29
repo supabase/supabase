@@ -1,0 +1,39 @@
+---
+title: 'How do I isolate tenant data in a multi-tenant SaaS on Postgres?'
+description: 'Add a tenant ID to every tenant-owned table and enforce it in one place, either with Row Level Security policies in the database or with a single query layer in your app.'
+date: '2026-09-28'
+---
+
+Give every tenant-owned row a tenant ID, then make sure every query is filtered by it in one place you can test. In Postgres that place is usually Row Level Security (RLS), or a single data-access layer in your application.
+
+## Start with a tenant column
+
+Add a `tenant_id` column to every table that holds tenant data, and index it. Keep the tenants themselves in their own table and reference it with a foreign key, so a row can't point at a tenant that doesn't exist.
+
+A shared schema with a tenant column scales to many tenants without extra databases, and it keeps migrations simple because every tenant has the same schema.
+
+## Enforce it with Row Level Security
+
+RLS attaches policies to a table. Postgres applies them to every query, like an extra `WHERE` clause the caller can't remove. A policy can compare `tenant_id` with a claim in the user's JWT, so the database itself refuses to return another tenant's rows.
+
+- Enable RLS on every table in an exposed schema. A table without it is readable and writable by any role with a grant on it.
+- Test policies as part of your migrations. The [RLS guide](/docs/guides/database/postgres/row-level-security) covers testing with `supabase test db`.
+
+RLS is the right choice when clients query the database directly, for example through the Data API.
+
+## Or enforce it in your app
+
+If all access goes through your server and an ORM, you can enforce isolation there instead:
+
+- Route every query through one helper or repository that adds the tenant filter.
+- Resolve the tenant from the authenticated session, never from request input the client controls.
+- Write tests that try to read another tenant's data.
+
+Watch which role your app connects as. Roles created with `bypassrls`, such as the `prisma` role in the [Prisma guide](/docs/guides/database/prisma), skip RLS policies, so with them your app code is the only guard.
+
+## Other models
+
+- **A schema per tenant** gives stronger separation but multiplies migrations.
+- **A project per tenant** gives each tenant its own database and compute, at the cost of managing many projects.
+
+Most SaaS apps start with a shared schema and a tenant column, then move large or regulated tenants out when they need to.

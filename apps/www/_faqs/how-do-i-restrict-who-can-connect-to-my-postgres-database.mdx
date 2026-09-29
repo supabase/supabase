@@ -1,0 +1,35 @@
+---
+title: 'How do I restrict who can connect to my Supabase Postgres database?'
+description: 'Use network restrictions to allow only your IP ranges, enforce SSL, keep the database password and secret key on your servers, and protect exposed tables with Row Level Security.'
+date: '2026-09-28'
+---
+
+Limit access at each layer: allow only known IP ranges to reach Postgres, require SSL, keep credentials on servers you control, and protect any table reachable through the Data API with Row Level Security.
+
+## Network restrictions
+
+Network restrictions let you choose which IP ranges can connect to Postgres and its poolers. They're enforced before traffic reaches the database and apply to direct and pooled connections alike.
+
+- Add the ranges your servers and CI connect from.
+- If direct connections resolve to IPv6, add both the IPv4 and IPv6 ranges you use.
+
+See [Network restrictions](/docs/guides/platform/network-restrictions).
+
+## SSL enforcement
+
+By default, Postgres accepts connections without SSL for compatibility. Turn on SSL enforcement to reject unencrypted connections. Applying it triggers a quick database restart. See [Postgres SSL enforcement](/docs/guides/platform/ssl-enforcement).
+
+Set `sslmode=require` in your own connection strings as well.
+
+## Credentials
+
+- Keep the database password and the secret API key on servers you control. Never ship them in browser or mobile code.
+- Give each service or tool its own database role with only the grants it needs.
+
+See [API keys](/docs/guides/getting-started/api-keys).
+
+## The Data API
+
+Network restrictions cover Postgres connections, not the HTTP APIs. If you use the Data API, Row Level Security is what decides who can read and change each row. Enable it on every table in an exposed schema. See [Row Level Security](/docs/guides/database/postgres/row-level-security).
+
+If nothing in your app uses the Data API, you can turn it off in your project's API settings.

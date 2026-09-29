@@ -1,0 +1,38 @@
+---
+title: 'Can I use Postgres as a message queue?'
+description: "Yes. The pgmq extension, available as Supabase Queues, gives you durable queues inside Postgres, so you don't need a separate queue service."
+date: '2026-09-28'
+---
+
+Yes. The `pgmq` extension turns Postgres into a durable message queue. Supabase provides it as Supabase Queues, so you can enqueue and process background work without running a separate queue service.
+
+## How it works
+
+- Queues are Postgres tables managed by the extension, so messages are stored as durably as the rest of your data.
+- Producers send messages with SQL or through the Supabase client libraries.
+- Consumers read messages, which become invisible to other consumers for a period of time, then delete or archive them once processed.
+- If a consumer fails to finish in time, the message becomes visible again and another consumer can retry it.
+
+## Send and read with SQL
+
+```sql
+select pgmq.create('emails');
+
+select pgmq.send('emails', '{"to": "user@example.com"}');
+
+select * from pgmq.read('emails', 30, 10);
+```
+
+The `read` call returns up to 10 messages and hides them from other readers for 30 seconds.
+
+## Common patterns
+
+- Enqueue work in the same transaction that changes your data, so the message exists only if the change commits.
+- Pair a queue with a [scheduled job](/faqs/how-do-i-run-scheduled-jobs-in-postgres) or a worker that polls it.
+- Keep queues private and control access with Postgres permissions.
+
+See [Supabase Queues](/docs/guides/queues).
+
+## When a dedicated queue fits better
+
+For very high message throughput or complex routing, a dedicated message broker may be a better fit. For most apps, a queue next to the data keeps things simpler.

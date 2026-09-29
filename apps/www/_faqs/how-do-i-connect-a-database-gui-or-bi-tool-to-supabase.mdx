@@ -1,0 +1,39 @@
+---
+title: 'How do I connect a database GUI or BI tool to Supabase Postgres?'
+description: "Use the shared pooler's session mode connection details, which work over IPv4 and support prepared statements, and connect with SSL."
+date: '2026-09-28'
+---
+
+Use the connection details for the shared pooler in session mode. Session mode is reachable over IPv4 from networks you don't control and supports prepared statements, which many desktop and BI tools rely on.
+
+## 1. Get the connection details
+
+In the Supabase dashboard, click **Connect** and choose **Session pooler**. You need:
+
+- **Host:** the pooler host from the dialog. Copy it rather than building it from your region.
+- **Port:** `5432`
+- **Database:** `postgres`
+- **User:** `postgres.[PROJECT-REF]`
+- **Password:** your database password
+
+Enable SSL in the tool's connection settings.
+
+## 2. Consider a read-only role
+
+A GUI or BI tool rarely needs to change data or the schema. Create a dedicated Postgres role with only the grants it needs, such as `select` on the tables it reports on, and connect as that role instead of `postgres`. Through the shared pooler, the username for a custom role is `[ROLE].[PROJECT-REF]`.
+
+## Tool guides
+
+- [pgAdmin](/docs/guides/database/pgadmin)
+- [DBeaver](/docs/guides/database/dbeaver)
+- [Beekeeper Studio](/docs/guides/database/beekeeper-studio)
+- [Metabase](/docs/guides/database/metabase)
+- [psql](/docs/guides/database/psql)
+
+## Or use the built-in editors
+
+The Supabase dashboard includes a Table Editor for browsing and editing rows, and a SQL Editor for running and saving queries against the same database. For many tasks, you don't need a separate tool.
+
+## If the connection times out
+
+A timeout usually means the tool is trying the direct connection over IPv6 from a network that only supports IPv4. Switch to the session pooler details above. See [How do I connect to Supabase Postgres from an IPv4-only network?](/faqs/how-do-i-connect-to-supabase-postgres-from-an-ipv4-only-network)

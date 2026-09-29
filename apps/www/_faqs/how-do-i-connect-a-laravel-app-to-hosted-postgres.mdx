@@ -1,0 +1,38 @@
+---
+title: 'How do I connect a Laravel app to hosted Postgres?'
+description: 'Set DB_CONNECTION to pgsql and DB_URL to your Supabase connection string in .env, then configure SSL in config/database.php and run your migrations.'
+date: '2026-09-28'
+---
+
+Set `DB_CONNECTION=pgsql` and put your Supabase connection string in `DB_URL` in your `.env` file. Eloquent and Laravel's migrations then work against the hosted database.
+
+## 1. Set the connection details
+
+Copy the session pooler connection string from **Connect** in the Supabase dashboard. It works from IPv4-only hosts:
+
+```bash
+DB_CONNECTION=pgsql
+DB_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres
+```
+
+Set the same values on your hosting platform, and keep `.env` out of your repository.
+
+## 2. Configure SSL
+
+Laravel takes `sslmode` as an option in `config/database.php` rather than as a URL parameter. Set it for the `pgsql` connection so the driver requires an encrypted connection.
+
+The same file controls `search_path`, if your tables live in a schema other than `public`.
+
+## 3. Run migrations
+
+```shell
+php artisan migrate
+```
+
+This creates Laravel's own tables, such as users and sessions, alongside yours. Laravel's built-in authentication works against them as it would with any Postgres database.
+
+See the [Laravel quickstart](/docs/guides/getting-started/quickstarts/laravel) for a full walkthrough.
+
+## Which connection mode
+
+A Laravel app on a server or container is long-running, so session mode or a direct connection is the right fit. Use the transaction pooler, on port `6543`, only for serverless deployments, and turn off prepared statements if you do. See [Connect to your database](/docs/guides/database/connecting-to-postgres).

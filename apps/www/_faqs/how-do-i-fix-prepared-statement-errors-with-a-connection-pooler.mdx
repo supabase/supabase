@@ -1,0 +1,44 @@
+---
+title: 'How do I fix prepared statement errors with a Postgres connection pooler?'
+description: 'Turn off prepared statements in your driver when you connect through a pooler in transaction mode, or connect through session mode or a direct connection instead.'
+date: '2026-09-28'
+---
+
+Turn off prepared statements in your database driver. A pooler in transaction mode hands your connection to other clients between transactions, so a statement you prepared earlier may not exist on the next connection you get.
+
+Errors about a prepared statement that "already exists" or "does not exist" almost always mean a driver is preparing statements through transaction mode.
+
+## The setting for your driver
+
+- **Postgres.js and Drizzle:** `prepare: false`
+- **Prisma:** add `pgbouncer=true` to the connection string
+- **asyncpg:** `statement_cache_size=0`
+- **JDBC:** `prepareThreshold=0`
+
+For example, with Postgres.js:
+
+```ts
+import postgres from 'postgres'
+
+export const sql = postgres(process.env.DATABASE_URL!, { prepare: false })
+```
+
+## Or change the connection mode
+
+Prepared statements work over a direct connection and the shared pooler's session mode. If your app runs as a long-lived server rather than serverless functions, switch to one of those:
+
+- **Direct connection:** port `5432` on `db.[PROJECT-REF].supabase.co`, over IPv6 unless you have the IPv4 add-on.
+- **Session mode:** port `5432` on the pooler host, over IPv4.
+
+Transaction mode uses port `6543`. If your connection string ends in `:6543`, you're in transaction mode.
+
+## Other things transaction mode doesn't keep
+
+Anything tied to a session is lost between transactions:
+
+- Query pipelining
+- `set` and session-level advisory locks
+- `listen` and `notify`
+- Temporary tables and `with hold` cursors
+
+See [Connect to your database](/docs/guides/database/connecting-to-postgres) for the full list and how each mode works.

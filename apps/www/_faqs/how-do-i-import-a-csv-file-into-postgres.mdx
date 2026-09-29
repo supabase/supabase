@@ -1,0 +1,31 @@
+---
+title: 'How do I import a CSV file into Postgres?'
+description: 'For small files, use CSV import in the Supabase Table Editor. For large files, use the Postgres COPY command from psql or a bulk loader such as pgloader.'
+date: '2026-09-28'
+---
+
+For small files, upload the CSV in the Supabase Table Editor. For large files, use the Postgres `COPY` command from `psql`, or a bulk loading tool such as `pgloader`.
+
+## Small files: the Table Editor
+
+In the Supabase dashboard, open the Table Editor and import a CSV into a new or existing table. It's the quickest option for development data, lookups, and one-off loads. Check the column types it proposes before you import, especially dates and numbers.
+
+## Large files: COPY from psql
+
+Create the table first so the column types are exactly what you want, then load the file from your machine:
+
+```sql
+\copy products (id, name, price) from 'products.csv' with (format csv, header true)
+```
+
+`\copy` is the `psql` version of `COPY` that reads a file from your computer and streams it to the database. Connect over the direct connection or the session pooler for large loads. See [Connecting with psql](/docs/guides/database/psql).
+
+## Loading from another database
+
+`pgloader` can load data from other sources into Postgres and convert types along the way. It's useful when a CSV export would lose information. See [Import data into Supabase](/docs/guides/database/import-data) for each method.
+
+## Tips for large imports
+
+- Load into a table without indexes, then create the indexes afterward. It's usually faster.
+- Import in dependency order, parent tables before child tables, so foreign keys are satisfied.
+- Run a quick `select count(*)` and spot-check a few rows before you point your app at the data.

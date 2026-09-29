@@ -1,0 +1,35 @@
+---
+title: 'How do I back up and restore a Supabase database?'
+description: 'Paid plans include daily backups you can restore from the dashboard, Point-in-Time Recovery is an add-on, and you can always export your own copy with the Supabase CLI.'
+date: '2026-09-28'
+---
+
+Paid plans back up your database every day, and you can restore from the dashboard. For recovery to an exact moment, add Point-in-Time Recovery. On any plan, you can export your own copy with the Supabase CLI.
+
+## Daily backups
+
+- **Pro:** the last 7 days of daily backups
+- **Team:** the last 14 days
+- **Enterprise:** up to 30 days
+
+Find them under **Database**, then **Backups**, in the dashboard, and restore the project to any of them. Daily backups don't store passwords for custom database roles, so reset those after a restore.
+
+## Point-in-Time Recovery
+
+Point-in-Time Recovery (PITR) lets you restore to any moment, down to seconds, instead of the last daily snapshot. It's an add-on for Pro, Team, and Enterprise projects and requires at least the Small compute size.
+
+## Your own exports
+
+The Free plan doesn't include daily backups, so export regularly and keep copies somewhere else:
+
+```shell
+supabase db dump -f backup.sql
+```
+
+This is worth doing on paid plans too if you need backups that live outside Supabase.
+
+See [Database backups](/docs/guides/platform/backups).
+
+## Restore into another database
+
+A dump is standard Postgres SQL. You can restore it into a new Supabase project or any Postgres server with `psql`. See [Migrate from Postgres to Supabase](/docs/guides/platform/migrating-to-supabase/postgres) for the full dump and restore process.
