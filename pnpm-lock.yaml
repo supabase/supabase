@@ -151,6 +151,9 @@ importers:
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
+      cn:
+        specifier: 'catalog:'
+        version: 0.4.0
       eslint:
         specifier: ^9.0.0
         version: 9.37.0(jiti@2.7.0)(supports-color@8.1.1)
