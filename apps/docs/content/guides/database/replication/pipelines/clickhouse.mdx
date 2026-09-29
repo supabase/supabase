@@ -56,13 +56,13 @@ For `ReplacingMergeTree`, the ClickHouse server must run version 23.5 or later. 
 
 Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). When prompted to choose a destination, select **ClickHouse** and enter the following settings:
 
-| Field              | Value                                                                      |
-| ------------------ | -------------------------------------------------------------------------- |
-| **HTTPS endpoint** | Public HTTPS endpoint, including its port when required                    |
-| **User**           | Your dedicated database user, such as `pipelines_user`                     |
-| **Password**       | That user's password, if set                                               |
-| **Database**       | Destination database, such as `pipelines`                                  |
-| **Table engine**   | `replacing_merge_tree` for current state or `merge_tree` for event history |
+| Field              | Value                                                                   |
+| ------------------ | ----------------------------------------------------------------------- |
+| **HTTPS endpoint** | Public HTTPS endpoint, including its port when required                 |
+| **User**           | Your dedicated database user, such as `pipelines_user`                  |
+| **Password**       | That user's password, if set                                            |
+| **Database**       | Destination database, such as `pipelines`                               |
+| **Table engine**   | `ReplacingMergeTree` for current state or `MergeTree` for event history |
 
 Click **Start pipeline** to validate the destination. Review the cost estimate, then click **Create and start pipeline**.
 

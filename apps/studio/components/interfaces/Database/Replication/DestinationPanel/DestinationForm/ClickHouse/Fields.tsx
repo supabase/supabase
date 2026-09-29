@@ -83,26 +83,28 @@ export const ClickHouseFields = ({
               labelOptional="Optional"
               description={
                 editMode
-                  ? 'Enter a new password to replace the stored one. The eye button shows only what you enter.'
+                  ? 'Enter a new password to replace the stored one.'
                   : 'Leave blank only if the ClickHouse user has no password.'
               }
             >
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword && !editMode ? 'text' : 'password'}
                   placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
-                    <div className="flex items-center justify-center">
-                      <Button
-                        className="w-7"
-                        title={passwordVisibilityLabel}
-                        aria-label={passwordVisibilityLabel}
-                        icon={showPassword ? <Eye /> : <EyeOff />}
-                        onClick={() => setShowPassword(!showPassword)}
-                      />
-                    </div>
+                    !editMode && (
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className="w-7"
+                          title={passwordVisibilityLabel}
+                          aria-label={passwordVisibilityLabel}
+                          icon={showPassword ? <Eye /> : <EyeOff />}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      </div>
+                    )
                   }
                 />
               </FormControl>
