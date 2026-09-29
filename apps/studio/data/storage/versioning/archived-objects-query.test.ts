@@ -2,16 +2,17 @@ import { describe, expect, it } from 'vitest'
 
 import { toArchivedObjects } from './archived-objects-query'
 
-const row = (overrides: Record<string, unknown>) =>
-  ({
-    name: 'folder/photo.jpg',
-    id: 'id',
-    updated_at: '2026-01-01T00:00:00Z',
-    created_at: '2026-01-01T00:00:00Z',
-    last_accessed_at: '2026-01-01T00:00:00Z',
-    metadata: { size: 100, mimetype: 'image/jpeg' },
-    ...overrides,
-  }) as any
+type StorageObjectV2 = Parameters<typeof toArchivedObjects>[0][number]
+
+const row = (overrides: Partial<StorageObjectV2>): StorageObjectV2 => ({
+  name: 'folder/photo.jpg',
+  id: 'id',
+  updated_at: '2026-01-01T00:00:00Z',
+  created_at: '2026-01-01T00:00:00Z',
+  last_accessed_at: '2026-01-01T00:00:00Z',
+  metadata: { size: 100, mimetype: 'image/jpeg' },
+  ...overrides,
+})
 
 describe('toArchivedObjects', () => {
   it('treats an object whose top row is a delete marker as archived', () => {
