@@ -4,13 +4,13 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 
 export interface UsageFilterNoticeProps {
-  isBranch: boolean
+  branchName?: string
   hasBranches: boolean
   onViewOrganizationUsage: () => void
 }
 
 export const UsageFilterNotice = ({
-  isBranch,
+  branchName,
   hasBranches,
   onViewOrganizationUsage,
 }: UsageFilterNoticeProps) => {
@@ -18,9 +18,9 @@ export const UsageFilterNotice = ({
     <ScaffoldContainer className="mt-5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground-light">
         <p>
-          {isBranch && 'This branch only.'}
-          {!isBranch && hasBranches && 'Main branch only. Other branches are tracked separately.'}
-          {!isBranch && !hasBranches && 'This project only.'}
+          {branchName && `${branchName} branch only.`}
+          {!branchName && hasBranches && 'Main branch only. Other branches are tracked separately.'}
+          {!branchName && !hasBranches && 'This project only.'}
         </p>
         <div className="flex items-center gap-x-2">
           <Button variant="text" size="tiny" onClick={onViewOrganizationUsage}>

@@ -382,7 +382,7 @@ export const Usage = () => {
         <>
           {selectedProject ? (
             <UsageFilterNotice
-              isBranch={!!selectedBranch}
+              branchName={selectedBranch?.name}
               hasBranches={branchOptions.length > 0}
               onViewOrganizationUsage={() => setUsageFilter({ projectRef: null, branchRef: null })}
             />

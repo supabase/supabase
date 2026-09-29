@@ -158,7 +158,7 @@ describe('Usage branch URLs', () => {
     const requests = captureUsageRequests()
     renderUsage()
 
-    expect(await screen.findByText('This branch only.')).toBeInTheDocument()
+    expect(await screen.findByText(`${branch.name} branch only.`)).toBeInTheDocument()
     await waitFor(() => {
       expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
     })
@@ -191,7 +191,7 @@ describe('Usage branch URLs', () => {
     })
     const { onUrlUpdate } = renderUsage(null, branch.project_ref)
 
-    expect(await screen.findByText('This branch only.')).toBeInTheDocument()
+    expect(await screen.findByText(`${branch.name} branch only.`)).toBeInTheDocument()
     await waitFor(() => {
       expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
     })
@@ -217,7 +217,7 @@ describe('Usage branch URLs', () => {
 
     await user.click(screen.getByLabelText('Filter by branch'))
     await user.click(await screen.findByRole('option', { name: branch.name }))
-    expect(await screen.findByText('This branch only.')).toBeInTheDocument()
+    expect(await screen.findByText(`${branch.name} branch only.`)).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'View organization total' }))
 
@@ -277,7 +277,7 @@ describe('Usage branch URLs', () => {
       await act(async () => response.resolve())
     }
 
-    expect(await screen.findByText('This branch only.')).toBeInTheDocument()
+    expect(await screen.findByText(`${branch.name} branch only.`)).toBeInTheDocument()
     await waitFor(() => {
       expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
     })

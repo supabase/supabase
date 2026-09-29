@@ -7,17 +7,17 @@ import { customRender } from '@/tests/lib/custom-render'
 
 describe('UsageFilterNotice', () => {
   it.each([
-    { isBranch: true, hasBranches: true, text: 'This branch only.' },
+    { branchName: 'dev-test', hasBranches: true, text: 'dev-test branch only.' },
     {
-      isBranch: false,
+      branchName: undefined,
       hasBranches: true,
       text: 'Main branch only. Other branches are tracked separately.',
     },
-    { isBranch: false, hasBranches: false, text: 'This project only.' },
-  ])('shows "$text" for the selected scope', ({ isBranch, hasBranches, text }) => {
+    { branchName: undefined, hasBranches: false, text: 'This project only.' },
+  ])('shows "$text" for the selected scope', ({ branchName, hasBranches, text }) => {
     customRender(
       <UsageFilterNotice
-        isBranch={isBranch}
+        branchName={branchName}
         hasBranches={hasBranches}
         onViewOrganizationUsage={vi.fn()}
       />
@@ -29,7 +29,7 @@ describe('UsageFilterNotice', () => {
   it('discloses organization totals on keyboard focus even without live branches', async () => {
     const user = userEvent.setup()
     customRender(
-      <UsageFilterNotice isBranch={false} hasBranches={false} onViewOrganizationUsage={vi.fn()} />
+      <UsageFilterNotice hasBranches={false} onViewOrganizationUsage={vi.fn()} />
     )
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
@@ -46,7 +46,11 @@ describe('UsageFilterNotice', () => {
     const user = userEvent.setup()
     const onViewOrganizationUsage = vi.fn()
     customRender(
-      <UsageFilterNotice isBranch hasBranches onViewOrganizationUsage={onViewOrganizationUsage} />
+      <UsageFilterNotice
+        branchName="dev-test"
+        hasBranches
+        onViewOrganizationUsage={onViewOrganizationUsage}
+      />
     )
 
     await user.click(screen.getByRole('button', { name: 'View organization total' }))
