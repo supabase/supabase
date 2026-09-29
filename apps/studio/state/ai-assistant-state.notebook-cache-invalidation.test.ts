@@ -8,8 +8,14 @@ import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
 
 const testContext = vi.hoisted(() => ({
+  sendTelemetryEvent: vi.fn(),
   queuedStreams: [] as Array<Array<UIMessageChunk>>,
   onSend: undefined as (() => void) | undefined,
+}))
+
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  sendTelemetryEvent: testContext.sendTelemetryEvent,
 }))
 
 vi.mock('ai', async (importOriginal) => {
@@ -66,6 +72,7 @@ const seedNotebook = () => {
 }
 
 afterEach(() => {
+  testContext.sendTelemetryEvent.mockClear()
   delete notebooksState.notebooks[NOTEBOOK_ID]
   notebooksState.needsSaving.clear()
   testContext.queuedStreams = []
@@ -105,6 +112,7 @@ describe('createChatInstance onFinish — notebook cache invalidation via a real
 
     // Still pending approval — must not evict yet.
     expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeDefined()
+    expect(testContext.sendTelemetryEvent).not.toHaveBeenCalled()
 
     // Second stream: after approval, the tool actually executes and returns its result.
     testContext.queuedStreams.push([
@@ -123,6 +131,12 @@ describe('createChatInstance onFinish — notebook cache invalidation via a real
       expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
     })
     expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
+    expect(testContext.sendTelemetryEvent).toHaveBeenCalledWith(expect.any(String), {
+      action: 'explorer_notebook_updated',
+      properties: { notebookId: NOTEBOOK_ID, origin: 'assistant', chatId },
+      groups: { project: PROJECT_REF },
+    })
+    expect(testContext.sendTelemetryEvent).toHaveBeenCalledTimes(1)
   })
 
   it('binds cache effects to the project the request was sent under, not whatever project is active when the stream finishes', async () => {
@@ -133,7 +147,7 @@ describe('createChatInstance onFinish — notebook cache invalidation via a real
     queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), { id: NOTEBOOK_ID })
 
     const state = createAiAssistantState()
-    state.setContext({ projectRef: PROJECT_REF })
+    state.setContext({ projectRef: PROJECT_REF, orgSlug: 'original-org' })
     const chatId = state.createChat({ name: 'Delete a cell' })
     const chatInstance = state.chatInstances[chatId]
 
@@ -167,7 +181,8 @@ describe('createChatInstance onFinish — notebook cache invalidation via a real
     // Simulate navigating to a different project while the approval round-trip is in
     // flight: after the request was sent (with the origin project ref in its body), but
     // before its stream resolves and onFinish runs.
-    testContext.onSend = () => state.setContext({ projectRef: OTHER_PROJECT_REF })
+    testContext.onSend = () =>
+      state.setContext({ projectRef: OTHER_PROJECT_REF, orgSlug: 'other-org' })
 
     await chatInstance.addToolApprovalResponse({ id: 'approval-1', approved: true })
 
@@ -177,5 +192,42 @@ describe('createChatInstance onFinish — notebook cache invalidation via a real
     // Must evict the origin project's cache entry — the one the write actually happened
     // in — not whichever project happened to be active once the stream finished.
     expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
+    expect(testContext.sendTelemetryEvent).toHaveBeenCalledWith(expect.any(String), {
+      action: 'explorer_notebook_updated',
+      properties: { notebookId: NOTEBOOK_ID, origin: 'assistant', chatId },
+      groups: { project: PROJECT_REF, organization: 'original-org' },
+    })
+  })
+
+  it('tracks a confirmed assistant-created notebook once', async () => {
+    const state = createAiAssistantState()
+    state.setContext({ projectRef: PROJECT_REF })
+    const chatId = state.createChat({ name: 'Create notebook' })
+    testContext.queuedStreams.push([
+      { type: 'start' },
+      {
+        type: 'tool-input-available',
+        toolCallId: 'create-1',
+        toolName: 'create_notebook',
+        input: { name: 'New notebook' },
+      },
+      {
+        type: 'tool-output-available',
+        toolCallId: 'create-1',
+        output: { id: NOTEBOOK_ID, name: 'New notebook' },
+      },
+      { type: 'finish' },
+    ])
+
+    await state.chatInstances[chatId].sendMessage({ text: 'Create a notebook' })
+
+    await vi.waitFor(() =>
+      expect(testContext.sendTelemetryEvent).toHaveBeenCalledWith(expect.any(String), {
+        action: 'explorer_notebook_created',
+        properties: { notebookId: NOTEBOOK_ID, origin: 'assistant', chatId },
+        groups: { project: PROJECT_REF },
+      })
+    )
+    expect(testContext.sendTelemetryEvent).toHaveBeenCalledTimes(1)
   })
 })

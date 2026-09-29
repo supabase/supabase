@@ -1,6 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
+import type { ExplorerQueryLocation } from 'common/telemetry-constants'
 import { CodeSquare, Eye, EyeOff } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
@@ -73,6 +74,7 @@ import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { detectOS } from '@/lib/helpers'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   isRoleImpersonationEnabled,
   type RoleImpersonationController,
@@ -122,6 +124,7 @@ export type QueryEditorHandle = {
 
 type QueryEditorProps = {
   id: string
+  location?: ExplorerQueryLocation
   isReadOnly?: boolean
   variant: 'embedded' | 'viewport'
   title: string
@@ -154,6 +157,7 @@ type QueryEditorProps = {
 export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(function QueryEditor(
   {
     id,
+    location,
     isReadOnly = false,
     variant,
     title,
@@ -179,6 +183,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   ref
 ) {
   const os = detectOS()
+  const track = useTrack()
   const sql = query.uncheckedSql
   const sqlRef = useLatest<string>(sql)
   const onSqlCommitRef = useLatest(onSqlCommit)
@@ -261,12 +266,23 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
     onRun?.()
     const querySnapshot = { sql: rawSql, source: query._tag }
+    const runProperties = location
+      ? { ...location, runId: crypto.randomUUID(), source: query._tag }
+      : undefined
+    const groups = { project: project.ref }
+    if (runProperties) track('explorer_query_submitted', runProperties, groups)
     // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
     // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)
 
     if (query._tag === 'logs') {
       if (!isOtelLogsEnabled) {
+        if (runProperties)
+          track(
+            'explorer_query_failed',
+            { ...runProperties, failureReason: 'logs_unavailable' },
+            groups
+          )
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
           ...querySnapshot,
@@ -280,12 +296,22 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
       }).then(
-        (data) =>
+        (data) => {
+          if (runProperties) track('explorer_query_completed', runProperties, groups)
           onResultChange({
             rows: data.rows as readonly Record<string, unknown>[],
             ...querySnapshot,
-          }),
-        (error) => onResultChange({ error, ...querySnapshot })
+          })
+        },
+        (error) => {
+          if (runProperties)
+            track(
+              'explorer_query_failed',
+              { ...runProperties, failureReason: 'execution_error' },
+              groups
+            )
+          onResultChange({ error, ...querySnapshot })
+        }
       )
       return
     }
@@ -294,6 +320,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
 
     if (!isValidConnString(connectionString)) {
+      if (runProperties)
+        track(
+          'explorer_query_failed',
+          { ...runProperties, failureReason: 'connection_unavailable' },
+          groups
+        )
       onResultChange({
         error: { message: 'Unable to run query: Connection string is missing' },
         ...querySnapshot,
@@ -310,8 +342,19 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     }).then(
-      (data) => onResultChange({ rows: data.result, ...querySnapshot }),
-      (error) => onResultChange({ error, ...querySnapshot })
+      (data) => {
+        if (runProperties) track('explorer_query_completed', runProperties, groups)
+        onResultChange({ rows: data.result, ...querySnapshot })
+      },
+      (error) => {
+        if (runProperties)
+          track(
+            'explorer_query_failed',
+            { ...runProperties, failureReason: 'execution_error' },
+            groups
+          )
+        onResultChange({ error, ...querySnapshot })
+      }
     )
   }
 

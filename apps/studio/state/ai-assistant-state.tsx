@@ -1,6 +1,6 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
-import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage, sendTelemetryEvent } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import {
@@ -26,7 +26,7 @@ import {
   applyNotebookCacheEffects,
   collectNotebookCacheEffects,
 } from '@/lib/ai/notebook-cache-invalidation'
-import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { API_URL, BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
   title: string
@@ -294,6 +294,7 @@ function createChatInstance(
   // request is sent, not re-read from (mutable) state.context in onFinish, since the user
   // can switch projects while the request is still in flight.
   let requestProjectRef: string | undefined
+  let requestOrgSlug: string | undefined
 
   return new Chat<MessageType>({
     id: options.id,
@@ -318,6 +319,7 @@ function createChatInstance(
         const chat = state.chats[options.id]
 
         requestProjectRef = state.context.projectRef
+        requestOrgSlug = state.context.orgSlug
 
         return {
           ...opts,
@@ -393,6 +395,20 @@ function createChatInstance(
         if (projectRef) {
           const effects = collectNotebookCacheEffects(messages, processedNotebookToolCallIds)
           effects.forEach((effect) => processedNotebookToolCallIds.add(effect.toolCallId))
+          effects.forEach((effect) => {
+            if (effect._tag !== 'upserted') return
+            sendTelemetryEvent(API_URL, {
+              action:
+                effect.operation === 'created'
+                  ? 'explorer_notebook_created'
+                  : 'explorer_notebook_updated',
+              properties: { notebookId: effect.id, origin: 'assistant', chatId: options.id },
+              groups: {
+                project: projectRef,
+                ...(requestOrgSlug && { organization: requestOrgSlug }),
+              },
+            })
+          })
           if (effects.length > 0) {
             void applyNotebookCacheEffects({ queryClient: getQueryClient(), projectRef, effects })
           }

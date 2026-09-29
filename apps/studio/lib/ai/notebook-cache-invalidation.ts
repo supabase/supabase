@@ -7,7 +7,7 @@ import { evictNotebookFromCaches } from '@/data/content/notebooks/notebook-cache
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 
 export type NotebookCacheEffect =
-  | { _tag: 'upserted'; toolCallId: string; id: string }
+  | { _tag: 'upserted'; toolCallId: string; id: string; operation: 'created' | 'updated' }
   | { _tag: 'deleted'; toolCallId: string; id: string }
 
 const NOTEBOOK_MUTATION_TOOL_TYPES = new Set([
@@ -37,11 +37,16 @@ export function collectNotebookCacheEffects(
       const result = notebookToolOutputSchema.safeParse(part.output)
       if (!result.success) continue
 
-      effects.push({
-        _tag: part.type === 'tool-delete_notebook' ? 'deleted' : 'upserted',
-        toolCallId: part.toolCallId,
-        id: result.data.id,
-      })
+      if (part.type === 'tool-delete_notebook') {
+        effects.push({ _tag: 'deleted', toolCallId: part.toolCallId, id: result.data.id })
+      } else {
+        effects.push({
+          _tag: 'upserted',
+          toolCallId: part.toolCallId,
+          id: result.data.id,
+          operation: part.type === 'tool-create_notebook' ? 'created' : 'updated',
+        })
+      }
     }
   }
 
