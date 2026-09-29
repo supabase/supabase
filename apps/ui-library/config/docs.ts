@@ -10,10 +10,10 @@ export const gettingStarted: SidebarNavGroup = {
       commandItemLabel: 'Introduction',
     },
     {
-      title: 'Quick Start',
+      title: 'Quickstart',
       href: '/docs/getting-started/quickstart',
       items: [],
-      commandItemLabel: 'Quick Start',
+      commandItemLabel: 'Quickstart',
     },
     {
       title: 'FAQ',
