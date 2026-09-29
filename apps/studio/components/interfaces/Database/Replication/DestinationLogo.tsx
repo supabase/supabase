@@ -4,9 +4,7 @@ import { DestinationIcon } from './DestinationIcon'
 import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { BASE_PATH } from '@/lib/constants'
 
-type DestinationBrand =
-  | { type: 'mark'; src: string }
-  | { type: 'monogram'; label: string }
+type DestinationBrand = { type: 'mark'; src: string } | { type: 'monogram'; label: string }
 
 const BRAND_BY_TYPE: Partial<Record<DestinationType, DestinationBrand>> = {
   BigQuery: { type: 'mark', src: `${BASE_PATH}/img/icons/bigquery-icon.svg` },
@@ -47,7 +45,9 @@ export const DestinationLogo = ({
         {brand === undefined && (
           <DestinationIcon type={type} size={sizing.icon} className="text-foreground-light" />
         )}
-        {brand?.type === 'mark' && <img src={brand.src} alt="" aria-hidden className={sizing.mark} />}
+        {brand?.type === 'mark' && (
+          <img src={brand.src} alt="" aria-hidden className={sizing.mark} />
+        )}
         {brand?.type === 'monogram' && (
           <span
             className={cn(
