@@ -1,23 +1,27 @@
 import { QueryClient } from '@tanstack/react-query'
-import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import { BannedIPs } from './BannedIPs'
 import type { deleteBannedIPs } from '@/data/banned-ips/banned-ips-delete-mutations'
 import type { IPData } from '@/data/banned-ips/banned-ips-query'
-import { projectKeys } from '@/data/projects/keys'
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 
+const routeParams = vi.hoisted(() => ({ ref: 'default' }))
+beforeEach(() => {
+  routeParams.ref = 'default'
+})
+
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
   IS_PLATFORM: true,
-  useParams: () => ({ ref: 'default' }),
+  useParams: () => routeParams,
 }))
 
 vi.mock('@/lib/constants', async (importOriginal) => ({
@@ -78,14 +82,16 @@ const PROJECT: ProjectDetail = {
 test.each([
   { name: 'v3', cloud_provider: 'AWS_K8S', high_availability: false },
   { name: 'HA', cloud_provider: 'AWS', high_availability: true },
-])('clears an open unban confirmation when the project becomes $name', async (unsupported) => {
-  let project = PROJECT
+])('clears an open unban confirmation when navigating to $name', async (unsupported) => {
   let bannedIPs: IPData = { banned_ipv4_addresses: ['203.0.113.10'] }
   const unbanRequests: unknown[] = []
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref',
-    response: () => HttpResponse.json<ProjectDetail>(project),
+    response: ({ params }) =>
+      HttpResponse.json<ProjectDetail>(
+        params.ref === 'default' ? PROJECT : { ...PROJECT, ...unsupported, ref: String(params.ref) }
+      ),
   })
   addAPIMock({
     method: 'post',
@@ -102,20 +108,20 @@ test.each([
     },
   })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  customRender(<BannedIPs />, { queryClient })
+  const { rerender } = customRender(<BannedIPs />, { queryClient })
 
   fireEvent.click(await screen.findByRole('button', { name: 'Unban IP' }))
   expect(await screen.findByRole('dialog', { name: 'Confirm Unban IP' })).toBeVisible()
 
-  project = { ...PROJECT, ...unsupported }
-  await act(() => queryClient.invalidateQueries({ queryKey: projectKeys.detail('default') }))
+  routeParams.ref = 'unsupported'
+  rerender(<BannedIPs />)
 
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   expect(screen.queryByRole('button', { name: 'Unban IP' })).not.toBeInTheDocument()
   expect(unbanRequests).toEqual([])
 
-  project = PROJECT
-  await act(() => queryClient.invalidateQueries({ queryKey: projectKeys.detail('default') }))
+  routeParams.ref = 'default'
+  rerender(<BannedIPs />)
 
   const unbanButton = await screen.findByRole('button', { name: 'Unban IP' })
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()

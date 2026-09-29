@@ -34,7 +34,7 @@ const V3_DISABLED_TITLE = 'Network bans unavailable on v3 projects'
 
 export const BannedIPs = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, error: projectError } = useSelectedProjectQuery()
   const { isHighAvailability } = useHighAvailability()
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
@@ -45,11 +45,11 @@ export const BannedIPs = () => {
     isFetching: isFetchingIPList,
     data: ipList,
     error: ipListError,
-    projectError,
   } = useBannedIPsQuery({ projectRef: ref })
 
   const { data: userIPAddress } = useUserIPAddressQuery()
 
+  const hasProjectError = !project && !!projectError
   const ipListLoading = isLoadingIPList || isFetchingIPList
 
   const { can: canUnbanNetworks } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -101,7 +101,7 @@ export const BannedIPs = () => {
           <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
         </PageSectionMeta>
         <PageSectionContent>
-          {projectError && (
+          {hasProjectError && (
             <AlertError
               error={projectError}
               subject="Failed to retrieve project details"
@@ -123,7 +123,7 @@ export const BannedIPs = () => {
               description="Fail2Ban is not supported on v3 projects."
             />
           )}
-          {!projectError && !isHighAvailability && !isAwsK8s && (
+          {!hasProjectError && !isHighAvailability && !isAwsK8s && (
             <>
               {ipListError && (
                 <AlertError
