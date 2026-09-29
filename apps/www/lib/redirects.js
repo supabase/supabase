@@ -1700,6 +1700,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/login',
+    destination: 'https://supabase.com/dashboard/sign-in',
+  },
+  {
+    permanent: true,
     source: '/sign-up',
     destination: 'https://supabase.com/dashboard/sign-up',
   },
@@ -1747,6 +1752,21 @@ module.exports = [
     permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
+  },
+  {
+    permanent: true,
+    source: '/support/new',
+    destination: 'https://supabase.com/dashboard/support/new',
+  },
+  {
+    permanent: true,
+    source: '/account/tokens',
+    destination: 'https://supabase.com/dashboard/account/tokens',
+  },
+  {
+    permanent: true,
+    source: '/project/:path+',
+    destination: 'https://supabase.com/dashboard/project/:path+',
   },
   // Reorganizing pooler docs:-----------------------------
 
