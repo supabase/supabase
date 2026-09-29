@@ -117,7 +117,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
               ],
             },
           ],
-    [currentPath, showSecuritySettings]
+    [currentPath, showOAuthApps, showSecuritySettings]
   )
 
   useLayoutEffect(() => {
