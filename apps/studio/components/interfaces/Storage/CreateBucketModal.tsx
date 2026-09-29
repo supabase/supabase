@@ -171,10 +171,16 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         versioning_status: isVersioningEnabled ? 'ENABLED' : 'DISABLED',
       })
 
-      // A second call, so a failure here leaves the bucket versioned with no retention policy.
+      // A second call, and the bucket exists whether or not it lands, so its failure is
+      // reported against the policy rather than the creation the user would only retry.
       const lifecycleRules = isVersioningEnabled ? toLifecycleRules(values) : []
+      let lifecycleError: string | undefined
       if (lifecycleRules.length > 0) {
-        await updateLifecycle({ projectRef: ref, bucketId: values.name, rules: lifecycleRules })
+        try {
+          await updateLifecycle({ projectRef: ref, bucketId: values.name, rules: lifecycleRules })
+        } catch (error) {
+          lifecycleError = error instanceof Error ? error.message : 'Unknown error'
+        }
       }
 
       track('storage_bucket_created', {
@@ -182,7 +188,14 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         hasVersioningEnabled: isVersioningEnabled,
       })
 
-      toast.success(`Successfully created bucket ${values.name}`)
+      if (lifecycleError === undefined) {
+        toast.success(`Successfully created bucket ${values.name}`)
+      } else {
+        toast.error(
+          `Created bucket ${values.name}, but its retention policy was not saved: ${lifecycleError}`
+        )
+      }
+
       form.reset()
       setSelectedUnit(StorageSizeUnits.MB)
       onOpenChange(false)
