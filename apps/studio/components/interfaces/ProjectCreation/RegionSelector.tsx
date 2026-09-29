@@ -1,4 +1,4 @@
-import { useFeatureFlags, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2, ThumbsUp } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -30,7 +30,12 @@ import {
   getAvailableRegions,
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
-import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
+import { ProjectCreationStatusAdmonition } from './ProjectCreationStatusAdmonition'
+import {
+  getRegionRestrictionCopy,
+  regionMatches,
+  SELECT_DIFFERENT_REGION,
+} from './RegionSelector.utils'
 import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -54,18 +59,6 @@ interface RegionSelectorProps {
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
 // I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
 // ^ can try again next time
-
-// Maps smart region group codes to the specific-region code prefixes they contain.
-// Used to check whether an incident affecting specific regions also affects a smart region selection.
-const SMART_REGION_PREFIXES: Record<string, Array<string>> = {
-  americas: ['us-', 'ca-', 'sa-'],
-  emea: ['eu-', 'me-', 'af-'],
-  apac: ['ap-'],
-}
-
-function smartRegionMatchesSpecific(smartCode: string, specificCode: string): boolean {
-  return (SMART_REGION_PREFIXES[smartCode] ?? []).some((prefix) => specificCode.startsWith(prefix))
-}
 
 // Map backend region names to user-friendly display names
 const getDisplayNameForSmartRegion = (name: string): string => {
@@ -100,10 +93,11 @@ export const RegionSelector = ({
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+  const isStatusPageEnabled = useFlag('incidentIoStatusPage') === true
 
   const { getRegionRestriction } = useRegionRestriction()
 
-  const { data: statusData } = useIncidentStatusQuery()
+  const { data: statusData } = useIncidentStatusQuery({ enabled: !isStatusPageEnabled })
   const { incidents = [] } = statusData ?? {}
 
   const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
@@ -250,12 +244,8 @@ export const RegionSelector = ({
             const affectedRegions = incident.cache?.affected_regions ?? []
             if (affectedRegions.length === 0 || selectedRegion?.code === undefined) return false
 
-            // Specific region: direct code match
-            if (affectedRegions.includes(selectedRegion.code)) return true
-
-            // Smart region: match if any affected region falls within the smart group
-            return affectedRegions.some((specificCode) =>
-              smartRegionMatchesSpecific(selectedRegion.code, specificCode)
+            return affectedRegions.some((affectedRegion) =>
+              regionMatches(selectedRegion.code, affectedRegion)
             )
           })
 
@@ -447,24 +437,28 @@ export const RegionSelector = ({
                 </FormControl>
               </FormItemLayout>
 
-              {affectingIncidents.length > 0 && (
-                <FormItemLayout layout="horizontal">
-                  <Admonition
-                    type="warning"
-                    title="Incident in progress for this region"
-                    description={
-                      <>
-                        We're currently investigating an issue that may impact projects in this
-                        region. Follow updates on{' '}
-                        <InlineLink href="https://status.supabase.com">
-                          status.supabase.com
-                        </InlineLink>
-                        .
-                      </>
-                    }
-                    className="mt-3"
-                  />
-                </FormItemLayout>
+              {isStatusPageEnabled ? (
+                <ProjectCreationStatusAdmonition selectedRegionCode={selectedRegion?.code} />
+              ) : (
+                affectingIncidents.length > 0 && (
+                  <FormItemLayout layout="horizontal">
+                    <Admonition
+                      type="warning"
+                      title="Incident in progress for this region"
+                      description={
+                        <>
+                          We're currently investigating an issue that may impact projects in this
+                          region. Follow updates on{' '}
+                          <InlineLink href="https://status.supabase.com">
+                            status.supabase.com
+                          </InlineLink>
+                          .
+                        </>
+                      }
+                      className="mt-3"
+                    />
+                  </FormItemLayout>
+                )
               )}
 
               {selectedRestrictionCopy !== undefined && (
