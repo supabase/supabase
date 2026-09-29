@@ -10,7 +10,7 @@ sidebar_label: 'FAQ'
 
 ## Which plans support Pipelines?
 
-Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Replication** or contact your account manager.
+Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Pipelines** or contact your account manager.
 
 ## What destinations are supported?
 
@@ -50,7 +50,7 @@ Support differs by destination. Check the [schema-change guides](/docs/guides/da
 
 Yes. Pipelines provides at-least-once processing: recovery can replay acknowledged data, and consumers of append-only histories must tolerate repeated events. Destination deduplication does not provide an exactly-once processing guarantee.
 
-See the data models for [BigQuery](/docs/guides/database/replication/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+See the data models for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/pipelines/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
 ## Why is a table not being replicated?
 
@@ -63,7 +63,7 @@ Check that:
 
 If new changes arrive but existing rows are missing, check the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy). [Changing a row filter](/docs/guides/database/replication/pipelines#other-publication-changes) also does not copy newly included historical rows.
 
-If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements).
+If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#source-table-requirements).
 
 ## Why is a table in error state?
 

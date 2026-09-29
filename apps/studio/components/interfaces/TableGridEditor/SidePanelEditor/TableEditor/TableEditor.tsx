@@ -78,7 +78,7 @@ export const TableRealtimeToggle = ({
   onCheckedChange,
 }: TableRealtimeToggleProps) => {
   return (
-    <div className="items-top flex space-x-2">
+    <div className="items-start flex space-x-2">
       <Checkbox
         id="enable-realtime"
         checked={checked}
@@ -473,7 +473,7 @@ export const TableEditor = ({
       <SidePanel.Separator />
 
       <SidePanel.Content className="space-y-10 py-6">
-        <div className="items-top flex space-x-2">
+        <div className="items-start flex space-x-2">
           <Checkbox
             id="enable-rls"
             checked={tableFields.isRLSEnabled}
@@ -579,7 +579,7 @@ export const TableEditor = ({
         )}
         {isDuplicating && (
           <>
-            <div className="items-top flex space-x-2">
+            <div className="items-start flex space-x-2">
               <Checkbox
                 id="duplicate-rows"
                 checked={isDuplicateRows}

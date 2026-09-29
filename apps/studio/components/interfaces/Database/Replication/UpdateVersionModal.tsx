@@ -83,24 +83,20 @@ export const UpdateVersionModal = ({ visible, pipeline, onClose }: UpdateVersion
             ? 'A newer pipeline version is available with improvements and bug fixes. The pipeline will restart and continue from where it left off.'
             : 'A newer pipeline version is available with improvements and bug fixes.'}
         </p>
-        <div className="overflow-hidden rounded-md border">
-          <table className="w-full text-sm">
-            <tbody aria-live="polite" aria-atomic="true">
-              <tr className="border-b">
-                <td className="px-3 py-2 text-foreground-lighter">Current</td>
-                <td className="px-3 py-2 text-right text-foreground" translate="no">
-                  {isLoadingVersion ? 'Loading…' : (currentVersionName ?? 'Unknown')}
-                </td>
-              </tr>
-              <tr>
-                <td className="px-3 py-2 text-foreground-lighter">New</td>
-                <td className="px-3 py-2 text-right text-foreground" translate="no">
-                  {isLoadingVersion ? 'Loading…' : (newVersionName ?? 'Unknown')}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <dl className="divide-y overflow-hidden rounded-md border text-sm" aria-live="polite">
+          <div className="px-3 py-2">
+            <dt className="text-foreground-lighter">Current</dt>
+            <dd className="mt-1 break-all text-foreground" translate="no">
+              {isLoadingVersion ? 'Loading…' : (currentVersionName ?? 'Unknown')}
+            </dd>
+          </div>
+          <div className="px-3 py-2">
+            <dt className="text-foreground-lighter">New</dt>
+            <dd className="mt-1 break-all text-foreground" translate="no">
+              {isLoadingVersion ? 'Loading…' : (newVersionName ?? 'Unknown')}
+            </dd>
+          </div>
+        </dl>
       </div>
     </ConfirmationModal>
   )

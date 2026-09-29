@@ -161,9 +161,11 @@ You need a _new_ project for staging. A project which has already been modified 
 
 The Supabase CLI requires a few environment variables to run in non-interactive mode.
 
-- `SUPABASE_ACCESS_TOKEN` is your personal access token
+- `SUPABASE_ACCESS_TOKEN` is a [scoped personal access token](/docs/guides/platform/personal-access-tokens) limited to the projects this workflow deploys to
 - `SUPABASE_DB_PASSWORD` is your project specific database password
 - `SUPABASE_PROJECT_ID` is your project specific reference string
+
+The workflows below run `supabase link`, so grant the token **Project Settings**, **API Keys**, and **API Key Secrets**, all with **Read** access.
 
 We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Actions runners.
 

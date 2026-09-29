@@ -7,6 +7,8 @@ vi.mock('common', () => ({
   IS_PLATFORM: true,
 }))
 
+const executeOptions = { toolCallId: 'test', messages: [], context: {} }
+
 describe('ai/tools/incident-tools', () => {
   let mockFetch: ReturnType<typeof vi.fn>
   let mockAbortSignal: AbortSignal
@@ -52,7 +54,7 @@ describe('ai/tools/incident-tools', () => {
         vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(false)
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
           incidents: [],
@@ -95,7 +97,7 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
           incidents: [],
@@ -123,7 +125,7 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect((result as any).incidents).toEqual([
           {
@@ -162,7 +164,7 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect((result as any).incidents).toHaveLength(2)
         expect((result as any).message).toContain('2 active incidents')
@@ -175,7 +177,7 @@ describe('ai/tools/incident-tools', () => {
         mockFetch.mockRejectedValue(new Error('Network error'))
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
           incidents: [],
@@ -193,7 +195,7 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
           incidents: [],
@@ -219,6 +221,26 @@ describe('ai/tools/incident-tools', () => {
 
         const callArgs = mockFetch.mock.calls[0]
         expect(callArgs[1].signal).toBeInstanceOf(AbortSignal)
+      })
+
+      it('cancels the request when the Assistant request is aborted', async () => {
+        mockFetch.mockResolvedValue({
+          ok: true,
+          json: async () => [],
+        })
+        const abortController = new AbortController()
+
+        const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+        if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
+        await tools.get_active_incidents.execute(
+          {},
+          { ...executeOptions, abortSignal: abortController.signal }
+        )
+
+        const { signal } = mockFetch.mock.calls[0][1]
+        expect(signal.aborted).toBe(false)
+        abortController.abort()
+        expect(signal.aborted).toBe(true)
       })
     })
   })

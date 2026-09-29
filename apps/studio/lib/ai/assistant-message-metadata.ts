@@ -10,10 +10,19 @@ export const assistantMessageMetadataSchema = z
      * carried by each snippet's own fence in the message text.
      */
     containsLogsSnippets: z.boolean().optional(),
+    /** Set by the server when this response was cut off at the Assistant's deadline. */
+    timedOut: z.boolean().optional(),
   })
   .optional()
 
 export type AssistantMessageMetadata = z.infer<typeof assistantMessageMetadataSchema>
+
+/** Whether the server stopped this assistant response at the Assistant's deadline. */
+export function isTimedOutMessage(message: UIMessage | undefined): boolean {
+  if (message?.role !== 'assistant') return false
+  const metadata = assistantMessageMetadataSchema.safeParse(message.metadata)
+  return metadata.success && metadata.data?.timedOut === true
+}
 
 /**
  * Whether any user message in the conversation attached a logs query.
