@@ -1,4 +1,5 @@
 import { act, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -25,16 +26,36 @@ vi.mock('@/lib/constants', async (importOriginal) => ({
 const parent = createMockProject({ ref: 'parent-ref', name: 'Parent project' })
 const branch = createTestBranch({ name: 'Preview branch' })
 const main = createTestBranch({ id: 'main-id', project_ref: parent.ref, is_default: true })
+const parentDetail: components['schemas']['ProjectDetailResponse_Output'] = {
+  ...parent,
+  connectionString: null,
+  db_host: 'db.parent-ref.supabase.co',
+  high_availability: false,
+  integration_source: null,
+  inserted_at: '2026-01-01T00:00:00Z',
+  is_physical_backups_enabled: false,
+  restUrl: 'https://parent-ref.supabase.co',
+  status: 'ACTIVE_HEALTHY',
+  subscription_id: 'subscription-1',
+  updated_at: '2026-01-01T00:00:00Z',
+}
+const branchDetail = {
+  ...parentDetail,
+  ref: branch.project_ref,
+  name: branch.name,
+  parent_project_ref: parent.ref,
+}
 
-function renderUsage(branchRef = branch.project_ref) {
-  const searchParams = { projectRef: parent.ref, branchRef }
+function renderUsage(branchRef: string | null = branch.project_ref, projectRef = parent.ref) {
+  const searchParams: Record<string, string> = { projectRef }
+  if (branchRef !== null) searchParams.branchRef = branchRef
   routerMock.setCurrentUrl({
     pathname: '/org/test-org/usage',
     query: { slug: 'test-org', ...searchParams },
   })
   return customRender(<Usage />, {
     profileContext: createMockProfileContext(),
-    nuqs: { searchParams },
+    nuqs: { searchParams, hasMemory: true },
   })
 }
 
@@ -72,20 +93,10 @@ describe('Usage branch URLs', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
-      response: () =>
-        HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
-          ...parent,
-          connectionString: null,
-          db_host: 'db.parent-ref.supabase.co',
-          high_availability: false,
-          integration_source: null,
-          inserted_at: '2026-01-01T00:00:00Z',
-          is_physical_backups_enabled: false,
-          restUrl: 'https://parent-ref.supabase.co',
-          status: 'ACTIVE_HEALTHY',
-          subscription_id: 'subscription-1',
-          updated_at: '2026-01-01T00:00:00Z',
-        }),
+      response: ({ params }) =>
+        HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>(
+          params.ref === branch.project_ref ? branchDetail : parentDetail
+        ),
     })
     addAPIMock({
       method: 'get',
@@ -145,6 +156,129 @@ describe('Usage branch URLs', () => {
     })
     expect(screen.getByLabelText('Filter by branch')).toHaveTextContent(branch.name)
     expect(screen.queryByText('Branch unavailable')).not.toBeInTheDocument()
+  })
+
+  it('resolves a direct branch project URL through its parent and can switch to main', async () => {
+    const user = userEvent.setup()
+    const requests = captureUsageRequests()
+    const branchListRefs: string[] = []
+    const projectRefs: string[] = []
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: ({ params }) => {
+        projectRefs.push(String(params.ref))
+        return HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>(
+          params.ref === branch.project_ref ? branchDetail : parentDetail
+        )
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/branches',
+      response: ({ params }) => {
+        branchListRefs.push(String(params.ref))
+        return HttpResponse.json<Branch[]>([main, branch])
+      },
+    })
+    renderUsage(null, branch.project_ref)
+
+    expect(await screen.findByText('Usage filtered by branch')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
+    })
+    expect(projectRefs).toEqual([branch.project_ref, parent.ref])
+    expect(branchListRefs).toEqual([parent.ref])
+    expect(screen.getByLabelText('Filter by branch')).toHaveTextContent(branch.name)
+    expect(screen.getByRole('combobox', { name: '' })).toHaveTextContent(parent.name)
+
+    await user.click(screen.getByLabelText('Filter by branch'))
+    await user.click(await screen.findByRole('option', { name: main.name }))
+
+    expect(await screen.findByText('Usage filtered by project')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(requests).toEqual({
+        usage: [branch.project_ref, parent.ref],
+        daily: [branch.project_ref, parent.ref],
+      })
+    })
+    expect(screen.getByLabelText('Filter by branch')).toHaveTextContent(main.name)
+    expect(branchListRefs).toEqual([parent.ref])
+  })
+
+  it('waits for direct branch project details before requesting branches or usage', async () => {
+    const requests = captureUsageRequests()
+    const response = Promise.withResolvers<void>()
+    const projectRequested = vi.fn()
+    const branchListRefs: string[] = []
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: async ({ params }) => {
+        if (params.ref === branch.project_ref) {
+          projectRequested()
+          await response.promise
+          return HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>(
+            branchDetail
+          )
+        }
+        return HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>(
+          parentDetail
+        )
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/branches',
+      response: ({ params }) => {
+        branchListRefs.push(String(params.ref))
+        return HttpResponse.json<Branch[]>([main, branch])
+      },
+    })
+    renderUsage(null, branch.project_ref)
+
+    try {
+      await waitFor(() => expect(projectRequested).toHaveBeenCalledOnce())
+      expect(screen.queryByText('Usage Summary')).not.toBeInTheDocument()
+      expect(branchListRefs).toEqual([])
+      expect(requests).toEqual({ usage: [], daily: [] })
+    } finally {
+      await act(async () => response.resolve())
+    }
+
+    expect(await screen.findByText('Usage filtered by branch')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
+    })
+    expect(branchListRefs).toEqual([parent.ref])
+  })
+
+  it('blocks a direct branch link when its parent project lookup fails', async () => {
+    const requests = captureUsageRequests()
+    const branchRequested = vi.fn()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: ({ params }) =>
+        params.ref === branch.project_ref
+          ? HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>(branchDetail)
+          : HttpResponse.json<APIErrorBody>({ message: 'Parent lookup failed' }, { status: 500 }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/branches',
+      response: () => {
+        branchRequested()
+        return HttpResponse.json<Branch[]>([main, branch])
+      },
+    })
+    renderUsage(null, branch.project_ref)
+
+    expect(await screen.findByText('Failed to retrieve project')).toBeInTheDocument()
+    expect(screen.queryByRole('status', { name: 'Loading branch usage' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Usage Summary')).not.toBeInTheDocument()
+    expect(branchRequested).not.toHaveBeenCalled()
+    expect(requests).toEqual({ usage: [], daily: [] })
   })
 
   it('does not request parent usage while the branch list is pending', async () => {

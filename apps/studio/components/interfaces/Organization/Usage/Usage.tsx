@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChartArea, Check, ChevronDown } from 'lucide-react'
-import { useQueryState } from 'nuqs'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -44,18 +44,35 @@ export const Usage = () => {
 
   const [dateRange, setDateRange] = useState<any>()
 
-  const [selectedProjectRef, setSelectedProjectRef] = useQueryState('projectRef')
-  const [selectedBranchRef, setSelectedBranchRef] = useQueryState('branchRef')
+  const [{ projectRef, branchRef }, setUsageFilter] = useQueryStates({
+    projectRef: parseAsString,
+    branchRef: parseAsString,
+  })
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
 
   const {
-    data: selectedProject,
-    isPending: isLoadingSelectedProject,
-    isError: isErrorSelectedProject,
-    error: selectedProjectError,
+    data: requestedProject,
+    isPending: isLoadingRequestedProject,
+    isError: isErrorRequestedProject,
+    error: requestedProjectError,
   } = useProjectDetailQuery({
-    ref: selectedProjectRef ?? undefined,
+    ref: projectRef ?? undefined,
   })
+  const parentProjectRef = requestedProject?.parent_project_ref
+  const {
+    data: parentProject,
+    isPending: isLoadingParentProject,
+    isError: isErrorParentProject,
+    error: parentProjectError,
+  } = useProjectDetailQuery({ ref: parentProjectRef ?? undefined })
+  const selectedProjectRef = parentProjectRef ?? projectRef
+  const selectedBranchRef = branchRef ?? (parentProjectRef ? projectRef : null)
+  const selectedProject = parentProjectRef ? parentProject : requestedProject
+  const isLoadingSelectedProject =
+    !!projectRef && (isLoadingRequestedProject || (!!parentProjectRef && isLoadingParentProject))
+  const isErrorSelectedProject =
+    isErrorRequestedProject || (!!parentProjectRef && isErrorParentProject)
+  const selectedProjectError = requestedProjectError ?? parentProjectError
   const isHighAvailability = resolveHighAvailability(selectedProject)
   const canLoadProjectUsage =
     !selectedProjectRef ||
@@ -89,7 +106,11 @@ export const Usage = () => {
   const isBranchLookupBlocked = !!selectedBranchRef && isErrorBranches
   const isBranchUnavailable =
     !!selectedBranchRef && isSuccessBranches && usageProjectRef !== selectedBranchRef
-  const canShowUsage = !isResolvingBranch && !isBranchLookupBlocked && !isProjectLookupBlocked
+  const canShowUsage =
+    !isLoadingSelectedProject &&
+    !isResolvingBranch &&
+    !isBranchLookupBlocked &&
+    !isProjectLookupBlocked
   const canLoadUsage = canLoadProjectUsage && canShowUsage
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -223,8 +244,7 @@ export const Usage = () => {
                     setOpen={setOpenProjectSelector}
                     selectedRef={selectedProjectRef}
                     onSelect={(project) => {
-                      setSelectedProjectRef(project.ref)
-                      setSelectedBranchRef(null)
+                      setUsageFilter({ projectRef: project.ref, branchRef: null })
                     }}
                     renderTrigger={({ listboxId, open }) => {
                       return (
@@ -258,13 +278,11 @@ export const Usage = () => {
                           className="cursor-pointer flex items-center justify-between w-full"
                           onSelect={() => {
                             setOpenProjectSelector(false)
-                            setSelectedProjectRef(null)
-                            setSelectedBranchRef(null)
+                            setUsageFilter({ projectRef: null, branchRef: null })
                           }}
                           onClick={() => {
                             setOpenProjectSelector(false)
-                            setSelectedProjectRef(null)
-                            setSelectedBranchRef(null)
+                            setUsageFilter({ projectRef: null, branchRef: null })
                           }}
                         >
                           All projects
@@ -281,7 +299,9 @@ export const Usage = () => {
                       branchOptions={branchOptions}
                       projectRef={selectedProjectRef}
                       branchRef={selectedBranch?.project_ref ?? null}
-                      onSelectBranch={setSelectedBranchRef}
+                      onSelectBranch={(branchRef) =>
+                        setUsageFilter({ projectRef: selectedProjectRef, branchRef })
+                      }
                     />
                   )}
                 </div>
