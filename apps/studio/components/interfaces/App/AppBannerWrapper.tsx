@@ -11,6 +11,7 @@ import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 import { isLogsOrObservabilityPath, isOrganizationLandingPath } from './AppBannerWrapper.utils'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
+import { StatusBanner } from '@/components/layouts/AppLayout/StatusBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerLogsAllDeprecation } from '@/components/ui/BannerStack/Banners/BannerLogsAllDeprecation'
 import { BannerPrivacyPolicyUpdate } from '@/components/ui/BannerStack/Banners/BannerPrivacyPolicyUpdate'
@@ -33,6 +34,7 @@ const MAX_TIMEOUT_MS = 2_147_483_647
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
+  const useStatusPageWidget = useFlag('incidentIoStatusPage')
 
   const { addBanner, dismissBanner } = useBannerStack()
   const pathname = usePathname()
@@ -158,7 +160,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (
     <div className="flex flex-col">
       <div className="shrink-0">
-        <StatusPageBanner />
+        {useStatusPageWidget ? <StatusBanner /> : <StatusPageBanner />}
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}
