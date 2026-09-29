@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { AnimatePresence } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 import { useFormContext, type Control } from 'react-hook-form'
@@ -16,6 +17,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import type { BucketVersioningFormValues } from './BucketVersioningFields.schema'
 import { ExpirationModeToggle } from './ExpirationModeToggle'
 import type { ExpirationMode } from './StorageVersioning.constants'
+import { AlertError } from '@/components/ui/AlertError'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
 const toFieldValue = (rawInput: string): '' | number => {
@@ -40,6 +42,8 @@ interface LifecyclePolicySectionProps {
   isLoading?: boolean
   /** The stored policy holds rules these fields cannot represent, let alone round-trip. */
   isUnsupported?: boolean
+  /** The stored policy could not be read, so the fields would be showing a guess. */
+  error?: { message: string } | null
 }
 
 export const LifecyclePolicySection = ({
@@ -50,7 +54,9 @@ export const LifecyclePolicySection = ({
   onModeChange,
   isLoading = false,
   isUnsupported = false,
+  error,
 }: LifecyclePolicySectionProps) => {
+  const { ref } = useParams()
   const { setValue } = useFormContext<BucketVersioningFormValues>()
   const hasNoPolicy = !hasDays && !hasVersions
   const hasBothConditions = hasDays && hasVersions
@@ -70,6 +76,19 @@ export const LifecyclePolicySection = ({
         <SectionHeading />
         <ShimmeringLoader className="h-9 py-0" />
         <ShimmeringLoader className="h-9 py-0" delayIndex={1} />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-y-2">
+        <SectionHeading />
+        <AlertError
+          error={error}
+          subject="Failed to retrieve the lifecycle policy"
+          projectRef={ref}
+        />
       </div>
     )
   }

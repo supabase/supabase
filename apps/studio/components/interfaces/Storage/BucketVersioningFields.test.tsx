@@ -14,6 +14,7 @@ import {
 } from './BucketVersioningFields.schema'
 import type { BucketVersioningState } from './StorageVersioning.constants'
 import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 
 const FormSchema = z.object(bucketVersioningFormFields).superRefine(superRefineBucketVersioning)
 
@@ -35,6 +36,7 @@ const Harness = ({
   isPublicBucket?: boolean
   isLoadingPolicy?: boolean
   isUnsupportedPolicy?: boolean
+  policyError?: { message: string } | null
 }) => {
   const form = useForm<BucketVersioningFormValues>({
     resolver: zodResolver(FormSchema),
@@ -212,6 +214,31 @@ describe('BucketVersioningFields', () => {
     expect(screen.queryByLabelText('Loading lifecycle policy')).not.toBeInTheDocument()
     expect(getDaysInput()).toBeInTheDocument()
     expect(screen.getByText('No lifecycle policy')).toBeInTheDocument()
+  })
+
+  test('reports a policy it failed to read instead of showing empty fields', () => {
+    // The alert's support link reads the project it would report against.
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      // @ts-expect-error minimal project shape for useSelectedProject
+      response: { id: 1, ref: 'default', name: 'Default Project', status: 'ACTIVE_HEALTHY' },
+    })
+
+    renderFields({
+      defaultValues: {
+        enable_versioning: true,
+        version_expiry_days: '',
+        max_noncurrent_versions: '',
+      },
+      initialVersioningState: 'enabled',
+      policyError: { message: 'Failed to retrieve bucket lifecycle' },
+    })
+
+    expect(screen.getByText('Failed to retrieve the lifecycle policy')).toBeInTheDocument()
+    // The bucket may well have a policy; the fetch failed before saying so.
+    expect(screen.queryByText('No lifecycle policy')).not.toBeInTheDocument()
+    expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
   })
 
   test('leaves a policy it cannot represent alone instead of offering to edit it', () => {

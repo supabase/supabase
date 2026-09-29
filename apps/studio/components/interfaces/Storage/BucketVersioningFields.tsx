@@ -23,6 +23,8 @@ interface BucketVersioningFieldsProps {
   isLoadingPolicy?: boolean
   /** The stored policy holds rules these fields cannot represent, so it is left alone. */
   isUnsupportedPolicy?: boolean
+  /** The bucket's stored lifecycle policy could not be fetched. */
+  policyError?: { message: string } | null
 }
 
 export const BucketVersioningFields = ({
@@ -32,6 +34,7 @@ export const BucketVersioningFields = ({
   isPublicBucket = false,
   isLoadingPolicy = false,
   isUnsupportedPolicy = false,
+  policyError,
 }: BucketVersioningFieldsProps) => {
   const { control, setValue } = useFormContext<BucketVersioningFormValues>()
 
@@ -44,7 +47,7 @@ export const BucketVersioningFields = ({
   const isSuspending = !isVersioningEnabled && initialVersioningState !== 'disabled'
 
   // A bound nobody has read, or that the fields only partly represent, can't be compared against.
-  const hasKnownBounds = !isLoadingPolicy && !isUnsupportedPolicy
+  const hasKnownBounds = !isLoadingPolicy && !isUnsupportedPolicy && !policyError
 
   const tightening = getRetentionTightening({
     initialVersioningState,
@@ -148,6 +151,7 @@ export const BucketVersioningFields = ({
                 onModeChange={handleModeChange}
                 isLoading={isLoadingPolicy}
                 isUnsupported={isUnsupportedPolicy}
+                error={policyError}
               />
             </FormSectionCollapse>
           )}
