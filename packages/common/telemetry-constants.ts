@@ -1015,7 +1015,19 @@ export interface AgentSetupClickedEvent {
 }
 
 /**
- * User copied the URL of a guide's md version from the docs top bar and the
+ * User copied a guide's Markdown content with "Copy page" in the docs top bar and
+ * the clipboard write succeeded. Fires on success only
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface DocsPageMarkdownCopiedEvent {
+  action: 'docs_page_markdown_copied'
+}
+
+/**
+ * User copied the URL of a guide's md version from the docs top bar menu and the
  * clipboard write succeeded. Fires on success only
  *
  * @group Events
@@ -1027,7 +1039,7 @@ export interface DocsMarkdownUrlCopiedEvent {
 }
 
 /**
- * User clicked "View as Markdown" in the docs top bar to open a guide's Markdown version
+ * User clicked "View as Markdown" in the docs top bar menu to open a guide's Markdown version
  *
  * @group Events
  * @source docs
@@ -4064,6 +4076,7 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | DocsMarkdownUrlCopiedEvent
+  | DocsPageMarkdownCopiedEvent
   | DocsViewAsMarkdownClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
