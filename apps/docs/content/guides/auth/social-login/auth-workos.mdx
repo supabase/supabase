@@ -1,12 +1,12 @@
 ---
-title: 'SSO and Social Login with WorkOS'
+title: 'SSO and social login with WorkOS'
 ---
 
-## Use Social Login with WorkOS
+## Use social login with WorkOS
 
 ### Step 1. Create a WorkOS organization
 
-Log in to the WorkOS dashboard and visit the Organizations tab to create an organization.
+Sign in to the WorkOS dashboard and visit the Organizations tab to create an organization.
 ![Create an Organization](/docs/img/guides/auth-workos/workos-create-organization.png)
 
 Alternatively, you can [create an organization via the WorkOS API](https://workos.com/docs/reference/organization/create).
@@ -67,7 +67,7 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
 
 ![Set your Supbase project redirect URL in the WorkOS dashboard](/docs/img/guides/auth-workos/workos-set-supabase-redirect.png)
 
-## Step 5. Add login code to your client app
+## Step 5. Add sign-in code to your client app
 
 When a user signs in, call `signInWithOAuth` with `workos` as the provider.
 

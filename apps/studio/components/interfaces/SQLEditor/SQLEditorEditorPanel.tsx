@@ -12,7 +12,7 @@ import {
   useSqlEditorSnippet,
   useSqlEditorUi,
 } from './SQLEditorControllers'
-import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
+import { ResizableAIWidget } from '@/components/ui/AIEditor/ResizableAIWidget'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { detectOS } from '@/lib/helpers'
 
@@ -176,7 +176,7 @@ function LoadingSpinner() {
   return (
     <div className="overflow-y-auto h-full">
       <div className="flex h-full w-full items-center justify-center">
-        <Loader2 className="animate-spin text-brand" />
+        <Loader2 className="animate-spin text-primary" />
       </div>
     </div>
   )

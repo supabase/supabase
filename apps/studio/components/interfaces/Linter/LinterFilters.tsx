@@ -65,7 +65,6 @@ const LinterFilters = ({
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.ADVISORS_REFRESH} side="bottom">
           <Button
             size="tiny"
-            variant="default"
             disabled={isLoading}
             onClick={onClickRefresh}
             icon={

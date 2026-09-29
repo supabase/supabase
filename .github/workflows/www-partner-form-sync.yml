@@ -1,0 +1,78 @@
+name: Sync partner intake form from HubSpot
+
+on:
+  schedule:
+    # Run at 00:00 UTC every Monday
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  sync-partner-form:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          ref: ${{ github.ref }}
+          sparse-checkout: |
+            apps/www
+            packages
+            patches
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Fetch the live HubSpot form and regenerate the snapshot
+        run: pnpm run sync:partner-form
+        working-directory: ./apps/www
+
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.GH_AUTOFIX_APP_CLIENT_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+          permission-pull-requests: write
+          permission-contents: write
+
+      # Only opens/updates a PR when the regenerated snapshot actually
+      # differs from what's committed — i.e. only when the live HubSpot form
+      # has changed since the last sync. The PR's existence is the drift
+      # alert: PartnerIntakeForm.sync.test.ts (run by the normal
+      # www-tests.yml suite on this PR) fails until a human reconciles
+      # PartnerIntakeForm.tsx / staticFormCrm.ts with the new snapshot.
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          commit-message: 'chore(www): sync partner intake form snapshot from HubSpot'
+          title: 'chore(www): partner intake form has changed in HubSpot'
+          body: |
+            The live "Become a Partner" HubSpot form no longer matches the
+            checked-in snapshot at
+            `apps/www/components/Partners/__generated__/partner-intake-form.hubspot.json`.
+
+            `PartnerIntakeForm.sync.test.ts` will fail on this PR until
+            `apps/www/components/Partners/PartnerIntakeForm.fields.ts` and
+            `apps/www/lib/staticFormCrm.ts` are updated by hand to match —
+            see the comment at the top of that test for what it checks.
+          branch: 'gha/auto-sync-partner-intake-form'
+          base: 'master'
+          add-paths: |
+            apps/www/components/Partners/__generated__/partner-intake-form.hubspot.json

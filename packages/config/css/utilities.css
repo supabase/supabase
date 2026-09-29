@@ -13,6 +13,60 @@
   background-color: var(--background);
 }
 
+/* Contrast 0.5 produces (0.05 + 0.95 * 0.5)² = 0.275625. */
+@utility control-surface-shadows {
+  --button-shadow-opacity: 0.04;
+  --button-edge-strength: calc(var(--contrast-border, 0.275625) / 0.275625 * 0.6);
+  --button-edge-color: var(--colors-black);
+  --button-shadow-drop: 0 1px 3px 0 hsl(var(--colors-black) / var(--button-shadow-opacity));
+  --button-shadow-raised:
+    var(--button-shadow-drop),
+    inset 0 1px 0 0 hsl(var(--button-edge-color) / calc(0.04 * var(--button-edge-strength))),
+    inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.06 * var(--button-edge-strength))),
+    inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.1 * var(--button-edge-strength)));
+  --button-shadow-default:
+    var(--button-shadow-drop),
+    inset 0 1px 0 0 hsl(var(--button-edge-color) / calc(0.04 * var(--button-edge-strength))),
+    inset 0 0 0 1px hsl(var(--colors-black) / calc(0.06 * var(--button-edge-strength))),
+    inset 0 -1px 0 0 hsl(var(--colors-black) / calc(0.06 * var(--button-edge-strength))),
+    inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.1 * var(--button-edge-strength)));
+
+  @variant dark {
+    --button-shadow-opacity: 0.2;
+    --button-edge-strength: calc(var(--contrast-border, 0.275625) / 0.275625);
+    --button-edge-color: var(--colors-white);
+  }
+}
+
+@utility raised-control-surface {
+  @apply text-foreground bg-card shadow-[var(--button-shadow-default)];
+
+  @variant hover {
+    @apply bg-muted;
+  }
+
+  &[data-state='open'] {
+    @apply bg-muted;
+  }
+
+  @variant dark {
+    @apply bg-muted;
+    background-image: linear-gradient(
+      to bottom,
+      hsl(var(--colors-white) / 0.015),
+      hsl(var(--colors-black) / 0.01)
+    );
+
+    @variant hover {
+      @apply bg-accent;
+    }
+
+    &[data-state='open'] {
+      @apply bg-accent;
+    }
+  }
+}
+
 /*
  * Soft shimmer gradient used by LoadingLine.
  */
@@ -198,10 +252,15 @@
 }
 
 @utility focus-inset {
+  /* Reserve outline geometry up front so focus never flashes the browser default. */
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  /* Call sites often add `transition`/`transition-all`; keep outline instant. */
+  transition-property:
+    color, background-color, border-color, text-decoration-color, fill, stroke, opacity, transform,
+    filter, backdrop-filter, box-shadow;
+
   &:focus-visible {
-    outline-style: solid;
-    outline-width: 2px;
-    outline-offset: -2px;
     outline-color: var(--ring);
     border-radius: var(--radius-md, 0.375rem);
   }

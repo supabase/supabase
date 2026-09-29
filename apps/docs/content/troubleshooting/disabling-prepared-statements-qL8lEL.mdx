@@ -51,6 +51,14 @@ Follow the recommendation in the [asyncpg docs](https://magicstack.github.io/asy
 
 > disable automatic use of prepared statements by passing `statement_cache_size=0` to [asyncpg.connect()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.connect) and [asyncpg.create_pool()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.pool.create_pool) (and, obviously, avoid the use of [Connection.prepare()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.Connection.prepare));
 
+## JDBC
+
+Set [`prepareThreshold`](https://jdbc.postgresql.org/documentation/use/#connection-parameters) to `0`:
+
+```
+jdbc:postgresql://[POOLER-HOST]:6543/postgres?prepareThreshold=0
+```
+
 ## Rust's Deadpool or `tokio-postgres`:
 
 - Check [GitHub Discussion](https://github.com/bikeshedder/deadpool/issues/340#event-13642472475)

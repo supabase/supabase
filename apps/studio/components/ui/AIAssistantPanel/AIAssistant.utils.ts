@@ -15,6 +15,7 @@ import { databaseKeys } from '@/data/database/keys'
 import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
 import { handleError } from '@/data/fetchers'
 import { tableKeys } from '@/data/tables/keys'
+import { isManualApprovalRequested } from '@/lib/ai/message-utils'
 import { tryParseJson } from '@/lib/helpers'
 import type { SqlSnippet } from '@/state/ai-assistant-state'
 import { ResponseError } from '@/types'
@@ -85,7 +86,7 @@ export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts
   return messages.some((message) => {
     if (message.role !== 'assistant') return false
 
-    return message.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-requested')
+    return message.parts?.some((part) => isManualApprovalRequested(part))
   })
 }
 
@@ -183,7 +184,7 @@ export const getSnippetContent = (snippet: SqlSnippet): string =>
  * against the `logs` table — a single message can carry both dialects.
  *
  * It also keeps the two apart in the rendered message: MessageMarkdown treats a `sql`
- * fence as runnable Postgres (`DisplayBlockRenderer`, branded with `untrustedSql`),
+ * fence as runnable Postgres (`AssistantQueryCell`, branded with `untrustedSql`),
  * which a ClickHouse query must never be offered as.
  */
 function getSnippetFenceLanguage(snippet: SqlSnippet): 'sql' | 'clickhouse' {

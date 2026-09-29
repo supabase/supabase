@@ -28,10 +28,7 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: {
-          ...(parentAlternates.types ?? {}),
-          'text/markdown': 'https://supabase.com/llms-full.txt',
-        },
+        types: parentAlternates.types || undefined,
       }),
     },
   }
@@ -333,7 +330,7 @@ const HomePage = () => (
             <TextLink
               label="Explore more resources"
               url="/guides/resources"
-              className="no-underline text-brand-link text-sm"
+              className="no-underline text-primary text-sm"
             />
           </div>
 
@@ -391,7 +388,7 @@ const HomePage = () => (
               <TextLink
                 label="More on self-hosting"
                 url="/guides/self-hosting"
-                className="no-underline text-brand-link text-sm"
+                className="no-underline text-primary text-sm"
               />
             </div>
           </div>

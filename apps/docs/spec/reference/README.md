@@ -426,7 +426,7 @@ No other call sites need to change.
 
 > ⚠️ Don't move the constant. `Reference.utils.ts` transitively pulls in
 > `next/navigation`, which crashes `tsx --conditions=react-server` (used by
-> `pnpm build:llms`). The constant lives in its own no-dep file
+> `pnpm embeddings`). The constant lives in its own no-dep file
 > (`Reference.constants.ts`) so server-only scripts can import it without
 > dragging the Next runtime in.
 

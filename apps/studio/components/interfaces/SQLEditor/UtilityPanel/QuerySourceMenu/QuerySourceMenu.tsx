@@ -61,7 +61,8 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
   const databaseSelector = useDatabaseSelectorStateSnapshot()
-  const [lastSelectedDatabase, setLastSelectedDatabase] = useLocalStorageQuery(
+
+  const [, setLastSelectedDatabase] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref ?? ''),
     ''
   )
@@ -79,10 +80,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
   // A snippet materializes in the store on its first keystroke; until then a
   // `/sql/new` tab is a blank scaffold with nothing to preserve.
   const isBlankNewTab = snapV2.snippets[id] === undefined
-  const databaseIdentifier =
-    lastSelectedDatabase.length > 0
-      ? lastSelectedDatabase
-      : (databaseSelector.selectedDatabaseId ?? ref)
+  const databaseIdentifier = databaseSelector.selectedDatabaseId ?? ref
 
   const selectableSources = QUERY_SOURCES.filter(
     (source) => source._tag !== 'logs' || canCreateLogsSnippet || isLogs
@@ -105,7 +103,6 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="default"
             aria-label={`Query source: ${QUERY_SOURCE_LABELS[currentSource]}`}
             icon={<QuerySourceIcon source={currentSource} className="text-foreground-light" />}
             iconRight={<ChevronDown size={14} className="text-foreground-light" />}

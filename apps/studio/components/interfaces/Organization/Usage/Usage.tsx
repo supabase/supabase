@@ -202,7 +202,6 @@ export const Usage = () => {
                       return (
                         <Button
                           block
-                          variant="default"
                           role="combobox"
                           size="tiny"
                           aria-expanded={open}
@@ -262,7 +261,7 @@ export const Usage = () => {
                 <div className="flex items-center gap-2">
                   <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                     Organization is on the{' '}
-                    <span className="font-medium text-brand">{subscription.plan.name} Plan</span>
+                    <span className="font-medium text-primary">{subscription.plan.name} Plan</span>
                   </p>
                   <span className="text-border-stronger">
                     <svg
@@ -366,18 +365,16 @@ export const Usage = () => {
         isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
 
-      {subscription?.plan.id === 'platform' && (
-        <OrgLogUsage
-          orgSlug={slug as string}
-          projectRef={usageProjectRef}
-          subscription={subscription}
-          startDate={startDate}
-          endDate={endDate}
-          currentBillingCycleSelected={currentBillingCycleSelected}
-          orgDailyStats={orgDailyStats}
-          isLoadingOrgDailyStats={isLoadingOrgDailyStats}
-        />
-      )}
+      <OrgLogUsage
+        orgSlug={slug as string}
+        projectRef={usageProjectRef}
+        subscription={subscription}
+        startDate={startDate}
+        endDate={endDate}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats || isLoadingSubscription}
+      />
 
       <Pipelines
         orgSlug={slug as string}

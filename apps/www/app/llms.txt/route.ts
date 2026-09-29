@@ -3,6 +3,8 @@ import path from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
 import matter from 'gray-matter'
 
+import { AGENT_RESOURCES } from '@/lib/agent-resources'
+
 export const dynamic = 'force-dynamic'
 
 interface Source {
@@ -81,6 +83,10 @@ export async function GET() {
     .map((source) => `- [${source.title}](https://supabase.com/${source.relPath})`)
     .join('\n')
 
+  const agentResourceLinks = AGENT_RESOURCES.map(
+    (resource) => `- [${resource.title}](${resource.url}): ${resource.description}`
+  ).join('\n')
+
   const content = [
     '# Supabase Docs',
     '',
@@ -93,6 +99,22 @@ export async function GET() {
     '## Pricing',
     '',
     '- [Supabase Pricing](https://supabase.com/pricing.md)',
+    '',
+    '## Product overviews',
+    '',
+    '- [Supabase overview](https://supabase.com/index.md)',
+    '- [Database](https://supabase.com/database.md): dedicated Postgres, usable on its own with any Postgres client or ORM',
+    '- [Auth](https://supabase.com/auth.md)',
+    '- [Storage](https://supabase.com/storage.md)',
+    '- [Realtime](https://supabase.com/realtime.md)',
+    '- [Edge Functions](https://supabase.com/edge-functions.md)',
+    '- [Cron](https://supabase.com/modules/cron.md)',
+    '- [Queues](https://supabase.com/modules/queues.md)',
+    '- [Vector](https://supabase.com/modules/vector.md)',
+    '',
+    '## API and agent resources',
+    '',
+    agentResourceLinks,
   ].join('\n')
 
   return new Response(content, {

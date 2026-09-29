@@ -238,7 +238,6 @@ export const ForeignRowSelector = ({
                     {isNullable && (
                       <div className="pl-3">
                         <Button
-                          variant="default"
                           onClick={() => {
                             if (columns?.length === 1) onSelect({ [columns[0].source]: null })
                           }}

@@ -156,7 +156,7 @@ export function AiAssistantDropdown({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem onClick={handleCopyPrompt} className="gap-2">
-            {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
+            {showCopied ? <Check size={14} className="text-primary" /> : <Copy size={14} />}
             {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
 

@@ -121,7 +121,7 @@ const AddNewWrapperCTA = () => {
             wrappers. Afterward, you can recreate the wrappers.
           </p>
         </div>
-        <Button asChild variant="default" className="w-min mt-3">
+        <Button asChild className="w-min mt-3">
           <Link
             href={
               databaseNeedsUpgrading
@@ -139,7 +139,6 @@ const AddNewWrapperCTA = () => {
   return (
     <div className="py-3 px-5 border rounded-md">
       <ButtonTooltip
-        variant="default"
         onClick={() => setCreateWrapperShown(true)}
         disabled={!canCreateWrapper}
         tooltip={{

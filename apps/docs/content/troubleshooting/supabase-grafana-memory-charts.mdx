@@ -7,7 +7,7 @@ date_created = "2024-06-05"
 database_id = "179d70f3-1e26-4346-9ee8-d340fad382a3"
 ---
 
-> [Supabase Grafana Installation Guide](/docs/guides/monitoring-and-debugging/metrics/grafana-self-hosted)
+> [Supabase Grafana Installation Guide](/docs/guides/observability/metrics/grafana-self-hosted)
 
 Here are examples of unhealthy memory usage:
 ![image](https://github.com/supabase/supabase/assets/91111415/baebfc74-642d-4988-992c-bb0f473a05ad)
@@ -22,7 +22,7 @@ The cache in Postgres is important because the database will store frequently ac
 
 Most data in a database is idle, but in cases where there is little available memory or uncached data is rapidly accessed, [thrashing](<https://en.wikipedia.org/wiki/Thrashing_(computer_science)>) can occur.
 
-Ideally, you want queries to hit the cache 99% of the time. You can use the [Supabase CLI](/docs/guides/database/inspect) `inspect db cache hit` command to check your cache hit rate. Alternatively, you can run the [query](https://github.com/supabase/cli/blob/c9cce58025fded16b4c332747f819a44f45c3b83/internal/inspect/bloat/bloat.go#L17) found in the CLI's GitHub repo in the [SQL Editor](/dashboard/project/_/sql/)
+Ideally, you want queries to hit the cache 99% of the time. You can use the [Supabase CLI](/docs/guides/monitoring-and-debugging/inspect) `inspect db cache hit` command to check your cache hit rate. Alternatively, you can run the [query](https://github.com/supabase/cli/blob/c9cce58025fded16b4c332747f819a44f45c3b83/internal/inspect/bloat/bloat.go#L17) found in the CLI's GitHub repo in the [SQL Editor](/dashboard/project/_/sql/)
 
 ```sh
 # login to the CLI

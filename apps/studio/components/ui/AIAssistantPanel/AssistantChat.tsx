@@ -3,7 +3,7 @@ import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
@@ -21,6 +21,7 @@ import {
   resolvePendingToolApprovalsAsDenied,
 } from './AIAssistant.utils'
 import { AIOnboarding } from './AIOnboarding'
+import { AssistantAgentHarnessFooter } from './AssistantAgentHarnessFooter'
 import { AssistantChatForm } from './AssistantChatForm'
 import {
   Conversation,
@@ -28,27 +29,26 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
+import { groupMessageParts } from './Message.Parts.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import type { AssistantMessageMetadata } from '@/lib/ai/assistant-message-metadata'
-import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import {
-  DEFAULT_ASSISTANT_BASE_MODEL_ID,
-  defaultAssistantModelId,
-  isAssistantBaseModelId,
-  isKnownAssistantModelId,
-} from '@/lib/ai/model.utils'
+  isTimedOutMessage,
+  type AssistantMessageMetadata,
+} from '@/lib/ai/assistant-message-metadata'
+import { ASSISTANT_TIMEOUT_MESSAGE } from '@/lib/ai/assistant-timeout'
+import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import { IS_PLATFORM } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
-import type { AssistantModel, SqlSnippet } from '@/state/ai-assistant-state'
+import type { SqlSnippet } from '@/state/ai-assistant-state'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -57,7 +57,6 @@ export interface AssistantChatHeaderProps {
   isChatLoading: boolean
   showMetadataWarning: boolean
   updatedOptInSinceMCP: boolean
-  isHipaaProjectDisallowed: boolean
   aiOptInLevel: 'disabled' | 'schema' | 'full' | string | undefined
 }
 
@@ -78,6 +77,7 @@ interface AssistantChatProps {
   onBranchChat: (messageId: string) => void
   composerContext?: AssistantChatComposerContext
   renderHeader?: (props: AssistantChatHeaderProps) => ReactNode
+  onInputChange?: (value: string) => void
 }
 
 export const AssistantChat = ({
@@ -89,6 +89,7 @@ export const AssistantChat = ({
   onBranchChat,
   composerContext,
   renderHeader,
+  onInputChange,
 }: AssistantChatProps) => {
   const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -98,6 +99,7 @@ export const AssistantChat = ({
     useSelectedOrganizationQuery()
 
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const shouldReduceMotion = useReducedMotion()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
   const currentChat = snap.chats[chatId]
@@ -106,26 +108,6 @@ export const AssistantChat = ({
     enabled: shortcutsEnabled,
   })
 
-  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
-    useCheckEntitlements('assistant.advance_model')
-
-  const selectedModel = useMemo<AssistantModel>(() => {
-    // While entitlements are loading, use the stored model without enforcing access
-    if (isLoadingEntitlements) {
-      return snap.model ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
-    }
-
-    const defaultModel = defaultAssistantModelId(hasAccessToAdvanceModel)
-    const model = snap.model ?? defaultModel
-
-    if (!isKnownAssistantModelId(model)) return defaultModel
-    if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(model)) {
-      return DEFAULT_ASSISTANT_BASE_MODEL_ID
-    }
-
-    return model
-  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
-
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
     false
@@ -133,7 +115,7 @@ export const AssistantChat = ({
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   // Whether attached queries are sent at all. One definition, shared by the chat form
   // (which folds them into the message text) and the message metadata (which states
   // whether any of them was a logs query), so the two can't disagree.
@@ -194,8 +176,10 @@ export const AssistantChat = ({
     addToolApprovalResponse,
     stop,
     regenerate,
-  } = useChat({
+  } = useChat<MessageType>({
     id: chatId,
+    // Batch token updates without throttling the SDK's tool execution or approval state.
+    throttle: 50,
     ...(chatInstance ? { chat: chatInstance } : {}),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onError: onErrorChat,
@@ -210,32 +194,36 @@ export const AssistantChat = ({
   const isChatInputDisabled =
     !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
 
+  const messagesRef = useLatest(chatMessages)
+  const isChatLoadingRef = useLatest(isChatLoading)
+
   const branchedFrom = currentChat?.branchedFrom
   const branchedConversation = branchedFrom ? snap.chats[branchedFrom.chatId] : undefined
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
-      // Find the message index in current chatMessages
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      const messages = messagesRef.current
+      const messageIndex = messages.findIndex((msg) => msg.id === messageId)
       if (messageIndex === -1) return
 
-      if (isChatLoading) stop()
+      if (isChatLoadingRef.current) stop()
 
-      snap.deleteMessagesAfter(messageId, { includeSelf: true, chatId })
+      state.deleteMessagesAfter(messageId, { includeSelf: true, chatId })
 
-      const updatedMessages = chatMessages.slice(0, messageIndex)
+      const updatedMessages = messages.slice(0, messageIndex)
       setMessages(updatedMessages)
     },
-    [snap, setMessages, chatMessages, isChatLoading, stop, chatId]
+    [state, setMessages, messagesRef, isChatLoadingRef, stop, chatId]
   )
 
   const editMessage = useCallback(
     (messageId: string) => {
-      const messageIndex = chatMessages.findIndex((msg) => msg.id === messageId)
+      const messages = messagesRef.current
+      const messageIndex = messages.findIndex((msg) => msg.id === messageId)
       if (messageIndex === -1) return
 
       // Target message
-      const messageToEdit = chatMessages[messageIndex]
+      const messageToEdit = messages[messageIndex]
 
       // Activate editing mode
       setEditingMessageId(messageId)
@@ -257,7 +245,7 @@ export const AssistantChat = ({
         }
       }, 100)
     },
-    [chatMessages, setValue]
+    [messagesRef, setValue]
   )
 
   const cancelEdit = useCallback(() => {
@@ -275,7 +263,7 @@ export const AssistantChat = ({
       try {
         const result = await rateMessage({
           rating,
-          messages: chatMessages,
+          messages: messagesRef.current,
           messageId,
           projectRef: project.ref,
           orgSlug: selectedOrganization.slug,
@@ -298,7 +286,7 @@ export const AssistantChat = ({
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state, chatId]
+    [messagesRef, project?.ref, selectedOrganization?.slug, rateMessage, track, state, chatId]
   )
 
   const isContextExceededError =
@@ -306,13 +294,27 @@ export const AssistantChat = ({
     (error.message?.includes('context_length_exceeded') ||
       error.message?.includes('exceeds the context window'))
 
+  const lastMessage = chatMessages.at(-1)
+  // A running tool group shimmers already, so the cursor would be a second loading indicator
+  const isToolGroupRunning =
+    isChatLoading &&
+    lastMessage?.role === 'assistant' &&
+    groupMessageParts(lastMessage.parts).at(-1)?.type === 'tool-group'
+
+  const isTimedOut = !error && !isChatLoading && isTimedOutMessage(lastMessage)
+  let displayError = IS_PLATFORM ? ASSISTANT_ERRORS['default'] : error
+  if (isContextExceededError) displayError = ASSISTANT_ERRORS['context-exceeded']
+  if (isTimedOut) displayError = { message: ASSISTANT_TIMEOUT_MESSAGE }
+
+  const editedMessageIndex = editingMessageId
+    ? chatMessages.findIndex((message) => message.id === editingMessageId)
+    : -1
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message, index) => {
         const isBeingEdited = editingMessageId === message.id
-        const isAfterEditedMessage = editingMessageId
-          ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
-          : false
+        const isAfterEditedMessage = !!editingMessageId && editedMessageIndex < index
         const isLastMessage = index === chatMessages.length - 1
 
         return (
@@ -358,6 +360,7 @@ export const AssistantChat = ({
       editMessage,
       cancelEdit,
       editingMessageId,
+      editedMessageIndex,
       chatStatus,
       addToolApprovalResponse,
       handleRateMessage,
@@ -459,6 +462,107 @@ export const AssistantChat = ({
     }
   }, [composerContext?.initialInput])
 
+  let placeholder: string
+  if (hasMessages && isSupportChat) {
+    placeholder = 'Share details so the assistant can help with your support request...'
+  } else if (hasMessages) {
+    placeholder = 'Ask a follow up question...'
+  } else if ((composerContext?.sqlSnippets ?? []).length > 0) {
+    placeholder = 'Ask a question or make a change...'
+  } else if (isSupportChat) {
+    placeholder = 'Describe your support issue...'
+  } else {
+    placeholder = 'Ask about your data, troubleshoot an issue, or explore your project...'
+  }
+
+  const composer = (
+    <div className={cn('relative z-20 w-full', hasMessages && 'px-7 pb-3')}>
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-y-3">
+        {isSupportChat && !isSupportChatClosed && (
+          <div>
+            <div className="mb-3 border-t" />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="tiny"
+                disabled={!supportConversationId}
+                onClick={() => state.setSupportLifecycleStatus(chatId, 'escalated')}
+              >
+                Escalate to human
+              </Button>
+              <Button
+                variant="outline"
+                size="tiny"
+                disabled={!supportConversationId}
+                onClick={() => state.setSupportLifecycleStatus(chatId, 'user_resolved')}
+              >
+                Resolve
+              </Button>
+            </div>
+          </div>
+        )}
+        {disablePrompts && (
+          <Admonition
+            showIcon={false}
+            type="default"
+            title="Assistant has been temporarily disabled"
+            description="We're currently looking into getting it back online"
+          />
+        )}
+
+        {isSuccess && !isApiKeySet && (
+          <Admonition
+            type="default"
+            title="OpenAI API key not set"
+            description={
+              <Markdown
+                content={
+                  'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                }
+              />
+            }
+          />
+        )}
+
+        <div>
+          <AssistantChatForm
+            textAreaRef={inputRef}
+            className={cn('z-20', !hasMessages && 'bg')}
+            loading={isChatLoading}
+            isEditing={!!editingMessageId}
+            disabled={isChatInputDisabled}
+            placeholder={placeholder}
+            value={value}
+            onValueChange={(e) => {
+              setValue(e.target.value)
+              onInputChange?.(e.target.value)
+            }}
+            onSubmit={(finalMessage) => {
+              sendMessageToAssistant(finalMessage)
+            }}
+            onStop={() => {
+              stop()
+              // to save partial responses from the AI
+              // Read the live SDK state: the rendered snapshot may trail the stream by 50ms.
+              const messages = chatInstance?.messages ?? chatMessages
+              const lastMessage = messages[messages.length - 1]
+              if (lastMessage && lastMessage.role === 'assistant') {
+                state.updateMessage(lastMessage, chatId)
+              }
+            }}
+            sqlSnippets={composerContext?.sqlSnippets}
+            onRemoveSnippet={(index) => {
+              const newSnippets = [...(composerContext?.sqlSnippets ?? [])]
+              newSnippets.splice(index, 1)
+              composerContext?.onSetSqlSnippets?.(newSnippets)
+            }}
+            includeSnippetsInMessage={includeSnippetsInMessage}
+          />
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <ErrorBoundary
       message="Something went wrong with the AI Assistant"
@@ -483,49 +587,35 @@ export const AssistantChat = ({
           isChatLoading,
           showMetadataWarning,
           updatedOptInSinceMCP,
-          isHipaaProjectDisallowed,
           aiOptInLevel,
         })}
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
+            <ConversationContent className="w-full py-8 mb-10">
               {renderedMessages}
-              {error && (
-                <>
+              <div className="w-full max-w-3xl mx-auto">
+                {(error || isTimedOut) && (
                   <AlertError
-                    error={
-                      isContextExceededError
-                        ? ASSISTANT_ERRORS['context-exceeded']
-                        : IS_PLATFORM
-                          ? ASSISTANT_ERRORS['default']
-                          : error
-                    }
+                    error={displayError}
                     showErrorPrefix={false}
                     showInstructions={false}
-                    subject="Sorry, I'm having trouble responding right now."
+                    subject={
+                      isTimedOut
+                        ? 'Assistant response timed out'
+                        : "Sorry, I'm having trouble responding right now."
+                    }
                     additionalActions={
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (
-                          <Button
-                            variant="default"
-                            size="tiny"
-                            onClick={onNewChat}
-                            className="text-xs"
-                          >
+                          <Button size="tiny" onClick={onNewChat} className="text-xs">
                             New chat
                           </Button>
                         ) : (
                           <>
-                            <Button
-                              variant="default"
-                              size="tiny"
-                              onClick={() => regenerate()}
-                              className="text-xs"
-                            >
+                            <Button size="tiny" onClick={() => regenerate()} className="text-xs">
                               Retry
                             </Button>
                             <ButtonTooltip
-                              variant="default"
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"
@@ -537,31 +627,27 @@ export const AssistantChat = ({
                       </div>
                     }
                   />
-                </>
-              )}
-              {isChatLoading && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
-                />
-              )}
+                )}
+                {isChatLoading && !isToolGroupRunning && (
+                  <motion.span
+                    animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [1, 0] }}
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0 }
+                        : { duration: 1, repeat: Infinity, ease: 'linear' }
+                    }
+                    className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
+                  />
+                )}
 
-              <p className="text-center text-xs text-foreground-muted mt-6">
-                The Assistant can make mistakes. Double check responses.
-              </p>
+                <p className="text-center text-xs text-foreground-muted mt-6">
+                  The Assistant can make mistakes. Double check responses.
+                </p>
+              </div>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
-        ) : (
-          <AIOnboarding
-            key={chatId}
-            sqlSnippets={composerContext?.sqlSnippets}
-            suggestions={composerContext?.suggestions}
-            onValueChange={(val) => setValue(val)}
-            onFocusInput={() => inputRef.current?.focus()}
-          />
-        )}
+        ) : null}
 
         <AnimatePresence>
           {editingMessageId && (
@@ -607,100 +693,23 @@ export const AssistantChat = ({
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
-          {isSupportChat && !isSupportChatClosed && (
-            <div>
-              <div className="mb-3 border-t" />
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="tiny"
-                  disabled={!supportConversationId}
-                  onClick={() => state.setSupportLifecycleStatus(chatId, 'escalated')}
-                >
-                  Escalate to human
-                </Button>
-                <Button
-                  variant="outline"
-                  size="tiny"
-                  disabled={!supportConversationId}
-                  onClick={() => state.setSupportLifecycleStatus(chatId, 'user_resolved')}
-                >
-                  Resolve
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {disablePrompts && (
-            <Admonition
-              showIcon={false}
-              type="default"
-              title="Assistant has been temporarily disabled"
-              description="We're currently looking into getting it back online"
-            />
-          )}
-
-          {isSuccess && !isApiKeySet && (
-            <Admonition
-              type="default"
-              title="OpenAI API key not set"
-              description={
-                <Markdown
-                  content={
-                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
-                  }
-                />
-              }
-            />
-          )}
-
-          <AssistantChatForm
-            textAreaRef={inputRef}
-            className={cn(
-              'z-20',
-              '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
-              '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
-              '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
-            )}
-            loading={isChatLoading}
-            isEditing={!!editingMessageId}
-            disabled={isChatInputDisabled}
-            placeholder={
-              hasMessages
-                ? isSupportChat
-                  ? 'Share details so the assistant can help with your support request...'
-                  : 'Ask a follow up question...'
-                : (composerContext?.sqlSnippets ?? []).length > 0
-                  ? 'Ask a question or make a change...'
-                  : isSupportChat
-                    ? 'Describe your support issue...'
-                    : 'Chat to Postgres...'
-            }
-            value={value}
-            onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(finalMessage) => {
-              sendMessageToAssistant(finalMessage)
-            }}
-            onStop={() => {
-              stop()
-              // to save partial responses from the AI
-              const lastMessage = chatMessages[chatMessages.length - 1]
-              if (lastMessage && lastMessage.role === 'assistant') {
-                state.updateMessage(lastMessage, chatId)
-              }
-            }}
+        {hasMessages ? (
+          composer
+        ) : (
+          <AIOnboarding
+            key={chatId}
             sqlSnippets={composerContext?.sqlSnippets}
-            onRemoveSnippet={(index) => {
-              const newSnippets = [...(composerContext?.sqlSnippets ?? [])]
-              newSnippets.splice(index, 1)
-              composerContext?.onSetSqlSnippets?.(newSnippets)
+            suggestions={composerContext?.suggestions}
+            onValueChange={(prompt) => {
+              setValue(prompt)
+              onInputChange?.(prompt)
             }}
-            includeSnippetsInMessage={includeSnippetsInMessage}
-            selectedModel={selectedModel}
-            onSelectModel={(model) => snap.setModel(model)}
-          />
-        </div>
+            onFocusInput={() => inputRef.current?.focus()}
+          >
+            {composer}
+            {!isSupportChat && <AssistantAgentHarnessFooter />}
+          </AIOnboarding>
+        )}
       </div>
     </ErrorBoundary>
   )

@@ -26,6 +26,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { SuspensionNotice } from '../Settings/SuspensionNotice'
 import { AlertError } from '@/components/ui/AlertError'
 import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -44,11 +45,13 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 const formId = 'realtime-configuration-form'
 
 const REALTIME_SOFT_LIMITS = {
-  max_concurrent_users: 50_000,
+  max_concurrent_users: 300_000,
   max_events_per_second: 50_000,
   max_presence_events_per_second: 5_000,
   max_payload_size_in_kb: 3_000,
 }
+
+const MAX_POSTGRES_CHANGES_POOL = 20
 
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
@@ -65,9 +68,7 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data, error, isError, isPending } = useRealtimeConfigurationQuery({
-    projectRef,
-  })
+  const { data, error, isError, isPending } = useRealtimeConfigurationQuery({ projectRef })
 
   const { data: policies, isSuccess: isSuccessPolicies } = useDatabasePoliciesQuery({
     projectRef,
@@ -117,6 +118,7 @@ export const RealtimeSettings = () => {
   const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
   const isRealtimeDisabled = data?.suspend ?? REALTIME_DEFAULT_CONFIG.suspend
+  const isAdminSuspended = Boolean(data?.admin_suspended_at)
   // Check if RLS policies exist for realtime.messages table
   const realtimeMessagesPolicies = policies?.filter(
     (policy) => policy.schema === 'realtime' && policy.table === 'messages'
@@ -141,6 +143,7 @@ export const RealtimeSettings = () => {
         .min(1)
         .max(maxConn?.maxConnections ?? 100)
         .optional(),
+      postgres_changes_pool: z.coerce.number().min(1).max(MAX_POSTGRES_CHANGES_POOL).optional(),
       max_concurrent_users: z.coerce
         .number()
         .min(1)
@@ -186,6 +189,7 @@ export const RealtimeSettings = () => {
         .number()
         .min(1)
         .max(maxConn?.maxConnections ?? 100),
+      postgres_changes_pool: z.coerce.number().min(1).max(MAX_POSTGRES_CHANGES_POOL),
       max_concurrent_users: z.coerce
         .number()
         .min(1)
@@ -226,6 +230,8 @@ export const RealtimeSettings = () => {
   const configValues = data ?? REALTIME_DEFAULT_CONFIG
   const sharedFormValues = {
     connection_pool: configValues.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool,
+    postgres_changes_pool:
+      configValues.postgres_changes_pool ?? REALTIME_DEFAULT_CONFIG.postgres_changes_pool,
     max_concurrent_users:
       configValues.max_concurrent_users ?? REALTIME_DEFAULT_CONFIG.max_concurrent_users,
     max_events_per_second:
@@ -278,6 +284,11 @@ export const RealtimeSettings = () => {
       connection_pool: Number(
         values.connection_pool ?? data?.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool
       ),
+      postgres_changes_pool: Number(
+        values.postgres_changes_pool ??
+          data?.postgres_changes_pool ??
+          REALTIME_DEFAULT_CONFIG.postgres_changes_pool
+      ),
       max_concurrent_users: Number(
         values.max_concurrent_users ??
           data?.max_concurrent_users ??
@@ -314,6 +325,8 @@ export const RealtimeSettings = () => {
 
   return (
     <>
+      {isAdminSuspended && <SuspensionNotice suspendedAt={data?.admin_suspended_at} />}
+
       <Form {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           {isError ? (
@@ -415,7 +428,7 @@ export const RealtimeSettings = () => {
                                   </p>
                                 }
                                 actions={
-                                  <Button asChild variant="default">
+                                  <Button asChild>
                                     <Link href={`/project/${projectRef}/realtime/policies`}>
                                       Create policy
                                     </Link>
@@ -465,6 +478,35 @@ export const RealtimeSettings = () => {
                               />
                             )}
                         </>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="postgres_changes_pool"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          id="postgres_changes_pool"
+                          layout="flex-row-reverse"
+                          label="Postgres Changes connection pool size"
+                          description="Postgres Changes uses this database pool to create subscriptions when clients subscribe"
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                id="postgres_changes_pool"
+                                type="number"
+                                disabled={!canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>connections</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </FormItemLayout>
                       )}
                     />
                   </CardContent>
@@ -678,9 +720,7 @@ export const RealtimeSettings = () => {
                 </div>
                 <div className="flex items-center gap-x-2">
                   {form.formState.isDirty && (
-                    <Button variant="default" onClick={() => form.reset(formValues)}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => form.reset(formValues)}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"

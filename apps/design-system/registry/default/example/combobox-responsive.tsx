@@ -58,7 +58,6 @@ export default function ComboBoxResponsive() {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="default"
             size="small"
             className="w-[150px] justify-start"
             icon={!selectedStatus && <Plus className="text-foreground-muted" />}

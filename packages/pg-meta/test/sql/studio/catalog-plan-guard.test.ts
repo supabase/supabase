@@ -470,3 +470,27 @@ test('tables.retrieve: scoped plan stays scoped for a single table by name+schem
   )
   assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
 }, 60_000)
+
+test('tables.retrieve: scoped plan stays scoped for a composite-FK hub', async () => {
+  const result = await explainAnalyze(db, tables.retrieve({ id: hubTableId, scoped: true }).sql)
+  assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
+}, 60_000)
+
+test('tables.retrieve: composite FKs stay ordinally paired at stress scale', async () => {
+  const { sql, zod } = tables.retrieve({ id: midChainTableId, scoped: true })
+  const row = zod.parse((await db.executeQuery(sql))[0])
+  const chainRelationships = row.relationships.filter(
+    ({ source_table_name, target_table_name }) =>
+      source_table_name === 't_1000' && target_table_name === 't_999'
+  )
+
+  expect(
+    chainRelationships.map(({ source_column_name, target_column_name }) => [
+      source_column_name,
+      target_column_name,
+    ])
+  ).toEqual([
+    ['fk_id', 'id'],
+    ['fk_tenant_id', 'tenant_id'],
+  ])
+}, 60_000)

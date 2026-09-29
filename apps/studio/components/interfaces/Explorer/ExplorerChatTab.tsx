@@ -8,6 +8,7 @@ import { ExplorerChatToolbar } from './ExplorerChatToolbar'
 import { useCreateChat } from './hooks'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AssistantChat } from '@/components/ui/AIAssistantPanel/AssistantChat'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -20,24 +21,15 @@ export const ExplorerChatTab = () => {
   const aiAssistantState = useAiAssistantState()
   const { createChat, openChat } = useCreateChat()
   const { activeSidebar } = useSidebarManagerSnapshot()
+  const { setLastVisitedExplorerTab } = useDashboardHistory()
   const chat = id ? aiAssistant.chats[id] : undefined
   const chatInstance = id ? aiAssistant.chatInstances[id] : undefined
   const tabId = id ? createTabId('chat', { id }) : undefined
   const shortcutsEnabled = activeSidebar?.id !== SIDEBAR_KEYS.AI_ASSISTANT
 
-  const syncChatTab = useEffectEvent(() => {
+  const ensureChatInstance = useEffectEvent(() => {
     if (!id || !chat) return
-
     aiAssistantState.ensureChatInstance(id)
-    const nextTabId = createTabId('chat', { id })
-    tabs.addTab({
-      id: nextTabId,
-      type: 'chat',
-      label: chat.name,
-      metadata: { chatId: id },
-      isPreview: false,
-    })
-    tabs.updateTab(nextTabId, { label: chat.name })
   })
 
   const removeDeletedChatTab = useEffectEvent(() => {
@@ -47,11 +39,11 @@ export const ExplorerChatTab = () => {
       id: tabId,
       router,
       editor: 'explorer',
-      onClearDashboardHistory: () => {},
+      onClearDashboardHistory: () => setLastVisitedExplorerTab(undefined),
     })
   })
 
-  useEffect(() => syncChatTab(), [id, chat?.name])
+  useEffect(() => ensureChatInstance(), [id, chat])
 
   useEffect(() => {
     if (aiAssistant.isInitialized && id && !chat) removeDeletedChatTab()
@@ -75,9 +67,7 @@ export const ExplorerChatTab = () => {
             This chat may have been deleted or is no longer available.
           </p>
         </div>
-        <Button variant="default" onClick={() => router.push(`/project/${ref}/explorer`)}>
-          Back to Explorer
-        </Button>
+        <Button onClick={() => router.push(`/project/${ref}/explorer`)}>Back to Explorer</Button>
       </div>
     )
   }
@@ -95,6 +85,8 @@ export const ExplorerChatTab = () => {
       onNewChat={() => createChat()}
       onSelectChat={openChat}
       onBranchChat={handleBranchChat}
+      composerContext={{ initialInput: aiAssistant.initialInput }}
+      onInputChange={() => tabs.makeTabPermanent(createTabId('chat', { id }))}
       renderHeader={(headerProps) => (
         <ExplorerChatToolbar {...headerProps} chatId={id} shortcutsEnabled={shortcutsEnabled} />
       )}

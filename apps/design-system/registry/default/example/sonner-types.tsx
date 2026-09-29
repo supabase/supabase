@@ -7,11 +7,8 @@ export default function SonnerDemo() {
 
   return (
     <div className="flex gap-1">
-      <Button variant="default" onClick={() => toast('Event has been created')}>
-        Default
-      </Button>
+      <Button onClick={() => toast('Event has been created')}>Default</Button>
       <Button
-        variant="default"
         onClick={() =>
           toast.message('Event has been created', {
             description: 'Monday, January 3rd at 6:00pm',
@@ -21,7 +18,6 @@ export default function SonnerDemo() {
         description
       </Button>
       <Button
-        variant="default"
         onClick={() =>
           toast.success('Event has been created', {
             description: 'Sunday, December 03, 2023 at 9:00 AM',
@@ -30,13 +26,8 @@ export default function SonnerDemo() {
       >
         Success
       </Button>
-      <Button variant="default" onClick={() => toast.success('Event has been created')}>
-        Show Toast
-      </Button>
-      <Button
-        variant="default"
-        onClick={() => toast.info('Be at the area 10 minutes before the event time')}
-      >
+      <Button onClick={() => toast.success('Event has been created')}>Show Toast</Button>
+      <Button onClick={() => toast.info('Be at the area 10 minutes before the event time')}>
         Info
       </Button>
       <Button
@@ -61,11 +52,8 @@ export default function SonnerDemo() {
       >
         Action
       </Button>
-      <Button variant="default" onClick={() => toast.loading('Event has been created')}>
-        Loading
-      </Button>
+      <Button onClick={() => toast.loading('Event has been created')}>Loading</Button>
       <Button
-        variant="default"
         onClick={() =>
           toast.promise(promise, {
             loading: 'Loading...',
@@ -80,12 +68,11 @@ export default function SonnerDemo() {
         Promise
       </Button>
       <Button
-        variant="default"
         onClick={() =>
           toast(
             <>
               <div>A custom toast with default styling</div>
-              <Button variant="default">Hello world</Button>
+              <Button>Hello world</Button>
             </>
           )
         }

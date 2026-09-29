@@ -50,7 +50,11 @@ export const General = () => {
   const { mutate: updateProject, isPending: isUpdating } = useProjectUpdateMutation()
 
   const formSchema = z.object({
-    name: z.string().trim().min(3, 'Project name must be at least 3 characters long'),
+    name: z
+      .string()
+      .trim()
+      .min(3, 'Project name must be at least 3 characters long')
+      .max(256, 'Project name must be no longer than 256 characters'),
   })
 
   const defaultValues = { name: projectName ?? '' }
@@ -240,7 +244,6 @@ export const General = () => {
                   <CardFooter className="justify-end space-x-2">
                     {form.formState.isDirty && (
                       <Button
-                        variant="default"
                         type="button"
                         disabled={isUpdating}
                         onClick={() => form.reset({ name: project?.name ?? '' })}

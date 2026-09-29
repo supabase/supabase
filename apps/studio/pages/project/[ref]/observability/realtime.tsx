@@ -8,7 +8,7 @@ import { Button } from 'ui'
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { SharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
@@ -156,7 +156,6 @@ const RealtimeUsage = () => {
                 side="bottom"
               >
                 <Button
-                  variant="default"
                   disabled={isRefreshing}
                   icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"

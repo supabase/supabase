@@ -1,5 +1,7 @@
-import { Card, CardContent, Checkbox } from 'ui'
 import {
+  Card,
+  CardContent,
+  Checkbox,
   Field,
   FieldDescription,
   FieldGroup,
@@ -7,7 +9,7 @@ import {
   FieldLegend,
   FieldSet,
   FieldTitle,
-} from 'ui/src/components/shadcn/ui/field'
+} from 'ui'
 
 const options = [
   {

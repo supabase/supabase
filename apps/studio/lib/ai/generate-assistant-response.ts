@@ -2,10 +2,10 @@ import * as ai from 'ai'
 import {
   convertToModelMessages,
   isStepCount,
-  isToolUIPart,
   type LanguageModel,
   type ModelMessage,
   type SystemModelMessage,
+  type TimeoutConfiguration,
   type ToolSet,
   type UIMessage,
 } from 'ai'
@@ -16,6 +16,7 @@ import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
+import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.utils'
 import {
   CHAT_PROMPT,
   GENERAL_PROMPT,
@@ -23,7 +24,6 @@ import {
   NOTEBOOKS_PROMPT,
   SECURITY_PROMPT,
 } from '@/lib/ai/prompts'
-import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 
@@ -40,13 +40,16 @@ export async function generateAssistantResponse({
   supportMode,
   userId,
   orgId,
+  orgSlug,
   planId,
+  isHighComplianceProject,
   includesLogsSnippets,
   isExplorerEnabled,
   systemProviderOptions,
   providerOptions,
   requestedModel,
   abortSignal,
+  timeout,
   onSpanCreated,
 }: {
   messages: UIMessage[]
@@ -61,7 +64,9 @@ export async function generateAssistantResponse({
   supportMode?: boolean
   userId?: string
   orgId?: number
+  orgSlug?: string
   planId?: string
+  isHighComplianceProject?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
   isExplorerEnabled?: boolean
@@ -69,41 +74,13 @@ export async function generateAssistantResponse({
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
+  timeout?: TimeoutConfiguration<ToolSet>
   onSpanCreated?: (spanId: string) => void
 }) {
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
   const run = async (span?: Span) => {
-    // Only returns last 7 messages
-    // Filters out tools with invalid states
-    // Filters out tool outputs based on opt-in level
-    const messages = (rawMessages || []).slice(-7).map((msg) => {
-      if (msg && msg.role === 'assistant' && 'results' in msg) {
-        const cleanedMsg = { ...msg }
-        delete cleanedMsg.results
-        return cleanedMsg
-      }
-      if (msg && msg.role === 'assistant' && msg.parts) {
-        const cleanedParts = msg.parts
-          .filter((part) => {
-            if (isToolUIPart(part)) {
-              const invalidStates = [
-                'input-streaming',
-                'input-available',
-                'approval-requested',
-                'output-error',
-              ]
-              return !invalidStates.includes(part.state)
-            }
-            return true
-          })
-          .map((part) => {
-            return sanitizeMessagePart(part, aiOptInLevel)
-          })
-        return { ...msg, parts: cleanedParts }
-      }
-      return msg
-    })
+    const messages = prepareMessagesForModel(rawMessages, aiOptInLevel)
 
     const schemasString =
       aiOptInLevel !== 'disabled' && getSchemas
@@ -126,6 +103,7 @@ export async function generateAssistantResponse({
 
       Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
       - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
+      - \`logs\` — ClickHouse SQL against the project's logs table. Always load before calling \`query_logs\`.
       - \`rls\` — Row Level Security policies for database tables.
       - \`storage\` — Supabase Storage buckets, public/private bucket access, and \`storage.objects\` policies. Always load before creating Storage buckets or \`storage.objects\` policies.
       - \`edge_functions\` — Supabase Edge Functions
@@ -151,14 +129,24 @@ export async function generateAssistantResponse({
 
     const streamTextFn = shouldTrace ? tracedStreamText : ai.streamText
 
+    // onEnd still fires after an abort once a step has finished, so end the span only once.
+    let isSpanEnded = false
+    const endSpan = (metadata: Record<string, unknown>) => {
+      if (!span || isSpanEnded) return
+      isSpanEnded = true
+      span.log({ metadata })
+      span.end()
+    }
+
     return streamTextFn({
       model,
       instructions: systemMessage,
-      stopWhen: isStepCount(10),
+      stopWhen: isStepCount(20),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
+      ...(timeout && { timeout }),
       ...(span && {
         onEnd: ({ steps, finishReason }) => {
           const metadata: Record<string, unknown> = {
@@ -172,8 +160,12 @@ export async function generateAssistantResponse({
               }
             }
           }
-          span.log({ metadata })
-          span.end()
+          endSpan(metadata)
+        },
+        // The call aborts on either the request signal or `timeout`, so an unaborted
+        // request signal means the deadline stopped it.
+        onAbort: () => {
+          endSpan({ isAborted: true, isTimedOut: !abortSignal?.aborted })
         },
       }),
     } satisfies Parameters<typeof ai.streamText>[0])
@@ -200,7 +192,9 @@ export async function generateAssistantResponse({
         aiOptInLevel,
         userId,
         orgId,
+        orgSlug,
         planId,
+        isHighComplianceProject,
         requestedModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,

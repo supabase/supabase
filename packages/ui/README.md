@@ -16,7 +16,7 @@ Some of the components have the `_Shadcn_` suffix. These components should be pr
 
 ```tsx
 // deep object merge (used for themes)
-import { clipboard, cn, mergeDeep } from 'ui' // clsx + tailwind-merge
+import { clipboard, cn, mergeDeep } from 'ui' // Tailwind class merging (shadcn-ui/cn)
 
 // copy-to-clipboard helper
 ```

@@ -3,6 +3,7 @@ import type { McpClient } from 'ui-patterns/McpUrlBuilder'
 export interface PluginClient extends McpClient {
   repoUrl?: string
   docsUrl?: string
+  docsLinkText?: string
 }
 
 export const PLUGIN_CLIENTS: PluginClient[] = [
@@ -25,6 +26,7 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     key: 'cursor',
     label: 'Cursor',
     icon: 'cursor',
+    hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/cursor-plugin',
     docsUrl: 'https://cursor.com/docs/plugins',
   },
@@ -45,12 +47,29 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
       'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing',
   },
   {
+    key: 'grok',
+    label: 'Grok',
+    icon: 'grok',
+    hasDistinctDarkIcon: true,
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://docs.x.ai/build/features/skills-plugins-marketplaces#plugins',
+    docsLinkText: 'View Grok plugins docs',
+  },
+  {
     key: 'kimi',
     label: 'Kimi Code',
     icon: 'kimi',
     hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/supabase-plugin',
     docsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/plugins.html',
+  },
+  {
+    key: 'omp',
+    label: 'omp',
+    icon: 'omp',
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://github.com/can1357/oh-my-pi/blob/main/docs/marketplace.md',
+    docsLinkText: 'View omp plugin docs',
   },
   {
     key: 'vscode',

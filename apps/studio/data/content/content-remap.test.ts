@@ -6,20 +6,20 @@ import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
 const MARKDOWN_CELL = {
   _tag: 'markdown_cell' as const,
-  id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+  _id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
   text: '# Signup funnel',
 }
 
 const DATABASE_CELL = {
   _tag: 'database_cell' as const,
-  id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
+  _id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
   sql: 'select * from auth.users limit 100',
   row_limit: 100,
 }
 
 const LOG_CELL = {
   _tag: 'log_cell' as const,
-  id: 'c2001199-1e2b-4ef8-bb6d-6bb9bd380a33',
+  _id: 'c2001199-1e2b-4ef8-bb6d-6bb9bd380a33',
   sql: "select timestamp, event_message from edge_logs where source = 'edge_logs' limit 10",
   time_range: {
     _tag: 'relative_time_range' as const,
@@ -113,10 +113,14 @@ describe('remapSqlContentField', () => {
     const result = remapSqlContentField(NOTEBOOK)
 
     const [markdownCell, databaseCell, logCell] = result.content.cells
-    expect(markdownCell).toEqual(MARKDOWN_CELL)
+    expect(markdownCell).toEqual({
+      _tag: 'markdown_cell',
+      _id: MARKDOWN_CELL._id,
+      text: MARKDOWN_CELL.text,
+    })
     expect(databaseCell).toEqual({
       _tag: 'database_cell',
-      id: DATABASE_CELL.id,
+      _id: DATABASE_CELL._id,
       row_limit: 100,
       view: 'table',
       unchecked_sql: untrustedSql(DATABASE_CELL.sql),
@@ -124,7 +128,7 @@ describe('remapSqlContentField', () => {
     expect(databaseCell).not.toHaveProperty('sql')
     expect(logCell).toEqual({
       _tag: 'log_cell',
-      id: LOG_CELL.id,
+      _id: LOG_CELL._id,
       time_range: LOG_CELL.time_range,
       view: 'table',
       unchecked_sql: untrustedLogSql(LOG_CELL.sql),
@@ -138,7 +142,7 @@ describe('remapSqlContentField', () => {
       type: 'notebook' as const,
       content: {
         schema_version: 1 as const,
-        cells: [{ _tag: 'database_cell' as const, id: '1', sql: 'select 1' }],
+        cells: [{ _tag: 'database_cell' as const, _id: '1', sql: 'select 1' }],
       },
     }
 
@@ -235,9 +239,9 @@ describe('unmapSqlContentField', () => {
 
 describe('unmapSqlContentField (notebooks)', () => {
   // Notebook content only ever reaches `unmapSqlContentField` via createNotebook/updateNotebook,
-  // which always hand it a WritableNotebook — plain `sql` per cell, `id` present only for
-  // existing cells. That's already wire-shaped, so this is a pure passthrough.
-  it('returns notebook content completely unchanged', () => {
+  // which always hand it a WritableNotebook already keyed on the wire's `_id` — present for
+  // an existing cell, omitted for a new one.
+  it('passes a real _id through, and leaves a cell with none without one', () => {
     const writableNotebook = {
       id: 'e4bbee88-8d2b-4de7-aa5c-5aa8ac270b55',
       type: 'notebook' as const,
@@ -247,7 +251,7 @@ describe('unmapSqlContentField (notebooks)', () => {
           { _tag: 'markdown_cell' as const, text: '# New cell' },
           {
             _tag: 'database_cell' as const,
-            id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
+            _id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
             sql: 'select * from auth.users limit 100',
             row_limit: 100,
           },
@@ -266,7 +270,31 @@ describe('unmapSqlContentField (notebooks)', () => {
 
     const result = unmapSqlContentField(writableNotebook)
 
-    expect(result).toBe(writableNotebook)
+    const [markdownCell, databaseCell, logCell] = result.content.cells
+    expect(markdownCell).not.toHaveProperty('_id')
+    expect(databaseCell).toMatchObject({ _id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22' })
+    expect(logCell).not.toHaveProperty('_id')
+  })
+
+  it('drops a client-fabricated draft id rather than sending it back as _id', () => {
+    const writableNotebook = {
+      id: 'e4bbee88-8d2b-4de7-aa5c-5aa8ac270b55',
+      type: 'notebook' as const,
+      content: {
+        schema_version: 1 as const,
+        cells: [
+          {
+            _tag: 'markdown_cell' as const,
+            _id: 'draft-b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
+            text: '# New cell',
+          },
+        ],
+      },
+    }
+
+    const result = unmapSqlContentField(writableNotebook)
+
+    expect(result.content.cells[0]).not.toHaveProperty('_id')
   })
 })
 

@@ -185,6 +185,22 @@ describe('SQLEditor.utils.ts:deriveSnippetIdentity', () => {
     })
     expect(result).toEqual({ id: 'existing-id', isLoading: false })
   })
+  test('is loading when the snippets map itself is missing', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: undefined as unknown as Record<string, { snippet: { content?: unknown } }>,
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
+  test('is loading when the snippets entry has no snippet on it', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: { 'existing-id': {} as { snippet: { content?: unknown } } },
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
 })
 
 const buildDebugSnippet = (uncheckedSql: string) => ({
@@ -1255,8 +1271,8 @@ const makeEditor = ({
 }): IStandaloneCodeEditor =>
   ({
     getValue: () => value,
-    getSelection: () => (hasSelection ? ({ startLineNumber: 1 } as any) : null),
-    getModel: () => ({ getValueInRange: () => selectionValue }) as any,
+    getSelection: () => (hasSelection ? { startLineNumber: 1 } : null),
+    getModel: () => ({ getValueInRange: () => selectionValue }),
   }) as unknown as IStandaloneCodeEditor
 
 describe('SQLEditor.utils:getEditorSql', () => {
@@ -1402,6 +1418,7 @@ describe('SQLEditor.utils:hasBlockingIssues', () => {
 const buildDatabase = (overrides: Partial<Database> = {}): Database => ({
   cloud_provider: 'AWS',
   connectionString: 'postgres://primary',
+  connection_string_read_only: 'postgres://primary',
   db_host: 'db.example.com',
   db_name: 'postgres',
   db_port: 5432,

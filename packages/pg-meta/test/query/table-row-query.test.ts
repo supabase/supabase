@@ -1142,6 +1142,46 @@ describe('Table Row Query', () => {
       expect(queryResult.every((row: any) => row.category === 'A')).toBe(true)
     })
 
+    withTestDatabase(
+      'should wrap a bare ilike filter value in wildcards for a contains match',
+      async (db) => {
+        // Create test table and insert data
+        await db.executeQuery(`
+        CREATE TABLE test_sql_filter_ilike (
+          id SERIAL PRIMARY KEY,
+          name TEXT
+        );
+
+        INSERT INTO test_sql_filter_ilike (name) VALUES
+          ('Alizarin'),
+          ('Amber'),
+          ('Coral');
+      `)
+
+        // Get table metadata
+        const { sql: tablesSql, zod: tablesZod } = pgMeta.tables.list()
+        const tables = tablesZod.parse(await db.executeQuery(tablesSql))
+        const testTable = tables.find((table) => table.name === 'test_sql_filter_ilike')
+
+        expect(testTable).toBeDefined()
+
+        // A bare value with no `%`/`_` should be treated as a "contains" search
+        const filters: Filter[] = [{ column: 'name', operator: '~~*', value: 'al' }]
+
+        const sql = getTableRowsSql({
+          table: testTable!,
+          filters,
+          page: 1,
+          limit: 10,
+        })
+
+        expect(sql).toContain(`name::text ~~* '%al%'`)
+
+        const queryResult = await db.executeQuery(sql)
+        expect(queryResult.map((row: any) => row.name).sort()).toEqual(['Alizarin', 'Coral'])
+      }
+    )
+
     withTestDatabase('should generate SQL with sorting', async (db) => {
       // Create test table and insert data
       await db.executeQuery(`

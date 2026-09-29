@@ -206,7 +206,7 @@ export const ChartConfig = ({
             <p className="text-xs text-foreground-light mt-1!">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
-            <Button asChild size="tiny" variant="default" className="mt-1">
+            <Button asChild size="tiny" className="mt-1">
               <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
             </Button>
           </Admonition>

@@ -5,10 +5,8 @@ subtitle: 'Enable S3-compatible client endpoint and set up an S3 backend for sel
 ---
 
 Self-hosted Supabase Storage has two independent S3-related features:
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
 - **S3 protocol endpoint** - an S3-compatible API that Storage exposes at `/storage/v1/s3`. This allows standard S3 tools like `rclone` and the AWS CLI to interact with your Storage instance.
-  {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 - **S3 backend** - where Storage keeps data. By default, files are stored on the local filesystem. You can switch to an S3-compatible service (AWS S3, MinIO, etc.) for durability, scalability, or to use existing infrastructure.
 
 You can configure either feature independently. For example, you can enable the S3 protocol endpoint to use `rclone` while keeping the default file-based storage, or switch to an S3 backend without enabling the S3 protocol endpoint.
@@ -41,8 +39,6 @@ aws s3 ls \
 --region $REGION \
 s3://your-storage-bucket )
 ```
-
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
 ### Test with rclone
 
@@ -79,15 +75,10 @@ storage:
     REGION: your-region
 ```
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Depending on your setup, you may need to adjust these values - for example, to use a local S3-compatible service like RustFS, MinIO or a cloud provider like AWS.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
 ### Using RustFS
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 An override `docker-compose.rustfs.yml` can be added to enable RustFS container and provide an S3-compatible API for Storage backend:
 
 ```sh
@@ -97,19 +88,14 @@ sh run.sh start
 
 Make sure to review the Storage section in your `.env` file for related configuration options.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-
 ### Using MinIO
 
 <Admonition type="note">
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 MinIO no longer publishes open source Docker images or maintains their open source repository. The MinIO configuration is provided for backward compatibility and uses images built by [Chainguard](https://images.chainguard.dev/directory/image/minio/overview) (`cgr.dev/chainguard/minio`). For new deployments, consider using [RustFS](#using-rustfs) instead.
 
 </Admonition>
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 An override `docker-compose.s3.yml` can be added to enable MinIO container and provide an S3-compatible API for Storage backend:
 
 ```sh
@@ -138,7 +124,6 @@ For AWS S3, you do not need `GLOBAL_S3_ENDPOINT` or `GLOBAL_S3_FORCE_PATH_STYLE`
 
 ### S3-compatible providers
 
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Use the same configuration as MinIO, replacing the endpoint, bucket name, region, and AWS credentials with the values provided by your S3-compatible provider, for example:
 
 ```yaml name=docker-compose.yml
@@ -155,8 +140,6 @@ storage:
 ```
 
 ## Verify the setup
-
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
 - Open Studio and upload a file to a bucket. List the file using the AWS CLI or `rclone` to confirm the S3 endpoint works.
 - If using an S3 backend: confirm the file appears in your S3 provider's console.
