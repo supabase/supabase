@@ -382,9 +382,9 @@ export const Usage = () => {
         <>
           {selectedProject ? (
             <UsageFilterNotice
-              projectName={selectedProject.name || (selectedProjectRef ?? '')}
-              branchName={selectedBranch?.name}
+              isBranch={!!selectedBranch}
               hasBranches={branchOptions.length > 0}
+              onViewOrganizationUsage={() => setUsageFilter({ projectRef: null, branchRef: null })}
             />
           ) : (
             <ScaffoldContainer id="restriction" className="mt-5">

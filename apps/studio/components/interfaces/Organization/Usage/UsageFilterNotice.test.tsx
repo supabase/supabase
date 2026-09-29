@@ -1,36 +1,56 @@
 import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 
 import { UsageFilterNotice } from './UsageFilterNotice'
 import { customRender } from '@/tests/lib/custom-render'
 
 describe('UsageFilterNotice', () => {
-  it('tells the reader that branch usage is excluded from the project view', () => {
-    customRender(<UsageFilterNotice projectName="Marvo app" hasBranches />)
-
-    expect(screen.getByText('Usage filtered by project')).toBeInTheDocument()
-    expect(
-      screen.getByText(/Each branch records its own usage, so this view excludes/)
-    ).toBeInTheDocument()
-  })
-
-  it('discloses deleted branch usage even when no live branches remain', () => {
-    customRender(<UsageFilterNotice projectName="Marvo app" hasBranches={false} />)
-
-    expect(screen.queryByText(/Each branch records its own usage/)).not.toBeInTheDocument()
-    expect(screen.getByText(/Usage from deleted branches still counts/)).toBeInTheDocument()
-  })
-
-  it('names the branch and drops the select-a-branch prompt once a branch is filtered', () => {
+  it.each([
+    { isBranch: true, hasBranches: true, text: 'This branch only.' },
+    {
+      isBranch: false,
+      hasBranches: true,
+      text: 'Main branch only. Other branches are tracked separately.',
+    },
+    { isBranch: false, hasBranches: false, text: 'This project only.' },
+  ])('shows "$text" for the selected scope', ({ isBranch, hasBranches, text }) => {
     customRender(
-      <UsageFilterNotice projectName="Marvo app" branchName="marvo-app-dev" hasBranches />
+      <UsageFilterNotice
+        isBranch={isBranch}
+        hasBranches={hasBranches}
+        onViewOrganizationUsage={vi.fn()}
+      />
     )
 
-    expect(screen.getByText('Usage filtered by branch')).toBeInTheDocument()
-    expect(screen.getByText('marvo-app-dev')).toBeInTheDocument()
-    expect(
-      screen.getByText(/This branch's usage counts toward the organization total/)
-    ).toBeInTheDocument()
-    expect(screen.queryByText(/Select a branch above/)).not.toBeInTheDocument()
+    expect(screen.getByText(text)).toBeInTheDocument()
+  })
+
+  it('discloses organization totals on keyboard focus even without live branches', async () => {
+    const user = userEvent.setup()
+    customRender(
+      <UsageFilterNotice isBranch={false} hasBranches={false} onViewOrganizationUsage={vi.fn()} />
+    )
+
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    await user.tab()
+    await user.tab()
+
+    expect(screen.getByRole('button', { name: 'About usage totals' })).toHaveFocus()
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Billing and quotas use totals from all projects and branches, including deleted branches that are no longer selectable.'
+    )
+  })
+
+  it('requests organization totals when the action is clicked', async () => {
+    const user = userEvent.setup()
+    const onViewOrganizationUsage = vi.fn()
+    customRender(
+      <UsageFilterNotice isBranch hasBranches onViewOrganizationUsage={onViewOrganizationUsage} />
+    )
+
+    await user.click(screen.getByRole('button', { name: 'View organization total' }))
+
+    expect(onViewOrganizationUsage).toHaveBeenCalledOnce()
   })
 })

@@ -2,6 +2,7 @@ import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
+import type { UrlUpdateEvent } from 'nuqs/adapters/testing'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Usage } from './Usage'
@@ -21,6 +22,11 @@ vi.mock('common', async (importOriginal) => ({
 vi.mock('@/lib/constants', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/constants')>()),
   IS_PLATFORM: true,
+}))
+
+vi.mock('next/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/navigation')>()),
+  usePathname: () => routerMock.pathname,
 }))
 
 const parent = createMockProject({ ref: 'parent-ref', name: 'Parent project' })
@@ -47,16 +53,18 @@ const branchDetail = {
 }
 
 function renderUsage(branchRef: string | null = branch.project_ref, projectRef = parent.ref) {
+  const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
   const searchParams: Record<string, string> = { projectRef }
   if (branchRef !== null) searchParams.branchRef = branchRef
   routerMock.setCurrentUrl({
     pathname: '/org/test-org/usage',
     query: { slug: 'test-org', ...searchParams },
   })
-  return customRender(<Usage />, {
+  customRender(<Usage />, {
     profileContext: createMockProfileContext(),
-    nuqs: { searchParams, hasMemory: true },
+    nuqs: { searchParams, hasMemory: true, onUrlUpdate },
   })
+  return { onUrlUpdate }
 }
 
 function captureUsageRequests() {
@@ -150,7 +158,7 @@ describe('Usage branch URLs', () => {
     const requests = captureUsageRequests()
     renderUsage()
 
-    expect(await screen.findByText('Usage filtered by branch')).toBeInTheDocument()
+    expect(await screen.findByText('This branch only.')).toBeInTheDocument()
     await waitFor(() => {
       expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
     })
@@ -158,7 +166,7 @@ describe('Usage branch URLs', () => {
     expect(screen.queryByText('Branch unavailable')).not.toBeInTheDocument()
   })
 
-  it('resolves a direct branch project URL through its parent and can switch to main', async () => {
+  it('resolves a direct branch URL and switches to main and organization totals', async () => {
     const user = userEvent.setup()
     const requests = captureUsageRequests()
     const branchListRefs: string[] = []
@@ -181,9 +189,9 @@ describe('Usage branch URLs', () => {
         return HttpResponse.json<Branch[]>([main, branch])
       },
     })
-    renderUsage(null, branch.project_ref)
+    const { onUrlUpdate } = renderUsage(null, branch.project_ref)
 
-    expect(await screen.findByText('Usage filtered by branch')).toBeInTheDocument()
+    expect(await screen.findByText('This branch only.')).toBeInTheDocument()
     await waitFor(() => {
       expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
     })
@@ -195,7 +203,9 @@ describe('Usage branch URLs', () => {
     await user.click(screen.getByLabelText('Filter by branch'))
     await user.click(await screen.findByRole('option', { name: main.name }))
 
-    expect(await screen.findByText('Usage filtered by project')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Main branch only. Other branches are tracked separately.')
+    ).toBeInTheDocument()
     await waitFor(() => {
       expect(requests).toEqual({
         usage: [branch.project_ref, parent.ref],
@@ -204,6 +214,27 @@ describe('Usage branch URLs', () => {
     })
     expect(screen.getByLabelText('Filter by branch')).toHaveTextContent(main.name)
     expect(branchListRefs).toEqual([parent.ref])
+
+    await user.click(screen.getByLabelText('Filter by branch'))
+    await user.click(await screen.findByRole('option', { name: branch.name }))
+    expect(await screen.findByText('This branch only.')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'View organization total' }))
+
+    await waitFor(() => {
+      expect(requests).toEqual({
+        usage: [branch.project_ref, parent.ref, null],
+        daily: [branch.project_ref, parent.ref, null],
+      })
+      const searchParams = onUrlUpdate.mock.lastCall?.[0].searchParams
+      expect(searchParams).toBeDefined()
+      expect(searchParams?.has('projectRef')).toBe(false)
+      expect(searchParams?.has('branchRef')).toBe(false)
+    })
+    expect(screen.queryByLabelText('Filter by branch')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'View organization total' })
+    ).not.toBeInTheDocument()
   })
 
   it('waits for direct branch project details before requesting branches or usage', async () => {
@@ -246,7 +277,7 @@ describe('Usage branch URLs', () => {
       await act(async () => response.resolve())
     }
 
-    expect(await screen.findByText('Usage filtered by branch')).toBeInTheDocument()
+    expect(await screen.findByText('This branch only.')).toBeInTheDocument()
     await waitFor(() => {
       expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
     })
@@ -333,7 +364,9 @@ describe('Usage branch URLs', () => {
     renderUsage('deleted-branch-ref')
 
     expect(await screen.findByText('Branch unavailable')).toBeInTheDocument()
-    expect(screen.getByText('Usage filtered by project')).toBeInTheDocument()
+    expect(
+      screen.getByText('Main branch only. Other branches are tracked separately.')
+    ).toBeInTheDocument()
     await waitFor(() => {
       expect(requests).toEqual({ usage: [parent.ref], daily: [parent.ref] })
     })

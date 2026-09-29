@@ -1,63 +1,48 @@
-import Link from 'next/link'
-import { Admonition } from 'ui-patterns/Admonition'
+import { Info } from 'lucide-react'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 
 export interface UsageFilterNoticeProps {
-  projectName: string
-  branchName?: string
+  isBranch: boolean
   hasBranches: boolean
+  onViewOrganizationUsage: () => void
 }
 
 export const UsageFilterNotice = ({
-  projectName,
-  branchName,
+  isBranch,
   hasBranches,
+  onViewOrganizationUsage,
 }: UsageFilterNoticeProps) => {
   return (
     <ScaffoldContainer className="mt-5">
-      <Admonition
-        type="default"
-        title={branchName ? 'Usage filtered by branch' : 'Usage filtered by project'}
-        description={
-          <div className="space-y-2">
-            <p>
-              You are currently viewing usage for the{' '}
-              <span className="font-medium text-foreground">{projectName}</span> project
-              {!!branchName && (
-                <>
-                  , branch <span className="font-medium text-foreground">{branchName}</span>
-                </>
-              )}
-              . Supabase uses{' '}
-              <Link
-                href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
-                target="_blank"
-              >
-                organization-level billing
-              </Link>{' '}
-              and quotas. For billing purposes, we sum up usage from all your projects. To view your
-              usage quota, set the project filter above back to "All projects".
-            </p>
-            {!!branchName && (
-              <p>
-                This branch's usage counts toward the organization total, but is not included in the
-                parent project's usage.
-              </p>
-            )}
-            {!branchName && hasBranches && (
-              <p>
-                Each branch records its own usage, so this view excludes the project's branches.
-                Select a branch above to see its usage.
-              </p>
-            )}
-            <p>
-              Usage from deleted branches still counts toward the organization total, but deleted
-              branches are not available in the branch filter.
-            </p>
-          </div>
-        }
-      />
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground-light">
+        <p>
+          {isBranch && 'This branch only.'}
+          {!isBranch && hasBranches && 'Main branch only. Other branches are tracked separately.'}
+          {!isBranch && !hasBranches && 'This project only.'}
+        </p>
+        <div className="flex items-center gap-x-2">
+          <Button variant="text" size="tiny" onClick={onViewOrganizationUsage}>
+            View organization total
+          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="text"
+                size="tiny"
+                className="px-1"
+                aria-label="About usage totals"
+                icon={<Info size={14} />}
+              />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              Billing and quotas use totals from all projects and branches, including deleted
+              branches that are no longer selectable.
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
     </ScaffoldContainer>
   )
 }
