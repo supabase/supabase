@@ -151,6 +151,9 @@ export const ProjectCreationForm = ({
     showBestAvailableRegionFeature && showBestAvailableRegionFlag && isFreePlan
   const [isBestAvailableSelected, setIsBestAvailableSelected] = useState(false)
 
+  const shouldTrackRegionRecommendation = isFreePlan && showBestAvailableRegionFeature
+  const initialRecommendedRegionRef = useRef<string | undefined>(undefined)
+
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
   // PostHog) so we only record an actual value (boolean true/false, or a variant string
@@ -301,6 +304,16 @@ export const ProjectCreationForm = ({
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
+  if (
+    initialRecommendedRegionRef.current === undefined &&
+    flagsLoaded &&
+    shouldTrackRegionRecommendation
+  ) {
+    initialRecommendedRegionRef.current = showBestAvailableRegionOption
+      ? 'best_available'
+      : recommendedSmartRegion || undefined
+  }
+
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
   const defaultRegion = resolveDefaultDbRegion({
@@ -373,7 +386,11 @@ export const ProjectCreationForm = ({
           ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
             dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
           }),
-          ...(showBestAvailableRegionOption && { selectedRegionOption, selectedRegionOptionType }),
+          ...(shouldTrackRegionRecommendation && {
+            selectedRegionOption,
+            selectedRegionOptionType,
+            initialRecommendedRegion: initialRecommendedRegionRef.current,
+          }),
         },
         {
           project: res.ref,

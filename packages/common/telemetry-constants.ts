@@ -450,9 +450,12 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
     /**
-     * Which region option was submitted. Only present when the "Best available region" option
-     * was shown to the user (see `showBestAvailableRegionOption` in RegionSelector.tsx); omitted
-     * entirely for users who never saw that option.
+     * Which region option was submitted. Only present for the region-recommendation experiment's
+     * eligible cohort (free plan + `project_creation:show_best_available_region` feature enabled —
+     * see `shouldTrackRegionRecommendation` in ProjectCreationForm.tsx). This is cohort-level
+     * eligibility, not "the option was shown" — it's present for both the PostHog flag's control
+     * and test arms so the two can be compared; omitted entirely outside the cohort (e.g. paid
+     * plans, or providers like AWS_NIMBUS where the feature is disabled).
      * 'best_available' = the "Best available region" shortcut was used
      * otherwise = the name of the region that was directly selected (e.g. 'Americas', 'ap-southeast-1')
      */
@@ -464,6 +467,18 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * 'specific' = picked from the "Specific regions" list
      */
     selectedRegionOptionType?: 'general' | 'specific'
+    /**
+     * The region that was recommended/defaulted to on initial render, before any user
+     * interaction. Present under the same cohort gate as `selectedRegionOption`. Frozen the
+     * first time it's known, so a later refetch (e.g. switching cloud provider or instance size)
+     * doesn't overwrite what was actually shown to the user initially.
+     * 'best_available' = the user was in the PostHog flag's test arm, so the form defaulted to
+     * the "Best available region" shortcut
+     * otherwise = the name of the smart-group region recommended by the `available-regions`
+     * endpoint (e.g. 'Americas'), for users in the flag's control arm
+     * undefined = no recommendation had loaded yet at submission time
+     */
+    initialRecommendedRegion?: string
   }
   groups: TelemetryGroups
 }
