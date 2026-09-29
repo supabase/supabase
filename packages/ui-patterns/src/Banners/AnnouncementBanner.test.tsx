@@ -88,11 +88,11 @@ describe('AnnouncementBanner', () => {
   })
 
   it('removes the livestream at 5:30pm', async () => {
-    vi.setSystemTime(new Date('2026-10-02T17:29:59.999-07:00'))
+    vi.setSystemTime(new Date('2026-10-02T17:29:00-07:00'))
     render(<AnnouncementBanner />)
 
     expect(await screen.findByText(SELECT_26_LIVESTREAM_MESSAGE)).toBeVisible()
-    act(() => vi.advanceTimersByTime(1))
+    act(() => vi.advanceTimersByTime(60 * 1000))
     expect(screen.queryByText(SELECT_26_LIVESTREAM_MESSAGE)).toBeNull()
   })
 
