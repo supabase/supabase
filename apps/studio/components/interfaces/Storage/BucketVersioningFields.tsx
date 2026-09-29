@@ -19,6 +19,8 @@ interface BucketVersioningFieldsProps {
   initialRetentionDays?: number | null
   initialMaxVersions?: number | null
   isPublicBucket?: boolean
+  /** The bucket's stored lifecycle policy is still being fetched. */
+  isLoadingPolicy?: boolean
 }
 
 export const BucketVersioningFields = ({
@@ -26,6 +28,7 @@ export const BucketVersioningFields = ({
   initialRetentionDays,
   initialMaxVersions,
   isPublicBucket = false,
+  isLoadingPolicy = false,
 }: BucketVersioningFieldsProps) => {
   const { control, setValue } = useFormContext<BucketVersioningFormValues>()
 
@@ -40,8 +43,9 @@ export const BucketVersioningFields = ({
   const tightening = getRetentionTightening({
     initialVersioningState,
     isVersioningEnabled,
-    initialRetentionDays,
-    initialMaxVersions,
+    // Undefined while loading: an unread bound can't be compared against.
+    initialRetentionDays: isLoadingPolicy ? undefined : initialRetentionDays,
+    initialMaxVersions: isLoadingPolicy ? undefined : initialMaxVersions,
     nextRetentionDays: toNullableNumber(retentionDays),
     nextMaxVersions: toNullableNumber(maxVersions),
   })
@@ -137,6 +141,7 @@ export const BucketVersioningFields = ({
                 hasVersions={hasVersions}
                 mode={expirationMode}
                 onModeChange={handleModeChange}
+                isLoading={isLoadingPolicy}
               />
             </FormSectionCollapse>
           )}

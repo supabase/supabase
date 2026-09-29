@@ -11,6 +11,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { BucketVersioningFormValues } from './BucketVersioningFields.schema'
 import { ExpirationModeToggle } from './ExpirationModeToggle'
@@ -22,12 +23,21 @@ const toFieldValue = (rawInput: string): '' | number => {
   return digits === '' ? '' : Number(digits)
 }
 
+const SectionHeading = () => (
+  <div className="flex flex-col gap-y-0.5">
+    <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
+    <p className="text-sm text-foreground-lighter">Automatically expire noncurrent versions</p>
+  </div>
+)
+
 interface LifecyclePolicySectionProps {
   control: Control<BucketVersioningFormValues>
   hasDays: boolean
   hasVersions: boolean
   mode: ExpirationMode
   onModeChange: (mode: ExpirationMode) => void
+  /** The stored policy is still in flight, so there is nothing truthful to show yet. */
+  isLoading?: boolean
 }
 
 export const LifecyclePolicySection = ({
@@ -36,6 +46,7 @@ export const LifecyclePolicySection = ({
   hasVersions,
   mode,
   onModeChange,
+  isLoading = false,
 }: LifecyclePolicySectionProps) => {
   const { setValue } = useFormContext<BucketVersioningFormValues>()
   const hasNoPolicy = !hasDays && !hasVersions
@@ -50,12 +61,19 @@ export const LifecyclePolicySection = ({
     if (wasSet && !hasDays) setValue('max_noncurrent_versions', '', { shouldDirty: true })
   }, [hasDays, setValue])
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-y-2" aria-busy="true" aria-label="Loading lifecycle policy">
+        <SectionHeading />
+        <ShimmeringLoader className="h-9 py-0" />
+        <ShimmeringLoader className="h-9 py-0" delayIndex={1} />
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-y-2">
-      <div className="flex flex-col gap-y-0.5">
-        <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
-        <p className="text-sm text-foreground-lighter">Automatically expire noncurrent versions</p>
-      </div>
+      <SectionHeading />
 
       <FormField
         name="version_expiry_days"
