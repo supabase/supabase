@@ -20,27 +20,38 @@ import { formatTimezoneLabel, getTimezoneOptions } from '@/lib/constants/timezon
 interface TimezoneSelectionProps {
   selectedTimezone: string
   onSelectTimezone: (timezone: string) => void
+  referenceTimeUnix?: number
 }
 
 export const TimezoneSelection = ({
   selectedTimezone,
   onSelectTimezone,
+  referenceTimeUnix,
 }: TimezoneSelectionProps) => {
   const [open, setOpen] = useState(false)
   const listboxId = useId()
 
   const options = useMemo(() => {
-    const timezoneOptions = getTimezoneOptions()
+    const referenceDate =
+      referenceTimeUnix === undefined ? new Date() : new Date(referenceTimeUnix * 1000)
+    const timezoneOptions = getTimezoneOptions(referenceDate)
     if (timezoneOptions.some((option) => option.iana === selectedTimezone)) {
       return timezoneOptions
     }
     return [
-      { iana: selectedTimezone, label: formatTimezoneLabel(selectedTimezone) },
+      {
+        iana: selectedTimezone,
+        label: formatTimezoneLabel(selectedTimezone, referenceDate),
+      },
       ...timezoneOptions,
     ]
-  }, [selectedTimezone])
+  }, [selectedTimezone, referenceTimeUnix])
 
-  const selectedLabel = formatTimezoneLabel(selectedTimezone)
+  const selectedLabel = useMemo(() => {
+    const referenceDate =
+      referenceTimeUnix === undefined ? new Date() : new Date(referenceTimeUnix * 1000)
+    return formatTimezoneLabel(selectedTimezone, referenceDate)
+  }, [selectedTimezone, referenceTimeUnix])
 
   return (
     <div className="w-full">

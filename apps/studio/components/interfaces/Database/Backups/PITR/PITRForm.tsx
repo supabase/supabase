@@ -1,8 +1,13 @@
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Calendar, cn } from 'ui'
 
-import { getDatesBetweenRange, toCalendarDate, withCalendarDate, withTime } from './PITR.utils'
+import {
+  fromUnixInTimezone,
+  getDatesBetweenRange,
+  toCalendarDate,
+  withCalendarDate,
+  withTime,
+} from './PITR.utils'
 import TimeInput from './TimeInput'
 import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -18,6 +23,7 @@ type Props = {
   }) => void
   earliestAvailableBackupUnix: number
   latestAvailableBackupUnix: number
+  initialTimezone?: string
   disabled?: boolean
 }
 
@@ -25,20 +31,23 @@ export function PITRForm({
   onSubmit,
   earliestAvailableBackupUnix,
   latestAvailableBackupUnix,
+  initialTimezone,
   disabled = false,
 }: Props) {
   const { timezone } = useTimezone()
   const [overriddenTimezone, setOverriddenTimezone] = useState<string>()
-  const selectedTimezone = overriddenTimezone ?? timezone
+  const selectedTimezone = overriddenTimezone ?? initialTimezone ?? timezone
 
-  const earliestAvailableBackup = dayjs.unix(earliestAvailableBackupUnix ?? 0).tz(selectedTimezone)
-  const latestAvailableBackup = dayjs.unix(latestAvailableBackupUnix ?? 0).tz(selectedTimezone)
+  const earliestAvailableBackup = fromUnixInTimezone(
+    earliestAvailableBackupUnix ?? 0,
+    selectedTimezone
+  )
+  const latestAvailableBackup = fromUnixInTimezone(latestAvailableBackupUnix ?? 0, selectedTimezone)
 
-  // Held as an instant rather than a wall clock so that switching timezone
-  // re-renders the same point in time instead of shifting it
   const [selectedUnix, setSelectedUnix] = useState(latestAvailableBackupUnix ?? 0)
+  const [isTimeValid, setIsTimeValid] = useState(true)
 
-  const selectedDate = dayjs.unix(selectedUnix).tz(selectedTimezone)
+  const selectedDate = fromUnixInTimezone(selectedUnix, selectedTimezone)
   const calendarRangeKey = `${selectedTimezone}:${earliestAvailableBackupUnix}:${latestAvailableBackupUnix}`
   const [calendarView, setCalendarView] = useState(() => ({
     rangeKey: calendarRangeKey,
@@ -46,8 +55,9 @@ export function PITRForm({
   }))
   const calendarMonth =
     calendarView.rangeKey === calendarRangeKey ? calendarView.month : toCalendarDate(selectedDate)
-  const isSelectedOnEarliestDay = selectedDate.isSame(earliestAvailableBackup, 'day')
-  const isSelectedOnLatestDay = selectedDate.isSame(latestAvailableBackup, 'day')
+  const selectedDateKey = selectedDate.format('YYYY-MM-DD')
+  const isSelectedOnEarliestDay = selectedDateKey === earliestAvailableBackup.format('YYYY-MM-DD')
+  const isSelectedOnLatestDay = selectedDateKey === latestAvailableBackup.format('YYYY-MM-DD')
   const availableDates = getDatesBetweenRange(earliestAvailableBackup, latestAvailableBackup)
 
   const selectedTime = {
@@ -56,25 +66,20 @@ export function PITRForm({
     s: selectedDate.second(),
   }
 
-  const earliestAvailableBackupTime = {
-    h: earliestAvailableBackup.hour(),
-    m: earliestAvailableBackup.minute(),
-    s: earliestAvailableBackup.second(),
-  }
-
-  const latestAvailableBackupTime = {
-    h: latestAvailableBackup.hour(),
-    m: latestAvailableBackup.minute(),
-    s: latestAvailableBackup.second(),
-  }
-
-  const isWithinRange =
-    !selectedDate.isBefore(earliestAvailableBackup) && !selectedDate.isAfter(latestAvailableBackup)
+  const rangeError = (() => {
+    if (selectedUnix < earliestAvailableBackupUnix) {
+      return 'Selected time is before the minimum time allowed'
+    }
+    if (selectedUnix > latestAvailableBackupUnix) {
+      return 'Selected time is after the maximum time allowed'
+    }
+  })()
+  const isWithinRange = rangeError === undefined
 
   const handleSubmit = () => {
     onSubmit({
       selectedTimezone,
-      recoveryTimeTargetUnix: selectedDate.unix(),
+      recoveryTimeTargetUnix: selectedUnix,
       recoveryTimeString: selectedDate.format('DD MMM YYYY HH:mm:ss'),
       recoveryTimeStringUtc: selectedDate.utc().format('DD MMM YYYY HH:mm:ss'),
     })
@@ -87,7 +92,7 @@ export function PITRForm({
         footer={
           <div className="flex items-center justify-end gap-3 p-6">
             <ButtonTooltip
-              disabled={disabled || !selectedDate || !isWithinRange}
+              disabled={disabled || !selectedDate || !isTimeValid || !isWithinRange}
               onClick={handleSubmit}
               tooltip={{
                 content: {
@@ -150,6 +155,7 @@ export function PITRForm({
                     <TimezoneSelection
                       selectedTimezone={selectedTimezone}
                       onSelectTimezone={setOverriddenTimezone}
+                      referenceTimeUnix={selectedUnix}
                     />
                   </div>
                 </div>
@@ -170,10 +176,9 @@ export function PITRForm({
                     )}
                     <TimeInput
                       defaultTime={selectedTime}
-                      minimumTime={
-                        isSelectedOnEarliestDay ? earliestAvailableBackupTime : undefined
-                      }
-                      maximumTime={isSelectedOnLatestDay ? latestAvailableBackupTime : undefined}
+                      resetIdentity={`${selectedUnix}:${selectedTimezone}`}
+                      rangeError={rangeError}
+                      onValidityChange={setIsTimeValid}
                       onChange={(time) =>
                         setSelectedUnix(withTime(selectedDate, time, selectedTimezone).unix())
                       }

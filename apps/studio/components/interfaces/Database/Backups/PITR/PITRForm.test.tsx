@@ -34,17 +34,26 @@ afterEach(() => {
 const EARLIEST_BACKUP_UNIX = dayjs.utc('2026-08-05T14:00:00Z').unix()
 const LATEST_BACKUP_UNIX = dayjs.utc('2026-08-10T02:30:00Z').unix()
 
+type RenderFormOptions = {
+  withTimezoneProvider?: boolean
+  earliestAvailableBackupUnix?: number
+  latestAvailableBackupUnix?: number
+  initialTimezone?: string
+}
+
 const renderForm = ({
   withTimezoneProvider = false,
   earliestAvailableBackupUnix = EARLIEST_BACKUP_UNIX,
   latestAvailableBackupUnix = LATEST_BACKUP_UNIX,
-} = {}) => {
+  initialTimezone,
+}: RenderFormOptions = {}) => {
   const onSubmit = vi.fn()
   const form = (
     <PITRForm
       onSubmit={onSubmit}
       earliestAvailableBackupUnix={earliestAvailableBackupUnix}
       latestAvailableBackupUnix={latestAvailableBackupUnix}
+      initialTimezone={initialTimezone}
     />
   )
   customRender(withTimezoneProvider ? <TimezoneProvider>{form}</TimezoneProvider> : form)
@@ -73,6 +82,12 @@ const setHours = (value: string) => {
   fireEvent.blur(hours)
 }
 
+const setMinutes = (value: string) => {
+  const minutes = screen.getByLabelText('Minutes')
+  fireEvent.change(minutes, { target: { value } })
+  fireEvent.blur(minutes)
+}
+
 describe('PITRForm', () => {
   test('defaults to the latest backup rendered in the local timezone', () => {
     renderForm()
@@ -88,6 +103,17 @@ describe('PITRForm', () => {
 
     await waitFor(() => expect(getRestorePoint()).toBe('10 Aug 2026, 11:30:00'))
     expect(screen.getByRole('combobox')).toHaveTextContent('(UTC+09:00) Osaka, Sapporo, Tokyo')
+  })
+
+  test('uses the initial timezone and its offset at the selected recovery point', () => {
+    renderForm({
+      earliestAvailableBackupUnix: dayjs.utc('2026-01-10T18:30:00Z').unix(),
+      latestAvailableBackupUnix: dayjs.utc('2026-01-15T18:30:00Z').unix(),
+      initialTimezone: 'America/New_York',
+    })
+
+    expect(getRestorePoint()).toBe('15 Jan 2026, 13:30:00')
+    expect(screen.getByRole('combobox')).toHaveTextContent('(UTC-05:00) Eastern Time (US & Canada)')
   })
 
   test('keeps the same point in time when the timezone changes', async () => {
@@ -140,6 +166,101 @@ describe('PITRForm', () => {
         recoveryTimeStringUtc: '01 Nov 2026 04:30:00',
       })
     )
+  })
+
+  test('allows the second occurrence of a fall-back time within the available range', async () => {
+    const { onSubmit } = renderForm({
+      earliestAvailableBackupUnix: dayjs.utc('2026-11-01T06:00:00Z').unix(),
+      latestAvailableBackupUnix: dayjs.utc('2026-11-01T07:00:00Z').unix(),
+      initialTimezone: 'America/New_York',
+    })
+
+    setHours('01')
+    await waitFor(() => expect(getRestorePoint()).toBe('01 Nov 2026, 01:00:00'))
+    setMinutes('30')
+
+    await waitFor(() => expect(getRestorePoint()).toBe('01 Nov 2026, 01:30:00'))
+    expect(getContinueButton()).toBeEnabled()
+
+    fireEvent.click(getContinueButton())
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recoveryTimeTargetUnix: dayjs.utc('2026-11-01T06:30:00Z').unix(),
+      })
+    )
+  })
+
+  test('shows both daily range hints across a fall-back offset change', () => {
+    renderForm({
+      earliestAvailableBackupUnix: dayjs.utc('2026-11-01T04:30:00Z').unix(),
+      latestAvailableBackupUnix: dayjs.utc('2026-11-01T06:30:00Z').unix(),
+      initialTimezone: 'America/New_York',
+    })
+
+    expect(
+      screen.getByText('Earliest backup available for this date').parentElement
+    ).toHaveTextContent('Earliest backup available for this date: 00:30:00')
+    expect(
+      screen.getByText('Latest backup available for this date').parentElement
+    ).toHaveTextContent('Latest backup available for this date: 01:30:00')
+  })
+
+  test('blocks the first occurrence of a fall-back time before the available range', async () => {
+    const { onSubmit } = renderForm({
+      earliestAvailableBackupUnix: dayjs.utc('2026-11-01T06:00:00Z').unix(),
+      latestAvailableBackupUnix: dayjs.utc('2026-11-01T07:00:00Z').unix(),
+      initialTimezone: 'America/New_York',
+    })
+
+    setHours('00')
+    await waitFor(() => expect(getRestorePoint()).toBe('01 Nov 2026, 00:00:00'))
+    setMinutes('30')
+    await waitFor(() => expect(getRestorePoint()).toBe('01 Nov 2026, 00:30:00'))
+    setHours('01')
+
+    expect(
+      await screen.findByText('Selected time is before the minimum time allowed')
+    ).toBeInTheDocument()
+    expect(getRestorePoint()).toBe('01 Nov 2026, 01:30:00')
+    expect(getContinueButton()).toHaveAttribute('aria-disabled', 'true')
+    fireEvent.click(getContinueButton())
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  test('blocks an invalid numeric time and resets it when the selected instant changes', async () => {
+    const { onSubmit } = renderForm()
+
+    setHours('99')
+
+    expect(await screen.findByText('Please enter a valid time')).toBeInTheDocument()
+    expect(getContinueButton()).toBeDisabled()
+    fireEvent.click(getContinueButton())
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(getRestorePoint()).toBe('09 Aug 2026, 22:30:00')
+
+    clickDay('2026-08-08')
+
+    await waitFor(() =>
+      expect(screen.queryByText('Please enter a valid time')).not.toBeInTheDocument()
+    )
+    expect(screen.getByLabelText('Hours')).toHaveValue('22')
+    expect(getContinueButton()).toBeEnabled()
+  })
+
+  test('resets an invalid time when switching between timezones with the same offset', async () => {
+    renderForm({ initialTimezone: 'Etc/GMT' })
+
+    setHours('99')
+    expect(await screen.findByText('Please enter a valid time')).toBeInTheDocument()
+
+    await selectTimezone('(UTC+00:00) Monrovia, Reykjavik')
+
+    await waitFor(() =>
+      expect(screen.queryByText('Please enter a valid time')).not.toBeInTheDocument()
+    )
+    expect(screen.getByLabelText('Hours')).toHaveValue('02')
+    expect(getRestorePoint()).toBe('10 Aug 2026, 02:30:00')
+    expect(getContinueButton()).toBeEnabled()
   })
 
   test('keeps the time of day when another date is picked', async () => {

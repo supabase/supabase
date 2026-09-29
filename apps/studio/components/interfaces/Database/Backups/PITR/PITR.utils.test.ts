@@ -1,7 +1,23 @@
 import dayjs from 'dayjs'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { toCalendarDate, withCalendarDate, withTime } from './PITR.utils'
+import { fromUnixInTimezone, toCalendarDate, withCalendarDate, withTime } from './PITR.utils'
+
+afterEach(() => {
+  vi.unstubAllEnvs()
+})
+
+describe('fromUnixInTimezone', () => {
+  it('preserves a fall-back instant when the host uses the same timezone', () => {
+    vi.stubEnv('TZ', 'America/New_York')
+    const unix = dayjs.utc('2026-11-01T06:30:00Z').unix()
+
+    const zoned = fromUnixInTimezone(unix, 'America/New_York')
+
+    expect(zoned.unix()).toBe(unix)
+    expect(zoned.format('YYYY-MM-DD HH:mm:ss Z')).toBe('2026-11-01 01:30:00 -05:00')
+  })
+})
 
 describe('toCalendarDate', () => {
   it('hands the calendar the day as seen in the selected timezone', () => {
@@ -48,6 +64,14 @@ describe('withCalendarDate', () => {
 
     expect(updated.tz('UTC').format('YYYY-MM-DD HH:mm:ss')).toBe('2026-02-28 08:00:00')
   })
+
+  it('keeps the second occurrence of an ambiguous fall time', () => {
+    const current = fromUnixInTimezone(dayjs.utc('2026-11-01T06:30:00Z').unix(), 'America/New_York')
+    const updated = withCalendarDate(current, new Date(2026, 10, 1), 'America/New_York')
+
+    expect(updated.format('YYYY-MM-DD HH:mm:ss Z')).toBe('2026-11-01 01:30:00 -05:00')
+    expect(updated.utc().format('YYYY-MM-DD HH:mm:ss')).toBe('2026-11-01 06:30:00')
+  })
 })
 
 describe('withTime', () => {
@@ -76,7 +100,7 @@ describe('withTime', () => {
   })
 
   it('keeps the daylight-time occurrence of an ambiguous fall time', () => {
-    const current = dayjs('2026-11-01T01:15:00-04:00').tz('America/New_York')
+    const current = fromUnixInTimezone(dayjs.utc('2026-11-01T05:15:00Z').unix(), 'America/New_York')
     const updated = withTime(current, { h: 1, m: 30, s: 0 }, 'America/New_York')
 
     expect(updated.format('YYYY-MM-DD HH:mm:ss Z')).toBe('2026-11-01 01:30:00 -04:00')
@@ -84,7 +108,7 @@ describe('withTime', () => {
   })
 
   it('keeps the standard-time occurrence of an ambiguous fall time', () => {
-    const current = dayjs('2026-11-01T01:15:00-05:00').tz('America/New_York')
+    const current = fromUnixInTimezone(dayjs.utc('2026-11-01T06:15:00Z').unix(), 'America/New_York')
     const updated = withTime(current, { h: 1, m: 30, s: 0 }, 'America/New_York')
 
     expect(updated.format('YYYY-MM-DD HH:mm:ss Z')).toBe('2026-11-01 01:30:00 -05:00')

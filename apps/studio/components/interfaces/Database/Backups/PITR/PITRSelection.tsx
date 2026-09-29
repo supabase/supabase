@@ -118,6 +118,7 @@ export const PITRSelection = () => {
             <PITRForm
               earliestAvailableBackupUnix={earliestPhysicalBackupDateUnix}
               latestAvailableBackupUnix={latestPhysicalBackupDateUnix}
+              initialTimezone={selectedTimezone}
               onSubmit={(recoveryPoint) => {
                 setSelectedRecoveryPoint(recoveryPoint)
                 setShowConfirmation(true)
