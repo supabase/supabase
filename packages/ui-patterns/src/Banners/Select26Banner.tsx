@@ -6,7 +6,6 @@ import Link from 'next/link'
 import {
   SELECT_26_CTA,
   SELECT_26_LIVESTREAM_CTA,
-  SELECT_26_LIVESTREAM_MESSAGE,
   SELECT_26_TITLE,
   SELECT_26_URL,
   Select26Field,
@@ -34,9 +33,9 @@ export const Select26Banner = ({ phase }: { phase: Exclude<Select26PromotionPhas
       mirror
       className="absolute right-0 top-1/2 -z-10 -translate-y-1/2 text-sm opacity-80 dark:opacity-70 md:text-base xl:text-[0.95rem]"
     />
-    <div className="relative z-10 ml-0 mr-auto flex w-fit max-w-full flex-wrap items-center justify-start gap-x-2 gap-y-1.5 rounded-md bg-[#f8f3ef] px-2.5 py-1 sm:mx-auto sm:flex-nowrap sm:justify-center sm:gap-x-2.5 sm:px-3.5 dark:bg-[#0b0e0d]">
+    <div className="relative z-10 ml-0 mr-auto flex w-fit max-w-full flex-wrap items-center justify-start gap-x-2 rounded-md bg-[#f8f3ef] px-2.5 py-1 sm:mx-auto sm:flex-nowrap sm:justify-center sm:gap-x-2.5 sm:px-3.5 dark:bg-[#0b0e0d]">
       <p className="text-left leading-5 sm:text-center">
-        {phase === 'livestream' ? SELECT_26_LIVESTREAM_MESSAGE : SELECT_26_TITLE}
+        {SELECT_26_TITLE}
         {phase === 'waitlist' && <span className="hidden sm:inline"> is coming October 2</span>}
       </p>
       <span aria-hidden className="text-[#00482f]/20 dark:text-white/15">

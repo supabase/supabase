@@ -5,7 +5,6 @@ import { AnnouncementBanner } from './AnnouncementBanner'
 import {
   SELECT_26_CTA,
   SELECT_26_LIVESTREAM_CTA,
-  SELECT_26_LIVESTREAM_MESSAGE,
   SELECT_26_LIVESTREAM_WWW_DISMISSAL_KEY,
   SELECT_26_MESSAGE,
   SELECT_26_TITLE,
@@ -78,11 +77,12 @@ describe('AnnouncementBanner', () => {
 
     render(<AnnouncementBanner />)
 
-    expect(await screen.findByText(SELECT_26_LIVESTREAM_MESSAGE)).toBeVisible()
-    expect(screen.getByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })).toHaveAttribute(
-      'href',
-      SELECT_26_URL
-    )
+    expect(
+      await screen.findByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })
+    ).toHaveAttribute('href', SELECT_26_URL)
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss announcement' }))
     expect(window.localStorage.getItem(SELECT_26_LIVESTREAM_WWW_DISMISSAL_KEY)).toBe('hidden')
   })
@@ -91,9 +91,11 @@ describe('AnnouncementBanner', () => {
     vi.setSystemTime(new Date('2026-10-02T17:29:00-07:00'))
     render(<AnnouncementBanner />)
 
-    expect(await screen.findByText(SELECT_26_LIVESTREAM_MESSAGE)).toBeVisible()
+    expect(
+      await screen.findByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })
+    ).toBeVisible()
     act(() => vi.advanceTimersByTime(60 * 1000))
-    expect(screen.queryByText(SELECT_26_LIVESTREAM_MESSAGE)).toBeNull()
+    expect(screen.queryByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })).toBeNull()
   })
 
   it('remains dismissible on launch-week routes', async () => {

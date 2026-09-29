@@ -39,10 +39,14 @@ describe('BannerSelect2026', () => {
     )
 
     act(() => vi.advanceTimersByTime(1))
-    expect(screen.getByRole('link', { name: 'Watch the livestream' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Watch livestream' })).toHaveAttribute(
       'href',
       'https://select.supabase.com/'
     )
+    expect(screen.getByText('Supabase Select 2026')).toBeVisible()
+    expect(
+      screen.getByText('Keynote, main stage, and build stage, streamed all day.')
+    ).toBeVisible()
 
     fireEvent.click(screen.getByRole('button', { name: 'Close banner' }))
     expect(setLivestreamDismissed).toHaveBeenCalledWith(true)
@@ -51,6 +55,6 @@ describe('BannerSelect2026', () => {
 
     vi.setSystemTime(new Date('2026-10-02T17:30:00-07:00'))
     act(() => document.dispatchEvent(new Event('visibilitychange')))
-    expect(screen.queryByRole('link', { name: 'Watch the livestream' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Watch livestream' })).toBeNull()
   })
 })

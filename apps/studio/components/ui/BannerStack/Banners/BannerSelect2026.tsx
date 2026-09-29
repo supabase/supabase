@@ -4,10 +4,9 @@ import { Button } from 'ui'
 import {
   SELECT_26_CTA,
   SELECT_26_DESCRIPTION,
-  SELECT_26_LIVESTREAM_CTA,
   SELECT_26_LIVESTREAM_DESCRIPTION,
+  SELECT_26_LIVESTREAM_STUDIO_CTA,
   SELECT_26_LIVESTREAM_STUDIO_DISMISSAL_KEY,
-  SELECT_26_LIVESTREAM_MESSAGE,
   SELECT_26_STUDIO_DISMISSAL_KEY,
   SELECT_26_TITLE,
   SELECT_26_URL,
@@ -56,9 +55,7 @@ export const BannerSelect2026 = () => {
         {/* Forehead spacer so the field reads above the copy */}
         <div className="h-10" aria-hidden />
         <div className="relative z-[2] flex flex-col gap-y-1 mb-2">
-          <p className="text-sm font-medium text-balance">
-            {phase === 'livestream' ? SELECT_26_LIVESTREAM_MESSAGE : SELECT_26_TITLE}
-          </p>
+          <p className="text-sm font-medium text-balance">{SELECT_26_TITLE}</p>
           <p className="text-xs text-foreground-lighter text-balance dark:text-[#f8f3ef]/65">
             {phase === 'livestream' ? SELECT_26_LIVESTREAM_DESCRIPTION : SELECT_26_DESCRIPTION}
           </p>
@@ -70,7 +67,7 @@ export const BannerSelect2026 = () => {
           iconRight={<ArrowUpRight size={14} strokeWidth={1.5} />}
         >
           <Link href={SELECT_26_URL} target="_blank" rel="noopener noreferrer" onClick={dismiss}>
-            {phase === 'livestream' ? SELECT_26_LIVESTREAM_CTA : SELECT_26_CTA}
+            {phase === 'livestream' ? SELECT_26_LIVESTREAM_STUDIO_CTA : SELECT_26_CTA}
           </Link>
         </Button>
       </div>

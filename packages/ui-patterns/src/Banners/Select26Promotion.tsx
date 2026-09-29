@@ -13,10 +13,10 @@ export const SELECT_26_MESSAGE = 'Supabase Select 2026 is coming October 2'
 export const SELECT_26_DESCRIPTION =
   'A curated day of talks by the industry’s best builders. Join us on October 2nd in San Francisco.'
 export const SELECT_26_CTA = 'Apply to attend'
-export const SELECT_26_LIVESTREAM_MESSAGE = 'Supabase Select 2026 livestream'
 export const SELECT_26_LIVESTREAM_DESCRIPTION =
-  'Watch the Main Stage and Build Stage livestreams today.'
+  'Keynote, main stage, and build stage, streamed all day.'
 export const SELECT_26_LIVESTREAM_CTA = 'Watch the livestream'
+export const SELECT_26_LIVESTREAM_STUDIO_CTA = 'Watch livestream'
 export const SELECT_26_LIVESTREAM_START = '2026-10-02T08:00:00-07:00'
 export const SELECT_26_EXPIRY = '2026-10-02T17:30:00-07:00'
 export const SELECT_26_WWW_DISMISSAL_KEY = 'announcement_select_26_08'
