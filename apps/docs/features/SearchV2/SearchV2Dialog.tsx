@@ -120,8 +120,8 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
               <CommandGroup heading="Results" forceMount>
                 {results.map((page) => (
                   <CommandItem
-                    key={page.id}
-                    value={page.id}
+                    key={page.path}
+                    value={page.path}
                     forceMount
                     onSelect={() => handleSelect(page.path)}
                   >

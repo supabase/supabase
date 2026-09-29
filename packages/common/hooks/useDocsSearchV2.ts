@@ -11,7 +11,6 @@ const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://supabase.com/docs'
 const SEARCH_API_BASE = BASE_PATH === '/docs' ? BASE_PATH : DOCS_URL
 
 interface DocsSearchV2Result {
-  id: string
   path: string
   title: string
   heading: string
@@ -49,7 +48,6 @@ function reshapeResult(row: unknown): DocsSearchV2Result | null {
 
   const slug = row.slug as string
   return {
-    id: `${slug}#${row.heading as string}`,
     // Next's router already prepends the app's basePath ('/docs'), so don't add it here.
     path: slug ? `/${slug}` : '/',
     title: row.page_title as string,
@@ -120,10 +118,15 @@ const useDocsSearchV2 = () => {
 
   const debouncedSearch = useMemo(() => debounce(handleSearch, 250), [handleSearch])
 
+  const debounceCancel = useCallback(() => {
+    debouncedSearch.cancel()
+  }, [debouncedSearch])
+
   const resetSearch = useCallback(() => {
+    debounceCancel()
     key.current += 1
     dispatch({ type: 'reset', key: key.current })
-  }, [])
+  }, [debounceCancel])
 
   return {
     searchState: state,
