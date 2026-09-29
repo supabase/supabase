@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -21,7 +20,7 @@ import { type AuthTemplate } from './EmailTemplates.types'
 import { getAuthTemplateType } from './EmailTemplates.utils'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const ResetTemplateDialog = ({
   template,
@@ -35,9 +34,8 @@ export const ResetTemplateDialog = ({
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { id } = template
@@ -48,7 +46,7 @@ export const ResetTemplateDialog = ({
       toast.success('Email template reset to default')
       onResetSuccess(config)
     },
-    onError: () => {},
+    onError: () => { },
   })
 
   const resetTemplateToDefault = async () => {

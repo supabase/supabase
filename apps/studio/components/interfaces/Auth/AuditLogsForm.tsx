@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -24,8 +23,8 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
 import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const schema = z.object({
   AUDIT_LOG_DISABLE_POSTGRES: z.boolean(),
@@ -64,9 +63,8 @@ export const AuditLogsForm = () => {
   )
   const authAuditLogsUrl = `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(authAuditLogsQuery)}`
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { data: tables = [] } = useTablesQuery({
