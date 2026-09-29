@@ -4,13 +4,15 @@ import { DestinationIcon } from './DestinationIcon'
 import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { BASE_PATH } from '@/lib/constants'
 
-// Destinations with a brand mark. Anything absent falls back to the line icon in the same frame,
-// so a new destination type never renders an empty square.
-const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, string>> = {
-  BigQuery: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
-  ClickHouse: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
-  DuckLake: `${BASE_PATH}/img/icons/ducklake-icon.svg`,
-  Snowflake: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
+type DestinationBrand =
+  | { type: 'mark'; src: string }
+  | { type: 'monogram'; label: string }
+
+const BRAND_BY_TYPE: Partial<Record<DestinationType, DestinationBrand>> = {
+  BigQuery: { type: 'mark', src: `${BASE_PATH}/img/icons/bigquery-icon.svg` },
+  ClickHouse: { type: 'monogram', label: 'CH' },
+  DuckLake: { type: 'mark', src: `${BASE_PATH}/img/icons/ducklake-icon.svg` },
+  Snowflake: { type: 'monogram', label: 'SF' },
 }
 
 const SIZE_CLASS_NAME = {
@@ -37,15 +39,25 @@ export const DestinationLogo = ({
   hasErrors = false,
 }: DestinationLogoProps) => {
   const sizing = SIZE_CLASS_NAME[size]
-  const brandMark = BRAND_MARK_BY_TYPE[type]
+  const brand = BRAND_BY_TYPE[type]
 
   return (
     <span className={cn('relative inline-flex shrink-0', className)}>
       <span className={cn('flex items-center justify-center border bg-surface-100', sizing.frame)}>
-        {brandMark === undefined ? (
+        {brand === undefined && (
           <DestinationIcon type={type} size={sizing.icon} className="text-foreground-light" />
-        ) : (
-          <img src={brandMark} alt="" aria-hidden className={sizing.mark} />
+        )}
+        {brand?.type === 'mark' && <img src={brand.src} alt="" aria-hidden className={sizing.mark} />}
+        {brand?.type === 'monogram' && (
+          <span
+            className={cn(
+              'font-mono font-medium leading-none text-foreground-muted',
+              size === 'small' ? 'text-xs' : 'text-lg'
+            )}
+            aria-hidden
+          >
+            {brand.label}
+          </span>
         )}
       </span>
       {hasErrors && (
