@@ -175,7 +175,7 @@ describe('BucketVersioningFields', () => {
 
     const warning = await screen.findByText('Tightening retention expires some versions')
     expect(
-      within(warning.parentElement!).getByText(/past the shorter retention window/)
+      within(warning.parentElement!).getByText(/past the retention window/)
     ).toBeInTheDocument()
   })
 
