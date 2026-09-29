@@ -64,7 +64,7 @@ Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-over
 | **Database**       | Destination database, such as `pipelines`                                  |
 | **Table engine**   | `replacing_merge_tree` for current state or `merge_tree` for event history |
 
-Click **Create and start pipeline**, then complete the validation and cost confirmations.
+Click **Start pipeline** to validate the destination. Review the cost estimate, then click **Create and start pipeline**.
 
 ## Query replicated data
 
@@ -94,7 +94,7 @@ Query the generated view for the current state:
 
 ```sql
 select *
-from "public_orders__current";
+from pipelines."public_orders__current";
 ```
 
 ClickHouse background merges combine older row versions over time. Before a merge, the base table can contain multiple versions of the same source row. The generated view uses `FINAL` to return the current version and excludes deleted rows.
