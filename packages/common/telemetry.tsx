@@ -430,6 +430,10 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
     groups: 'groups' in event ? { ...event.groups } : {},
   }
 
+  if (event.action.startsWith('explorer_query_') || event.action.startsWith('explorer_notebook_')) {
+    body.page_title = 'Explorer | Supabase'
+  }
+
   if (body.groups?.project === 'Unknown') {
     delete body.groups.project
     if (body.groups?.organization === 'Unknown') {
