@@ -25,13 +25,13 @@ const client = postgres(process.env.DATABASE_URL!, { prepare: false })
 export const db = drizzle(client)
 ```
 
-See the [Drizzle guide](/docs/guides/database/drizzle).
+See the [Drizzle guide](https://supabase.com/docs/guides/database/drizzle).
 
 ## Prisma
 
 Point the Prisma datasource at your connection string. For transaction mode, add `pgbouncer=true` to the URL so Prisma stops using prepared statements. Supabase recommends creating a dedicated `prisma` database role so you can control and monitor its access.
 
-See the [Prisma guide](/docs/guides/database/prisma).
+See the [Prisma guide](https://supabase.com/docs/guides/database/prisma).
 
 ## Other drivers
 
@@ -42,7 +42,7 @@ The setting that turns off prepared statements differs by driver:
 - **asyncpg:** `statement_cache_size=0`
 - **JDBC:** `prepareThreshold=0`
 
-You only need these for the pooler's transaction mode. Direct connections and session mode support prepared statements. See [Connect to your database](/docs/guides/database/connecting-to-postgres).
+You only need these for the pooler's transaction mode. Direct connections and session mode support prepared statements. See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
 ## Turn off what you don't use
 

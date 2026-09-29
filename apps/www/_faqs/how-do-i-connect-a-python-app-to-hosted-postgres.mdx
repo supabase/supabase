@@ -13,7 +13,7 @@ Open **Connect** in the Supabase dashboard:
 - **A long-running server,** such as a Django, Flask, or FastAPI app in a container: the direct connection, or the shared pooler in session mode if the host only supports IPv4.
 - **Serverless functions:** the shared pooler in transaction mode, on port `6543`.
 
-Add `sslmode=require` so the driver refuses unencrypted connections. See [Connect to your database](/docs/guides/database/connecting-to-postgres).
+Add `sslmode=require` so the driver refuses unencrypted connections. See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
 ## Configure the driver
 
@@ -29,4 +29,4 @@ Run migrations from your machine or CI over the direct connection, using your fr
 
 ## Don't need a Postgres connection?
 
-The `supabase-py` client library talks to the Data API over HTTP instead of opening Postgres connections. The [Flask quickstart](/docs/guides/getting-started/quickstarts/flask) uses it. Choose it when you also want Auth, Storage, or Realtime from Python. For plain database access, a Postgres driver is enough.
+The `supabase-py` client library talks to the Data API over HTTP instead of opening Postgres connections. The [Flask quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/flask) uses it. Choose it when you also want Auth, Storage, or Realtime from Python. For plain database access, a Postgres driver is enough.

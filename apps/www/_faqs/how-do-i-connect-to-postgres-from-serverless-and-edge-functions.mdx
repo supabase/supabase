@@ -45,8 +45,8 @@ Your connection returns to the pool after each transaction, so session state doe
 - No `set` or session-level advisory locks outside a transaction
 - No `listen` and `notify`, or temporary tables across transactions
 
-If you need these, use a direct connection or session mode from a long-running server. See [Connect to your database](/docs/guides/database/connecting-to-postgres).
+If you need these, use a direct connection or session mode from a long-running server. See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
 ## Functions that run next to the database
 
-[Edge Functions](/docs/guides/functions) run on Supabase and follow the same rules when they connect to Postgres. The [serverless drivers guide](/docs/guides/database/connecting-to-postgres/serverless-drivers) covers drivers built for these environments.
+[Edge Functions](https://supabase.com/docs/guides/functions) run on Supabase and follow the same rules when they connect to Postgres. The [serverless drivers guide](https://supabase.com/docs/guides/database/connecting-to-postgres/serverless-drivers) covers drivers built for these environments.

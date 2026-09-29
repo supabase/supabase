@@ -18,13 +18,13 @@ The browser never talks to the database directly, so you don't need the Data API
 
 ## Option 2: The browser talks to Supabase with your provider's tokens
 
-If you want to use the Data API, Storage, or Realtime from the client while keeping an external identity provider, use [third-party auth](/docs/guides/auth/third-party/overview).
+If you want to use the Data API, Storage, or Realtime from the client while keeping an external identity provider, use [third-party auth](https://supabase.com/docs/guides/auth/third-party/overview).
 
 - Supabase verifies your provider's JWTs, so you don't have to migrate users.
 - The provider must sign JWTs with asymmetric keys and publish them through an OIDC discovery URL, and each token needs a `kid` header.
 - Row Level Security policies can read the token's claims, so the database enforces who sees which rows.
 
-See [Row Level Security](/docs/guides/database/postgres/row-level-security).
+See [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
 ## What happens to Supabase Auth
 

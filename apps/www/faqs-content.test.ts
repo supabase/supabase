@@ -9,8 +9,14 @@ import { describe, expect, it } from 'vitest'
 const FAQ_DIR = path.join(process.cwd(), '_faqs')
 const DOCS_GUIDES_DIR = path.join(process.cwd(), '..', 'docs', 'content', 'guides')
 
-// Links an FAQ page may use besides /docs/guides/* and /faqs/*.
-const ALLOWED_LINK_PREFIXES = ['/pricing', '/database', '/dashboard', 'https://www.postgresql.org/']
+// Docs and other supabase.com links are absolute, so they work on www previews
+// and in the markdown versions. Links between FAQ pages stay relative.
+const DOCS_GUIDES_URL = 'https://supabase.com/docs/guides/'
+const ALLOWED_LINK_PREFIXES = [
+  'https://supabase.com/pricing',
+  'https://supabase.com/dashboard',
+  'https://www.postgresql.org/',
+]
 
 const files = fs
   .readdirSync(FAQ_DIR)
@@ -18,9 +24,9 @@ const files = fs
   .sort()
 const slugs = new Set(files.map((f) => f.replace(/\.mdx$/, '')))
 
-function docsGuideExists(docsPath: string): boolean {
-  const rel = docsPath
-    .replace(/^\/docs\/guides\//, '')
+function docsGuideExists(docsUrl: string): boolean {
+  const rel = docsUrl
+    .slice(DOCS_GUIDES_URL.length)
     .replace(/[#?].*$/, '')
     .replace(/\/$/, '')
   return (
@@ -64,7 +70,6 @@ describe('FAQ pages', () => {
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/)
     })
 
-
     it('contains no tables', () => {
       expect(/^\s*\|.*\|\s*$/m.test(content)).toBe(false)
     })
@@ -76,7 +81,7 @@ describe('FAQ pages', () => {
 
     it('links only to docs guides, other FAQs, or allowed pages that exist', () => {
       for (const target of linkTargets(content)) {
-        if (target.startsWith('/docs/guides/')) {
+        if (target.startsWith(DOCS_GUIDES_URL)) {
           expect(docsGuideExists(target), `missing docs page: ${target}`).toBe(true)
         } else if (target.startsWith('/faqs/')) {
           const slug = target.replace(/^\/faqs\//, '').replace(/[#?].*$/, '')

@@ -15,7 +15,7 @@ The browser can only be trusted with what your policies allow. Before exposing a
 1. Enable Row Level Security on every table in an exposed schema.
 2. Write policies for who can select, insert, update, and delete each row, usually based on the signed-in user.
 
-A table in an exposed schema without Row Level Security is readable and writable by any role with a grant on it. See [Row Level Security](/docs/guides/database/postgres/row-level-security).
+A table in an exposed schema without Row Level Security is readable and writable by any role with a grant on it. See [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
 ## 2. Use the publishable key in the browser
 
@@ -24,15 +24,15 @@ Supabase has two kinds of API keys:
 - **Publishable key:** safe to ship in a browser, mobile app, or script. It only reaches what Row Level Security allows.
 - **Secret key:** bypasses Row Level Security. Keep it on servers you control and never ship it.
 
-See [API keys](/docs/guides/getting-started/api-keys).
+See [API keys](https://supabase.com/docs/guides/getting-started/api-keys).
 
 ## 3. Call the Data API
 
-Use a Supabase client library, such as `supabase-js`, which wraps the Data API and sends the signed-in user's token with each request. You can also call the REST endpoints directly. See the [Data API guide](/docs/guides/api).
+Use a Supabase client library, such as `supabase-js`, which wraps the Data API and sends the signed-in user's token with each request. You can also call the REST endpoints directly. See the [Data API guide](https://supabase.com/docs/guides/api).
 
 ## When you need a backend after all
 
-Keep logic that must stay secret on a server, for example calling a paid third-party API with your key or charging a customer. [Edge Functions](/docs/guides/functions) run that code on Supabase, so you still don't need to run a server yourself.
+Keep logic that must stay secret on a server, for example calling a paid third-party API with your key or charging a customer. [Edge Functions](https://supabase.com/docs/guides/functions) run that code on Supabase, so you still don't need to run a server yourself.
 
 ## Mobile apps
 

@@ -11,9 +11,9 @@ A mobile app bundle can be unpacked by anyone who downloads it, so it can never 
 ## How the pieces fit
 
 1. **Postgres stores the data.** Every Supabase project is a dedicated Postgres database.
-2. **The Data API serves it.** Your tables are available over REST and GraphQL without writing an API server. See the [Data API guide](/docs/guides/api).
-3. **Row Level Security enforces access.** Policies decide which rows each signed-in user can read and change. See [Row Level Security](/docs/guides/database/postgres/row-level-security).
-4. **The app uses the publishable key.** It's safe to ship because it only reaches what your policies allow. See [API keys](/docs/guides/getting-started/api-keys).
+2. **The Data API serves it.** Your tables are available over REST and GraphQL without writing an API server. See the [Data API guide](https://supabase.com/docs/guides/api).
+3. **Row Level Security enforces access.** Policies decide which rows each signed-in user can read and change. See [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
+4. **The app uses the publishable key.** It's safe to ship because it only reaches what your policies allow. See [API keys](https://supabase.com/docs/guides/getting-started/api-keys).
 
 ## Client libraries
 
@@ -24,11 +24,11 @@ Supabase has client libraries for the common mobile stacks:
 - **Android:** the Kotlin library
 - **React Native and Expo:** the JavaScript library
 
-Each wraps the Data API and handles the signed-in user's session. The framework quickstarts show a full setup, for example [Flutter](/docs/guides/getting-started/quickstarts/flutter) and [Expo with React Native](/docs/guides/getting-started/quickstarts/expo-react-native).
+Each wraps the Data API and handles the signed-in user's session. The framework quickstarts show a full setup, for example [Flutter](https://supabase.com/docs/guides/getting-started/quickstarts/flutter) and [Expo with React Native](https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native).
 
 ## Server-side work
 
-Put anything secret, such as payment calls or third-party API keys, in [Edge Functions](/docs/guides/functions) instead of the app.
+Put anything secret, such as payment calls or third-party API keys, in [Edge Functions](https://supabase.com/docs/guides/functions) instead of the app.
 
 ## Live updates
 

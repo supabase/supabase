@@ -17,7 +17,7 @@ Open **Connect** in the dashboard and choose based on where your app will run:
 - **Serverless or edge functions:** shared pooler, transaction mode, on port `6543`.
 - **A server or container that stays running:** the direct connection, or the shared pooler in session mode if the host only supports IPv4.
 
-See [Connect to your database](/docs/guides/database/connecting-to-postgres).
+See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
 ## 3. Configure the app
 
@@ -28,15 +28,15 @@ See [Connect to your database](/docs/guides/database/connecting-to-postgres).
 ## 4. Create the schema and move the data
 
 1. Run your migrations against the new database from your machine or CI.
-2. Import existing data. For small tables, use CSV import in the dashboard. For more, use `COPY` or `pgloader`. See [Import data into Supabase](/docs/guides/database/import-data).
+2. Import existing data. For small tables, use CSV import in the dashboard. For more, use `COPY` or `pgloader`. See [Import data into Supabase](https://supabase.com/docs/guides/database/import-data).
 
 Coming from a local SQLite file? See [How do I move an app from SQLite to hosted Postgres for production?](/faqs/how-do-i-move-an-app-from-sqlite-to-hosted-postgres)
 
 ## 5. Lock it down
 
 - Keep SSL required and the password out of client code.
-- If browsers or mobile apps will query tables directly, enable Row Level Security first. See [Row Level Security](/docs/guides/database/postgres/row-level-security).
-- If only your servers connect, you can limit which IP ranges may reach the database. See [Network restrictions](/docs/guides/platform/network-restrictions).
+- If browsers or mobile apps will query tables directly, enable Row Level Security first. See [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
+- If only your servers connect, you can limit which IP ranges may reach the database. See [Network restrictions](https://supabase.com/docs/guides/platform/network-restrictions).
 
 ## Keep it running
 

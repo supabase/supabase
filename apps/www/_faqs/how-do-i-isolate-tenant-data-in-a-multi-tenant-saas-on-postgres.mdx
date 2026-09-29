@@ -17,7 +17,7 @@ A shared schema with a tenant column scales to many tenants without extra databa
 RLS attaches policies to a table. Postgres applies them to every query, like an extra `WHERE` clause the caller can't remove. A policy can compare `tenant_id` with a claim in the user's JWT, so the database itself refuses to return another tenant's rows.
 
 - Enable RLS on every table in an exposed schema. A table without it is readable and writable by any role with a grant on it.
-- Test policies as part of your migrations. The [RLS guide](/docs/guides/database/postgres/row-level-security) covers testing with `supabase test db`.
+- Test policies as part of your migrations. The [RLS guide](https://supabase.com/docs/guides/database/postgres/row-level-security) covers testing with `supabase test db`.
 
 RLS is the right choice when clients query the database directly, for example through the Data API.
 
@@ -29,7 +29,7 @@ If all access goes through your server and an ORM, you can enforce isolation the
 - Resolve the tenant from the authenticated session, never from request input the client controls.
 - Write tests that try to read another tenant's data.
 
-Watch which role your app connects as. Roles created with `bypassrls`, such as the `prisma` role in the [Prisma guide](/docs/guides/database/prisma), skip RLS policies, so with them your app code is the only guard.
+Watch which role your app connects as. Roles created with `bypassrls`, such as the `prisma` role in the [Prisma guide](https://supabase.com/docs/guides/database/prisma), skip RLS policies, so with them your app code is the only guard.
 
 ## Other models
 

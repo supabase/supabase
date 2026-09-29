@@ -18,11 +18,11 @@ Create the table first so the column types are exactly what you want, then load 
 \copy products (id, name, price) from 'products.csv' with (format csv, header true)
 ```
 
-`\copy` is the `psql` version of `COPY` that reads a file from your computer and streams it to the database. Connect over the direct connection or the session pooler for large loads. See [Connecting with psql](/docs/guides/database/psql).
+`\copy` is the `psql` version of `COPY` that reads a file from your computer and streams it to the database. Connect over the direct connection or the session pooler for large loads. See [Connecting with psql](https://supabase.com/docs/guides/database/psql).
 
 ## Loading from another database
 
-`pgloader` can load data from other sources into Postgres and convert types along the way. It's useful when a CSV export would lose information. See [Import data into Supabase](/docs/guides/database/import-data) for each method.
+`pgloader` can load data from other sources into Postgres and convert types along the way. It's useful when a CSV export would lose information. See [Import data into Supabase](https://supabase.com/docs/guides/database/import-data) for each method.
 
 ## Tips for large imports
 
