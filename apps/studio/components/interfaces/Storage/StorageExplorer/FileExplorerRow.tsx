@@ -73,6 +73,7 @@ const ArchivedRowIcon = ({ name, onOpen }: { name: string; onOpen?: () => void }
       {onOpen ? (
         <button
           type="button"
+          tabIndex={0}
           aria-label={`View archived file ${name}`}
           onClick={(event) => {
             event.stopPropagation()
