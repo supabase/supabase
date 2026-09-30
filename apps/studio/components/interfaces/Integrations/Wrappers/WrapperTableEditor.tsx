@@ -177,7 +177,17 @@ export const WrapperTableEditor = ({
             <Separator />
 
             {selectedTable && (
-              <TableForm table={selectedTable} onSubmit={onSubmit} initialData={initialData} />
+              <TableForm
+                // A prop change alone won't remount TableForm, so without this
+                // key, switching targets would reuse the same instance -
+                // leaving its one-time defaults sync (hasSyncedDefaultsRef)
+                // and field array permanently stuck on the first target ever
+                // selected.
+                key={selectedTableIndex}
+                table={selectedTable}
+                onSubmit={onSubmit}
+                initialData={initialData}
+              />
             )}
           </div>
         </SheetSection>
