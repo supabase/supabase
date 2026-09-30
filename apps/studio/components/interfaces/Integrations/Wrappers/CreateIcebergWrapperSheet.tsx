@@ -36,7 +36,7 @@ const FORM_ID = 'create-wrapper-form'
 const S3TableSchema = z.object({
   target: z.literal('S3Tables'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
-  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  server_name: z.string().min(1, 'Please provide a name for your server'),
   target_schema: z.string().min(1, 'Please provide an unique target schema'),
   vault_aws_access_key_id: z.string().min(1, 'Required'),
   vault_aws_secret_access_key: z.string().min(1, 'Required'),
@@ -46,7 +46,7 @@ const S3TableSchema = z.object({
 const R2CatalogSchema = z.object({
   target: z.literal('R2Catalog'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
-  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  server_name: z.string().min(1, 'Please provide a name for your server'),
   target_schema: z.string().min(1, 'Please provide an unique target schema'),
   vault_aws_access_key_id: z.string().min(1, 'Required'),
   vault_aws_secret_access_key: z.string().min(1, 'Required'),
@@ -58,7 +58,7 @@ const R2CatalogSchema = z.object({
 const IcebergRestCatalogSchema = z.object({
   target: z.literal('IcebergRestCatalog'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
-  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  server_name: z.string().min(1, 'Please provide a name for your server'),
   target_schema: z.string().min(1, 'Please provide an unique target schema'),
   vault_aws_access_key_id: z.string().optional(),
   vault_aws_secret_access_key: z.string().optional(),
@@ -107,7 +107,7 @@ const targetFields: Record<Target, { name: string; required: boolean }[]> = {
 type Target = 'S3Tables' | 'R2Catalog' | 'IcebergRestCatalog'
 
 const INITIAL_VALUES = {
-  wrapper_name: '',
+  server_name: '',
   source_schema: '',
   target_schema: '',
   target: 'S3Tables',
@@ -119,6 +119,7 @@ const INITIAL_VALUES = {
 
 export const CreateIcebergWrapperSheet = ({
   wrapperMeta,
+  hasExistingWrapper,
   onDirty,
   onClose,
   onCloseWithConfirmation,
@@ -200,10 +201,11 @@ export const CreateIcebergWrapperSheet = ({
       await createFDW({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
+        hasExistingWrapper,
         wrapperMeta,
         formState: {
           ...formValues,
-          server_name: `${values.wrapper_name}_server`,
+          wrapper_name: wrapperMeta.name,
           supabase_target_schema: values.target_schema,
         },
         mode: 'schema',
@@ -220,7 +222,6 @@ export const CreateIcebergWrapperSheet = ({
   }
 
   const isLoading = isCreatingWrapper || isSubmitting
-  const wrapperName = useWatch({ name: 'wrapper_name', control: form.control })
   const target = useWatch({ name: 'target', control: form.control })
 
   const targetOptions = wrapperMeta.server.options
@@ -244,26 +245,13 @@ export const CreateIcebergWrapperSheet = ({
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
             <SheetSection className="grow overflow-y-auto p-0">
-              <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+              <FormSection header={<FormSectionLabel>Server Configuration</FormSectionLabel>}>
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
-                    name="wrapper_name"
+                    name="server_name"
                     render={({ field }) => (
-                      <FormItemLayout
-                        layout="horizontal"
-                        label="Wrapper Name"
-                        description={
-                          wrapperName.length > 0 ? (
-                            <>
-                              Your wrapper's server name will be{' '}
-                              <code className="text-code-inline">{wrapperName}_server</code>
-                            </>
-                          ) : (
-                            ''
-                          )
-                        }
-                      >
+                      <FormItemLayout layout="horizontal" label="Server Name">
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
