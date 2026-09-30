@@ -23,7 +23,6 @@ import { DestinationType } from '../DestinationPanel.types'
 import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
-  DEFAULT_DUCKLAKE_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
   DEFAULT_MAX_FILL_MS,
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
@@ -71,7 +70,7 @@ export const AdvancedSettings = ({
                   <FormItemLayout
                     layout="horizontal"
                     label="Pool size"
-                    description={`Number of concurrent DuckDB connections to the catalog. Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}.`}
+                    description="1 to 6 concurrent DuckDB connections to the catalog."
                   >
                     <FormControl>
                       <Input

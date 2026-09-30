@@ -18,7 +18,7 @@ Insert-only tables don't require a primary key or replica identity. Updates and 
 
 ## Prepare DuckLake resources [#understand-the-ducklake-components]
 
-DuckLake uses a Postgres catalog and object storage. **Use Supabase** lets you select projects and a Storage bucket in the destination form; Pipelines provisions the connection credentials. **Custom parameters** requires your own catalog and storage credentials. You also need a compatible query engine to read the replicated data.
+DuckLake uses a Postgres catalog and object storage. With **Select Supabase projects**, you choose projects and a Storage bucket; Pipelines creates the connection credentials. With **Enter connection details**, you provide the catalog URL and storage credentials. You also need a compatible query engine to read the replicated data.
 
 | Component        | Purpose                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -30,11 +30,11 @@ You can query replicated tables, but treat them and their underlying catalog and
 
 ## Configure DuckLake as a destination [#choose-a-configuration-mode]
 
-Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). In **Add pipeline**, select **DuckLake**, enter a **Pipeline name**, choose a **Publication**, and set **Initial sync**. Then choose **Use Supabase** or **Custom parameters** for the catalog and storage.
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). In **Add pipeline**, select **DuckLake**, enter a **Pipeline name**, choose a **Publication**, and set **Initial sync**. Then choose how to configure the catalog and storage.
 
-### Use Supabase
+### Select Supabase projects [#use-supabase]
 
-Use this mode to back the DuckLake with Supabase projects. Pipelines provisions its own catalog and object-storage credentials when you create the destination.
+Choose Supabase projects for the Postgres catalog and Storage bucket. Pipelines creates the connection credentials when you create the destination.
 
 Before you begin:
 
@@ -46,17 +46,17 @@ Before you begin:
 
 To configure the destination:
 
-1. Select **Use Supabase**.
+1. Select **Select Supabase projects** under **Configuration method**.
 2. Choose the **Catalog project** and **Metadata schema**.
-3. Choose the **Storage project** and private **Bucket**. Use **Create bucket** beside the bucket field if you haven't created one yet.
+3. Choose the **Storage project** and private **Bucket**. Select **New bucket** at the bottom of the bucket list if you haven't created one yet.
 4. Optionally adjust **Pool size** under **Advanced settings**. It allows `1` to `6` concurrent DuckDB connections; the default is `4`.
 5. Click **Start pipeline**. Review any validation warnings, then confirm the estimated cost with **Create and start pipeline**.
 
 Credential-provisioning warnings are expected before creation: catalog and Storage credentials are provisioned when you save the destination. Review the selected resources before proceeding.
 
-### Custom parameters
+### Enter connection details [#custom-parameters]
 
-Use this mode with a Postgres catalog and S3-compatible object storage that you control.
+Use this mode when you want to provide a Postgres catalog URL and S3-compatible storage credentials yourself.
 
 Prepare the following resources:
 
@@ -66,7 +66,7 @@ Prepare the following resources:
 
 Use a new catalog metadata schema and data prefix for each destination. Reusing an existing schema or prefix can mix the metadata or files of different DuckLakes.
 
-Configure these fields in the destination form:
+Select **Enter connection details** under **Configuration method**, then configure these fields:
 
 - **Catalog URL**: A `postgres://` or `postgresql://` connection URL, including credentials and an `sslmode` appropriate for your provider
 - **Data path**: An `s3://<bucket>/<prefix>` URL
@@ -93,7 +93,7 @@ A source `TRUNCATE` truncates the DuckLake table. A [table restart](/docs/guides
 
 Connect DuckDB with its `ducklake` extension, or another compatible engine, to the same catalog and storage path. Query through the catalog; reading raw Parquet files can miss inlined changes, delete files, and the current snapshot.
 
-For **Use Supabase** mode, create separate read credentials for the selected catalog and Storage projects. The writer credentials generated for Pipelines aren't exposed. For **Custom parameters**, use separate read-only credentials when your catalog and storage provider support them.
+If you selected Supabase projects, create separate read credentials for the catalog and Storage projects. The writer credentials generated for Pipelines aren't exposed. If you entered connection details, use separate read-only credentials when your catalog and storage provider support them.
 
 After attaching the catalog under an alias such as `my_ducklake`, source schemas and tables are available as qualified DuckLake tables:
 
@@ -161,14 +161,14 @@ For type changes, unsupported changes, and interrupted schema changes, see the s
 
 ## Troubleshooting
 
-| Issue                                    | Resolution                                                                                                                                                  |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Credential-provisioning warnings         | Expected in [Use Supabase](#use-supabase) mode before saving. Review the selected resources.                                                                |
-| Catalog or storage validation fails      | Check [custom parameters](#custom-parameters), credentials, connectivity, and permissions for the configured prefix. Local `file://` paths are unsupported. |
-| Metadata schema exists                   | Choose a new schema, unless intentionally reusing the same DuckLake and its corresponding data path.                                                        |
-| Inserts work but updates or deletes fail | Check [replica identity and published columns](#source-table-requirements).                                                                                 |
-| Queries omit changes or deleted rows     | [Query through the catalog](#query-the-destination) with credentials for both catalog and storage.                                                          |
-| A schema change fails                    | Review [supported changes](#schema-change-support). Don't modify catalog tables or files manually.                                                          |
+| Issue                                    | Resolution                                                                                                                                                       |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Credential-provisioning warnings         | Expected when you [select Supabase projects](#use-supabase) before saving. Review the selected resources.                                                        |
+| Catalog or storage validation fails      | Check the [connection details](#custom-parameters), credentials, connectivity, and permissions for the configured prefix. Local `file://` paths are unsupported. |
+| Metadata schema exists                   | Choose a new schema, unless intentionally reusing the same DuckLake and its corresponding data path.                                                             |
+| Inserts work but updates or deletes fail | Check [replica identity and published columns](#source-table-requirements).                                                                                      |
+| Queries omit changes or deleted rows     | [Query through the catalog](#query-the-destination) with credentials for both catalog and storage.                                                               |
+| A schema change fails                    | Review [supported changes](#schema-change-support). Don't modify catalog tables or files manually.                                                               |
 
 Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring) to inspect errors. For unresolved failures, [contact support](/dashboard/support/new) with the pipeline ID and error details.
 

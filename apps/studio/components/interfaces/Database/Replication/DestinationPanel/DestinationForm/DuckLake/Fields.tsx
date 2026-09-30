@@ -1,9 +1,18 @@
-import { Eye, EyeOff, Plus } from 'lucide-react'
+import { Check, Eye, EyeOff, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
+  ComboboxTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -14,13 +23,16 @@ import {
   FormControl,
   FormField,
   Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  ScrollArea,
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectSeparator,
   SelectTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -54,19 +66,18 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
-const CREATE_BUCKET_OPTION = '__create_ducklake_bucket__'
-
 const DUCKLAKE_MODE_OPTIONS = [
   {
     value: DUCKLAKE_MODE_SUPABASE,
-    label: 'Use Supabase',
+    label: 'Select Supabase projects',
     description:
-      'Use Supabase projects for the catalog and storage. Pipelines creates the credentials.',
+      'Choose projects for the Postgres catalog and Storage bucket. Pipelines creates the credentials.',
   },
   {
     value: DUCKLAKE_MODE_CUSTOM,
-    label: 'Custom parameters',
-    description: 'Enter a Postgres catalog URL and S3-compatible storage credentials.',
+    label: 'Enter connection details',
+    description:
+      'Provide a Postgres catalog URL and S3-compatible storage details and credentials.',
   },
 ] as const
 
@@ -585,17 +596,19 @@ export const DuckLakeFields = ({
 
   return (
     <div className="flex flex-col gap-y-6 p-5">
-      <p className="text-sm font-medium text-foreground">
-        {editMode ? 'DuckLake settings' : 'Configuration method'}
-      </p>
-
-      {!editMode && (
-        <DuckLakeModeSelector
-          value={effectiveMode}
-          onChange={(value) =>
-            form.setValue('ducklakeMode', value, { shouldValidate: true, shouldDirty: true })
-          }
-        />
+      {editMode ? (
+        <p className="text-sm font-medium text-foreground">DuckLake settings</p>
+      ) : (
+        <FormItemLayout layout="horizontal" label="Configuration method">
+          <FormControl>
+            <DuckLakeModeSelector
+              value={effectiveMode}
+              onChange={(value) =>
+                form.setValue('ducklakeMode', value, { shouldValidate: true, shouldDirty: true })
+              }
+            />
+          </FormControl>
+        </FormItemLayout>
       )}
 
       {effectiveMode === DUCKLAKE_MODE_SUPABASE ? (
@@ -699,6 +712,8 @@ const BucketSelection = ({
   onChange: (value: string) => void
   onCreateBucket: () => void
 }) => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const ducklakeStorageProjectRef = useWatch({
     control: form.control,
     name: 'ducklakeStorageProjectRef',
@@ -723,6 +738,10 @@ const BucketSelection = ({
     [bucketsData]
   )
   const isBucketsErrorVisible = isMetadataListErrorVisible(isErrorBuckets, buckets.length)
+  const isBucketsLoading = isMetadataListLoading(
+    isPendingBuckets || isFetchingBuckets,
+    buckets.length
+  )
   const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
     isEnabled: !!ducklakeStorageProjectRef,
     refetch: refetchBuckets,
@@ -730,49 +749,93 @@ const BucketSelection = ({
 
   if (!ducklakeStorageProjectRef) {
     return (
-      <Select disabled>
-        <SelectTrigger>Select a storage project first</SelectTrigger>
-      </Select>
+      <ComboboxTrigger size="small" disabled>
+        Select a storage project first
+      </ComboboxTrigger>
     )
   }
 
   return (
-    <Select
-      value={value || ''}
-      onOpenChange={handleRefreshBucketsOnOpen}
-      onValueChange={(nextValue) => {
-        if (nextValue === CREATE_BUCKET_OPTION) onCreateBucket()
-        else if (nextValue) onChange(nextValue)
+    <Popover
+      modal={false}
+      open={isDropdownOpen}
+      onOpenChange={(open) => {
+        setIsDropdownOpen(open)
+        handleRefreshBucketsOnOpen(open)
+        if (!open) setSearchTerm('')
       }}
     >
-      <SelectTrigger>{value || 'Select a bucket'}</SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectionListState
-            isLoading={isMetadataListLoading(isPendingBuckets || isFetchingBuckets, buckets.length)}
-            isError={isBucketsErrorVisible}
-            isEmpty={
-              !isMetadataListLoading(isPendingBuckets || isFetchingBuckets, buckets.length) &&
-              !isBucketsErrorVisible &&
-              buckets.length === 0
-            }
-            emptyLabel="No buckets available"
-            errorLabel="Unable to load buckets"
+      <PopoverTrigger asChild>
+        <ComboboxTrigger
+          size="small"
+          aria-expanded={isDropdownOpen}
+          data-state={isDropdownOpen ? 'open' : 'closed'}
+          className={cn(!value && 'text-foreground-muted')}
+        >
+          {value || 'Select a bucket'}
+        </ComboboxTrigger>
+      </PopoverTrigger>
+      <PopoverContent sameWidthAsTrigger className="p-0" align="start" side="bottom">
+        <Command>
+          <CommandInput
+            placeholder="Find bucket..."
+            className="text-xs"
+            value={searchTerm}
+            onValueChange={setSearchTerm}
           />
-          {buckets.map((bucket) => (
-            <SelectItem key={bucket.id} value={bucket.id}>
-              {bucket.name}
-            </SelectItem>
-          ))}
-          <SelectSeparator />
-          <SelectItem value={CREATE_BUCKET_OPTION}>
-            <span className="flex items-center gap-x-2">
-              <Plus size={14} />
-              New bucket
-            </span>
-          </SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+          <CommandList>
+            {!isBucketsLoading && !isBucketsErrorVisible && buckets.length > 0 && (
+              <CommandEmpty>No buckets found</CommandEmpty>
+            )}
+            <SelectionListState
+              isLoading={isBucketsLoading}
+              isError={isBucketsErrorVisible}
+              isEmpty={!isBucketsLoading && !isBucketsErrorVisible && buckets.length === 0}
+              emptyLabel="No buckets available"
+              errorLabel="Unable to load buckets"
+              skeletonVariant="command"
+            />
+            {buckets.length > 0 && (
+              <CommandGroup>
+                <ScrollArea
+                  className={buckets.length > 7 ? 'h-[210px]' : ''}
+                  onWheel={(event) => event.stopPropagation()}
+                >
+                  {buckets.map((bucket) => (
+                    <CommandItem
+                      key={bucket.id}
+                      value={bucket.name}
+                      className="cursor-pointer flex items-center justify-between gap-x-2 w-full"
+                      onSelect={() => {
+                        onChange(bucket.id)
+                        setIsDropdownOpen(false)
+                      }}
+                    >
+                      <span>{bucket.name}</span>
+                      {value === bucket.id && (
+                        <Check className="text-primary" strokeWidth={2} size={13} />
+                      )}
+                    </CommandItem>
+                  ))}
+                </ScrollArea>
+              </CommandGroup>
+            )}
+            <CommandSeparator />
+            <CommandGroup>
+              <CommandItem
+                className="cursor-pointer w-full"
+                onSelect={() => {
+                  setIsDropdownOpen(false)
+                  onCreateBucket()
+                }}
+              >
+                <Plus size={14} strokeWidth={1.5} className="mr-2" />
+                New bucket
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
