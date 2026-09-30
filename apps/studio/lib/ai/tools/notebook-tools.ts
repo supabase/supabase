@@ -128,8 +128,8 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       description:
         'List the databases available for this project — the primary and any read replicas.',
       inputSchema: z.object({}),
-      execute: async () => {
-        const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+      execute: async (_input, { abortSignal }) => {
+        const databases = await getReadReplicas({ projectRef }, abortSignal, authHeaders)
 
         return {
           databases: (databases ?? []).map((database) => ({
@@ -162,10 +162,10 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
             'Field to sort notebooks by. There is no "updated_at" sort — use "inserted_at" for creation order.'
           ),
       }),
-      execute: async ({ cursor, limit, sort_by }) => {
+      execute: async ({ cursor, limit, sort_by }, { abortSignal }) => {
         const { content, cursor: nextCursor } = await getContent(
           { projectRef, type: 'notebook', limit, cursor, sort: sort_by },
-          undefined,
+          abortSignal,
           authHeaders
         )
 
@@ -188,8 +188,8 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       inputSchema: z.object({
         id: z.string().describe('The id of the notebook to fetch.'),
       }),
-      execute: async ({ id }) => {
-        const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
+      execute: async ({ id }, { abortSignal }) => {
+        const notebook = await getNotebook({ projectRef, id }, abortSignal, authHeaders)
 
         // toWireNotebook discards the `unchecked_sql` brand for display purposes only — the
         // result is returned to the agent, never written back.
@@ -215,8 +215,8 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           ),
       }),
       needsApproval: true,
-      execute: async ({ id, expected_updated_at }) => {
-        const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
+      execute: async ({ id, expected_updated_at }, { abortSignal }) => {
+        const notebook = await getNotebook({ projectRef, id }, abortSignal, authHeaders)
 
         if (notebook.updated_at !== expected_updated_at) {
           throw new NotebookToolError(
@@ -238,7 +238,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
         let replicaLookupFailure: { error: unknown } | undefined
         if (shouldLookupReplica) {
           try {
-            databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+            databases = await getReadReplicas({ projectRef }, abortSignal, authHeaders)
           } catch (error) {
             replicaLookupFailure = { error }
           }
@@ -260,6 +260,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
                 sql: acceptUntrustedLogsSql(cell.unchecked_sql),
                 range: resolveLogTimeRange(cell.time_range),
                 endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
+                signal: abortSignal,
                 headers: authHeaders,
               })
               if (result.error) throw result.error
@@ -304,7 +305,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
                 sql: limitedSql.sql,
                 isStatementTimeoutDisabled: true,
               },
-              undefined,
+              abortSignal,
               authHeaders
             )
             cells.push({
@@ -351,13 +352,13 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
         ),
       }),
       needsApproval: true,
-      execute: async ({ name, description, content }) => {
+      execute: async ({ name, description, content }, { abortSignal }) => {
         if (
           content.cells.some(
             (cell) => cell._tag === 'database_cell' && cell.database_identifier !== undefined
           )
         ) {
-          const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+          const databases = await getReadReplicas({ projectRef }, abortSignal, authHeaders)
           assertValidDatabaseIdentifiers(
             content.cells,
             new Set((databases ?? []).map((database) => database.identifier))
@@ -385,7 +386,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
             description,
             content: { schema_version: content.schema_version, cells },
           },
-          undefined,
+          abortSignal,
           authHeaders
         )
 
@@ -407,7 +408,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
         ),
       }),
       needsApproval: true,
-      execute: async ({ id, expected_updated_at, operations }) => {
+      execute: async ({ id, expected_updated_at, operations }, { abortSignal }) => {
         const newCells = operations.flatMap((operation) =>
           operation._tag === 'insert_cell' || operation._tag === 'replace_cell'
             ? [operation.cell]
@@ -418,14 +419,14 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
             (cell) => cell._tag === 'database_cell' && cell.database_identifier !== undefined
           )
         ) {
-          const databases = await getReadReplicas({ projectRef }, undefined, authHeaders)
+          const databases = await getReadReplicas({ projectRef }, abortSignal, authHeaders)
           assertValidDatabaseIdentifiers(
             newCells,
             new Set((databases ?? []).map((database) => database.identifier))
           )
         }
 
-        const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
+        const notebook = await getNotebook({ projectRef, id }, abortSignal, authHeaders)
 
         if (notebook.updated_at !== expected_updated_at) {
           throw new NotebookToolError(
@@ -467,7 +468,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
             description: notebook.description ?? undefined,
             content: { schema_version: result.notebook.schema_version, cells },
           },
-          undefined,
+          abortSignal,
           authHeaders
         )
 
@@ -487,10 +488,10 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
         id: z.string().describe('The id of the notebook to delete.'),
       }),
       needsApproval: true,
-      execute: async ({ id }) => {
-        const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
+      execute: async ({ id }, { abortSignal }) => {
+        const notebook = await getNotebook({ projectRef, id }, abortSignal, authHeaders)
 
-        await deleteContents({ projectRef: projectRef ?? '', ids: [id] }, undefined, authHeaders)
+        await deleteContents({ projectRef: projectRef ?? '', ids: [id] }, abortSignal, authHeaders)
 
         return { id, name: notebook.name }
       },

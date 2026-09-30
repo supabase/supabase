@@ -1,9 +1,11 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AnnouncementBanner } from './AnnouncementBanner'
 import {
   SELECT_26_CTA,
+  SELECT_26_LIVESTREAM_CTA,
+  SELECT_26_LIVESTREAM_WWW_DISMISSAL_KEY,
   SELECT_26_MESSAGE,
   SELECT_26_TITLE,
   SELECT_26_URL,
@@ -67,6 +69,33 @@ describe('AnnouncementBanner', () => {
     render(<AnnouncementBanner />)
 
     expect(screen.queryByText(SELECT_26_TITLE)).not.toBeInTheDocument()
+  })
+
+  it('shows the livestream even after the waitlist banner was dismissed', async () => {
+    window.localStorage.setItem(SELECT_26_WWW_DISMISSAL_KEY, 'hidden')
+    vi.setSystemTime(new Date('2026-10-02T08:00:00-07:00'))
+
+    render(<AnnouncementBanner />)
+
+    expect(
+      await screen.findByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })
+    ).toHaveAttribute('href', SELECT_26_URL)
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss announcement' }))
+    expect(window.localStorage.getItem(SELECT_26_LIVESTREAM_WWW_DISMISSAL_KEY)).toBe('hidden')
+  })
+
+  it('removes the livestream at 5:30pm', async () => {
+    vi.setSystemTime(new Date('2026-10-02T17:29:00-07:00'))
+    render(<AnnouncementBanner />)
+
+    expect(
+      await screen.findByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })
+    ).toBeVisible()
+    act(() => vi.advanceTimersByTime(60 * 1000))
+    expect(screen.queryByRole('link', { name: new RegExp(SELECT_26_LIVESTREAM_CTA) })).toBeNull()
   })
 
   it('remains dismissible on launch-week routes', async () => {
