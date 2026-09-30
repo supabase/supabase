@@ -1,5 +1,4 @@
 import { safeSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Database, Plus, Search } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
@@ -36,7 +35,6 @@ import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/dat
 import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -46,6 +44,7 @@ import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const createFunctionSnippet = safeSql`create function function_name()
 returns void
@@ -124,9 +123,8 @@ export const FunctionsList = () => {
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canCreateFunctions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'functions'
+  const { can: canCreateFunctions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -420,9 +418,8 @@ const CreateFunctionButton = ({
   createFunction: () => void
 }) => {
   const { selectedSchema } = useQuerySchemaState()
-  const { can: canCreateFunctions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'functions'
+  const { can: canCreateFunctions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
   const canAddFunctions = canCreateFunctions && !isSchemaLocked

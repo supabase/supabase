@@ -1,6 +1,5 @@
 'use client'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -8,9 +7,9 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from '@/data/projects/project-restart-services-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface RestartProjectDialogProps {
   visible: boolean
@@ -28,9 +27,8 @@ export function RestartProjectDialog({
   const { data: project } = useSelectedProjectQuery()
   const { setProjectStatus } = useSetProjectStatus()
 
-  const { can: canRestartProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'reboot'
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2(
+    'project_operations_write'
   )
 
   const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertTriangle, ArrowRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -29,9 +28,8 @@ import {
 import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog.hooks'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatCurrency } from '@/lib/helpers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface DiskManagementReviewAndSubmitDialogProps {
   loading: boolean
@@ -56,12 +54,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
   message,
   buttonSize = 'medium',
 }: DiskManagementReviewAndSubmitDialogProps) => {
-  const { data: project } = useSelectedProjectQuery()
-
-  const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+  const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
   )
 
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
