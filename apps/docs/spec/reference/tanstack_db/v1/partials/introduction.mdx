@@ -1,0 +1,14 @@
+---
+id: introduction
+title: Introduction
+---
+
+`@supabase-labs/tanstack-db` syncs [TanStack DB](https://tanstack.com/db) collections with Postgres through Supabase. It gives you reactive, optimistically updated client state with no manual cache invalidation: components re-render when the underlying data changes, and mutations apply to the UI immediately, rolling back if the server rejects them.
+
+Collections work with an existing Supabase project and respect Row Level Security. No migrations required.
+
+<Admonition type="caution" title="Experimental">
+
+`@supabase-labs/tanstack-db` is early (0.x). Realtime sync is still experimental, and there's no SSR support yet.
+
+</Admonition>

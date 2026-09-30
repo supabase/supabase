@@ -1,0 +1,33 @@
+---
+id: use-live-query
+title: Live queries and mutations
+---
+
+Read a collection reactively with `useLiveQuery()`, and mutate it optimistically. The UI updates immediately, and changes roll back if the server rejects them.
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    `useLiveQuery` re-runs whenever the underlying collection changes, so components stay in sync without manual cache invalidation. `.update()` and `.delete()` apply to the UI immediately and roll back if the server rejects the change.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```tsx
+    import { useLiveQuery, eq } from '@tanstack/react-db'
+
+    const { data, isLoading } = useLiveQuery(
+      (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, false)),
+      []
+    )
+
+    todos.update(id, (draft) => {
+      draft.completed = true
+    })
+
+    todos.delete(id)
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>

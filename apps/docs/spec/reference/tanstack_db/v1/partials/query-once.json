@@ -1,0 +1,25 @@
+{
+  "title": "queryOnce()",
+  "description": "Runs a single, non-reactive query against a collection. Filters, ordering, and limits are pushed to PostgREST where possible. Operations like `groupBy`, `having`, and `distinct` are applied client-side after fetching.",
+  "params": [
+    {
+      "name": "callback",
+      "isOptional": false,
+      "type": "(q: InitialQueryBuilder) => QueryBuilder",
+      "description": "A query builder function describing the query to run once."
+    },
+    {
+      "name": "supabase",
+      "isOptional": false,
+      "type": "SupabaseClient",
+      "description": "The Supabase client instance to run the query against."
+    }
+  ],
+  "examples": [
+    {
+      "id": "query-once-example",
+      "name": "Run a one-time query",
+      "code": "```tsx\nimport { queryOnce } from '@supabase-labs/tanstack-db'\n\nconst completed = await queryOnce(\n  (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, true)),\n  supabase\n)\n```"
+    }
+  ]
+}
