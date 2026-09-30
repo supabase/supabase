@@ -112,7 +112,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
               )}`}
               className="transition text-foreground-light hover:text-foreground flex items-center gap-x-2"
             >
-              <span title={`View ${metadata.label} in Vault`}>View in Vault</span>
+              <span title={`View ${metadata.label} in Vault`}>{metadata.label}</span>
               <ExternalLink size={14} strokeWidth={1.5} />
             </Link>
           </div>

@@ -81,7 +81,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
             <TableRow>
               <TableHead className="w-[220px]">Name</TableHead>
               <TableHead>Tables</TableHead>
-              <TableHead>Encrypted key</TableHead>
+              <TableHead>Encrypted keys</TableHead>
               <TableHead className="w-24">
                 <span className="sr-only">Actions</span>
               </TableHead>
