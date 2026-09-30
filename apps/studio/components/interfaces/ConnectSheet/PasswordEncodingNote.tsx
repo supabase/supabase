@@ -4,9 +4,9 @@ import { SPECIAL_SYMBOLS_IN_PASSWORDS_DOCS_URL } from '@/lib/constants'
 export const PasswordEncodingNote = () => {
   return (
     <p className="text-sm text-foreground-lighter mb-1">
-      Replace [YOUR-PASSWORD], including the brackets, with your database password.{' '}
-      <InlineLink href={SPECIAL_SYMBOLS_IN_PASSWORDS_DOCS_URL}>Percent-encode</InlineLink> any
-      special characters in the connection string.
+      If your database password contains special characters,{' '}
+      <InlineLink href={SPECIAL_SYMBOLS_IN_PASSWORDS_DOCS_URL}>percent-encode</InlineLink> them in
+      the connection string.
     </p>
   )
 }
