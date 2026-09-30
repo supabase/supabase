@@ -10,6 +10,7 @@ import {
   Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  Separator,
   SheetFooter,
   SheetHeader,
   SheetSection,
@@ -244,8 +245,12 @@ export const CreateIcebergWrapperSheet = ({
             <SheetHeader>
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
+
             <SheetSection className="grow overflow-y-auto p-0">
-              <FormSection header={<FormSectionLabel>Server Configuration</FormSectionLabel>}>
+              <FormSection
+                className="p-5!"
+                header={<FormSectionLabel>Server Configuration</FormSectionLabel>}
+              >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
@@ -260,13 +265,19 @@ export const CreateIcebergWrapperSheet = ({
                   />
                 </FormSectionContent>
               </FormSection>
-              <FormSection header={<FormSectionLabel>Data target</FormSectionLabel>}>
+
+              <Separator />
+
+              <FormSection
+                className="p-5!"
+                header={<FormSectionLabel>Data target</FormSectionLabel>}
+              >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
                     name="target"
                     render={({ field }) => (
-                      <FormItemLayout layout="vertical">
+                      <FormItemLayout layout="horizontal" label="Import as">
                         <div>
                           <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
                             <RadioGroupStackedItem
@@ -319,7 +330,10 @@ export const CreateIcebergWrapperSheet = ({
                 </FormSectionContent>
               </FormSection>
 
+              <Separator />
+
               <FormSection
+                className="p-5!"
                 header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
               >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
@@ -342,11 +356,14 @@ export const CreateIcebergWrapperSheet = ({
                 </FormSectionContent>
               </FormSection>
 
+              <Separator />
+
               <FormSection
+                className="p-5!"
                 header={
-                  <FormSectionLabel>
+                  <FormSectionLabel className="lg:col-span-12 flex flex-col gap-y-1">
                     <p>Foreign schema</p>
-                    <p className="text-foreground-light mt-2 w-[90%]">
+                    <p className="text-foreground-light">
                       You can query your data from the foreign tables in the specified schema after
                       the wrapper is created.
                     </p>
