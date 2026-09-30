@@ -97,9 +97,9 @@ function useSingleLog({
 
   // Bound the lookup to a tight window around the row's own timestamp, falling
   // back to the selected search range when it isn't known.
-  const { isoTimestampStart, isoTimestampEnd } = useMemo(
-    () => resolveSingleLogWindow(logTimestampMicros, paramsToMerge),
-    [logTimestampMicros, paramsToMerge?.iso_timestamp_start, paramsToMerge?.iso_timestamp_end]
+  const { isoTimestampStart, isoTimestampEnd } = resolveSingleLogWindow(
+    logTimestampMicros,
+    paramsToMerge
   )
 
   const enabled = Boolean(id && table)
