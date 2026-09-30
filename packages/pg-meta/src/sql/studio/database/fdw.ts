@@ -498,21 +498,6 @@ export const getUpdateFDWSql = ({
   formState: { [k: string]: string }
   tables: WrapperFormTable[]
 }): SafeSqlFragment => {
-  const ensureWrapperIsNotSharedSql = safeSql`
-    do $$
-    begin
-      if exists (
-        select 1
-        from pg_catalog.pg_foreign_server s
-        join pg_catalog.pg_foreign_data_wrapper w on w.oid = s.srvfdw
-        where w.fdwname = ${literal(wrapper.name)}
-          and s.srvname <> ${literal(wrapper.server_name)}
-      ) then
-        raise exception 'This wrapper is used by another server and cannot be edited here.';
-      end if;
-    end $$;
-  `
-
   // wrapperMeta.name is fixed per wrapper type and shared across every server
   // that uses it, so it's never user-editable here - only the server itself
   // (formState.server_name / wrapper.server_name) can be configured per connection.
@@ -677,7 +662,6 @@ export const getUpdateFDWSql = ({
   )
 
   const sql = safeSql`
-    ${ensureWrapperIsNotSharedSql}
     ${renameServerSql}
     ${alterServerOptionsSql}
     ${encryptedOptionsSql}

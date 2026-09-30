@@ -79,7 +79,7 @@ test('deleting a wrapper row drops its server and preserves shared wrapper depen
   expect(sql).toContain("where fdwname = 'bigquery_fdw'")
 })
 
-test('editing a shared wrapper fails before any other statement runs', () => {
+test('editing a server does not raise even when other servers share the same FDW', () => {
   const sql = getUpdateFDWSql({
     wrapper: {
       id: 42,
@@ -101,8 +101,11 @@ test('editing a shared wrapper fails before any other statement runs', () => {
     tables: [],
   })
 
-  expect(sql).toContain("s.srvname <> 'selected_bigquery_server'")
-  expect(sql.indexOf('raise exception')).toBeLessThan(sql.indexOf('alter server'))
+  // A server can be edited regardless of whether other servers share its FDW -
+  // the update only ever targets this server's own name, options, and tables.
+  expect(sql).not.toContain('raise exception')
+  expect(sql).not.toContain('cannot be edited here')
+  expect(sql).toContain("alter server selected_bigquery_server\n          options (set project_id 'new-project')")
 })
 
 test('updating a wrapper alters the server and FDW instead of dropping and recreating them', () => {
