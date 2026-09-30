@@ -249,11 +249,12 @@ supabase stop --no-backup
 
 The most common thing you'll do with the CLI is run the full Supabase stack (Postgres, Auth, Storage, and the rest) on your own machine. That stack runs in Docker containers, so you need a container runtime installed first. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
 
+On macOS, we recommend [OrbStack](https://orbstack.dev/) instead of Docker Desktop. It's a drop-in replacement that starts faster and uses less CPU, memory, and disk, which makes a noticeable difference when running the full Supabase stack.
+
 Alternately, you can use a different container tool that offers Docker compatible APIs.
 
 - [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
 - [Podman](https://podman.io/) (macOS, Windows, Linux)
-- [OrbStack](https://orbstack.dev/) (macOS)
 - [colima](https://github.com/abiosoft/colima) (macOS)
 
 With a container runtime running, go to the folder where you want to create your project and initialize it:
