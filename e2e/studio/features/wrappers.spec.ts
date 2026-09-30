@@ -36,7 +36,7 @@ testRunner('Stripe', () => {
       }
     )
     await page.goto(toUrl(`/project/${ref}/integrations/stripe_wrapper/overview`))
-    await page.getByRole('button', { name: 'Add new wrapper' }).click()
+    await page.getByRole('link', { name: 'Add new wrapper' }).click()
 
     await page.getByRole('textbox', { name: 'Server Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Stripe Secret Key' }).fill('my secret')
@@ -77,7 +77,7 @@ testRunner('Stripe', () => {
       }
     )
     await page.goto(toUrl(`/project/${ref}/integrations/stripe_wrapper/overview`))
-    await page.getByRole('button', { name: 'Add new wrapper' }).click()
+    await page.getByRole('link', { name: 'Add new wrapper' }).click()
 
     await page.getByRole('textbox', { name: 'Server Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Stripe Secret Key' }).fill('my secret')
@@ -121,7 +121,7 @@ testRunner('S3 Wrapper', () => {
       }
     )
     await page.goto(toUrl(`/project/${ref}/integrations/s3_wrapper/overview`))
-    await page.getByRole('button', { name: 'Add new wrapper' }).click()
+    await page.getByRole('link', { name: 'Add new wrapper' }).click()
 
     await page.getByRole('textbox', { name: 'Server Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Access Key ID' }).fill('s3 access id')
