@@ -49,8 +49,6 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   )
 
   const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
-  const isSharedWrapper = (wrapper: (typeof wrappers)[number]) =>
-    data?.some((other) => other.id !== wrapper.id && other.name === wrapper.name) ?? false
   const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
   const openedWrapperId = useRef<string | null>(null)
 
@@ -91,7 +89,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
           </TableHeader>
           <TableBody>
             {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => (
-              <WrapperRow key={x.id} wrapper={x} isShared={isSharedWrapper(x)} />
+              <WrapperRow key={x.id} wrapper={x} />
             ))}
           </TableBody>
           <TableFooter

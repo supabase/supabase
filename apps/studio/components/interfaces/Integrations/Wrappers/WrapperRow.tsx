@@ -14,10 +14,9 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface WrapperRowProps {
   wrapper: FDW
-  isShared: boolean
 }
 
-export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
+export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   const { ref, id } = useParams()
   const { can: canManageWrappers } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
