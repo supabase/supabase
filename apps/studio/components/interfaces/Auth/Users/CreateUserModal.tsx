@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Lock, Mail } from 'lucide-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -23,7 +22,7 @@ import {
 import * as z from 'zod'
 
 import { useUserCreateMutation } from '@/data/auth/user-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type CreateUserModalProps = {
   visible: boolean
@@ -38,9 +37,8 @@ const CreateUserFormSchema = z.object({
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canCreateUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'create_user'
+  const { can: canCreateUsers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { mutate: createUser, isPending: isCreatingUser } = useUserCreateMutation({

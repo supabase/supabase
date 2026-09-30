@@ -35,7 +35,7 @@ export const ResetTemplateDialog = ({
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
   )
 
   const { id } = template

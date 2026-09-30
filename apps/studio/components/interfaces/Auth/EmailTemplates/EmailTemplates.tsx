@@ -57,7 +57,7 @@ export const EmailTemplates = () => {
   const { data: selectedProject } = useSelectedProjectQuery()
 
   const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
   )
 
   const {
