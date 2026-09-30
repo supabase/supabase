@@ -172,7 +172,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          DuckLake metadata is stored in the selected project's Postgres database.
+          DuckLake metadata is stored in the selected project’s Postgres database.
         </p>
       </div>
 
@@ -208,7 +208,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <FormItemLayout
             layout="horizontal"
             label="Metadata schema"
-            description="Schema for DuckLake metadata tables in the catalog project's Postgres database."
+            description="Schema for DuckLake metadata tables in the catalog project’s Postgres database."
           >
             <FormControl>
               <Input {...field} placeholder="ducklake" value={field.value ?? ''} />

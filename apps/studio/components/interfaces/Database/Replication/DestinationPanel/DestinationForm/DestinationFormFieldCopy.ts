@@ -25,7 +25,7 @@ export const ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY = {
 
 export const DUCKLAKE_CATALOG_PROJECT_FIELD_COPY = {
   label: 'Catalog project',
-  description: "Postgres project that stores this DuckLake's metadata.",
+  description: 'Postgres project that stores this DuckLake’s metadata.',
 } as const
 
 export const DUCKLAKE_STORAGE_PROJECT_FIELD_COPY = {
