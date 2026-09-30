@@ -240,6 +240,7 @@ export const OAuthAppsAuthorizeScreen = ({
             email={identity.email}
             organizationSlug={memberOrg.slug}
             onSignOut={handleSignOut}
+            grantKind={grantKind}
           />
 
           {isBlockedOnProjects && (

@@ -147,14 +147,13 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('tells the member an organization-bound grant is shared, exactly once', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
 
-    expect(
-      await screen.findAllByText('This grant is shared with the whole organization')
-    ).toHaveLength(1)
+    expect(await screen.findAllByText('Want this scoped to one member?')).toHaveLength(1)
     expect(
       screen.getAllByText(
-        'kemal-bot acts with owner permissions for every member of northwind-traders, and stays active if you leave.'
+        'Have them authorize kemal-bot from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.'
       )
     ).toHaveLength(1)
+    expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
   })
 
   test('keeps the no-admin-approval footer line for a member-bound grant', async () => {
@@ -182,8 +181,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(
       screen.queryByText('This grant is shared with the whole organization')
     ).not.toBeInTheDocument()
-    expect(screen.queryByText(/acts with owner permissions/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/This grant acts as you/)).toBeInTheDocument()
   })
 
   test('says the grant covers future projects when there is no picker', async () => {

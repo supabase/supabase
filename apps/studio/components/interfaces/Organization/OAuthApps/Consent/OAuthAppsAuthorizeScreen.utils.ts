@@ -9,7 +9,7 @@ export const CONSENT_COPY = {
   organizationBoundGrant: {
     title: 'Want this scoped to one member?',
     description: (appName: string) =>
-      `Have them authorize ${appName} from their own  account. Authorizing here gives it your Administrator access on every project, including ones created later.`,
+      `Have them authorize ${appName} from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.`,
   },
   coversEveryProject: {
     title: 'This grant covers every project',

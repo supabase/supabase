@@ -1,14 +1,18 @@
 import { LogOut } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { OAuthGrantKind } from '@/data/oauth-apps/types'
+
 export interface AuthorizingAsCardProps {
   email: string
+  grantKind: OAuthGrantKind
   organizationSlug: string
   onSignOut: () => void
 }
 
 export const AuthorizingAsCard = ({
   email,
+  grantKind,
   organizationSlug,
   onSignOut,
 }: AuthorizingAsCardProps) => {
@@ -41,9 +45,11 @@ export const AuthorizingAsCard = ({
           <span className="min-w-0 truncate text-right text-foreground">{organizationSlug}</span>
         </div>
       </div>
-      <p className="text-xs text-foreground-lighter">
-        This grant acts as you, it can never do more than your role in this organization allows.
-      </p>
+      {grantKind === 'member_bound' && (
+        <p className="text-xs text-foreground-lighter">
+          This grant acts as you, it can never do more than your role in this organization allows.
+        </p>
+      )}
     </section>
   )
 }
