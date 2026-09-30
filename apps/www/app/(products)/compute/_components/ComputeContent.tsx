@@ -16,7 +16,7 @@ export function ComputeContent() {
       <section id="workloads" className="border-t border-border" aria-label="Workload shapes">
         <WorkloadsSection />
       </section>
-      <section id="highlights" className="space-y-8 md:space-y-16" aria-label="Workload shapes">
+      <section id="highlights" className="space-y-8 md:space-y-16" aria-label="Compute highlights">
         <ComputeVisual />
         <Highlights />
       </section>

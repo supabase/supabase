@@ -154,10 +154,10 @@ export async function POST(req: Request) {
     )
 
     if (!response.ok) {
-      const errorData = await response.json()
-      Sentry.captureException(
-        new Error(`HubSpot form submission failed: ${JSON.stringify(errorData)}`)
-      )
+      // Read as text: HubSpot doesn't always return JSON on errors, and a parse
+      // failure here would mask the real status behind the catch-all 500 below.
+      const errorBody = await response.text()
+      Sentry.captureException(new Error(`HubSpot form submission failed: ${errorBody}`))
       return new Response(JSON.stringify({ message: 'Submission failed. Please try again.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: response.status,

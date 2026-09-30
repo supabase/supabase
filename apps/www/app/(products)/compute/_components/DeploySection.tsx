@@ -1,7 +1,7 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
@@ -19,16 +19,24 @@ const TERMINAL_LINES = [
 function TerminalAnimation() {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, amount: 0.5 })
+  const prefersReducedMotion = useReducedMotion()
   const [visibleCount, setVisibleCount] = useState(0)
 
   useEffect(() => {
     if (!inView) return
+
+    // Show the finished output straight away rather than typing it out.
+    if (prefersReducedMotion) {
+      setVisibleCount(TERMINAL_LINES.length)
+      return
+    }
+
     const timeouts: ReturnType<typeof setTimeout>[] = []
     TERMINAL_LINES.forEach((line, i) => {
       timeouts.push(setTimeout(() => setVisibleCount(i + 1), line.delay * 1000))
     })
     return () => timeouts.forEach(clearTimeout)
-  }, [inView])
+  }, [inView, prefersReducedMotion])
 
   return (
     <div ref={ref} className="w-full rounded-lg border border-border bg-surface-75 overflow-hidden">
@@ -40,9 +48,9 @@ function TerminalAnimation() {
           {TERMINAL_LINES.slice(0, visibleCount).map((line, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 1 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 1 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
               className={
                 line.accent ? 'text-brand' : line.dim ? 'text-foreground-light' : 'text-foreground'
               }
