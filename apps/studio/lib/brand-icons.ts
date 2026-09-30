@@ -15,11 +15,11 @@ export const BRAND_ICONS = {
   bigquery: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
   clickhouse: {
     light: `${BASE_PATH}/img/icons/clickhouse-icon-light.svg`,
-    dark: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
+    dark: `${BASE_PATH}/img/icons/clickhouse-icon-dark.svg`,
   },
   ducklake: {
     light: `${BASE_PATH}/img/icons/ducklake-icon-light.svg`,
-    dark: `${BASE_PATH}/img/icons/ducklake-icon.svg`,
+    dark: `${BASE_PATH}/img/icons/ducklake-icon-dark.svg`,
   },
   snowflake: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
 } as const satisfies Record<string, ThemedIconSrc>
