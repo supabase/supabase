@@ -15,6 +15,7 @@
     "build:next": "next build --turbopack",
     "build": "pnpm build:registry && run-p build:content build:markdown build:markdown-index && pnpm build:next",
     "test": "pnpm build:markdown && vitest",
+    "test:smart-columns": "tsx scripts/test-smart-columns.mts",
     "test:headless-tools": "tsx scripts/test-headless-tools.mts",
     "start": "next start",
     "lint": "eslint .",

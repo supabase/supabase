@@ -50,6 +50,19 @@ export const oauthBlocks: SidebarNavGroup = {
   ],
 }
 
+export const databaseBlocks: SidebarNavGroup = {
+  title: 'Database',
+  items: [
+    {
+      title: 'Smart Columns',
+      href: '/docs/headless/smart-columns',
+      items: [],
+      new: true,
+      commandItemLabel: 'Smart Columns',
+    },
+  ],
+}
+
 export const mcpBlocks: SidebarNavGroup = {
   title: 'MCP',
   items: [

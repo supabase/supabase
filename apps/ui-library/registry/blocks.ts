@@ -20,6 +20,7 @@ import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json'
 import realtimeFlow from './default/blocks/realtime-flow/registry-item.json' with { type: 'json' }
 import realtimeMonaco from './default/blocks/realtime-monaco/registry-item.json' with { type: 'json' }
 import safeNextPath from './default/blocks/safe-next-path/registry-item.json' with { type: 'json' }
+import smartColumns from './default/blocks/smart-columns/registry-item.json' with { type: 'json' }
 import socialAuthNextjs from './default/blocks/social-auth-nextjs/registry-item.json' with { type: 'json' }
 import socialAuthReactRouter from './default/blocks/social-auth-react-router/registry-item.json' with { type: 'json' }
 import socialAuthReact from './default/blocks/social-auth-react/registry-item.json' with { type: 'json' }
@@ -82,6 +83,7 @@ export const blocks = [
   // Backend-only Deno Edge Function block. Every file has an explicit target,
   // so it can be installed directly into a Supabase project.
   mcpServer as RegistryItem,
+  smartColumns as RegistryItem,
 
   // Composes the auth, OAuth consent and MCP server blocks into one app.
   registryItemAppend(headlessApp, [tanstackClient!]),

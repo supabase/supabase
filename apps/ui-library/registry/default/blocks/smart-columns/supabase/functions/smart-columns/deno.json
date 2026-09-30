@@ -1,0 +1,4 @@
+{
+  "nodeModulesDir": "none",
+  "tasks": { "check": "deno check index.ts" }
+}

@@ -1,0 +1,162 @@
+---
+title: Smart Columns
+description: Enum, boolean, text, and numeric columns populated from row content with Jev
+preview: <BlockOverview name="smart-columns" showFiles />
+---
+
+Categorize, flag, and score rows with [Jev](https://docs.typesafe.ai/introduction) by TypeSafe.
+When a row is inserted or its inputs change, an Edge Function writes Jev's answers to ordinary columns you can query, usually within a second.
+Low-confidence answers are stored as `NULL`.
+
+## Installation
+
+Requires a Supabase project, the Supabase CLI, Deno 2, and a [TypeSafe API key](https://console.typesafe.ai).
+
+<BlockItem name="smart-columns" />
+
+Installs the Edge Function into `supabase/functions/smart-columns/` and its database objects into `supabase/schemas/smart_columns.sql`. In a frontend app, add `supabase/functions/**` to `exclude` in `tsconfig.json`.
+
+## Describe the outputs
+
+Choose a table with a single-column primary key, the input columns Jev reads, and the output columns to fill.
+Replace the `public.feedback` example in `supabase/functions/smart-columns/config.ts`:
+
+```ts
+export const tables: SmartTable[] = [
+  {
+    table: 'public.feedback',
+    inputs: ['title', 'body'],
+    columns: {
+      category: {
+        type: 'choice',
+        instructions: 'What kind of feedback is this?',
+        criteria: {
+          bug: 'Something does not work as expected',
+          feature: 'A request for new or improved functionality',
+          praise: 'Positive feedback without a request',
+          other: 'None of the other categories fits',
+        },
+      },
+      needs_response: {
+        type: 'noul',
+        instructions: 'Is the author asking for help or a reply?',
+      },
+      severity: {
+        type: 'score',
+        instructions: 'How much does the reported problem affect use of the product?',
+        criteria: [
+          'No problem reported, or cosmetic only',
+          'A feature is impaired, but a workaround exists',
+          'An essential task is blocked with no workaround',
+        ],
+      },
+    },
+  },
+]
+```
+
+`type`, `instructions`, and `criteria` are sent to Jev as written; see [Jev's question guide](https://docs.typesafe.ai/primitives). Only `inputs` are sent to TypeSafe.
+
+| `type`   | Output column  | `criteria`                               | `NULL` when                                                     |
+| -------- | -------------- | ---------------------------------------- | --------------------------------------------------------------- |
+| `choice` | Enum or `text` | Each option and its description          | Confidence is below `minConfidence` (0.7)                       |
+| `noul`   | `boolean`      | Optional `true` and `false` descriptions | Probability is between `falseBelow` (0.2) and `trueAbove` (0.8) |
+| `score`  | `numeric`      | 2 to 10 levels, lowest first             | Confidence is below `minConfidence` (0.7)                       |
+
+## Add the columns and trigger
+
+Add nullable output columns to the table, and the trigger that queues changed rows:
+
+```sql
+create type public.feedback_category as enum ('bug', 'feature', 'praise', 'other');
+
+create table public.feedback (
+  id bigint generated always as identity primary key,
+  title text not null,
+  body text not null,
+  category public.feedback_category,
+  needs_response boolean,
+  severity numeric check (severity between 0 and 2)
+);
+
+create trigger smart_columns after insert or update or delete on public.feedback
+for each row execute function smart_columns.enqueue();
+```
+
+With [declarative schemas](https://supabase.com/docs/guides/local-development/declarative-database-schemas), put these in the table's schema file, then generate and apply the migration:
+
+```bash
+supabase db schema declarative sync -f smart_columns
+supabase migration up
+```
+
+With migrations, turn the installed schema file into a migration, and add the columns and trigger in a migration of your own:
+
+```bash
+supabase migration new smart_columns < supabase/schemas/smart_columns.sql && rm supabase/schemas/smart_columns.sql
+```
+
+## Deploy
+
+1. The function checks a shared secret, not a JWT. Add to `supabase/config.toml`:
+
+   ```toml
+   [functions.smart-columns]
+   verify_jwt = false
+   ```
+
+1. Create `.env`, set `TYPESAFE_API_KEY` and `SMART_COLUMNS_SECRET`, and keep it out of version control. Then push the schema and deploy the function:
+
+   ```bash
+   cp supabase/functions/smart-columns/.env.example supabase/functions/smart-columns/.env
+   openssl rand -hex 32 # SMART_COLUMNS_SECRET
+   supabase db push
+   supabase secrets set --env-file supabase/functions/smart-columns/.env
+   supabase functions deploy smart-columns
+   ```
+
+1. In the project's SQL editor, store the same secret and the function URL in Vault. Use `vault.update_secret` if they exist, and never put secrets in a migration.
+
+   ```sql
+   select vault.create_secret('YOUR_WORKER_SECRET', 'smart_columns_secret');
+   select
+     vault.create_secret(
+       'https://YOUR_PROJECT_REF.supabase.co/functions/v1/smart-columns',
+       'smart_columns_url'
+     );
+   ```
+
+1. Evaluate rows that already exist:
+
+   ```sql
+   select smart_columns.backfill('public.feedback');
+   ```
+
+## Change outputs
+
+Edit `config.ts`, add or drop the columns in your schema, and deploy both. Then re-check existing rows with `backfill()`.
+Jev is only asked about outputs whose inputs or instructions changed, so adding an output asks only the new question and removing one asks nothing.
+An output whose column doesn't exist yet is skipped until it does.
+
+## Row status
+
+| `status`       | Meaning                                               |
+| -------------- | ----------------------------------------------------- |
+| `pending`      | Queued or waiting to retry                            |
+| `processing`   | Being evaluated                                       |
+| `ready`        | All outputs written                                   |
+| `needs_review` | An answer was below its threshold and left `NULL`     |
+| `failed`       | Failed five times. Edit an input or backfill to retry |
+
+```sql
+select row_id, status, result, error
+from smart_columns.row_state
+where target = 'public.feedback'::regclass
+order by updated_at desc;
+```
+
+Rows are delivered through [Supabase Queues](https://supabase.com/docs/guides/queues). The `smart_columns` queue, including archived messages for failed rows, appears under **Integrations > Queues** in the Dashboard.
+Every write to the table queues the row, and `pg_net` starts the function as soon as it commits. Rows whose inputs haven't changed are skipped without asking Jev.
+On a table with frequent unrelated updates, add `update of title, body` to the trigger so they aren't queued, and keep it in step with `inputs`.
+Outputs keep their previous answers until new ones are saved. Jev rate limits and server errors are retried within the same call; other failures are retried on the next write or within a minute, up to five attempts.
+Subscribe to the table with Realtime to show outputs as they arrive.

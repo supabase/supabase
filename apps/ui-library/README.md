@@ -14,6 +14,20 @@ pnpm --filter library lint
 pnpm --filter library build
 ```
 
+Smart Columns includes checks against the files installed by its registry item:
+
+```bash
+pnpm --filter library test:smart-columns
+```
+
+This needs Deno 2 and runs the Edge Function typecheck and unit tests. To also
+exercise the database schema, Supabase Queues, RLS, retries, and concurrent updates,
+set `SMART_COLUMNS_TEST_DB_URL` to a **disposable local Supabase database** before
+running the same command. The integration test creates and removes its own
+`public.feedback` fixture and `smart_columns` schema; it refuses to run when
+either already exists. Do not use an application database. `DENO_BIN` can select
+a Deno executable when it is not on `PATH`.
+
 The development server runs at [localhost:3004/library](http://localhost:3004/library). `build` and `dev` build the registry first, then generate the HTML content, Markdown guides, and `llms.txt`. Markdown generation reads the completed registry, so these steps must retain that order. Type checking generates Next.js types before running TypeScript and works without a previous development build.
 
 Registry JSON in `public/r` and the preview index in `__registry__` are generated and committed. Regenerate them with `pnpm --filter library build:registry`; do not edit them by hand. `.velite`, `public/markdown`, and `public/llms.txt` are generated build artifacts. Library CI runs the test suite, checks for registry drift, and builds the app.

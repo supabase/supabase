@@ -1796,6 +1796,55 @@
       ]
     },
     {
+      "name": "smart-columns",
+      "type": "registry:item",
+      "title": "Smart Columns",
+      "description": "Populate enum, boolean, text, and numeric columns from row content with Jev.",
+      "docs": "Replace the public.feedback example in supabase/functions/smart-columns/config.ts with the tables, input columns, and outputs to fill; if they are not specified, ask. Add the output columns and the smart_columns trigger to each table. Then follow https://supabase.com/library/docs/headless/smart-columns.md to generate the migration, configure secrets, and deploy.",
+      "files": [
+        {
+          "path": "registry/default/blocks/smart-columns/supabase/functions/smart-columns/config.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/smart-columns/config.ts"
+        },
+        {
+          "path": "registry/default/blocks/smart-columns/supabase/functions/smart-columns/schema.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/smart-columns/schema.ts"
+        },
+        {
+          "path": "registry/default/blocks/smart-columns/supabase/functions/smart-columns/worker.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/smart-columns/worker.ts"
+        },
+        {
+          "path": "registry/default/blocks/smart-columns/supabase/functions/smart-columns/index.ts",
+          "type": "registry:file",
+          "target": "~/supabase/functions/smart-columns/index.ts"
+        },
+        {
+          "path": "registry/default/blocks/smart-columns/supabase/functions/smart-columns/deno.json",
+          "type": "registry:file",
+          "target": "~/supabase/functions/smart-columns/deno.json"
+        },
+        {
+          "path": "registry/default/blocks/smart-columns/supabase/functions/smart-columns/deno.lock",
+          "type": "registry:file",
+          "target": "~/supabase/functions/smart-columns/deno.lock"
+        },
+        {
+          "path": "registry/default/blocks/smart-columns/supabase/functions/smart-columns/.env.example",
+          "type": "registry:file",
+          "target": "~/supabase/functions/smart-columns/.env.example"
+        },
+        {
+          "path": "registry/default/blocks/smart-columns/supabase/schemas/smart_columns.sql",
+          "type": "registry:file",
+          "target": "~/supabase/schemas/smart_columns.sql"
+        }
+      ]
+    },
+    {
       "name": "headless-app-tanstack",
       "type": "registry:block",
       "title": "Headless App for TanStack Start",

@@ -1,4 +1,4 @@
-import { componentPages, mcpBlocks, oauthBlocks, platformBlocks } from './docs'
+import { componentPages, databaseBlocks, mcpBlocks, oauthBlocks, platformBlocks } from './docs'
 
 export const libraryCategories = [
   {
@@ -34,6 +34,7 @@ export type CatalogPreviewKind =
   | 'consent'
   | 'avatar'
   | 'table'
+  | 'smart-columns'
   | 'storage'
   | 'cursors'
   | 'editor'
@@ -114,6 +115,11 @@ const blockMetadata: Record<string, Pick<LibraryBlock, 'description' | 'category
     category: 'Messaging',
     preview: 'chat',
   },
+  'smart-columns': {
+    description: 'Populate enum, boolean, text, and numeric columns from row content with Jev.',
+    category: 'Database',
+    preview: 'smart-columns',
+  },
   'mcp-server': {
     description: 'Add a user-scoped MCP server to your product.',
     category: 'AI & APIs',
@@ -186,6 +192,7 @@ export const libraryBlocks: LibraryBlock[] = [
     ...componentPages.items,
     ...oauthBlocks.items,
     ...mcpBlocks.items,
+    ...databaseBlocks.items,
     ...platformBlocks.items,
   ].map((item) => {
     const slug = item.href!.split('/').pop()!

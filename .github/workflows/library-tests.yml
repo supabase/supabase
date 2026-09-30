@@ -47,6 +47,10 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: v2.7.11
+      - run: pnpm --filter library test:smart-columns
       - run: pnpm --filter library test
       - run: pnpm --filter library build:registry
       - name: Check generated registry

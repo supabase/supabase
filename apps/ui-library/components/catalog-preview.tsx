@@ -8,6 +8,7 @@ import {
   MousePointer2,
   Search,
   Send,
+  Sparkles,
   Upload,
   UserRound,
   Workflow,
@@ -18,6 +19,7 @@ import type { CatalogPreviewKind } from '@/config/library'
 
 const previewTitles: Partial<Record<CatalogPreviewKind, string>> = {
   table: 'customers',
+  'smart-columns': 'feedback',
   storage: 'product-assets',
   chat: 'team chat',
   editor: 'index.ts',
@@ -152,6 +154,34 @@ export function CatalogPreview({ kind }: { kind: CatalogPreviewKind }) {
                     <span className="ml-auto size-1.5 shrink-0 rounded-full bg-brand" />
                   </div>
                 ))}
+              </>
+            )}
+            {kind === 'smart-columns' && (
+              <>
+                <div className="rounded border bg-surface-100 px-2 py-1.5 text-foreground-light">
+                  Export fails. Can you help?
+                </div>
+                <div className="flex items-center gap-2 text-foreground-light">
+                  <span className="h-px flex-1 bg-border" />
+                  <Sparkles className="size-3 text-primary" />
+                  Jev
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { type: 'enum', value: 'bug' },
+                    { type: 'boolean', value: 'true' },
+                    { type: 'numeric', value: '1.8' },
+                  ].map(({ type, value }) => (
+                    <div
+                      key={type}
+                      className="min-w-0 rounded border border-brand/20 bg-brand/5 px-2 py-1.5"
+                    >
+                      <p className="text-foreground-light">{type}</p>
+                      <p className="mt-1 font-mono tabular-nums text-primary">{value}</p>
+                    </div>
+                  ))}
+                </div>
               </>
             )}
             {kind === 'storage' && (

@@ -3,7 +3,13 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import { componentPages, mcpBlocks, oauthBlocks, platformBlocks } from '../config/docs'
+import {
+  componentPages,
+  databaseBlocks,
+  mcpBlocks,
+  oauthBlocks,
+  platformBlocks,
+} from '../config/docs'
 import { getLibraryBlockHref, libraryBlocks, libraryCategories } from '../config/library'
 import { collectMdxFiles, getDocSlug } from './library-documents'
 
@@ -53,6 +59,7 @@ describe('library catalog', () => {
       ...componentPages.items,
       ...oauthBlocks.items,
       ...mcpBlocks.items,
+      ...databaseBlocks.items,
       ...platformBlocks.items,
     ]
 
