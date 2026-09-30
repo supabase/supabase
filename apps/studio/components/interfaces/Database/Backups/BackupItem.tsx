@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Download } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -8,7 +7,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
 import type { DatabaseBackup } from '@/data/database/backups-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface BackupItemProps {
   index: number
@@ -26,9 +25,8 @@ export const BackupItem = ({
   onSelectBackup,
 }: BackupItemProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canTriggerScheduledBackups } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.restore.prepare'
+  const { can: canTriggerScheduledBackups } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE
   )
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
@@ -101,9 +99,8 @@ export const BackupItem = ({
 
   return (
     <div
-      className={`flex h-12 items-center justify-between px-6 ${
-        index ? 'border-t border-default' : ''
-      }`}
+      className={`flex h-12 items-center justify-between px-6 ${index ? 'border-t border-default' : ''
+        }`}
     >
       <div className="flex items-center gap-x-2">
         <TimestampInfo

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertTriangle, Book, Github, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -13,9 +12,9 @@ import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseExtensionDisableMutation } from '@/data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface ExtensionRowProps {
   extension: DatabaseExtension
@@ -29,9 +28,8 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  const { can: canUpdateExtensions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
+  const { can: canUpdateExtensions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
   const orioleDbCheck = isOrioleDb && extension.name === 'orioledb'
   const disabled = !canUpdateExtensions || orioleDbCheck

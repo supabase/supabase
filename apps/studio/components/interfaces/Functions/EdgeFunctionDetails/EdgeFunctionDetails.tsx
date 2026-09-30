@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -47,8 +46,8 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),
@@ -71,14 +70,13 @@ export const EdgeFunctionDetails = () => {
   const [selectedTab, setSelectedTab] = useState(invocationTabs[0].id)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const { can: canUpdateEdgeFunctionPermission } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_WRITE,
-    '*'
+  const { can: canUpdateEdgeFunctionPermission } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE
   )
 
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ)
   const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, publishableKey } = apiKeyData ?? {}
 

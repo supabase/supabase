@@ -1,5 +1,4 @@
 import type { PGTrigger } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Image from 'next/legacy/image'
 import { useEffect } from 'react'
@@ -36,10 +35,10 @@ import {
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useTableNamesQuery } from '@/data/tables/table-names-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { buildDatabaseEdgeFunctionUrl, isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface FormContentsProps {
   form: UseFormReturn<WebhookFormValues>
@@ -52,7 +51,10 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
 
   const restUrl = project?.restUrl
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+  ])
   const { data: keys = [] } = useAPIKeysQuery(
     { projectRef: ref, reveal: true },
     { enabled: canReadAPIKeys }
@@ -282,3 +284,4 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     </div>
   )
 }
+2026 -09 - 30T14:00: 49 +07:00

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
@@ -54,7 +53,6 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { AddonVariantId } from '@/data/subscriptions/types'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
@@ -64,6 +62,7 @@ import {
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function DiskManagementForm({
   chartsClassName,
@@ -105,11 +104,9 @@ export function DiskManagementForm({
   const isHighAvailability = useIsHighAvailability()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-      resource: {
-        project_id: project?.id,
-      },
-    })
+    useAsyncCheckPermissionsV2(
+      FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
+    )
 
   const { hasAccess, isSuccess: isEntitlementsLoaded } = useCheckEntitlements(
     'instances.compute_update_available_sizes'

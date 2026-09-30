@@ -1,16 +1,13 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { DeleteHookModal } from '@/components/interfaces/Database/Hooks/DeleteHookModal'
 import { EditHookPanel } from '@/components/interfaces/Database/Hooks/EditHookPanel'
 import { HooksList } from '@/components/interfaces/Database/Hooks/HooksList/HooksList'
 import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const WebhooksListTab = () => {
-  const { can: canReadWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'triggers'
+  const { can: canReadWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ,
   )
 
   if (isPermissionsLoaded && !canReadWebhooks) {

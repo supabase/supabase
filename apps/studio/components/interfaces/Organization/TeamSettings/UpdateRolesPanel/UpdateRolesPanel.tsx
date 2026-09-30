@@ -29,7 +29,7 @@ import {
 } from 'ui'
 
 import { ROLE_DESCRIPTIONS } from '../Roles.constants'
-import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
+import { canManageRole, getAssignableRoleIds, getOrgRole } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
   formatMemberRoleToProjectRoleConfiguration,
@@ -40,7 +40,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
-import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import {
   OrgProject,
   useOrgProjectsInfiniteQuery,
@@ -61,7 +61,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data: permissions } = usePermissionsQuery()
+  const { data: permissionsV2 } = usePermissionsQueryV2()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
   const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
@@ -71,14 +71,12 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
-  const projectScopedRoles = allRoles?.project_scoped_roles ?? []
 
-  const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    organization?.slug,
-    orgScopedRoles.concat(projectScopedRoles),
-    permissions ?? []
-  )
-  const cannotAddAnyRoles = orgScopedRoles.every((r) => !rolesAddable.includes(r.id))
+  // Role management requires an org-level role; the Owner role is only
+  // assignable/removable by another owner. Server enforces the same rule.
+  const orgRole = getOrgRole(permissionsV2, organization?.slug)
+  const rolesAddable = getAssignableRoleIds(orgRole, orgScopedRoles)
+  const cannotAddAnyRoles = rolesAddable.length === 0
   const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -91,7 +89,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
   const originalConfigurationType =
     originalConfiguration.length === 1 &&
-    !!orgScopedRoles.find((r) => r.id === originalConfiguration[0].roleId)
+      !!orgScopedRoles.find((r) => r.id === originalConfiguration[0].roleId)
       ? 'org-scope'
       : 'project-scope'
 
@@ -242,7 +240,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                     if (project.baseRoleId !== undefined) return r.id === project.baseRoleId
                     else return r.id === project.roleId
                   })
-                  const canRemoveRole = rolesRemovable.includes(role?.id ?? 0)
+                  const canRemoveRole = canManageRole(orgRole, role?.name)
 
                   return (
                     <div

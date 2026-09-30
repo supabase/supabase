@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback, useState } from 'react'
@@ -12,11 +11,11 @@ import { WrapperTable } from './WrapperTable'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const WrappersTab = () => {
   const { id } = useParams()
@@ -27,9 +26,8 @@ export const WrappersTab = () => {
     parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
   )
 
-  const { can: canCreateWrapper } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'wrappers'
+  const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setIsCreating(true), {

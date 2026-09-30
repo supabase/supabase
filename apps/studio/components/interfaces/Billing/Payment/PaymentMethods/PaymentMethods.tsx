@@ -1,4 +1,4 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { CreditCardIcon, ExternalLink, Plus } from 'lucide-react'
 import { useState } from 'react'
@@ -26,10 +26,10 @@ import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { getURL } from '@/lib/helpers'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
@@ -48,13 +48,11 @@ const PaymentMethods = () => {
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug }, { enabled: inView })
 
-  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.payment_methods'
+  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    'billing_read'
   )
-  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.payment_methods'
+  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissionsV2(
+    'billing_write'
   )
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner

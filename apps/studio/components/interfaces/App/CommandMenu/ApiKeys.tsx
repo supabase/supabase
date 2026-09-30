@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
@@ -16,9 +15,9 @@ import {
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 
@@ -30,7 +29,7 @@ export function useApiKeysCommands() {
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ)
   const { isHighAvailability } = useHighAvailability()
 
   const { data: apiKeysData } = useAPIKeys(

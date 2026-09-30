@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { UserPlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -44,7 +43,7 @@ import {
   parseEmails,
 } from './InviteMemberButton.utils'
 import { ROLE_DESCRIPTIONS } from './Roles.constants'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { getAssignableRoleIds, getOrgRole } from './TeamSettings.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -55,10 +54,10 @@ import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { doPermissionsCheck, useGetPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -71,7 +70,7 @@ export const InviteMemberButton = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { permissions: permissions } = useGetPermissions()
+  const { data: permissionsV2 } = usePermissionsQueryV2()
 
   const { organizationMembersCreate: organizationMembersCreationEnabled } = useIsFeatureEnabled([
     'organization_members:create',
@@ -106,24 +105,11 @@ export const InviteMemberButton = () => {
 
   const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
-  const { rolesAddable } = useGetRolesManagementPermissions(
-    organization?.slug,
-    orgScopedRoles,
-    permissions ?? []
-  )
 
-  const canInviteMembers =
-    hasOrgRole &&
-    rolesAddable.length > 0 &&
-    orgScopedRoles.some(({ id: role_id }) =>
-      doPermissionsCheck(
-        permissions,
-        PermissionAction.CREATE,
-        'user_invites',
-        { resource: { role_id } },
-        organization?.slug
-      )
-    )
+  const orgRole = getOrgRole(permissionsV2, organization?.slug)
+  const rolesAddable = getAssignableRoleIds(orgRole, orgScopedRoles)
+
+  const canInviteMembers = hasOrgRole && rolesAddable.length > 0
 
   const inviteDisabledReason = !organizationMembersCreationEnabled
     ? 'Inviting members is currently disabled'

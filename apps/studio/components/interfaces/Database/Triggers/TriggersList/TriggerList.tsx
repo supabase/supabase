@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { includes, sortBy } from 'lodash'
 import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
@@ -29,12 +28,12 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface TriggerListProps {
   editTrigger: (trigger: PostgresTrigger) => void
@@ -48,9 +47,8 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const { can: canUpdateTriggers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { selectedSchema: schema } = useQuerySchemaState()

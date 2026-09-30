@@ -1,12 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useRevealedSecret } from '@/components/interfaces/APIKeys/useRevealedSecret'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const AUTO_HIDE_MS = 10_000
 const SECRET_MASK = '••••••••••••••••••••'
@@ -48,9 +47,8 @@ export interface UseConnectServerEnvResult {
 export function useConnectServerEnv(): UseConnectServerEnvResult {
   const { ref: projectRef } = useParams()
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { can: canReadAPIKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
 
   const [isRevealed, setIsRevealed] = useState(false)

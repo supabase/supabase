@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Lock, Table } from 'lucide-react'
@@ -8,9 +7,9 @@ import type { PolicyTable } from './PolicyTableRow.types'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface PolicyTableRowHeaderProps {
   table: PolicyTable
@@ -33,13 +32,11 @@ export const PolicyTableRowHeader = ({
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { can: canCreatePolicies } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'policies'
+  const { can: canCreatePolicies } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
   )
-  const { can: canToggleRLS } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canToggleRLS } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
   )
 
   const isRealtimeSchema = table.schema === 'realtime'

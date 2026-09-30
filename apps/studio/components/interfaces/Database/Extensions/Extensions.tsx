@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
 import { AlertCircle, Search } from 'lucide-react'
@@ -23,11 +22,11 @@ import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 import InformationBox from '@/components/ui/InformationBox'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const Extensions = () => {
   const { filter } = useParams()
@@ -69,9 +68,8 @@ export const Extensions = () => {
     (ext) => !isNull(ext.installed_version)
   )
 
-  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
+  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   useEffect(() => {

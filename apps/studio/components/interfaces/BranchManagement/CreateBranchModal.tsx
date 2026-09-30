@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
@@ -57,12 +56,12 @@ import { projectKeys } from '@/data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -76,9 +75,8 @@ export const CreateBranchModal = () => {
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
-  const { can: canCreateBranch } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'preview_branches'
+  const { can: canCreateBranch } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_CREATE
   )
 
   const { hasAccess: hasAccessToBranching, isLoading: isLoadingEntitlement } =
@@ -178,7 +176,7 @@ export const CreateBranchModal = () => {
 
   const { mutate: checkGithubBranchValidity, isPending: isCheckingGHBranchValidity } =
     useCheckGithubBranchValidity({
-      onError: () => {},
+      onError: () => { },
     })
 
   const { mutate: createBranch, isPending: isCreatingBranch } = useBranchCreateMutation({

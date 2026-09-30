@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -19,7 +18,7 @@ import * as z from 'zod'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const schema = z.object({
   SITE_URL: z.string().trim().min(1, 'Must have a Site URL'),
@@ -36,9 +35,8 @@ const SiteUrl = () => {
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
   )
 
   const siteUrlForm = useForm({

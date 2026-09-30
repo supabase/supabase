@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useIsLoggedIn, useParams } from 'common'
 import { MoreVertical, Redo2, Trash } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -13,7 +12,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { LeaveTeamButton } from './LeaveTeamButton'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { canManageRole, getOrgRole } from './TeamSettings.utils'
 import { useTeamSettingsData } from './TeamSettingsDataContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -21,7 +20,6 @@ import { useOrganizationCreateInvitationMutation } from '@/data/organization-mem
 import { useOrganizationDeleteInvitationMutation } from '@/data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationMemberDeleteMutation } from '@/data/organizations/organization-member-delete-mutation'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
-import { doPermissionsCheck } from '@/hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 
@@ -37,10 +35,10 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const {
     members,
     roles: allRoles,
-    permissions,
     selectedOrganization,
     organizationMembersDeletionEnabled,
     onManageAccess,
+    permissionsV2
   } = useTeamSettingsData()
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
@@ -53,42 +51,35 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     (userMemberData?.role_ids ?? []).length === 1 &&
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
-  const { rolesRemovable } = useGetRolesManagementPermissions(
-    selectedOrganization?.slug,
-    orgScopedRoles.concat(projectScopedRoles),
-    permissions ?? []
-  )
+  // Member management requires an org-level role: project-scoped users have a null
+  // org role in the v2 response and fail every canManageRole check below.
+  const orgRole = getOrgRole(permissionsV2, selectedOrganization?.slug)
+
+  // Name of the role a target member holds; project-scoped roles resolve via their base role.
+  const roleNameFor = (id: number): string | undefined => {
+    const orgScopedRole = orgScopedRoles.find((r) => r.id === id)
+    if (orgScopedRole) return orgScopedRole.name
+    const projectScopedRole = projectScopedRoles.find((r) => r.id === id)
+    return projectScopedRole
+      ? orgScopedRoles.find((r) => r.id === projectScopedRole.base_role_id)?.name
+      : undefined
+  }
 
   const roleId = member.role_ids?.[0] ?? -1
-  const canRemoveMember = member.role_ids.every((id) => rolesRemovable.includes(id))
+  const canRemoveMember = (member.role_ids ?? []).every((id) =>
+    canManageRole(orgRole, roleNameFor(id))
+  )
 
-  const canCreateUserInvites = useMemo(() => {
+  const canManageTargetRole = useMemo(() => {
     if (!IS_PLATFORM) return true
     if (!isLoggedIn) return false
-    if (!permissions) return false
-    return doPermissionsCheck(
-      permissions,
-      PermissionAction.CREATE,
-      'user_invites',
-      { resource: { role_id: roleId } },
-      selectedOrganization?.slug
-    )
-  }, [isLoggedIn, permissions, roleId, selectedOrganization?.slug])
-  const canResendInvite = canCreateUserInvites && hasOrgRole
+    if (!permissionsV2) return false
+    return canManageRole(orgRole, roleNameFor(roleId))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn, permissionsV2, orgRole, roleId])
 
-  const canDeleteUserInvites = useMemo(() => {
-    if (!IS_PLATFORM) return true
-    if (!isLoggedIn) return false
-    if (!permissions) return false
-    return doPermissionsCheck(
-      permissions,
-      PermissionAction.DELETE,
-      'user_invites',
-      { resource: { role_id: roleId } },
-      selectedOrganization?.slug
-    )
-  }, [isLoggedIn, permissions, roleId, selectedOrganization?.slug])
-  const canRevokeInvite = canDeleteUserInvites && hasOrgRole
+  const canResendInvite = canManageTargetRole && hasOrgRole
+  const canRevokeInvite = canManageTargetRole && hasOrgRole
 
   const { mutate: deleteOrganizationMember, isPending: isDeletingMember } =
     useOrganizationMemberDeleteMutation({

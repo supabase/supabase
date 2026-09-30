@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   parseAsArrayOf,
   parseAsBoolean,
@@ -11,10 +10,10 @@ import type { CellKeyboardEvent, DataGridHandle } from 'react-data-grid'
 
 import { MAX_BULK_DELETE } from './Users.constants'
 import type { User } from '@/data/auth/users-infinite-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface UseAuthUsersShortcutsParams {
   gridRef: RefObject<DataGridHandle | null>
@@ -75,13 +74,11 @@ export function useAuthUsersShortcuts({
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { can: canCreateUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'create_user'
+  const { can: canCreateUsers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
-  const { can: canInviteUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'invite_user'
+  const { can: canInviteUsers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
   const showSendInvitation = useIsFeatureEnabled('authentication:show_send_invitation')
 
