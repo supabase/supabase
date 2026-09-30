@@ -1,0 +1,271 @@
+---
+id: 'platform-webhooks'
+title: 'Platform Webhooks'
+description: 'Get an HTTP request when something happens on your organization or its projects.'
+subtitle: 'Get an HTTP request when something happens on your organization or its projects.'
+---
+
+Platform Webhooks send an HTTP request to a URL you control when something happens on your organization or one of its projects, for example when a project pauses or a member joins. Subscribe to the events you care about instead of polling the [Management API](/docs/reference/api/introduction) for changes.
+
+<Admonition type="note" title="Platform Webhooks is an early access feature">
+
+Enable **Platform webhooks** from the **Dashboard feature previews** dialog to see the **Webhooks** settings page. The API also allowlists specific organizations; a request from an organization outside that list is rejected with `403` and the error code `forbidden.access_disabled`. Event payload shapes aren't finalized, and a handler must ignore fields it doesn't recognize.
+
+</Admonition>
+
+Don't confuse Platform Webhooks with [Database Webhooks](/docs/guides/database/webhooks), which fire on Postgres table changes. Platform Webhooks fire on organization- and project-level events raised by the Management API.
+
+## Concepts
+
+- **Endpoint**: a configuration for where and how to deliver events. It has a URL, a signing secret, the event types it subscribes to, and optional custom headers.
+- **Event**: a single occurrence, for example `v1.project.paused`, published to every endpoint subscribed to it.
+- **Delivery**: one attempt to send an event to an endpoint's URL, including your server's response.
+
+An endpoint is scoped to either an organization or a single project:
+
+- An **organization-scoped** endpoint receives every organization event and every project event across the organization.
+- A **project-scoped** endpoint receives events for that project only.
+
+A project event is delivered to both a matching project-scoped endpoint and any organization-scoped endpoints in the same organization. Each endpoint gets its own copy of the event, with its own `id`.
+
+## Set up an endpoint
+
+### Via dashboard
+
+1. Go to your organization's or project's **Settings** > **Webhooks** page.
+2. Click **Create endpoint**.
+3. Enter a **Name** and the **Endpoint URL** to deliver events to. The URL must use a real, DNS-resolvable domain; a raw IP address, a reserved TLD such as `.local`, or a placeholder domain such as `example.com` is rejected.
+4. Select one or more **Event types** to subscribe to. An endpoint receives only the event types you select.
+5. Optionally add a description and custom headers, for example an `Authorization` header your listener expects.
+6. Click **Create endpoint**.
+
+The dashboard generates the endpoint's signing secret and shows it once in a dialog. Store it somewhere safe. If you lose it, generate a new one from the endpoint's settings, which invalidates the old one immediately.
+
+### Via the Management API
+
+Creating an endpoint through the [Management API](/docs/reference/api/introduction) instead of the dashboard lets you provide your own signing secret, useful when you manage secrets centrally.
+
+Substitute the scope prefix for where you want the endpoint to live:
+
+- Project scope: `https://api.supabase.com/v2/projects/{project_ref}/webhooks`
+- Organization scope: `https://api.supabase.com/v2/organizations/{organization_slug}/webhooks`
+
+```bash
+curl https://api.supabase.com/v2/projects/your-project-ref/webhooks/endpoints \
+  --request POST \
+  --header 'Authorization: Bearer sbp_your_access_token' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "data": {
+      "type": "endpoint",
+      "attributes": {
+        "url": "https://your-domain.com/webhooks/supabase",
+        "description": "Track pause and restore events",
+        "event_types": [
+          { "type": "v1.project.paused" },
+          { "type": "v1.project.restored" }
+        ],
+        "signing_secret": "a_shared_secret_you_generate"
+      }
+    }
+  }'
+```
+
+A signing secret is 8 to 64 characters. See the [Management API reference](/docs/reference/api/introduction) for the full set of operations: list, get, update, and delete endpoints; list and retry deliveries; and send test events. These operations are documented under the **Project webhooks** and **Organization webhooks** tags, at both scopes.
+
+## Verify webhook signatures
+
+Every delivery follows the [Standard Webhooks](https://www.standardwebhooks.com/) specification and carries these headers:
+
+| Header              | Description                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------------- |
+| `webhook-id`        | The event ID. It's the same across every retry of the same event.                                       |
+| `webhook-timestamp` | The Unix timestamp, in seconds, of when the delivery attempt was signed.                                |
+| `webhook-signature` | An HMAC-SHA256 signature over `{webhook-id}.{webhook-timestamp}.{raw body}`, in the form `v1,<base64>`. |
+
+Verify against the raw request body, before you parse it as JSON:
+
+```typescript
+import { Webhook } from 'standardwebhooks'
+
+const webhook = new Webhook(signingSecret, { format: 'raw' })
+
+// Throws if the signature is invalid or the timestamp is outside the allowed tolerance.
+const event = webhook.verify(rawRequestBody, {
+  'webhook-id': request.headers['webhook-id'],
+  'webhook-timestamp': request.headers['webhook-timestamp'],
+  'webhook-signature': request.headers['webhook-signature'],
+})
+```
+
+To rotate a signing secret without missing deliveries:
+
+1. Add the new secret to your listener, and accept signatures made with either the old or the new secret.
+2. Update the endpoint to use the new secret.
+3. Remove the old secret from your listener.
+
+## Send a test event
+
+A test event goes through the same pipeline as a real event: signing, custom headers, retries, and delivery history, so it confirms connectivity end to end.
+
+```bash
+curl https://api.supabase.com/v2/projects/your-project-ref/webhooks/endpoints/your-endpoint-id/test \
+  --request POST \
+  --header 'Authorization: Bearer sbp_your_access_token' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "data": {
+      "type": "event",
+      "attributes": { "type": "v1.project.paused" }
+    }
+  }'
+```
+
+The event type must be one the endpoint subscribes to. A test event's payload includes `"is_test": true`; check this field before you trigger any side effect from it.
+
+## Available events
+
+### Project lifecycle events
+
+<Admonition type="note">
+
+`v1.project.created` through `v1.project.backup.started` below have documented payloads. The remaining project and organization event types further down are limited to their name and trigger; their payload schemas aren't published yet.
+
+</Admonition>
+
+| Event type                  | Fires when                                                                               |
+| --------------------------- | ---------------------------------------------------------------------------------------- |
+| `v1.project.created`        | A new project is accepted and provisioning begins.                                       |
+| `v1.project.paused`         | A project pause completes.                                                               |
+| `v1.project.restored`       | A paused project is restored (unpaused).                                                 |
+| `v1.project.restarted`      | A project restart completes.                                                             |
+| `v1.project.removed`        | A project deletion is accepted and cleanup is queued.                                    |
+| `v1.project.transferred`    | A project is transferred between organizations.                                          |
+| `v1.project.status.changed` | The platform records certain project status transitions. Coverage is partial; see below. |
+| `v1.project.backup.started` | A physical backup is scheduled for the project.                                          |
+
+Every event shares a common envelope:
+
+```json
+{
+  "id": "019f3c9c-c758-766d-acb2-94eb089b3f69",
+  "type": "v1.project.paused",
+  "timestamp": "2026-07-07T12:45:35.449Z",
+  "payload": {
+    "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" },
+    "project_ref": "your-project-ref",
+    "organization_slug": "your-org-slug"
+  }
+}
+```
+
+- `id`: the event ID, unique per endpoint. Retries of the same event reuse this ID.
+- `timestamp`: when the event was published, not when a given delivery attempt happened.
+- `payload.actor.user_id`: the user who performed the action, or `null` for a system-initiated or platform-initiated change.
+- `payload.project_ref` and `payload.organization_slug`: `null` when not applicable to the event.
+- `payload.is_test`: present and `true` only on a test event.
+
+#### `v1.project.created`
+
+Fires when a new project is accepted and provisioning begins. The project isn't usable yet; poll it through the Management API until its status reaches `ACTIVE_HEALTHY`.
+
+`payload.source` is `null` for a project created from scratch, or `{ "type": "clone", "project_ref": "..." }` when the project was created by cloning another one.
+
+#### `v1.project.paused`
+
+Fires when a project pause completes and the project reaches status `INACTIVE`. `payload.reason` is one of:
+
+- `api_request`: an explicit pause through the dashboard or Management API. `payload.actor` identifies the user.
+- `inactivity`: an automatic pause of an inactive project. `payload.actor` is `null`.
+- `other`: another platform-initiated pause. `payload.actor` is `null`.
+
+#### `v1.project.restored`
+
+Fires when a project restore completes, most commonly when you unpause a project through the dashboard or Management API. `payload.actor` is `null` regardless of who triggered the restore. Not emitted for preview branches.
+
+#### `v1.project.restarted`
+
+Fires when a project restart completes, whether triggered through the dashboard, a Management API restart endpoint, or a platform operation such as a compute change. `payload.actor` is `null` regardless of who triggered the restart.
+
+#### `v1.project.removed`
+
+Fires after a project deletion request is accepted and cleanup is queued. It doesn't indicate that infrastructure cleanup has finished.
+
+Deleting a project also deletes its project-scoped webhook endpoints, so only an organization-scoped endpoint can reliably receive this event. Subscribe at the organization scope if you need to know about deletions.
+
+#### `v1.project.transferred`
+
+Fires when a project moves from one organization to another. The event is published to both the source and target organizations; `payload.organization_slug` reflects which organization a given copy was published for. `payload.source.organization_slug` and `payload.target.organization_slug` identify both sides.
+
+#### `v1.project.status.changed`
+
+Fires for a subset of project status transitions: a pause completing (`PAUSING` to `INACTIVE`), worker-driven deletion cleanup (`GOING_DOWN` to `REMOVED`), and upgrade finalization (`UPGRADING` to `ACTIVE_HEALTHY`). Other transitions, such as project creation or a restore or restart in progress, update the project's status without emitting this event. `payload.actor` is always `null`.
+
+`payload.previous_status` and `payload.current_status` carry the transition.
+
+#### `v1.project.backup.started`
+
+Fires after a pending physical backup record is created and backup work is scheduled. It doesn't confirm that the backup has started running or that it will complete. This happens when physical backups are first enabled, when a final backup is scheduled during a pause, and around restores, restarts, clones, and upgrades. `payload.actor` is always `null`.
+
+### Other project and organization events
+
+<Admonition type="note">
+
+The event names below match what the API accepts. The "fires when" column is inferred from the event name rather than confirmed against a payload example, and payload schemas for these event types aren't published yet.
+
+</Admonition>
+
+| Event type                                   | Fires when                                     |
+| -------------------------------------------- | ---------------------------------------------- |
+| `v1.project.branch.created`                  | A preview branch is created.                   |
+| `v1.project.branch.updated`                  | A preview branch is updated.                   |
+| `v1.project.branch.removed`                  | A preview branch is removed.                   |
+| `v1.organization.member.invitation.created`  | A member invitation is sent.                   |
+| `v1.organization.member.invitation.canceled` | A member invitation is canceled.               |
+| `v1.organization.member.added`               | A member joins the organization.               |
+| `v1.organization.member.removed`             | A member is removed from the organization.     |
+| `v1.organization.member.role.assigned`       | A role is assigned to a member.                |
+| `v1.organization.member.role.removed`        | A role is removed from a member.               |
+| `v1.organization.member.role.updated`        | A member's role changes.                       |
+| `v1.organization.billing.plan.upgraded`      | The organization's billing plan is upgraded.   |
+| `v1.organization.billing.plan.downgraded`    | The organization's billing plan is downgraded. |
+
+## Delivery behavior
+
+A delivery succeeds when your listener returns a `2xx` status within 20 seconds. Everything else counts as a failure, including a non-`2xx` response (a `3xx` redirect isn't followed), a timeout, or no response at all.
+
+Delivery is at least once. Deduplicate by the event `id`, also available as the `webhook-id` header.
+
+### Automatic retries
+
+Each event is attempted up to 5 times in total: the initial attempt plus up to 4 retries, with the wait growing by a factor of 6 between attempts.
+
+| Attempt   | Wait after the previous failure | Approximate time since the event |
+| --------- | ------------------------------- | -------------------------------- |
+| 1         | n/a                             | immediately                      |
+| 2         | 30 seconds                      | ~30 seconds                      |
+| 3         | 3 minutes                       | ~3.5 minutes                     |
+| 4         | 18 minutes                      | ~22 minutes                      |
+| 5 (final) | 1 hour 48 minutes               | ~2 hours 10 minutes              |
+
+After the fifth failed attempt, the delivery is marked `failure` and no further automatic attempts happen. You can still recover it with a manual retry, which creates a new delivery for the same event and starts the retry schedule over.
+
+Delivery history is retained for 14 days. An expired delivery is no longer listed and can't be retried.
+
+Disabling an endpoint stops it from recording new events; nothing delivers later for the time it was disabled. If you need to avoid gaps, keep the endpoint enabled and rely on retries for short downtime instead.
+
+### Ordering and duplicates
+
+Each event delivers through an independent job with independent retries, so arrival order isn't emission order. Treat events as triggers rather than as state:
+
+- Read the authoritative state from the Management API and reconcile against it, rather than trusting that one event implies another already arrived.
+- Make handlers idempotent and based on the current state, not on an assumed sequence of transitions.
+- If you need to order events yourself, sort by the top-level `timestamp`, and keep the last-seen timestamp per project so you can drop anything older than what you already processed.
+
+## Best practices
+
+- Return `2xx` as soon as you've durably accepted the event, for example by queueing it, then process it in the background.
+- Deduplicate by `id`. At-least-once delivery, plus manual retries, means you can see the same event more than once.
+- Verify the signature against the raw request body before you trust an event.
+- Check `payload.is_test` before you trigger a side effect.
+- Don't assume ordering. Correlate on `payload.project_ref`, and query the Management API when the current state matters.

@@ -2776,6 +2776,11 @@ export const platform: NavMenuConstant = {
           enabled: fullPlatformEnabled,
         },
         {
+          name: 'Platform Webhooks',
+          url: '/guides/platform/webhooks' as `/${string}`,
+          enabled: fullPlatformEnabled,
+        },
+        {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
           enabled: fullPlatformEnabled,
