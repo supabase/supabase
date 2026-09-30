@@ -23,9 +23,9 @@ export function Hero() {
           <Button asChild size="medium">
             <Link href="#waitlist">Join the waitlist</Link>
           </Button>
-          <Button asChild size="medium" variant="outline">
+          {/* <Button asChild size="medium" variant="outline">
             <Link href="#waitlist">View announcement</Link>
-          </Button>
+          </Button> */}
         </div>
       </div>
     </SectionContainerWithCn>
