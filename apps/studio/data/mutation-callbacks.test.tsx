@@ -24,7 +24,7 @@ describe('mutation callback contracts', () => {
       response: () =>
         failure
           ? HttpResponse.json<APIErrorBody>({ message: 'Mutation failed' }, { status: 500 })
-          : HttpResponse.json(null),
+          : HttpResponse.json<null>(null),
     })
     const onSuccess = vi.fn()
     const onError = vi.fn()
@@ -73,7 +73,7 @@ describe('mutation callback contracts', () => {
       response: () =>
         failure
           ? HttpResponse.json<APIErrorBody>({ message: 'Mutation failed' }, { status: 500 })
-          : HttpResponse.json(null),
+          : HttpResponse.json<null>(null),
     })
     const onSuccess = vi.fn()
     const onError = vi.fn()
