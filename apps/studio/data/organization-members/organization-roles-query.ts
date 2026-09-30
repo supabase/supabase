@@ -46,9 +46,11 @@ export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
     select: (data) => {
       return {
         ...data,
-        org_scoped_roles: [...data.org_scoped_roles].sort((a, b) => {
-          return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
-        }),
+        org_scoped_roles: [...data.org_scoped_roles]
+          .sort((a, b) => {
+            return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
+          })
+          .filter((role) => FIXED_ROLE_ORDER.includes(role.name)),
       } as TData
     },
     ...options,
