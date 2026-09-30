@@ -388,7 +388,7 @@ export const examples: Registry = [
   {
     name: 'combobox-create-option',
     type: 'components:example',
-    registryDependencies: ['command', 'dialog'],
+    registryDependencies: ['command'],
     files: ['example/combobox-create-option.tsx'],
   },
   {
