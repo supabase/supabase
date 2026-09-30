@@ -65,6 +65,18 @@ export const scores = {
     ],
   },
 
+  noAIWriting: {
+    type: 'score',
+    instructions:
+      'The style guide tells writers to cut mannered prose: sentences that exist to sound composed rather than to carry information. It names three shapes. Antithesis is "X, not Y" where Y only negates X. Rhythm for its own sake is three examples where two would do, or a clause added to balance a sentence. The aphoristic closer is a final sentence that restates the paragraph in a tidier shape. The guide also bans marketing and filler words such as easy, simply, just, powerful, seamlessly, effortlessly, and leverage, asks for a specific verb over a vague one such as "manage", and prefers a separate sentence to an aside bounded by dashes. Rate how free the page is of these patterns. A contrast is fine when both halves are real, such as a recommended and not-recommended pair. Judge the prose only, and ignore code blocks, frontmatter, and MDX component markup.',
+    criteria: [
+      'poor: reads as generated boilerplate, with antithesis, padded three-part lists, aphoristic closers, and marketing words throughout',
+      'fair: several mannered sentences or banned filler words, enough to notice while reading',
+      'good: mostly plain and specific, with an occasional balanced clause or vague verb',
+      'excellent: every sentence carries information, verbs name the operation, and no sentence exists for rhythm',
+    ],
+  },
+
   terminology: {
     type: 'score',
     instructions:
