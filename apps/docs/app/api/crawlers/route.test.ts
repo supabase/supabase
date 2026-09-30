@@ -117,8 +117,9 @@ describe('crawler reference aliases', () => {
     expect(await html('/reference/javascript/v1/auth-update')).toContain(
       'href="https://supabase.com/docs/reference/javascript/v1/auth-update"'
     )
-    expect(await html('/reference/javascript/v2/auth-update')).toContain(
-      'href="https://supabase.com/docs/reference/javascript/auth-update"'
+    reference.sections = [section('auth-updateuser', 'Update')]
+    expect(await html('/reference/javascript/v2/auth-updateuser')).toContain(
+      'href="https://supabase.com/docs/reference/javascript/auth-updateuser"'
     )
   })
 })
