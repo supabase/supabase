@@ -1,0 +1,20 @@
+---
+import Layout from './Layout.astro'
+
+interface Props {
+	title: string
+	description?: string
+	formattedDate: string
+}
+
+const { title, description, formattedDate } = Astro.props
+---
+
+<Layout title={title} description={description}>
+	<article class="prose max-w-3xl mx-auto px-6 py-16">
+		<h1>{title}</h1>
+		<p>{formattedDate}</p>
+		{description && <p class="lead">{description}</p>}
+		<slot />
+	</article>
+</Layout>

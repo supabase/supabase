@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content'
+
+import Layout from '../../layouts/Layout.astro'
+
+const articles = await getCollection('articles')
+
+// Sort articles by date, newest first
+const sortedArticles = articles.sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+)
+---
+
+<Layout title="Articles" description="Long-form articles on Supabase and the broader database ecosystem">
+	<div class="mx-auto flex max-w-7xl flex-col gap-12 px-6 py-16">
+		<section id="articles" class="flex flex-col gap-1">
+			<div class="mb-8 flex items-center justify-between border-b border-border pb-4">
+				<h1 class="text-l font-semibold uppercase tracking-widest text-muted-foreground">Articles</h1>
+			</div>
+
+			<ul class="flex flex-col gap-0">
+				{sortedArticles.map((article, idx) => (
+					<li class={`border-b border-border py-8 ${idx === sortedArticles.length - 1 ? 'border-b-0' : ''}`}>
+						<a
+							href={`${import.meta.env.BASE_URL}/articles/${article.id}`}
+							class="group flex flex-col gap-2 hover:opacity-70 transition-opacity"
+						>
+							<div class="flex items-start justify-between gap-4">
+								<h3 class="flex-1 text-xl font-semibold leading-tight text-foreground group-hover:underline">
+									{article.data.title}
+								</h3>
+								<div class="flex-shrink-0 whitespace-nowrap text-right text-xs text-muted-foreground">
+									{article.data.formattedDate}
+								</div>
+							</div>
+							<p class="text-sm text-muted-foreground">{article.data.description}</p>
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+	</div>
+</Layout>

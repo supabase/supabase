@@ -1,0 +1,22 @@
+---
+import { getCollection, render } from 'astro:content'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+
+export async function getStaticPaths() {
+	const articles = await getCollection('articles')
+	return articles.map((article) => ({
+		params: { slug: article.id },
+		props: { article },
+	}))
+}
+
+const { article } = Astro.props
+const { title, description, formattedDate } = article.data
+const { Content } = await render(article)
+---
+
+<ArticleLayout title={title} description={description} formattedDate={formattedDate}>
+	<Content components={{ Admonition }} />
+</ArticleLayout>
