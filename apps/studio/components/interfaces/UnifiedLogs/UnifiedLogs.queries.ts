@@ -561,10 +561,6 @@ HAVING value != ''
   }
   blocks.push(scanBlock(baseFacets, whereFor()))
 
-  // pathname is high-cardinality, so it needs its own LIMIT (the endpoint
-  // rejects LIMIT BY inside the shared arrayJoin).
-  blocks.push(safeSql`(${getFacetCountQuery({ search, facet: 'pathname' })})`)
-
   return safeSql`-- unified logs: sidebar facet counts
 ${joinSqlFragments(blocks, ' UNION ALL ')}`
 }

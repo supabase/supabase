@@ -32,7 +32,7 @@ const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge functio
  * to the cheap two-source set. With `=` filters, narrows to those values. With
  * `<>` filters, excludes them from the full set.
  */
-const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
+export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
   if (filters.length === 0) return [...DEFAULT_LOG_TYPES]
   const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
@@ -490,8 +490,7 @@ level_counts AS (
 
 -- Variable facets: open-ended values still need GROUP BY
 ${getFacetCountCTE({ search, facet: 'method', cteName: safeSql`method_count` })},
-${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })},
-${getFacetCountCTE({ search, facet: 'pathname', cteName: safeSql`pathname_count` })}
+${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })}
 
 SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
@@ -505,7 +504,6 @@ UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
 UNION ALL SELECT 'level', 'error', error_count FROM level_counts
 UNION ALL SELECT dimension, value, count FROM method_count
 UNION ALL SELECT dimension, value, count FROM status_count
-UNION ALL SELECT dimension, value, count FROM pathname_count
 `
 }
 
