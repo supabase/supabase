@@ -128,8 +128,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Secrets')).toBeInTheDocument()
-    expect(screen.getByText('Projects, Edge Functions, Storage')).toBeInTheDocument()
+    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
+    expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
