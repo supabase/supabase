@@ -63,7 +63,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
       <TableCell className="space-y-2 p-4!">
         {_tables?.map((table) => {
-          const target = table.table ?? table.object ?? table.src_key
+          const target = table.table ?? table.object ?? table.src_key ?? table.table_name
 
           return (
             <div key={table.id} className="flex items-center">

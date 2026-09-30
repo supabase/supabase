@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown, XIcon } from 'lucide-react'
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Control,
   FieldValues,
@@ -33,6 +33,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
+  Separator,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -105,13 +106,13 @@ export const WrapperTableEditor = ({
 
   return (
     <Sheet open={visible} onOpenChange={(open) => !open && handleCancel()}>
-      <SheetContent size="default">
+      <SheetContent size="default" className="flex flex-col h-full">
         <SheetHeader>
           <SheetTitle>Edit foreign table</SheetTitle>
         </SheetHeader>
-        <SheetSection className="grow overflow-y-auto">
-          <div className="flex flex-col gap-y-6">
-            <div className="flex flex-col gap-y-2">
+        <SheetSection className="grow overflow-y-auto p-0">
+          <div>
+            <div className="px-5 pb-5 flex flex-col gap-y-2">
               <Label className="text-foreground-light">
                 Select a target the table will point to
               </Label>
@@ -173,6 +174,8 @@ export const WrapperTableEditor = ({
               </Popover>
             </div>
 
+            <Separator />
+
             {selectedTable && (
               <TableForm table={selectedTable} onSubmit={onSubmit} initialData={initialData} />
             )}
@@ -206,7 +209,6 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectSeparator />
                   {option.options.map((subOption) => (
                     <SelectItem key={subOption.value} value={subOption.value}>
                       {subOption.label}
@@ -299,7 +301,6 @@ const TableForm = ({
   const form = useForm<FormSchema>({
     defaultValues,
     resolver: zodResolver(formSchema),
-    shouldUnregister: true,
   })
 
   const {
@@ -313,11 +314,7 @@ const TableForm = ({
   })
 
   const { reset } = form
-  useEffect(() => {
-    reset(defaultValues)
-    // Workaround bug in react-hook-form
-    replaceColumns(defaultValues.columns ?? [])
-  }, [reset, replaceColumns, defaultValues])
+  const hasSyncedDefaultsRef = useRef(false)
 
   const handleSubmit: SubmitHandler<FieldValues> = (values) => {
     const { schema_name, schema, ...valuesWithoutSchema } = values
@@ -340,6 +337,14 @@ const TableForm = ({
   const { errors } = form.formState
   const schema = useWatch({ name: 'schema', control: form.control })
 
+  useEffect(() => {
+    if (isLoading || hasSyncedDefaultsRef.current) return
+    hasSyncedDefaultsRef.current = true
+    reset(defaultValues)
+    // Workaround bug in react-hook-form
+    replaceColumns(defaultValues.columns ?? [])
+  }, [isLoading, reset, replaceColumns, defaultValues])
+
   return (
     <Form {...form}>
       <form
@@ -348,173 +353,187 @@ const TableForm = ({
           event.stopPropagation()
           form.handleSubmit(handleSubmit)(event)
         }}
-        className="space-y-4"
       >
         {isLoading && <ShimmeringLoader className="py-4" />}
 
-        <FormField
-          control={form.control}
-          name="schema"
-          render={({ field }) => (
-            <FormItemLayout layout="vertical" label="Select a schema for the foreign table">
-              <FormControl>
-                <Select
-                  value={field.value}
-                  onValueChange={(schema) => {
-                    field.onChange(schema)
-                    form.resetField('schema_name')
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="custom">Create a new schema</SelectItem>
-                    <SelectSeparator />
-                    {(schemas ?? [])?.map((schema) => {
-                      return (
-                        <SelectItem key={schema.name} value={schema.name}>
-                          {schema.name}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-        {schema === 'custom' && (
+        <div className="flex flex-col gap-y-4 p-5">
           <FormField
             control={form.control}
-            name="schema_name"
+            name="schema"
             render={({ field }) => (
-              <FormItemLayout layout="vertical" label="Schema name">
+              <FormItemLayout layout="vertical" label="Select a schema for the foreign table">
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={(schema) => {
+                      field.onChange(schema)
+                      form.resetField('schema_name')
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="custom">Create a new schema</SelectItem>
+                      <SelectSeparator />
+                      {(schemas ?? [])?.map((schema) => {
+                        return (
+                          <SelectItem key={schema.name} value={schema.name}>
+                            {schema.name}
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItemLayout>
+            )}
+          />
+
+          {schema === 'custom' && (
+            <FormField
+              control={form.control}
+              name="schema_name"
+              render={({ field }) => (
+                <FormItemLayout layout="vertical" label="Schema name">
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+          )}
+
+          <FormField
+            control={form.control}
+            name="table_name"
+            render={({ field }) => (
+              <FormItemLayout
+                layout="vertical"
+                label="Table name"
+                description="You can query from this table after the wrapper is enabled."
+              >
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
           />
-        )}
 
-        <FormField
-          control={form.control}
-          name="table_name"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="vertical"
-              label="Table name"
-              description="You can query from this table after the wrapper is enabled."
-            >
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-        {requiredOptions.map((option) => (
-          <Option key={option.name} option={option} control={form.control} />
-        ))}
-        {nonEditableOptions.map((option) => (
-          <input key={option.name} type="hidden" {...form.register(option.name)} />
-        ))}
-        {table.availableColumns != null ? (
-          <FormField
-            control={form.control}
-            name="selected_columns"
-            render={() => (
-              <FormItemLayout
-                layout="vertical"
-                label="Select the columns to be added to your table."
-              >
-                <div>
-                  <MultiSelector
-                    onValuesChange={(selectedColumns) => {
-                      const newColumnFieldsValue: AvailableColumn[] = []
+          {requiredOptions.map((option) => (
+            <Option key={option.name} option={option} control={form.control} />
+          ))}
 
-                      table.availableColumns!.forEach((availableColumn) => {
-                        if (selectedColumns.includes(availableColumn.name)) {
-                          newColumnFieldsValue.push(availableColumn)
-                        }
-                      })
-                      replaceColumns(newColumnFieldsValue)
-                    }}
-                    values={columnFields.map(
-                      (column) =>
-                        // @ts-expect-error FIXME: cannot make inference work properly
-                        column.name
-                    )}
-                    size="small"
-                    className="w-full"
-                  >
-                    <MultiSelectorTrigger
-                      mode="inline-combobox"
-                      badgeLimit="wrap"
-                      showIcon={false}
-                      deletableBadge
+          {nonEditableOptions.map((option) => (
+            <input key={option.name} type="hidden" {...form.register(option.name)} />
+          ))}
+
+          {table.availableColumns != null ? (
+            <FormField
+              control={form.control}
+              name="selected_columns"
+              render={() => (
+                <FormItemLayout
+                  layout="vertical"
+                  label="Select the columns to be added to your table."
+                >
+                  <div>
+                    <MultiSelector
+                      onValuesChange={(selectedColumns) => {
+                        const newColumnFieldsValue: AvailableColumn[] = []
+
+                        table.availableColumns!.forEach((availableColumn) => {
+                          if (selectedColumns.includes(availableColumn.name)) {
+                            newColumnFieldsValue.push(availableColumn)
+                          }
+                        })
+                        replaceColumns(newColumnFieldsValue)
+                      }}
+                      values={columnFields.map(
+                        (column) =>
+                          // @ts-expect-error FIXME: cannot make inference work properly
+                          column.name
+                      )}
+                      size="small"
                       className="w-full"
-                    />
-                    <MultiSelectorContent>
-                      <MultiSelectorList>
-                        {table.availableColumns!.map((availableColumn) => (
-                          <MultiSelectorItem
-                            key={availableColumn.name}
-                            value={availableColumn.name}
-                          >
-                            {availableColumn.name}
-                          </MultiSelectorItem>
-                        ))}
-                      </MultiSelectorList>
-                    </MultiSelectorContent>
-                  </MultiSelector>
+                    >
+                      <MultiSelectorTrigger
+                        mode="inline-combobox"
+                        badgeLimit="wrap"
+                        showIcon={false}
+                        deletableBadge
+                        className="w-full"
+                      />
+                      <MultiSelectorContent>
+                        <MultiSelectorList>
+                          {table.availableColumns!.map((availableColumn) => (
+                            <MultiSelectorItem
+                              key={availableColumn.name}
+                              value={availableColumn.name}
+                            >
+                              {availableColumn.name}
+                            </MultiSelectorItem>
+                          ))}
+                        </MultiSelectorList>
+                      </MultiSelectorContent>
+                    </MultiSelector>
+                  </div>
+                </FormItemLayout>
+              )}
+            />
+          ) : (
+            <div className="flex flex-col gap-y-2">
+              {columnFields.map((column, columnIndex) => (
+                <div key={column.id} className="flex items-center gap-x-2">
+                  <FormField
+                    control={form.control}
+                    name={`columns.${columnIndex}.name`}
+                    render={({ field }) => (
+                      <FormItemLayout layout="vertical" label="Name">
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <ColumnType
+                    control={form.control}
+                    className="w-1/2"
+                    name={`columns.${columnIndex}.type`}
+                    enumTypes={[]}
+                  />
+                  <Button
+                    variant="outline"
+                    icon={<XIcon strokeWidth={1.5} />}
+                    onClick={() => removeColumn(columnIndex)}
+                    className="self-end -translate-y-1.5 px-1.5"
+                    // @ts-expect-error FIXME: cannot make inference work
+                    aria-label={`Remove column ${column.name}`}
+                  />
                 </div>
-              </FormItemLayout>
-            )}
-          />
-        ) : (
-          <div className="flex flex-col gap-y-2">
-            {columnFields.map((column, columnIndex) => (
-              <div key={column.id} className="flex items-center gap-x-2">
-                <FormField
-                  control={form.control}
-                  name={`columns.${columnIndex}.name`}
-                  render={({ field }) => (
-                    <FormItemLayout layout="vertical" label="Name">
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-                <ColumnType
-                  control={form.control}
-                  className="w-1/2"
-                  name={`columns.${columnIndex}.type`}
-                  enumTypes={[]}
-                />
-                <Button
-                  variant="outline"
-                  icon={<XIcon strokeWidth={1.5} />}
-                  onClick={() => removeColumn(columnIndex)}
-                  className="self-end -translate-y-1.5 px-1.5"
-                  // @ts-expect-error FIXME: cannot make inference work
-                  aria-label={`Remove column ${column.name}`}
-                />
-              </div>
-            ))}
-            <Button onClick={() => appendColumn({ name: '', type: 'text' })} className="self-start">
-              Add column
-            </Button>
-            {errors.columns != null && errors.columns.message != null && (
-              <span className="text-red-900 text-sm mt-2">{errors.columns.message.toString()}</span>
-            )}
-          </div>
-        )}
+              ))}
+              <Button
+                onClick={() => appendColumn({ name: '', type: 'text' })}
+                className="self-start"
+              >
+                Add column
+              </Button>
+              {errors.columns != null && errors.columns.message != null && (
+                <span className="text-red-900 text-sm mt-2">
+                  {errors.columns.message.toString()}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
 
-        {optionalOptions.map((option) => (
-          <Option key={option.name} option={option} control={form.control} />
-        ))}
+        <Separator />
+
+        <div className="p-5 flex flex-col gap-y-4">
+          {optionalOptions.map((option) => (
+            <Option key={option.name} option={option} control={form.control} />
+          ))}
+        </div>
       </form>
     </Form>
   )
