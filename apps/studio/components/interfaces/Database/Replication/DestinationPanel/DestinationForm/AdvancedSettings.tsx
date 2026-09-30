@@ -70,7 +70,7 @@ export const AdvancedSettings = ({
                   <FormItemLayout
                     layout="horizontal"
                     label="Pool size"
-                    description="1 to 6 concurrent DuckDB connections to the catalog."
+                    description="Maximum number of connections Pipelines opens to the catalog at once. Choose 1 to 6."
                   >
                     <FormControl>
                       <Input

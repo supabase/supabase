@@ -18,7 +18,7 @@ Insert-only tables don't require a primary key or replica identity. Updates and 
 
 ## Prepare DuckLake resources [#understand-the-ducklake-components]
 
-DuckLake uses a Postgres catalog and object storage. With **Use Supabase for catalog and storage**, you choose catalog and storage projects, which can be the same project, and a Storage bucket. Pipelines creates the connection credentials. With **Enter connection details**, you provide the catalog URL and storage credentials. You also need a compatible query engine to read the replicated data.
+DuckLake uses a Postgres catalog and object storage. With **Select Supabase projects**, you choose catalog and storage projects, which can be the same project, and a Storage bucket. Pipelines creates the connection credentials. With **Enter connection details**, you provide the catalog URL and storage credentials. You also need a compatible query engine to read the replicated data.
 
 | Component        | Purpose                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -32,7 +32,7 @@ You can query replicated tables, but treat them and their underlying catalog and
 
 Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). In **Add pipeline**, select **DuckLake**, enter a **Pipeline name**, choose a **Publication**, and set **Initial sync**. Then choose how to configure the catalog and storage.
 
-### Use Supabase for catalog and storage [#use-supabase]
+### Select Supabase projects [#use-supabase]
 
 Choose Supabase projects for the Postgres catalog and Storage bucket. Pipelines creates the connection credentials when you create the destination.
 
@@ -46,7 +46,7 @@ Before you begin:
 
 To configure the destination:
 
-1. Select **Use Supabase for catalog and storage** under **Configuration method**.
+1. Select **Select Supabase projects** under **Configuration method**.
 2. Choose the **Catalog project** and **Metadata schema**.
 3. Choose the **Storage project** and private **Bucket**. Select **New bucket** at the bottom of the bucket list if you haven't created one yet.
 4. Optionally adjust **Pool size** under **Advanced settings**. It allows `1` to `6` concurrent DuckDB connections; the default is `4`.

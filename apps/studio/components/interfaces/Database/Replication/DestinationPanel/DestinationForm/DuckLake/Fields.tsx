@@ -69,7 +69,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 const DUCKLAKE_MODE_OPTIONS = [
   {
     value: DUCKLAKE_MODE_SUPABASE,
-    label: 'Use Supabase for catalog and storage',
+    label: 'Select Supabase projects',
     description:
       'Choose projects for the Postgres catalog and Storage bucket. They can be the same project; Pipelines creates credentials.',
   },
