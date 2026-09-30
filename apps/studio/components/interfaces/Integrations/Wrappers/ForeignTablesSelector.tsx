@@ -5,7 +5,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { Table } from './Wrappers.types'
 import { FormattedWrapperTable, NewTable } from './Wrappers.utils'
-import WrapperTableEditor from './WrapperTableEditor'
+import { WrapperTableEditor } from './WrapperTableEditor'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface ForeignTablesSelectorProps {

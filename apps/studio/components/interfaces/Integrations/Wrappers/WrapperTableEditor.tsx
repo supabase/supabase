@@ -191,8 +191,6 @@ export const WrapperTableEditor = ({
   )
 }
 
-export default WrapperTableEditor
-
 const Option = ({ option, control }: { option: TableOption; control: Control<FieldValues> }) => {
   if (option.type === 'select') {
     return (
