@@ -163,7 +163,9 @@ test('editing a server does not raise even when other servers share the same FDW
   // the update only ever targets this server's own name, options, and tables.
   expect(sql).not.toContain('raise exception')
   expect(sql).not.toContain('cannot be edited here')
-  expect(sql).toContain("alter server selected_bigquery_server\n          options (set project_id 'new-project')")
+  expect(sql).toContain(
+    "alter server selected_bigquery_server\n          options (set project_id 'new-project')"
+  )
 })
 
 test('updating a wrapper alters the server and FDW instead of dropping and recreating them', () => {
