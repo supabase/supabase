@@ -173,7 +173,8 @@ export const PublishAppSidePanel = ({
 
   const onFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.persist()
-    const [file] = event.target.files || (event as any).dataTransfer.items
+    const file = event.target.files?.[0]
+    if (!file) return
     setIconFile(file)
     setIconUrl(URL.createObjectURL(file))
     event.target.value = ''
@@ -342,7 +343,7 @@ export const PublishAppSidePanel = ({
                           <DropdownMenuItem
                             key="upload"
                             onClick={() => {
-                              if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
+                              uploadButtonRef.current?.click()
                             }}
                           >
                             <p>Upload image</p>
@@ -367,7 +368,7 @@ export const PublishAppSidePanel = ({
                       'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer'
                     )}
                     onClick={() => {
-                      if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
+                      uploadButtonRef.current?.click()
                     }}
                   >
                     <Upload size={18} strokeWidth={1.5} className="text-foreground" />
