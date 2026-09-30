@@ -17,14 +17,14 @@ export const getSchemaTools = ({
     inputSchema: z.object({
       schemas: z.array(z.string()).describe('The schema names to get the policies for'),
     }),
-    execute: async ({ schemas }) => {
+    execute: async ({ schemas }, { abortSignal }) => {
       const data = await getDatabasePolicies(
         {
           projectRef,
           connectionString,
           schemas,
         },
-        undefined,
+        abortSignal,
         authorization ? { Authorization: authorization } : undefined
       )
 

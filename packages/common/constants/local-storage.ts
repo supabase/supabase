@@ -4,6 +4,7 @@ export const LOCAL_STORAGE_KEYS = {
   /**
    * STUDIO
    */
+  LOG_PRICING_ANNOUNCEMENT_DISMISSED: 'log-pricing-announcement-dismissed',
   AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
@@ -14,6 +15,7 @@ export const LOCAL_STORAGE_KEYS = {
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
   INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
+  STATUS_BANNER_DISMISSED_KEYS: 'status-banner-dismissed-keys',
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 
@@ -53,9 +55,6 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
-  // Set when a user follows the "temporarily switch to SQL Editor" link from Explorer;
-  // shows a way back and is cleared once they return to Explorer
-  SQL_EDITOR_TEMPORARY_FROM_EXPLORER: (ref: string) => `sql-editor-temporary-from-explorer-${ref}`,
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
   NOTEBOOK_DRAFTS: (ref: string) => `notebook-drafts-${ref}`,

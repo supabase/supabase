@@ -1,0 +1,57 @@
+---
+title = "Error: \"NXDOMAIN\" when connecting to a Supabase project"
+topics = [ "database", "platform" ]
+keywords = [ "NXDOMAIN", "dns", "DNS_PROBE_FINISHED_NXDOMAIN"]
+
+[[errors]]
+message = "Connection failed {:error, :nxdomain} to 'db.xxxxxxxxxxxxxxxxxxxx.supabase.co':5432"
+
+[[errors]]
+message = "getaddrinfo ENOTFOUND db.xxxxxxxxxxxxxxxxxxxx.supabase.co"
+
+[[errors]]
+message = "DNS_PROBE_FINISHED_NXDOMAIN https://xxxxxxxxxxxxxxxxxxxx.supabase.co"
+
+
+[[errors]]
+message = "can't open the page because the server can't be found"
+
+
+---
+
+An `NXDOMAIN` error means DNS resolution failed for the hostname you're connecting to. The hostname doesn't exist, or it can't resolve on the network you're connecting from. Work through the following causes in order.
+
+## Wrong project reference in the hostname
+
+A single mismatched character in the project reference produces `NXDOMAIN`. Get the project reference from the address bar while your project is open in the dashboard, or from [Project Settings](/dashboard/project/_/settings/general), and copy it rather than retyping it.
+
+Confirm the hostname ends in `.supabase.co`. Project hostnames never end in `.supabase.com`; that domain serves the marketing site and dashboard, not project connections.
+
+## Project is paused
+
+A paused project stops serving its hostname, so connections to it resolve as `NXDOMAIN` even though the project still exists. Check your [project list](/dashboard/org/_/) for a **Paused** status, and resume the project if it's paused.
+
+## Project was deleted
+
+A deleted project's hostname stops resolving permanently. If you're on a Team plan or above, check your organization's [audit logs](/dashboard/org/_/audit) to confirm whether the project was deleted.
+
+## DNS resolution fails only certain networks
+
+If `supabase.co` and multiple unrelated `*.supabase.co` hostnames all fail to resolve on certain networks, but resolve over a VPN or a different network, the problem could be with that network's DNS resolver rather than with Supabase. This is common on restrictive mobile carrier, office, or ISP networks.
+
+- Switch your device or router to a public DNS resolver such as Cloudflare (`1.1.1.1`) or Google (`8.8.8.8`).
+- Flush your local DNS cache and restart your browser or device.
+- Check for any anti-virus / network / firewall systems that could be blocking access.
+- Test from a different network, or over a VPN, to confirm the hostname resolves there.
+- If only your internal company network is affected, raise it with your network administrator, since their resolver may be failing to resolve `supabase.co`.
+- This blog post has more information about [Navigating Regional Network Blocks](/blog/navigating-regional-network-blocks).
+
+If you are able to work around the issue using any steps above, please open a [support ticket](/dashboard/support/new) so our team can assess the situation.
+
+## Custom domain hostname fails to resolve
+
+A custom domain's DNS records are managed by your own domain registrar or DNS provider, not Supabase. Check the DNS configuration with your provider before treating it as a platform issue.
+
+## If the problem continues
+
+Open a [support ticket](/dashboard/support/new) for your project if none of these causes apply, and include the exact hostname, the error message, and the networks you've already tested from.
