@@ -53,7 +53,6 @@ const FORM_ID = 'create-wrapper-form'
 
 export interface CreateWrapperSheetProps {
   wrapperMeta: WrapperMeta
-  hasExistingWrapper: boolean
   onDirty: (isDirty: boolean) => void
   onClose: () => void
   onCloseWithConfirmation: () => void
@@ -61,7 +60,6 @@ export interface CreateWrapperSheetProps {
 
 export const CreateWrapperSheet = ({
   wrapperMeta,
-  hasExistingWrapper,
   onDirty,
   onClose,
   onCloseWithConfirmation,
@@ -197,7 +195,6 @@ export const CreateWrapperSheet = ({
       await createFDW({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        hasExistingWrapper,
         wrapperMeta,
         formState: {
           ...wrapperValues,

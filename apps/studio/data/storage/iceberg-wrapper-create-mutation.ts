@@ -13,7 +13,6 @@ import {
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
-import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -34,12 +33,6 @@ export const useIcebergWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
-  const { data: fdws } = useFDWsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const hasExistingWrapper = fdws?.some((wrapper) => wrapper.name === wrapperMeta?.name) ?? false
-
   const { can: canCreateCredentials } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
@@ -59,7 +52,6 @@ export const useIcebergWrapperCreateMutation = () => {
     const params: FDWCreateVariables = {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      hasExistingWrapper,
       wrapperMeta: wrapperMeta!,
       formState: {
         server_name: getAnalyticsBucketFDWServerName(bucketName),

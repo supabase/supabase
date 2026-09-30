@@ -63,6 +63,7 @@ export const EditWrapperSheet = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
 
+  const [secretsReady, setSecretsReady] = useState(false)
   const [isLoadingSecrets, setIsLoadingSecrets] = useState(false)
   const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
 
@@ -147,8 +148,11 @@ export const EditWrapperSheet = ({
 
     if (encryptedIdsToFetch.length === 0) {
       setIsLoadingSecrets(false)
+      setSecretsReady(true)
       return
     }
+
+    setSecretsReady(false)
 
     const fetchEncryptedValues = async (ids: string[]) => {
       try {
@@ -166,6 +170,7 @@ export const EditWrapperSheet = ({
 
           resetField(option.name, { defaultValue: decryptedValues[encryptedId] })
         })
+        setSecretsReady(true)
       } catch (error) {
         if (!isCurrent) return
         toast.error('Failed to fetch encrypted values')
@@ -192,7 +197,7 @@ export const EditWrapperSheet = ({
           >
             <SheetHeader>
               <SheetTitle>
-                Edit {wrapperMeta.label} wrapper connection: {wrapper.name}
+                Edit {wrapperMeta.label} wrapper connection: {wrapper.server_name}
               </SheetTitle>
             </SheetHeader>
             <div className="grow overflow-y-auto">
@@ -258,12 +263,12 @@ export const EditWrapperSheet = ({
                 variant="primary"
                 form={FORM_ID}
                 type="submit"
-                disabled={isSubmitting || !isDirty || isLoadingSecrets}
+                disabled={isSubmitting || !isDirty || !secretsReady}
                 loading={isSubmitting}
                 tooltip={{
                   content: {
                     side: 'top',
-                    text: isLoadingSecrets ? 'Waiting for encrypted values to load' : undefined,
+                    text: !secretsReady ? 'Waiting for encrypted values to load' : undefined,
                   },
                 }}
               >
