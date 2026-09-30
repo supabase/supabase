@@ -465,10 +465,10 @@ const DuckLakeCustomFields = ({
             >
               <FormControl>
                 <PasswordInput
+                  {...field}
                   type={showSecretAccessKey && !editMode ? 'text' : 'password'}
                   placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   value={field.value ?? ''}
-                  onChange={(event) => field.onChange(event.target.value)}
                   autoComplete="off"
                   actions={
                     !editMode && (

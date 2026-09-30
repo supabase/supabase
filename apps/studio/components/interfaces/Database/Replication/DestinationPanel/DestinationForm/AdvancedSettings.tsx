@@ -74,15 +74,12 @@ export const AdvancedSettings = ({
                   >
                     <FormControl>
                       <Input
+                        {...field}
                         type="number"
                         min={1}
                         max={6}
                         value={field.value ?? ''}
-                        onChange={(event) =>
-                          field.onChange(
-                            event.target.value === '' ? '' : Number(event.target.value)
-                          )
-                        }
+                        onChange={handleNumberChange(field)}
                       />
                     </FormControl>
                   </FormItemLayout>
