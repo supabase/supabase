@@ -82,6 +82,13 @@ type SchemaUpdateParams = {
   name?: string
   owner?: string
 }
+/**
+ * Renames a schema and/or transfers ownership.
+ *
+ * Accepts either the OID or the current schema name as the locator.
+ * A `null` value for `name` or `owner` in `params` leaves the corresponding
+ * attribute unchanged.
+ */
 function update({ id }: { id: number }, params: SchemaUpdateParams): { sql: SafeSqlFragment }
 function update({ name }: { name: string }, params: SchemaUpdateParams): { sql: SafeSqlFragment }
 function update(
@@ -124,6 +131,12 @@ $pgmeta$;
 type SchemaRemoveParams = {
   cascade?: boolean
 }
+/**
+ * Drops a schema by OID or name.
+ *
+ * Pass `cascade: true` to drop all objects inside the schema together with it;
+ * the default is `restrict` (fails if the schema is not empty).
+ */
 function remove({ id }: { id: number }, params?: SchemaRemoveParams): { sql: SafeSqlFragment }
 function remove({ name }: { name: string }, params?: SchemaRemoveParams): { sql: SafeSqlFragment }
 function remove(
