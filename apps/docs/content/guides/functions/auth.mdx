@@ -18,8 +18,8 @@ Each mode names the credential a caller must present. `withSupabase` accepts fou
 | Mode            | Accepts                                    |
 | --------------- | ------------------------------------------ |
 | `'user'`        | A valid user JWT on `Authorization`        |
-| `'secret'`      | A secret key on `apikey`                   |
-| `'publishable'` | A publishable key on `apikey`              |
+| `'secret'`      | The `default` secret key on `apikey`       |
+| `'publishable'` | The `default` publishable key on `apikey`  |
 | `'none'`        | Any caller, no check (for signed webhooks) |
 
 For how authorization headers and the `verify_jwt` platform check work, see [Authorization headers](/docs/guides/functions/auth-headers).
@@ -62,7 +62,7 @@ A handler that queries a shared table through `ctx.supabaseAdmin` without filter
 
 ### Service-to-service calls
 
-Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'`. The wrapper validates the key against any secret key in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work.
+Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'`. The wrapper validates the key against the secret key named `default` in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server@1'
@@ -77,7 +77,7 @@ export default {
 
 <Admonition type="note">
 
-To accept only one specific key, use `auth: 'secret:<name>'`. For example, `auth: 'secret:automations'` accepts only the secret key named `automations`. Every project starts with a secret key named `default`, and you can add more. To name a new key, open [**Settings > API keys**](/dashboard/project/_/settings/api-keys) in the Supabase Dashboard. The same syntax works for publishable keys: `auth: 'publishable:<name>'`.
+`auth: 'secret'` accepts only the key named `default`. To accept a different key, use `auth: 'secret:<name>'`. For example, `auth: 'secret:automations'` accepts only the secret key named `automations`. To accept any secret key on the project, use `auth: 'secret:*'`. Every project starts with a secret key named `default`, and you can add more. To name a new key, open [**Settings > API keys**](/dashboard/project/_/settings/api-keys) in the Supabase Dashboard. The same syntax works for publishable keys: `auth: 'publishable:<name>'` and `auth: 'publishable:*'`.
 
 ![The Secret keys section of the Supabase Dashboard. A table with Name and API key columns lists two keys, "default" and "automations". Each row shows a masked sb_secret_ value with reveal and copy buttons.](/docs/img/guides/functions/secret-keys-automations.png)
 
