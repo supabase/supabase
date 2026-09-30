@@ -12,9 +12,8 @@ const { title, description, formattedDate } = Astro.props
 
 <Layout title={title} description={description}>
 	<article class="prose max-w-3xl mx-auto px-6 py-16">
-		<h1>{title}</h1>
-		<p>{formattedDate}</p>
-		{description && <p class="lead">{description}</p>}
+		<h1 class="mb-0">{title}</h1>
+		<p class="text-sm pb-4">{formattedDate}</p>
 		<slot />
 	</article>
 </Layout>
