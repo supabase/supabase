@@ -37,7 +37,12 @@ export async function createFDW({ projectRef, connectionString, ...rest }: FDWCr
   const sql = wrapWithTransaction(
     joinSqlFragments([createForeignDataWrapperSql, createServerSql], '\n\n')
   )
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['create-fdw'],
+  })
   return result
 }
 
