@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo } from 'react'
 
@@ -5,7 +6,7 @@ export const useTableEditorFiltersSort = () => {
   const router = useRouter()
 
   const urlParams = useMemo(() => {
-    return new URLSearchParams(router.asPath.split('?')[1])
+    return new URLSearchParams(router.asPath.split('?')[1]?.split('#')[0])
   }, [router.asPath])
 
   const filters = useMemo(() => {
@@ -28,9 +29,16 @@ export const useTableEditorFiltersSort = () => {
 
       const hasFilter = newParams.filter !== undefined
       const hasSort = newParams.sort !== undefined
+      const areFiltersUnchanged = !hasFilter || isEqual(newParams.filter, filters)
+      const areSortsUnchanged = !hasSort || isEqual(newParams.sort, sorts)
 
+      // A no-op URL sync must not create an entry that discards browser Forward history.
+      if (areFiltersUnchanged && areSortsUnchanged) return
+
+      const hashStart = router.asPath.indexOf('#')
       router.push(
         {
+          hash: hashStart === -1 ? undefined : router.asPath.slice(hashStart),
           query: {
             ...router.query,
             ...(hasFilter ? { filter: newParams.filter } : {}),
