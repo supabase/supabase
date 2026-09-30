@@ -88,7 +88,6 @@ export const useS3VectorsWrapperCreateMutation = () => {
       hasExistingWrapper,
       wrapperMeta: wrapperMeta!,
       formState: {
-        wrapper_name: wrapperMeta!.name,
         server_name: serverName,
         vault_access_key_id: accessKey,
         vault_secret_access_key: secretKey,

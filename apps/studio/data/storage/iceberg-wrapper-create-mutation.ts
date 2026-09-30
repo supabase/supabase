@@ -62,7 +62,6 @@ export const useIcebergWrapperCreateMutation = () => {
       hasExistingWrapper,
       wrapperMeta: wrapperMeta!,
       formState: {
-        wrapper_name: wrapperMeta!.name,
         server_name: getAnalyticsBucketFDWServerName(bucketName),
         vault_aws_access_key_id: createS3KeyData?.access_key,
         vault_aws_secret_access_key: createS3KeyData?.secret_key,

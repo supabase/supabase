@@ -33,7 +33,12 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-  SidePanel,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -49,10 +54,11 @@ import * as z from 'zod'
 import { ColumnType } from './ColumnType'
 import type { AvailableColumn, Table, TableOption } from './Wrappers.types'
 import { getTableFormSchema } from './Wrappers.utils'
-import { ActionBar } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+const FORM_ID = 'wrapper-table-editor-form'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -63,7 +69,7 @@ export type WrapperTableEditorProps = {
   initialData: any
 }
 
-const WrapperTableEditor = ({
+export const WrapperTableEditor = ({
   visible,
   onCancel,
   onSave,
@@ -73,12 +79,6 @@ const WrapperTableEditor = ({
   const [open, setOpen] = useState(false)
   const listboxId = useId()
   const [selectedTableIndex, setSelectedTableIndex] = useState<string>('')
-
-  useEffect(() => {
-    if (initialData && Object.keys(initialData).length > 0) {
-      setSelectedTableIndex(String(initialData.index))
-    }
-  }, [initialData])
 
   const selectedTable = selectedTableIndex === '' ? undefined : tables[parseInt(selectedTableIndex)]
 
@@ -97,87 +97,97 @@ const WrapperTableEditor = ({
     setSelectedTableIndex('')
   }
 
-  return (
-    <SidePanel
-      key="WrapperTableEditor"
-      size="medium"
-      visible={visible}
-      onCancel={handleCancel}
-      header={<span>Edit foreign table</span>}
-      customFooter={
-        <ActionBar
-          backButtonLabel="Cancel"
-          applyButtonLabel="Save"
-          formId="wrapper-table-editor-form"
-          closePanel={handleCancel}
-        />
-      }
-    >
-      <SidePanel.Content>
-        <div className="my-4 flex flex-col gap-y-6">
-          <div className="flex flex-col gap-y-2">
-            <Label className="text-foreground-light">Select a target the table will point to</Label>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  role="combobox"
-                  aria-expanded={open}
-                  aria-controls={listboxId}
-                  className={cn(
-                    'w-full justify-between',
-                    !selectedTableIndex && 'text-muted-foreground'
-                  )}
-                  size="small"
-                  iconRight={
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />
-                  }
-                >
-                  {!!selectedTableIndex ? tables[Number(selectedTableIndex)].label : '---'}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
-                <Command>
-                  <CommandInput placeholder="Find a table..." />
-                  <CommandList>
-                    <CommandEmpty>No targets found</CommandEmpty>
-                    <CommandGroup>
-                      <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
-                        {(tables ?? []).map((table, i) => (
-                          <CommandItem
-                            key={table.label}
-                            className="cursor-pointer flex items-center justify-between space-x-2 w-full"
-                            onSelect={() => {
-                              setSelectedTableIndex(String(i))
-                              setOpen(false)
-                            }}
-                            onClick={() => {
-                              setSelectedTableIndex(String(i))
-                              setOpen(false)
-                            }}
-                          >
-                            <div className="space-y-1">
-                              <p>{table.label}</p>
-                              <p className="text-foreground-lighter">{table.description}</p>
-                            </div>
-                            {String(i) === selectedTableIndex && (
-                              <Check className={cn('mr-2 h-4 w-4')} />
-                            )}
-                          </CommandItem>
-                        ))}
-                      </ScrollArea>
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
+  useEffect(() => {
+    if (initialData && Object.keys(initialData).length > 0) {
+      setSelectedTableIndex(String(initialData.index))
+    }
+  }, [initialData])
 
-          {selectedTable && (
-            <TableForm table={selectedTable} onSubmit={onSubmit} initialData={initialData} />
-          )}
-        </div>
-      </SidePanel.Content>
-    </SidePanel>
+  return (
+    <Sheet open={visible} onOpenChange={(open) => !open && handleCancel()}>
+      <SheetContent size="default">
+        <SheetHeader>
+          <SheetTitle>Edit foreign table</SheetTitle>
+        </SheetHeader>
+        <SheetSection className="grow overflow-y-auto">
+          <div className="flex flex-col gap-y-6">
+            <div className="flex flex-col gap-y-2">
+              <Label className="text-foreground-light">
+                Select a target the table will point to
+              </Label>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    role="combobox"
+                    aria-expanded={open}
+                    aria-controls={listboxId}
+                    className={cn(
+                      'w-full justify-between',
+                      !selectedTableIndex && 'text-muted-foreground'
+                    )}
+                    size="small"
+                    iconRight={
+                      <ChevronsUpDown
+                        className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                        strokeWidth={1}
+                      />
+                    }
+                  >
+                    {!!selectedTableIndex ? tables[Number(selectedTableIndex)].label : '---'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
+                  <Command>
+                    <CommandInput placeholder="Find a table..." />
+                    <CommandList>
+                      <CommandEmpty>No targets found</CommandEmpty>
+                      <CommandGroup>
+                        <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
+                          {(tables ?? []).map((table, i) => (
+                            <CommandItem
+                              key={table.label}
+                              className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                              onSelect={() => {
+                                setSelectedTableIndex(String(i))
+                                setOpen(false)
+                              }}
+                              onClick={() => {
+                                setSelectedTableIndex(String(i))
+                                setOpen(false)
+                              }}
+                            >
+                              <div className="space-y-1">
+                                <p>{table.label}</p>
+                                <p className="text-foreground-lighter">{table.description}</p>
+                              </div>
+                              {String(i) === selectedTableIndex && (
+                                <Check className={cn('mr-2 h-4 w-4')} />
+                              )}
+                            </CommandItem>
+                          ))}
+                        </ScrollArea>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {selectedTable && (
+              <TableForm table={selectedTable} onSubmit={onSubmit} initialData={initialData} />
+            )}
+          </div>
+        </SheetSection>
+        <SheetFooter>
+          <Button size="tiny" type="button" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button size="tiny" variant="primary" form={FORM_ID} type="submit">
+            Save
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -335,8 +345,11 @@ const TableForm = ({
   return (
     <Form {...form}>
       <form
-        id="wrapper-table-editor-form"
-        onSubmit={form.handleSubmit(handleSubmit)}
+        id={FORM_ID}
+        onSubmit={(event) => {
+          event.stopPropagation()
+          form.handleSubmit(handleSubmit)(event)
+        }}
         className="space-y-4"
       >
         {isLoading && <ShimmeringLoader className="py-4" />}

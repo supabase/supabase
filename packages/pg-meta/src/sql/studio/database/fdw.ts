@@ -369,7 +369,7 @@ export function getCreateFDWSql({
       )}
     
       execute format(
-        E'create server ${ident(formState.server_name)} foreign data wrapper ${ident(formState.wrapper_name)} options (${optionsSqlArray});',
+        E'create server ${ident(formState.server_name)} foreign data wrapper ${ident(wrapperMeta.name)} options (${optionsSqlArray});',
         ${joinSqlFragments(
           [
             ...encryptedOptions
