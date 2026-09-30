@@ -97,7 +97,10 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
       { otel: useOtel },
     ],
     queryFn: ({ signal }) =>
-      getUnifiedLogsFacetCount({ projectRef, search, facet, facetSearch, useOtel }, signal),
+      getUnifiedLogsFacetCount(
+        { projectRef, search: scopedSearch, facet, facetSearch, useOtel },
+        signal
+      ),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
