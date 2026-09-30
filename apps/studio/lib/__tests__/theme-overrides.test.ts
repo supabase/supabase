@@ -9,6 +9,7 @@ import {
   mergeThemeOverride,
   parseThemeOverridesByMode,
   resolveThemeOverrideMode,
+  resolveThemeOverridesForFlags,
   sliderValueToThemeOverride,
   THEME_OVERRIDE_DEFAULTS,
   THEME_OVERRIDE_KNOBS,
@@ -141,7 +142,7 @@ describe('theme override application', () => {
     expect(root.style.getPropertyValue('--contrast')).toBe('')
   })
 
-  it('applies a spot hue without changing the brand hue or surface hue', () => {
+  it('applies a spot hue via --primary-hue and leaves brand and surface hues alone', () => {
     const root = document.createElement('html')
     applyThemeOverrides(root, 'dark', { primaryHue: 48 })
 
@@ -156,6 +157,15 @@ describe('theme override application', () => {
   it('reports whether a mode has overrides', () => {
     expect(hasThemeOverrides({})).toBe(false)
     expect(hasThemeOverrides({ chroma: 0.02 })).toBe(true)
+  })
+
+  it('strips spot hue when the employee-only flag is off', () => {
+    expect(
+      resolveThemeOverridesForFlags({ primaryHue: 48, chroma: 0.02 }, { isSpotColorEnabled: false })
+    ).toEqual({ chroma: 0.02 })
+    expect(
+      resolveThemeOverridesForFlags({ primaryHue: 48, chroma: 0.02 }, { isSpotColorEnabled: true })
+    ).toEqual({ primaryHue: 48, chroma: 0.02 })
   })
 
   it('resolves classic dark as dark for legacy stored themes', () => {
