@@ -71,42 +71,20 @@ RUN mkdir -p /srv && \
   cp -a apps/studio/.next/static /srv/apps/studio/.next/static && \
   cp -a apps/studio/public /srv/apps/studio/public
 
-# Compile TanStack Start (Vite)
+# Compile TanStack Start (Vite + Nitro)
 FROM dev AS build-tanstack
-# build:tanstack = vite build --mode production, then a smoke test that
-# boots the server bundle so module-scope crashes fail the image build.
 RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter studio run build:tanstack
 
-# Assemble the runtime tree at /srv. Unlike Next's standalone output, the
-# Vite SSR bundle externalizes studio's dependencies and resolves them from
-# node_modules at request time, so the tree is a prod-only `pnpm deploy` of
-# studio (node_modules + manifest) plus the built dist/ and the runtime
-# scripts. `scripts/serve.js` is the HTTP server (the same entry
-# start:tanstack uses); the server.js shim gives the production stage a
-# single CMD that works for both frameworks. `.env` is kept because
-# serve.js loads it as the base of the runtime env cascade (container env
-# vars always win over file values).
-#
-# --ignore-scripts: pnpm 11 hard-errors (ERR_PNPM_IGNORED_BUILDS) on
-# dependency build scripts without an allowBuilds entry, and deploy turns
-# the workspace packages into file: deps whose `only-allow pnpm` preinstall
-# guards trip it. No lifecycle script is needed here anyway: the tree is
-# fully prebuilt, and nothing in studio's prod graph is approved to build
-# (allowBuilds only permits node-pty and supabase, both dev-only).
-RUN pnpm --filter studio deploy --prod --legacy --ignore-scripts /srv/apps/studio && \
-  cd /srv/apps/studio && \
-  find . -mindepth 1 -maxdepth 1 \
-  ! -name node_modules ! -name package.json ! -name scripts \
-  ! -name instrument.server.mjs ! -name .env \
-  -exec rm -rf {} + && \
-  cp -a /app/apps/studio/dist ./dist && \
-  printf "import('./scripts/serve.js')\n" > server.js
-
-# Boot the pruned tree exactly the way the container will run it, so a
-# dependency that's runtime-imported but missing from `dependencies`
-# (present only in devDependencies) fails the build here instead of
-# 500ing the deployed container.
-RUN cd /srv/apps/studio && node scripts/smoke-server.mjs
+# Assemble the runtime tree at /srv. Nitro's node-server output is
+# self-contained (`.output/server` bundles the app with its traced
+# dependencies, `.output/public` holds the client assets), so no node_modules
+# install is needed. The server.js shim loads `.env` (container env vars win)
+# and gives the production stage one CMD for both frameworks; package.json is
+# copied so the shim runs as ESM.
+RUN mkdir -p /srv/apps/studio && \
+  cp -a apps/studio/.output /srv/apps/studio/.output && \
+  cp apps/studio/package.json apps/studio/.env /srv/apps/studio/ && \
+  printf "process.loadEnvFile(new URL('.env', import.meta.url))\nawait import('./.output/server/index.mjs')\n" > /srv/apps/studio/server.js
 
 # Alias whichever framework build was selected so the production stage can
 # COPY from a single stage name. BuildKit only builds the selected branch.
@@ -115,8 +93,8 @@ FROM build-${STUDIO_FRAMEWORK} AS build
 # Copy only compiled code and dependencies
 FROM base AS production
 COPY --from=build /srv ./
-# serve.js (TanStack) defaults to port 8082; pin both servers to the port
-# the healthcheck and compose files expect. Next's server.js reads PORT too.
+# Both servers read PORT (the TanStack `start` script defaults it to 8082);
+# pin it to the port the healthcheck and compose files expect.
 ENV PORT=3000
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]

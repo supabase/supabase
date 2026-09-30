@@ -7,12 +7,13 @@ vi.mock('common', () => ({
   IS_PLATFORM: true,
 }))
 
+const executeOptions = { toolCallId: 'test', messages: [], context: {} }
+
 describe('ai/tools/incident-tools', () => {
   let mockFetch: ReturnType<typeof vi.fn>
   let mockAbortSignal: AbortSignal
 
   beforeEach(() => {
-    vi.clearAllMocks()
     mockFetch = vi.fn()
     global.fetch = mockFetch as typeof fetch
 
@@ -53,7 +54,7 @@ describe('ai/tools/incident-tools', () => {
         vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(false)
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
           incidents: [],
@@ -73,7 +74,10 @@ describe('ai/tools/incident-tools', () => {
 
         const tools = getIncidentTools({ baseUrl: 'https://example.com/dashboard' })
         if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
-        await tools.get_active_incidents.execute({}, { toolCallId: 'test', messages: [] })
+        await tools.get_active_incidents.execute(
+          {},
+          { toolCallId: 'test', messages: [], context: {} }
+        )
 
         expect(mockFetch).toHaveBeenCalledWith(
           'https://example.com/dashboard/api/incident-status',
@@ -93,7 +97,7 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
           incidents: [],
@@ -121,7 +125,7 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect((result as any).incidents).toEqual([
           {
@@ -160,7 +164,7 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect((result as any).incidents).toHaveLength(2)
         expect((result as any).message).toContain('2 active incidents')
@@ -173,7 +177,7 @@ describe('ai/tools/incident-tools', () => {
         mockFetch.mockRejectedValue(new Error('Network error'))
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
           incidents: [],
@@ -191,7 +195,7 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({})
+        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
           incidents: [],
@@ -210,10 +214,249 @@ describe('ai/tools/incident-tools', () => {
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
         if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
-        await tools.get_active_incidents.execute({}, { toolCallId: 'test', messages: [] })
+        await tools.get_active_incidents.execute(
+          {},
+          { toolCallId: 'test', messages: [], context: {} }
+        )
 
         const callArgs = mockFetch.mock.calls[0]
         expect(callArgs[1].signal).toBeInstanceOf(AbortSignal)
+      })
+
+      it('cancels the request when the Assistant request is aborted', async () => {
+        mockFetch.mockResolvedValue({
+          ok: true,
+          json: async () => [],
+        })
+        const abortController = new AbortController()
+
+        const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+        if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
+        await tools.get_active_incidents.execute(
+          {},
+          { ...executeOptions, abortSignal: abortController.signal }
+        )
+
+        const { signal } = mockFetch.mock.calls[0][1]
+        expect(signal.aborted).toBe(false)
+        abortController.abort()
+        expect(signal.aborted).toBe(true)
+      })
+    })
+  })
+
+  describe('with useStatusPageWidget enabled', () => {
+    beforeEach(async () => {
+      const common = await import('common')
+      vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(true)
+    })
+
+    const baseIncident = {
+      id: 'incident-1',
+      name: 'Elevated error rates',
+      url: 'https://status.supabase.com/incidents/incident-1',
+      last_update_at: '2026-01-01T00:00:00Z',
+      last_update_message: 'We are investigating.',
+      affected_components: [],
+      status: 'investigating',
+      current_worst_impact: 'partial_outage',
+    }
+
+    const baseMaintenance = {
+      id: 'maintenance-1',
+      name: 'Scheduled database maintenance',
+      url: 'https://status.supabase.com/maintenances/maintenance-1',
+      last_update_at: '2026-01-01T00:00:00Z',
+      last_update_message: null,
+      affected_components: [],
+      status: 'maintenance_in_progress',
+      started_at: '2026-01-01T00:00:00Z',
+    }
+
+    function statusPagePayload(overrides: Record<string, unknown> = {}) {
+      return {
+        page_title: 'Supabase',
+        page_url: 'https://status.supabase.com',
+        ongoing_incidents: [],
+        in_progress_maintenances: [],
+        scheduled_maintenances: [],
+        ...overrides,
+      }
+    }
+
+    it('fetches from the status page endpoint', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => statusPagePayload(),
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://example.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
+      await tools.get_active_incidents.execute({}, executeOptions)
+
+      expect(mockFetch).toHaveBeenCalledWith('https://example.com/dashboard/api/status-page', {
+        signal: expect.any(AbortSignal),
+      })
+    })
+
+    it('drops incidents and maintenances where visible is false', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () =>
+          statusPagePayload({
+            ongoing_incidents: [
+              { ...baseIncident, visible: false, show_banner: false },
+              { ...baseIncident, id: 'incident-2', visible: true, show_banner: true },
+            ],
+            in_progress_maintenances: [{ ...baseMaintenance, visible: false, show_banner: false }],
+          }),
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
+
+      expect((result as any).incidents).toHaveLength(1)
+      expect((result as any).incidents[0]).toMatchObject({
+        kind: 'incident',
+        name: 'Elevated error rates',
+      })
+    })
+
+    it('includes items with show_banner set to false', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () =>
+          statusPagePayload({
+            ongoing_incidents: [{ ...baseIncident, visible: true, show_banner: false }],
+          }),
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
+
+      expect((result as any).incidents).toHaveLength(1)
+    })
+
+    it('combines ongoing incidents and in-progress maintenances, excluding scheduled maintenances', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () =>
+          statusPagePayload({
+            ongoing_incidents: [{ ...baseIncident, visible: true, show_banner: true }],
+            in_progress_maintenances: [{ ...baseMaintenance, visible: true, show_banner: true }],
+            scheduled_maintenances: [
+              {
+                id: 'scheduled-1',
+                name: 'Upcoming maintenance',
+                url: 'https://status.supabase.com/maintenances/scheduled-1',
+                last_update_at: '2026-01-01T00:00:00Z',
+                last_update_message: null,
+                affected_components: [],
+                status: 'maintenance_scheduled',
+                starts_at: '2026-02-01T00:00:00Z',
+                ends_at: '2026-02-01T01:00:00Z',
+                visible: true,
+                show_banner: true,
+                banner_lead_days: 1,
+              },
+            ],
+          }),
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
+
+      expect((result as any).incidents).toHaveLength(2)
+      expect((result as any).incidents.map((incident: any) => incident.kind).sort()).toEqual([
+        'incident',
+        'maintenance',
+      ])
+      expect((result as any).message).toContain('status.supabase.com')
+    })
+
+    it('describes maintenance-only results as maintenance, not as an incident', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () =>
+          statusPagePayload({
+            in_progress_maintenances: [{ ...baseMaintenance, visible: true, show_banner: true }],
+          }),
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
+
+      expect((result as any).incidents).toHaveLength(1)
+      expect((result as any).message).toContain('1 in-progress maintenance')
+      expect((result as any).message).not.toContain('active incident')
+    })
+
+    it('returns the no-active-incidents message when nothing is visible', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => statusPagePayload(),
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
+
+      expect(result).toEqual({
+        incidents: [],
+        message: expect.stringContaining('No active incidents'),
+      })
+    })
+
+    it('returns an error when the response fails to parse', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({ this_is: 'not a valid status page response' }),
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
+
+      expect(result).toEqual({
+        incidents: [],
+        error: 'Unable to check incident status at this time.',
+      })
+    })
+
+    it('returns an error on a non-ok response', async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+      })
+
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        useStatusPageWidget: true,
+      })
+      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
+
+      expect(result).toEqual({
+        incidents: [],
+        error: 'Unable to check incident status at this time.',
       })
     })
   })

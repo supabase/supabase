@@ -58,6 +58,84 @@ describe('classifyApiError', () => {
       errorCode: 400,
     })
   })
+
+  describe('signin', () => {
+    it('reads a GoTrue AuthError status as the code', () => {
+      expect(
+        classifyApiError('signin', { status: 400, message: 'Invalid login credentials' })
+      ).toEqual({
+        errorCategory: 'api',
+        errorReason: 'invalid_credentials',
+        errorCode: 400,
+      })
+    })
+
+    it('classifies an unconfirmed email', () => {
+      expect(classifyApiError('signin', { status: 400, message: 'Email not confirmed' })).toEqual({
+        errorCategory: 'api',
+        errorReason: 'email_not_confirmed',
+        errorCode: 400,
+      })
+    })
+
+    it('classifies 429 via status as rate_limited', () => {
+      expect(classifyApiError('signin', { status: 429, message: 'Rate limit exceeded' })).toEqual({
+        errorCategory: 'api',
+        errorReason: 'rate_limited',
+        errorCode: 429,
+      })
+    })
+
+    it('classifies a captcha failure', () => {
+      expect(
+        classifyApiError('signin', { status: 400, message: 'captcha verification process failed' })
+      ).toEqual({ errorCategory: 'api', errorReason: 'captcha_failed', errorCode: 400 })
+    })
+
+    it('matches the SSO pattern before the 404 status map', () => {
+      expect(
+        classifyApiError('signin', {
+          status: 404,
+          message: 'No SSO provider assigned for this domain',
+        })
+      ).toEqual({ errorCategory: 'api', errorReason: 'sso_provider_not_found', errorCode: 404 })
+    })
+
+    it('classifies a redirect allow-list rejection', () => {
+      expect(classifyApiError('signin', { status: 400, message: 'Invalid redirect URL' })).toEqual({
+        errorCategory: 'api',
+        errorReason: 'redirect_not_allowed',
+        errorCode: 400,
+      })
+    })
+
+    it('classifies a disabled provider', () => {
+      expect(
+        classifyApiError('signin', {
+          status: 400,
+          message: 'Unsupported provider: provider is not enabled',
+        })
+      ).toEqual({ errorCategory: 'api', errorReason: 'provider_not_enabled', errorCode: 400 })
+    })
+
+    it('classifies a GoTrue transport failure (status 0) as network_error, never api/other', () => {
+      expect(
+        classifyApiError('signin', {
+          name: 'AuthRetryableFetchError',
+          status: 0,
+          message: 'Failed to fetch',
+        })
+      ).toEqual({ errorCategory: 'network', errorReason: 'network_error' })
+    })
+
+    it('classifies a retryable 5xx via status as server_error', () => {
+      expect(classifyApiError('signin', { status: 503, message: 'Service unavailable' })).toEqual({
+        errorCategory: 'api',
+        errorReason: 'server_error',
+        errorCode: 503,
+      })
+    })
+  })
 })
 
 describe('classifyValidationError', () => {
@@ -77,6 +155,15 @@ describe('classifyValidationError', () => {
         password: { type: 'too_small' },
       } as FieldErrors)
     ).toEqual({ errorCategory: 'validation', errorReason: 'email_invalid' })
+  })
+
+  it('maps a signin password error to password_invalid', () => {
+    expect(
+      classifyValidationError('signin', { password: { type: 'too_small' } } as FieldErrors)
+    ).toEqual({
+      errorCategory: 'validation',
+      errorReason: 'password_invalid',
+    })
   })
 
   it('maps an org name error to org_name_missing', () => {

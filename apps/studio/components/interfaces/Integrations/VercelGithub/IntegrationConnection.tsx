@@ -80,7 +80,6 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
               <ButtonTooltip
                 disabled
                 iconRight={<ChevronDown size={14} />}
-                variant="default"
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -97,7 +96,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<ChevronDown size={14} />} variant="default">
+                  <Button iconRight={<ChevronDown size={14} />}>
                     <span>Manage</span>
                   </Button>
                 </DropdownMenuTrigger>

@@ -77,9 +77,7 @@ function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
         className="w-full"
       />
       <div className="flex justify-end gap-2 py-3 px-4 border-t">
-        <Button variant="default" onClick={onCancel}>
-          Cancel
-        </Button>
+        <Button onClick={onCancel}>Cancel</Button>
         <Button variant="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
           Apply
         </Button>
@@ -229,7 +227,10 @@ export const FilterPopoverNew = ({
   const icon = isGenerating ? (
     <AiIconAnimation size={16} loading />
   ) : isRefetching ? (
-    <Loader2 className="animate-spin text-brand h-4 w-4 shrink-0" aria-label="Loading table data" />
+    <Loader2
+      className="animate-spin text-primary h-4 w-4 shrink-0"
+      aria-label="Loading table data"
+    />
   ) : null
 
   return (

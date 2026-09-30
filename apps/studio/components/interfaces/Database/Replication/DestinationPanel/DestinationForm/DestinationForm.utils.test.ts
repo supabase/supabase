@@ -11,25 +11,26 @@ import {
   buildTableSyncCopyConfig,
   generateDefaultValues,
   pruneStaleSelectedTableIds,
+  pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
 import type { ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
-import type { ReplicationPublication } from '@/data/replication/publications-query'
+import type { ReplicationPublicationData } from '@/data/replication/publication-query'
 
 const baseDucklakeFormData = {
   name: 'DuckLake Destination',
   publicationName: 'pub',
   tableSyncCopyMode: 'include_all_tables' as const,
   tableSyncCopyTableIds: [],
-  maxFillMs: undefined,
-  maxTableSyncWorkers: undefined,
-  maxCopyConnectionsPerTable: undefined,
+  maxFillMs: 500,
+  maxTableSyncWorkers: 1,
+  maxCopyConnectionsPerTable: 1,
   invalidatedSlotBehavior: undefined,
   projectId: undefined,
   datasetId: undefined,
   serviceAccountKey: undefined,
-  connectionPoolSize: undefined,
+  connectionPoolSize: 1,
   maxStalenessMins: undefined,
   warehouseName: undefined,
   namespace: undefined,
@@ -55,14 +56,14 @@ const baseSnowflakeFormData = {
   publicationName: 'pub',
   tableSyncCopyMode: 'include_all_tables' as const,
   tableSyncCopyTableIds: [],
-  maxFillMs: undefined,
-  maxTableSyncWorkers: undefined,
-  maxCopyConnectionsPerTable: undefined,
+  maxFillMs: 500,
+  maxTableSyncWorkers: 1,
+  maxCopyConnectionsPerTable: 1,
   invalidatedSlotBehavior: undefined,
   projectId: undefined,
   datasetId: undefined,
   serviceAccountKey: undefined,
-  connectionPoolSize: undefined,
+  connectionPoolSize: 1,
   maxStalenessMins: undefined,
   warehouseName: undefined,
   namespace: undefined,
@@ -169,33 +170,105 @@ describe('DestinationForm.utils table copy selection', () => {
   })
 
   it('drops selected ids that are no longer in the publication', () => {
-    const publications = [
-      { name: 'analytics', tables: [{ id: 101, schema: 'public', name: 'orders' }] },
-    ] as ReplicationPublication[]
+    const publication: ReplicationPublicationData = {
+      name: 'analytics',
+      config: {
+        type: 'all_tables',
+        operations: ['insert'],
+        publish_via_partition_root: false,
+      },
+      tables: [
+        {
+          id: 101,
+          schema: 'public',
+          name: 'orders',
+          kind: 'table',
+          partition_parent_id: null,
+        },
+      ],
+    }
 
     expect(
       pruneStaleSelectedTableIds({
         mode: 'include_tables',
         selectedTableIds: ['101', '202'],
-        publications,
+        publication,
         publicationName: 'analytics',
       })
     ).toEqual(['101'])
   })
 
   it('leaves selected ids untouched for non-selective modes', () => {
-    const publications = [
-      { name: 'analytics', tables: [{ id: 101, schema: 'public', name: 'orders' }] },
-    ] as ReplicationPublication[]
+    const publication: ReplicationPublicationData = {
+      name: 'analytics',
+      config: {
+        type: 'all_tables',
+        operations: ['insert'],
+        publish_via_partition_root: false,
+      },
+      tables: [
+        {
+          id: 101,
+          schema: 'public',
+          name: 'orders',
+          kind: 'table',
+          partition_parent_id: null,
+        },
+      ],
+    }
 
     expect(
       pruneStaleSelectedTableIds({
         mode: 'include_all_tables',
         selectedTableIds: ['202'],
-        publications,
+        publication,
         publicationName: 'analytics',
       })
     ).toEqual(['202'])
+  })
+})
+
+describe('pruneStaleTableOptions', () => {
+  const publication: ReplicationPublicationData = {
+    name: 'analytics',
+    config: {
+      type: 'tables',
+      tables: [{ id: 101, schema: 'public', name: 'orders', columns: null, row_filter: null }],
+      operations: ['insert'],
+      publish_via_partition_root: false,
+    },
+    tables: [
+      {
+        id: 101,
+        schema: 'public',
+        name: 'orders',
+        kind: 'table',
+        partition_parent_id: null,
+      },
+    ],
+  }
+
+  it('drops table options whose ids are no longer in the publication', () => {
+    expect(
+      pruneStaleTableOptions({
+        tableOptions: [
+          { tableId: 101, clusterBy: ['region'] },
+          { tableId: 202, clusterBy: ['unused'] },
+        ],
+        publication,
+        publicationName: 'analytics',
+      })
+    ).toEqual([{ tableId: 101, clusterBy: ['region'] }])
+  })
+
+  it('returns undefined when table options were never set', () => {
+    expect(
+      pruneStaleTableOptions({
+        tableOptions: undefined,
+        publication,
+        publicationName: 'analytics',
+      })
+    ).toBeUndefined()
   })
 })
 
@@ -204,14 +277,14 @@ const baseClickHouseFormData = {
   publicationName: 'pub',
   tableSyncCopyMode: 'include_all_tables' as const,
   tableSyncCopyTableIds: [],
-  maxFillMs: undefined,
-  maxTableSyncWorkers: undefined,
-  maxCopyConnectionsPerTable: undefined,
+  maxFillMs: 500,
+  maxTableSyncWorkers: 1,
+  maxCopyConnectionsPerTable: 1,
   invalidatedSlotBehavior: undefined,
   projectId: undefined,
   datasetId: undefined,
   serviceAccountKey: undefined,
-  connectionPoolSize: undefined,
+  connectionPoolSize: 1,
   maxStalenessMins: undefined,
   warehouseName: undefined,
   namespace: undefined,
@@ -306,12 +379,12 @@ describe('DestinationForm.utils DuckLake', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
-      { path: 'ducklakeDataPath', message: 'Data path is required' },
-      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required' },
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
-      { path: 'ducklakeS3Region', message: 'S3 region is required' },
-      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required' },
+      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required.' },
+      { path: 'ducklakeDataPath', message: 'Data path is required.' },
+      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required.' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required.' },
+      { path: 'ducklakeS3Region', message: 'S3 region is required.' },
+      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required.' },
     ])
   })
 
@@ -347,7 +420,7 @@ describe('DestinationForm.utils DuckLake', () => {
     )
 
     expect(issues).toEqual([
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required.' },
     ])
   })
 
@@ -363,12 +436,12 @@ describe('DestinationForm.utils DuckLake', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
-      { path: 'ducklakeDataPath', message: 'Data path is required' },
-      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required' },
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
-      { path: 'ducklakeS3Region', message: 'S3 region is required' },
-      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required' },
+      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required.' },
+      { path: 'ducklakeDataPath', message: 'Data path is required.' },
+      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required.' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required.' },
+      { path: 'ducklakeS3Region', message: 'S3 region is required.' },
+      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required.' },
     ])
   })
 
@@ -386,19 +459,19 @@ describe('DestinationForm.utils DuckLake', () => {
     expect(issues).toEqual([
       {
         path: 'ducklakeCatalogUrl',
-        message: 'DuckLake catalog URL must be a PostgreSQL-compatible URL',
+        message: 'DuckLake catalog URL must be a PostgreSQL-compatible URL.',
       },
       {
         path: 'ducklakeDataPath',
-        message: 'DuckLake data path must start with s3:// and cannot contain file://',
+        message: 'DuckLake data path must start with s3:// and cannot contain file://.',
       },
       {
         path: 'ducklakeS3Endpoint',
-        message: 'S3 endpoint must not contain the protocol scheme',
+        message: 'S3 endpoint must not contain the protocol scheme.',
       },
       {
         path: 'ducklakeMetadataSchema',
-        message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
+        message: 'DuckLake metadata schema must contain only letters, numbers, and underscores.',
       },
     ])
   })
@@ -487,9 +560,9 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required' },
-      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required' },
-      { path: 'ducklakeStorageBucket', message: 'Bucket is required' },
+      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
+      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
+      { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
     ])
   })
 
@@ -574,11 +647,11 @@ describe('DestinationForm.utils Snowflake', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'snowflakeAccountId', message: 'Account ID is required' },
-      { path: 'snowflakeUser', message: 'User is required' },
-      { path: 'snowflakePrivateKey', message: 'Private key is required' },
-      { path: 'snowflakeDatabase', message: 'Database is required' },
-      { path: 'snowflakeSchema', message: 'Schema is required' },
+      { path: 'snowflakeAccountId', message: 'Account ID is required.' },
+      { path: 'snowflakeUser', message: 'User is required.' },
+      { path: 'snowflakePrivateKey', message: 'Private key is required.' },
+      { path: 'snowflakeDatabase', message: 'Database is required.' },
+      { path: 'snowflakeSchema', message: 'Schema is required.' },
     ])
   })
 
@@ -653,9 +726,9 @@ describe('DestinationForm.utils ClickHouse', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'clickhouseUrl', message: 'URL is required' },
-      { path: 'clickhouseUser', message: 'User is required' },
-      { path: 'clickhouseDatabase', message: 'Database is required' },
+      { path: 'clickhouseUrl', message: 'URL is required.' },
+      { path: 'clickhouseUser', message: 'User is required.' },
+      { path: 'clickhouseDatabase', message: 'Database is required.' },
     ])
   })
 
@@ -666,7 +739,7 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseUser: 'default',
         clickhouseDatabase: 'analytics',
       })
-    ).toEqual([{ path: 'clickhouseUrl', message: 'ClickHouse URL must use https://' }])
+    ).toEqual([{ path: 'clickhouseUrl', message: 'ClickHouse URL must use HTTPS.' }])
 
     expect(
       getClickHouseValidationIssues({
@@ -675,7 +748,7 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseDatabase: 'analytics',
       })
     ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address.' },
     ])
   })
 
@@ -711,7 +784,7 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseDatabase: 'analytics',
       })
     ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address.' },
     ])
   })
 
@@ -739,9 +812,9 @@ describe('DestinationForm.utils BigQuery', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'projectId', message: 'Project ID is required' },
-      { path: 'datasetId', message: 'Dataset ID is required' },
-      { path: 'serviceAccountKey', message: 'Service account key is required' },
+      { path: 'projectId', message: 'Project ID is required.' },
+      { path: 'datasetId', message: 'Dataset ID is required.' },
+      { path: 'serviceAccountKey', message: 'Service account key is required.' },
     ])
   })
 
@@ -753,9 +826,9 @@ describe('DestinationForm.utils BigQuery', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'projectId', message: 'Project ID is required' },
-      { path: 'datasetId', message: 'Dataset ID is required' },
-      { path: 'serviceAccountKey', message: 'Service account key is required' },
+      { path: 'projectId', message: 'Project ID is required.' },
+      { path: 'datasetId', message: 'Dataset ID is required.' },
+      { path: 'serviceAccountKey', message: 'Service account key is required.' },
     ])
   })
 
@@ -767,6 +840,58 @@ describe('DestinationForm.utils BigQuery', () => {
     })
 
     expect(issues).toEqual([])
+  })
+
+  it('rejects invalid JSON in the service account key', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: 'my-project',
+      datasetId: 'my_dataset',
+      serviceAccountKey: '{ "type": "service_account" ',
+    })
+
+    expect(issues).toEqual([
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
+    ])
+  })
+
+  it('skips JSON shape checks when validateJson is false', () => {
+    const issues = getBigQueryValidationIssues(
+      {
+        projectId: 'my-project',
+        datasetId: 'my_dataset',
+        serviceAccountKey: '{ "type": "service_account" ',
+      },
+      { validateJson: false }
+    )
+
+    expect(issues).toEqual([])
+  })
+
+  it('rejects non-JSON text in the service account key', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: 'my-project',
+      datasetId: 'my_dataset',
+      serviceAccountKey: 'not-json',
+    })
+
+    expect(issues).toEqual([
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
+    ])
+  })
+
+  it('validates JSON when replacing credentials in edit mode', () => {
+    const issues = getBigQueryValidationIssues(
+      {
+        projectId: 'my-project',
+        datasetId: 'my_dataset',
+        serviceAccountKey: '{ invalid',
+      },
+      { secretsOptional: true }
+    )
+
+    expect(issues).toEqual([
+      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
+    ])
   })
 
   it('allows an omitted BigQuery service account key in edit mode', () => {
@@ -795,11 +920,11 @@ describe('DestinationForm.utils Analytics Bucket', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'warehouseName', message: 'Bucket is required' },
-      { path: 's3Region', message: 'S3 region is required' },
-      { path: 's3AccessKeyId', message: 'S3 access key ID is required' },
-      { path: 'namespace', message: 'Namespace is required' },
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 'warehouseName', message: 'Bucket is required.' },
+      { path: 's3Region', message: 'S3 region is required.' },
+      { path: 's3AccessKeyId', message: 'S3 access key ID is required.' },
+      { path: 'namespace', message: 'Namespace is required.' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
     ])
   })
 
@@ -814,11 +939,11 @@ describe('DestinationForm.utils Analytics Bucket', () => {
     })
 
     expect(issues).toEqual([
-      { path: 'warehouseName', message: 'Bucket is required' },
-      { path: 's3Region', message: 'S3 region is required' },
-      { path: 's3AccessKeyId', message: 'S3 access key ID is required' },
-      { path: 'namespace', message: 'Namespace is required' },
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 'warehouseName', message: 'Bucket is required.' },
+      { path: 's3Region', message: 'S3 region is required.' },
+      { path: 's3AccessKeyId', message: 'S3 access key ID is required.' },
+      { path: 'namespace', message: 'Namespace is required.' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
     ])
   })
 
@@ -832,7 +957,7 @@ describe('DestinationForm.utils Analytics Bucket', () => {
       s3SecretAccessKey: 'secret',
     })
 
-    expect(issues).toEqual([{ path: 'newNamespaceName', message: 'Namespace name is required' }])
+    expect(issues).toEqual([{ path: 'newNamespaceName', message: 'Namespace name is required.' }])
   })
 
   it('skips the S3 secret when creating a new access key', () => {
@@ -894,7 +1019,7 @@ describe('DestinationForm.utils Analytics Bucket', () => {
     )
 
     expect(issues).toEqual([
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
     ])
   })
 

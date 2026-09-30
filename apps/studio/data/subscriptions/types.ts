@@ -1,12 +1,6 @@
 import type { components } from '@/data/api'
 
-export type SubscriptionTier =
-  | 'tier_free'
-  | 'tier_pro'
-  | 'tier_payg'
-  | 'tier_team'
-  | 'tier_enterprise'
-  | 'tier_platform'
+export type SubscriptionTier = 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team'
 
 export type AddonVariantId = components['schemas']['UpdateAddonBody']['addon_variant']
 
@@ -14,9 +8,9 @@ export type OrgSubscription = components['schemas']['GetSubscriptionResponse']
 
 export type ProjectAddon = components['schemas']['GetSubscriptionResponse']['project_addons'][0]
 
-export type PlanId = components['schemas']['PlansResponse']['plans'][number]['id']
+export type PlanId = components['schemas']['PlansResponse_Output']['plans'][number]['id']
 
-export type OrgPlan = components['schemas']['PlansResponse']['plans'][0]
+export type OrgPlan = components['schemas']['PlansResponse_Output']['plans'][0]
 
 export type ProjectAddonType = components['schemas']['UpdateAddonBody']['addon_type']
 
@@ -33,6 +27,6 @@ export interface ProjectAddonVariantMeta {
 }
 
 export type ProjectSelectedAddon =
-  components['schemas']['ProjectAddonsResponse']['selected_addons'][0]
+  components['schemas']['ProjectAddonsResponse_Output']['selected_addons'][0]
 export type ProjectAvailableAddon =
-  components['schemas']['ProjectAddonsResponse']['available_addons'][0]
+  components['schemas']['ProjectAddonsResponse_Output']['available_addons'][0]

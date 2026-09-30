@@ -1,5 +1,4 @@
-import { Skeleton } from 'ui'
-import { TableCell, TableRow } from 'ui/src/components/shadcn/ui/table'
+import { Skeleton, TableCell, TableRow } from 'ui'
 
 export const RowLoading = () => (
   <TableRow>

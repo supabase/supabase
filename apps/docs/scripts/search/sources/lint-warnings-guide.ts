@@ -1,15 +1,11 @@
-import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { retry } from '@octokit/plugin-retry'
-import crypto, { createHash } from 'node:crypto'
+import { createHash } from 'node:crypto'
+import { githubAuthOptions } from '../../../lib/octokit.auth.js'
 import { OCTOKIT_RETRY_OPTIONS } from '../../../lib/octokit.constants.js'
 import { BaseLoader, BaseSource } from './base.js'
 
 const RetryOctokit = Octokit.plugin(retry)
-
-const appId = process.env.DOCS_GITHUB_APP_ID
-const installationId = process.env.DOCS_GITHUB_APP_INSTALLATION_ID
-const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
 
 const getBasename = (path: string) => path.split('/').at(-1)!.replace(/\.md$/, '')
 
@@ -28,18 +24,7 @@ export class LintWarningsGuideLoader extends BaseLoader {
   }
 
   async load() {
-    if (!appId || !installationId || !privateKey) {
-      throw new Error('Missing DOCS_GITHUB_APP_* environment variables')
-    }
-
-    const octokit = new RetryOctokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId,
-        installationId,
-        privateKey: crypto.createPrivateKey(privateKey).export({ type: 'pkcs8', format: 'pem' }),
-      },
-    })
+    const octokit = new RetryOctokit(githubAuthOptions())
 
     const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner: this.org,

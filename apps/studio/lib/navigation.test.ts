@@ -7,8 +7,6 @@ describe('createNavigationHandler', () => {
   let mockWindowOpen: any
 
   beforeEach(() => {
-    vi.clearAllMocks()
-
     // Mock router with push method
     mockRouter = {
       push: vi.fn(),
@@ -192,8 +190,9 @@ describe('createNavigationHandler', () => {
 
       handler(event)
 
-      // Right click should trigger router.push (falls through to default case)
-      expect(mockRouter.push).toHaveBeenCalledWith('/test-url')
+      // Right click opens the context menu, so it must not navigate.
+      expect(mockRouter.push).not.toHaveBeenCalled()
+      expect(mockWindowOpen).not.toHaveBeenCalled()
     })
   })
 

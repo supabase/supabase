@@ -43,6 +43,10 @@ module.exports = defineConfig([
   { files: ['**/*.ts', '**/*.tsx'] },
   supabaseConfig,
   {
+    files: ['components/ui/PartnerIcon.tsx'],
+    rules: { 'shadcn/no-raw-colors': 'off' },
+  },
+  {
     files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
     plugins: {
       'barrel-files': barrelFiles,
@@ -69,10 +73,10 @@ module.exports = defineConfig([
       'barrel-files/avoid-re-export-all': 'error',
       'jsx-a11y/alt-text': 'warn',
       'jsx-a11y/role-has-required-aria-props': 'error',
-      'jsx-a11y/aria-props': 'warn',
-      'jsx-a11y/aria-proptypes': 'warn',
-      'jsx-a11y/role-supports-aria-props': 'warn',
-      'jsx-a11y/anchor-has-content': 'warn',
+      'jsx-a11y/aria-props': 'error',
+      'jsx-a11y/aria-proptypes': 'error',
+      'jsx-a11y/role-supports-aria-props': 'error',
+      'jsx-a11y/anchor-has-content': 'error',
       'jsx-a11y/control-has-associated-label': [
         'warn',
         { controlComponents: ['Button', 'Switch'] },
@@ -81,25 +85,25 @@ module.exports = defineConfig([
         'warn',
         { labelComponents: ['Label'], controlComponents: ['Input', 'Switch'] },
       ],
-      'jsx-a11y/aria-role': 'warn',
+      'jsx-a11y/aria-role': 'error',
       'jsx-a11y/no-redundant-roles': 'warn',
-      'jsx-a11y/no-aria-hidden-on-focusable': 'warn',
-      'jsx-a11y/tabindex-no-positive': 'warn',
+      'jsx-a11y/no-aria-hidden-on-focusable': 'error',
+      'jsx-a11y/tabindex-no-positive': 'error',
       'jsx-a11y/anchor-is-valid': 'warn',
       'jsx-a11y/heading-has-content': 'warn',
-      'jsx-a11y/no-distracting-elements': 'warn',
+      'jsx-a11y/no-distracting-elements': 'error',
       'valtio/state-snapshot-rule': 'warn',
       'valtio/avoid-this-in-proxy': 'error',
       'react-hook-form/destructuring-formstate': 'error',
       'react-hook-form/no-access-control': 'error',
       'react-hook-form/no-nested-object-setvalue': 'error',
-      'react-hook-form/no-use-watch': 'warn',
+      'react-hook-form/no-use-watch': 'error',
     },
   },
   // Analytics SQL wire boundary: every call to a SQL-bearing analytics
   // endpoint (`logs.all` / `logs.all.otel`) must go through
   // `executeAnalyticsSql` so the `SafeLogSqlFragment` brand is enforced at the
-  // type level. See .claude/skills/safe-sql-execution/SKILL.md.
+  // type level. See .agents/skills/safe-sql-execution/SKILL.md.
   {
     files: ['**/*.ts', '**/*.tsx'],
     ignores: ['data/logs/execute-analytics-sql.ts'],

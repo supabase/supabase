@@ -6,7 +6,11 @@
     "version": "1.0.0",
     "contact": {}
   },
-  "servers": [],
+  "servers": [
+    {
+      "url": "https://api.supabase.com"
+    }
+  ],
   "tags": [
     {
       "name": "Advisors",
@@ -103,10 +107,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchDetailResponse"
+                  "$ref": "#/components/schemas/BranchDetailResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve database branch"
@@ -175,10 +188,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchResponse"
+                  "$ref": "#/components/schemas/BranchResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update database branch"
@@ -247,10 +269,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchDeleteResponse"
+                  "$ref": "#/components/schemas/BranchDeleteResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to delete database branch"
@@ -321,10 +352,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchUpdateResponse"
+                  "$ref": "#/components/schemas/BranchUpdateResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to push database branch"
@@ -395,10 +435,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchUpdateResponse"
+                  "$ref": "#/components/schemas/BranchUpdateResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to merge database branch"
@@ -469,10 +518,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchUpdateResponse"
+                  "$ref": "#/components/schemas/BranchUpdateResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to reset database branch"
@@ -528,15 +586,24 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchRestoreResponse"
+                  "$ref": "#/components/schemas/BranchRestoreResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to restore database branch"
@@ -621,6 +688,15 @@
             },
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
           "500": {
             "description": "Failed to diff database branch"
           }
@@ -656,7 +732,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse"
+                    "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse_Output"
                   }
                 }
               }
@@ -685,7 +761,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["projects_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -708,7 +784,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ProjectResponse"
+                  "$ref": "#/components/schemas/V1ProjectResponse_Output"
                 }
               }
             }
@@ -736,7 +812,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["organization_projects_create"]],
         "x-oauth-scope": "projects:write"
       }
@@ -803,7 +879,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegionsInfo"
+                  "$ref": "#/components/schemas/RegionsInfo_Output"
                 }
               }
             }
@@ -839,7 +915,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/OrganizationResponseV1"
+                    "$ref": "#/components/schemas/OrganizationResponseV1_Output"
                   }
                 }
               }
@@ -871,7 +947,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organizations_read"]],
         "x-oauth-scope": "organizations:read"
       },
@@ -894,7 +970,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationResponseV1"
+                  "$ref": "#/components/schemas/OrganizationResponseV1_Output"
                 }
               }
             }
@@ -919,7 +995,7 @@
         ],
         "summary": "Create an organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api", "billing"],
+        "x-endpoint-owners": ["control-plane", "billing"],
         "x-fga-permissions": [["organizations_create"]]
       }
     },
@@ -1037,11 +1113,20 @@
         "responses": {
           "204": {
             "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "summary": "[Beta] Authorize user through oauth",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/token": {
@@ -1065,15 +1150,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OAuthTokenResponse"
+                  "$ref": "#/components/schemas/OAuthTokenResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/revoke": {
@@ -1093,11 +1187,20 @@
         "responses": {
           "204": {
             "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["auth", "management-api"]
+        "x-endpoint-owners": ["auth", "control-plane"]
       }
     },
     "/v1/oauth/authorize/project-claim": {
@@ -1207,7 +1310,7 @@
         ],
         "summary": "Authorize user through oauth and claim a project",
         "tags": ["OAuth"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]]
       }
     },
@@ -1271,7 +1374,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SnippetList"
+                  "$ref": "#/components/schemas/SnippetList_Output"
                 }
               }
             }
@@ -1302,7 +1405,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["snippets_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -1329,7 +1432,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SnippetResponse"
+                  "$ref": "#/components/schemas/SnippetResponse_Output"
                 }
               }
             }
@@ -1360,7 +1463,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["snippets_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -1375,7 +1478,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ProfileResponse"
+                  "$ref": "#/components/schemas/V1ProfileResponse_Output"
                 }
               }
             }
@@ -1388,7 +1491,7 @@
         ],
         "summary": "Gets the user's profile",
         "tags": ["Profile"],
-        "x-endpoint-owners": ["management-api"]
+        "x-endpoint-owners": ["control-plane"]
       }
     },
     "/v1/projects/{ref}/actions": {
@@ -1497,7 +1600,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListActionRunResponse"
+                  "$ref": "#/components/schemas/ListActionRunResponse_Output"
                 }
               }
             }
@@ -1568,7 +1671,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionRunResponse"
+                  "$ref": "#/components/schemas/ActionRunResponse_Output"
                 }
               }
             }
@@ -1649,7 +1752,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateRunStatusResponse"
+                  "$ref": "#/components/schemas/UpdateRunStatusResponse_Output"
                 }
               }
             }
@@ -1792,7 +1895,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ApiKeyResponse"
+                    "$ref": "#/components/schemas/ApiKeyResponse_Output"
                   }
                 }
               }
@@ -1821,8 +1924,11 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
-        "x-fga-permissions": [["api_gateway_keys_read"]],
+        "x-endpoint-owners": ["auth", "control-plane"],
+        "x-fga-permissions": [
+          ["api_gateway_keys_read"],
+          ["api_gateway_keys_read", "api_gateway_keys_secret_read"]
+        ],
         "x-oauth-scope": "secrets:read"
       },
       "post": {
@@ -1868,7 +1974,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiKeyResponse"
+                  "$ref": "#/components/schemas/ApiKeyResponse_Output"
                 }
               }
             }
@@ -1896,7 +2002,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -1925,7 +2031,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LegacyApiKeysResponse"
+                  "$ref": "#/components/schemas/LegacyApiKeysResponse_Output"
                 }
               }
             }
@@ -1953,7 +2059,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_read"]],
         "x-oauth-scope": "secrets:read"
       },
@@ -1990,7 +2096,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LegacyApiKeysResponse"
+                  "$ref": "#/components/schemas/LegacyApiKeysResponse_Output"
                 }
               }
             }
@@ -2018,7 +2124,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -2078,7 +2184,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiKeyResponse"
+                  "$ref": "#/components/schemas/ApiKeyResponse_Output"
                 }
               }
             }
@@ -2106,7 +2212,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       },
@@ -2154,7 +2260,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiKeyResponse"
+                  "$ref": "#/components/schemas/ApiKeyResponse_Output"
                 }
               }
             }
@@ -2182,8 +2288,11 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
-        "x-fga-permissions": [["api_gateway_keys_read"]],
+        "x-endpoint-owners": ["auth", "control-plane"],
+        "x-fga-permissions": [
+          ["api_gateway_keys_read"],
+          ["api_gateway_keys_read", "api_gateway_keys_secret_read"]
+        ],
         "x-oauth-scope": "secrets:read"
       },
       "delete": {
@@ -2249,7 +2358,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiKeyResponse"
+                  "$ref": "#/components/schemas/ApiKeyResponse_Output"
                 }
               }
             }
@@ -2277,7 +2386,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["auth", "management-api"],
+        "x-endpoint-owners": ["auth", "control-plane"],
         "x-fga-permissions": [["api_gateway_keys_write"]],
         "x-oauth-scope": "secrets:write"
       }
@@ -2309,11 +2418,20 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BranchResponse"
+                    "$ref": "#/components/schemas/BranchResponse_Output"
                   }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve database branches"
@@ -2370,10 +2488,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchResponse"
+                  "$ref": "#/components/schemas/BranchResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to create database branch"
@@ -2483,10 +2610,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BranchResponse"
+                  "$ref": "#/components/schemas/BranchResponse_Output"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to fetch database branch"
@@ -2534,7 +2670,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateCustomHostnameResponse"
+                  "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output"
                 }
               }
             }
@@ -2565,7 +2701,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_read"]],
         "x-oauth-scope": "domains:read"
       },
@@ -2625,7 +2761,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2664,7 +2800,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateCustomHostnameResponse"
+                  "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output"
                 }
               }
             }
@@ -2695,7 +2831,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2724,7 +2860,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateCustomHostnameResponse"
+                  "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output"
                 }
               }
             }
@@ -2755,7 +2891,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2784,7 +2920,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateCustomHostnameResponse"
+                  "$ref": "#/components/schemas/UpdateCustomHostnameResponse_Output"
                 }
               }
             }
@@ -2815,7 +2951,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["custom_domain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -2857,8 +2993,7 @@
                           "type": "boolean"
                         }
                       },
-                      "required": ["state"],
-                      "additionalProperties": false
+                      "required": ["state"]
                     },
                     {
                       "type": "object",
@@ -2870,14 +3005,14 @@
                         "unavailableReason": {
                           "type": "string",
                           "enum": [
+                            "platform_unsupported",
                             "postgres_upgrade_required",
                             "ssl_enforcement_required",
                             "temporarily_unavailable"
                           ]
                         }
                       },
-                      "required": ["state", "unavailableReason"],
-                      "additionalProperties": false
+                      "required": ["state", "unavailableReason"]
                     }
                   ]
                 }
@@ -2910,7 +3045,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["security", "management-api"],
+        "x-endpoint-owners": ["security", "control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -2960,8 +3095,7 @@
                           "type": "boolean"
                         }
                       },
-                      "required": ["state"],
-                      "additionalProperties": false
+                      "required": ["state"]
                     },
                     {
                       "type": "object",
@@ -2973,14 +3107,14 @@
                         "unavailableReason": {
                           "type": "string",
                           "enum": [
+                            "platform_unsupported",
                             "postgres_upgrade_required",
                             "ssl_enforcement_required",
                             "temporarily_unavailable"
                           ]
                         }
                       },
-                      "required": ["state", "unavailableReason"],
-                      "additionalProperties": false
+                      "required": ["state", "unavailableReason"]
                     }
                   ]
                 }
@@ -3013,7 +3147,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["security", "management-api"],
+        "x-endpoint-owners": ["security", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -3042,7 +3176,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetworkBanResponse"
+                  "$ref": "#/components/schemas/NetworkBanResponse_Output"
                 }
               }
             }
@@ -3073,7 +3207,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3102,7 +3236,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetworkBanResponseEnriched"
+                  "$ref": "#/components/schemas/NetworkBanResponseEnriched_Output"
                 }
               }
             }
@@ -3133,7 +3267,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -3196,7 +3330,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_network_bans_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3225,7 +3359,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetworkRestrictionsResponse"
+                  "$ref": "#/components/schemas/NetworkRestrictionsResponse_Output"
                 }
               }
             }
@@ -3256,7 +3390,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -3293,7 +3427,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetworkRestrictionsV2Response"
+                  "$ref": "#/components/schemas/NetworkRestrictionsV2Response_Output"
                 }
               }
             }
@@ -3324,7 +3458,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3363,7 +3497,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NetworkRestrictionsResponse"
+                  "$ref": "#/components/schemas/NetworkRestrictionsResponse_Output"
                 }
               }
             }
@@ -3394,7 +3528,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3423,7 +3557,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PgsodiumConfigResponse"
+                  "$ref": "#/components/schemas/PgsodiumConfigResponse_Output"
                 }
               }
             }
@@ -3491,7 +3625,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PgsodiumConfigResponse"
+                  "$ref": "#/components/schemas/PgsodiumConfigResponse_Output"
                 }
               }
             }
@@ -3551,7 +3685,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostgrestConfigWithJWTSecretResponse"
+                  "$ref": "#/components/schemas/PostgrestConfigWithJWTSecretResponse_Output"
                 }
               }
             }
@@ -3582,8 +3716,11 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
-        "x-fga-permissions": [["data_api_config_read"]],
+        "x-endpoint-owners": ["control-plane", "infra"],
+        "x-fga-permissions": [
+          ["data_api_config_read"],
+          ["data_api_config_read", "data_api_config_secret_read"]
+        ],
         "x-oauth-scope": "rest:read"
       },
       "patch": {
@@ -3619,7 +3756,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1PostgrestConfigResponse"
+                  "$ref": "#/components/schemas/V1PostgrestConfigResponse_Output"
                 }
               }
             }
@@ -3650,7 +3787,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["data_api_config_write"]],
         "x-oauth-scope": "rest:write"
       }
@@ -3679,7 +3816,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse"
+                  "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse_Output"
                 }
               }
             }
@@ -3710,7 +3847,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -3737,7 +3874,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ProjectRefResponse"
+                  "$ref": "#/components/schemas/V1ProjectRefResponse_Output"
                 }
               }
             }
@@ -3765,7 +3902,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra", "dev-workflows"],
+        "x-endpoint-owners": ["control-plane", "infra", "dev-workflows"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       },
@@ -3802,7 +3939,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ProjectRefResponse"
+                  "$ref": "#/components/schemas/V1ProjectRefResponse_Output"
                 }
               }
             }
@@ -3833,7 +3970,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -3865,7 +4002,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SecretResponse"
+                    "$ref": "#/components/schemas/SecretResponse_Output"
                   }
                 }
               }
@@ -4050,7 +4187,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SslEnforcementResponse"
+                  "$ref": "#/components/schemas/SslEnforcementResponse_Output"
                 }
               }
             }
@@ -4081,7 +4218,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_ssl_config_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -4118,7 +4255,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SslEnforcementResponse"
+                  "$ref": "#/components/schemas/SslEnforcementResponse_Output"
                 }
               }
             }
@@ -4149,7 +4286,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_ssl_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -4189,7 +4326,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TypescriptResponse"
+                  "$ref": "#/components/schemas/TypescriptResponse_Output"
                 }
               }
             }
@@ -4249,7 +4386,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VanitySubdomainConfigResponse"
+                  "$ref": "#/components/schemas/VanitySubdomainConfigResponse_Output"
                 }
               }
             }
@@ -4295,7 +4432,7 @@
             "position": "before"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_read"]],
         "x-oauth-scope": "domains:read"
       },
@@ -4346,7 +4483,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -4385,7 +4522,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubdomainAvailabilityResponse"
+                  "$ref": "#/components/schemas/SubdomainAvailabilityResponse_Output"
                 }
               }
             }
@@ -4431,7 +4568,7 @@
             "position": "before"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -4470,7 +4607,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActivateVanitySubdomainResponse"
+                  "$ref": "#/components/schemas/ActivateVanitySubdomainResponse_Output"
                 }
               }
             }
@@ -4516,7 +4653,7 @@
             "position": "before"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["vanity_subdomain_write"]],
         "x-oauth-scope": "domains:write"
       }
@@ -4555,7 +4692,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectUpgradeInitiateResponse"
+                  "$ref": "#/components/schemas/ProjectUpgradeInitiateResponse_Output"
                 }
               }
             }
@@ -4586,7 +4723,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write", "database_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -4615,7 +4752,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectUpgradeEligibilityResponse"
+                  "$ref": "#/components/schemas/ProjectUpgradeEligibilityResponse_Output"
                 }
               }
             }
@@ -4646,7 +4783,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read", "database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -4684,7 +4821,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DatabaseUpgradeStatusResponse"
+                  "$ref": "#/components/schemas/DatabaseUpgradeStatusResponse_Output"
                 }
               }
             }
@@ -4715,7 +4852,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read", "database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -4744,7 +4881,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReadOnlyStatusResponse"
+                  "$ref": "#/components/schemas/ReadOnlyStatusResponse_Output"
                 }
               }
             }
@@ -4775,7 +4912,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
+        "x-endpoint-owners": ["control-plane", "infra", "support-tooling"],
         "x-fga-permissions": [["database_readonly_config_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -4828,7 +4965,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra", "support-tooling"],
+        "x-endpoint-owners": ["control-plane", "infra", "support-tooling"],
         "x-fga-permissions": [["database_readonly_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -4902,7 +5039,7 @@
             "position": "before"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_read_replicas_write"]]
       }
     },
@@ -4958,7 +5095,7 @@
         ],
         "summary": "[Beta] Remove a read replica",
         "tags": ["Database"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_read_replicas_write"]]
       }
     },
@@ -5033,7 +5170,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/V1ServiceHealthResponse"
+                    "$ref": "#/components/schemas/V1ServiceHealthResponse_Output"
                   }
                 }
               }
@@ -5065,7 +5202,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -5094,7 +5231,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SigningKeyResponse"
+                  "$ref": "#/components/schemas/SigningKeyResponse_Output"
                 }
               }
             }
@@ -5149,7 +5286,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SigningKeyResponse"
+                  "$ref": "#/components/schemas/SigningKeyResponse_Output"
                 }
               }
             }
@@ -5216,7 +5353,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SigningKeyResponse"
+                  "$ref": "#/components/schemas/SigningKeyResponse_Output"
                 }
               }
             }
@@ -5271,7 +5408,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SigningKeysResponse"
+                  "$ref": "#/components/schemas/SigningKeysResponse_Output"
                 }
               }
             }
@@ -5339,7 +5476,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SigningKeyResponse"
+                  "$ref": "#/components/schemas/SigningKeyResponse_Output"
                 }
               }
             }
@@ -5398,7 +5535,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SigningKeyResponse"
+                  "$ref": "#/components/schemas/SigningKeyResponse_Output"
                 }
               }
             }
@@ -5474,7 +5611,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SigningKeyResponse"
+                  "$ref": "#/components/schemas/SigningKeyResponse_Output"
                 }
               }
             }
@@ -5531,7 +5668,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthConfigResponse"
+                  "$ref": "#/components/schemas/AuthConfigResponse_Output"
                 }
               }
             }
@@ -5599,7 +5736,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthConfigResponse"
+                  "$ref": "#/components/schemas/AuthConfigResponse_Output"
                 }
               }
             }
@@ -5669,7 +5806,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ThirdPartyAuth"
+                  "$ref": "#/components/schemas/ThirdPartyAuth_Output"
                 }
               }
             }
@@ -5726,7 +5863,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ThirdPartyAuth"
+                    "$ref": "#/components/schemas/ThirdPartyAuth_Output"
                   }
                 }
               }
@@ -5795,7 +5932,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ThirdPartyAuth"
+                  "$ref": "#/components/schemas/ThirdPartyAuth_Output"
                 }
               }
             }
@@ -5861,7 +5998,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ThirdPartyAuth"
+                  "$ref": "#/components/schemas/ThirdPartyAuth_Output"
                 }
               }
             }
@@ -5939,7 +6076,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -5989,7 +6126,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -6018,7 +6155,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetProjectAvailableRestoreVersionsResponse"
+                  "$ref": "#/components/schemas/GetProjectAvailableRestoreVersionsResponse_Output"
                 }
               }
             }
@@ -6046,7 +6183,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-oauth-scope": "projects:read"
       },
@@ -6094,7 +6231,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -6144,7 +6281,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["project_admin_write"]],
         "x-oauth-scope": "projects:write"
       }
@@ -6174,7 +6311,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListProjectAddonsResponse"
+                  "$ref": "#/components/schemas/ListProjectAddonsResponse_Output"
                 }
               }
             }
@@ -6374,7 +6511,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectClaimTokenResponse"
+                  "$ref": "#/components/schemas/ProjectClaimTokenResponse_Output"
                 }
               }
             }
@@ -6396,7 +6533,7 @@
         ],
         "summary": "Gets project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["project_admin_read"]],
         "x-internal": true
       },
@@ -6423,7 +6560,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateProjectClaimTokenResponse"
+                  "$ref": "#/components/schemas/CreateProjectClaimTokenResponse_Output"
                 }
               }
             }
@@ -6445,7 +6582,7 @@
         ],
         "summary": "Creates project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]],
         "x-internal": true
       },
@@ -6487,7 +6624,7 @@
         ],
         "summary": "Revokes project claim token",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write", "project_admin_write"]],
         "x-internal": true
       }
@@ -6518,7 +6655,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ProjectAdvisorsResponse"
+                  "$ref": "#/components/schemas/V1ProjectAdvisorsResponse_Output"
                 }
               }
             }
@@ -6546,7 +6683,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["advisors_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -6587,7 +6724,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ProjectAdvisorsResponse"
+                  "$ref": "#/components/schemas/V1ProjectAdvisorsResponse_Output"
                 }
               }
             }
@@ -6615,7 +6752,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["advisors_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -6623,7 +6760,7 @@
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
         "deprecated": true,
-        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.\n",
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#logs-explorer) for all available sources.\n",
         "operationId": "v1-get-project-logs-all",
         "parameters": [
           {
@@ -6643,7 +6780,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
-            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "example": "select event_message from edge_logs limit 10",
               "type": "string"
@@ -6678,7 +6815,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
+                  "$ref": "#/components/schemas/AnalyticsResponse_Output"
                 }
               }
             }
@@ -6709,7 +6846,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -6737,7 +6874,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
-            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "example": "select event_message from edge_logs limit 10",
               "type": "string"
@@ -6772,7 +6909,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
+                  "$ref": "#/components/schemas/AnalyticsResponse_Output"
                 }
               }
             }
@@ -6803,7 +6940,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -6842,7 +6979,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1GetUsageApiCountResponse"
+                  "$ref": "#/components/schemas/V1GetUsageApiCountResponse_Output"
                 }
               }
             }
@@ -6867,7 +7004,7 @@
         ],
         "summary": "Gets project's usage api counts",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -6895,7 +7032,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1GetUsageApiRequestsCountResponse"
+                  "$ref": "#/components/schemas/V1GetUsageApiRequestsCountResponse_Output"
                 }
               }
             }
@@ -6920,7 +7057,7 @@
         ],
         "summary": "Gets project's usage api requests count",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -6967,7 +7104,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
+                  "$ref": "#/components/schemas/AnalyticsResponse_Output"
                 }
               }
             }
@@ -6992,7 +7129,7 @@
         ],
         "summary": "Gets a project's function combined statistics",
         "tags": ["Analytics"],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_usage_read"]]
       }
     },
@@ -7031,6 +7168,9 @@
               }
             }
           },
+          "400": {
+            "description": "Project must be active and healthy, or metrics are not available for this project"
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -7057,7 +7197,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["analytics"],
+        "x-endpoint-owners": ["observability"],
         "x-fga-permissions": [["analytics_logs_read"]],
         "x-oauth-scope": "analytics:read"
       }
@@ -7096,7 +7236,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateRoleResponse"
+                  "$ref": "#/components/schemas/CreateRoleResponse_Output"
                 }
               }
             }
@@ -7154,7 +7294,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeleteRolesResponse"
+                  "$ref": "#/components/schemas/DeleteRolesResponse_Output"
                 }
               }
             }
@@ -7214,7 +7354,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ListMigrationsResponse"
+                  "$ref": "#/components/schemas/V1ListMigrationsResponse_Output"
                 }
               }
             }
@@ -7486,7 +7626,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1GetMigrationResponse"
+                  "$ref": "#/components/schemas/V1GetMigrationResponse_Output"
                 }
               }
             }
@@ -7651,7 +7791,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"], ["database_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -7715,7 +7855,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -7768,7 +7908,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_webhooks_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -7799,7 +7939,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetProjectDbMetadataResponse"
+                  "$ref": "#/components/schemas/GetProjectDbMetadataResponse_Output"
                 }
               }
             }
@@ -7827,7 +7967,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -7866,7 +8006,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1UpdatePasswordResponse"
+                  "$ref": "#/components/schemas/V1UpdatePasswordResponse_Output"
                 }
               }
             }
@@ -7897,7 +8037,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -7927,7 +8067,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JitAccessResponse"
+                  "$ref": "#/components/schemas/JitAccessResponse_Output"
                 }
               }
             }
@@ -7996,7 +8136,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JitAuthorizeAccessResponse"
+                  "$ref": "#/components/schemas/JitAuthorizeAccessResponse_Output"
                 }
               }
             }
@@ -8065,7 +8205,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JitAccessResponse"
+                  "$ref": "#/components/schemas/JitAccessResponse_Output"
                 }
               }
             }
@@ -8119,7 +8259,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JitListAccessResponse"
+                  "$ref": "#/components/schemas/JitListAccessResponse_Output"
                 }
               }
             }
@@ -8183,7 +8323,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InviteExternalUserJitResponse"
+                  "$ref": "#/components/schemas/InviteExternalUserJitResponse_Output"
                 }
               }
             }
@@ -8247,7 +8387,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JitAccessResponse"
+                  "$ref": "#/components/schemas/JitAccessResponse_Output"
                 }
               }
             }
@@ -8448,7 +8588,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -8480,7 +8620,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FunctionResponse"
+                    "$ref": "#/components/schemas/FunctionResponse_Output"
                   }
                 }
               }
@@ -8621,7 +8761,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FunctionResponse"
+                  "$ref": "#/components/schemas/FunctionResponse_Output"
                 }
               }
             }
@@ -8693,7 +8833,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BulkUpdateFunctionResponse"
+                  "$ref": "#/components/schemas/BulkUpdateFunctionResponse_Output"
                 }
               }
             }
@@ -8786,7 +8926,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeployFunctionResponse"
+                  "$ref": "#/components/schemas/DeployFunctionResponse_Output"
                 }
               }
             }
@@ -8861,7 +9001,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FunctionSlugResponse"
+                  "$ref": "#/components/schemas/FunctionSlugResponse_Output"
                 }
               }
             }
@@ -9011,7 +9151,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FunctionResponse"
+                  "$ref": "#/components/schemas/FunctionSlugResponse_Output"
                 }
               }
             }
@@ -9208,7 +9348,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/V1StorageBucketResponse"
+                    "$ref": "#/components/schemas/V1StorageBucketResponse_Output"
                   }
                 }
               }
@@ -9269,7 +9409,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DiskResponse"
+                  "$ref": "#/components/schemas/DiskResponse_Output"
                 }
               }
             }
@@ -9294,7 +9434,7 @@
         ],
         "summary": "Get database disk attributes",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       },
       "post": {
@@ -9348,7 +9488,7 @@
         ],
         "summary": "Modify database disk",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_write"]]
       }
     },
@@ -9376,7 +9516,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DiskUtilMetricsResponse"
+                  "$ref": "#/components/schemas/DiskUtilMetricsResponse_Output"
                 }
               }
             }
@@ -9401,7 +9541,7 @@
         ],
         "summary": "Get disk utilization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       }
     },
@@ -9429,7 +9569,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DiskAutoscaleConfig"
+                  "$ref": "#/components/schemas/DiskAutoscaleConfig_Output"
                 }
               }
             }
@@ -9454,7 +9594,7 @@
         ],
         "summary": "Gets project disk autoscale config",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"],
+        "x-endpoint-owners": ["control-plane", "infra"],
         "x-fga-permissions": [["infra_disk_config_read"]]
       }
     },
@@ -9482,7 +9622,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StorageConfigResponse"
+                  "$ref": "#/components/schemas/StorageConfigResponse_Output"
                 }
               }
             }
@@ -9589,7 +9729,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1PgbouncerConfigResponse"
+                  "$ref": "#/components/schemas/V1PgbouncerConfigResponse_Output"
                 }
               }
             }
@@ -9615,7 +9755,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_read"]],
         "x-oauth-scope": "database:read"
       }
@@ -9646,7 +9786,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SupavisorConfigResponse"
+                    "$ref": "#/components/schemas/SupavisorConfigResponse_Output"
                   }
                 }
               }
@@ -9715,7 +9855,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateSupavisorConfigResponse"
+                  "$ref": "#/components/schemas/UpdateSupavisorConfigResponse_Output"
                 }
               }
             }
@@ -9775,7 +9915,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostgresConfigResponse"
+                  "$ref": "#/components/schemas/PostgresConfigResponse_Output"
                 }
               }
             }
@@ -9806,7 +9946,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_read"]],
         "x-oauth-scope": "database:read"
       },
@@ -9843,7 +9983,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostgresConfigResponse"
+                  "$ref": "#/components/schemas/PostgresConfigResponse_Output"
                 }
               }
             }
@@ -9874,7 +10014,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["infra", "management-api"],
+        "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
       }
@@ -9903,7 +10043,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RealtimeConfigResponse"
+                  "$ref": "#/components/schemas/RealtimeConfigResponse_Output"
                 }
               }
             }
@@ -10060,7 +10200,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateProviderResponse"
+                  "$ref": "#/components/schemas/CreateProviderResponse_Output"
                 }
               }
             }
@@ -10118,7 +10258,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListProvidersResponse"
+                  "$ref": "#/components/schemas/ListProvidersResponse_Output"
                 }
               }
             }
@@ -10189,7 +10329,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetProviderResponse"
+                  "$ref": "#/components/schemas/GetProviderResponse_Output"
                 }
               }
             }
@@ -10268,7 +10408,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateProviderResponse"
+                  "$ref": "#/components/schemas/UpdateProviderResponse_Output"
                 }
               }
             }
@@ -10337,7 +10477,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeleteProviderResponse"
+                  "$ref": "#/components/schemas/DeleteProviderResponse_Output"
                 }
               }
             }
@@ -10397,7 +10537,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1BackupsResponse"
+                  "$ref": "#/components/schemas/V1BackupsResponse_Output"
                 }
               }
             }
@@ -10714,7 +10854,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1BackupScheduleResponse"
+                  "$ref": "#/components/schemas/V1BackupScheduleResponse_Output"
                 }
               }
             }
@@ -10801,7 +10941,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1BackupScheduleResponse"
+                  "$ref": "#/components/schemas/V1BackupScheduleResponse_Output"
                 }
               }
             }
@@ -10942,7 +11082,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1ListEntitlementsResponse"
+                  "$ref": "#/components/schemas/V1ListEntitlementsResponse_Output"
                 }
               }
             }
@@ -10999,11 +11139,20 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/V1OrganizationMemberResponse"
+                    "$ref": "#/components/schemas/V1OrganizationMemberResponse_Output"
                   }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -11019,7 +11168,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["members_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -11046,7 +11195,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/V1OrganizationSlugResponse"
+                  "$ref": "#/components/schemas/V1OrganizationSlugResponse_Output"
                 }
               }
             }
@@ -11074,7 +11223,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_read"]],
         "x-oauth-scope": "organizations:read"
       }
@@ -11110,7 +11259,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationProjectClaimResponse"
+                  "$ref": "#/components/schemas/OrganizationProjectClaimResponse_Output"
                 }
               }
             }
@@ -11132,7 +11281,7 @@
         ],
         "summary": "Gets project details for the specified organization and claim token",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]],
         "x-internal": true
       },
@@ -11181,7 +11330,7 @@
         ],
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_admin_write"]],
         "x-internal": true
       }
@@ -11267,7 +11416,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationProjectsResponse"
+                  "$ref": "#/components/schemas/OrganizationProjectsResponse_Output"
                 }
               }
             }
@@ -11298,7 +11447,7 @@
             "position": "after"
           }
         ],
-        "x-endpoint-owners": ["management-api"],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["organization_projects_read"]],
         "x-oauth-scope": "projects:read"
       }
@@ -11310,10 +11459,46 @@
         "scheme": "bearer",
         "bearerFormat": "JWT",
         "type": "http"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://api.supabase.com/v1/oauth/authorize",
+            "tokenUrl": "https://api.supabase.com/v1/oauth/token",
+            "scopes": {
+              "analytics:read": "Read access to analytics",
+              "analytics:write": "Write access to analytics",
+              "analytics_config:read": "Read access to analytics config",
+              "analytics_config:write": "Write access to analytics config",
+              "auth:read": "Read access to auth",
+              "auth:write": "Write access to auth",
+              "database:read": "Read access to database",
+              "database:write": "Write access to database",
+              "domains:read": "Read access to domains",
+              "domains:write": "Write access to domains",
+              "edge_functions:read": "Read access to edge functions",
+              "edge_functions:write": "Write access to edge functions",
+              "environment:read": "Read access to environment",
+              "environment:write": "Write access to environment",
+              "organizations:read": "Read access to organizations",
+              "organizations:write": "Write access to organizations",
+              "projects:read": "Read access to projects",
+              "projects:write": "Write access to projects",
+              "rest:read": "Read access to rest",
+              "rest:write": "Write access to rest",
+              "secrets:read": "Read access to secrets",
+              "secrets:write": "Write access to secrets",
+              "storage:read": "Read access to storage",
+              "storage:write": "Write access to storage"
+            }
+          }
+        },
+        "description": "OAuth 2.0 authorization code flow for Supabase OAuth apps. Tokens carry the scopes approved for the app by the organization."
       }
     },
     "schemas": {
-      "BranchDetailResponse": {
+      "BranchDetailResponse_Output": {
         "type": "object",
         "properties": {
           "ref": {
@@ -11422,7 +11607,7 @@
           "notify_url": "https://example.com/webhooks/branches"
         }
       },
-      "BranchResponse": {
+      "BranchResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -11475,17 +11660,17 @@
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "review_requested_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "with_data": {
             "type": "boolean"
@@ -11497,7 +11682,7 @@
           "deletion_scheduled_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "preview_project_status": {
             "type": "string",
@@ -11533,7 +11718,7 @@
           "with_data"
         ]
       },
-      "BranchDeleteResponse": {
+      "BranchDeleteResponse_Output": {
         "type": "object",
         "properties": {
           "message": {
@@ -11554,7 +11739,7 @@
           "migration_version": "20250312000000"
         }
       },
-      "BranchUpdateResponse": {
+      "BranchUpdateResponse_Output": {
         "type": "object",
         "properties": {
           "workflow_run_id": {
@@ -11567,7 +11752,7 @@
         },
         "required": ["workflow_run_id", "message"]
       },
-      "BranchRestoreResponse": {
+      "BranchRestoreResponse_Output": {
         "type": "object",
         "properties": {
           "message": {
@@ -11577,7 +11762,7 @@
         },
         "required": ["message"]
       },
-      "V1ProjectWithDatabaseResponse": {
+      "V1ProjectWithDatabaseResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -11836,7 +12021,7 @@
         },
         "additionalProperties": false
       },
-      "V1ProjectResponse": {
+      "V1ProjectResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -11907,7 +12092,7 @@
           "status"
         ]
       },
-      "RegionsInfo": {
+      "RegionsInfo_Output": {
         "type": "object",
         "properties": {
           "recommendations": {
@@ -12056,7 +12241,7 @@
         },
         "required": ["recommendations", "all"]
       },
-      "OrganizationResponseV1": {
+      "OrganizationResponseV1_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -12145,7 +12330,7 @@
         },
         "additionalProperties": false
       },
-      "OAuthTokenResponse": {
+      "OAuthTokenResponse_Output": {
         "type": "object",
         "properties": {
           "access_token": {
@@ -12165,8 +12350,7 @@
             "enum": ["Bearer"]
           }
         },
-        "required": ["access_token", "expires_in", "token_type"],
-        "additionalProperties": false
+        "required": ["access_token", "expires_in", "token_type"]
       },
       "OAuthRevokeTokenBody": {
         "type": "object",
@@ -12191,7 +12375,7 @@
         },
         "additionalProperties": false
       },
-      "SnippetList": {
+      "SnippetList_Output": {
         "type": "object",
         "properties": {
           "data": {
@@ -12284,7 +12468,7 @@
         },
         "required": ["data"]
       },
-      "SnippetResponse": {
+      "SnippetResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -12383,7 +12567,7 @@
           "content"
         ]
       },
-      "V1ProfileResponse": {
+      "V1ProfileResponse_Output": {
         "type": "object",
         "properties": {
           "gotrue_id": {
@@ -12398,7 +12582,7 @@
         },
         "required": ["gotrue_id", "primary_email", "username"]
       },
-      "ListActionRunResponse": {
+      "ListActionRunResponse_Output": {
         "type": "array",
         "items": {
           "type": "object",
@@ -12469,7 +12653,7 @@
           ]
         }
       },
-      "ActionRunResponse": {
+      "ActionRunResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -12576,7 +12760,7 @@
           "deploy": "CREATED"
         }
       },
-      "UpdateRunStatusResponse": {
+      "UpdateRunStatusResponse_Output": {
         "type": "object",
         "properties": {
           "message": {
@@ -12586,7 +12770,7 @@
         },
         "required": ["message"]
       },
-      "ApiKeyResponse": {
+      "ApiKeyResponse_Output": {
         "type": "object",
         "properties": {
           "api_key": {
@@ -12628,19 +12812,19 @@
           "inserted_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           }
         },
         "required": ["name"]
       },
-      "LegacyApiKeysResponse": {
+      "LegacyApiKeysResponse_Output": {
         "type": "object",
         "properties": {
           "enabled": {
@@ -12787,7 +12971,7 @@
           "notify_url": "https://example.com/webhooks/branches"
         }
       },
-      "UpdateCustomHostnameResponseJsonValue": {
+      "JsonValue_Output": {
         "description": "Any JSON-serializable value",
         "anyOf": [
           {
@@ -12807,18 +12991,18 @@
           {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue"
+              "$ref": "#/components/schemas/JsonValue_Output"
             }
           },
           {
             "type": "object",
             "additionalProperties": {
-              "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue"
+              "$ref": "#/components/schemas/JsonValue_Output"
             }
           }
         ]
       },
-      "UpdateCustomHostnameResponse": {
+      "UpdateCustomHostnameResponse_Output": {
         "type": "object",
         "properties": {
           "status": {
@@ -12843,13 +13027,13 @@
               "errors": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue"
+                  "$ref": "#/components/schemas/JsonValue_Output"
                 }
               },
               "messages": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/UpdateCustomHostnameResponseJsonValue"
+                  "$ref": "#/components/schemas/JsonValue_Output"
                 }
               },
               "result": {
@@ -12878,8 +13062,7 @@
                             "txt_value": {
                               "type": "string"
                             }
-                          },
-                          "required": ["txt_name", "txt_value"]
+                          }
                         }
                       },
                       "validation_errors": {
@@ -12894,8 +13077,7 @@
                           "required": ["message"]
                         }
                       }
-                    },
-                    "required": ["status", "validation_records"]
+                    }
                   },
                   "ownership_verification": {
                     "type": "object",
@@ -12909,8 +13091,7 @@
                       "value": {
                         "type": "string"
                       }
-                    },
-                    "required": ["type", "name", "value"]
+                    }
                   },
                   "custom_origin_server": {
                     "type": "string"
@@ -12925,20 +13106,13 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "id",
-                  "hostname",
-                  "ssl",
-                  "ownership_verification",
-                  "custom_origin_server",
-                  "status"
-                ]
+                "required": ["id", "hostname"]
               }
             },
             "required": ["success", "errors", "messages", "result"]
           }
         },
-        "required": ["status", "custom_hostname", "data"]
+        "required": ["status", "data"]
       },
       "UpdateCustomHostnameBody": {
         "type": "object",
@@ -12967,7 +13141,7 @@
           "state": "enabled"
         }
       },
-      "NetworkBanResponse": {
+      "NetworkBanResponse_Output": {
         "type": "object",
         "properties": {
           "banned_ipv4_addresses": {
@@ -12979,7 +13153,7 @@
         },
         "required": ["banned_ipv4_addresses"]
       },
-      "NetworkBanResponseEnriched": {
+      "NetworkBanResponseEnriched_Output": {
         "type": "object",
         "properties": {
           "banned_ipv4_addresses": {
@@ -13028,7 +13202,7 @@
           "requester_ip": false
         }
       },
-      "NetworkRestrictionsResponse": {
+      "NetworkRestrictionsResponse_Output": {
         "type": "object",
         "properties": {
           "entitlement": {
@@ -13086,12 +13260,12 @@
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "applied_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           }
         },
         "required": ["entitlement", "config", "status"]
@@ -13164,7 +13338,7 @@
           }
         }
       },
-      "NetworkRestrictionsV2Response": {
+      "NetworkRestrictionsV2Response_Output": {
         "type": "object",
         "properties": {
           "entitlement": {
@@ -13218,12 +13392,12 @@
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "applied_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "status": {
             "type": "string",
@@ -13232,7 +13406,7 @@
         },
         "required": ["entitlement", "config", "status"]
       },
-      "PgsodiumConfigResponse": {
+      "PgsodiumConfigResponse_Output": {
         "type": "object",
         "properties": {
           "root_key": {
@@ -13258,7 +13432,7 @@
           "root_key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
         }
       },
-      "PostgrestConfigWithJWTSecretResponse": {
+      "PostgrestConfigWithJWTSecretResponse_Output": {
         "type": "object",
         "properties": {
           "db_schema": {
@@ -13329,7 +13503,7 @@
           "max_rows": 1000
         }
       },
-      "V1PostgrestConfigResponse": {
+      "V1PostgrestConfigResponse_Output": {
         "type": "object",
         "properties": {
           "db_schema": {
@@ -13366,7 +13540,7 @@
           "db_pool_acquisition_timeout"
         ]
       },
-      "V1ProjectRefResponse": {
+      "V1ProjectRefResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -13397,7 +13571,7 @@
           "name": "Acme Platform"
         }
       },
-      "SecretResponse": {
+      "SecretResponse_Output": {
         "type": "object",
         "properties": {
           "name": {
@@ -13449,7 +13623,7 @@
         },
         "example": ["OPENAI_API_KEY"]
       },
-      "SslEnforcementResponse": {
+      "SslEnforcementResponse_Output": {
         "type": "object",
         "properties": {
           "currentConfig": {
@@ -13487,7 +13661,7 @@
           }
         }
       },
-      "TypescriptResponse": {
+      "TypescriptResponse_Output": {
         "type": "object",
         "properties": {
           "types": {
@@ -13496,7 +13670,7 @@
         },
         "required": ["types"]
       },
-      "VanitySubdomainConfigResponse": {
+      "VanitySubdomainConfigResponse_Output": {
         "type": "object",
         "properties": {
           "status": {
@@ -13553,7 +13727,7 @@
           "vanity_subdomain": "acme-prod"
         }
       },
-      "SubdomainAvailabilityResponse": {
+      "SubdomainAvailabilityResponse_Output": {
         "type": "object",
         "properties": {
           "available": {
@@ -13562,7 +13736,7 @@
         },
         "required": ["available"]
       },
-      "ActivateVanitySubdomainResponse": {
+      "ActivateVanitySubdomainResponse_Output": {
         "type": "object",
         "properties": {
           "custom_domain": {
@@ -13588,7 +13762,7 @@
           "release_channel": "ga"
         }
       },
-      "ProjectUpgradeInitiateResponse": {
+      "ProjectUpgradeInitiateResponse_Output": {
         "type": "object",
         "properties": {
           "tracking_id": {
@@ -13597,7 +13771,7 @@
         },
         "required": ["tracking_id"]
       },
-      "ProjectUpgradeEligibilityResponse": {
+      "ProjectUpgradeEligibilityResponse_Output": {
         "type": "object",
         "properties": {
           "eligible": {
@@ -13869,6 +14043,16 @@
                     }
                   },
                   "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["btree_gist_nan_reindex"]
+                    }
+                  },
+                  "required": ["type"]
                 }
               ]
             }
@@ -13889,7 +14073,7 @@
           "warnings"
         ]
       },
-      "DatabaseUpgradeStatusResponse": {
+      "DatabaseUpgradeStatusResponse_Output": {
         "type": "object",
         "properties": {
           "databaseUpgradeStatus": {
@@ -13902,7 +14086,7 @@
                 "type": "string"
               },
               "target_version": {
-                "type": "number"
+                "type": "string"
               },
               "error": {
                 "type": "string",
@@ -13944,7 +14128,7 @@
         },
         "required": ["databaseUpgradeStatus"]
       },
-      "ReadOnlyStatusResponse": {
+      "ReadOnlyStatusResponse_Output": {
         "type": "object",
         "properties": {
           "enabled": {
@@ -14004,7 +14188,7 @@
           "database_identifier": "abcdefghijklmnopqrst-rr-us-west-1-abcde"
         }
       },
-      "V1ServiceHealthResponse": {
+      "V1ServiceHealthResponse_Output": {
         "type": "object",
         "properties": {
           "name": {
@@ -14091,7 +14275,7 @@
         },
         "required": ["name", "healthy", "status"]
       },
-      "SigningKeyResponse": {
+      "SigningKeyResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -14113,16 +14297,15 @@
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
           }
         },
-        "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"],
-        "additionalProperties": false
+        "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"]
       },
       "CreateSigningKeyBody": {
         "type": "object",
@@ -14347,7 +14530,7 @@
         },
         "additionalProperties": false
       },
-      "SigningKeysResponse": {
+      "SigningKeysResponse_Output": {
         "type": "object",
         "properties": {
           "keys": {
@@ -14374,21 +14557,19 @@
                 "created_at": {
                   "type": "string",
                   "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 },
                 "updated_at": {
                   "type": "string",
                   "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 }
               },
-              "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"],
-              "additionalProperties": false
+              "required": ["id", "algorithm", "status", "public_jwk", "created_at", "updated_at"]
             }
           }
         },
-        "required": ["keys"],
-        "additionalProperties": false
+        "required": ["keys"]
       },
       "UpdateSigningKeyBody": {
         "type": "object",
@@ -14404,7 +14585,7 @@
         },
         "additionalProperties": false
       },
-      "AuthConfigResponse": {
+      "AuthConfigResponse_Output": {
         "type": "object",
         "properties": {
           "api_max_request_duration": {
@@ -15231,6 +15412,10 @@
             "maximum": 9007199254740991,
             "nullable": true
           },
+          "security_update_password_require_current_password": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_update_password_require_reauthentication": {
             "type": "boolean",
             "nullable": true
@@ -15603,6 +15788,7 @@
           "security_captcha_secret",
           "security_manual_linking_enabled",
           "security_refresh_token_reuse_interval",
+          "security_update_password_require_current_password",
           "security_update_password_require_reauthentication",
           "sessions_inactivity_timeout",
           "sessions_single_per_user",
@@ -15887,11 +16073,13 @@
           "sessions_timebox": {
             "type": "number",
             "minimum": 0,
+            "description": "Session timebox in hours. Maximum 8760 hours (1 year).",
             "nullable": true
           },
           "sessions_inactivity_timeout": {
             "type": "number",
             "minimum": 0,
+            "description": "Session inactivity timeout in hours. Maximum 8760 hours (1 year).",
             "nullable": true
           },
           "sessions_single_per_user": {
@@ -15982,10 +16170,16 @@
             "type": "boolean",
             "nullable": true
           },
+          "security_update_password_require_current_password": {
+            "type": "boolean",
+            "description": "Require the user's current password when updating their password.",
+            "nullable": true
+          },
           "security_refresh_token_reuse_interval": {
             "type": "integer",
             "minimum": 0,
             "maximum": 2147483647,
+            "description": "Refresh token reuse interval in seconds. Maximum 300 seconds (5 minutes).",
             "nullable": true
           },
           "mailer_otp_exp": {
@@ -16666,7 +16860,7 @@
           "jwks_url": "https://login.acme.com/.well-known/jwks.json"
         }
       },
-      "ThirdPartyAuth": {
+      "ThirdPartyAuth_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -16704,7 +16898,7 @@
         },
         "required": ["id", "type", "inserted_at", "updated_at"]
       },
-      "GetProjectAvailableRestoreVersionsResponse": {
+      "GetProjectAvailableRestoreVersionsResponse_Output": {
         "type": "object",
         "properties": {
           "available_versions": {
@@ -16730,38 +16924,7 @@
         },
         "required": ["available_versions"]
       },
-      "ListProjectAddonsResponseJsonValue": {
-        "description": "Any JSON-serializable value",
-        "anyOf": [
-          {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "boolean"
-              }
-            ],
-            "nullable": true
-          },
-          {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue"
-            }
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue"
-            }
-          }
-        ]
-      },
-      "ListProjectAddonsResponse": {
+      "ListProjectAddonsResponse_Output": {
         "type": "object",
         "properties": {
           "selected_addons": {
@@ -16864,7 +17027,7 @@
                       "required": ["description", "type", "interval", "amount"]
                     },
                     "meta": {
-                      "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue"
+                      "$ref": "#/components/schemas/JsonValue_Output"
                     }
                   },
                   "required": ["id", "name", "price"]
@@ -16978,7 +17141,7 @@
                         "required": ["description", "type", "interval", "amount"]
                       },
                       "meta": {
-                        "$ref": "#/components/schemas/ListProjectAddonsResponseJsonValue"
+                        "$ref": "#/components/schemas/JsonValue_Output"
                       }
                     },
                     "required": ["id", "name", "price"]
@@ -17053,7 +17216,7 @@
           "addon_type": "pitr"
         }
       },
-      "ProjectClaimTokenResponse": {
+      "ProjectClaimTokenResponse_Output": {
         "type": "object",
         "properties": {
           "token_alias": {
@@ -17073,7 +17236,7 @@
         },
         "required": ["token_alias", "expires_at", "created_at", "created_by"]
       },
-      "CreateProjectClaimTokenResponse": {
+      "CreateProjectClaimTokenResponse_Output": {
         "type": "object",
         "properties": {
           "token": {
@@ -17096,7 +17259,7 @@
         },
         "required": ["token", "token_alias", "expires_at", "created_at", "created_by"]
       },
-      "V1ProjectAdvisorsResponse": {
+      "V1ProjectAdvisorsResponse_Output": {
         "type": "object",
         "properties": {
           "lints": {
@@ -17105,6 +17268,7 @@
               "type": "object",
               "properties": {
                 "name": {
+                  "type": "string",
                   "enum": [
                     "unindexed_foreign_keys",
                     "auth_users_exposed",
@@ -17126,6 +17290,7 @@
                     "auth_otp_long_expiry",
                     "auth_otp_short_length",
                     "ssl_not_enforced",
+                    "log_connections_not_enabled",
                     "network_restrictions_not_set",
                     "password_requirements_min_length",
                     "pitr_not_enabled",
@@ -17134,9 +17299,20 @@
                     "auth_password_policy_missing",
                     "leaked_service_key",
                     "no_backup_admin",
-                    "vulnerable_postgres_version"
-                  ],
-                  "type": "string"
+                    "vulnerable_postgres_version",
+                    "db_not_reachable",
+                    "db_connection_failing",
+                    "db_connection_limit_reached",
+                    "instance_telemetry_lost",
+                    "instance_db_down",
+                    "instance_alert_firing",
+                    "log_data_api_error_rate_high",
+                    "log_auth_error_rate_high",
+                    "log_storage_error_rate_high",
+                    "log_edge_function_error_rate_high",
+                    "project_not_active",
+                    "advisor_check_unavailable"
+                  ]
                 },
                 "title": {
                   "type": "string"
@@ -17153,8 +17329,9 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": ["PERFORMANCE", "SECURITY"]
-                  }
+                    "enum": ["PERFORMANCE", "SECURITY", "HEALTH"]
+                  },
+                  "x-ignore-array-items-must-be-objects": true
                 },
                 "description": {
                   "type": "string"
@@ -17179,12 +17356,23 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": ["table", "view", "auth", "function", "extension", "compliance"]
+                      "enum": [
+                        "table",
+                        "view",
+                        "materialized view",
+                        "foreign table",
+                        "auth",
+                        "function",
+                        "extension",
+                        "compliance",
+                        "health"
+                      ]
                     },
                     "fkey_name": {
                       "type": "string"
                     },
                     "fkey_columns": {
+                      "x-ignore-array-items-must-be-objects": true,
                       "type": "array",
                       "items": {
                         "type": "number"
@@ -17194,6 +17382,11 @@
                 },
                 "cache_key": {
                   "type": "string"
+                },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                 }
               },
               "required": [
@@ -17212,7 +17405,7 @@
         },
         "required": ["lints"]
       },
-      "AnalyticsResponse": {
+      "AnalyticsResponse_Output": {
         "type": "object",
         "properties": {
           "result": {
@@ -17267,7 +17460,7 @@
           }
         }
       },
-      "V1GetUsageApiCountResponse": {
+      "V1GetUsageApiCountResponse_Output": {
         "type": "object",
         "properties": {
           "result": {
@@ -17350,7 +17543,7 @@
           }
         }
       },
-      "V1GetUsageApiRequestsCountResponse": {
+      "V1GetUsageApiRequestsCountResponse_Output": {
         "type": "object",
         "properties": {
           "result": {
@@ -17425,7 +17618,7 @@
           "read_only": true
         }
       },
-      "CreateRoleResponse": {
+      "CreateRoleResponse_Output": {
         "type": "object",
         "properties": {
           "role": {
@@ -17445,7 +17638,7 @@
         },
         "required": ["role", "password", "ttl_seconds"]
       },
-      "DeleteRolesResponse": {
+      "DeleteRolesResponse_Output": {
         "type": "object",
         "properties": {
           "message": {
@@ -17455,14 +17648,13 @@
         },
         "required": ["message"]
       },
-      "V1ListMigrationsResponse": {
+      "V1ListMigrationsResponse_Output": {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
             "version": {
-              "type": "string",
-              "minLength": 1
+              "type": "string"
             },
             "name": {
               "type": "string"
@@ -17513,12 +17705,11 @@
           "rollback": "drop table if exists public.widgets;"
         }
       },
-      "V1GetMigrationResponse": {
+      "V1GetMigrationResponse_Output": {
         "type": "object",
         "properties": {
           "version": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "name": {
             "type": "string"
@@ -17597,7 +17788,7 @@
           "query": "select * from pg_stat_activity limit 1;"
         }
       },
-      "GetProjectDbMetadataResponse": {
+      "GetProjectDbMetadataResponse_Output": {
         "type": "object",
         "properties": {
           "databases": {
@@ -17617,13 +17808,11 @@
                         "type": "string"
                       }
                     },
-                    "required": ["name"],
-                    "additionalProperties": {}
+                    "required": ["name"]
                   }
                 }
               },
-              "required": ["name", "schemas"],
-              "additionalProperties": {}
+              "required": ["name", "schemas"]
             }
           }
         },
@@ -17642,7 +17831,7 @@
           "password": "correct-horse-battery-staple"
         }
       },
-      "V1UpdatePasswordResponse": {
+      "V1UpdatePasswordResponse_Output": {
         "type": "object",
         "properties": {
           "message": {
@@ -17651,7 +17840,7 @@
         },
         "required": ["message"]
       },
-      "JitAccessResponse": {
+      "JitAccessResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": {
@@ -17665,8 +17854,7 @@
               "type": "object",
               "properties": {
                 "role": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "string"
                 },
                 "expires_at": {
                   "type": "number"
@@ -17742,7 +17930,7 @@
           "rhost": "203.0.113.10"
         }
       },
-      "JitAuthorizeAccessResponse": {
+      "JitAuthorizeAccessResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": {
@@ -17754,8 +17942,7 @@
             "type": "object",
             "properties": {
               "role": {
-                "type": "string",
-                "minLength": 1
+                "type": "string"
               },
               "expires_at": {
                 "type": "number"
@@ -17802,7 +17989,7 @@
         },
         "required": ["user_id", "user_role"]
       },
-      "JitListAccessResponse": {
+      "JitListAccessResponse_Output": {
         "type": "object",
         "properties": {
           "items": {
@@ -17833,8 +18020,7 @@
                         "type": "object",
                         "properties": {
                           "role": {
-                            "type": "string",
-                            "minLength": 1
+                            "type": "string"
                           },
                           "expires_at": {
                             "type": "number"
@@ -17905,8 +18091,7 @@
                         "type": "object",
                         "properties": {
                           "role": {
-                            "type": "string",
-                            "minLength": 1
+                            "type": "string"
                           },
                           "expires_at": {
                             "type": "number"
@@ -18122,7 +18307,7 @@
           ]
         }
       },
-      "InviteExternalUserJitResponse": {
+      "InviteExternalUserJitResponse_Output": {
         "type": "object",
         "properties": {
           "email": {
@@ -18141,8 +18326,7 @@
               "type": "object",
               "properties": {
                 "role": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "string"
                 },
                 "expires_at": {
                   "type": "number"
@@ -18210,7 +18394,7 @@
           "token": ""
         }
       },
-      "FunctionResponse": {
+      "FunctionResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -18346,7 +18530,7 @@
           }
         ]
       },
-      "BulkUpdateFunctionResponse": {
+      "BulkUpdateFunctionResponse_Output": {
         "type": "object",
         "properties": {
           "functions": {
@@ -18451,7 +18635,7 @@
           }
         }
       },
-      "DeployFunctionResponse": {
+      "DeployFunctionResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -18502,7 +18686,7 @@
         },
         "required": ["id", "slug", "name", "status", "version"]
       },
-      "FunctionSlugResponse": {
+      "FunctionSlugResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -18576,7 +18760,7 @@
           "verify_jwt": true
         }
       },
-      "V1StorageBucketResponse": {
+      "V1StorageBucketResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -18600,7 +18784,7 @@
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
       },
-      "DiskResponse": {
+      "DiskResponse_Output": {
         "type": "object",
         "properties": {
           "attributes": {
@@ -18731,7 +18915,7 @@
           }
         }
       },
-      "DiskUtilMetricsResponse": {
+      "DiskUtilMetricsResponse_Output": {
         "type": "object",
         "properties": {
           "timestamp": {
@@ -18755,7 +18939,7 @@
         },
         "required": ["timestamp", "metrics"]
       },
-      "DiskAutoscaleConfig": {
+      "DiskAutoscaleConfig_Output": {
         "type": "object",
         "properties": {
           "growth_percent": {
@@ -18782,7 +18966,7 @@
         },
         "required": ["growth_percent", "min_increment_gb", "max_size_gb"]
       },
-      "StorageConfigResponse": {
+      "StorageConfigResponse_Output": {
         "type": "object",
         "properties": {
           "fileSizeLimit": {
@@ -18881,9 +19065,12 @@
               },
               "iceberg_catalog": {
                 "type": "boolean"
+              },
+              "object_versioning": {
+                "type": "boolean"
               }
             },
-            "required": ["list_v2", "iceberg_catalog"]
+            "required": ["list_v2", "iceberg_catalog", "object_versioning"]
           },
           "external": {
             "type": "object",
@@ -18896,20 +19083,11 @@
             "required": ["upstreamTarget"]
           },
           "migrationVersion": {
-            "type": "string"
-          },
-          "databasePoolMode": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
-        "required": [
-          "fileSizeLimit",
-          "features",
-          "capabilities",
-          "external",
-          "migrationVersion",
-          "databasePoolMode"
-        ]
+        "required": ["fileSizeLimit", "features", "capabilities", "external", "migrationVersion"]
       },
       "UpdateStorageConfigBody": {
         "type": "object",
@@ -19016,7 +19194,7 @@
         },
         "additionalProperties": false
       },
-      "V1PgbouncerConfigResponse": {
+      "V1PgbouncerConfigResponse_Output": {
         "type": "object",
         "properties": {
           "default_pool_size": {
@@ -19061,7 +19239,7 @@
           }
         }
       },
-      "SupavisorConfigResponse": {
+      "SupavisorConfigResponse_Output": {
         "type": "object",
         "properties": {
           "identifier": {
@@ -19147,7 +19325,7 @@
           "pool_mode": "transaction"
         }
       },
-      "UpdateSupavisorConfigResponse": {
+      "UpdateSupavisorConfigResponse_Output": {
         "type": "object",
         "properties": {
           "default_pool_size": {
@@ -19162,7 +19340,7 @@
         },
         "required": ["default_pool_size", "pool_mode"]
       },
-      "PostgresConfigResponse": {
+      "PostgresConfigResponse_Output": {
         "type": "object",
         "properties": {
           "effective_cache_size": {
@@ -19472,7 +19650,7 @@
         },
         "additionalProperties": false
       },
-      "RealtimeConfigResponse": {
+      "RealtimeConfigResponse_Output": {
         "type": "object",
         "properties": {
           "private_only": {
@@ -19485,6 +19663,13 @@
             "minimum": 1,
             "maximum": 100,
             "description": "Sets connection pool size for Realtime Authorization",
+            "nullable": true
+          },
+          "postgres_changes_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size used to create Postgres Changes subscriptions",
             "nullable": true
           },
           "max_concurrent_users": {
@@ -19549,6 +19734,7 @@
         "required": [
           "private_only",
           "connection_pool",
+          "postgres_changes_pool",
           "max_concurrent_users",
           "max_events_per_second",
           "max_bytes_per_second",
@@ -19572,6 +19758,12 @@
             "minimum": 1,
             "maximum": 100,
             "description": "Sets connection pool size for Realtime Authorization"
+          },
+          "postgres_changes_pool": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Sets connection pool size used to create Postgres Changes subscriptions"
           },
           "max_concurrent_users": {
             "type": "integer",
@@ -19668,6 +19860,9 @@
                         "type": "string"
                       }
                     },
+                    "array": {
+                      "type": "boolean"
+                    },
                     "default": {
                       "anyOf": [
                         {
@@ -19684,9 +19879,6 @@
                           "type": "boolean"
                         }
                       ]
-                    },
-                    "array": {
-                      "type": "boolean"
                     }
                   }
                 }
@@ -19724,7 +19916,7 @@
           }
         }
       },
-      "CreateProviderResponse": {
+      "CreateProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -19759,6 +19951,9 @@
                             "type": "string"
                           }
                         },
+                        "array": {
+                          "type": "boolean"
+                        },
                         "default": {
                           "anyOf": [
                             {
@@ -19775,9 +19970,6 @@
                               "type": "boolean"
                             }
                           ]
-                        },
-                        "array": {
-                          "type": "boolean"
                         }
                       }
                     }
@@ -19823,7 +20015,7 @@
         },
         "required": ["id"]
       },
-      "ListProvidersResponse": {
+      "ListProvidersResponse_Output": {
         "type": "object",
         "properties": {
           "items": {
@@ -19863,6 +20055,9 @@
                                   "type": "string"
                                 }
                               },
+                              "array": {
+                                "type": "boolean"
+                              },
                               "default": {
                                 "anyOf": [
                                   {
@@ -19879,9 +20074,6 @@
                                     "type": "boolean"
                                   }
                                 ]
-                              },
-                              "array": {
-                                "type": "boolean"
                               }
                             }
                           }
@@ -19931,7 +20123,7 @@
         },
         "required": ["items"]
       },
-      "GetProviderResponse": {
+      "GetProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -19966,6 +20158,9 @@
                             "type": "string"
                           }
                         },
+                        "array": {
+                          "type": "boolean"
+                        },
                         "default": {
                           "anyOf": [
                             {
@@ -19982,9 +20177,6 @@
                               "type": "boolean"
                             }
                           ]
-                        },
-                        "array": {
-                          "type": "boolean"
                         }
                       }
                     }
@@ -20062,6 +20254,9 @@
                         "type": "string"
                       }
                     },
+                    "array": {
+                      "type": "boolean"
+                    },
                     "default": {
                       "anyOf": [
                         {
@@ -20078,9 +20273,6 @@
                           "type": "boolean"
                         }
                       ]
-                    },
-                    "array": {
-                      "type": "boolean"
                     }
                   }
                 }
@@ -20103,7 +20295,7 @@
           "domains": ["acme.com", "contractors.acme.com"]
         }
       },
-      "UpdateProviderResponse": {
+      "UpdateProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -20138,6 +20330,9 @@
                             "type": "string"
                           }
                         },
+                        "array": {
+                          "type": "boolean"
+                        },
                         "default": {
                           "anyOf": [
                             {
@@ -20154,9 +20349,6 @@
                               "type": "boolean"
                             }
                           ]
-                        },
-                        "array": {
-                          "type": "boolean"
                         }
                       }
                     }
@@ -20202,7 +20394,7 @@
         },
         "required": ["id"]
       },
-      "DeleteProviderResponse": {
+      "DeleteProviderResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -20237,6 +20429,9 @@
                             "type": "string"
                           }
                         },
+                        "array": {
+                          "type": "boolean"
+                        },
                         "default": {
                           "anyOf": [
                             {
@@ -20253,9 +20448,6 @@
                               "type": "boolean"
                             }
                           ]
-                        },
-                        "array": {
-                          "type": "boolean"
                         }
                       }
                     }
@@ -20301,7 +20493,7 @@
         },
         "required": ["id"]
       },
-      "V1BackupsResponse": {
+      "V1BackupsResponse_Output": {
         "type": "object",
         "properties": {
           "region": {
@@ -20396,7 +20588,7 @@
           "completed_on": {
             "type": "string",
             "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
             "nullable": true
           }
         },
@@ -20416,7 +20608,7 @@
           "id": 12345
         }
       },
-      "V1BackupScheduleResponse": {
+      "V1BackupScheduleResponse_Output": {
         "type": "object",
         "properties": {
           "schedule_for": {
@@ -20463,7 +20655,7 @@
           "name": "before-upgrade"
         }
       },
-      "V1ListEntitlementsResponse": {
+      "V1ListEntitlementsResponse_Output": {
         "type": "object",
         "properties": {
           "entitlements": {
@@ -20536,6 +20728,7 @@
                         "project_restore_after_expiry",
                         "assistant.advance_model",
                         "integrations.github_connections",
+                        "integrations.github_push_webhooks_limit",
                         "dedicated_pooler",
                         "observability.dashboard_advanced_metrics",
                         "api.members.invitations",
@@ -20609,7 +20802,7 @@
         },
         "required": ["entitlements"]
       },
-      "V1OrganizationMemberResponse": {
+      "V1OrganizationMemberResponse_Output": {
         "type": "object",
         "properties": {
           "user_id": {
@@ -20632,9 +20825,9 @@
             "nullable": true
           }
         },
-        "required": ["user_id", "user_name", "role_name", "mfa_enabled", "avatar_url"]
+        "required": ["user_id", "user_name", "mfa_enabled", "avatar_url"]
       },
-      "V1OrganizationSlugResponse": {
+      "V1OrganizationSlugResponse_Output": {
         "type": "object",
         "properties": {
           "id": {
@@ -20667,7 +20860,7 @@
         },
         "required": ["id", "name", "opt_in_tags", "allowed_release_channels"]
       },
-      "OrganizationProjectClaimResponse": {
+      "OrganizationProjectClaimResponse_Output": {
         "type": "object",
         "properties": {
           "project": {
@@ -20782,7 +20975,7 @@
         },
         "required": ["project", "preview", "expires_at", "created_at", "created_by"]
       },
-      "OrganizationProjectsResponse": {
+      "OrganizationProjectsResponse_Output": {
         "type": "object",
         "properties": {
           "projects": {

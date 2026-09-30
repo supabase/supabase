@@ -25,7 +25,6 @@ describe('uploadAttachment', () => {
   const mockFile = new File(['test'], 'test.png', { type: 'image/png' })
 
   beforeEach(() => {
-    vi.clearAllMocks()
     ;(createClient as any).mockReturnValue(mockSupabaseClient)
   })
 

@@ -82,10 +82,10 @@ const Panel = ({
     <Component
       ref={outerRef}
       className={cn(
-        'group/panel relative rounded-lg md:rounded-xl p-px bg-surface-75 bg-linear-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md',
+        'group/panel relative [--panel-radius:var(--radius-lg)] md:[--panel-radius:var(--radius-xl)] rounded-(--panel-radius) p-px bg-surface-75 bg-linear-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
-            ? 'hover:bg-none hover:bg-brand!'
+            ? 'hover:bg-none hover:bg-brand-default!'
             : 'hover:bg-none hover:bg-border-stronger!'
           : '',
         outerClassName
@@ -95,7 +95,7 @@ const Panel = ({
     >
       <div
         className={cn(
-          'relative z-10 w-full h-full rounded-[7px] md:rounded-[11px] bg-surface-75 overflow-hidden text-foreground-light',
+          'relative z-10 w-full h-full rounded-[calc(var(--panel-radius)-1px)] bg-surface-75 overflow-hidden text-foreground-light',
           innerClassName
         )}
         style={innerStyle}

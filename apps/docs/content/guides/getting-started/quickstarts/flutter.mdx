@@ -16,17 +16,9 @@ Create a Flutter app using the `flutter create` command.
 flutter create my_app
 ```
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client library
 
@@ -63,6 +55,8 @@ Future<void> main() async {
 ```
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "flutter", "tab": "mobiles" }} />
+
+<$Partial path="quickstart_mobile_env_note.mdx" />
 
 ## 7. Query data from the app
 
@@ -101,6 +95,9 @@ class _HomePageState extends State<HomePage> {
       body: FutureBuilder(
         future: _future,
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Error loading instruments: ${snapshot.error}'));
+          }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -136,7 +133,7 @@ flutter run
 
 Many sign in methods require deep links to redirect the user back to your app after authentication. Read more about setting deep links up for all platforms (including web) in the [Flutter Mobile Guide](/docs/guides/getting-started/tutorials/with-flutter#setup-deep-links).
 
-## Going to production
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ### Android
 

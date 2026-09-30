@@ -26,7 +26,7 @@ export const DPA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         <div className="@lg:flex items-center justify-center h-full">
-          <Button asChild variant="default">
+          <Button asChild>
             <a
               href="https://supabase.com/legal/customer-resources/data-processing-addendum"
               target="_blank"

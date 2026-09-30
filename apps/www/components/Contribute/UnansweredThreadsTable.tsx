@@ -322,7 +322,7 @@ export function UnansweredThreadsTable({
             allProductAreas={allProductAreas}
             allStacks={allStacks}
             trigger={
-              <Button variant="default" icon={<Filter size={12} />}>
+              <Button icon={<Filter size={12} />}>
                 <span className="flex items-center gap-2">
                   Filters
                   {activeFilterCount > 0 && (
@@ -340,7 +340,6 @@ export function UnansweredThreadsTable({
       {hasMore && (
         <div className="flex justify-center mt-4">
           <Button
-            variant="default"
             size="tiny"
             onClick={handleLoadMore}
             loading={isLoadingMore}

@@ -16,7 +16,7 @@ This guide shows you how to scaffold, develop, and deploy an MCP server using mc
 
 This combination offers several advantages:
 
-- **Zero cold starts**: Edge Functions stay warm for fast responses
+- **Fast cold starts**: Edge Functions boot in milliseconds, and warm isolates serve subsequent requests without restarting
 - **Global distribution**: Deploy once and run everywhere
 - **Direct database access**: Connect directly to your Supabase Postgres
 - **Minimal footprint**: mcp-lite has zero runtime dependencies
@@ -262,9 +262,9 @@ https://your-project-ref.supabase.co/functions/v1/mcp-server/mcp
 
 <Admonition type="caution">
 
-The template uses `--no-verify-jwt` for quick development. This means authentication is not enforced by Supabase's JWT layer.
+The template uses `--no-verify-jwt` for quick development. This means authentication is not enforced by Supabase's JWT layer, and anyone who finds the URL can call your tools.
 
-For production, you should implement authentication at the MCP server level following the [MCP Authorization specification](https://modelcontextprotocol.io/specification/draft/basic/authorization). This gives you control over who can access your MCP tools.
+For production, authenticate at the MCP server level following the [MCP Authorization specification](https://modelcontextprotocol.io/specification/draft/basic/authorization). On Supabase, `withOAuthProtectedResource` and `withSupabase` from `@supabase/server` do this with Supabase Auth as the OAuth 2.1 server, so each tool call runs as the signed-in user. They wrap any MCP library, including mcp-lite. See [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp).
 
 </Admonition>
 
@@ -278,7 +278,7 @@ When deploying MCP servers:
 - **Limit tool scope**: Only expose tools that are necessary for your use case
 - **Monitor usage**: Track tool calls and monitor for unusual activity
 
-For more security guidance, see the [MCP security guide](/guides/getting-started/mcp#security-risks).
+For more security guidance, see the [MCP security guide](/docs/guides/getting-started/mcp#security-risks).
 
 ## What's next
 
@@ -295,6 +295,6 @@ With your MCP server running on Supabase Edge Functions, you can:
 
 - [mcp-lite on GitHub](https://github.com/fiberplane/mcp-lite)
 - [Model Context Protocol Spec](https://modelcontextprotocol.io/)
-- [Supabase Edge Functions Docs](/guides/functions)
+- [Supabase Edge Functions Docs](/docs/guides/functions)
 - [Deno Runtime Documentation](https://deno.land/)
 - [Fiberplane tutorial](https://blog.fiberplane.com/blog/mcp-lite-supabase-edge-functions/)

@@ -10,7 +10,13 @@ const RadioGroupCard = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  return <RadioGroupPrimitive.Root className={cn('grid gap-2', className)} {...props} ref={ref} />
+  return (
+    <RadioGroupPrimitive.Root
+      className={cn('relative grid gap-2', className)}
+      {...props}
+      ref={ref}
+    />
+  )
 })
 RadioGroupCard.displayName = RadioGroupPrimitive.Root.displayName
 
@@ -23,10 +29,14 @@ interface RadioGroupCardItemProps {
 const RadioGroupCardItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   RadioGroupCardItemProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
->(({ image, label, showIndicator = true, ...props }, ref) => {
+>(({ id: idProp, children, className, image, label, showIndicator = true, ...props }, ref) => {
+  const generatedId = React.useId()
+  const id = idProp || generatedId
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
+      id={id}
+      aria-labelledby={`${id}-label`}
       {...props}
       className={cn(
         'flex flex-col gap-2',
@@ -36,23 +46,24 @@ const RadioGroupCardItem = React.forwardRef<
         'border',
         'p-2',
         // 'hover:bg-selection',
-        'hover:border-foreground-muted',
-        'hover:z-1 focus-visible:z-1',
+        'hover:border-control-hover',
+        'hover:z-1 focus-visible:z-1 focus-visible:border-control-hover',
         'outline-hidden',
         'transition-colors',
         'group',
-        props.className
+        'data-[state=checked]:border-control-hover',
+        className
       )}
     >
-      {props.children}
-      <label className="flex gap-2 w-full" id={props.id} htmlFor={props.value}>
+      {children}
+      <div className="flex gap-2 w-full" id={`${id}-label`}>
         {showIndicator && (
           <div
             className="
                 aspect-square h-4 w-4
-                rounded-full border group-data-[state=checked]:border-foreground-muted
-                group-focus:border-foreground-muted
-                group-hover:border-foreground-muted
+                rounded-full border group-data-[state=checked]:border-control-hover
+                group-focus:border-control-hover
+                group-hover:border-control-hover
                 ring-offset-background
                 group-focus:outline-hidden
                 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background
@@ -78,7 +89,7 @@ const RadioGroupCardItem = React.forwardRef<
         >
           {label}
         </div>
-      </label>
+      </div>
     </RadioGroupPrimitive.Item>
   )
 })

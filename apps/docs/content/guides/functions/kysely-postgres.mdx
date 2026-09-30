@@ -4,14 +4,7 @@ title: 'Type-Safe SQL with Kysely'
 description: 'Combining Kysely with Deno Postgres gives you a convenient developer experience for interacting directly with your Postgres database.'
 ---
 
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/zd9a_Lk3jAc"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="zd9a_Lk3jAc" title="Type-safe SQL in Edge Functions with Kysely" />
 
 Supabase Edge Functions can [connect directly to your Postgres database](/docs/guides/functions/connect-to-postgres) to execute SQL queries. [Kysely](https://github.com/kysely-org/kysely#kysely) is a type-safe and autocompletion-friendly typescript SQL query builder.
 
@@ -191,6 +184,7 @@ Create an `index.ts` file to execute a query on incoming requests:
 
 ```ts index.ts
 import { Pool } from 'jsr:@db/postgres@^0'
+import { withSupabase } from 'npm:@supabase/server@^1'
 import {
   Generated,
   Kysely,
@@ -198,7 +192,6 @@ import {
   PostgresIntrospector,
   PostgresQueryCompiler,
 } from 'npm:kysely@^0'
-import { withSupabase } from 'npm:@supabase/server@^1'
 
 import { PostgresDriver } from './DenoPostgresDriver.ts'
 

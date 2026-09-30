@@ -1,13 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronRight } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useReducedMotion } from 'common'
+import { ChevronRight, X } from 'lucide-react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, ScrollArea, Separator, SheetClose, SheetFooter } from 'ui'
+import {
+  Button,
+  Form,
+  InfoIcon,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  ScrollArea,
+  Separator,
+  SheetClose,
+  SheetFooter,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { CLASSIC_TOKEN_WARNING } from '../../AccessToken.constants'
 import { countConfigured, PermissionMode } from '../../AccessToken.permissions'
+import { applyPreset, type PermissionPreset } from '../../AccessToken.presets'
 import { useTokenAccessEvaluation } from '../../hooks/useTokenAccessEvaluation'
 import { DEFAULT_EXPIRY, TokenFormSchema, TokenFormValues } from './NewScopedTokenForm.utils'
 import { NewScopedTokenFormReview } from './NewScopedTokenFormReview'
@@ -30,24 +43,41 @@ const DEFAULT_VALUES: TokenFormValues = {
   permissions: {},
 }
 
-export const NewScopedTokenForm = ({
-  isPending,
-  onCreateToken,
-  onCancel,
-}: {
-  isPending: boolean
-  onCreateToken: (values: TokenFormValues) => void
-  onCancel: () => void
-}) => {
+export interface NewScopedTokenFormHandle {
+  getAbandonmentContext: () => {
+    resourceAccess: TokenFormValues['resourceAccess']
+    formStep: 'form' | 'review'
+    isFormTouched: boolean
+  }
+}
+
+export const NewScopedTokenForm = forwardRef<
+  NewScopedTokenFormHandle,
+  {
+    isPending: boolean
+    onCreateToken: (values: TokenFormValues) => void
+    onCancel: () => void
+  }
+>(({ isPending, onCreateToken, onCancel }, ref) => {
   const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenFormSchema),
     defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   })
   const [step, setStep] = useState<'form' | 'review'>('form')
+  const { isDirty } = form.formState
+  useImperativeHandle(ref, () => ({
+    getAbandonmentContext: () => ({
+      resourceAccess: form.getValues('resourceAccess'),
+      formStep: step,
+      isFormTouched: isDirty,
+    }),
+  }))
   const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
-  const [showMissingPermissionsWarning, setShowMissingPermissionsWarning] = useState(false)
+  const [isCreateHintDismissed, setIsCreateHintDismissed] = useState(false)
+  const [missingPermissionsAttempts, setMissingPermissionsAttempts] = useState(0)
   const resourceSectionRef = useRef<HTMLDivElement>(null)
+  const missingPermissionsRef = useRef<HTMLDivElement>(null)
   const resourceAccess = useWatch({ control: form.control, name: 'resourceAccess' })
   const selection = useWatch({ control: form.control, name: 'permissions' })
   const organizationSlugs = useWatch({
@@ -71,23 +101,33 @@ export const NewScopedTokenForm = ({
   })
 
   const { data: permissionScopeMap, isError } = useGetEnabledEndpointsForCapability()
+  const isReducedMotionPreferred = useReducedMotion()
+  const isReducedMotionPreferredRef = useRef(isReducedMotionPreferred)
+  isReducedMotionPreferredRef.current = isReducedMotionPreferred
+  const onCancelRef = useRef(onCancel)
+  onCancelRef.current = onCancel
 
   useEffect(() => {
     if (isError) {
       toast.error('Something went wrong, try again')
-      onCancel()
+      onCancelRef.current()
     }
-  }, [onCancel, isError])
+  }, [isError])
 
-  // 'account' switches to the classic token flow: name + expiry only, no permissions or review.
+  useEffect(() => {
+    if (missingPermissionsAttempts === 0) return
+    missingPermissionsRef.current?.scrollIntoView({
+      behavior: isReducedMotionPreferredRef.current ? 'auto' : 'smooth',
+      block: 'nearest',
+    })
+  }, [missingPermissionsAttempts])
+
   const isClassicMode = resourceAccess === 'account'
 
-  // Single owner of the mode switch, so every entry point resets the same dependent fields.
   const handleSelectLegacyMode = () => {
     form.setValue('resourceAccess', 'account', { shouldValidate: true })
     form.setValue('organizationSlugs', [])
     form.setValue('projectRefs', [])
-    // The fields unmount in legacy mode, so drop any validation errors they were holding.
     form.clearErrors(['organizationSlugs', 'projectRefs'])
   }
 
@@ -97,7 +137,7 @@ export const NewScopedTokenForm = ({
       return
     }
     if (configuredCount === 0) {
-      setShowMissingPermissionsWarning(true)
+      setMissingPermissionsAttempts((attempts) => attempts + 1)
       return
     }
     setFormValues(values)
@@ -106,12 +146,18 @@ export const NewScopedTokenForm = ({
 
   const handlePermissionChange = (key: string, mode: PermissionMode) => {
     form.setValue('permissions', { ...selection, [key]: mode })
-    if (mode !== 'none') setShowMissingPermissionsWarning(false)
+    if (mode !== 'none') setMissingPermissionsAttempts(0)
+  }
+
+  const handleApplyPreset = (preset: PermissionPreset) => {
+    const next = applyPreset(preset, selection)
+    form.setValue('permissions', next)
+    if (countConfigured(next) > 0) setMissingPermissionsAttempts(0)
   }
 
   return (
     <>
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
         {step === 'form' ? (
           <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(handleReviewAccess)}>
@@ -152,17 +198,15 @@ export const NewScopedTokenForm = ({
                   </div>
                   <Separator />
                   <PermissionsAccordion
+                    control={form.control}
                     selection={selection}
                     onChange={handlePermissionChange}
-                    permissionScopeMap={permissionScopeMap}
+                    onApplyPreset={handleApplyPreset}
                     access={access}
                   />
-                  {showMissingPermissionsWarning && (
-                    <div className="space-y-3 px-5 sm:px-6 pb-6">
+                  {missingPermissionsAttempts > 0 && (
+                    <div ref={missingPermissionsRef} className="space-y-3 px-5 sm:px-6 pb-6">
                       <Admonition
-                        ref={(node) => {
-                          node?.scrollIntoView()
-                        }}
                         type="warning"
                         title="No permissions selected"
                         description="This token won't be able to do anything until you grant at least one permission."
@@ -187,37 +231,64 @@ export const NewScopedTokenForm = ({
         ) : (
           <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {step === 'review' && (
-            <>
-              <span className="text-xs text-foreground-lighter">
-                Access can't be changed after creation
-              </span>
-              <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
-                Back
-              </Button>
-            </>
+            <Button disabled={isPending} onClick={() => setStep('form')}>
+              Back
+            </Button>
           )}
           <SheetClose asChild disabled={isPending}>
-            <Button variant="default">Cancel</Button>
+            <Button>Cancel</Button>
           </SheetClose>
           {step === 'form' && isClassicMode && (
-            <Button type="submit" form={FORM_ID} loading={isPending}>
+            <Button variant="primary" type="submit" form={FORM_ID} loading={isPending}>
               Generate token
             </Button>
           )}
           {step === 'form' && !isClassicMode && (
-            <Button type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
+            <Button variant="primary" type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
               Review access
             </Button>
           )}
           {step === 'review' && (
-            <Button loading={isPending} onClick={() => onCreateToken(formValues)}>
-              Create token
-            </Button>
+            <Popover open={!isCreateHintDismissed}>
+              <PopoverAnchor asChild>
+                <Button
+                  variant="primary"
+                  loading={isPending}
+                  onClick={() => onCreateToken(formValues)}
+                >
+                  Create token
+                </Button>
+              </PopoverAnchor>
+              <PopoverContent
+                side="top"
+                align="end"
+                sideOffset={8}
+                className="flex w-auto items-center gap-2 py-1.5 pl-3 pr-1.5"
+                onOpenAutoFocus={(event) => event.preventDefault()}
+                onInteractOutside={() => setIsCreateHintDismissed(true)}
+                onEscapeKeyDown={() => setIsCreateHintDismissed(true)}
+              >
+                <InfoIcon className="h-5 w-5 shrink-0" />
+                <p className="text-xs text-foreground-light">
+                  Access can't be changed after creation
+                </p>
+                <Button
+                  variant="text"
+                  size="tiny"
+                  icon={<X />}
+                  aria-label="Dismiss"
+                  className="px-1 text-foreground-lighter"
+                  onClick={() => setIsCreateHintDismissed(true)}
+                />
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       </SheetFooter>
     </>
   )
-}
+})
+
+NewScopedTokenForm.displayName = 'NewScopedTokenForm'

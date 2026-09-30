@@ -1,5 +1,4 @@
 @import 'config/tailwind.config.css';
-@import './../../../packages/ui/build/css/themes/classic-dark.css';
 @import 'config/typography.css';
 
 @source '../pages/**/*.{js,ts,jsx,tsx}';
@@ -12,6 +11,17 @@
 }
 
 @theme {
+  /* Scale Tailwind's default radius tokens by 4/3 to match the Studio curve. */
+  --radius: 0.333333rem;
+  --radius-xs: 0.166667rem;
+  --radius-sm: 0.333333rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.666667rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.333333rem;
+  --radius-3xl: 2rem;
+  --radius-4xl: 2.666667rem;
+
   --text-grid: 13px;
 
   --color-typography-body-light: var(--foreground-light);
@@ -138,16 +148,6 @@
 }
 
 :root {
-  --chart-1: hsl(var(--brand-default));
-  --chart-2: 173 58% 39%;
-  --chart-3: 197 37% 24%;
-  --chart-4: 43 74% 66%;
-  --chart-5: 27 87% 67%;
-  --chart-blue: 217 91% 60%;
-  --chart-warning: hsl(var(--warning-500));
-  --chart-warning-muted: hsl(var(--warning-400));
-  --chart-destructive: hsl(var(--destructive-default));
-  --chart-success: color-mix(in oklch, var(--foreground-muted) 50%, white);
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
@@ -161,16 +161,6 @@
 
 [data-theme='dark'],
 .dark {
-  --chart-1: hsl(var(--brand-default));
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
-  --chart-blue: 217 91% 65%;
-  --chart-warning: hsl(var(--warning-default));
-  --chart-warning-muted: hsl(var(--warning-500));
-  --chart-destructive: hsl(var(--destructive-default));
-  --chart-success: color-mix(in oklch, var(--foreground-muted) 55%, var(--background));
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);

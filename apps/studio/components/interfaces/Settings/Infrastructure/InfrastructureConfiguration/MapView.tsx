@@ -4,7 +4,7 @@ import { partition, uniqBy } from 'lodash'
 import { MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   ComposableMap,
   Geographies,
@@ -27,12 +27,16 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
-import { REPLICA_STATUS } from '@/components/interfaces/Database/Replication/Replication.constants'
+import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+
+const MAP_WIDTH = 800
+const MAP_HEIGHT = 600
 
 const MapView = () => {
   const { ref } = useParams()
@@ -42,6 +46,7 @@ const MapView = () => {
   ])
 
   const [mount, setMount] = useState(false)
+  const [isPanning, setIsPanning] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
   const [center, setCenter] = useState<[number, number]>([14, 7])
   const [tooltip, setTooltip] = useState<{
@@ -77,18 +82,34 @@ const MapView = () => {
     setTimeout(() => setMount(true), 100)
   }, [])
 
+  const filterZoomEvent = useCallback((event: SVGElement) => {
+    const { type, ctrlKey, button } = event as unknown as MouseEvent
+    return type !== 'wheel' && type !== 'dblclick' && !ctrlKey && !button
+  }, [])
+  const onMoveStart = useCallback(() => setIsPanning(true), [])
+  const onMoveEnd = useCallback(() => setIsPanning(false), [])
+
   return (
-    <div className="bg-studio h-[500px] relative">
-      <ComposableMap projectionConfig={{ scale: 155 }} className="w-full h-full">
+    <div className="bg-studio h-full relative cursor-grab active:cursor-grabbing">
+      <ComposableMap
+        width={MAP_WIDTH}
+        height={MAP_HEIGHT}
+        projectionConfig={{ scale: 155 }}
+        className="w-full h-full"
+      >
         <ZoomableGroup
-          className={mount ? 'transition-all duration-300' : ''}
+          className={mount && !isPanning ? 'transition-all duration-300' : ''}
           center={center}
           zoom={zoom}
           minZoom={1.5}
           maxZoom={2.0}
-          filterZoomEvent={({ constructor: { name } }) =>
-            !['MouseEvent', 'WheelEvent'].includes(name)
-          }
+          translateExtent={[
+            [0, 0],
+            [MAP_WIDTH, MAP_HEIGHT],
+          ]}
+          filterZoomEvent={filterZoomEvent}
+          onMoveStart={onMoveStart}
+          onMoveEnd={onMoveEnd}
         >
           <Geographies geography={GeographyData}>
             {({ geographies }) =>
@@ -177,7 +198,7 @@ const MapView = () => {
                   <circle
                     r={4}
                     className={`animate-ping ${
-                      hasNoDatabases ? 'fill-border-stronger' : 'fill-brand'
+                      hasNoDatabases ? 'fill-border-stronger' : 'fill-primary-bright'
                     }`}
                   />
                 )}
@@ -187,7 +208,7 @@ const MapView = () => {
                     hasNoDatabases
                       ? 'fill-background-surface-300 stroke-border-stronger'
                       : hasPrimary
-                        ? 'fill-brand stroke-brand-500'
+                        ? 'fill-primary-bright stroke-brand-500'
                         : 'fill-brand-500 stroke-brand-400'
                   }`}
                 />
@@ -201,11 +222,7 @@ const MapView = () => {
                 <div className="bg-studio/50 rounded-sm border">
                   <div className="px-3 py-2 flex flex-col">
                     <div className="flex items-center gap-x-2">
-                      <img
-                        alt="region icon"
-                        className="w-4 rounded-xs"
-                        src={`${BASE_PATH}/img/regions/${tooltip.region.region}.svg`}
-                      />
+                      <RegionFlag className="w-4" region={tooltip.region.region ?? ''} />
                       <p className="text-[10px]">{tooltip.region.country}</p>
                     </div>
                     <p
@@ -233,11 +250,7 @@ const MapView = () => {
               </p>
               <p className="text-sm">{selectedRegion.name}</p>
             </div>
-            <img
-              alt="region icon"
-              className="w-10 rounded-xs"
-              src={`${BASE_PATH}/img/regions/${selectedRegion.region}.svg`}
-            />
+            <RegionFlag className="w-10" region={selectedRegion.region} />
           </div>
 
           {databasesInSelectedRegion.length > 0 && (
@@ -302,10 +315,8 @@ const MapView = () => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="gap-x-2">
-                              <Link
-                                href={`/project/${ref}/database/replication/replica/${database.identifier}`}
-                              >
+                            <DropdownMenuItem className="gap-x-2" asChild>
+                              <Link href={getReadReplicaPath(ref, database.identifier)}>
                                 Manage replica
                               </Link>
                             </DropdownMenuItem>
@@ -325,7 +336,6 @@ const MapView = () => {
             }`}
           >
             <Button
-              variant="default"
               onClick={() => {
                 setCenter([14, 7])
                 setZoom(1.5)

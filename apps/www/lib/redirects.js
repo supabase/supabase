@@ -17,6 +17,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/rss.xml',
+    destination: '/rss.xml',
+  },
+  {
+    permanent: true,
     source: '/blog/introducing-supabase-etl',
     destination: '/blog/introducing-supabase-pipelines',
   },
@@ -107,13 +112,63 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/security',
+    destination: '/docs/guides/storage/security/ownership',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/serving',
+    destination: '/docs/guides/storage/serving/downloads',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/management',
+    destination: '/docs/guides/storage/management/copy-move-objects',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/s3',
+    destination: '/docs/guides/storage/s3/authentication',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/debugging',
+    destination: '/docs/guides/storage/debugging/logs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/schema',
+    destination: '/docs/guides/storage/schema/design',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/production',
+    destination: '/docs/guides/storage/production/scaling',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/vector',
+    destination: '/docs/guides/storage/vector/introduction',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/analytics/examples',
+    destination: '/docs/guides/storage/analytics/examples/duckdb',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgrest',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/storage/image-transformations',
     destination: '/docs/guides/storage/serving/image-transformations',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/access-control',
-    destination: 'docs/guides/storage/security/access-control',
+    destination: '/docs/guides/storage/security/access-control',
   },
   {
     permanent: true,
@@ -137,13 +192,38 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/observability/access-data',
+    destination: '/docs/guides/observability',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/reports/:match*',
     destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: true,
     source: '/docs/guides/telemetry/:match*',
-    destination: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging',
+    destination: '/docs/guides/observability',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/resolve-issues',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/debugging',
+    destination: '/docs/guides/observability/detecting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/:match*',
+    destination: '/docs/guides/observability/:match*',
   },
   {
     permanent: false,
@@ -165,117 +245,117 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/common/filters/_adj',
-    destination: '/docs/reference/javascript/rangeAdjacent',
+    destination: '/docs/reference/javascript/using-filters-rangeadjacent',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_cd',
-    destination: '/docs/reference/javascript/containedBy',
+    destination: '/docs/reference/javascript/using-filters-containedby',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_cs',
-    destination: '/docs/reference/javascript/contains',
+    destination: '/docs/reference/javascript/using-filters-contains',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_eq',
-    destination: '/docs/reference/javascript/eq',
+    destination: '/docs/reference/javascript/using-filters-eq',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_filter',
-    destination: '/docs/reference/javascript/filter',
+    destination: '/docs/reference/javascript/using-filters-filter',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_gt',
-    destination: '/docs/reference/javascript/gt',
+    destination: '/docs/reference/javascript/using-filters-gt',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_gte',
-    destination: '/docs/reference/javascript/gte',
+    destination: '/docs/reference/javascript/using-filters-gte',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_ilike',
-    destination: '/docs/reference/javascript/ilike',
+    destination: '/docs/reference/javascript/using-filters-ilike',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_in',
-    destination: '/docs/reference/javascript/in',
+    destination: '/docs/reference/javascript/using-filters-in',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_is',
-    destination: '/docs/reference/javascript/is',
+    destination: '/docs/reference/javascript/using-filters-is',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_like',
-    destination: '/docs/reference/javascript/like',
+    destination: '/docs/reference/javascript/using-filters-like',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_lt',
-    destination: '/docs/reference/javascript/lt',
+    destination: '/docs/reference/javascript/using-filters-lt',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_lte',
-    destination: '/docs/reference/javascript/lte',
+    destination: '/docs/reference/javascript/using-filters-lte',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_match',
-    destination: '/docs/reference/javascript/match',
+    destination: '/docs/reference/javascript/using-filters-match',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_neq',
-    destination: '/docs/reference/javascript/neq',
+    destination: '/docs/reference/javascript/using-filters-neq',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_not',
-    destination: '/docs/reference/javascript/not',
+    destination: '/docs/reference/javascript/using-filters-not',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_nxl',
-    destination: '/docs/reference/javascript/rangeGte',
+    destination: '/docs/reference/javascript/using-filters-rangegte',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_nxr',
-    destination: '/docs/reference/javascript/rangeLte',
+    destination: '/docs/reference/javascript/using-filters-rangelte',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_or',
-    destination: '/docs/reference/javascript/or',
+    destination: '/docs/reference/javascript/using-filters-or',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_ova',
-    destination: '/docs/reference/javascript/overlaps',
+    destination: '/docs/reference/javascript/using-filters-overlaps',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_ovr',
-    destination: '/docs/reference/javascript/overlaps',
+    destination: '/docs/reference/javascript/using-filters-overlaps',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_sl',
-    destination: '/docs/reference/javascript/rangeLt',
+    destination: '/docs/reference/javascript/using-filters-rangelt',
   },
   {
     permanent: false,
     source: '/docs/common/filters/_sr',
-    destination: '/docs/reference/javascript/rangeGt',
+    destination: '/docs/reference/javascript/using-filters-rangegt',
   },
   {
     permanent: false,
@@ -366,7 +446,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/generating-types',
-    destination: '/docs/reference/javascript/generating-types',
+    destination: '/docs/reference/javascript/typescript-support',
   },
   {
     permanent: false,
@@ -396,12 +476,12 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/auth-user',
-    destination: '/docs/reference/javascript/auth-user',
+    destination: '/docs/reference/javascript/v1/auth-user',
   },
   {
     permanent: false,
     source: '/docs/client/auth-update',
-    destination: '/docs/reference/javascript/auth-update',
+    destination: '/docs/reference/javascript/v1/auth-update',
   },
   {
     permanent: false,
@@ -411,7 +491,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/reset-password-email',
-    destination: '/docs/reference/javascript/reset-password-email',
+    destination: '/docs/reference/javascript/v1/auth-resetpasswordforemail',
   },
   {
     permanent: false,
@@ -461,22 +541,22 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/limit',
-    destination: '/docs/reference/javascript/limit',
+    destination: '/docs/reference/javascript/using-modifiers-limit',
   },
   {
     permanent: false,
     source: '/docs/client/order',
-    destination: '/docs/reference/javascript/order',
+    destination: '/docs/reference/javascript/using-modifiers-order',
   },
   {
     permanent: false,
     source: '/docs/client/range',
-    destination: '/docs/reference/javascript/range',
+    destination: '/docs/reference/javascript/using-modifiers-range',
   },
   {
     permanent: false,
     source: '/docs/client/single',
-    destination: '/docs/reference/javascript/single',
+    destination: '/docs/reference/javascript/using-modifiers-single',
   },
   {
     permanent: false,
@@ -486,118 +566,142 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/filter',
-    destination: '/docs/reference/javascript/filter',
+    destination: '/docs/reference/javascript/using-filters-filter',
   },
-  { permanent: false, source: '/docs/client/or', destination: '/docs/reference/javascript/or' },
+  {
+    permanent: false,
+    source: '/docs/client/or',
+    destination: '/docs/reference/javascript/using-filters-or',
+  },
   {
     permanent: false,
     source: '/docs/client/not',
-    destination: '/docs/reference/javascript/not',
+    destination: '/docs/reference/javascript/using-filters-not',
   },
   {
     permanent: false,
     source: '/docs/client/match',
-    destination: '/docs/reference/javascript/match',
+    destination: '/docs/reference/javascript/using-filters-match',
   },
-  { permanent: false, source: '/docs/client/eq', destination: '/docs/reference/javascript/eq' },
+  {
+    permanent: false,
+    source: '/docs/client/eq',
+    destination: '/docs/reference/javascript/using-filters-eq',
+  },
   {
     permanent: false,
     source: '/docs/client/neq',
-    destination: '/docs/reference/javascript/neq',
+    destination: '/docs/reference/javascript/using-filters-neq',
   },
-  { permanent: false, source: '/docs/client/gt', destination: '/docs/reference/javascript/gt' },
+  {
+    permanent: false,
+    source: '/docs/client/gt',
+    destination: '/docs/reference/javascript/using-filters-gt',
+  },
   {
     permanent: false,
     source: '/docs/client/gte',
-    destination: '/docs/reference/javascript/gte',
+    destination: '/docs/reference/javascript/using-filters-gte',
   },
-  { permanent: false, source: '/docs/client/lt', destination: '/docs/reference/javascript/lt' },
+  {
+    permanent: false,
+    source: '/docs/client/lt',
+    destination: '/docs/reference/javascript/using-filters-lt',
+  },
   {
     permanent: false,
     source: '/docs/client/lte',
-    destination: '/docs/reference/javascript/lte',
+    destination: '/docs/reference/javascript/using-filters-lte',
   },
   {
     permanent: false,
     source: '/docs/client/like',
-    destination: '/docs/reference/javascript/like',
+    destination: '/docs/reference/javascript/using-filters-like',
   },
   {
     permanent: false,
     source: '/docs/client/ilike',
-    destination: '/docs/reference/javascript/ilike',
+    destination: '/docs/reference/javascript/using-filters-ilike',
   },
-  { permanent: false, source: '/docs/client/is', destination: '/docs/reference/javascript/is' },
-  { permanent: false, source: '/docs/client/in', destination: '/docs/reference/javascript/in' },
+  {
+    permanent: false,
+    source: '/docs/client/is',
+    destination: '/docs/reference/javascript/using-filters-is',
+  },
+  {
+    permanent: false,
+    source: '/docs/client/in',
+    destination: '/docs/reference/javascript/using-filters-in',
+  },
   {
     permanent: false,
     source: '/docs/client/gte',
-    destination: '/docs/reference/javascript/gte',
+    destination: '/docs/reference/javascript/using-filters-gte',
   },
   {
     permanent: false,
     source: '/docs/client/cs',
-    destination: '/docs/reference/javascript/contains',
+    destination: '/docs/reference/javascript/using-filters-contains',
   },
   {
     permanent: false,
     source: '/docs/client/cd',
-    destination: '/docs/reference/javascript/containedBy',
+    destination: '/docs/reference/javascript/using-filters-containedby',
   },
   {
     permanent: false,
     source: '/docs/client/sl',
-    destination: '/docs/reference/javascript/rangeLt',
+    destination: '/docs/reference/javascript/using-filters-rangelt',
   },
   {
     permanent: false,
     source: '/docs/client/sr',
-    destination: '/docs/reference/javascript/rangeGt',
+    destination: '/docs/reference/javascript/using-filters-rangegt',
   },
   {
     permanent: false,
     source: '/docs/client/nxl',
-    destination: '/docs/reference/javascript/rangeGte',
+    destination: '/docs/reference/javascript/using-filters-rangegte',
   },
   {
     permanent: false,
     source: '/docs/client/nxr',
-    destination: '/docs/reference/javascript/rangeLte',
+    destination: '/docs/reference/javascript/using-filters-rangelte',
   },
   {
     permanent: false,
     source: '/docs/client/adj',
-    destination: '/docs/reference/javascript/rangeAdjacent',
+    destination: '/docs/reference/javascript/using-filters-rangeadjacent',
   },
   {
     permanent: false,
     source: '/docs/client/ov',
-    destination: '/docs/reference/javascript/overlaps',
+    destination: '/docs/reference/javascript/using-filters-overlaps',
   },
   {
     permanent: false,
     source: '/docs/client/ova',
-    destination: '/docs/reference/javascript/overlaps',
+    destination: '/docs/reference/javascript/using-filters-overlaps',
   },
   {
     permanent: false,
     source: '/docs/client/fts',
-    destination: '/docs/reference/javascript/textSearch',
+    destination: '/docs/reference/javascript/using-filters-textsearch',
   },
   {
     permanent: false,
     source: '/docs/client/plfts',
-    destination: '/docs/reference/javascript/textSearch',
+    destination: '/docs/reference/javascript/using-filters-textsearch',
   },
   {
     permanent: false,
     source: '/docs/client/phfts',
-    destination: '/docs/reference/javascript/textSearch',
+    destination: '/docs/reference/javascript/using-filters-textsearch',
   },
   {
     permanent: false,
     source: '/docs/client/wfts',
-    destination: '/docs/reference/javascript/textSearch',
+    destination: '/docs/reference/javascript/using-filters-textsearch',
   },
   { permanent: false, source: '/blog/page/:number', destination: '/blog' },
   { permanent: false, source: '/blog/tags', destination: '/blog' },
@@ -1620,6 +1724,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/login',
+    destination: 'https://supabase.com/dashboard/sign-in',
+  },
+  {
+    permanent: true,
     source: '/sign-up',
     destination: 'https://supabase.com/dashboard/sign-up',
   },
@@ -1660,8 +1769,28 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/cicd-workflow',
+    destination: '/docs/guides/functions/deploy',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
+  },
+  {
+    permanent: true,
+    source: '/support/new',
+    destination: 'https://supabase.com/dashboard/support/new',
+  },
+  {
+    permanent: true,
+    source: '/account/tokens',
+    destination: 'https://supabase.com/dashboard/account/tokens',
+  },
+  {
+    permanent: true,
+    source: '/project/:path+',
+    destination: 'https://supabase.com/dashboard/project/:path+',
   },
   // Reorganizing pooler docs:-----------------------------
 
@@ -2067,32 +2196,32 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript',
-    destination: '/docs/reference/javascript/start',
+    destination: '/docs/reference/javascript/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/dart',
-    destination: '/docs/reference/dart/start',
+    destination: '/docs/reference/dart/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/python',
-    destination: '/docs/reference/python/start',
+    destination: '/docs/reference/python/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/csharp',
-    destination: '/docs/reference/csharp/start',
+    destination: '/docs/reference/csharp/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/swift',
-    destination: '/docs/reference/swift/start',
+    destination: '/docs/reference/swift/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/kotlin',
-    destination: '/docs/reference/kotlin/start',
+    destination: '/docs/reference/kotlin/introduction',
   },
   {
     permanent: true,
@@ -2282,6 +2411,11 @@ module.exports = [
     permanent: true,
     source: '/customers/mendableai',
     destination: '/customers/firecrawl',
+  },
+  {
+    permanent: true,
+    source: '/customers/lingo-dev',
+    destination: '/customers/lingodotdev',
   },
 
   {
@@ -2753,8 +2887,18 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/inspect',
+    destination: '/docs/guides/observability/inspect',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/database-linter',
-    destination: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/observability/advisors',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/observability/advisors',
   },
   {
     permanent: true,
@@ -2835,6 +2979,26 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
     destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/bigquery',
+    destination: '/docs/guides/database/replication/pipelines/bigquery',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/clickhouse',
+    destination: '/docs/guides/database/replication/pipelines/clickhouse',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/ducklake',
+    destination: '/docs/guides/database/replication/pipelines/ducklake',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/snowflake',
+    destination: '/docs/guides/database/replication/pipelines/snowflake',
   },
   {
     permanent: true,
@@ -2936,6 +3100,31 @@ module.exports = [
     permanent: true,
     source: '/launchweek',
     destination: '/launch-week',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/6',
+    destination: '/blog/launch-week-6-wrap-up',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/x',
+    destination: '/blog/launch-week-x-best-launches',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/12',
+    destination: '/blog/launch-week-12-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/13',
+    destination: '/blog/launch-week-13-top-10',
+  },
+  {
+    permanent: true,
+    source: '/launch-week/14',
+    destination: '/blog/launch-week-14-top-10',
   },
   {
     permanent: true,
@@ -3229,6 +3418,16 @@ module.exports = [
     destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
   },
   {
+    permanent: true,
+    source: '/docs/guides/platform/manage-your-usage/log-ingest',
+    destination: '/docs/guides/platform/manage-your-usage/logs-ingest',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/manage-your-usage/log-query',
+    destination: '/docs/guides/platform/manage-your-usage/logs-query',
+  },
+  {
     permanent: false,
     source: '/docs/guides/platform/org-based-billing#disk-size',
     destination: '/docs/guides/platform/manage-your-usage/disk-size',
@@ -3359,7 +3558,7 @@ module.exports = [
     permanent: false,
   },
   // Legacy product .txt URLs → new .md routes
-  { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
+  { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
   { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
   { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
@@ -3368,4 +3567,7 @@ module.exports = [
   { permanent: true, source: '/llms/vector.txt', destination: '/modules/vector.md' },
   { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
   { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
+  { permanent: true, source: '/homepage.md', destination: '/index.md' },
+  { permanent: true, source: '/.md', destination: '/index.md' },
+  { permanent: true, source: '/index', destination: '/' },
 ]

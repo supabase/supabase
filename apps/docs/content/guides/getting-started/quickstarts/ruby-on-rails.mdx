@@ -10,6 +10,12 @@ breadcrumb: 'Framework Quickstarts'
 
 Save your database password securely. You need it for the connection string.
 
+<Admonition type="note">
+
+This guide uses Rails' own Active Record models and migrations, not the shared `instruments` sample table used by other quickstarts.
+
+</Admonition>
+
 ## 2. Create a Rails project
 
 With your Ruby and Rails versions up to date, run `rails new` on your terminal to scaffold a new project.
@@ -23,41 +29,21 @@ rails new blog -d=postgresql
 cd blog
 ```
 
-## 3. Install Supabase's Agent Skills (optional)
+## 3. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+<$Partial path="quickstart_ai_tooling.mdx" />
 
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
+## 4. Set up the Postgres connection details
 
-To install, run the following command in the root of your project:
+<$Partial path="quickstart_connection_string.mdx" />
 
-```bash
-npx skills add supabase/agent-skills
-```
-
-## 4. Install MCP server (optional)
-
-The Supabase MCP server connects AI assistants to Supabase, allowing you to interact with your projects on your behalf. Find out more on how to add it to your client in [the MCP docs](/docs/guides/ai-tools/mcp).
-
-## 5. Set up the Postgres connection details
-
-Navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&connectTab=direct&method=session).
-
-Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password, and [percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
-
-<Admonition type="note">
-
-If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
-
-</Admonition>
-
-Set the connection string as an environment variable. Rails reads `DATABASE_URL` from the environment and connects with it, so you don't need to edit `config/database.yml`. The export applies to the current shell session, so run it in the same shell as the Rails commands in the following steps. `sslmode=require` stops the driver from falling back to sending your data in plaintext.
+Set the connection string as an environment variable. Rails reads `DATABASE_URL` from the environment and connects with it, so you don't need to edit `config/database.yml`. The export applies to the current shell session, so run it in the same shell as the Rails commands in the following steps.
 
 ```bash
-export DATABASE_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres?sslmode=require
+export DATABASE_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres?sslmode=require
 ```
 
-## 6. Create and run a database migration
+## 5. Create and run a database migration
 
 Rails includes Active Record as the ORM as well as database migration tooling which generates the SQL migration files for you.
 
@@ -68,7 +54,7 @@ bin/rails generate model Article title:string body:text
 bin/rails db:migrate
 ```
 
-## 7. Use the model to interact with the database
+## 6. Use the model to interact with the database
 
 You can use the included Rails console to interact with the database. For example, you can create new entries or list all entries in a Model's table.
 
@@ -83,13 +69,15 @@ article.save # Saves the entry to the database
 Article.all
 ```
 
-## 8. Start the app
+## 7. Start the app
 
 Run the development server. Go to http://127.0.0.1:3000 in a browser to see your application running.
 
 ```bash
 bin/rails server
 ```
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

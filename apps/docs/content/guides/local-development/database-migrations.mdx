@@ -23,14 +23,7 @@ This page is a focused tutorial on migrations. If you want to move an existing p
 
 Database changes are managed through "migrations." Database migrations are a common way of tracking changes to your database over time.
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/Kx5nHBmIxyQ"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="Kx5nHBmIxyQ" title="Managing database migrations with the Supabase CLI" />
 
 For this guide, we'll create a table called `employees` and see how we can make changes to it.
 
@@ -221,7 +214,7 @@ The last step is deploying these changes to a live Supabase project.
 
 You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](/dashboard) and create a new project to deploy to.
 
-### Log in to the Supabase CLI
+### Sign in to the Supabase CLI
 
 <$CodeTabs>
 
@@ -296,7 +289,13 @@ SUPABASE_AUTH_GITHUB_SECRET="redacted"
 
 For these changes to take effect, you need to run `supabase stop` and `supabase start` again.
 
-If you have additional triggers or RLS policies defined on your `auth` schema, you can pull them as a migration file locally.
+If you have additional triggers or RLS policies defined on your `auth` schema, how you pull them locally depends on your project's diff engine.
+
+<$Partial path="diff_engine_check.mdx" />
+
+On `pg-delta`, a plain `supabase db pull` captures your customizations automatically. Triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) and RLS policies on `auth` tables are included in the diff.
+
+On the legacy `migra` engine, the initial pull's `pg_dump` skips the `auth` schema, but the diff pass that follows appends your triggers and RLS policies there to the same migration. Older CLI versions excluded the `auth` schema entirely and printed a message saying so. If you see that message, capture existing customizations once with an explicit pull:
 
 ```bash
 supabase db pull --schema auth
@@ -304,7 +303,7 @@ supabase db pull --schema auth
 
 ### Sync storage buckets
 
-Your RLS policies on storage buckets can be pulled locally by specifying `storage` schema. For example,
+On the `pg-delta` engine, your RLS policies on `storage.objects` and `storage.buckets` are also captured automatically by a plain `supabase db pull`. On the legacy `migra` engine, the diff pass that follows the initial `pg_dump` appends them to the same migration. If an older CLI prints a message that the `storage` schema was excluded, capture existing policies once with an explicit pull:
 
 ```bash
 supabase db pull --schema storage

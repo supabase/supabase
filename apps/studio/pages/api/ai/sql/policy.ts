@@ -1,5 +1,5 @@
 import type { JwtPayload } from '@supabase/supabase-js'
-import { generateText, Output, stepCountIs } from 'ai'
+import { generateText, isStepCount, Output } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -122,9 +122,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
         signal: toolsAbortController.signal,
       })
 
-      const { experimental_output } = await generateText({
+      const { output } = await generateText({
         ...modelParams,
-        stopWhen: stepCountIs(5),
+        stopWhen: isStepCount(5),
         prompt: source`
           You are a Postgres RLS (Row Level Security) expert.
           Determine the most appropriate policies for the "${schema}"."${tableName}" table within a Supabase project.
@@ -146,7 +146,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
           - Prefer PERMISSIVE policies unless a RESTRICTIVE policy is explicitly required
         `,
         tools,
-        experimental_output: Output.object({
+        output: Output.object({
           schema: z.object({
             policies: z.array(policySchema),
           }),
@@ -154,7 +154,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
       })
 
       // Add table and schema to each policy from the request
-      const policies = (experimental_output?.policies ?? []).map((policy) => ({
+      const policies = (output?.policies ?? []).map((policy) => ({
         ...policy,
         table: tableName,
         schema,

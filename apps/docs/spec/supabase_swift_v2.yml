@@ -224,7 +224,7 @@ functions:
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
-      - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/swift/get-user).
+      - To fetch the currently signed-in user, refer to [`getUser()`](/docs/reference/swift/get-user).
     overwriteParams:
       - name: email
         isOptional: true
@@ -335,7 +335,7 @@ functions:
               - Check the [User Sessions](/docs/guides/auth/sessions) docs for more information.
           - Use this to clean up any local storage your application has associated with the user.
         - `TOKEN_REFRESHED`
-          - Emitted each time a new access and refresh token are fetched for the signed in user.
+          - Emitted each time a new access and refresh token are fetched for the signed-in user.
           - It's best practice and highly recommended to extract the access token (JWT) and store it in memory for further use in your application.
             - Avoid frequent calls to `supabase.auth.session` for the same purpose.
           - There is a background process that keeps track of when the session should be refreshed so you will always receive valid tokens by listening to this event.
@@ -4741,7 +4741,7 @@ functions:
       - id: passing-custom-headers
         name: Passing custom headers
         description: |
-          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+          You can pass custom headers to your function. Note: supabase-swift automatically passes the `Authorization` header with the signed-in user's JWT.
         isSpotlight: true
         code: |
           ```swift

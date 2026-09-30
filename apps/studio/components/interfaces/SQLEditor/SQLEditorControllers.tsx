@@ -15,7 +15,6 @@ import {
 } from 'react'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
-import { type QuerySource } from './querySource'
 import type { UtilityTab } from './SQLEditor.types'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useAddDefinitions } from './useAddDefinitions'
@@ -26,17 +25,16 @@ import { useRunSource } from './useRunSource'
 import { useSnippetIdentity } from './useSnippetIdentity'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { useSqlEditorAi } from './useSqlEditorAi'
+import { useSqlEditorDatabaseSelection } from './useSqlEditorDatabaseSelection'
 import { useSqlEditorExecution } from './useSqlEditorExecution'
 import { useSqlEditorShortcuts } from './useSqlEditorShortcuts'
-import { isValidConnString } from '@/data/fetchers'
 import {
   untrustedLogSql,
   type SafeLogSqlFragment,
   type UntrustedLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import {
   getSqlEditorV2StateSnapshot,
   useSqlEditorV2StateSnapshot,
@@ -81,7 +79,7 @@ type RunContextValue = {
   potentialIssues: SqlEditorExecution['potentialIssues']
   resetPotentialIssues: () => void
   prettifyQuery: () => void
-  runSource: QuerySource
+  runSource: QuerySourceBinding
   executeLogsQuery: (sql: SafeLogSqlFragment) => void
   readEditorLogsSql: () => UntrustedLogSqlFragment | undefined
 }
@@ -129,7 +127,6 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { setSelectedDatabaseId } = useDatabaseSelectorStateSnapshot()
 
   const diff = useSqlEditorDiff()
   const { isDiffOpen } = diff
@@ -144,14 +141,9 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   const runSource = useRunSource(id)
 
-  useAddDefinitions(id, monacoRef.current, { enabled: runSource.type !== 'logs' })
+  useAddDefinitions(id, monacoRef.current, { enabled: runSource._tag !== 'logs' })
 
-  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
-    {
-      projectRef: ref,
-    },
-    { enabled: isValidConnString(project?.connectionString) }
-  )
+  useSqlEditorDatabaseSelection({ ref, connectionString: project?.connectionString })
 
   const { setAiTitle } = useSnippetTitleGenerator()
 
@@ -191,7 +183,7 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   const isExecuting = isExecutingDb || isExecutingLogs
 
-  const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt, sqlSource: runSource.type })
+  const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt, sqlSource: runSource._tag })
   const { acceptAiHandler, discardAiHandler } = ai
 
   useSqlEditorShortcuts({
@@ -213,13 +205,6 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
     // Save the departing snippet's scroll position on unmount / snippet switch.
     return () => saveScrollPosition(id)
   }, [id])
-
-  useEffect(() => {
-    if (isSuccessReadReplicas) {
-      const primaryDatabase = databases.find((db) => db.identifier === ref)
-      setSelectedDatabaseId(primaryDatabase?.identifier)
-    }
-  }, [isSuccessReadReplicas, databases, ref, setSelectedDatabaseId])
 
   const snippetName =
     urlId === 'new'

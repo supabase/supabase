@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "current-user-avatar-vue",
-  "type": "registry:block",
   "title": "Current User Avatar",
   "description": "Component which renders the current user's avatar.",
   "dependencies": [
@@ -29,5 +28,6 @@
       "type": "registry:component",
       "target": "composables/useCurrentUserImage.ts"
     }
-  ]
+  ],
+  "type": "registry:block"
 }
