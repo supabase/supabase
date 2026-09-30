@@ -53,7 +53,7 @@ export const getWrapperCreationFormSchema = (wrapperMeta: WrapperMeta) => {
 export const getEditionFormSchema = (wrapperMeta: WrapperMeta) => {
   let wrapperSchema = {
     // Common validation for all wrappers
-    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+    server_name: z.string().min(1, 'Please provide a name for your server'),
     tables: z
       .array(tableSchema, { required_error: 'Please provide at least one table' })
       .min(1, 'Please provide at least one table'),

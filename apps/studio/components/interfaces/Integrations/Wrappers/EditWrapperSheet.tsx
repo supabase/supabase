@@ -88,7 +88,6 @@ export const EditWrapperSheet = ({
 
   const initialValues: Record<string, any> = useMemo(
     () => ({
-      wrapper_name: wrapper?.name,
       server_name: wrapper?.server_name,
       ...convertKVStringArrayToJson(wrapper?.server_options ?? []),
       tables: formatWrapperTables(wrapper, wrapperMeta),
