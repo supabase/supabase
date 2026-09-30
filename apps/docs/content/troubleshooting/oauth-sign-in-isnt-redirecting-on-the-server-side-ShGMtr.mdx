@@ -38,7 +38,7 @@ throw redirect(303, data.url)
 **Remix:**
 
 ```ts
-import { redirect, type ActionFunctionArgs } from '@remix-run/node' // or cloudflare/deno
+import { redirect, type ActionFunctionArgs } from '@remix-run/node'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function action({ request }: ActionFunctionArgs) {
