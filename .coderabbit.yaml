@@ -34,7 +34,7 @@ reviews:
         Strictly enforce event naming: [object]_[verb] in snake_case. Only approved
         verbs: opened, clicked, submitted, created, removed, updated, retrieved,
         intended, evaluated, added, enabled, disabled, copied, exposed, failed,
-        converted. Properties must be camelCase for new events (match existing
+        converted, completed. Properties must be camelCase for new events (match existing
         convention when adding to existing events). Flag any usage of
         useSendEventMutation. Verify @group Events and @source JSDoc tags are
         accurate. Check that new interfaces are added to the TelemetryEvent union type.

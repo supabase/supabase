@@ -27,6 +27,7 @@ import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as McpSecretsRouteImport } from './routes/mcp/secrets'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
+import { Route as ApiStatusPageRouteImport } from './routes/api/status-page'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
 import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
@@ -420,6 +421,11 @@ const McpSecretsRoute = McpSecretsRouteImport.update({
 const IntegrationsVercelRoute = IntegrationsVercelRouteImport.update({
   id: '/integrations/vercel',
   path: '/integrations/vercel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStatusPageRoute = ApiStatusPageRouteImport.update({
+  id: '/api/status-page',
+  path: '/api/status-page',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
@@ -2175,6 +2181,7 @@ export interface FileRoutesByFullPath {
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
@@ -2497,6 +2504,7 @@ export interface FileRoutesByTo {
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
@@ -2809,6 +2817,7 @@ export interface FileRoutesById {
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
@@ -3134,6 +3143,7 @@ export interface FileRouteTypes {
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
+    | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
     | '/new/$slug'
@@ -3456,6 +3466,7 @@ export interface FileRouteTypes {
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
+    | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
     | '/new/$slug'
@@ -3767,6 +3778,7 @@ export interface FileRouteTypes {
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
+    | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
     | '/new/$slug'
@@ -4081,6 +4093,7 @@ export interface RootRouteChildren {
   ApiParseQueryRoute: typeof ApiParseQueryRoute
   ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
+  ApiStatusPageRoute: typeof ApiStatusPageRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   McpSecretsRoute: typeof McpSecretsRoute
   NewSlugRoute: typeof NewSlugRoute
@@ -4307,6 +4320,13 @@ declare module '@tanstack/react-router' {
       path: '/integrations/vercel'
       fullPath: '/integrations/vercel'
       preLoaderRoute: typeof IntegrationsVercelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/status-page': {
+      id: '/api/status-page'
+      path: '/api/status-page'
+      fullPath: '/api/status-page'
+      preLoaderRoute: typeof ApiStatusPageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/status-override': {
@@ -7207,6 +7227,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiParseQueryRoute: ApiParseQueryRoute,
   ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
+  ApiStatusPageRoute: ApiStatusPageRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   McpSecretsRoute: McpSecretsRoute,
   NewSlugRoute: NewSlugRoute,

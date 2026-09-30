@@ -2425,6 +2425,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/profile/permissions/v2': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the user's role and effective permissions per organization and project */
+    get: operations['getPermissionsV2']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/profile/scoped-access-tokens': {
     parameters: {
       query?: never
@@ -8951,6 +8968,8 @@ export interface components {
       private_link_associations: {
         account_name?: string
         aws_account_id: string
+        /** @description The custom DNS name configured on the AWS VPC Lattice resource configuration. */
+        custom_dns_name: string
         /** @description Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier. */
         database_identifier: string
         /**
@@ -9735,6 +9754,7 @@ export interface components {
       payment_attempted: boolean
       payment_is_processing: boolean
       period_end: number
+      prepaid_credits_applied_cents: number
       status: string
       subscription: string | null
       subtotal: number
@@ -10437,6 +10457,7 @@ export interface components {
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
+      high_availability?: boolean
       /** @enum {string} */
       provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
       region: string
@@ -15306,6 +15327,20 @@ export interface components {
       role?: string
       updated_at?: string
     }
+    UserPermissionsResponse_Output: {
+      organizations: {
+        permissions: string[]
+        projects: {
+          permissions: string[]
+          ref: string
+          /** @enum {string} */
+          role: 'member' | 'readonly' | 'developer' | 'administrator' | 'owner'
+        }[]
+        /** @enum {string} */
+        role: 'member' | 'readonly' | 'developer' | 'administrator' | 'owner'
+        slug: string
+      }[]
+    }
     ValidateDestinationBody: {
       /** @description Destination configuration */
       config:
@@ -17983,6 +18018,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SendFeedbackResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to send feedback */
       500: {
@@ -24731,6 +24787,25 @@ export interface operations {
       }
     }
   }
+  getPermissionsV2: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserPermissionsResponse_Output']
+        }
+      }
+    }
+  }
   ScopedAccessTokensController_getAccessTokens: {
     parameters: {
       query?: never
@@ -29754,6 +29829,7 @@ export interface operations {
           | '48xlarge_optimized_memory'
           | '48xlarge_optimized_cpu'
           | '48xlarge_high_memory'
+        high_availability?: string
         organization_slug: string
       }
       header?: never

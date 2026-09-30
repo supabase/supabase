@@ -312,7 +312,12 @@ export const CreateWrapperSheet = ({
                   {wrapperMeta.server.options
                     .filter((option) => !option.hidden)
                     .map((option) => (
-                      <InputField option={option} control={form.control} key={option.name} />
+                      <InputField
+                        key={option.name}
+                        option={option}
+                        control={form.control}
+                        placeholder={option.defaultValue}
+                      />
                     ))}
                 </FormSectionContent>
               </FormSection>
