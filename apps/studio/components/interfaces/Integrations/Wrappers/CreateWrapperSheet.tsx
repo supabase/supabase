@@ -23,7 +23,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import InputField from './InputField'
+import { InputField } from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
   FormattedWrapperTable,
@@ -413,11 +413,11 @@ export const CreateWrapperSheet = ({
                 <FormSection className="p-5!">
                   <FormSectionContent loading={false}>
                     <FormItemLayout
+                      isReactForm={false}
                       layout="horizontal"
                       label="Foreign tables"
                       labelOptional="You can query your data from these foreign tables after the wrapper is
                         created"
-                      isReactForm={false}
                       className={cn(
                         '[&>div>span]:text-balance',
                         tablesField.length === 0 &&
@@ -494,20 +494,15 @@ export const CreateWrapperSheet = ({
               )}
 
               {mode === 'schema' && (
-                <>
-                  <Separator />
-                  <FormSection
-                    header={
-                      <FormSectionLabel>
-                        <p>Foreign Schema</p>
-                        <p className="text-foreground-light mt-2 w-[90%]">
-                          You can query your data from the foreign tables in the specified schema
-                          after the wrapper is created.
-                        </p>
-                      </FormSectionLabel>
-                    }
-                  >
-                    <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                <FormSection className="p-5!">
+                  <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="horizontal"
+                      label="Foreign schema"
+                      labelOptional="You can query your data from the foreign tables in the specified schema after the wrapper is created."
+                      className={cn('[&>div>span]:text-balance')}
+                    >
                       {wrapperMeta.sourceSchemaOption &&
                         !wrapperMeta.sourceSchemaOption?.readOnly && (
                           // Hide the field if the source schema is read-only
@@ -520,6 +515,7 @@ export const CreateWrapperSheet = ({
                       <div className="flex flex-col gap-2">
                         <InputField
                           key="target_schema"
+                          layout="vertical"
                           option={{
                             name: 'target_schema',
                             label: 'Specify a new schema to create all wrapper tables in',
@@ -532,9 +528,9 @@ export const CreateWrapperSheet = ({
                           control={form.control}
                         />
                       </div>
-                    </FormSectionContent>
-                  </FormSection>
-                </>
+                    </FormItemLayout>
+                  </FormSectionContent>
+                </FormSection>
               )}
             </div>
 

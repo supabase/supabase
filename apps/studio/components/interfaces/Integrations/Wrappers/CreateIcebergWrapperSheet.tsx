@@ -19,7 +19,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { CreateWrapperSheetProps } from './CreateWrapperSheet'
-import InputField from './InputField'
+import { InputField } from './InputField'
 import {
   FormSection,
   FormSectionContent,
@@ -353,10 +353,11 @@ export const CreateIcebergWrapperSheet = ({
                   )}
                 </FormSectionContent>
               </FormSection>
+
               <FormSection
                 header={
                   <FormSectionLabel>
-                    <p>Foreign Schema</p>
+                    <p>Foreign schema</p>
                     <p className="text-foreground-light mt-2 w-[90%]">
                       You can query your data from the foreign tables in the specified schema after
                       the wrapper is created.

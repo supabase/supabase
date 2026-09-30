@@ -516,6 +516,15 @@ export const getUpdateFDWSql = ({
   // wrapperMeta.name is fixed per wrapper type and shared across every server
   // that uses it, so it's never user-editable here - only the server itself
   // (formState.server_name / wrapper.server_name) can be configured per connection.
+  const newServerName = formState.server_name || wrapper.server_name
+  const isRenamingServer = newServerName !== wrapper.server_name
+
+  // Runs before every other statement so the rest of this transaction can
+  // target the server by its new name.
+  const renameServerSql = isRenamingServer
+    ? safeSql`alter server ${ident(wrapper.server_name)} rename to ${ident(newServerName)};`
+    : safeSql``
+
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
   const unencryptedOptions = wrapperMeta.server.options.filter((option) => !option.encrypted)
   const currentServerOptions = parseOptionsArray(wrapper.server_options)
@@ -541,7 +550,7 @@ export const getUpdateFDWSql = ({
   for (const option of encryptedOptions) {
     const existingSecretId = currentServerOptions[option.name]
     const newValue = formState[option.name]
-    const newSecretName = `${wrapper.server_name}_${option.name}`
+    const newSecretName = `${newServerName}_${option.name}`
 
     if (newValue && existingSecretId !== undefined) {
       // Secret already exists: update its value in place instead of deleting and recreating it.
@@ -596,7 +605,7 @@ export const getUpdateFDWSql = ({
             select id::text into v_secret_ref from vault.secrets where name = ${literal(newSecretName)} limit 1;
           end if;
 
-          execute format('alter server ${ident(wrapper.server_name)} options (add ${ident(option.name)} %L)', v_secret_ref);
+          execute format('alter server ${ident(newServerName)} options (add ${ident(option.name)} %L)', v_secret_ref);
         end $$;
       `)
     } else if (!newValue && existingSecretId !== undefined) {
@@ -619,7 +628,7 @@ export const getUpdateFDWSql = ({
   const alterServerOptionsSql =
     serverOptionClauses.length > 0
       ? safeSql`
-          alter server ${ident(wrapper.server_name)}
+          alter server ${ident(newServerName)}
           options (${joinSqlFragments(serverOptionClauses, ', ')});
         `
       : safeSql``
@@ -647,7 +656,7 @@ export const getUpdateFDWSql = ({
     '\n'
   )
   const createTablesSql = joinSqlFragments(
-    tablesToCreate.map((table) => buildCreateForeignTableSql(table, wrapper.server_name)),
+    tablesToCreate.map((table) => buildCreateForeignTableSql(table, newServerName)),
     '\n'
   )
   const dropTablesSql = joinSqlFragments(
@@ -669,6 +678,7 @@ export const getUpdateFDWSql = ({
 
   const sql = safeSql`
     ${ensureWrapperIsNotSharedSql}
+    ${renameServerSql}
     ${alterServerOptionsSql}
     ${encryptedOptionsSql}
     ${newSchemasSql}
