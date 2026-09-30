@@ -56,7 +56,11 @@ function extractSectionsFromOpenApi(filePaths: string[], outputPath: string) {
         const sectionCate = sections.find((i) => i.title === tag)
         sectionCate?.items.push({
           id: operationId,
-          title: slugToTitle(operationId),
+          title:
+            operationId.startsWith('v2-organizations-slug-webhooks') ||
+            operationId.startsWith('v2-projects-ref-webhooks')
+              ? methods[method].summary
+              : slugToTitle(operationId),
           slug: operationId,
           type: 'operation',
         })
