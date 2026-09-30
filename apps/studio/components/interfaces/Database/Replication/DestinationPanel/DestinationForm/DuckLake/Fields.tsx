@@ -1,10 +1,9 @@
-import { Check, Database, Eye, EyeOff, Plus, SlidersHorizontal } from 'lucide-react'
+import { Eye, EyeOff, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -15,10 +14,13 @@ import {
   FormControl,
   FormField,
   Input,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -52,17 +54,17 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
+const CREATE_BUCKET_OPTION = '__create_ducklake_bucket__'
+
 const DUCKLAKE_MODE_OPTIONS = [
   {
     value: DUCKLAKE_MODE_SUPABASE,
-    icon: Database,
     label: 'Use Supabase',
     description:
       'Use Supabase projects for the catalog and storage. Pipelines creates the credentials.',
   },
   {
     value: DUCKLAKE_MODE_CUSTOM,
-    icon: SlidersHorizontal,
     label: 'Custom parameters',
     description: 'Enter a Postgres catalog URL and S3-compatible storage credentials.',
   },
@@ -76,40 +78,20 @@ const DuckLakeModeSelector = ({
   onChange: (value: DucklakeMode) => void
 }) => {
   return (
-    <div role="radiogroup" aria-label="Configuration method" className="grid grid-cols-2 gap-3">
-      {DUCKLAKE_MODE_OPTIONS.map((option) => {
-        const Icon = option.icon
-        const selected = value === option.value
-        return (
-          <button
-            key={option.value}
-            type="button"
-            tabIndex={0}
-            role="radio"
-            aria-checked={selected}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              'relative flex flex-col gap-y-3 rounded-md border p-4 text-left transition',
-              'hover:border-control-hover',
-              selected ? 'border-control-hover bg-surface-300' : 'border-default bg-surface-100'
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <Icon size={18} strokeWidth={1.5} className="text-foreground-light" />
-              {selected ? (
-                <Check size={16} className="text-primary" />
-              ) : (
-                <span className="h-4 w-4 rounded-full border border-strong" />
-              )}
-            </div>
-            <div className="flex flex-col gap-y-1">
-              <span className="text-sm text-foreground">{option.label}</span>
-              <span className="text-xs text-foreground-light">{option.description}</span>
-            </div>
-          </button>
-        )
-      })}
-    </div>
+    <RadioGroupStacked
+      aria-label="Configuration method"
+      value={value}
+      onValueChange={(nextValue) => onChange(nextValue as DucklakeMode)}
+    >
+      {DUCKLAKE_MODE_OPTIONS.map((option) => (
+        <RadioGroupStackedItem
+          key={option.value}
+          value={option.value}
+          label={option.label}
+          description={option.description}
+        />
+      ))}
+    </RadioGroupStacked>
   )
 }
 
@@ -280,23 +262,14 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
             label={DUCKLAKE_BUCKET_FIELD_COPY.label}
             description={DUCKLAKE_BUCKET_FIELD_COPY.description}
           >
-            <div className="flex items-center gap-x-2">
-              <div className="grow">
-                <FormControl>
-                  <BucketSelection form={form} value={field.value} onChange={field.onChange} />
-                </FormControl>
-              </div>
-              <Button
-                type="button"
-                size="small"
-                icon={<Plus />}
-                aria-label="Create bucket"
-                title="Create bucket"
-                className="h-[34px] w-[34px] shrink-0 p-0"
-                disabled={!ducklakeStorageProjectRef}
-                onClick={() => setShowNewBucketDialog(true)}
+            <FormControl>
+              <BucketSelection
+                form={form}
+                value={field.value}
+                onChange={field.onChange}
+                onCreateBucket={() => setShowNewBucketDialog(true)}
               />
-            </div>
+            </FormControl>
           </FormItemLayout>
         )}
       />
@@ -378,7 +351,7 @@ const DuckLakeCustomFields = ({
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
-                  type={showCatalogUrl ? 'text' : 'password'}
+                  type={showCatalogUrl && !editMode ? 'text' : 'password'}
                   placeholder={
                     editMode
                       ? STORED_SECRET_PLACEHOLDER
@@ -386,14 +359,16 @@ const DuckLakeCustomFields = ({
                   }
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
-                    <div className="flex items-center justify-center">
-                      <Button
-                        className="w-7"
-                        icon={showCatalogUrl ? <Eye /> : <EyeOff />}
-                        aria-label={showCatalogUrl ? 'Hide catalog URL' : 'Show catalog URL'}
-                        onClick={() => setShowCatalogUrl(!showCatalogUrl)}
-                      />
-                    </div>
+                    !editMode && (
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className="w-7"
+                          aria-label={showCatalogUrl ? 'Hide catalog URL' : 'Show catalog URL'}
+                          icon={showCatalogUrl ? <Eye /> : <EyeOff />}
+                          onClick={() => setShowCatalogUrl(!showCatalogUrl)}
+                        />
+                      </div>
+                    )
                   }
                 />
               </FormControl>
@@ -467,19 +442,21 @@ const DuckLakeCustomFields = ({
               <FormControl>
                 <Input
                   {...field}
-                  type={showSecretAccessKey ? 'text' : 'password'}
+                  type={showSecretAccessKey && !editMode ? 'text' : 'password'}
                   placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'my-secret-key'}
                   value={field.value ?? ''}
                 />
               </FormControl>
-              <Button
-                icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
-                aria-label={
-                  showSecretAccessKey ? 'Hide S3 secret access key' : 'Show S3 secret access key'
-                }
-                className="w-7 absolute right-6 top-[4px]"
-                onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
-              />
+              {!editMode && (
+                <Button
+                  aria-label={
+                    showSecretAccessKey ? 'Hide S3 secret access key' : 'Show S3 secret access key'
+                  }
+                  icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                  className="w-7 absolute right-6 top-[4px]"
+                  onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
+                />
+              )}
             </FormItemLayout>
           )}
         />
@@ -715,10 +692,12 @@ const BucketSelection = ({
   form,
   value,
   onChange,
+  onCreateBucket,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   value: string | undefined
   onChange: (value: string) => void
+  onCreateBucket: () => void
 }) => {
   const ducklakeStorageProjectRef = useWatch({
     control: form.control,
@@ -761,8 +740,9 @@ const BucketSelection = ({
     <Select
       value={value || ''}
       onOpenChange={handleRefreshBucketsOnOpen}
-      onValueChange={(e) => {
-        if (e) onChange(e)
+      onValueChange={(nextValue) => {
+        if (nextValue === CREATE_BUCKET_OPTION) onCreateBucket()
+        else if (nextValue) onChange(nextValue)
       }}
     >
       <SelectTrigger>{value || 'Select a bucket'}</SelectTrigger>
@@ -784,6 +764,13 @@ const BucketSelection = ({
               {bucket.name}
             </SelectItem>
           ))}
+          <SelectSeparator />
+          <SelectItem value={CREATE_BUCKET_OPTION}>
+            <span className="flex items-center gap-x-2">
+              <Plus size={14} />
+              New bucket
+            </span>
+          </SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

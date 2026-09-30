@@ -48,7 +48,8 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsAwsCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
@@ -67,9 +68,15 @@ const PoolingConfigurationFormSchema = z.object({
  */
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
+  const isAws = useIsAwsCloudProvider()
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
   const canLoadPoolingConfig = !isHighAvailability && !isHighAvailabilityPending
+
+  const { projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
+    'project_addons:dedicated_ipv4_address',
+  ])
+
   const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -121,6 +128,14 @@ export const ConnectionPooling = () => {
   const default_pool_size = useWatch({ control: form.control, name: 'default_pool_size' })
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
   const ignoreStartupParameters = pgbouncerConfig?.ignore_startup_parameters
+
+  const showIpv4Callout =
+    isAws &&
+    projectAddonsDedicatedIpv4Address &&
+    isSuccessAddons &&
+    !isHighAvailability &&
+    !disablePoolModeSelection &&
+    !hasIpv4Addon
 
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
     if (!projectRef || isHighAvailability) return
@@ -187,7 +202,7 @@ export const ConnectionPooling = () => {
           />
         )}
 
-        {isSuccessAddons && !isHighAvailability && !disablePoolModeSelection && !hasIpv4Addon && (
+        {showIpv4Callout && (
           <Admonition
             type="default"
             layout="responsive"

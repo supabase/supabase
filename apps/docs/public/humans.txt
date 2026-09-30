@@ -139,6 +139,7 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Iryna Deans
+Isaac Dawson
 Ivan Vasilov
 Jamie Boyd
 Jake Ng
@@ -175,6 +176,7 @@ Joshen Lim
 Juan Manuel Valenzuela
 Julian Domke
 Julien Goux
+Kacper Mentel
 Kai M
 Kalleby Santos
 Kanad Gupta
@@ -189,7 +191,9 @@ Keith Fiske
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Shaffer-Morrison
 Kevin Strong-Holte
+Kody Jackson
 Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
@@ -299,6 +303,7 @@ Shreekar Shetty
 Simon Tomlinson
 Sreyas Udayavarman
 Stephanie Jackson (stejacks)
+Stephen Denham
 Stephen Morgan
 Steve Chavez
 Steven Eubank
