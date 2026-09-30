@@ -70,7 +70,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
                 {' '}
                 Edit this server&apos;s credentials in{' '}
                 <Link
-                  href={`/project/${ref}/settings/vault/secrets`}
+                  href={`/project/${ref}/integrations/vault/secrets`}
                   className="underline underline-offset-2"
                 >
                   Vault
@@ -140,7 +140,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
         {encryptedMetadata.map((metadata) => (
           <div key={metadata.name} className="flex items-center space-x-2 text-sm">
             <Link
-              href={`/project/${ref}/settings/vault/secrets?search=${encodeURIComponent(
+              href={`/project/${ref}/integrations/vault/secrets?search=${encodeURIComponent(
                 `${wrapper.name}_${metadata.name}`
               )}`}
               className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"

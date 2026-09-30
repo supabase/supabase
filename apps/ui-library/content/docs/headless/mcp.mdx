@@ -1,7 +1,7 @@
 ---
 title: MCP Server
 description: Add a user-scoped MCP server to your product
-preview: <BlockOverview name="mcp-server" showFiles />
+preview: <BlockOverview name="mcp" showFiles />
 ---
 
 Give embedded product agents and external clients such as Codex, Claude Code,
@@ -11,7 +11,7 @@ and gives every tool an RLS-scoped client.
 
 ## Installation
 
-<BlockItem name="mcp-server" showOpenInV0={false} />
+<BlockItem name="mcp" showOpenInV0={false} />
 
 Installs Deno Edge Function files into a Supabase project or empty directory. No
 `components.json` is required. Backend files stay in `supabase/` at the project
@@ -25,7 +25,7 @@ list, preserving existing entries. Check the function separately with Deno.
 The function verifies access tokens itself, so disable the gateway JWT check:
 
 ```toml
-[functions.mcp-server]
+[functions.mcp]
 verify_jwt = false
 ```
 
@@ -86,7 +86,7 @@ Deno.serve(
 ```
 
 `withOAuthProtectedResource()` runs before the auth gate. It serves RFC 9728
-metadata at `/functions/v1/mcp-server/oauth-protected-resource` and adds a
+metadata at `/functions/v1/mcp/oauth-protected-resource` and adds a
 `WWW-Authenticate` challenge to `401` responses so MCP clients can discover the
 authorization server. On Edge Functions it derives the public URLs itself, locally
 and hosted; off Edge Functions pass `resourceServer` and `authorizationServer`.
@@ -115,7 +115,7 @@ authorization decisions.
 Each tool module exports one registration function:
 
 ```ts
-// supabase/functions/mcp-server/tools/tasks.ts
+// supabase/functions/mcp/tools/tasks.ts
 import type { McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'
 import { z } from 'npm:zod@4.4.3'
 
@@ -182,11 +182,11 @@ the `SupabaseClient` in `tools/types.ts` a `SupabaseClient<Database>`.
 | `MCP_SERVER_NAME`        | `supabase-mcp`   | Server name shown to MCP clients |
 | `MCP_SERVER_DESCRIPTION` | Generic sentence | Instructions shown to clients    |
 
-The block includes `supabase/functions/mcp-server/.env.example`. Copy it before
+The block includes `supabase/functions/mcp/.env.example`. Copy it before
 serving locally, then customize the name and description:
 
 ```bash
-cp supabase/functions/mcp-server/.env.example supabase/functions/.env
+cp supabase/functions/mcp/.env.example supabase/functions/.env
 ```
 
 Add `supabase/functions/.env` to `.gitignore`. Supabase supplies the project URL,
@@ -199,10 +199,10 @@ function's public URL.
 Check the function before serving or deploying it:
 
 ```bash
-cd supabase/functions/mcp-server
+cd supabase/functions/mcp
 deno task check
 cd ../../..
-supabase functions serve mcp-server --env-file supabase/functions/.env
+supabase functions serve mcp --env-file supabase/functions/.env
 ```
 
 Then deploy:
@@ -210,7 +210,7 @@ Then deploy:
 ```bash
 supabase config push
 supabase secrets set --env-file supabase/functions/.env
-supabase functions deploy mcp-server
+supabase functions deploy mcp
 ```
 
 ## Further reading

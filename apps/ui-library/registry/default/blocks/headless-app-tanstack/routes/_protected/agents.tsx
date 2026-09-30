@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ConnectedAgents } from '@/registry/default/blocks/headless-app-tanstack/components/connected-agents'
 
 const PRODUCT_NAME = import.meta.env.VITE_PRODUCT_NAME?.trim() || 'Your product'
-const MCP_SERVER_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mcp-server`
+const MCP_SERVER_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mcp`
 
 // Nested under _protected, so the layout route redirects signed-out visitors
 // before this renders.

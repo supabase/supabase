@@ -239,21 +239,23 @@ export const SnowflakeFields = ({
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
-                  type={showPrivateKeyPassphrase ? 'text' : 'password'}
+                  type={showPrivateKeyPassphrase && !editMode ? 'text' : 'password'}
                   placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
-                    <div className="flex items-center justify-center">
-                      <Button
-                        className="w-7"
-                        title={showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'}
-                        aria-label={
-                          showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'
-                        }
-                        icon={showPrivateKeyPassphrase ? <Eye /> : <EyeOff />}
-                        onClick={() => setShowPrivateKeyPassphrase(!showPrivateKeyPassphrase)}
-                      />
-                    </div>
+                    !editMode && (
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className="w-7"
+                          title={showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+                          aria-label={
+                            showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'
+                          }
+                          icon={showPrivateKeyPassphrase ? <Eye /> : <EyeOff />}
+                          onClick={() => setShowPrivateKeyPassphrase(!showPrivateKeyPassphrase)}
+                        />
+                      </div>
+                    )
                   }
                 />
               </FormControl>

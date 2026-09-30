@@ -56,7 +56,7 @@ export const PipelineStatePill = ({
     return (
       <span className="inline-flex" aria-live="polite" aria-atomic="true">
         <span className="sr-only">Loading pipeline status</span>
-        <ShimmeringLoader className="w-20" />
+        <ShimmeringLoader className="h-5 w-20 py-0" />
       </span>
     )
   }
