@@ -14,12 +14,12 @@ export type ThemedIconSrc = string | { light: string; dark: string }
 export const BRAND_ICONS = {
   bigquery: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
   clickhouse: {
-    light: `${BASE_PATH}/img/icons/clickhouse-icon-light.svg`,
-    dark: `${BASE_PATH}/img/icons/clickhouse-icon-dark.svg`,
+    light: `${BASE_PATH}/img/icons/clickhouse-icon-on-light.svg`,
+    dark: `${BASE_PATH}/img/icons/clickhouse-icon-on-dark.svg`,
   },
   ducklake: {
-    light: `${BASE_PATH}/img/icons/ducklake-icon-light.svg`,
-    dark: `${BASE_PATH}/img/icons/ducklake-icon-dark.svg`,
+    light: `${BASE_PATH}/img/icons/ducklake-icon-on-light.svg`,
+    dark: `${BASE_PATH}/img/icons/ducklake-icon-on-dark.svg`,
   },
   snowflake: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
 } as const satisfies Record<string, ThemedIconSrc>
