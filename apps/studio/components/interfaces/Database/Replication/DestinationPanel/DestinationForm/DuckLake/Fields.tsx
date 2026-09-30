@@ -15,6 +15,7 @@ import {
   CommandSeparator,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -135,6 +136,11 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
     () => new Map(projects.map((project) => [project.ref, project])),
     [projects]
   )
+  const storageProjectName =
+    projectsByRef.get(ducklakeStorageProjectRef ?? '')?.name ??
+    (ducklakeStorageProjectRef === sourceProject?.ref
+      ? sourceProject?.name
+      : ducklakeStorageProjectRef)
 
   const regionForRef = (ref?: string) => {
     if (!ref) return undefined
@@ -286,9 +292,12 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       />
 
       <Dialog open={showNewBucketDialog} onOpenChange={setShowNewBucketDialog}>
-        <DialogContent>
+        <DialogContent size="small">
           <DialogHeader>
-            <DialogTitle>Create a new file bucket</DialogTitle>
+            <DialogTitle>New bucket</DialogTitle>
+            <DialogDescription>
+              Creates a private bucket in the selected Storage project ({storageProjectName}).
+            </DialogDescription>
           </DialogHeader>
           <DialogSectionSeparator />
           <DialogSection className="flex flex-col gap-y-2">
