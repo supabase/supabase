@@ -4,24 +4,14 @@
     "import/no-anonymous-default-export": 57,
     "@tanstack/query/exhaustive-deps": 87,
     "@typescript-eslint/no-explicit-any": 799,
-    "no-restricted-imports": 0,
     "no-restricted-exports": 176,
     "react/no-unstable-nested-components": 34,
-    "jsx-a11y/aria-props": 0,
-    "jsx-a11y/aria-proptypes": 0,
-    "jsx-a11y/role-supports-aria-props": 0,
-    "jsx-a11y/anchor-has-content": 0,
     "jsx-a11y/control-has-associated-label": 178,
     "jsx-a11y/label-has-associated-control": 33,
-    "jsx-a11y/aria-role": 0,
     "jsx-a11y/no-redundant-roles": 2,
-    "jsx-a11y/no-aria-hidden-on-focusable": 0,
-    "jsx-a11y/tabindex-no-positive": 0,
     "jsx-a11y/anchor-is-valid": 6,
     "jsx-a11y/heading-has-content": 2,
-    "jsx-a11y/no-distracting-elements": 0,
-    "valtio/state-snapshot-rule": 1,
-    "react-hook-form/no-use-watch": 0
+    "valtio/state-snapshot-rule": 1
   },
   "ruleFiles": {
     "react-hooks/exhaustive-deps": {
@@ -629,7 +619,6 @@
       "types/next.ts": 2,
       "types/ui.ts": 2
     },
-    "no-restricted-imports": {},
     "no-restricted-exports": {
       "__mocks__/hooks/analytics/useFillTimeseriesSorted.ts": 1,
       "__mocks__/hooks/analytics/useLogsQuery.ts": 1,
@@ -832,10 +821,6 @@
       "components/ui/Charts/ComposedChart.utils.tsx": 3,
       "components/ui/ErrorBoundary/ErrorBoundary.tsx": 1
     },
-    "jsx-a11y/aria-props": {},
-    "jsx-a11y/aria-proptypes": {},
-    "jsx-a11y/role-supports-aria-props": {},
-    "jsx-a11y/anchor-has-content": {},
     "jsx-a11y/control-has-associated-label": {
       "components/grid/components/editor/TimeEditor.tsx": 1,
       "components/interfaces/Account/Preferences/AnalyticsSettings.tsx": 1,
@@ -999,13 +984,10 @@
       "components/ui/Charts/ComposedChart.tsx": 1,
       "components/ui/Charts/ComposedChart.utils.tsx": 2
     },
-    "jsx-a11y/aria-role": {},
     "jsx-a11y/no-redundant-roles": {
       "components/interfaces/Organization/BillingSettings/Subscription/EnterpriseCard.tsx": 1,
       "components/interfaces/Organization/BillingSettings/Subscription/PlanCard.tsx": 1
     },
-    "jsx-a11y/no-aria-hidden-on-focusable": {},
-    "jsx-a11y/tabindex-no-positive": {},
     "jsx-a11y/anchor-is-valid": {
       "components/interfaces/BranchManagement/Overview.tsx": 1,
       "components/interfaces/Organization/ProjectClaim/confirm.tsx": 1,
@@ -1016,10 +998,8 @@
     "jsx-a11y/heading-has-content": {
       "components/layouts/Scaffold.tsx": 2
     },
-    "jsx-a11y/no-distracting-elements": {},
     "valtio/state-snapshot-rule": {
       "state/storage-explorer.tsx": 1
-    },
-    "react-hook-form/no-use-watch": {}
+    }
   }
 }

@@ -405,7 +405,7 @@ const DuckLakeCustomFields = ({
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
-                  type={showCatalogUrl ? 'text' : 'password'}
+                  type={showCatalogUrl && !editMode ? 'text' : 'password'}
                   placeholder={
                     editMode
                       ? STORED_SECRET_PLACEHOLDER
@@ -413,13 +413,16 @@ const DuckLakeCustomFields = ({
                   }
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
-                    <div className="flex items-center justify-center">
-                      <Button
-                        className="w-7"
-                        icon={showCatalogUrl ? <Eye /> : <EyeOff />}
-                        onClick={() => setShowCatalogUrl(!showCatalogUrl)}
-                      />
-                    </div>
+                    !editMode && (
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className="w-7"
+                          aria-label={showCatalogUrl ? 'Hide catalog URL' : 'Show catalog URL'}
+                          icon={showCatalogUrl ? <Eye /> : <EyeOff />}
+                          onClick={() => setShowCatalogUrl(!showCatalogUrl)}
+                        />
+                      </div>
+                    )
                   }
                 />
               </FormControl>
@@ -520,16 +523,21 @@ const DuckLakeCustomFields = ({
               <FormControl>
                 <Input
                   {...field}
-                  type={showSecretAccessKey ? 'text' : 'password'}
+                  type={showSecretAccessKey && !editMode ? 'text' : 'password'}
                   placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'my-secret-key'}
                   value={field.value ?? ''}
                 />
               </FormControl>
-              <Button
-                icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
-                className="w-7 absolute right-6 top-[4px]"
-                onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
-              />
+              {!editMode && (
+                <Button
+                  aria-label={
+                    showSecretAccessKey ? 'Hide secret access key' : 'Show secret access key'
+                  }
+                  icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                  className="w-7 absolute right-6 top-[4px]"
+                  onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
+                />
+              )}
             </FormItemLayout>
           )}
         />
