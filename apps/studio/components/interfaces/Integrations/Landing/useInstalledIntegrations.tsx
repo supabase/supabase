@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
 import {
@@ -12,19 +11,17 @@ import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { can: canReadOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'oauth_apps',
-    undefined,
+  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(
+    'oauth_apps_read',
     {
       organizationSlug: org?.slug,
       projectRef: null,

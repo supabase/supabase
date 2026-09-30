@@ -1,5 +1,4 @@
 import { parseSchemaComment } from '@stripe/sync-engine/supabase'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
 import { type WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -20,9 +19,9 @@ import {
   usePartnerIntegrationsQuery,
 } from '@/data/partners/integration-status-query'
 import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { ResponseError } from '@/types'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
   const stripeSchema = findStripeSchema(schemas)
@@ -75,10 +74,8 @@ export const useProjectOAuthIntegrationData = (
   // `isLoading` remount on each refetch, which loops. Transient failures still recover: the retry
   // policy gives 5xx three attempts, and refetch-on-focus/reconnect are staleness-driven, so they
   // are unaffected by this.
-  const { can: canReadOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'oauth_apps',
-    undefined,
+  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(
+    'oauth_apps_read',
     {
       organizationSlug: org?.slug,
       projectRef: null,

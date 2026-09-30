@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -23,19 +22,20 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const computeEnabled = useFlag('compute')
   const [searchString, setSearchString] = useState('')
 
-  const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_SECRET_READ,
-    '*'
+  const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_READ
   )
-  const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
+  const { can: canUpdateSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
+  )
 
   const {
     data = [],

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
@@ -19,9 +18,9 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { SecretTableColumn } from './Secrets.types'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { VaultSecret } from '@/types'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface SecretRowProps {
   row: VaultSecret
@@ -37,9 +36,8 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   const [, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
   const [, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
 
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
   )
 
   const { data: revealedValue, isFetching } = useVaultSecretDecryptedValueQuery(
