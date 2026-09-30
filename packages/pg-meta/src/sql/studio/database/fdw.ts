@@ -426,16 +426,12 @@ export const getDeleteFDWSql = ({
     return safeSql`
       do $$
       begin
-        if not exists (
-          select 1 from pg_catalog.pg_foreign_data_wrapper where fdwname = ${literal(wrapper.name)}
-        ) then
-          if ${isUsingOldWrappersSql} then
-            delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = ${literal(key)});
+        if ${isUsingOldWrappersSql} then
+          delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = ${literal(key)});
 
-            delete from pgsodium.key where name = ${literal(key)};
-          else
-            delete from vault.secrets where name = ${literal(key)};
-          end if;
+          delete from pgsodium.key where name = ${literal(key)};
+        else
+          delete from vault.secrets where name = ${literal(key)};
         end if;
       end $$;
     `
