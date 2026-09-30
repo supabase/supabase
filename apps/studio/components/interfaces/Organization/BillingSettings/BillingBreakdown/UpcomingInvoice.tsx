@@ -1,56 +1,22 @@
-import React from 'react'
+import type { ReactNode } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
+import { cn, Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { billingMetricUnit, formatUsage } from '../helpers'
 import { AlertError } from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
-import {
-  UpcomingInvoiceResponse,
-  useOrgUpcomingInvoiceQuery,
-} from '@/data/invoices/org-invoice-upcoming-query'
+import { useOrgUpcomingInvoiceQuery } from '@/data/invoices/org-invoice-upcoming-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
-import { DOCS_URL } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 
 export interface UpcomingInvoiceProps {
   slug?: string
 }
 
-const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
-  [PricingMetric.MONTHLY_ACTIVE_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users`,
-  [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-sso`,
-  [PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`,
-  [PricingMetric.AUTH_MFA_PHONE]: `${DOCS_URL}/guides/platform/manage-your-usage/advanced-mfa-phone`,
-
-  [PricingMetric.EGRESS]: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
-  [PricingMetric.CACHED_EGRESS]: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
-
-  [PricingMetric.FUNCTION_INVOCATIONS]: `${DOCS_URL}/guides/platform/manage-your-usage/edge-function-invocations`,
-
-  [PricingMetric.STORAGE_SIZE]: `${DOCS_URL}/guides/platform/manage-your-usage/storage-size`,
-  [PricingMetric.STORAGE_IMAGES_TRANSFORMED]: `${DOCS_URL}/guides/platform/manage-your-usage/storage-image-transformations`,
-
-  [PricingMetric.REALTIME_MESSAGE_COUNT]: `${DOCS_URL}/guides/platform/manage-your-usage/realtime-messages`,
-  [PricingMetric.REALTIME_PEAK_CONNECTIONS]: `${DOCS_URL}/guides/platform/manage-your-usage/realtime-peak-connections`,
-
-  [PricingMetric.CUSTOM_DOMAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/custom-domains`,
-  [PricingMetric.IPV4]: `${DOCS_URL}/guides/platform/manage-your-usage/ipv4`,
-  [PricingMetric.PITR_7]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
-  [PricingMetric.PITR_14]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
-  [PricingMetric.PITR_28]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
-  [PricingMetric.DISK_SIZE_GB_HOURS_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
-  [PricingMetric.DISK_SIZE_GB_HOURS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
-  [PricingMetric.DISK_IOPS_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
-  [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
-  [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
-  [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
-  [PricingMetric.ETL_PIPELINE]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
-  [PricingMetric.ETL_COPY_BACKFILL_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
-  [PricingMetric.ETL_REPLICATED_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+interface InvoiceLineItem {
+  name: string
+  pre_tax_amount: number
+  pre_tax_amount_before_discount: number
 }
 
 export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
@@ -58,7 +24,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const {
     data: upcomingInvoice,
-    error: error,
+    error,
     isPending: isLoading,
     isError,
     isSuccess,
@@ -66,50 +32,15 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const { data: organization } = useOrganizationQuery({ slug })
 
-  // For non-platform customers, compute is broken down per project and contains a breakdown array
-  const computeItems =
-    upcomingInvoice?.lines?.filter(
-      (item) =>
-        item.description?.toLowerCase().includes('compute') &&
-        !item.description.startsWith('Compute Credits')
-    ) || []
+  const invoice = upcomingInvoice?.upcomingInvoice
 
-  const computeCreditsItem =
-    upcomingInvoice?.lines?.find((item) => item.description.startsWith('Compute Credits')) ?? null
-
-  const planItem = upcomingInvoice?.lines?.find((item) =>
-    item.description?.toLowerCase().includes('plan')
-  )
-
-  const regularComputeItems = computeItems.filter(
-    (it) => !it.metadata?.is_branch && !it.metadata?.is_read_replica
-  )
-  const branchingComputeItems = computeItems.filter((it) => it.metadata?.is_branch)
-  const replicaComputeItems = computeItems.filter((it) => it.metadata?.is_read_replica)
-
-  const branchingComputeItemsDisplay = branchingComputeItems
-    .flatMap((it) => it.breakdown)
-    .sort((a, b) => (a?.project_name ?? '').localeCompare(b?.project_name ?? ''))
-
-  const otherItems =
-    upcomingInvoice?.lines
-      ?.filter(
-        (item) =>
-          !item.description?.toLowerCase().includes('compute') &&
-          !item.description?.toLowerCase().includes('plan') &&
-          item.amount_before_discount > 0
-      )
-      .sort((a, b) => b.amount_before_discount - a.amount_before_discount) || []
-
-  const prepaidCreditsItem =
-    upcomingInvoice?.lines?.find((item) => item.item_name === 'Prepaid Credits') ?? null
-
-  const hasTax =
-    upcomingInvoice?.tax_status === 'calculated' && (upcomingInvoice?.tax?.tax_amount ?? 0) > 0
-  const taxFailed = upcomingInvoice?.tax_status === 'failed'
-
-  const planFeePaidInAdvance =
-    !planItem && upcomingInvoice?.fixed_fees_billing_mode === 'in_arrears'
+  const hasPrepaidCredits = (invoice?.prepaidCredits.expectedWithdrawnAtEndOfCycle ?? 0) !== 0
+  const hasAppliedCustomerBalance = (invoice?.appliedCustomerBalance ?? 0) !== 0
+  const hasTax = invoice?.taxes.status === 'calculated' && invoice.taxes.expectedAtEndOfCycle > 0
+  const hasTaxFailed = invoice?.taxes.status === 'failed'
+  const isPlanFeePaidInAdvance =
+    invoice?.fixed_fees_billing_mode === 'in_arrears' &&
+    invoice.currentCosts.fixedFees.lineItems.length === 0
 
   return (
     <div ref={ref}>
@@ -123,285 +54,173 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
       {isError && <AlertError subject="Failed to retrieve upcoming invoice" error={error} />}
 
-      {isSuccess && (
-        <div>
-          <div>
-            <Table className="w-full text-sm">
-              <TableBody>
-                {planItem && !planFeePaidInAdvance && (
-                  <TableRow>
-                    <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
-                    <TableCell className="text-right py-2 px-0">
-                      {!planItem ? (
-                        '-'
-                      ) : (
-                        <InvoiceLineItemAmount
-                          amount={planItem.amount}
-                          amountBeforeDiscount={planItem.amount_before_discount}
-                        />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                )}
+      {isSuccess && invoice && (
+        <Table className="w-full text-sm">
+          <TableBody>
+            <InvoiceSectionRow
+              title="Current Costs"
+              tooltip="Costs accumulated from the beginning of the billing cycle up to now."
+              amount={invoice.currentCosts.actualInElapsedCycle}
+            />
+            <InvoiceCategory
+              title="Fixed Fees"
+              lineItems={invoice.currentCosts.fixedFees.lineItems}
+            />
+            <InvoiceCategory title="Usage" lineItems={invoice.currentCosts.usage.lineItems} />
 
-                {/* Compute section */}
-                <ComputeLineItem
-                  computeItems={regularComputeItems}
-                  title="Compute"
-                  computeCredits={computeCreditsItem}
-                  tooltip={
-                    <p className="prose text-xs">
-                      The first project is covered by Compute Credits. Additional projects incur
-                      compute costs starting at <span translate="no">$10</span>/month, independent
-                      of activity. See{' '}
-                      <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}>
-                        docs
-                      </InlineLink>
-                      .
-                    </p>
-                  }
-                />
+            <InvoiceSectionRow
+              title="Projected Costs"
+              tooltip="Projected costs for the remainder of the billing cycle. Includes predictable costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no costs for metrics like MAU, storage or function invocations. Final amounts may vary depending on your usage."
+              amount={invoice.projectedCosts.projectedInRemainingCycle}
+            />
+            <InvoiceCategory title="Usage" lineItems={invoice.projectedCosts.usage.lineItems} />
+          </TableBody>
 
-                {/* Read Replica compute */}
-                <ComputeLineItem
-                  title="Replica Compute"
-                  computeItems={replicaComputeItems}
-                  tooltip={
-                    <p className="prose text-xs">
-                      Each Read Replica is a dedicated database. You are charged for its resources:
-                      Compute, Disk Size, provisioned Disk IOPS, provisioned Disk Throughput, and
-                      IPv4. See{' '}
-                      <InlineLink
-                        href={`${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`}
-                      >
-                        docs
-                      </InlineLink>
-                      .
-                    </p>
-                  }
-                />
+          <TableFooter>
+            {hasPrepaidCredits && (
+              <InvoiceTotalRow
+                title="Prepaid Credits"
+                tooltip="Prepaid credits purchased upfront, applied automatically against your invoice. Any remaining balance rolls over to the next billing cycle."
+                amount={-invoice.prepaidCredits.expectedWithdrawnAtEndOfCycle}
+              />
+            )}
 
-                {/* Branching compute */}
-                {branchingComputeItems.length > 0 && (
-                  <TableRow>
-                    <TableCell className="py-2 px-0">
-                      <div className="flex items-center gap-1">
-                        <span>Branching</span>
-                        <InfoTooltip className="max-w-sm">
-                          <ul className="ml-6 list-disc">
-                            {branchingComputeItemsDisplay.map((breakdown) => (
-                              <li key={`branching-breakdown-${breakdown!.project_ref}`}>
-                                {breakdown!.project_name} ({breakdown!.usage} Hours)
-                              </li>
-                            ))}
-                          </ul>
+            <InvoiceTotalRow
+              title="Pre-tax Total"
+              amount={invoice.total.gross.expectedAtEndOfCycle}
+              isEmphasized
+            />
 
-                          <p className="mt-2">
-                            See{' '}
-                            <InlineLink
-                              href={`${DOCS_URL}/guides/platform/manage-your-usage/branching`}
-                            >
-                              docs
-                            </InlineLink>{' '}
-                            on how billing for Branching works.
-                          </p>
-                        </InfoTooltip>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right py-2 px-0">
-                      <InvoiceLineItemAmount
-                        amount={branchingComputeItems.reduce((prev, cur) => prev + cur.amount, 0)}
-                        amountBeforeDiscount={branchingComputeItems.reduce(
-                          (prev, cur) => prev + (cur.amount_before_discount ?? 0),
-                          0
-                        )}
-                      />
-                    </TableCell>
-                  </TableRow>
-                )}
+            {hasTax && (
+              <InvoiceTotalRow
+                title={`Tax (${invoice.taxes.percentage}%)`}
+                tooltip="Estimated based on your organization's billing address. The final amount may be adjusted at the end of the billing cycle."
+                amount={invoice.taxes.expectedAtEndOfCycle}
+              />
+            )}
 
-                {/* Non-compute items */}
-                {otherItems.map((item) => {
-                  const usageMetric = item.usage_metric as PricingMetric
-                  const sortedBreakdown = (item.breakdown ?? []).sort((a, b) =>
-                    a.project_name.localeCompare(b.project_name)
-                  )
+            {hasTaxFailed && (
+              <InvoiceTotalRow
+                title="Tax"
+                tooltip={
+                  <p className="text-warning">
+                    We were unable to estimate tax for your organization. Please verify your billing
+                    address in your organization settings.
+                  </p>
+                }
+              />
+            )}
 
-                  return (
-                    <TableRow key={item.description}>
-                      <TableCell className="py-2 px-0">
-                        <div className="gap-1 flex items-center">
-                          <span>{item.description ?? 'Unknown'}</span>
-                          {(sortedBreakdown.length > 0 || item.usage_metric !== null) && (
-                            <InfoTooltip className="max-w-sm">
-                              {item.item_name === 'minimum_amount' && (
-                                <p className="mb-2" translate="no">
-                                  Minimum Fee - If your cost is below the minimum fee, you will be
-                                  charged the difference as a floor fee
-                                </p>
-                              )}
+            {hasAppliedCustomerBalance && (
+              <InvoiceTotalRow
+                title="Applied Customer Balance"
+                amount={invoice.appliedCustomerBalance}
+              />
+            )}
 
-                              {item.unit_price_desc && (
-                                <p className="mb-2" translate="no">
-                                  Pricing: {item.unit_price_desc}
-                                </p>
-                              )}
+            <InvoiceTotalRow
+              title="Net Total"
+              amount={invoice.total.net.expectedAtEndOfCycle}
+              isEmphasized
+            />
 
-                              {sortedBreakdown.length > 0 && (
-                                <>
-                                  <p>Projects using {item.description}:</p>
-                                  <ul className="ml-6 list-disc">
-                                    {sortedBreakdown.map((breakdown) => {
-                                      const unit = billingMetricUnit(usageMetric)
-                                      return (
-                                        <li
-                                          key={`${item.description}-breakdown-${breakdown.project_ref}`}
-                                        >
-                                          <InlineLink
-                                            target="_blank"
-                                            href={`/project/${breakdown.project_ref}`}
-                                          >
-                                            {breakdown.project_name}
-                                          </InlineLink>{' '}
-                                          {usageMetric && (
-                                            <span>
-                                              ({formatUsage(usageMetric, breakdown)}
-                                              {!!unit ? ` ${unit}` : ''})
-                                            </span>
-                                          )}
-                                        </li>
-                                      )
-                                    })}
-                                  </ul>
-                                </>
-                              )}
-
-                              {usageMetric && usageBillingDocsLink[usageMetric] != null && (
-                                <p className="mt-2">
-                                  See{' '}
-                                  <InlineLink href={usageBillingDocsLink[usageMetric]!}>
-                                    docs
-                                  </InlineLink>{' '}
-                                  on how billing for {item.description} works and{' '}
-                                  <InlineLink href={`/org/${slug}/usage`}>usage page</InlineLink>{' '}
-                                  for a detailed breakdown.
-                                </p>
-                              )}
-                            </InfoTooltip>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right py-2 px-0">
-                        <InvoiceLineItemAmount
-                          amount={item.amount}
-                          amountBeforeDiscount={item.amount_before_discount}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-
-              <TableFooter>
-                {prepaidCreditsItem && (
-                  <TableRow>
-                    <TableCell className="py-2 px-0 flex items-center">
-                      <span className="mr-2">{prepaidCreditsItem.item_name}</span>
-                      <InfoTooltip className="max-w-xs">
-                        Prepaid credits purchased upfront, applied automatically against your
-                        invoice. Any remaining balance rolls over to the next billing cycle.
-                      </InfoTooltip>
-                    </TableCell>
-                    <TableCell className="text-right py-2 px-0" translate="no">
-                      {formatCurrency(prepaidCreditsItem.amount) ?? '-'}
-                    </TableCell>
-                  </TableRow>
-                )}
-                <TableRow>
-                  <TableCell className="font-medium py-2 px-0 flex items-center">
-                    <span className="mr-2">Current Costs</span>
-                    <InfoTooltip>
-                      Costs accumulated from the beginning of the billing cycle up to now.
-                    </InfoTooltip>
-                  </TableCell>
-                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                    {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
-                  </TableCell>
-                </TableRow>
-
-                {(!!upcomingInvoice.amount_projected || hasTax || taxFailed) && (
-                  <TableRow>
-                    <TableCell className="font-medium py-2 px-0 flex items-center">
-                      <span className="mr-2">Projected Costs</span>
-                      <InfoTooltip className="max-w-sm">
-                        <p className="mb-2">
-                          Projected costs at the end of the billing cycle. Includes predictable
-                          costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery,
-                          but no costs for metrics like MAU, storage or function invocations. Final
-                          amounts may vary depending on your usage.
-                        </p>
-
-                        {hasTax && (
-                          <div className="mt-3 border-t border-muted pt-2 space-y-1">
-                            <div className="flex items-center justify-between gap-4 text-xs">
-                              <span>Subtotal</span>
-                              <span translate="no">
-                                {formatCurrency(upcomingInvoice.tax!.total_amount_excluding_tax)}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-4 text-xs">
-                              <span>
-                                Tax
-                                {upcomingInvoice.tax?.tax_rate_percentage != null &&
-                                  ` (${upcomingInvoice.tax.tax_rate_percentage}%)`}
-                              </span>
-                              <span translate="no">
-                                {formatCurrency(upcomingInvoice.tax!.tax_amount)}
-                              </span>
-                            </div>
-                            <p className="text-foreground-lighter pt-1 text-xs">
-                              Estimated based on your organization's billing address. The final
-                              amount may be adjusted at the end of the billing cycle.
-                            </p>
-                          </div>
-                        )}
-
-                        {taxFailed && (
-                          <p className="mt-3 border-t border-muted pt-2 text-warning">
-                            We were unable to estimate tax for your organization. Please verify your
-                            billing address in your organization settings.
-                          </p>
-                        )}
-                      </InfoTooltip>
-                    </TableCell>
-                    <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                      {formatCurrency(
-                        hasTax
-                          ? upcomingInvoice.tax!.total_amount_including_tax
-                          : upcomingInvoice.amount_projected
-                      ) ?? '-'}
-                    </TableCell>
-                  </TableRow>
-                )}
-
-                {planFeePaidInAdvance && (
-                  <TableRow className="border-0 hover:bg-transparent">
-                    <TableCell
-                      className="pt-2! pb-0! px-0 text-foreground-light text-xs text-right"
-                      colSpan={2}
-                    >
-                      Your {organization?.plan?.name && `${organization.plan.name} `}Plan fee for
-                      this period has already been paid. This invoice will only reflect usage
-                      charges.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableFooter>
-            </Table>
-          </div>
-        </div>
+            {isPlanFeePaidInAdvance && (
+              <TableRow className="border-0 hover:bg-transparent">
+                <TableCell
+                  className="pt-2! pb-0! px-0 text-foreground-light text-xs text-right"
+                  colSpan={2}
+                >
+                  Your {organization?.plan?.name && `${organization.plan.name} `}Plan fee for this
+                  period has already been paid. This invoice will only reflect usage charges.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableFooter>
+        </Table>
       )}
     </div>
+  )
+}
+
+function InvoiceSectionRow({
+  title,
+  tooltip,
+  amount,
+}: {
+  title: string
+  tooltip?: ReactNode
+  amount: number
+}) {
+  return (
+    <TableRow>
+      <TableCell className="font-medium py-2 px-0">
+        <div className="flex items-center gap-1">
+          <span>{title}</span>
+          {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
+        </div>
+      </TableCell>
+      <TableCell className="text-right font-medium py-2 px-0" translate="no">
+        {formatCurrency(amount) ?? '-'}
+      </TableCell>
+    </TableRow>
+  )
+}
+
+function InvoiceCategory({ title, lineItems }: { title: string; lineItems: InvoiceLineItem[] }) {
+  if (lineItems.length === 0) return null
+
+  return (
+    <>
+      <TableRow className="hover:bg-transparent">
+        <TableCell className="py-2 px-0 pl-4 text-foreground-light text-xs" colSpan={2}>
+          {title}
+        </TableCell>
+      </TableRow>
+      {lineItems.map((item) => (
+        <TableRow key={item.name}>
+          <TableCell className="py-2 px-0 pl-8">{item.name}</TableCell>
+          <TableCell className="text-right py-2 px-0">
+            {item.pre_tax_amount === 0 ? (
+              '-'
+            ) : (
+              <InvoiceLineItemAmount
+                amount={item.pre_tax_amount}
+                amountBeforeDiscount={item.pre_tax_amount_before_discount}
+              />
+            )}
+          </TableCell>
+        </TableRow>
+      ))}
+    </>
+  )
+}
+
+function InvoiceTotalRow({
+  title,
+  tooltip,
+  amount,
+  isEmphasized = false,
+}: {
+  title: string
+  tooltip?: ReactNode
+  amount?: number
+  isEmphasized?: boolean
+}) {
+  return (
+    <TableRow>
+      <TableCell className={cn('py-2 px-0', isEmphasized && 'font-medium')}>
+        <div className="flex items-center gap-1">
+          <span>{title}</span>
+          {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
+        </div>
+      </TableCell>
+      <TableCell
+        className={cn('text-right py-2 px-0', isEmphasized && 'font-medium')}
+        translate="no"
+      >
+        {amount === undefined ? '-' : (formatCurrency(amount) ?? '-')}
+      </TableCell>
+    </TableRow>
   )
 }
 
@@ -421,100 +240,7 @@ function InvoiceLineItemAmount({
         <span translate="no">{formatCurrency(amount)}</span>
       </div>
     )
-  } else {
-    return <span translate="no">{formatCurrency(amount)}</span>
   }
-}
 
-function ComputeLineItem({
-  computeItems,
-  tooltip,
-  title,
-  computeCredits,
-}: {
-  title: string
-  tooltip: React.ReactElement
-  computeItems: UpcomingInvoiceResponse['lines']
-  computeCredits?: UpcomingInvoiceResponse['lines'][number] | null
-}) {
-  const computeProjects = computeItems
-    .flatMap((item) =>
-      item.breakdown!.map((project) => ({
-        ...project,
-        computeType: item.description,
-        computeCosts: project.amount!,
-      }))
-    )
-    // descending by cost
-    .sort((a, b) => b.computeCosts - a.computeCosts)
-
-  const computeItemsSortedByCost = computeItems
-    // descending by cost
-    .sort((a, b) => b.amount - a.amount)
-
-  const computeCosts = Math.max(
-    0,
-    computeItems.reduce((prev, cur) => prev + cur.amount_before_discount, 0)
-  )
-
-  const discountedComputeCosts = Math.max(
-    0,
-    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0)
-  )
-
-  if (!computeItems.length) return null
-
-  return (
-    <>
-      <TableRow>
-        <TableCell className="py-2! px-0 flex items-center gap-1">
-          <span>{title}</span>
-          <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>
-        </TableCell>
-        <TableCell className="text-right py-2 px-0">
-          <InvoiceLineItemAmount
-            amount={discountedComputeCosts}
-            amountBeforeDiscount={computeCosts}
-          />
-        </TableCell>
-      </TableRow>
-      {computeProjects.map((project) => (
-        <TableRow key={project.project_ref} className="text-foreground-light text-xs">
-          <TableCell className="py-2! px-0 pl-6">
-            {project.project_name} ({project.computeType} - {project.usage} Hours)
-          </TableCell>
-
-          <TableCell className="py-2! px-0 text-right" translate="no">
-            {formatCurrency(project.computeCosts)}
-          </TableCell>
-        </TableRow>
-      ))}
-
-      {/* Fallback to breakdown by instance size if project breakdown not available  */}
-      {!computeProjects.length &&
-        computeItemsSortedByCost.map((computeItem) => (
-          <TableRow
-            key={title + computeItem.usage_metric}
-            className="text-foreground-light text-xs"
-          >
-            <TableCell className="py-2! px-0 pl-6">
-              {computeItem.description} - {computeItem.usage_original} Hours
-            </TableCell>
-
-            <TableCell className="py-2! px-0 text-right" translate="no">
-              {formatCurrency(computeItem.amount)}
-            </TableCell>
-          </TableRow>
-        ))}
-
-      {computeCredits && (
-        <TableRow className="text-foreground-light text-xs">
-          <TableCell className="py-2! px-0 pl-6">Compute Credits</TableCell>
-          <TableCell className="py-2! px-0 text-right" translate="no">
-            {formatCurrency(computeCredits.amount)}
-          </TableCell>
-        </TableRow>
-      )}
-    </>
-  )
+  return <span translate="no">{formatCurrency(amount)}</span>
 }
