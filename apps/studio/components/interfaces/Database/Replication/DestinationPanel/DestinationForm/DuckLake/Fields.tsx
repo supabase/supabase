@@ -375,7 +375,7 @@ const DuckLakeCustomFields = ({
                   placeholder={
                     editMode
                       ? STORED_SECRET_PLACEHOLDER
-                      : 'postgres://user:pass@host:5432/ducklake_catalog'
+                      : 'postgresql://user:password@host:5432/database'
                   }
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
@@ -416,7 +416,7 @@ const DuckLakeCustomFields = ({
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Object storage</p>
         <p className="text-sm text-foreground-light">
-          Optional credentials and endpoint settings for S3-compatible storage providers.
+          Connection settings and credentials for your S3-compatible object storage.
         </p>
       </div>
 
@@ -437,8 +437,13 @@ const DuckLakeCustomFields = ({
               <FormControl>
                 <Input
                   {...field}
-                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'my-access-key'}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   value={field.value ?? ''}
+                  autoComplete="off"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-form-type="other"
+                  data-bwignore
                 />
               </FormControl>
             </FormItemLayout>
@@ -463,8 +468,13 @@ const DuckLakeCustomFields = ({
                 <Input
                   {...field}
                   type={showSecretAccessKey && !editMode ? 'text' : 'password'}
-                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'my-secret-key'}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   value={field.value ?? ''}
+                  autoComplete="off"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-form-type="other"
+                  data-bwignore
                 />
               </FormControl>
               {!editMode && (
@@ -504,10 +514,14 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="S3 endpoint"
-              description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`."
+              description="Publicly reachable provider endpoint, without `https://`."
             >
               <FormControl>
-                <Input {...field} placeholder="127.0.0.1:5000/s3" value={field.value ?? ''} />
+                <Input
+                  {...field}
+                  placeholder="s3.us-east-1.amazonaws.com"
+                  value={field.value ?? ''}
+                />
               </FormControl>
             </FormItemLayout>
           )}
@@ -542,7 +556,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Use SSL"
-              description="Whether to use SSL when connecting to the S3-compatible endpoint."
+              description="Connect to the S3 endpoint over HTTPS."
             >
               <FormControl>
                 <Select

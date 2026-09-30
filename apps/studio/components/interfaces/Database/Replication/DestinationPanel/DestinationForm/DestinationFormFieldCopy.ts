@@ -40,7 +40,8 @@ export const DUCKLAKE_BUCKET_FIELD_COPY = {
 
 export const DUCKLAKE_CATALOG_URL_FIELD_COPY = {
   label: 'Catalog URL',
-  createDescription: 'Postgres connection string for the DuckLake catalog.',
+  createDescription:
+    'Postgres URL for an existing database. Add TLS settings to the URL if required.',
   editDescription: 'Stored catalog URL is hidden. Enter a new URL to replace it.',
 } as const
 

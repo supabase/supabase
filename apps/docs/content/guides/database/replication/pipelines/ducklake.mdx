@@ -56,7 +56,7 @@ Credential-provisioning warnings are expected before creation: catalog and Stora
 
 ### Enter connection details [#custom-parameters]
 
-Use this mode when you want to provide a Postgres catalog URL and S3-compatible storage credentials yourself.
+Use this mode to connect an existing Postgres database and S3-compatible object storage. You provide their connection details and credentials.
 
 Prepare the following resources:
 
@@ -68,13 +68,13 @@ Use a new catalog metadata schema and data prefix for each destination. Reusing 
 
 Select **Enter connection details** under **Configuration method**, then configure these fields:
 
-- **Catalog URL**: A `postgres://` or `postgresql://` connection URL, including credentials and an `sslmode` appropriate for your provider
+- **Catalog URL**: A `postgres://` or `postgresql://` URL for your existing database, including credentials. If your provider requires TLS, append `?sslmode=require` after the database name, or `&sslmode=require` if the URL already has query parameters. Keep the database name from your provider's URL; it doesn't need to be `ducklake_catalog`.
 - **Data path**: An `s3://<bucket>/<prefix>` URL
 - **S3 access key ID** and **S3 secret access key**: A credential pair for the data path
 - **S3 region**: The storage provider's region
-- **S3 endpoint**: The provider endpoint without `http://` or `https://`
-- **S3 URL style**: `path` for Supabase Storage and many S3-compatible providers, or `vhost` for virtual-host-style addressing
-- **Use SSL**: Keep enabled for production endpoints
+- **S3 endpoint**: A publicly reachable provider endpoint without `http://` or `https://`
+- **S3 URL style**: `path` if the bucket is in the URL path, or `vhost` if the bucket is in the hostname
+- **Use SSL**: Enable to connect to the S3 endpoint over HTTPS
 - **Metadata schema**: A unique Postgres schema for DuckLake metadata, using only letters, numbers, and underscores
 
 Optionally adjust **Pool size** under **Advanced settings**. It allows `1` to `6` concurrent DuckDB connections; the default is `4`. Click **Start pipeline**, review the validation results, then confirm the estimated cost with **Create and start pipeline**.
