@@ -120,7 +120,7 @@ describe('APIAuthorizationPage', () => {
 
     expect(await screen.findByText('This grant covers every project')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
-    expect(screen.getByText('This grant is shared with the whole organization')).toBeInTheDocument()
+    expect(screen.getByText('Want this scoped to one member?')).toBeInTheDocument()
   })
 
   test('user_bound_all renders without a picker and covers every project', async () => {
@@ -134,8 +134,6 @@ describe('APIAuthorizationPage', () => {
 
     expect(await screen.findByText('This grant covers every project')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
-    expect(
-      screen.queryByText('This grant is shared with the whole organization')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
   })
 })
