@@ -80,7 +80,7 @@ export const getURL = () => {
  * `https://supabase.com/dashboard` → unchanged
  */
 export const getBasePathURL = (basePath = BASE_PATH) => {
-  const url = getURL()
+  const url = getURL().replace(/\/$/, '')
   return url.endsWith(basePath) ? url : `${url}${basePath}`
 }
 

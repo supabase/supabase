@@ -124,6 +124,11 @@ describe('getBasePathURL', () => {
     expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
   })
 
+  it('strips a trailing slash before appending the base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com/')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
   it('returns the site URL when there is no base path', () => {
     vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://localhost:8082')
     expect(getBasePathURL('')).toEqual('http://localhost:8082')
