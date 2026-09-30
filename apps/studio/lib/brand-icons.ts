@@ -14,8 +14,8 @@ export type ThemedIconSrc = string | { light: string; dark: string }
 export const BRAND_ICONS = {
   bigquery: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
   clickhouse: {
-    light: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
-    dark: `${BASE_PATH}/img/icons/clickhouse-icon-dark.svg`,
+    light: `${BASE_PATH}/img/icons/clickhouse-icon-light.svg`,
+    dark: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
   },
   ducklake: {
     light: `${BASE_PATH}/img/icons/ducklake-icon-light.svg`,
