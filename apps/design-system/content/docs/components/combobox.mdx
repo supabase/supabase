@@ -132,3 +132,9 @@ You can create a responsive combobox by using the `<Popover />` on desktop and t
 ### Form
 
 <ComponentPreview name="combobox-form" />
+
+### Create from the list
+
+When users can create an option while choosing one, place the action at the bottom of the list. Separate it from the options and give it a clear verb label. Keep creation separate from selection state: opening the creation dialog should not select a temporary option. After creation succeeds, add and select the new option. If the list is searchable, keep the action visible when the search has no matches.
+
+<ComponentPreview name="combobox-create-option" peekCode wide />

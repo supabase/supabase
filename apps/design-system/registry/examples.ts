@@ -386,6 +386,12 @@ export const examples: Registry = [
     files: ['example/combobox-demo.tsx'],
   },
   {
+    name: 'combobox-create-option',
+    type: 'components:example',
+    registryDependencies: ['command', 'dialog'],
+    files: ['example/combobox-create-option.tsx'],
+  },
+  {
     name: 'combobox-dropdown-menu',
     type: 'components:example',
     registryDependencies: ['command', 'dropdown-menu', 'button'],
