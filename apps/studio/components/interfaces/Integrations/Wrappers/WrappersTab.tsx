@@ -10,6 +10,7 @@ import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { WrapperTable } from './WrapperTable'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
@@ -22,6 +23,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const WrappersTab = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const [isCreating, setIsCreating] = useQueryState(
     'new',
@@ -84,10 +86,12 @@ export const WrappersTab = () => {
         </div>
       ) : (
         <>
-          <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
-            <DocsButton href={wrapperMeta.docsUrl} />
-            <AddWrapperButton variant="primary" onClick={() => setIsCreating(true)} />
-          </div>
+          {!isMarketplaceEnabled && (
+            <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
+              <DocsButton href={wrapperMeta.docsUrl} />
+              <AddWrapperButton variant="primary" onClick={() => setIsCreating(true)} />
+            </div>
+          )}
           <WrapperTable />
         </>
       )}
