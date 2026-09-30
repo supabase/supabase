@@ -821,8 +821,9 @@ const BucketSelection = ({
               </CommandGroup>
             )}
             <CommandSeparator />
-            <CommandGroup>
+            <CommandGroup forceMount>
               <CommandItem
+                forceMount
                 className="cursor-pointer w-full"
                 onSelect={() => {
                   setIsDropdownOpen(false)
