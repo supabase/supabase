@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
-  getAnalyticsBucketFDWName,
+  getAnalyticsBucketFDWServerName,
   getAnalyticsBucketS3KeyName,
 } from '@/components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import {
@@ -13,6 +13,7 @@ import {
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -33,6 +34,12 @@ export const useIcebergWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
+  const { data: fdws } = useFDWsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const hasExistingWrapper = fdws?.some((wrapper) => wrapper.name === wrapperMeta?.name) ?? false
+
   const { can: canCreateCredentials } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
@@ -49,15 +56,14 @@ export const useIcebergWrapperCreateMutation = () => {
       description: getAnalyticsBucketS3KeyName(bucketName),
     })
 
-    const wrapperName = getAnalyticsBucketFDWName(bucketName)
-
     const params: FDWCreateVariables = {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      hasExistingWrapper,
       wrapperMeta: wrapperMeta!,
       formState: {
-        wrapper_name: wrapperName,
-        server_name: `${wrapperName}_server`,
+        wrapper_name: wrapperMeta!.name,
+        server_name: getAnalyticsBucketFDWServerName(bucketName),
         vault_aws_access_key_id: createS3KeyData?.access_key,
         vault_aws_secret_access_key: createS3KeyData?.secret_key,
         vault_token: apiKey,
