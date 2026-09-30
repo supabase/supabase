@@ -51,9 +51,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
   const isSharedWrapper = (wrapper: (typeof wrappers)[number]) =>
     data?.some((other) => other.id !== wrapper.id && other.name === wrapper.name) ?? false
-  const selectedWrapper = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
-  const isSelectedWrapperShared = selectedWrapper !== undefined && isSharedWrapper(selectedWrapper)
-  const selectedWrapperToEdit = isSelectedWrapperShared ? undefined : selectedWrapper
+  const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
   const openedWrapperId = useRef<string | null>(null)
 
   useEffect(() => {
@@ -63,22 +61,11 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
       openedWrapperId.current = selectedWrapperIdToEdit
     } else if (isSuccess || isError) {
       if (openedWrapperId.current !== selectedWrapperIdToEdit) {
-        toast(
-          isSelectedWrapperShared
-            ? 'Shared wrappers cannot be edited in the dashboard. Use the SQL Editor to edit this connection.'
-            : 'Wrapper not found'
-        )
+        toast('Wrapper not found')
       }
       setSelectedWrapperToEdit(null)
     }
-  }, [
-    isError,
-    isSelectedWrapperShared,
-    isSuccess,
-    selectedWrapperIdToEdit,
-    selectedWrapperToEdit,
-    setSelectedWrapperToEdit,
-  ])
+  }, [isError, isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
   if (!integration || integration.type !== 'wrapper') {
     return (

@@ -421,7 +421,7 @@ export const getDeleteFDWSql = ({
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
   const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
-    const key = `${wrapper.name}_${option.name}`
+    const key = `${wrapper.server_name}_${option.name}`
 
     return safeSql`
       do $$

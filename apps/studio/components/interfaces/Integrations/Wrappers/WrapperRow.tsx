@@ -40,44 +40,15 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
   )
 
   const _tables = formatWrapperTables(wrapper, integration?.meta)
-  const canEdit = canManageWrappers && !isShared
 
-  let editTooltip = 'Edit wrapper'
-  if (!canManageWrappers) editTooltip = 'You need additional permissions to edit wrappers'
-  else if (isShared) editTooltip = 'Shared wrappers cannot be edited in the dashboard'
+  const editTooltip = canManageWrappers
+    ? 'Edit wrapper'
+    : 'You need additional permissions to edit wrappers'
 
   return (
     <TableRow>
       <TableCell className="gap-2 align-top py-3! min-w-80">
         <p className="text-sm">{wrapper.server_name}</p>
-        {isShared && (
-          <p className="text-sm text-foreground-light">
-            This wrapper is shared. To edit this connection, use <code>ALTER SERVER</code> on{' '}
-            <code className="text-code-inline">{wrapper.server_name}</code> or{' '}
-            <code>ALTER FOREIGN TABLE</code> in the{' '}
-            <Link
-              href={`/project/${ref}/sql/new?skip=true`}
-              className="underline underline-offset-2"
-            >
-              SQL Editor
-            </Link>
-            .
-            {encryptedMetadata.length > 0 && (
-              <>
-                {' '}
-                Edit this server&apos;s credentials in{' '}
-                <Link
-                  href={`/project/${ref}/settings/vault/secrets`}
-                  className="underline underline-offset-2"
-                >
-                  Vault
-                </Link>
-                . Changes to a secret used by other connections affect them too.
-              </>
-            )}
-          </p>
-        )}
-
         {visibleMetadata.map((metadata) => (
           <div
             key={metadata.name}
@@ -138,7 +109,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
           <div key={metadata.name} className="flex items-center space-x-2 text-sm">
             <Link
               href={`/project/${ref}/settings/vault/secrets?search=${encodeURIComponent(
-                `${wrapper.name}_${metadata.name}`
+                `${wrapper.server_name}_${metadata.name}`
               )}`}
               className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"
             >
@@ -155,7 +126,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
       <TableCell className="flex-nowrap">
         <div className="flex items-center gap-x-2">
           <ButtonTooltip
-            disabled={!canEdit}
+            disabled={!canManageWrappers}
             icon={<Edit strokeWidth={1.5} />}
             className="px-1.5"
             onClick={() => setSelectedWrapperToEdit(wrapper.id.toString())}
