@@ -175,7 +175,7 @@
   "devDependencies": {
     "@babel/core": "*",
     "@eslint/compat": "^2.1.0",
-    "@faker-js/faker": "^9.9.0",
+    "@faker-js/faker": "^10.6.0",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@lexical/headless": "0.51.0",

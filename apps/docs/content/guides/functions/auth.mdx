@@ -21,7 +21,7 @@ For how authorization headers and the `verify_jwt` platform check work under the
 Functions called by signed-in users — typically through `supabase.functions.invoke` from the client — send the user's session JWT on the `Authorization` header. Keep `verify_jwt = true` (the default) so the platform validates the JWT before your handler runs, then use `auth: 'user'` to get `ctx.supabase` already scoped to the caller's RLS policies.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
@@ -43,7 +43,7 @@ export default {
 Cron jobs, workers, `pg_net`, or another Edge Function make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'` to validate the key against any secret key from your [dashboard](/dashboard/project/_/settings/api-keys). You get `ctx.supabaseAdmin` for privileged work.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
@@ -71,7 +71,7 @@ verify_jwt = false
 ```
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'none' }, async () => {
@@ -88,7 +88,7 @@ export default {
 External providers like Stripe or GitHub don't send Supabase credentials. They sign the request body with their own shared secret. Use `auth: 'none'` to skip the SDK's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 import Stripe from 'npm:stripe'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
@@ -134,7 +134,7 @@ export default {
 Functions that answer both users and internal callers take an array on `auth`. Modes are tried in order. The first match wins, and `ctx.authMode` tells you which matched.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: ['user', 'secret'] }, async (req, ctx) => {
@@ -154,7 +154,7 @@ export default {
 To shape the 401 response yourself, use `createSupabaseContext` instead of `withSupabase`. It returns a `{ data, error }` tuple so you stay in control.
 
 ```ts
-import { createSupabaseContext } from 'npm:@supabase/server'
+import { createSupabaseContext } from 'npm:@supabase/server@1'
 
 export default {
   fetch: async (req: Request) => {

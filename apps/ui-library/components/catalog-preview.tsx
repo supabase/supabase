@@ -21,7 +21,7 @@ const previewTitles: Partial<Record<CatalogPreviewKind, string>> = {
   storage: 'product-assets',
   chat: 'team chat',
   editor: 'index.ts',
-  mcp: 'mcp-server',
+  mcp: 'mcp',
   agents: 'connected agents',
   dashboard: 'acme workspace',
   client: 'supabase.ts',

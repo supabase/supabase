@@ -10,59 +10,61 @@ sidebar_label: 'ClickHouse'
 
 The ClickHouse destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
 
-Replicate Postgres changes to [ClickHouse](https://clickhouse.com/) as current-state tables or an append-only history. [Choose a table engine](#choose-a-table-engine), [prepare resources](#prepare-clickhouse-resources), then [configure the destination](#configure-clickhouse-as-a-destination).
+[ClickHouse](https://clickhouse.com/) is a database for analytics. Supabase Pipelines replicates Postgres tables to ClickHouse as either current-state tables or an append-only history of changes.
+
+To replicate data to ClickHouse:
+
+1. [Choose a table engine](#choose-a-table-engine) and check the [source table requirements](#source-table-requirements).
+2. [Prepare a database, user, and HTTPS endpoint](#prepare-clickhouse-resources) in ClickHouse.
+3. [Configure the ClickHouse destination](#configure-clickhouse-as-a-destination) in the Dashboard.
+4. [Query the replicated data](#query-replicated-data) in ClickHouse.
 
 ## Source table requirements
 
-`ReplacingMergeTree` requires a source primary key. `MergeTree` can replicate insert-only tables without one. Include all primary-key columns in the publication when the table has a key.
+The source table requirements depend on the selected table engine and the operations in the Postgres publication. `ReplacingMergeTree` requires a source primary key. `MergeTree` can replicate insert-only tables without one. If a table has a primary key, include all its key columns in the publication.
 
 Check the [replica-identity and array requirements](#replica-identity-and-arrays) for your source tables.
 
 ### Choose a table engine
 
-The table engine controls how ClickHouse represents changes. It is selected for the entire destination.
-
-Choose the engine before creating the pipeline. Changing **Table engine** later does not convert existing destination tables; writes fail if their engine differs from the configured one. Restore the previous setting to resume using those tables.
+The table engine determines how ClickHouse stores and queries replicated changes. Choose one engine for the entire destination:
 
 | Engine               | Data model and query pattern                                                                     |
 | -------------------- | ------------------------------------------------------------------------------------------------ |
 | `ReplacingMergeTree` | Current-state tables. Requires a primary key. Query the generated `__current` view.              |
 | `MergeTree`          | Append-only CDC history. A primary key is optional for insert-only tables. Query the base table. |
 
-Updating a source primary-key value removes the old key from the current-state view and writes the row under its new key. Changing the primary-key definition is a separate [schema change](#schema-change-support).
+Choose the engine before creating the pipeline. Changing **Table engine** later does not convert existing destination tables. Writes fail if their engine differs from the configured one. Restore the previous setting to resume writing to those tables.
+
+With `ReplacingMergeTree`, changing a source primary-key value removes the old key from the current-state view and writes the row under its new key. Changing which columns make up the primary key is a separate [schema change](#schema-change-support).
 
 ## Prepare ClickHouse resources
 
-Before creating the destination:
+Managed Pipelines run in AWS `eu-central-1` (Frankfurt). When creating your ClickHouse service, choose a nearby region to [reduce replication latency](/docs/guides/database/replication/pipelines#region). Then prepare these resources in ClickHouse before creating the destination:
 
-1. Create or choose a ClickHouse database for the replicated tables.
-2. Create a dedicated ClickHouse user for Pipelines.
-3. Grant the user access to the target database. Pipelines must be able to:
+1. Create an empty database for the replicated tables. In ClickHouse Cloud, open your service's **SQL console** and run `create database if not exists pipelines;`, replacing `pipelines` if you prefer another name. Pipelines creates and manages the tables and, for `ReplacingMergeTree`, the current-state views. Do not create or alter these objects yourself.
+2. Create a dedicated database user for Pipelines and grant it access to that database. In ClickHouse Cloud, create this user in the **SQL console**; the organization's **Users and roles** page manages console members. The database user must be able to:
    - Query `system.databases`, `system.tables`, and `system.columns`
    - Create, alter, truncate, and drop tables
    - Create and drop views when using `ReplacingMergeTree`
    - Insert rows into managed tables
-4. Copy the database's HTTPS endpoint, including its port when required. Pipelines rejects HTTP endpoints and private or internal hostnames.
+3. Copy the public HTTPS endpoint for your ClickHouse server. In ClickHouse Cloud, click **Connect** and select **HTTPS** to find it. Include the port if your endpoint requires one. Pipelines cannot connect to HTTP endpoints or private and internal hostnames.
 
-Keep the database otherwise empty. Pipelines manages the replicated tables and current-state views. Don't pre-create or manually alter those objects.
-
-The default `ReplacingMergeTree` engine requires ClickHouse 23.5 or later. The `MergeTree` event-log engine does not have this minimum-version requirement.
+For `ReplacingMergeTree`, the ClickHouse server must run version 23.5 or later. `MergeTree` does not have this minimum-version requirement.
 
 ## Configure ClickHouse as a destination
 
-Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) and select **ClickHouse**. Enter these destination settings:
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). When prompted to choose a destination, select **ClickHouse** and enter the following settings:
 
-| Field            | Value                                                                      |
-| ---------------- | -------------------------------------------------------------------------- |
-| **URL**          | Public HTTPS endpoint, including its port when required                    |
-| **User**         | Dedicated ClickHouse user                                                  |
-| **Password**     | User's password, if required                                               |
-| **Database**     | Existing target database                                                   |
-| **Table engine** | `replacing_merge_tree` for current state or `merge_tree` for event history |
+| Field              | Value                                                                   |
+| ------------------ | ----------------------------------------------------------------------- |
+| **HTTPS endpoint** | Public HTTPS endpoint, including its port when required                 |
+| **User**           | Your dedicated database user, such as `pipelines_user`                  |
+| **Password**       | That user's password, if set                                            |
+| **Database**       | Destination database, such as `pipelines`                               |
+| **Table engine**   | `ReplacingMergeTree` for current state or `MergeTree` for event history |
 
-Click **Create and start pipeline** and complete the validation and cost confirmations.
-
-Place ClickHouse near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
+Click **Start pipeline** to validate the destination. Review the cost estimate, then click **Create and start pipeline**.
 
 ## Query replicated data
 
@@ -79,7 +81,7 @@ Postgres schema and table names cannot start or end with `_` or contain `"` or `
 
 ### ReplacingMergeTree
 
-`ReplacingMergeTree` is the default and is intended for current-state analytics. Pipelines:
+Use the generated `__current` view when you need the latest version of each source row. `ReplacingMergeTree` is the default engine. Pipelines:
 
 - Uses the source primary key as ClickHouse's sorting and deduplication key
 - Adds an `_etl_version UInt128` ordering column
@@ -92,16 +94,16 @@ Query the generated view for the current state:
 
 ```sql
 select *
-from "public_orders__current";
+from pipelines."public_orders__current";
 ```
 
-ClickHouse background merges combine older row versions over time. Until they do, querying the base table without `FINAL` can return multiple versions of the same source row. Use the generated `__current` view for normal current-state queries.
+ClickHouse background merges combine older row versions over time. Before a merge, the base table can contain multiple versions of the same source row. The generated view uses `FINAL` to return the current version and excludes deleted rows.
 
 Pipelines does not run `OPTIMIZE ... FINAL CLEANUP`. ClickHouse operators remain responsible for any physical tombstone cleanup required by their storage-retention policy.
 
 ### MergeTree
 
-`MergeTree` stores every replicated change as an append-only event. Pipelines adds:
+Query the base table when you need the history of inserts, updates, and deletes. `MergeTree` stores each replicated change as an append-only event. Pipelines adds:
 
 - `cdc_operation`, containing `INSERT`, `UPDATE`, or `DELETE`
 - `cdc_lsn`, containing the Postgres commit LSN for the change
@@ -111,7 +113,7 @@ The `cdc_operation`, `cdc_lsn`, and `cdc_tx_ordinal` names are reserved and can'
 
 Inserts and updates append the complete new row. A primary-key value update also appends a `DELETE` for the old key. Deletes append the old row when the source uses `REPLICA IDENTITY FULL`. With primary-key identity, a delete contains the key values; other fields use `NULL` for nullable scalars or placeholders such as zero, empty strings, and empty arrays. Those placeholders are not the deleted row's original values.
 
-Read the base table to analyze the event history. Order source changes by `cdc_lsn` and then `cdc_tx_ordinal`. The old-key delete and new-key update from one primary-key value change share both values, so this pair is not a unique destination-row ID.
+Order source changes by `cdc_lsn` and then `cdc_tx_ordinal`. The old-key delete and new-key update from one primary-key value change share both values, so this pair is not a unique destination-row ID.
 
 ### Truncates and table restarts
 

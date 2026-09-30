@@ -234,7 +234,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                 {isPipelineLoading ? (
                   <span className="inline-flex items-center">
                     <span className="sr-only">Loading pipeline</span>
-                    <ShimmeringLoader className="h-3 w-24 py-0" />
+                    <ShimmeringLoader className="h-5 w-24 py-0" />
                   </span>
                 ) : (
                   (pipeline?.destination_name ?? 'Pipeline')
@@ -258,7 +258,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
             <PageHeaderSummary>
               <PageHeaderTitle>
                 {isPipelineLoading ? (
-                  <span className="inline-flex items-center">
+                  <span className="flex h-8 items-center">
                     <span className="sr-only">Loading pipeline</span>
                     <ShimmeringLoader className="h-6 w-40 py-0" />
                   </span>
@@ -286,7 +286,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   {isPipelineIdentityLoading ? (
                     <span className="inline-flex items-center">
                       <span className="sr-only">Loading destination</span>
-                      <ShimmeringLoader className="h-3 w-20 py-0" />
+                      <ShimmeringLoader className="h-5 w-20 py-0" />
                     </span>
                   ) : (
                     <span>{destinationType ?? pipeline?.destination_name ?? 'Unknown'}</span>

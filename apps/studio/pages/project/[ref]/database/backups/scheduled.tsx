@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { DatabaseBackup, Info } from 'lucide-react'
-import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -18,13 +17,12 @@ import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/Databas
 import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { AlertError } from '@/components/ui/AlertError'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
 import InformationBox from '@/components/ui/InformationBox'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsHighAvailability, useIsOrioleDbInAws } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -63,7 +61,6 @@ const ScheduledBackups = () => {
     isSuccess,
   } = useBackupsQuery({ projectRef })
 
-  const isOrioleDbInAws = useIsOrioleDbInAws()
   const isHighAvailability = useIsHighAvailability()
   const isPitrEnabled = backups?.pitr_enabled
 
@@ -71,18 +68,6 @@ const ScheduledBackups = () => {
     PermissionAction.READ,
     'back_ups'
   )
-
-  if (isOrioleDbInAws) {
-    return (
-      <Admonition
-        type="default"
-        title="Database backups are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
-      >
-        <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
-      </Admonition>
-    )
-  }
 
   if (isHighAvailability) {
     return (
