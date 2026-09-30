@@ -307,9 +307,31 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         expect(sql).toContain(`'${lvl}'`)
       }
       expect(sql).toContain(`'pathname'`)
+      // log_type + base (with pathname folded in) = 2 scans
+      expect(sql.match(/FROM logs/g)?.length ?? 0).toBe(2)
+    })
+
+    it('folds an unfiltered pathname into the base scan, capped at its top 20 values', () => {
+      const sql = getLogsCountQuery(baseSearch)
+      const baseScan = sql.split(/\bUNION ALL\b/).find((b) => b.includes(`'all'`)) ?? ''
+      expect(baseScan).toContain(`arrayJoin(['total','level','method','status','pathname'])`)
+      expect(baseScan).toContain('ORDER BY count DESC\nLIMIT 20 BY facet')
+    })
+
+    it('orders the single-facet query so LIMIT keeps the most frequent values', () => {
+      const sql = getFacetCountQuery({ search: baseSearch, facet: 'pathname' })
+      expect(sql).toContain('GROUP BY value\nORDER BY count DESC\nLIMIT 20')
+    })
+
+    it('gives a filtered pathname its own scan that excludes the pathname filter', () => {
+      const sql = getLogsCountQuery(withFilters('pathname:eq:/customers'))
+      expect(sql.match(/FROM logs/g)?.length ?? 0).toBe(3)
       expect(sql).toContain('LIMIT 20')
-      // log_type + base + pathname = 3 scans
-      expect(sql.match(/FROM logs/g)?.length ?? 0).toBeLessThanOrEqual(4)
+      expect(sql).not.toContain('LIMIT 20 BY')
+      const pathnameWhere = whereOfBranchContaining(sql, `single-facet counts ('pathname')`)
+      expect(pathnameWhere).not.toContain('/customers')
+      // The base scan keeps the pathname filter for the other facets.
+      expect(whereOfBranchContaining(sql, `'all'`)).toContain('/customers')
     })
 
     it('honours an active log_type filter in the total count scan', () => {
