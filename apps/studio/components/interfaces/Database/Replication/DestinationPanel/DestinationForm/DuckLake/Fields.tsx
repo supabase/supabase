@@ -462,31 +462,30 @@ const DuckLakeCustomFields = ({
                   ? 'Stored secret access key is hidden. Enter a new secret to replace it.'
                   : 'Required secret access key for the object storage provider.'
               }
-              className="relative"
             >
               <FormControl>
-                <Input
-                  {...field}
+                <PasswordInput
                   type={showSecretAccessKey && !editMode ? 'text' : 'password'}
                   placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   value={field.value ?? ''}
+                  onChange={(event) => field.onChange(event.target.value)}
                   autoComplete="off"
-                  data-1p-ignore
-                  data-lpignore="true"
-                  data-form-type="other"
-                  data-bwignore
+                  actions={
+                    !editMode && (
+                      <Button
+                        className="w-7"
+                        aria-label={
+                          showSecretAccessKey
+                            ? 'Hide S3 secret access key'
+                            : 'Show S3 secret access key'
+                        }
+                        icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                        onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
+                      />
+                    )
+                  }
                 />
               </FormControl>
-              {!editMode && (
-                <Button
-                  aria-label={
-                    showSecretAccessKey ? 'Hide S3 secret access key' : 'Show S3 secret access key'
-                  }
-                  icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
-                  className="w-7 absolute right-6 top-[4px]"
-                  onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
-                />
-              )}
             </FormItemLayout>
           )}
         />
@@ -514,7 +513,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="S3 endpoint"
-              description="Publicly reachable provider endpoint, without `https://`."
+              description="Public address of your storage provider, without the HTTP or HTTPS prefix."
             >
               <FormControl>
                 <Input
@@ -534,7 +533,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="S3 URL style"
-              description="Choose `path` for MinIO/Supabase-style endpoints or `vhost` for AWS-style virtual host addressing."
+              description="Choose path style if the bucket is in the address path, or virtual-host style if it is in the hostname."
             >
               <FormControl>
                 <Select value={field.value ?? 'path'} onValueChange={field.onChange}>
