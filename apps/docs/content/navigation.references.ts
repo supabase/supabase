@@ -62,7 +62,7 @@ export const REFERENCES = {
     type: 'sdk',
     name: 'TanStack DB',
     library: '@supabase-labs/tanstack-db',
-    libPath: 'tanstack-db',
+    libPath: 'tanstack_db',
     versions: ['v1'],
     typeSpec: true,
     icon: 'reference-javascript',
