@@ -21,7 +21,7 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     key: 'primaryHue',
     cssVar: '--primary-hue',
     label: 'Spot color',
-    description: 'Changes the hue of primary controls and the canvas tint.',
+    description: 'Changes the hue of primary controls and the canvas.',
     ranges: { dark: { min: 0, max: 360 }, light: { min: 0, max: 360 } },
   },
   {
