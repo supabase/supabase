@@ -19,7 +19,7 @@ export const GrantDisconnectDialogContent = ({
   grant: MemberOauthGrantItem
   onClose: () => void
 }) => {
-  const { mutate: revokeApp, isPending } = useOAuthGrantRevokeMutation({
+  const { mutate: revokeGrant, isPending } = useOAuthGrantRevokeMutation({
     onSuccess: () => {
       toast.success(`Revoked access for ${grant?.app?.name}`)
       onClose()
@@ -54,7 +54,7 @@ export const GrantDisconnectDialogContent = ({
           variant="danger"
           loading={isPending}
           onClick={() => {
-            if (grant) revokeApp({ slug: grant.organization.slug, grantId: grant.grant_id })
+            if (grant) revokeGrant({ slug: grant.organization.slug, grantId: grant.grant_id })
           }}
         >
           Disconnect
