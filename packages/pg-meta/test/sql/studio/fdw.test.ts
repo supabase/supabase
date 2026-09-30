@@ -76,7 +76,10 @@ test('deleting a wrapper row drops its server and preserves shared wrapper depen
   expect(sql).toContain("where w.fdwname = 'bigquery_fdw'")
   expect(sql).toContain("execute format('drop foreign data wrapper if exists %I cascade'")
   expect(sql).not.toContain('drop foreign data wrapper if exists "bigquery_fdw" cascade')
-  expect(sql).toContain("where fdwname = 'bigquery_fdw'")
+  // Vault secrets are named after this server, not the (possibly shared) FDW,
+  // so deleting them never depends on whether sibling servers still exist.
+  expect(sql).toContain("delete from vault.secrets where name = 'selected_bigquery_server_sa_key_id'")
+  expect(sql).not.toContain("where fdwname = 'bigquery_fdw'")
 })
 
 test('editing a server does not raise even when other servers share the same FDW', () => {
