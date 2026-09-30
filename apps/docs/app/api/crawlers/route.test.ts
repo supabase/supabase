@@ -111,11 +111,14 @@ describe('crawler reference aliases', () => {
     await expect(html('/reference/javascript/list')).rejects.toThrow('notFound')
   })
 
-  it('keeps explicit version in the canonical URL', async () => {
+  it('uses canonical paths for explicit versions', async () => {
     reference.sections = [section('auth-update', 'Update')]
 
     expect(await html('/reference/javascript/v1/auth-update')).toContain(
       'href="https://supabase.com/docs/reference/javascript/v1/auth-update"'
+    )
+    expect(await html('/reference/javascript/v2/auth-update')).toContain(
+      'href="https://supabase.com/docs/reference/javascript/auth-update"'
     )
   })
 })

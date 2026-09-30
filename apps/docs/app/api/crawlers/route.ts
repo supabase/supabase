@@ -98,6 +98,7 @@ function htmlShell(
   body: string
 ) {
   const libraryName = REFERENCES[lib].name
+  const versionPath = version && version !== REFERENCES[lib].versions[0] ? '/' + version : ''
   let title = libraryName + ': ' + (section.title ?? '')
 
   return (
@@ -108,7 +109,7 @@ function htmlShell(
     `<meta name="og:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<meta name="twitter:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
-    (version ? '/' + version : '') +
+    versionPath +
     (slug ? '/' + slug : '') +
     `">` +
     '</head>' +
