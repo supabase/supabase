@@ -431,7 +431,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/supabase-client',
-    destination: '/docs/reference/javascript/initializing',
+    destination: '/docs/reference/javascript/supabase-client',
   },
   {
     permanent: false,
@@ -476,12 +476,12 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/auth-user',
-    destination: '/docs/reference/javascript/auth-getuser',
+    destination: '/docs/reference/javascript/v1/auth-user',
   },
   {
     permanent: false,
     source: '/docs/client/auth-update',
-    destination: '/docs/reference/javascript/auth-updateuser',
+    destination: '/docs/reference/javascript/v1/auth-update',
   },
   {
     permanent: false,
@@ -491,7 +491,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/reset-password-email',
-    destination: '/docs/reference/javascript/auth-resetpasswordforemail',
+    destination: '/docs/reference/javascript/v1/auth-resetpasswordforemail',
   },
   {
     permanent: false,
