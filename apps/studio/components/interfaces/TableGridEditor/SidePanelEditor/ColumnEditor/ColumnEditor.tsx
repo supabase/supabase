@@ -371,7 +371,7 @@ export const ColumnEditor = ({
                       isReactForm={false}
                       layout="flex"
                       id="isArray"
-                      label="Define as Array"
+                      label="Define as array"
                       description="Allow column to be defined as variable-length multidimensional arrays"
                     >
                       <Checkbox
@@ -484,7 +484,7 @@ export const ColumnEditor = ({
                       isReactForm={false}
                       layout="flex"
                       id="isUnique"
-                      label="Is Unique"
+                      label="Is unique"
                       description="Enforce values in the column to be unique across rows"
                     >
                       <Switch

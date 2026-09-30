@@ -1,4 +1,4 @@
-import { useFeatureFlags, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2, ThumbsUp } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -30,7 +30,12 @@ import {
   getAvailableRegions,
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
-import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
+import { ProjectCreationStatusAdmonition } from './ProjectCreationStatusAdmonition'
+import {
+  getRegionRestrictionCopy,
+  regionMatches,
+  SELECT_DIFFERENT_REGION,
+} from './RegionSelector.utils'
 import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -43,6 +48,7 @@ import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
+  hasSelectedOrganization: boolean
   instanceSize?: DesiredInstanceSize
   layout?: 'vertical' | 'horizontal'
   showBestAvailableRegionOption: boolean
@@ -53,18 +59,6 @@ interface RegionSelectorProps {
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
 // I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
 // ^ can try again next time
-
-// Maps smart region group codes to the specific-region code prefixes they contain.
-// Used to check whether an incident affecting specific regions also affects a smart region selection.
-const SMART_REGION_PREFIXES: Record<string, Array<string>> = {
-  americas: ['us-', 'ca-', 'sa-'],
-  emea: ['eu-', 'me-', 'af-'],
-  apac: ['ap-'],
-}
-
-function smartRegionMatchesSpecific(smartCode: string, specificCode: string): boolean {
-  return (SMART_REGION_PREFIXES[smartCode] ?? []).some((prefix) => specificCode.startsWith(prefix))
-}
 
 // Map backend region names to user-friendly display names
 const getDisplayNameForSmartRegion = (name: string): string => {
@@ -84,6 +78,7 @@ const BestAvailableRegionIcon = () => (
 
 export const RegionSelector = ({
   form,
+  hasSelectedOrganization,
   instanceSize,
   layout = 'horizontal',
   showBestAvailableRegionOption,
@@ -98,10 +93,11 @@ export const RegionSelector = ({
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+  const isStatusPageEnabled = useFlag('incidentIoStatusPage') === true
 
   const { getRegionRestriction } = useRegionRestriction()
 
-  const { data: statusData } = useIncidentStatusQuery()
+  const { data: statusData } = useIncidentStatusQuery({ enabled: !isStatusPageEnabled })
   const { incidents = [] } = statusData ?? {}
 
   const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
@@ -115,8 +111,11 @@ export const RegionSelector = ({
     isError: isErrorAvailableRegions,
     error: errorAvailableRegions,
   } = useOrganizationAvailableRegionsQuery(
-    { slug, cloudProvider, desiredInstanceSize: instanceSize },
-    { enabled: smartRegionEnabled, staleTime: 1000 * 60 * 5 } // 5 minutes
+    { slug, cloudProvider, desiredInstanceSize: instanceSize, highAvailability },
+    {
+      enabled: smartRegionEnabled && hasSelectedOrganization,
+      staleTime: 1000 * 60 * 5,
+    }
   )
 
   const allSmartRegions = availableRegionsData?.all.smartGroup ?? []
@@ -147,7 +146,7 @@ export const RegionSelector = ({
 
   // Keeps dbRegion following the recommendation while "Best available" is active, so a
   // recommendation change (e.g. after a refetch) doesn't leave the form submitting a stale
-  // region behind a label that still reads "Best available region".
+  // region behind a label that still reads "Auto".
   useEffect(() => {
     if (!isBestAvailableSelected || !recommendedSmartRegion) return
     if (dbRegion !== recommendedSmartRegion.name) {
@@ -238,19 +237,15 @@ export const RegionSelector = ({
           const triggerLabel = isLoading
             ? 'Loading available regions...'
             : isBestAvailableActive
-              ? 'Best available region'
+              ? 'Auto'
               : selectedRegionLabel
 
           const affectingIncidents = incidents.filter((incident) => {
             const affectedRegions = incident.cache?.affected_regions ?? []
             if (affectedRegions.length === 0 || selectedRegion?.code === undefined) return false
 
-            // Specific region: direct code match
-            if (affectedRegions.includes(selectedRegion.code)) return true
-
-            // Smart region: match if any affected region falls within the smart group
-            return affectedRegions.some((specificCode) =>
-              smartRegionMatchesSpecific(selectedRegion.code, specificCode)
+            return affectedRegions.some((affectedRegion) =>
+              regionMatches(selectedRegion.code, affectedRegion)
             )
           })
 
@@ -261,31 +256,26 @@ export const RegionSelector = ({
                 layout={layout}
                 label="Region"
                 description={
-                  <>
-                    <p>Select the region closest to your users for the best performance.</p>
-                    {restrictHighAvailabilityRegion ? (
-                      <div className="mt-2 text-warning">
-                        High Availability projects are currently limited to{' '}
-                        {regionOptions[0]?.name ?? highAvailabilityRegionCode}.
-                      </div>
-                    ) : (
-                      showNonProdFields && (
-                        <div className="mt-2 text-warning">
-                          <p>Only these regions are supported for local/staging projects:</p>
-                          <ul className="list-disc list-inside mt-1">
-                            <li>East US (North Virginia)</li>
-                            <li>Central EU (Frankfurt)</li>
-                            <li>Southeast Asia (Singapore)</li>
-                          </ul>
-                          {isLocalEnvironment && (
-                            <p className="mt-1">
-                              Use Central EU (Frankfurt) unless you're on a personal dev stack.
-                            </p>
-                          )}
-                        </div>
-                      )
-                    )}
-                  </>
+                  restrictHighAvailabilityRegion ? (
+                    <div className="text-warning">
+                      High Availability projects are currently limited to{' '}
+                      {regionOptions[0]?.name ?? highAvailabilityRegionCode}.
+                    </div>
+                  ) : showNonProdFields ? (
+                    <div className="text-warning">
+                      <p>Only these regions are supported for local/staging projects:</p>
+                      <ul className="list-disc list-inside mt-1">
+                        <li>East US (North Virginia)</li>
+                        <li>Central EU (Frankfurt)</li>
+                        <li>Southeast Asia (Singapore)</li>
+                      </ul>
+                      {isLocalEnvironment && (
+                        <p className="mt-1">
+                          Use Central EU (Frankfurt) unless you're on a personal dev stack.
+                        </p>
+                      )}
+                    </div>
+                  ) : undefined
                 }
               >
                 <FormControl>
@@ -344,8 +334,11 @@ export const RegionSelector = ({
                               <div className="flex flex-row items-center justify-between w-full">
                                 <div className="flex items-center gap-x-3">
                                   <BestAvailableRegionIcon />
-                                  <span className="text-foreground">Best available region</span>
+                                  <span className="text-foreground">Auto</span>
                                 </div>
+                                <Badge variant="success" className="mr-1">
+                                  Recommended
+                                </Badge>
                               </div>
                             </SelectItem>
                           </SelectGroup>
@@ -444,24 +437,28 @@ export const RegionSelector = ({
                 </FormControl>
               </FormItemLayout>
 
-              {affectingIncidents.length > 0 && (
-                <FormItemLayout layout="horizontal">
-                  <Admonition
-                    type="warning"
-                    title="Incident in progress for this region"
-                    description={
-                      <>
-                        We're currently investigating an issue that may impact projects in this
-                        region. Follow updates on{' '}
-                        <InlineLink href="https://status.supabase.com">
-                          status.supabase.com
-                        </InlineLink>
-                        .
-                      </>
-                    }
-                    className="mt-3"
-                  />
-                </FormItemLayout>
+              {isStatusPageEnabled ? (
+                <ProjectCreationStatusAdmonition selectedRegionCode={selectedRegion?.code} />
+              ) : (
+                affectingIncidents.length > 0 && (
+                  <FormItemLayout layout="horizontal">
+                    <Admonition
+                      type="warning"
+                      title="Incident in progress for this region"
+                      description={
+                        <>
+                          We're currently investigating an issue that may impact projects in this
+                          region. Follow updates on{' '}
+                          <InlineLink href="https://status.supabase.com">
+                            status.supabase.com
+                          </InlineLink>
+                          .
+                        </>
+                      }
+                      className="mt-3"
+                    />
+                  </FormItemLayout>
+                )
               )}
 
               {selectedRestrictionCopy !== undefined && (

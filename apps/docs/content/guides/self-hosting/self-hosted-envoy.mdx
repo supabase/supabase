@@ -113,7 +113,7 @@ Routes are matched in the order declared. The first matching prefix wins. Protec
 | `/.well-known/oauth-authorization-server` | auth      | -                        | Open           | OAuth 2.0 Authorization Server Metadata (RFC 8414)                     |
 | `/auth/v1/sso/saml/acs`                   | auth      | `/sso/saml/acs`          | Open           | SAML assertion consumer                                                |
 | `/auth/v1/sso/saml/metadata`              | auth      | `/sso/saml/metadata`     | Open           | SAML metadata                                                          |
-| `/functions/v1/`                          | functions | `/`                      | Bypass         | Edge Functions runtime performs its own JWT verification; 150s timeout |
+| `/functions/v1/`                          | functions | `/`                      | `sb_` keys     | Rejects invalid and conflicting `sb_` keys; others pass; timeout: 150s |
 | `/storage/v1/`                            | storage   | `/`                      | Bypass         | Storage performs its own authorization                                 |
 | `/auth/v1/`                               | auth      | `/`                      | API key        | Protected Auth endpoints                                               |
 | `/rest/v1/`                               | rest      | `/`                      | API key        | PostgREST Open API root (requires secret key)                          |
@@ -154,7 +154,7 @@ A Lua filter rejects missing or invalid keys with HTTP `401 Unauthorized`. An RB
 
 ### Opaque key translation
 
-When the new API keys (`sb_publishable_*`, `sb_secret_*`) are configured, a chain of Lua filters translates opaque keys into the corresponding pre-signed internal JWTs before the request reaches API key enforcement and upstream services. **The entire chain is skipped on `/functions/v1/`**: the Edge Runtime receives the original `apikey` and `Authorization` headers unchanged.
+When the new API keys (`sb_publishable_*`, `sb_secret_*`) are configured, a chain of Lua filters translates opaque keys into the corresponding pre-signed internal JWTs before the request reaches API key enforcement and upstream services. **The chain is skipped on `/functions/v1/`**, which has its own filter. See [Edge Functions](#edge-functions).
 
 The chain operates in this order:
 
@@ -165,6 +165,23 @@ The chain operates in this order:
 5. **`Authorization` synthesis.** If the client did not send a real JWT in the `Authorization` header (or sent only a `Bearer sb_*` value, which is not a valid JWT), the gateway synthesizes `Authorization: Bearer <apikey>` from the (potentially translated) `apikey` header. This is skipped on the Realtime WebSocket route, which uses `x-api-key` instead.
 
 For background on opaque vs asymmetric keys, see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
+
+### Edge Functions
+
+On `/functions/v1/`, a dedicated Lua filter handles API keys without changing the `apikey` or `Authorization` headers. When the new API keys are configured, it works as follows:
+
+| Request                                                            | Result                                                   |
+| ------------------------------------------------------------------ | -------------------------------------------------------- |
+| No `apikey` or `Authorization`                                     | Passed through                                           |
+| `apikey` is `sb_publishable_*` or `sb_secret_*`                    | Passed through with `sb-api-key` set to the internal JWT |
+| `Authorization: Bearer sb_...` and no `apikey`                     | Same as above, using the key from `Authorization`        |
+| Non-`sb_` value (legacy API key, user session token, any other)    | Passed through                                           |
+| Unknown `sb_` key                                                  | Rejected with `401 Unauthorized`                         |
+| `apikey` and `Authorization: Bearer sb_...` contain different keys | Rejected with `401 Unauthorized`                         |
+
+The filter always removes any `sb-api-key` header sent by the client. Without the new API keys configured, all other requests pass through unchanged. The `sb-api-key` value is the raw JWT, without a `Bearer` prefix. The `apikey` query parameter is not read on this route.
+
+When `FUNCTIONS_VERIFY_JWT` is `true`, the functions service verifies the JWT in `Authorization`. If `Authorization` is missing or contains an `sb_` key, it verifies `sb-api-key` instead. It removes `sb-api-key` before the request reaches your function. Functions can also check API keys themselves, for example with `withSupabase` from `@supabase/server`. See [Self-hosted Edge Functions](/docs/guides/self-hosting/self-hosted-functions).
 
 ## Forwarded headers and CORS
 

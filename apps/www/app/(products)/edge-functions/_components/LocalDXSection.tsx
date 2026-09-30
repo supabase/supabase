@@ -84,7 +84,7 @@ function CICard() {
         <p className="text-foreground-lighter text-sm">
           Use the{' '}
           <Link
-            href="https://supabase.com/docs/guides/functions/cicd-workflow"
+            href="https://supabase.com/docs/guides/functions/deploy#cicd-deployment"
             className="underline hover:text-foreground-light transition-colors"
             target="_blank"
             rel="noopener noreferrer"
