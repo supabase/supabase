@@ -24,10 +24,10 @@ export const useGitHubAuthorizationQuery = <TData = GitHubAuthorizationData>({
   return useQuery<GitHubAuthorizationData, GitHubAuthorizationError, TData>({
     queryKey: integrationKeys.githubAuthorization(),
     queryFn: ({ signal }) => getGitHubAuthorization(signal),
+    ...options,
     enabled,
-    staleTime: 0,
+    staleTime: 1000 * 60,
     // explicitly disable retries so we don't spam the endpoint if the user just isn't connected
     retry: false,
-    ...options,
   })
 }
