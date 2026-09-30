@@ -1,4 +1,5 @@
 import { useQueries } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -9,6 +10,7 @@ import { NoProjectsNotice } from './NoProjectsNotice'
 import { CONSENT_COPY } from './OAuthAppsAuthorizeScreen.utils'
 import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
+import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
 import {
   DestinationLogo,
   InterstitialLayout,
@@ -223,7 +225,11 @@ export const OAuthAppsAuthorizeScreen = ({
     <InterstitialLayout
       logo={<LogoPair left={<DestinationLogo name={request.name} />} right={<SupabaseLogo />} />}
       title={`Authorize ${request.name}`}
-      description="This application wants to access your Supabase Account"
+      description={
+        orgAppDetails.existing_grant
+          ? `You authorized ${request.name} for this organization on ${dayjs(orgAppDetails.existing_grant.approved_at).format('D MMM YYYY')}. It's now asking for more access.`
+          : 'This application wants to access your Supabase Account'
+      }
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
         {hasRoleFailure && (
@@ -270,7 +276,14 @@ export const OAuthAppsAuthorizeScreen = ({
             <>
               <section className="flex flex-col gap-3">
                 <p className="text-sm text-foreground">Permissions requested</p>
-                <ScopeGroupCard scopes={request.scopes} />
+                {orgAppDetails.existing_grant?.approved_scopes ? (
+                  <ScopeGroupCardWithDiff
+                    scopes={request.scopes}
+                    previousScopes={orgAppDetails.existing_grant.approved_scopes}
+                  />
+                ) : (
+                  <ScopeGroupCard scopes={request.scopes} />
+                )}
                 <p className="text-xs text-foreground-lighter">
                   Authorizing {request.name} grants it access to the permissions
                   {isProjectScopingModeEnabled && !allProjectsSelected
