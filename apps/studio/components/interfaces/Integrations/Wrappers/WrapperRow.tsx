@@ -109,16 +109,12 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
           <div key={metadata.name} className="flex items-center space-x-2 text-sm">
             <Link
               href={`/project/${ref}/settings/vault/secrets?search=${encodeURIComponent(
-                `${wrapper.server_name}_${metadata.name}`
+                serverOptions[metadata.name] ?? ''
               )}`}
-              className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"
+              className="transition text-foreground-light hover:text-foreground flex items-center gap-x-2"
             >
-              <span className="truncate" title={metadata.label}>
-                {metadata.label}
-              </span>
-              <div>
-                <ExternalLink size={12} strokeWidth={1.5} className="text-foreground-lighter" />
-              </div>
+              <span title={`View ${metadata.label} in Vault`}>View in Vault</span>
+              <ExternalLink size={14} strokeWidth={1.5} />
             </Link>
           </div>
         ))}
