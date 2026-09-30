@@ -567,17 +567,25 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Use SSL"
-              description="Uses an encrypted HTTPS connection. Turn off only if your storage provider requires HTTP."
+              description="Controls whether connections to your storage provider use HTTPS."
             >
               <FormControl>
                 <Select
                   value={field.value === false ? 'false' : 'true'}
                   onValueChange={(value) => field.onChange(value === 'true')}
                 >
-                  <SelectTrigger>{field.value === false ? 'false' : 'true'}</SelectTrigger>
+                  <SelectTrigger>{field.value === false ? 'Off' : 'On'}</SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">true</SelectItem>
-                    <SelectItem value="false">false</SelectItem>
+                    <SelectItem value="true" className="[&>span]:top-2.5">
+                      <p>On</p>
+                      <p className="text-foreground-lighter">Encrypts the connection with HTTPS.</p>
+                    </SelectItem>
+                    <SelectItem value="false" className="[&>span]:top-2.5">
+                      <p>Off</p>
+                      <p className="text-foreground-lighter">
+                        Uses HTTP if your provider requires it.
+                      </p>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>

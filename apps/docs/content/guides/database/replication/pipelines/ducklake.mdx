@@ -74,7 +74,7 @@ Select **Enter connection details** under **Configuration method**, then configu
 - **S3 endpoint**: A publicly reachable provider endpoint without `http://` or `https://`
 - **S3 region**: The storage provider's region
 - **S3 URL style**: Path style if the bucket is in the URL path, or virtual-host style if the bucket is in the hostname
-- **Use SSL**: Enable to connect to the S3 endpoint over HTTPS
+- **Use SSL**: Choose **On** for HTTPS, or **Off** if your provider requires HTTP
 - **Metadata schema**: A unique Postgres schema for DuckLake metadata, using only letters, numbers, and underscores
 
 Optionally adjust **Pool size** under **Advanced settings**. It allows 1 to 6 concurrent DuckDB connections; the default is 4. Click **Start pipeline**, review the validation results, then confirm the estimated cost with **Create and start pipeline**.
