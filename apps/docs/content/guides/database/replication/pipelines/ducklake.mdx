@@ -41,7 +41,7 @@ Before you begin:
 - Choose active, healthy, non-branch projects from the same organization for the catalog and storage. You can use the same project for both.
 - Make sure your organization role can administer SQL in the catalog project and Storage in the storage project.
 - Choose a private standard Storage bucket. You can create one from the destination form.
-- Choose a metadata schema unique to this DuckLake. Use only letters, numbers, and underscores. If the catalog project already uses the default `ducklake` schema for Warehouse, enter a different name.
+- Choose an unused metadata schema name for this DuckLake. Pipelines creates the schema and its tables. Use only letters, numbers, and underscores. If the catalog project already uses the default `ducklake` schema for Warehouse, enter a different name.
 - Keep catalog and storage in the same region when possible, near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
 To configure the destination:
@@ -49,7 +49,7 @@ To configure the destination:
 1. Select **Select Supabase projects** under **Configuration method**.
 2. Choose the **Catalog project** and **Metadata schema**.
 3. Choose the **Storage project** and private **Bucket**. Select **New bucket** at the bottom of the bucket list if you haven't created one yet.
-4. Optionally adjust **Pool size** under **Advanced settings**. It allows `1` to `6` concurrent DuckDB connections; the default is `4`.
+4. Optionally adjust **Pool size** under **Advanced settings**. It allows 1 to 6 concurrent DuckDB connections; the default is 4.
 5. Click **Start pipeline**. Review any validation warnings, then confirm the estimated cost with **Create and start pipeline**.
 
 Credential-provisioning warnings are expected before creation: catalog and Storage credentials are provisioned when you save the destination. Review the selected resources before proceeding.
@@ -60,24 +60,24 @@ Use this mode to connect an existing Postgres database and S3-compatible object 
 
 Prepare the following resources:
 
-1. A Postgres database reachable from managed Pipelines. Create a dedicated user that can create and modify the DuckLake metadata schema and its tables.
+1. A Postgres database reachable from managed Pipelines. Create a dedicated user with permission to create the DuckLake metadata schema and its tables.
 2. An S3-compatible bucket and a dedicated prefix for this DuckLake.
 3. Object-storage credentials that can list, read, write, and delete objects under that prefix. Delete access is required for managed file cleanup.
 
-Use a new catalog metadata schema and data prefix for each destination. Reusing an existing schema or prefix can mix the metadata or files of different DuckLakes.
+Choose an unused metadata schema name and a new data prefix for each destination. Pipelines creates the schema and its tables. Initialising a DuckLake catalog in that schema beforehand triggers a validation warning; reusing its schema or prefix can mix metadata or files from different DuckLakes.
 
 Select **Enter connection details** under **Configuration method**, then configure these fields:
 
 - **Catalog URL**: A `postgres://` or `postgresql://` URL for your existing database, including credentials. If your provider requires TLS, append `?sslmode=require` after the database name, or `&sslmode=require` if the URL already has query parameters. Keep the database name from your provider's URL; it doesn't need to be `ducklake_catalog`.
 - **Data path**: An `s3://<bucket>/<prefix>` URL
 - **S3 access key ID** and **S3 secret access key**: A credential pair for the data path
-- **S3 region**: The storage provider's region
 - **S3 endpoint**: A publicly reachable provider endpoint without `http://` or `https://`
-- **S3 URL style**: `path` if the bucket is in the URL path, or `vhost` if the bucket is in the hostname
+- **S3 region**: The storage provider's region
+- **S3 URL style**: Path style if the bucket is in the URL path, or virtual-host style if the bucket is in the hostname
 - **Use SSL**: Enable to connect to the S3 endpoint over HTTPS
 - **Metadata schema**: A unique Postgres schema for DuckLake metadata, using only letters, numbers, and underscores
 
-Optionally adjust **Pool size** under **Advanced settings**. It allows `1` to `6` concurrent DuckDB connections; the default is `4`. Click **Start pipeline**, review the validation results, then confirm the estimated cost with **Create and start pipeline**.
+Optionally adjust **Pool size** under **Advanced settings**. It allows 1 to 6 concurrent DuckDB connections; the default is 4. Click **Start pipeline**, review the validation results, then confirm the estimated cost with **Create and start pipeline**.
 
 The catalog URL and storage credentials are stored as secrets and aren't returned after creation. When editing the destination, leave a secret field empty to keep its stored value, or enter a new value to replace it.
 
