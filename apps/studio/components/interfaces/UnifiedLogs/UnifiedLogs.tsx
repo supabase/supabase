@@ -45,6 +45,7 @@ import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import {
+  deduplicateUnifiedLogs,
   gateLogTypeFilters,
   gateLogTypeOptions,
   getComputeLogsAvailability,
@@ -222,12 +223,7 @@ export const UnifiedLogs = () => {
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
-  // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
-  const flatData = useMemo(() => {
-    return rawFlatData.filter((value, idx) => {
-      return idx === rawFlatData.findIndex((x) => x.id === value.id)
-    })
-  }, [rawFlatData])
+  const flatData = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount

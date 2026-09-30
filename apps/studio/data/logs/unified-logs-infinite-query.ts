@@ -16,6 +16,7 @@ import { handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
+const LIVE_LOGS_OVERLAP_MS = 2 * 60 * 1000
 
 export const UNIFIED_LOGS_QUERY_OPTIONS = {
   refetchOnWindowFocus: false,
@@ -64,73 +65,57 @@ export async function getUnifiedLogs(
   if (typeof projectRef === 'undefined')
     throw new Error('projectRef is required for getUnifiedLogs')
 
-  /**
-   * [Joshen] RE infinite loading pagination logic for unified logs, these all really should live in the API
-   * but for now we're doing these on the FE to move quickly while figuring out what data we need before we
-   * migrate this logic to the BE. Just thought to leave a small explanation on the logic here:
-   *
-   * We're leveraging on the log's timestamp to essentially fetch the next page
-   * Given that the logs are ordered descending (latest logs come first, and we're fetching older logs as we scroll down)
-   * Hence why the cursor is basically the last row's timestamp from the latest page
-   *
-   * iso_timestamp_start will always be the current timestamp
-   * iso_timestamp_end will default to the last hour for the first page, followed by the last row's timestamp from
-   * the previous page.
-   *
-   * However, just note that this isn't a perfect solution as there's always the edge case where by there's multiple rows
-   * with identical timestamps, hence why FE will need a de-duping logic (in UnifiedLogs.tsx) unless we can figure a cleaner
-   * solution when we move all this logic to the BE (e.g using composite columns for the cursor like timestamp + id)
-   *
-   */
-
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
   const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
-  const sql = safeSql`${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)}`
 
   const cursorValue = pageParam?.cursor
   const cursorDirection = pageParam?.direction
 
-  let timestampEnd: string
+  let timestampStart = isoTimestampStart
+  let timestampEnd = isoTimestampEnd
 
-  if (cursorDirection === 'prev') {
-    // Live mode: fetch logs newer than the cursor
+  if (cursorDirection === 'prev' && !search.date) {
+    timestampStart = new Date(Number(cursorValue) - LIVE_LOGS_OVERLAP_MS).toISOString()
     timestampEnd = new Date().toISOString()
   } else if (cursorDirection === 'next') {
-    // Regular pagination: fetch logs older than the cursor.
-    // The cursor is stored as milliseconds (set below from `date.getTime()`),
-    // so we can convert it directly without worrying about the wire format.
     timestampEnd =
       cursorValue !== null && cursorValue !== undefined
         ? new Date(Number(cursorValue)).toISOString()
         : isoTimestampEnd
-  } else {
-    timestampEnd = isoTimestampEnd
   }
 
   const endpoint = logsAllEndpointUrl(useOtel)
-  const data = await executeAnalyticsSql({
-    projectRef,
-    endpoint,
-    sql,
-    iso_timestamp_start: isoTimestampStart,
-    iso_timestamp_end: timestampEnd,
-    signal,
-    headers: headersInit,
-  })
+  const fetchPage = async (offset: number) => {
+    const sql = safeSql`${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)} OFFSET ${analyticsLiteral(offset)}`
+    const data = await executeAnalyticsSql({
+      projectRef,
+      endpoint,
+      sql,
+      iso_timestamp_start: timestampStart,
+      iso_timestamp_end: timestampEnd,
+      signal,
+      headers: headersInit,
+    })
 
-  if (data.error) handleError(new Error(data.error as string))
+    if (data.error) handleError(new Error(data.error as string))
+    return parseUnifiedLogsQueryRows(data?.result).map(mapUnifiedLogRow)
+  }
 
-  const resultData = parseUnifiedLogsQueryRows(data?.result)
-  const result = resultData.map(mapUnifiedLogRow)
+  let result = await fetchPage(0)
 
-  const firstRow = result.length > 0 ? result[0] : null
+  if (cursorDirection === 'prev') {
+    for (let offset = LOGS_PAGE_LIMIT; result.length >= offset; offset += LOGS_PAGE_LIMIT) {
+      const page = await fetchPage(offset)
+      result = [...result, ...page]
+      if (page.length < LOGS_PAGE_LIMIT) break
+    }
+  }
+
   const lastRow = result.length > 0 ? result[result.length - 1] : null
   const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
 
-  // Cursors are stored as milliseconds (Date.getTime()) so the OTEL endpoint's
-  // wire format (ISO string vs numeric microseconds) doesn't bleed into pagination.
   const nextCursor = lastRow ? lastRow.date.getTime() : null
-  const prevCursor = firstRow ? firstRow.date.getTime() : new Date().getTime()
+  const prevCursor = new Date(timestampEnd).getTime()
 
   return {
     data: result,

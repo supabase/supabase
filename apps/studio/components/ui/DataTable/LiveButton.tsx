@@ -26,7 +26,7 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
 
     async function fetchData() {
       if (live) {
-        await fetchPreviousPage?.()
+        await fetchPreviousPage?.().catch(() => undefined)
         timeoutId = setTimeout(fetchData, REFRESH_INTERVAL)
       } else {
         clearTimeout(timeoutId)
