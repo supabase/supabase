@@ -457,6 +457,16 @@ fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -d '{}')
 check "Call hello function" '{"message":"Hello from Edge Functions!"}' "$fn_resp"
 
+# A non-sb_ value (typo / legacy / third-party JWT) is not rejected at the
+# gateway - it passes to the function, where the Supabase Server SDK rejects it.
+# (Detailed sb_-key translation/rejection is covered in test-auth-keys.sh.)
+check "Functions reject non-sb_ apikey (Server SDK)" "401" \
+    "$(http_status "$BASE_URL/functions/v1/hello" \
+        -X POST \
+        -H "apikey: invalid-key" \
+        -H "Content-Type: application/json" \
+        -d '{}')"
+
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
 # ---------------------------------------------

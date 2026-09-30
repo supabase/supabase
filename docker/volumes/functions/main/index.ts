@@ -36,7 +36,7 @@ export function parseJwks(raw: string | undefined): jose.JSONWebKeySet | null {
 }
 
 /**
- * Extract JWT token from Authorization header
+ * Extract JWT token from 'Authorization' header or fallback to 'sb-api-key' compatibility
  *
  * Parses the Authorization header to extract the Bearer token.
  * Expects format: "Bearer <token>"
@@ -44,22 +44,41 @@ export function parseJwks(raw: string | undefined): jose.JSONWebKeySet | null {
  * @param req - The HTTP request object
  * @returns The JWT token string or an authentication failure
  */
+function extractBearerToken(authHeader: string | null): string | null {
+  const tokenParts = (authHeader ?? '').trim().split(/\s+/)
+  const [bearer, token] = tokenParts
+  if (bearer.toLowerCase() !== 'bearer' || tokenParts.length !== 2 || !token) {
+    return null
+  }
+  return token
+}
+
 function getAuthToken(req: Request): string | AuthFailure {
   const authHeader = req.headers.get('authorization')
-  if (!authHeader) {
+  const sbApiKeyCompatibilityToken = req.headers.get('sb-api-key')
+
+  if (!authHeader && !sbApiKeyCompatibilityToken) {
     return {
       code: RequestErrors.MissingAuthHeader,
       message: 'Missing authorization header',
     }
   }
-  const tokenParts = authHeader.trim().split(/\s+/)
-  const [bearer, token] = tokenParts
-  if (bearer.toLowerCase() !== 'bearer' || tokenParts.length !== 2 || !token) {
+
+  // NOTE:(kallebysantos) Compatibility mode is triggered when all conditions match:
+  // - API proxy mints a temp token
+  // - Original bearer is not present or is ApiKey
+  const bearerToken = extractBearerToken(authHeader)
+  const token = !bearerToken || bearerToken.startsWith('sb_')
+    ? sbApiKeyCompatibilityToken
+    : bearerToken
+
+  if (!token) {
     return {
       code: RequestErrors.InvalidTokenFormat,
       message: 'Invalid JWT format',
     }
   }
+
   return token
 }
 
@@ -221,7 +240,11 @@ Deno.serve(async (req: Request) => {
       importMapPath,
       envVars,
     })
-    return await worker.fetch(req)
+    // Gateway-minted internal JWT is for this router only; never expose it to user functions.
+    const userReq = new Request(req)
+    userReq.headers.delete('sb-api-key')
+    EdgeRuntime.applySupabaseTag(req, userReq)
+    return await worker.fetch(userReq)
   } catch (e) {
     const error = { msg: e.toString() }
     return new Response(JSON.stringify(error), {
