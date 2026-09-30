@@ -11,7 +11,6 @@ import {
 } from '@/components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
-import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -38,12 +37,6 @@ export const useS3VectorsWrapperCreateMutation = () => {
     : settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 's3_vectors_wrapper')
-
-  const { data: fdws } = useFDWsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const hasExistingWrapper = fdws?.some((wrapper) => wrapper.name === wrapperMeta?.name) ?? false
 
   const { can: canCreateCredentials } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
@@ -85,7 +78,6 @@ export const useS3VectorsWrapperCreateMutation = () => {
     const params: FDWCreateVariables = {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      hasExistingWrapper,
       wrapperMeta: wrapperMeta!,
       formState: {
         wrapper_name: wrapperMeta!.name,

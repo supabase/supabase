@@ -29,25 +29,13 @@ export type FDWCreateVariables = {
   sourceSchema: string
   targetSchema: string
   schemaOptions?: SafeSqlFragment[]
-  // Set when adding another connection to a wrapper type that already has a foreign data
-  // wrapper registered - only the server (and its tables) needs to be created in that case.
-  hasExistingWrapper?: boolean
 }
 
-export async function createFDW({
-  projectRef,
-  connectionString,
-  hasExistingWrapper,
-  ...rest
-}: FDWCreateVariables) {
+export async function createFDW({ projectRef, connectionString, ...rest }: FDWCreateVariables) {
+  const createForeignDataWrapperSql = getCreateForeignDataWrapperSql(rest.wrapperMeta)
   const createServerSql = getCreateFDWSql(rest)
   const sql = wrapWithTransaction(
-    hasExistingWrapper
-      ? createServerSql
-      : joinSqlFragments(
-          [getCreateForeignDataWrapperSql(rest.wrapperMeta), createServerSql],
-          '\n\n'
-        )
+    joinSqlFragments([createForeignDataWrapperSql, createServerSql], '\n\n')
   )
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result

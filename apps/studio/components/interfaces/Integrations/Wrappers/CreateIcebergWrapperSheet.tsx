@@ -120,7 +120,6 @@ const INITIAL_VALUES = {
 
 export const CreateIcebergWrapperSheet = ({
   wrapperMeta,
-  hasExistingWrapper,
   onDirty,
   onClose,
   onCloseWithConfirmation,
@@ -202,7 +201,6 @@ export const CreateIcebergWrapperSheet = ({
       await createFDW({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        hasExistingWrapper,
         wrapperMeta,
         formState: {
           ...formValues,

@@ -50,7 +50,6 @@ export const WrappersTab = () => {
   const createdWrappers = wrapperMeta
     ? wrappers.filter((w) => wrapperMetaComparator(wrapperMeta, w))
     : []
-  const hasExistingForeignDataWrapper = createdWrappers.some((x) => x.name === wrapperMeta?.name)
 
   const [isDirty, setIsDirty] = useState(false)
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
@@ -101,7 +100,6 @@ export const WrappersTab = () => {
           {wrapperMeta && CreateWrapperSheetComponent && (
             <CreateWrapperSheetComponent
               wrapperMeta={wrapperMeta}
-              hasExistingWrapper={hasExistingForeignDataWrapper}
               onDirty={setIsDirty}
               onClose={() => {
                 setIsCreating(null)

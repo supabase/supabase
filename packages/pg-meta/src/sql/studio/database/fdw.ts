@@ -260,9 +260,19 @@ export function getCreateForeignDataWrapperSql(
   wrapperMeta: SimplifiedWrapperMeta
 ): SafeSqlFragment {
   return safeSql`
-    create foreign data wrapper ${ident(wrapperMeta.name)}
-    handler ${ident(wrapperMeta.handlerName)}
-    validator ${ident(wrapperMeta.validatorName)};
+    do $$
+    begin
+      if not exists (
+        select 1 from pg_catalog.pg_foreign_data_wrapper where fdwname = ${literal(wrapperMeta.name)}
+      ) then
+        execute format(
+          'create foreign data wrapper %I handler %I validator %I',
+          ${literal(wrapperMeta.name)},
+          ${literal(wrapperMeta.handlerName)},
+          ${literal(wrapperMeta.validatorName)}
+        );
+      end if;
+    end $$;
   `
 }
 
