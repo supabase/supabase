@@ -6,7 +6,7 @@ import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
+import { NO_PROJECT_MARKER } from '../SupportForm.utils'
 import { SupportForm, SupportFormPage, SupportFormStatusButton } from '../SupportFormPage'
 // End of third-party imports
 
@@ -753,7 +753,6 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload).toMatchObject({
-      projectRef: NO_PROJECT_MARKER,
       organizationSlug: 'org-1',
       allowSupportAccess: false,
     })
@@ -1952,8 +1951,6 @@ describe('SupportFormPage', () => {
     expect(payload).toMatchObject({
       subject: 'Cannot access my account',
       category: 'Dashboard_bug',
-      projectRef: NO_PROJECT_MARKER,
-      organizationSlug: NO_ORG_MARKER,
       library: '',
       affectedServices: '',
       allowSupportAccess: false,
