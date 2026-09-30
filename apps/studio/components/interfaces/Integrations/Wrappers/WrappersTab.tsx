@@ -81,7 +81,7 @@ export const WrappersTab = () => {
             <p className="text-sm text-foreground-light">
               No {wrapperMeta.label} wrappers have been installed
             </p>
-            <AddWrapperButton onClick={() => setIsCreating(true)} />
+            <AddWrapperButton />
           </div>
         </div>
       ) : (
@@ -89,14 +89,14 @@ export const WrappersTab = () => {
           {!isMarketplaceEnabled && (
             <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
               <DocsButton href={wrapperMeta.docsUrl} />
-              <AddWrapperButton variant="primary" onClick={() => setIsCreating(true)} />
+              <AddWrapperButton variant="primary" />
             </div>
           )}
           <WrapperTable />
         </>
       )}
 
-      <Sheet open={!!isCreating} onOpenChange={handleOpenChange}>
+      <Sheet open={!!isCreating && canCreateWrapper} onOpenChange={handleOpenChange}>
         <SheetContent size="lg">
           {wrapperMeta && CreateWrapperSheetComponent && (
             <CreateWrapperSheetComponent

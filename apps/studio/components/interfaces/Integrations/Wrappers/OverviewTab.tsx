@@ -6,6 +6,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
+import { AddWrapperButton } from './AddWrapperButton'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -15,15 +16,11 @@ import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const WrapperOverviewContent = () => {
-  const { id, ref } = useParams()
-
   return (
     <div className="flex flex-col gap-y-5 max-w-5xl">
       <div className="flex items-center justify-between">
         <p>Recent wrappers</p>
-        <Button asChild variant="primary">
-          <Link href={`/project/${ref}/integrations/${id}/wrappers?new=true`}>Add new wrapper</Link>
-        </Button>
+        <AddWrapperButton variant="primary" />
       </div>
       <WrapperTable />
     </div>
