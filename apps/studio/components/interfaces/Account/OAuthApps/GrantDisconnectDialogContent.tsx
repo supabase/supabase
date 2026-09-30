@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from 'ui'
 
-import { useOAuthAppRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-mutation'
+import { useOAuthGrantRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-grant-mutation'
 import { MemberOauthGrantItem } from '@/data/oauth-apps/types'
 
 export const GrantDisconnectDialogContent = ({
@@ -19,7 +19,7 @@ export const GrantDisconnectDialogContent = ({
   grant: MemberOauthGrantItem
   onClose: () => void
 }) => {
-  const { mutate: revokeApp, isPending } = useOAuthAppRevokeMutation({
+  const { mutate: revokeApp, isPending } = useOAuthGrantRevokeMutation({
     onSuccess: () => {
       toast.success(`Revoked access for ${grant?.app?.name}`)
       onClose()
@@ -54,7 +54,7 @@ export const GrantDisconnectDialogContent = ({
           variant="danger"
           loading={isPending}
           onClick={() => {
-            if (grant) revokeApp({ slug: grant.organization.slug, appId: grant.app.id })
+            if (grant) revokeApp({ slug: grant.organization.slug, grantId: grant.grant_id })
           }}
         >
           Disconnect
