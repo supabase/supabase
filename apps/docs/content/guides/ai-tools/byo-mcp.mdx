@@ -196,8 +196,8 @@ Replace the contents of `supabase/functions/mcp/index.ts`. Compared with the pub
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0'
-import { pipeline } from 'npm:@supabase/middleware@^0.5.0'
-import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@^1.6.0'
+import { pipeline } from 'npm:@supabase/middleware@1'
+import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
 import { z } from 'npm:zod@^4.3.6'
 
 import type { Database } from './database.types.ts'
@@ -254,7 +254,7 @@ Deno.serve(
 
 <Admonition type="note">
 
-Composing `withSupabase` as a `pipeline` entry is alpha and tracks `@supabase/middleware` 0.x. The nested form, `withOAuthProtectedResource(withSupabase({ auth: 'user' }, handler))`, is stable and behaves the same. Both need `@supabase/server` 1.6.0 or later.
+The nested form, `withOAuthProtectedResource(withSupabase({ auth: 'user' }, handler))`, behaves the same. Both need `@supabase/server` 1.6.0 or later.
 
 </Admonition>
 
