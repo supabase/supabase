@@ -59,7 +59,12 @@ test('encrypted server options still resolve their value through Vault unchanged
 
 test('deleting a wrapper row drops its server and preserves shared wrapper dependencies', () => {
   const sql = getDeleteFDWSql({
-    wrapper: { id: 42, name: 'bigquery_fdw', server_name: 'selected_bigquery_server' },
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'selected_bigquery_server',
+      server_options: ['sa_key_id=123e4567-e89b-12d3-a456-426614174000'],
+    },
     wrapperMeta: {
       name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
@@ -76,10 +81,60 @@ test('deleting a wrapper row drops its server and preserves shared wrapper depen
   expect(sql).toContain("where w.fdwname = 'bigquery_fdw'")
   expect(sql).toContain("execute format('drop foreign data wrapper if exists %I cascade'")
   expect(sql).not.toContain('drop foreign data wrapper if exists "bigquery_fdw" cascade')
-  // Vault secrets are named after this server, not the (possibly shared) FDW,
-  // so deleting them never depends on whether sibling servers still exist.
-  expect(sql).toContain("delete from vault.secrets where name = 'selected_bigquery_server_sa_key_id'")
-  expect(sql).not.toContain("where fdwname = 'bigquery_fdw'")
+  // Secrets are deleted by the id already stored on the server's own option
+  // value - never by a guessed name, since that naming convention has changed
+  // more than once across this feature's history (see next two tests).
+  expect(sql).toContain(
+    "delete from vault.secrets where id = '123e4567-e89b-12d3-a456-426614174000'::uuid"
+  )
+  expect(sql).toContain(
+    "delete from vault.secrets where key_id = '123e4567-e89b-12d3-a456-426614174000'"
+  )
+  expect(sql).not.toContain('where name =')
+})
+
+test('skips secret cleanup entirely when an encrypted option was never set', () => {
+  const sql = getDeleteFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'selected_bigquery_server',
+      server_options: [],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [{ name: 'sa_key_id', encrypted: true }] },
+    },
+  })
+
+  expect(sql).not.toContain('vault.secrets')
+  expect(sql).not.toContain('pgsodium')
+})
+
+test('secret cleanup is deterministic regardless of which era the wrapper was created in', () => {
+  // Older wrappers may have named their secrets after the FDW or a
+  // wrapper_name-based convention that no longer exists in the app - this must
+  // not matter, since cleanup never guesses a name.
+  const sql = getDeleteFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'some_legacy_custom_fdw_name',
+      server_name: 'some_legacy_custom_fdw_name_server',
+      server_options: ['sa_key_id=123e4567-e89b-12d3-a456-426614174000'],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [{ name: 'sa_key_id', encrypted: true }] },
+    },
+  })
+
+  expect(sql).toContain(
+    "delete from vault.secrets where id = '123e4567-e89b-12d3-a456-426614174000'::uuid"
+  )
 })
 
 test('editing a server does not raise even when other servers share the same FDW', () => {

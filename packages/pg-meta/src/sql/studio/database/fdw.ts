@@ -415,27 +415,33 @@ export const getDeleteFDWSql = ({
   wrapper,
   wrapperMeta,
 }: {
-  wrapper: { id: number; name: string; server_name: string }
+  wrapper: { id: number; name: string; server_name: string; server_options?: string[] | null }
   wrapperMeta: SimplifiedWrapperMeta
 }): SafeSqlFragment => {
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
+  const currentServerOptions = parseOptionsArray(wrapper.server_options)
 
-  const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
-    const key = `${wrapper.server_name}_${option.name}`
+  // Secrets are looked up by the id already stored in the server's own option
+  // value, never by a guessed name - the naming convention for new secrets has
+  // changed more than once across this feature's history, but the stored id is
+  // stable regardless of when the wrapper was created.
+  const deleteEncryptedSecretsSqlArray = encryptedOptions
+    .filter((option) => currentServerOptions[option.name] !== undefined)
+    .map((option) => {
+      const existingSecretId = currentServerOptions[option.name]
 
-    return safeSql`
-      do $$
-      begin
-        if ${isUsingOldWrappersSql} then
-          delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = ${literal(key)});
-
-          delete from pgsodium.key where name = ${literal(key)};
-        else
-          delete from vault.secrets where name = ${literal(key)};
-        end if;
-      end $$;
-    `
-  })
+      return safeSql`
+        do $$
+        begin
+          if ${isUsingOldWrappersSql} then
+            delete from vault.secrets where key_id = ${literal(existingSecretId)};
+            delete from pgsodium.key where id = ${literal(existingSecretId)};
+          else
+            delete from vault.secrets where id = ${literal(existingSecretId)}::uuid;
+          end if;
+        end $$;
+      `
+    })
 
   const deleteEncryptedSecretsSql = joinSqlFragments(deleteEncryptedSecretsSqlArray, '\n')
 
