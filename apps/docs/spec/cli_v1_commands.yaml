@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.118.0
+  version: 2.119.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -653,7 +653,7 @@ commands:
 
       `config pull` never writes a `config.toml`/`.json` it cannot load back on the next command. Pulling a value that GATES other declared fields — e.g. flipping a disabled provider's `enabled` on — also pulls its now-required sibling values into the same write (not just the gate), so the file never comes out half-configured. When one of those siblings genuinely can't be supplied — the remote doesn't report it, or supplying it would still leave a REQUIRED value missing — the whole toggle is skipped instead, reported with a new reason (`requires values pull cannot write` in text output, `would_invalidate` in the machine payload) plus a note naming the missing field(s) and, when a missing field's local spelling is itself an unresolved `env(VAR)` reference, the exact environment variable to set before rerunning.
 
-      `--dry-run` computes and prints exactly what `config diff` would show, then stops — no git check, no prompt, no write. `--output-format json|stream-json` never prompts at all — it returns the confirmation's default value without reading anything, so use `--dry-run` for a preview in those shapes rather than relying on the prompt. A non-interactive run in the default text format (no TTY on stdin) still prints the confirmation to stderr and reads a single line from piped stdin: an explicit `y`/`n` answer is honored, and an empty or unparseable line falls back to the default. `--yes` (or `SUPABASE_YES`) answers the confirmation prompt without asking on an interactive TTY; it does not bypass the uncommitted-changes guard — on the contrary, `--yes` together with uncommitted (or untracked) changes aborts instead of silently overwriting them, since no human is left to read the warning. `--force` writes even when `supabase/config.toml` has uncommitted or untracked changes in git — without it, an interactive run's prompt defaults to "no" instead of "yes", and every other case (non-interactive text, machine-format, or `--yes` on any TTY) aborts outright.
+      `--dry-run` computes and prints exactly what `config diff` would show, then stops — no git check, no prompt, no write. `--output-format json|stream-json` never prompts at all — it returns the confirmation's default value without reading anything, so use `--dry-run` for a preview in those shapes rather than relying on the prompt. A non-interactive run in the default text format (no TTY on stdin) still prints the confirmation to stderr and reads a single line from piped stdin: an explicit `y`/`yes`/`n`/`no` answer is honored, an empty line falls back to the default, and any other answer declines. `--yes` (or `SUPABASE_YES`) answers the confirmation prompt without asking on an interactive TTY; it does not bypass the uncommitted-changes guard — on the contrary, `--yes` together with uncommitted (or untracked) changes aborts instead of silently overwriting them, since no human is left to read the warning. `--force` writes even when `supabase/config.toml` has uncommitted or untracked changes in git — without it, an interactive run's prompt defaults to "no" instead of "yes", and every other case (non-interactive text, machine-format, or `--yes` on any TTY) aborts outright.
 
       A second `config pull` against an already-tracked, unchanged remote always writes nothing — that convergence is the design's own acceptance property, not a special case. It never even checks for uncommitted local changes to the config file in that case, since there is nothing to write either way. A target that isn't tracked yet (a branch or `--remote-label` name with no existing `[remotes.*]` block) still creates that block on its first pull, even when every value it carries already matches the local defaults — it's the second pull against that now-tracked block that then writes nothing.
 
@@ -2187,22 +2187,25 @@ commands:
         description: Generate types from a database url.
         default_value: ''
       - id: lang
-        name: --lang <[ typescript | go | swift | python ]>
+        name: --lang <[ typescript | go | python | swift | dart ]>
         description: Output language of the generated types. (default typescript)
         default_value: typescript
         accepted_values:
           - id: typescript
             name: typescript
-            type: '[ typescript | go | swift | python ]'
+            type: '[ typescript | go | python | swift | dart ]'
           - id: go
             name: go
-            type: '[ typescript | go | swift | python ]'
-          - id: swift
-            name: swift
-            type: '[ typescript | go | swift | python ]'
+            type: '[ typescript | go | python | swift | dart ]'
           - id: python
             name: python
-            type: '[ typescript | go | swift | python ]'
+            type: '[ typescript | go | python | swift | dart ]'
+          - id: swift
+            name: swift
+            type: '[ typescript | go | python | swift | dart ]'
+          - id: dart
+            name: dart
+            type: '[ typescript | go | python | swift | dart ]'
       - id: linked
         name: --linked
         description: Generate types from the linked project.
@@ -2210,10 +2213,6 @@ commands:
       - id: local
         name: --local
         description: Generate types from the local dev database.
-        default_value: 'false'
-      - id: postgrest-v9-compat
-        name: --postgrest-v9-compat
-        description: Generate types compatible with PostgREST v9 and below.
         default_value: 'false'
       - id: project-id
         name: --project-id <string>
@@ -2228,16 +2227,22 @@ commands:
         description: Comma separated list of schema to include.
         default_value: '[]'
       - id: swift-access-control
-        name: --swift-access-control <[ internal | public ]>
+        name: --swift-access-control <[ internal | public | private | package ]>
         description: Access control for Swift generated types. (default internal)
         default_value: internal
         accepted_values:
           - id: internal
             name: internal
-            type: '[ internal | public ]'
+            type: '[ internal | public | private | package ]'
           - id: public
             name: public
-            type: '[ internal | public ]'
+            type: '[ internal | public | private | package ]'
+          - id: private
+            name: private
+            type: '[ internal | public | private | package ]'
+          - id: package
+            name: package
+            type: '[ internal | public | private | package ]'
   - id: supabase-init
     title: supabase init
     summary: Initialize a local project
@@ -2251,6 +2256,8 @@ commands:
       > You may override the directory path by specifying the `SUPABASE_WORKDIR` environment variable or `--workdir` flag.
 
       In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
+
+      To use OrioleDB as the Postgres storage engine, run `supabase init --use-orioledb`. The command writes the OrioleDB version to `db.orioledb_version` in `supabase/config.toml`; `--experimental` is not required.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -2259,6 +2266,10 @@ commands:
       - id: from-workdir
         name: Initialize from an existing directory
         code: supabase init --workdir .
+        response: Finished supabase init.
+      - id: with-orioledb
+        name: Initialize with OrioleDB
+        code: supabase init --use-orioledb
         response: Finished supabase init.
     tags:
       - local-dev
