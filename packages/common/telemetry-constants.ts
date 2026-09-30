@@ -449,6 +449,36 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * omitted = PostHog flags had not loaded at the time of project creation
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
+    /**
+     * Which region option was submitted. Only present for the region-recommendation experiment's
+     * eligible cohort (free plan + `project_creation:show_best_available_region` feature enabled —
+     * see `shouldTrackRegionRecommendation` in ProjectCreationForm.tsx). This is cohort-level
+     * eligibility, not "the option was shown" — it's present for both the PostHog flag's control
+     * and test arms so the two can be compared; omitted entirely outside the cohort (e.g. paid
+     * plans, or providers like AWS_NIMBUS where the feature is disabled).
+     * 'best_available' = the "Best available region" shortcut was used
+     * otherwise = the name of the region that was directly selected (e.g. 'Americas', 'ap-southeast-1')
+     */
+    selectedRegionOption?: string
+    /**
+     * Which region list `selectedRegionOption` came from. Only present alongside `selectedRegionOption`.
+     * 'general' = picked from the "General regions" (smart group) list, or the "Best available
+     * region" shortcut was used (it always resolves to a general/smart region)
+     * 'specific' = picked from the "Specific regions" list
+     */
+    selectedRegionOptionType?: 'general' | 'specific'
+    /**
+     * The region that was recommended/defaulted to on initial render, before any user
+     * interaction. Present under the same cohort gate as `selectedRegionOption`. Frozen the
+     * first time it's known, so a later refetch (e.g. switching cloud provider or instance size)
+     * doesn't overwrite what was actually shown to the user initially.
+     * 'best_available' = the user was in the PostHog flag's test arm, so the form defaulted to
+     * the "Best available region" shortcut
+     * otherwise = the name of the smart-group region recommended by the `available-regions`
+     * endpoint (e.g. 'Americas'), for users in the flag's control arm
+     * undefined = no recommendation had loaded yet at submission time
+     */
+    initialRecommendedRegion?: string
   }
   groups: TelemetryGroups
 }
@@ -991,6 +1021,41 @@ export interface AskAiClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+  }
+}
+
+/**
+ * Surface that rendered the prompt panel a user copied from.
+ */
+export type DocsAiPromptSource = 'homepage' | 'guide' | 'agent_setup'
+
+/**
+ * User copied the contents of a docs prompt panel - the homepage setup card or an
+ * `AiPrompt` block - and the clipboard write succeeded. Fires on success only;
+ * failed clipboard writes are not counted.
+ *
+ * Distinct from `ai_prompt_copied`, which belongs to Studio's AI assistant.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs, /docs/guides
+ */
+export interface DocsAiPromptCopiedEvent {
+  action: 'docs_ai_prompt_copied'
+  properties: {
+    /**
+     * Surface the panel was rendered on.
+     */
+    source: DocsAiPromptSource
+    /**
+     * `value` of the pane that was active when the copy happened. Known panes
+     * are `prompt` and `cli`; other strings remain allowed for future panes.
+     */
+    tab: 'prompt' | 'cli' | (string & {})
+    /**
+     * Prompt identifier, set when the panel comes from an `AiPrompt` block.
+     */
+    promptId?: string
   }
 }
 
@@ -1561,8 +1626,8 @@ export interface ExplorerBannerCtaButtonClickedEvent {
 }
 
 /**
- * User clicked the button in the Explorer sidebar title bar to temporarily switch to the SQL
- * Editor for snippet access.
+ * User clicked the SQL Editor button in the Explorer sidebar footer to temporarily switch
+ * to the SQL Editor for snippet access.
  *
  * @group Events
  * @source studio
@@ -1574,8 +1639,8 @@ export interface ExplorerTempAccessSqlEditorClickedEvent {
 }
 
 /**
- * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
- * visit originated from the Explorer's temporary switch button.
+ * User clicked the Explorer sidebar nav item while on the SQL Editor page, navigating back
+ * to Explorer.
  *
  * @group Events
  * @source studio
@@ -3394,6 +3459,85 @@ export interface LogExplorerQueryRunButtonClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ExplorerQueryLocation =
+  | { surface: 'query_tab'; queryId: string; notebookId?: never; cellId?: never }
+  | { surface: 'notebook_cell'; notebookId: string; cellId: string; queryId?: never }
+
+export type ExplorerQueryRunProperties = ExplorerQueryLocation & {
+  runId: string
+  source: 'database' | 'logs'
+}
+
+type ExplorerGroups = Pick<TelemetryGroups, 'project'> &
+  Partial<Pick<TelemetryGroups, 'organization'>>
+
+/**
+ * User started an Explorer query run.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQuerySubmittedEvent {
+  action: 'explorer_query_submitted'
+  properties: ExplorerQueryRunProperties
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer query run completed successfully.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQueryCompletedEvent {
+  action: 'explorer_query_completed'
+  properties: ExplorerQueryRunProperties
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer query run failed.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQueryFailedEvent {
+  action: 'explorer_query_failed'
+  properties: ExplorerQueryRunProperties & {
+    failureReason: 'logs_unavailable' | 'connection_unavailable' | 'execution_error'
+  }
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer notebook was saved for the first time.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerNotebookCreatedEvent {
+  action: 'explorer_notebook_created'
+  properties: { notebookId: string }
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer notebook was saved after creation.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerNotebookUpdatedEvent {
+  action: 'explorer_notebook_updated'
+  properties: { notebookId: string }
+  groups: ExplorerGroups
+}
+
 /**
  * User clicked an upgrade CTA inside the compute badge hover card.
  *
@@ -3903,7 +4047,12 @@ export interface WarehouseEnabledEvent {
  */
 export interface WarehouseDisabledEvent {
   action: 'warehouse_disabled'
-  properties: {}
+  properties: {
+    /** Number of schemas that were replicated in full. Omitted when the replicated tables have not resolved. */
+    schemaTargetCount?: number
+    /** Number of tables that were replicated individually. Omitted when the replicated tables have not resolved. */
+    tableTargetCount?: number
+  }
   groups: TelemetryGroups
 }
 
@@ -3911,6 +4060,11 @@ export interface WarehouseDisabledEvent {
  * @hidden
  */
 export type TelemetryEvent =
+  | ExplorerQuerySubmittedEvent
+  | ExplorerQueryCompletedEvent
+  | ExplorerQueryFailedEvent
+  | ExplorerNotebookCreatedEvent
+  | ExplorerNotebookUpdatedEvent
   | SignUpEvent
   | SignInEvent
   | SignInSubmittedEvent
@@ -3964,6 +4118,7 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | AskAiClickedEvent
+  | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent

@@ -4,20 +4,26 @@ import '@/styles/globals.css'
 
 import { FeatureFlagProvider, TelemetryTagManager } from 'common'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
-import { Inter } from 'next/font/google'
+import { Inter, Manrope, Source_Code_Pro } from 'next/font/google'
 
 import { Providers } from './Providers'
 import { Toaster } from './toaster'
 import { API_URL } from '@/lib/constants'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' })
+const sourceCodePro = Source_Code_Pro({
+  subsets: ['latin'],
+  variable: '--font-source-code-pro',
+  display: 'swap',
+})
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export const metadata: Metadata = {
   applicationName: 'Supabase Library',
   title: 'Supabase Library',
-  description: 'Provides a library of components for your project',
+  description: 'Supabase blocks and starter apps for authentication, storage, realtime, and more',
   metadataBase: new URL('https://supabase.com'),
   icons: genFaviconData(BASE_PATH),
   openGraph: {
@@ -42,9 +48,11 @@ interface RootLayoutProps {
 
 export default async function Layout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head />
-      <body className={`${inter.className} antialiased`}>
+      <body
+        className={`${inter.variable} ${manrope.variable} ${sourceCodePro.variable} font-sans antialiased`}
+      >
         <TelemetryTagManager />
         <FeatureFlagProvider API_URL={API_URL}>
           <Providers>

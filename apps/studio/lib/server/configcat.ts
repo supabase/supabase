@@ -1,4 +1,5 @@
 import { getClient, PollingMode, User } from '@configcat/sdk/node'
+import { IS_PLATFORM } from 'common'
 
 let serverClient: ReturnType<typeof getClient>
 
@@ -70,4 +71,11 @@ export async function getServerFlags(
   }
 
   return client.getAllValuesAsync(buildUser(userEmail, customAttributes))
+}
+
+export async function isServerFlagEnabled(name: string): Promise<boolean> {
+  if (!IS_PLATFORM) return false
+
+  const flags = await getServerFlags()
+  return flags.some((flag) => flag.settingKey === name && flag.settingValue === true)
 }

@@ -43,7 +43,7 @@ const Command = ({ item }: any) => {
               }}
             >
               {isCopied ? (
-                <Check size={14} strokeWidth={3} className="text-brand" />
+                <Check size={14} strokeWidth={3} className="text-primary" />
               ) : (
                 <Copy size={14} />
               )}

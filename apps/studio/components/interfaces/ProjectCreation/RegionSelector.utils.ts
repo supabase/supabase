@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { captureCriticalError } from '@/lib/error-reporting'
+import { normalizeRegion, type StatusItem } from '@/lib/status-page/status-page.utils'
 
 export const RESTRICTED_REGIONS_FLAG_KEY = 'projectCreationRestrictedRegions'
 
@@ -92,4 +93,36 @@ export function resolveRegionRestriction({
   flagRestriction,
 }: ResolveRegionRestrictionArgs): string | undefined {
   return platformStatus ?? flagRestriction
+}
+
+// Maps smart region group codes to the specific-region code prefixes they contain.
+// Used to check whether a status item affecting specific regions also affects a smart region selection.
+export const SMART_REGION_PREFIXES: Record<string, Array<string>> = {
+  americas: ['us-', 'ca-', 'sa-'],
+  emea: ['eu-', 'me-', 'af-'],
+  apac: ['ap-'],
+}
+
+export function regionMatches(selectedCode: string, affectedRegion: string): boolean {
+  const normalizedSelected = normalizeRegion(selectedCode)
+  const normalizedAffected = normalizeRegion(affectedRegion)
+  if (normalizedSelected === normalizedAffected) return true
+  return (SMART_REGION_PREFIXES[normalizedSelected] ?? []).some((prefix) =>
+    normalizedAffected.startsWith(prefix)
+  )
+}
+
+export function getItemsAffectingProjectCreation(
+  items: Array<StatusItem>,
+  selectedRegionCode: string | undefined
+): Array<StatusItem> {
+  return items.filter((item) => {
+    if (item.kind !== 'incident' && item.kind !== 'maintenance') return false
+    if (item.projectCreationScope === null) return false
+    if (item.projectCreationScope.type === 'global') return true
+    return (
+      selectedRegionCode !== undefined &&
+      item.projectCreationScope.regions.some((region) => regionMatches(selectedRegionCode, region))
+    )
+  })
 }

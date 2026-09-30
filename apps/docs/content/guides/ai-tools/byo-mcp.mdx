@@ -155,10 +155,10 @@ allow_dynamic_registration = true
 
 ### Step 2: Create the MCP server
 
-The fastest path is the [MCP Server block](/library/docs/headless/mcp-server) in the Supabase Library. It installs an Edge Function with the middleware already wired, a `whoami` tool, and a small tool registry to extend:
+The fastest path is the [MCP Server block](/library/docs/headless/mcp) in the Supabase Library. It installs an Edge Function with the middleware already wired, a `whoami` tool, and a small tool registry to extend:
 
 ```bash
-npx shadcn@latest add https://supabase.com/library/r/mcp-server.json
+npx shadcn@latest add https://supabase.com/library/r/mcp.json
 ```
 
 To write the function yourself, start with a table for the tools to work on. Create it with RLS so each user only sees their own rows; the `user_id` default means inserts don't need to pass it. Save this as a migration with `supabase migration new create_todos` and paste it into the generated file:
@@ -380,7 +380,7 @@ Both examples in this guide are in the `supabase/supabase` repository, ready to 
 
 ## Resources
 
-- [MCP Server block](/library/docs/headless/mcp-server) and [Headless App block](/library/docs/tanstack/headless-app) in the Supabase Library
+- [MCP Server block](/library/docs/headless/mcp) and [Headless App block](/library/docs/tanstack/headless-app) in the Supabase Library
 - [`@supabase/server` reference](/docs/reference/server/introduction)
 - [MCP authentication with Supabase Auth](/docs/guides/auth/oauth-server/mcp-authentication)
 - [OAuth 2.1 server](/docs/guides/auth/oauth-server)

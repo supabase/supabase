@@ -117,7 +117,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
         <div className="flex items-center gap-x-2">
           {hook.enabled ? (
             <Badge className="space-x-1" variant="success">
-              <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">
+              <div className="h-3.5 w-3.5 bg-brand-default rounded-full flex justify-center items-center">
                 <Check className="h-2 w-2 text-background-overlay " strokeWidth={6} />
               </div>
               <span>Enabled</span>

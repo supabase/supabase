@@ -465,6 +465,16 @@ check "Unknown function returns 404" "404" "$fn_missing_status"
 fn_error_code=$(awk 'tolower($1) == "sb-error-code:" { sub(/^[^:]*:[[:space:]]*/, ""); sub(/[[:space:]]*$/, ""); print }' "$fn_headers")
 check "Unknown function returns sb-error-code header" "NOT_FOUND" "$fn_error_code"
 
+# A non-sb_ value (typo / legacy / third-party JWT) is not rejected at the
+# gateway - it passes to the function, where the Supabase Server SDK rejects it.
+# (Detailed sb_-key translation/rejection is covered in test-auth-keys.sh.)
+check "Functions reject non-sb_ apikey (Server SDK)" "401" \
+    "$(http_status "$BASE_URL/functions/v1/hello" \
+        -X POST \
+        -H "apikey: invalid-key" \
+        -H "Content-Type: application/json" \
+        -d '{}')"
+
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
 # ---------------------------------------------

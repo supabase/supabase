@@ -16,7 +16,8 @@ type DatabasePoliciesVariables = {
 
 export async function getDatabasePolicies(
   { projectRef, connectionString, schemas }: DatabasePoliciesVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -28,7 +29,8 @@ export async function getDatabasePolicies(
       sql,
       queryKey: ['policies', schemas],
     },
-    signal
+    signal,
+    headersInit
   )
 
   return result as PGPolicy[]

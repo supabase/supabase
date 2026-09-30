@@ -17,5 +17,5 @@ export function AiPrompt({ props }: HandlerContext): string {
     throw new Error(`Unknown AiPrompt id: ${id}`)
   }
 
-  return `**AI Prompt**\n\n${toMarkdown({ type: 'code', lang: 'text', value: prompt }).trimEnd()}`
+  return `**Agent Prompt**\n\n${toMarkdown({ type: 'code', lang: 'text', value: prompt }).trimEnd()}`
 }

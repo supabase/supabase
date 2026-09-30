@@ -207,7 +207,7 @@ export const ChooseChannelPopover = ({
               <div className="flex items-center gap-x-2">
                 <p className="text-foreground text-xs">
                   Currently joined{' '}
-                  <span className={config.isChannelPrivate ? 'text-brand' : 'text-warning'}>
+                  <span className={config.isChannelPrivate ? 'text-primary' : 'text-warning'}>
                     {config.isChannelPrivate ? 'private' : 'public'}
                   </span>{' '}
                   channel:

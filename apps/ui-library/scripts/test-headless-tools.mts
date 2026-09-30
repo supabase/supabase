@@ -15,7 +15,7 @@ try {
   const files = block.files!.filter((file) => file.target?.startsWith('~/supabase/'))
   const targets = files.map((file) => file.target!)
   assert.equal(new Set(targets).size, targets.length, 'Install targets must be unique')
-  assert(!block.registryDependencies?.some((dependency) => dependency.endsWith('/mcp-server.json')))
+  assert(!block.registryDependencies?.some((dependency) => dependency.endsWith('/mcp.json')))
 
   for (const file of files) {
     const destination = join(installRoot, file.target!.replace(/^~\//, ''))
@@ -23,7 +23,7 @@ try {
     await copyFile(join(appRoot, file.path), destination)
   }
 
-  const functionRoot = join(installRoot, 'supabase/functions/mcp-server')
+  const functionRoot = join(installRoot, 'supabase/functions/mcp')
   await copyFile(
     join(appRoot, 'tests/headless-task-tools.test.mts'),
     join(functionRoot, 'tasks.test.ts')

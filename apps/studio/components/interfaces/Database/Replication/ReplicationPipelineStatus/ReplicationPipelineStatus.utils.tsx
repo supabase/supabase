@@ -2,13 +2,13 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 
 import { getPipelineDisplayState, normalizePipelineStatusName } from '../Pipeline.utils'
-import type { StateDotVariant } from '../StateDot'
 import {
   RetryPolicy,
   SlotLagMetrics,
   SlotWalStatus,
   TableState,
 } from './ReplicationPipelineStatus.types'
+import type { StateDotVariant } from '@/components/ui/StateDot'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { formatBytes } from '@/lib/helpers'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
@@ -274,6 +274,18 @@ export const getTableSyncLagLabel = (metrics: SlotLagMetrics): string[] => {
   const pendingBytes = metrics.confirmed_flush_lsn_bytes
   if (typeof pendingBytes === 'number' && pendingBytes > 0) {
     parts.push(`${formatBytes(pendingBytes, pendingBytes < 1024 ? 0 : 1)} waiting to sync`)
+  }
+
+  const safeWalSizeBytes = metrics.safe_wal_size_bytes
+  if (safeWalSizeBytes === null) {
+    parts.push('Unlimited WAL retention')
+  } else if (
+    typeof safeWalSizeBytes === 'number' &&
+    Number.isFinite(safeWalSizeBytes) &&
+    safeWalSizeBytes >= 0
+  ) {
+    const formattedBytes = formatBytes(safeWalSizeBytes, safeWalSizeBytes < 1024 ? 0 : 1)
+    parts.push(`${formattedBytes} WAL retention remaining`)
   }
 
   if (metrics.wal_status === 'unreserved') parts.push('Some changes at risk')

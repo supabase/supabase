@@ -379,7 +379,7 @@ export const ColumnList = ({
                                   <DropdownMenuTrigger asChild>
                                     <Button
                                       aria-label={`Delete ${column.name} column`}
-                                      // Tooltip repeats the label; the description would read the name twice
+                                      // Tooltip repeats the label; screen readers would read it twice
                                       aria-describedby={undefined}
                                       className="px-1"
                                       icon={<MoreVertical />}

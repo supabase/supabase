@@ -657,7 +657,7 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
 
 ## Setup
-Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
 
 ## Requirements
 Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
@@ -2700,7 +2700,7 @@ This feature is particularly valuable for developers looking to build dynamic we
     icon: JsIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/introduction',
     slug: 'client-library-javascript',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2725,7 +2725,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     icon: FlutterIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    docsUrl: 'https://supabase.com/docs/reference/dart/introduction',
     slug: 'client-library-flutter',
     status: {
       stage: PRODUCT_STAGES.GA,

@@ -59,6 +59,7 @@ const createMockInvoice = (details: Partial<Invoice> = {}): Invoice => ({
   payment_attempted: false,
   payment_is_processing: false,
   period_end: 1_700_000_000,
+  prepaid_credits_applied_cents: 0,
   status: 'draft',
   subscription: null,
   subtotal: 0,

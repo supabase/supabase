@@ -231,6 +231,15 @@ const RESOURCE_METADATA: Record<string, ResourceMeta> = {
     allowsRead: ['Read project SQL snippets'],
     allowsWrite: ['Manage project SQL snippets'],
   },
+  'project:notebooks': {
+    category: 'project',
+    name: 'Notebooks',
+    description: 'Notebooks shared with everyone on the project.',
+    risk: 'low',
+    riskReason: 'Read-write can create, edit, and delete notebooks shared across the project.',
+    allowsRead: ['Read project notebooks'],
+    allowsWrite: ['Manage project notebooks'],
+  },
 
   // --- Database ---
   'project:database': {
