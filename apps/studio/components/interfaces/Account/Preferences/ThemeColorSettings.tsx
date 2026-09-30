@@ -19,7 +19,7 @@ import {
   themeOverrideToSliderValue,
 } from '@/lib/theme-overrides'
 
-/** Full-hue OKLCH spectrum for the spot colour track. */
+/** Full-hue OKLCH spectrum for the spot color track. */
 const HUE_SPECTRUM_TRACK =
   'linear-gradient(to right, oklch(0.7 0.14 0), oklch(0.7 0.14 60), oklch(0.7 0.14 120), oklch(0.7 0.14 180), oklch(0.7 0.14 240), oklch(0.7 0.14 300), oklch(0.7 0.14 360))'
 
@@ -34,13 +34,8 @@ const PRIMARY_SWATCHES = [
 ] as const
 
 // `background` shorthand (not transparent + background-image) avoids a dark
-// hairline at rounded caps in dark mode. A light outline keeps pale tracks
-// visible against the card without eating into the fill.
+// hairline at rounded caps in dark mode.
 const SPECTRUM_SLIDER_CLASS = cn(
-  '[&_[data-slot=slider-track]]:outline',
-  '[&_[data-slot=slider-track]]:outline-1',
-  '[&_[data-slot=slider-track]]:outline-foreground/10',
-  '[&_[data-slot=slider-track]]:outline-offset-0',
   '[&_[data-slot=slider-track]]:[background:var(--slider-track-fill)]',
   '[&_[data-slot=slider-range]]:invisible'
 )

@@ -28,7 +28,7 @@ export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
     key: 'chroma',
     cssVar: '--chroma',
     label: 'Surface tint',
-    description: 'Controls how much colour tints backgrounds, text, and borders.',
+    description: 'Controls how much color tints backgrounds, text, and borders.',
     ranges: { dark: { min: 0, max: 0.04 }, light: { min: 0, max: 0.03 } },
   },
   {
