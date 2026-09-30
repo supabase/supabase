@@ -39,7 +39,7 @@ export const ProductDropdown = () => {
                       hasChevron
                       badge={
                         product.name === 'Compute'
-                          ? { label: 'Private Alpha', variant: 'warning' }
+                          ? { label: 'Private Alpha', variant: 'default' }
                           : undefined
                       }
                     />

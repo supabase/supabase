@@ -15,6 +15,16 @@ const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
 const RATE_LIMIT_MAX = 5
 const ipRequestMap = new Map<string, { count: number; resetAt: number }>()
 
+const MAX_FIELD_LENGTH = 255
+const MAX_DETAILS_LENGTH = 2000
+const USE_CASE_OPTIONS = ['sandboxes', 'services', 'both']
+
+const isFilledString = (value: unknown, maxLength: number): value is string =>
+  typeof value === 'string' && value.trim().length > 0 && value.length <= maxLength
+
+const isOptionalString = (value: unknown, maxLength: number): boolean =>
+  value === undefined || value === null || (typeof value === 'string' && value.length <= maxLength)
+
 export async function OPTIONS() {
   return new Response(null, {
     headers: corsHeaders,
@@ -26,8 +36,18 @@ export async function POST(req: Request) {
   const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID
   const HUBSPOT_FORM_GUID = process.env.HUBSPOT_COMPUTE_WAITLIST_FORM_GUID
 
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  // x-vercel-forwarded-for is set by the platform and cannot be spoofed by the client.
+  const ip =
+    req.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    'unknown'
   const now = Date.now()
+
+  // Drop expired entries so the map doesn't grow unbounded on a long-lived instance.
+  for (const [key, value] of ipRequestMap) {
+    if (now >= value.resetAt) ipRequestMap.delete(key)
+  }
+
   const entry = ipRequestMap.get(ip)
 
   if (entry && now < entry.resetAt) {
@@ -62,8 +82,28 @@ export async function POST(req: Request) {
     })
   }
 
-  if (!firstName || !lastName || !email) {
+  if (
+    !isFilledString(firstName, MAX_FIELD_LENGTH) ||
+    !isFilledString(lastName, MAX_FIELD_LENGTH) ||
+    !isFilledString(email, MAX_FIELD_LENGTH)
+  ) {
     return new Response(JSON.stringify({ message: 'Name and email are required' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 422,
+    })
+  }
+
+  if (
+    !isOptionalString(company, MAX_FIELD_LENGTH) ||
+    !isOptionalString(details, MAX_DETAILS_LENGTH) ||
+    !(
+      useCase === undefined ||
+      useCase === null ||
+      useCase === '' ||
+      USE_CASE_OPTIONS.includes(useCase)
+    )
+  ) {
+    return new Response(JSON.stringify({ message: 'Invalid form values' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 422,
     })
