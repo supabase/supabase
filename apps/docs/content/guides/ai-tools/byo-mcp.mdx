@@ -345,27 +345,29 @@ Users can review and revoke connected clients through the [OAuth grant managemen
 
 ## Use a custom domain
 
-With a [custom domain](/docs/guides/platform/custom-domains) active, clients can reach your MCP server at `https://api.example.com/functions/v1/mcp`. Supabase Auth keeps its issuer on the project domain, `https://<your-project-ref>.supabase.co/auth/v1`, but `withOAuthProtectedResource()` builds the Auth URL from the domain the request arrived on. On the custom domain it advertises `https://api.example.com/auth/v1`, which doesn't match the issuer, and MCP clients that validate the Auth metadata stop at discovery.
+With a [custom domain](/docs/guides/platform/custom-domains) active, clients can reach your MCP server at `https://api.example.com/functions/v1/mcp`. Supabase Auth keeps its issuer on the project domain, `https://<your-project-ref>.supabase.co/auth/v1`. `withOAuthProtectedResource()` builds the Auth URL from the domain the request arrived on, so on the custom domain it advertises `https://api.example.com/auth/v1`. That doesn't match the issuer, and MCP clients that validate the Auth metadata stop at discovery.
 
-If your clients can use the project URL, `https://<your-project-ref>.supabase.co/functions/v1/mcp` works without changes. To serve MCP on the custom domain, set the Auth server explicitly:
+If your clients can use the project URL, `https://<your-project-ref>.supabase.co/functions/v1/mcp` needs no changes. To serve MCP on the custom domain too, set the Auth server explicitly:
 
-```ts
-[
-  withOAuthProtectedResource({ authorizationServer: Deno.env.get('MCP_AUTH_ISSUER') }),
-  withSupabase<Database>({ auth: 'user' }),
-],
-```
+1. Point `authorizationServer` at an environment variable instead of letting it default to the request's domain:
 
-Store the issuer as a secret on the project and redeploy:
+   ```ts
+   [
+     withOAuthProtectedResource({ authorizationServer: Deno.env.get('MCP_AUTH_ISSUER') }),
+     withSupabase<Database>({ auth: 'user' }),
+   ],
+   ```
 
-```bash
-supabase secrets set MCP_AUTH_ISSUER=https://<your-project-ref>.supabase.co/auth/v1
-supabase functions deploy mcp
-```
+2. Store the issuer as a secret, and redeploy:
+
+   ```bash
+   supabase secrets set MCP_AUTH_ISSUER=https://<your-project-ref>.supabase.co/auth/v1
+   supabase functions deploy mcp
+   ```
 
 Leave `MCP_AUTH_ISSUER` unset locally. An unset value falls back to the default, which is correct on the local stack. The `resource` URL still follows the domain each client uses, so the project URL and the custom domain both keep working.
 
-To check, compare `authorization_servers` with the `issuer` Auth reports. They must be identical:
+To confirm the fix, compare `authorization_servers` from the resource metadata with `issuer` from Auth's discovery document. They must match:
 
 ```bash
 curl https://api.example.com/functions/v1/mcp/oauth-protected-resource
