@@ -31,6 +31,10 @@ If you are converting an existing BigQuery logs query, read
 [references/bigquery-migration.md](references/bigquery-migration.md) for the full
 translation table.
 
+If you are benchmarking a logs query, or claiming a change makes one cheaper, read
+[references/performance.md](references/performance.md) first. It is easy to measure
+something production doesn't do.
+
 ## The logs table
 
 Each row has a small set of real columns. Everything specific to a service lives
@@ -90,6 +94,8 @@ select
   log_attributes['response.status_code'] as status
 from logs
 where source = 'edge_logs'
+order by timestamp desc
+limit 100
 ```
 
 The key keeps the dotted path that BigQuery expressed through nested structs, with
@@ -135,6 +141,11 @@ limit 100;
 rank them by frequency. (The Studio codebase does exactly this for the Field
 Reference drawer and to feed real keys to the AI rewrite.)
 
+This reads the whole map for every row in the time range, so it gets slow on busy
+sources. Don't fix that by shrinking the range: some keys only appear rarely (error
+codes, auth `error` / `error_code`), and a range of an hour or even a day can miss
+them entirely. Studio's discovery query uses a 7-day range for this reason.
+
 ## ClickHouse vs BigQuery functions
 
 These are the substitutions that trip people up most:
@@ -152,6 +163,38 @@ The `logs.all.otel` analytics endpoint (and the Logs Explorer on top of it)
 rejects `count(*)` and `select *` — use `count()` and list the columns you need.
 (Raw ClickHouse supports both; this is a constraint of the logs query surface.)
 
+## What a logs query costs
+
+Most of the cost of a logs query comes from three things. Knowing them tells you
+which changes help and which only look like they should.
+
+**The data parts in the time range.** The table is stored as many parts, and a
+query reads at least one block (a few thousand rows) from every part that might
+contain matching data. Recent data sits in many small, not-yet-merged parts, so
+even a query over the last minute can touch dozens of parts. A shorter range means
+fewer parts; filtering by `source` or `project` does not, because each part holds a
+little of every source.
+
+**Where `log_attributes` is used.** The map stores keys and values as two arrays per
+row, and reading any key, with `log_attributes['...']` or `mapKeys`, reads both
+arrays in full for every row it's evaluated on. So what matters is how many rows
+that is:
+
+- **In the `SELECT` of an `ORDER BY ... LIMIT` query, the map is cheap.** ClickHouse
+  reads columns that aren't used for filtering or sorting (the map, `event_message`)
+  only for the rows that survive the `LIMIT`. The endpoint enables this for limits
+  far above anything Studio uses. Selecting a handful of map keys in a list query
+  costs about the same as selecting none.
+- **In `WHERE`, `GROUP BY`, or an aggregate, the map is read for every row in the
+  range.** Status, method, and path filters, and anything like `mapKeys` discovery,
+  pay for the map on every row. Filter on the real columns first (`source`,
+  `timestamp`, `severity_text`) so fewer rows get that far.
+
+**Point lookups by `id`.** `id` has a skip index, so `where id = '...'` reads only
+the block that holds the row. What still grows with the range is checking that
+index across more parts. When you know roughly when the row was logged, bound the
+range tightly around it, for example a minute either side.
+
 ## Best practices
 
 These keep queries correct and cheap. Log tables are large; an unbounded scan
@@ -160,9 +203,12 @@ reads far more data than you need.
 - **Start every query with an identifying comment** (e.g. `-- errors since last deploy`). It labels the query in logs and review, and makes each of several queries in a file easy to tell apart.
 - **Always include a `LIMIT`.** Even for aggregates while you iterate.
 - **Always query `from logs where source = '...'`.** There is no per-service table (no `edge_logs`, `postgres_logs`, etc. table) — there is one `logs` table, and `source` scopes it to a service. Filtering by `source` is required, not just an optimization.
-- **Keep the time range tight.** A smaller window returns results faster.
-- **Filter on the real columns** (`source`, `timestamp`) before reaching into
-  `log_attributes`.
+- **Keep the time range tight.** Fewer parts to open; see [What a logs query costs](#what-a-logs-query-costs).
+- **Filter on the real columns** (`source`, `timestamp`, `severity_text`) before
+  reaching into `log_attributes`. A map key in `WHERE` is read for every row in the
+  range.
+- **For polling or "what's new" queries, start the range at the newest row you
+  already have**, not at the start of the view's range.
 - **Order by `timestamp desc`** to see the most recent logs first.
 - **Use `count()`**, not `count(*)` or `select *`.
 
