@@ -225,7 +225,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <FormItemLayout
             layout="horizontal"
             label="Metadata schema"
-            description="Schema for DuckLake metadata tables in the catalog project’s Postgres database."
+            description="Name for a new schema Pipelines creates for DuckLake metadata."
           >
             <FormControl>
               <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
@@ -492,22 +492,6 @@ const DuckLakeCustomFields = ({
 
         <FormField
           control={form.control}
-          name="ducklakeS3Region"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="horizontal"
-              label="S3 region"
-              description="Required region for the object storage provider."
-            >
-              <FormControl>
-                <Input {...field} placeholder="us-east-1" value={field.value ?? ''} />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-
-        <FormField
-          control={form.control}
           name="ducklakeS3Endpoint"
           render={({ field }) => (
             <FormItemLayout
@@ -528,19 +512,47 @@ const DuckLakeCustomFields = ({
 
         <FormField
           control={form.control}
+          name="ducklakeS3Region"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="S3 region"
+              description="Required region for the object storage provider."
+            >
+              <FormControl>
+                <Input {...field} placeholder="us-east-1" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="ducklakeS3UrlStyle"
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
               label="S3 URL style"
-              description="Choose path style if the bucket is in the address path, or virtual-host style if it is in the hostname."
+              description="Controls where the bucket name appears in requests to your storage provider."
             >
               <FormControl>
                 <Select value={field.value ?? 'path'} onValueChange={field.onChange}>
-                  <SelectTrigger>{field.value ?? 'path'}</SelectTrigger>
+                  <SelectTrigger>
+                    {field.value === 'vhost' ? 'Virtual-host style' : 'Path style'}
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="path">path</SelectItem>
-                    <SelectItem value="vhost">vhost</SelectItem>
+                    <SelectItem value="path" className="[&>span]:top-2.5">
+                      <p>Path style</p>
+                      <p className="text-foreground-lighter">
+                        Bucket name appears in the URL path.
+                      </p>
+                    </SelectItem>
+                    <SelectItem value="vhost" className="[&>span]:top-2.5">
+                      <p>Virtual-host style</p>
+                      <p className="text-foreground-lighter">
+                        Bucket name appears in the hostname.
+                      </p>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -555,7 +567,7 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Use SSL"
-              description="Connect to the S3 endpoint over HTTPS."
+              description="Uses an encrypted HTTPS connection. Turn off only if your storage provider requires HTTP."
             >
               <FormControl>
                 <Select
@@ -589,7 +601,11 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Metadata schema"
-              description="Schema for DuckLake metadata tables in Postgres."
+              description={
+                editMode
+                  ? 'Schema containing this destination’s DuckLake metadata tables.'
+                  : 'Name for a new schema Pipelines creates for DuckLake metadata.'
+              }
             >
               <FormControl>
                 <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
