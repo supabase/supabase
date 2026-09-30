@@ -57,7 +57,7 @@ function extractSectionsFromOpenApi(filePaths: string[], outputPath: string) {
         sectionCate?.items.push({
           id: operationId,
           title: operationId.match(/^v\d+-(organizations-slug|projects-ref)-.+$/)
-            ? methods[method].summary
+            ? (methods[method].summary ?? slugToTitle(operationId))
             : slugToTitle(operationId),
           slug: operationId,
           type: 'operation',
