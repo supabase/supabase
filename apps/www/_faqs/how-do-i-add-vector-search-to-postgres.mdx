@@ -1,0 +1,54 @@
+---
+title: 'How do I add vector search to Postgres?'
+description: 'Enable the pgvector extension, store embeddings in a vector column next to your data, and query by distance with an index for speed.'
+date: '2026-09-28'
+---
+
+Enable the `pgvector` extension, add a `vector` column that stores embeddings, and query by distance. Your embeddings live in the same database as the rest of your data, so you can filter and join in one query.
+
+## 1. Enable pgvector
+
+In Supabase, enable `vector` from the Extensions page in the dashboard, or with SQL:
+
+```sql
+create extension if not exists vector with schema extensions;
+```
+
+## 2. Store embeddings
+
+Add a column whose dimension matches your embedding model:
+
+```sql
+create table documents (
+  id bigint generated always as identity primary key,
+  content text not null,
+  embedding extensions.vector(1536)
+);
+```
+
+Generate embeddings in your app or in a server function, then insert them like any other value.
+
+## 3. Query by similarity
+
+Order by distance to a query embedding. The `<=>` operator is cosine distance:
+
+```sql
+select id, content
+from documents
+order by embedding <=> $1
+limit 5;
+```
+
+Combine it with normal `where` clauses, for example to search only one user's documents.
+
+## 4. Add an index when the table grows
+
+Without an index, Postgres compares against every row. For larger tables, add an approximate nearest neighbor index such as HNSW, which trades a little accuracy for much faster queries.
+
+See [Vector columns](https://supabase.com/docs/guides/ai/vector-columns) and the [pgvector guide](https://supabase.com/docs/guides/database/extensions/pgvector).
+
+## Keep keyword search too
+
+Semantic search and keyword search catch different things. Postgres also has built-in full text search, and you can combine the two. See [How do I add full text search to Postgres?](/faqs/how-do-i-add-full-text-search-to-postgres)
+
+For more, see [AI and vectors](https://supabase.com/docs/guides/ai).

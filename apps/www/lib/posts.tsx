@@ -5,7 +5,7 @@ import matter from 'gray-matter'
 import { validateBlogFrontmatterImages } from './blog-images'
 import { generateReadingTime } from './helpers'
 
-type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
+type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events' | '_faqs'
 
 // substring amount for file names
 // based on YYYY-MM-DD format

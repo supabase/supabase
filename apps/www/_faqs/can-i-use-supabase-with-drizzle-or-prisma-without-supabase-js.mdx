@@ -1,0 +1,49 @@
+---
+title: 'Can I use Supabase with Drizzle or Prisma without supabase-js?'
+description: "Yes. Drizzle, Prisma, and other ORMs connect to Supabase with a standard Postgres connection string, and you don't need the Supabase client library."
+date: '2026-09-28'
+---
+
+Yes. Supabase gives you a standard Postgres connection string, so Drizzle, Prisma, postgres.js, and any other Postgres ORM or driver work without `supabase-js`. The client library is only needed if you want to use the Data API, Auth, Storage, or Realtime from your app.
+
+## Drizzle
+
+Install Drizzle and the `postgres` driver:
+
+```shell
+npm i drizzle-orm postgres
+npm i -D drizzle-kit
+```
+
+Copy the shared pooler connection string from the **Connect** dialog, save it as `DATABASE_URL`, and connect with prepared statements turned off, because transaction mode doesn't support them:
+
+```ts
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+
+const client = postgres(process.env.DATABASE_URL!, { prepare: false })
+export const db = drizzle(client)
+```
+
+See the [Drizzle guide](https://supabase.com/docs/guides/database/drizzle).
+
+## Prisma
+
+Point the Prisma datasource at your connection string. For transaction mode, add `pgbouncer=true` to the URL so Prisma stops using prepared statements. Supabase recommends creating a dedicated `prisma` database role so you can control and monitor its access.
+
+See the [Prisma guide](https://supabase.com/docs/guides/database/prisma).
+
+## Other drivers
+
+The setting that turns off prepared statements differs by driver:
+
+- **Postgres.js and Drizzle:** `prepare: false`
+- **Prisma:** `pgbouncer=true` on the connection string
+- **asyncpg:** `statement_cache_size=0`
+- **JDBC:** `prepareThreshold=0`
+
+You only need these for the pooler's transaction mode. Direct connections and session mode support prepared statements. See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
+
+## Turn off what you don't use
+
+If your app reaches the database only through an ORM, you can turn off the Data API in your project's API settings. Your tables are then reachable only through Postgres connections.

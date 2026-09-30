@@ -1,0 +1,38 @@
+---
+title: 'Can I use my own auth library or provider with a Supabase database?'
+description: "Yes. You can keep your own auth and use Supabase only as the database, either by enforcing access in your server code or by letting Supabase verify your provider's JWTs."
+date: '2026-09-28'
+---
+
+Yes. Using the Supabase database doesn't require Supabase Auth. How you set it up depends on where your app checks permissions.
+
+## Option 1: Your server handles auth and talks to Postgres
+
+This is the common setup when you already use an auth library in your backend framework and an ORM for data.
+
+1. Keep your auth library as it is, including its user and session tables.
+2. Point it and your ORM at the Supabase connection string. Store user and session tables in Postgres like any other tables.
+3. Enforce authorization in your server code, for example by filtering every query by the signed-in user's ID.
+
+The browser never talks to the database directly, so you don't need the Data API. You can turn it off in your project's API settings.
+
+## Option 2: The browser talks to Supabase with your provider's tokens
+
+If you want to use the Data API, Storage, or Realtime from the client while keeping an external identity provider, use [third-party auth](https://supabase.com/docs/guides/auth/third-party/overview).
+
+- Supabase verifies your provider's JWTs, so you don't have to migrate users.
+- The provider must sign JWTs with asymmetric keys and publish them through an OIDC discovery URL, and each token needs a `kid` header.
+- Row Level Security policies can read the token's claims, so the database enforces who sees which rows.
+
+See [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
+
+## What happens to Supabase Auth
+
+Supabase Auth is part of every project and can't be turned off. If you don't use it, it doesn't touch your data or your users.
+
+## Which option to choose
+
+- **Choose option 1** if all data access already goes through your own API or server-rendered pages.
+- **Choose option 2** if you want the client to query data directly and let the database enforce access rules.
+
+Both work with the same database, so you can start with option 1 and add option 2 later for specific features.

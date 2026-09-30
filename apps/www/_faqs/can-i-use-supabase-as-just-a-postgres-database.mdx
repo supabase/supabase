@@ -1,0 +1,35 @@
+---
+title: 'Can I use Supabase as just a Postgres database?'
+description: 'Yes. Every Supabase project is a dedicated Postgres database you can connect to with any Postgres client or ORM, and the other products are optional.'
+date: '2026-09-28'
+---
+
+Yes. Every Supabase project is a dedicated Postgres instance, not a shared tenant or a Postgres-compatible layer. You get a standard connection string and can use it from any Postgres client, driver, or ORM. Auth, Storage, Realtime, and Edge Functions come with every project, but you don't have to use them.
+
+## What you get as a database-only user
+
+- **A standard Postgres connection string.** Copy it from the **Connect** dialog in the dashboard and use it the same way you would with any other Postgres server.
+- **Connection pooling.** A shared pooler supports session mode and transaction mode, and paid plans add a dedicated pooler. See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
+- **Postgres extensions.** Enable extensions such as pgvector, PostGIS, and pg_cron from the dashboard or with SQL. See [Postgres extensions](https://supabase.com/docs/guides/database/extensions).
+- **Backups.** Paid plans include daily backups, and Point-in-Time Recovery is available as an add-on. See [Database backups](https://supabase.com/docs/guides/platform/backups).
+- **A dashboard for the database.** The Table Editor and SQL Editor work against the same database your app connects to.
+
+## Use your own ORM and migrations
+
+You don't need the Supabase client libraries to query the database. Drizzle, Prisma, postgres.js, and psql all work with the connection string. See [Can I use Supabase with Drizzle or Prisma without supabase-js?](/faqs/can-i-use-supabase-with-drizzle-or-prisma-without-supabase-js) for the settings each one needs.
+
+If your app talks to the database only through an ORM, you can turn off the Data API in your project's API settings.
+
+## Which connection to use
+
+- **A long-running server or container:** the direct connection, or the shared pooler in session mode if your network is IPv4-only.
+- **Serverless or edge functions:** the shared pooler in transaction mode, with prepared statements turned off.
+- **Migrations and `pg_dump`:** the direct connection.
+
+## It stays portable
+
+Supabase runs standard Postgres, so you can move an existing Postgres database in with `pg_dump` and `pg_restore`, or move it out the same way. See [Migrate from Postgres to Supabase](https://supabase.com/docs/guides/platform/migrating-to-supabase/postgres).
+
+## When this isn't the right fit
+
+If you need a database that runs inside your application process with no network hop, an embedded database is simpler. Supabase is a hosted Postgres server that your app reaches over the network.

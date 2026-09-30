@@ -1,0 +1,39 @@
+---
+title: 'Which Postgres database works for a Next.js app on Vercel?'
+description: 'Any hosted Postgres your functions can reach over the network, used through a connection pooler. Supabase provides one, and it can be connected to a Vercel project from the Vercel Marketplace.'
+date: '2026-09-28'
+---
+
+Use a hosted Postgres database and connect to it through a connection pooler. Next.js on Vercel runs your server code as functions that start and stop constantly, so each one needs a short-lived pooled connection rather than a long-lived one.
+
+## Connect from server code
+
+Route handlers, server actions, and server components run on the server, so they can use a Postgres connection:
+
+1. Copy the shared pooler transaction mode connection string from the **Connect** dialog in the Supabase dashboard.
+2. Add it to your Vercel project's environment variables, for example as `DATABASE_URL`.
+3. Create the client once at module scope, with a pool of 1 connection and prepared statements off:
+
+```ts lib/db.ts
+import postgres from 'postgres'
+
+export const sql = postgres(process.env.DATABASE_URL!, {
+  max: 1,
+  prepare: false,
+  ssl: 'require',
+})
+```
+
+Drizzle and Prisma work the same way. See [Can I use Supabase with Drizzle or Prisma without supabase-js?](/faqs/can-i-use-supabase-with-drizzle-or-prisma-without-supabase-js)
+
+## Connect from client components
+
+Browser code must never hold your database password. For data the browser reads directly, use the [Data API](https://supabase.com/docs/guides/api) with Row Level Security instead of a Postgres connection. See [How do I query Postgres from a frontend app without a backend?](/faqs/how-do-i-query-postgres-from-a-frontend-app-without-a-backend)
+
+## Set it up from Vercel
+
+You can create and manage Supabase projects from the [Vercel Marketplace](https://supabase.com/docs/guides/integrations/vercel-marketplace), with billing through your Vercel account. Projects created there sync their connection environment variables, such as `POSTGRES_URL` and `POSTGRES_URL_NON_POOLING`, to the connected Vercel project.
+
+## Migrations
+
+Run migrations from your machine or CI over the direct connection, not from the deployed functions. See [How do I develop locally and deploy Postgres migrations?](/faqs/how-do-i-develop-locally-and-deploy-postgres-migrations)

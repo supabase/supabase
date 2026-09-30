@@ -1,0 +1,40 @@
+---
+title: 'How do I connect a Ruby on Rails app to hosted Postgres?'
+description: 'Set DATABASE_URL to your Supabase connection string and Rails connects with Active Record, with no changes to config/database.yml.'
+date: '2026-09-28'
+---
+
+Set the `DATABASE_URL` environment variable to your Supabase connection string. Rails reads it on startup and Active Record connects with it, so you don't need to edit `config/database.yml`.
+
+## 1. Get the connection string
+
+In the Supabase dashboard, click **Connect** and copy a connection string:
+
+- **Session pooler,** on port `5432`, works from IPv4-only hosts and supports everything Active Record needs.
+- **Direct connection** works if your host supports IPv6, or if the project has the IPv4 add-on.
+
+Add `sslmode=require` to the end:
+
+```shell
+export DATABASE_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres?sslmode=require
+```
+
+Set the same variable on your hosting platform. Keep the password out of your repository.
+
+## 2. Run migrations
+
+Active Record migrations work as usual:
+
+```shell
+bin/rails db:migrate
+```
+
+## 3. Use your models
+
+Nothing else changes. Models, queries, and the Rails console work against the hosted database the same way they did locally.
+
+See the [Ruby on Rails quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/ruby-on-rails) for a full walkthrough.
+
+## Using the transaction pooler
+
+A Rails server is long-running, so session mode or a direct connection is the usual choice. If you do connect through transaction mode, on port `6543`, turn off prepared statements, which transaction mode doesn't support. See [How do I fix prepared statement errors with a Postgres connection pooler?](/faqs/how-do-i-fix-prepared-statement-errors-with-a-connection-pooler)

@@ -1,0 +1,32 @@
+---
+title: 'How do I connect to Supabase Postgres from an IPv4-only network?'
+description: 'Use the shared pooler, which is reachable over IPv4 on every plan, or add the IPv4 add-on to make the direct connection reachable over IPv4.'
+date: '2026-09-28'
+---
+
+Use the shared pooler, which accepts IPv4 connections on every plan. Or, on a paid plan, add the IPv4 add-on so the direct connection is reachable over IPv4.
+
+The direct connection, `db.[PROJECT-REF].supabase.co`, resolves to an IPv6 address. Networks and hosting platforms that only support IPv4 can't reach it, which usually shows up as a timeout or a "network unreachable" error.
+
+## Option 1: The shared pooler
+
+The shared pooler runs on IPv4 in both modes:
+
+- **Session mode**, on port `5432`, for long-running servers, GUI tools, and anything that needs prepared statements or session state.
+- **Transaction mode**, on port `6543`, for serverless and edge functions.
+
+Pooler usernames include your project reference, such as `postgres.[PROJECT-REF]`. Copy the full string from **Connect** in the dashboard rather than editing the direct one. The pooler host can't be worked out from your region.
+
+## Option 2: The IPv4 add-on
+
+The [IPv4 add-on](https://supabase.com/docs/guides/platform/ipv4-address) gives the project's database a dedicated IPv4 address for incoming connections.
+
+- It isn't dual-stack. Enabling it switches the direct connection from IPv6 to IPv4.
+- The address is static for incoming traffic, which helps when a firewall needs an allowlist. Outgoing connections from the database don't use a fixed address.
+
+## Which to choose
+
+- **Most apps:** use the shared pooler. It works on every plan with no add-on.
+- **Migrations, `pg_dump`, and replication:** the docs recommend the direct connection for these, so on an IPv4-only network they're the main reason to get the add-on.
+
+See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).

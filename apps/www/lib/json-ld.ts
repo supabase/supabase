@@ -146,6 +146,31 @@ export function breadcrumbListSchema(items: BreadcrumbItem[]) {
   }
 }
 
+interface FaqPageSchemaInput {
+  url: string
+  question: string
+  answer: string
+}
+
+export function faqPageSchema(input: FaqPageSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': input.url,
+    url: input.url,
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: input.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: input.answer,
+        },
+      },
+    ],
+  }
+}
+
 interface BlogPostingSchemaInput {
   url: string
   headline: string

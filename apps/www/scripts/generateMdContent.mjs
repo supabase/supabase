@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * Scans content/md/ + _blog/ + _customers/ + _events/ and emits a TypeScript
+ * Scans content/md/ + _blog/ + _customers/ + _events/ + _faqs/ and emits a TypeScript
  * module exporting MD_CONTENT (slug → markdown) and MD_PAGES (allowlist Set).
  * The static import keeps content traceable by @vercel/nft, no runtime fs reads.
  */
@@ -76,6 +76,12 @@ const MDX_SECTIONS = [
       'onDemand',
     ],
     skipIf: (data) => data.disable_page_build === true,
+  },
+  {
+    dir: '_faqs',
+    urlPrefix: 'faqs',
+    stripDatePrefix: false,
+    frontmatterFields: ['title', 'description', 'date'],
   },
 ]
 
@@ -168,6 +174,28 @@ for (const section of MDX_SECTIONS) {
   const sectionEntries = await ingestMdxSection(section)
   console.log(`   ${sectionEntries.length} entries`)
   mdxEntries.push(...sectionEntries)
+}
+
+// /faqs.md lists every FAQ page, mirroring the /faqs HTML index.
+const faqEntries = mdxEntries.filter((entry) => entry.slug.startsWith('faqs/'))
+if (faqEntries.length > 0) {
+  const items = faqEntries
+    .map((entry) => ({ slug: entry.slug, data: matter(entry.content).data }))
+    .sort((a, b) => String(a.data.title).localeCompare(String(b.data.title)))
+    .map(
+      ({ slug, data }) => `- [${data.title}](https://supabase.com/${slug}.md): ${data.description}`
+    )
+  mdxEntries.push({
+    slug: 'faqs',
+    content: [
+      '# Supabase FAQs',
+      '',
+      '> Answers to common questions about using Postgres on Supabase.',
+      '',
+      ...items,
+      '',
+    ].join('\n'),
+  })
 }
 
 const allEntries = [...staticEntries, ...mdxEntries]

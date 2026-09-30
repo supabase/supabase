@@ -1,0 +1,32 @@
+---
+title: 'Can I get a separate Postgres database for each pull request?'
+description: 'Yes. Supabase Branching creates an isolated preview environment with its own database for each pull request and deletes it when the pull request is merged or closed.'
+date: '2026-09-28'
+---
+
+Yes. Supabase Branching gives each pull request its own preview environment, with a separate database and its own API credentials. When the pull request is merged or closed, the preview branch is deleted.
+
+## How it works
+
+- **Preview branches** are created for pull requests and removed automatically when the pull request closes. They suit testing a migration or a feature in isolation.
+- **Persistent branches** are long-lived and fit staging, QA, or shared development environments. They aren't paused or deleted for inactivity.
+- Each branch starts as a clone of your main project's configuration, with its migrations applied.
+- Branches start **without production data** by default, so previews don't expose real user data. Seed them with a seed file, or include data when you create a branch from the dashboard.
+
+## Deploying to production
+
+When you merge a branch into your main project, Supabase runs a deployment workflow that applies the branch's migrations and configuration to production.
+
+## Set it up
+
+You can manage branches through the GitHub integration, which creates them from pull requests automatically, or directly from the dashboard. See [Branching](https://supabase.com/docs/guides/deployment/branching).
+
+Deploying from GitHub works on any plan: changes pushed to `main` deploy to your project.
+
+## Pair it with local development
+
+Branches work best when schema changes live in migration files in your repository. Write and test migrations locally, commit them, and open a pull request to get a preview. See [How do I develop locally and deploy Postgres migrations?](/faqs/how-do-i-develop-locally-and-deploy-postgres-migrations)
+
+## Test your security rules too
+
+A preview database is a good place to check Row Level Security policies before they reach production. See [Testing your database](https://supabase.com/docs/guides/database/testing).

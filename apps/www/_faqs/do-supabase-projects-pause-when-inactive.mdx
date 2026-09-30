@@ -1,0 +1,39 @@
+---
+title: "Do Supabase projects pause when they're inactive?"
+description: 'Only on the Free plan, after 7 days of low database activity. Projects on paid plans never pause, and a paused Free project can be restored from the dashboard.'
+date: '2026-09-28'
+---
+
+Only Free plan projects pause, and only after a week of low database activity. Projects on the Pro, Team, and Enterprise plans are never paused for inactivity.
+
+## How pausing works on the Free plan
+
+Supabase looks at database activity over the past 7 days. A Free project that gets too few user queries in that window becomes a candidate for pausing. A few requests to the database each day is usually enough to keep it running.
+
+You get two emails:
+
+1. A warning roughly a week before the pause takes effect.
+2. A confirmation once the project is paused.
+
+Paused projects don't count toward the Free plan's limit of 2 active projects.
+
+## What happens to your data
+
+Nothing is deleted. A paused project keeps its data and configuration. To bring it back:
+
+1. Open the [dashboard](https://supabase.com/dashboard) and select the organization.
+2. Select the paused project.
+3. Click **Resume project** and confirm.
+
+You can restore a paused project for up to 1 year after it was paused.
+
+## How to avoid pausing
+
+- **Upgrade the organization to a paid plan.** Paid projects can't be paused and aren't subject to inactivity pausing. The Pro plan starts at $25 per month and includes one project on Micro compute. See [How much does a single database-only Supabase project cost?](/faqs/how-much-does-a-database-only-supabase-project-cost)
+- **Keep real traffic flowing.** A project that your app queries every day stays active.
+
+For the full rules, see [Project pausing](https://supabase.com/docs/guides/platform/free-project-pausing).
+
+## When this matters
+
+Pausing is designed for projects that are genuinely idle, such as experiments and tutorials. If you're deploying something that people rely on, even with low traffic, put it on a paid plan so it's always reachable.
