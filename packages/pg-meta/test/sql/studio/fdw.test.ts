@@ -163,6 +163,37 @@ test('the FDW is never renamed or recreated, since it is shared across every ser
   expect(sql).not.toContain('drop foreign data wrapper')
 })
 
+test('renaming a server emits a rename statement before any clause targeting the new name', () => {
+  const sql = getUpdateFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'old_server_name',
+      server_options: ['project_id=old-project'],
+      tables: [],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [{ name: 'project_id', encrypted: false }] },
+    },
+    formState: {
+      wrapper_name: 'bigquery_fdw',
+      server_name: 'new_server_name',
+      project_id: 'new-project',
+    },
+    tables: [],
+  })
+
+  expect(sql).toContain('alter server old_server_name rename to new_server_name')
+  expect(sql).toContain(
+    "alter server new_server_name\n          options (set project_id 'new-project')"
+  )
+  expect(sql).not.toContain('alter server old_server_name\n          options')
+  expect(sql.indexOf('rename to')).toBeLessThan(sql.indexOf('options (set project_id'))
+})
+
 test('adding a server option not previously set uses ADD, not SET', () => {
   const sql = getUpdateFDWSql({
     wrapper: {
