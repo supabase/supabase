@@ -5537,7 +5537,7 @@ functions:
     title: 'from.downloadStream()'
     notes: |
       - The request is sent when the stream is listened to. A non-success response surfaces as a `StorageException` on the stream before any bytes are emitted.
-      - Prefer this over [`download()`](/docs/reference/dart/storage-from-download) for large files to keep memory usage low.
+      - Prefer this over [`download()`](/docs/reference/dart/file-buckets-download) for large files to keep memory usage low.
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `select`
