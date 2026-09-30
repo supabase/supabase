@@ -1,0 +1,129 @@
+openref: 0.1
+
+info:
+  id: reference/tanstack-db
+  title: Supabase TanStack DB
+  description: |
+    A frontend data layer that syncs TanStack DB collections with Postgres through Supabase: reactive, optimistically updated, realtime-synced client state with no manual cache invalidation.
+  specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_tanstack_db_v1.yml
+  slugPrefix: '/'
+  libraries:
+    - id: 'tanstack-db'
+      version: '0.1.0'
+
+functions:
+  - id: installing
+    title: 'Installing'
+    description: |
+      Install `@supabase-labs/tanstack-db` alongside `@tanstack/react-db` and your existing `@supabase/supabase-js` client.
+    examples:
+      - id: install
+        name: Install
+        code: |
+          ```bash
+          npm install @supabase-labs/tanstack-db @tanstack/react-db
+          ```
+
+  - id: supabase-collection-options
+    title: 'supabaseCollectionOptions()'
+    description: |
+      Builds the configuration for a TanStack DB collection backed by a Postgres table. Pass the result to `createCollection()` from `@tanstack/react-db`.
+    params:
+      - name: tableName
+        isOptional: false
+        type: string
+        description: The Postgres table this collection reads from and writes to.
+      - name: keys
+        isOptional: false
+        type: string[]
+        description: The primary key column(s) for the table.
+      - name: schema
+        isOptional: false
+        type: ZodSchema | ValibotSchema
+        description: A schema used to validate and type each row.
+      - name: supabase
+        isOptional: false
+        type: SupabaseClient
+        description: The Supabase client instance to query and subscribe through.
+      - name: queryClient
+        isOptional: true
+        type: QueryClient
+        description: An existing TanStack Query client to share, if you already use one.
+      - name: realtime
+        isOptional: true
+        type: boolean
+        description: Keep the collection in sync across clients using Supabase Realtime.
+      - name: realtimeUseFilter
+        isOptional: true
+        type: boolean
+        description: Apply server-side filtering to realtime updates instead of filtering on the client. Defaults to `false`.
+    notes: |
+      - Realtime sync is experimental.
+      - Collections work with an existing Supabase project and respect Row Level Security. No migrations required.
+    examples:
+      - id: create-collection
+        name: Create a collection
+        code: |
+          ```tsx
+          import { createCollection } from '@tanstack/react-db'
+          import { supabaseCollectionOptions } from '@supabase-labs/tanstack-db'
+
+          const todos = createCollection(
+            supabaseCollectionOptions({
+              tableName: 'todos',
+              keys: ['id'],
+              schema: todosSchema,
+              supabase,
+              realtime: true,
+            })
+          )
+          ```
+
+  - id: use-live-query
+    title: 'Live queries and mutations'
+    description: |
+      Read a collection reactively with `useLiveQuery()`, and mutate it optimistically. The UI updates immediately, and changes roll back if the server rejects them.
+    examples:
+      - id: live-query
+        name: Query and mutate
+        code: |
+          ```tsx
+          import { useLiveQuery, eq } from '@tanstack/react-db'
+
+          const { data, isLoading } = useLiveQuery(
+            (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, false)),
+            []
+          )
+
+          todos.update(id, (draft) => {
+            draft.completed = true
+          })
+
+          todos.delete(id)
+          ```
+
+  - id: query-once
+    title: 'queryOnce()'
+    description: |
+      Runs a single, non-reactive query against a collection. Filters, ordering, and limits are pushed to PostgREST where possible. Operations like `groupBy`, `having`, and `distinct` are applied client-side after fetching.
+    params:
+      - name: callback
+        isOptional: false
+        type: '(q: InitialQueryBuilder) => QueryBuilder'
+        description: A query builder function describing the query to run once.
+      - name: supabase
+        isOptional: false
+        type: SupabaseClient
+        description: The Supabase client instance to run the query against.
+    examples:
+      - id: query-once-example
+        name: Run a one-time query
+        code: |
+          ```tsx
+          import { queryOnce } from '@supabase-labs/tanstack-db'
+
+          const completed = await queryOnce(
+            (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, true)),
+            supabase
+          )
+          ```
