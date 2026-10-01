@@ -1,10 +1,6 @@
 // Canonical list of guide topics. Single source of truth for the `topics`
 // field in src/content.config.ts (so a guide with an unsupported topic fails
 // content validation), the "Topics" nav menu, and the /topics/[topic] pages.
-//
-// `pinned` topics surface as cards on the homepage (see src/pages/index.astro)
-// — keep this to a handful so that section stays a highlights row, not a
-// second copy of the full topic list.
 export const TOPICS = [
   {
     name: 'Migration',
