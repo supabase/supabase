@@ -232,7 +232,7 @@ if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
         check "Conflicting sb_ keys -> 401 at gateway (Envoy)" "401" \
             "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
     else
-        check "Invalid sb_ apikey -> passed to function, rejected by SDK (Kong)" "401 sdk" \
+        check "Invalid sb_ apikey -> rejected by Functions (Kong)" "$unauthenticated_fn_status" \
             "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
     fi
 fi
