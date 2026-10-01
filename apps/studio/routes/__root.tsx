@@ -31,6 +31,7 @@ import {
   redirect,
   Scripts,
   type AnyRouter,
+  type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
@@ -308,7 +309,7 @@ function NotFound() {
   return <Error404 />
 }
 
-function ErrorBoundaryRoute({ error }: { error: Error }) {
+function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   // Mirrors `errorBoundaryHandler` above (used by the in-tree
   // `react-error-boundary`) — TanStack's `errorComponent` covers
   // errors thrown during route load/render before the in-tree
@@ -318,10 +319,10 @@ function ErrorBoundaryRoute({ error }: { error: Error }) {
       scope.setTag('routerErrorComponent', true)
       const eventId = Sentry.captureException(error)
       if (eventId && error && typeof error === 'object') {
-        ;(error as Error & { sentryId?: string }).sentryId = eventId
+        Object.assign(error, { sentryId: eventId })
       }
     })
-    console.error(error.stack)
+    console.error(error instanceof Error ? error.stack : error)
   }, [error])
 
   return <Error500 />

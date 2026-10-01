@@ -63,7 +63,7 @@ export const useStripeSyncInstallMutation = ({
 
   return useMutation<StripeSyncInstallData, ResponseError, StripeSyncInstallVariables>({
     mutationFn: (vars) => installStripeSync(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
 
       track('integration_install_submitted', {
@@ -81,13 +81,13 @@ export const useStripeSyncInstallMutation = ({
         queryKey: stripeSyncKeys.all,
       })
 
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to install Stripe Sync: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,
