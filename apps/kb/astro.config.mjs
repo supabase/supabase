@@ -11,6 +11,8 @@ import { defineConfig } from 'astro/config'
 import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
 import supabaseTheme from '../learn/lib/themes/supabase-2.json' with { type: 'json' }
 
+import sitemap from '@astrojs/sitemap';
+
 // Absolute dir of lodash-es, for the SSR-only lodash alias below (same fix
 // apps/studio/vite.config.ts uses). `packages/ui`'s clipboard util does
 // `import { noop } from 'lodash'` — under Vite's dev-mode SSR module runner,
@@ -41,18 +43,16 @@ const ssrLodashEs = {
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://supabase.com',
   base: '/kb',
   trailingSlash: 'ignore',
-  integrations: [
-    react(),
-    // rehype-admonitions is a custom rehype plugin and Astro's default pipeline is
-    // satteri, so .mdx gets its own unified processor. Plain .md stays on satteri.
-    mdx({
-      processor: unified({
-        rehypePlugins: [rehypeAdmonitions],
-      }),
+  integrations: [react(), // rehype-admonitions is a custom rehype plugin and Astro's default pipeline is
+  // satteri, so .mdx gets its own unified processor. Plain .md stays on satteri.
+  mdx({
+    processor: unified({
+      rehypePlugins: [rehypeAdmonitions],
     }),
-  ],
+  }), sitemap()],
   vite: {
     ssr: {
       noExternal: ['lodash'],
