@@ -35,6 +35,7 @@ interface ProjectCreationFooterProps {
   organizationProjects: OrgProject[]
   isCreatingNewProject: boolean
   isSuccessNewProject: boolean
+  isLoadingAvailableRegions?: boolean
   cancelAction?: ProjectCreationCancelAction
 }
 
@@ -46,6 +47,7 @@ export const ProjectCreationFooter = ({
   organizationProjects,
   isCreatingNewProject,
   isSuccessNewProject,
+  isLoadingAvailableRegions = false,
   cancelAction = 'studio',
 }: ProjectCreationFooterProps) => {
   const router = useRouter()
@@ -107,7 +109,7 @@ export const ProjectCreationFooter = ({
         <div className="col-span-4">
           <div className="flex justify-between text-sm">
             <span>Additional costs</span>
-            <div className="text-brand flex gap-1 items-center font-mono font-medium">
+            <div className="text-primary flex gap-1 items-center font-mono font-medium">
               <span role="status">${displayedAdditionalMonthlySpend}/m</span>
               <InfoTooltip side="top" className="max-w-[450px] p-0">
                 <div className="p-4 text-sm text-foreground-light space-y-1">
@@ -219,7 +221,6 @@ export const ProjectCreationFooter = ({
         ) : (
           <Button
             type="button"
-            variant="default"
             disabled={isCreatingNewProject || isSuccessNewProject}
             onClick={onCancel}
           >
@@ -228,9 +229,10 @@ export const ProjectCreationFooter = ({
         )}
 
         <Button
+          variant="primary"
           type="submit"
           loading={isCreatingNewProject || isSuccessNewProject}
-          disabled={!canCreateProject}
+          disabled={!canCreateProject || isLoadingAvailableRegions}
         >
           Create new project
         </Button>

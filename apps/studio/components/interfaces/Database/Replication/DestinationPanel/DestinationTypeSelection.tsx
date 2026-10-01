@@ -10,7 +10,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { DestinationIcon } from '../DestinationIcon'
+import { DestinationLogo } from '../DestinationLogo'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -20,7 +20,6 @@ import {
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
-import { ReadReplicasMovedCallout } from './ReadReplicasMovedCallout'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -75,7 +74,7 @@ export const DestinationTypeSelection = () => {
         {
           value: 'BigQuery',
           label: 'BigQuery',
-          description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
+          description: 'Replicate changes to BigQuery for analytics and BI',
           stage: 'Public Alpha',
           enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
         },
@@ -87,22 +86,21 @@ export const DestinationTypeSelection = () => {
         {
           value: 'DuckLake',
           label: 'DuckLake',
-          description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
+          description: 'Replicate changes to DuckLake for open lakehouse storage',
           stage: 'Early Access',
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
         },
         {
           value: 'Snowflake',
           label: 'Snowflake',
-          description:
-            'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
+          description: 'Replicate changes to Snowflake for cloud data warehousing',
           stage: 'Early Access',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
         },
         {
           value: 'ClickHouse',
           label: 'ClickHouse',
-          description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
+          description: 'Replicate changes to ClickHouse for real-time analytics',
           stage: 'Early Access',
           enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
         },
@@ -114,7 +112,7 @@ export const DestinationTypeSelection = () => {
         {
           value: 'Analytics Bucket',
           label: 'Analytics Bucket',
-          description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
+          description: 'Replicate changes to Supabase Storage as Apache Iceberg tables',
           stage: 'Deprecated',
           enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
@@ -129,18 +127,23 @@ export const DestinationTypeSelection = () => {
 
   const selectedOption = options.find((option) => option.value === destinationType)
 
-  const STAGE_DESCRIPTIONS: Record<NonNullable<DestinationTypeOption['stage']>, string> = {
-    'Public Alpha': 'In public alpha and may change.',
-    'Early Access': 'In early access and may change.',
-    Deprecated: 'This destination type is deprecated.',
+  const STAGE_DESCRIPTIONS: Record<
+    NonNullable<DestinationTypeOption['stage']>,
+    (type: DestinationType) => string
+  > = {
+    'Public Alpha': (type) => `${type} support is in public alpha.`,
+    'Early Access': (type) => `${type} support is in early access.`,
+    Deprecated: (type) => `${type} is deprecated.`,
   }
 
-  const stageDescription = selectedOption?.stage ? STAGE_DESCRIPTIONS[selectedOption.stage] : null
+  const stageDescription = selectedOption?.stage
+    ? STAGE_DESCRIPTIONS[selectedOption.stage](selectedOption.value)
+    : null
 
   const typeDescription =
     !editMode || stageDescription ? (
       <span>
-        {!editMode && 'Cannot be changed after creation.'}
+        {!editMode && 'Destination type cannot be changed after creation.'}
         {!editMode && stageDescription ? ' ' : null}
         {stageDescription}
       </span>
@@ -157,17 +160,13 @@ export const DestinationTypeSelection = () => {
       >
         <Select
           disabled={editMode}
-          value={destinationType ?? undefined}
+          value={destinationType ?? ''}
           onValueChange={(value) => setDestinationType(value as DestinationType)}
         >
           <SelectTrigger className="h-auto py-2">
             {selectedOption ? (
               <div className="flex items-center gap-x-3 text-left">
-                <DestinationIcon
-                  type={selectedOption.value}
-                  size={20}
-                  className="shrink-0 text-foreground-light"
-                />
+                <DestinationLogo type={selectedOption.value} />
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
               </div>
             ) : (
@@ -182,11 +181,7 @@ export const DestinationTypeSelection = () => {
                 {group.options.map((option) => (
                   <SelectItem key={option.value} value={option.value} className="py-2">
                     <div className="flex items-center gap-x-3">
-                      <DestinationIcon
-                        type={option.value}
-                        size={20}
-                        className="shrink-0 text-foreground-light"
-                      />
+                      <DestinationLogo type={option.value} />
                       <div className="flex flex-col gap-y-0.5">
                         <span className="text-foreground">{option.label}</span>
                         <span className="text-xs text-foreground-lighter">
@@ -201,7 +196,6 @@ export const DestinationTypeSelection = () => {
           </SelectContent>
         </Select>
       </FormItemLayout>
-      {!editMode && <ReadReplicasMovedCallout className="px-5 pb-5" />}
     </>
   )
 }

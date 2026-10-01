@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getTools } from './index'
 import { getMcpTools } from './mcp-tools'
+import { getSchemaTools } from './schema-tools'
 
 vi.mock('common', () => ({ IS_PLATFORM: true }))
 
@@ -25,7 +26,6 @@ const BASE_PARAMS = {
 
 describe('ai/tools getTools', () => {
   beforeEach(async () => {
-    vi.clearAllMocks()
     vi.mocked(getMcpTools).mockResolvedValue({ list_tables: {} } as any)
     // Reset to platform each test; the self-hosted test overrides to false.
     // Done here (not afterEach) so the spy can't leak across tests via order.
@@ -46,6 +46,16 @@ describe('ai/tools getTools', () => {
     expect(tools).toHaveProperty('list_tables')
     expect(tools).toHaveProperty('schema_tool')
     expect(tools).toHaveProperty('incident_tool')
+  })
+
+  it('passes authorization through to schema tools', async () => {
+    await getTools(BASE_PARAMS)
+
+    expect(getSchemaTools).toHaveBeenCalledWith({
+      projectRef: BASE_PARAMS.projectRef,
+      connectionString: BASE_PARAMS.connectionString,
+      authorization: BASE_PARAMS.authorization,
+    })
   })
 
   it('degrades gracefully to the remaining tools when remote MCP fetch fails', async () => {

@@ -1,4 +1,5 @@
 const { defineConfig } = require('eslint/config')
+const { plugin: shadcn } = require('@shadcn/lint')
 const prettierConfig = require('eslint-config-prettier/flat')
 const { default: turboConfig } = require('eslint-config-turbo/flat')
 const tanstackQuery = require('@tanstack/eslint-plugin-query')
@@ -65,6 +66,21 @@ module.exports = defineConfig([
   { ignores: ['**/*.mts', '**/*.cts'] },
   turboConfig,
   prettierConfig,
+  {
+    name: 'supabase/shadcn',
+    files: NEXT_PLUGIN_FILES,
+    plugins: { shadcn },
+    settings: {
+      shadcn: {
+        componentImports: ['^ui(/|$)', '^ui-patterns(/|$)'],
+      },
+    },
+    rules: {
+      'shadcn/no-unknown-classes': ['warn', { allow: ['not-prose'] }],
+      'shadcn/no-arbitrary-values': ['warn', { allow: ['layout'] }],
+      'shadcn/no-raw-colors': 'warn',
+    },
+  },
   tanstackQuery.configs['flat/recommended'],
   {
     rules: {

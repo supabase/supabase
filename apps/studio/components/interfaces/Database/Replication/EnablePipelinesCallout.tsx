@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -16,7 +15,6 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
@@ -43,7 +41,7 @@ export const EnablePipelinesModal = ({
   const { mutate: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation({
       onSuccess: () => {
-        toast.success('Pipelines has been successfully enabled!')
+        toast.success('Pipelines enabled')
         setOpen(false)
       },
       onError: (error) => {
@@ -60,48 +58,35 @@ export const EnablePipelinesModal = ({
     <Dialog open={open} onOpenChange={setOpen}>
       {!hideTrigger && (
         <DialogTrigger asChild>
-          <Button variant="primary" className="w-min">
-            Enable Pipelines
-          </Button>
+          <Button variant="primary">Enable</Button>
         </DialogTrigger>
       )}
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>Enable Pipelines</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <DialogSection className="flex flex-col gap-y-2 p-0!">
-          <Admonition
-            type="warning"
-            className="rounded-none border-0"
-            title="Pipelines is currently in public alpha"
-          >
-            {hasAccess ? (
-              <>
-                <p className="text-sm leading-normal!">
-                  Public alpha features may change as we refine the product and incorporate customer
-                  feedback.
-                </p>
-                <p className="text-sm leading-normal!">
-                  Pipelines is billed for configured pipeline hours and Postgres row data processed
-                  during initial sync and ongoing replication. Review the{' '}
-                  <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
-                    Pipelines pricing
-                  </InlineLink>{' '}
-                  before enabling it.
-                </p>
-              </>
-            ) : (
+        <DialogSection className="flex flex-col gap-y-3">
+          {hasAccess ? (
+            <>
               <p className="text-sm text-foreground-light">
-                Supabase Pipelines replicates database changes to supported destination systems.{' '}
-                {hasAccess ? 'Enable Pipelines for your project' : 'Upgrade to the Pro plan'} to
-                replicate database changes to data warehouses and analytics platforms.
+                Pipelines bills for configured pipeline hours and Postgres row data processed during
+                initial sync and ongoing replication. Review{' '}
+                <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
+                  Pipelines pricing
+                </InlineLink>{' '}
+                before enabling.
               </p>
-            )}
-          </Admonition>
+              <p className="text-sm text-foreground-light">
+                Pipelines is in public alpha and may change.
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-foreground-light">Pipelines requires the Pro plan.</p>
+          )}
         </DialogSection>
         <DialogFooter>
-          <Button variant="default" disabled={creatingTenantSource} onClick={() => setOpen(false)}>
+          <Button disabled={creatingTenantSource} onClick={() => setOpen(false)}>
             Cancel
           </Button>
           {hasAccess ? (
@@ -117,33 +102,26 @@ export const EnablePipelinesModal = ({
   )
 }
 
-export const EnablePipelinesCallout = ({
-  type,
-  className,
-}: {
-  type?: DestinationType | null
-  className?: string
-}) => {
+export const EnablePipelinesCallout = ({ type }: { type?: DestinationType | null }) => {
   const { hasAccess } = useCheckEntitlements('replication.etl')
 
   return (
-    <div className={cn('border rounded-md p-4 md:p-12 flex flex-col gap-y-4', className)}>
-      <div className="flex flex-col gap-y-1">
-        <h4>Enable Pipelines</h4>
-        <p className="text-sm text-foreground-light">
-          Supabase Pipelines replicates database changes to supported destination systems.{' '}
-          {hasAccess ? 'Enable Pipelines for your project' : 'Upgrade to the Pro plan'} to replicate
-          database changes to {type ?? 'data warehouses and analytics platforms'}.
-        </p>
-      </div>
-      <div className="flex gap-x-2">
-        {hasAccess ? (
+    <Admonition
+      type="note"
+      layout="responsive"
+      title={hasAccess ? 'Enable Pipelines' : 'Upgrade to Pro for Pipelines'}
+      description={
+        hasAccess
+          ? `Pipelines must be enabled before this project can replicate database changes to ${type ?? 'external destinations'}.`
+          : `The Pro plan is required to replicate database changes to ${type ?? 'external destinations'} with Pipelines.`
+      }
+      actions={
+        hasAccess ? (
           <EnablePipelinesModal />
         ) : (
           <UpgradePlanButton source="replication" featureProposition="use replication" />
-        )}
-        <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
-      </div>
-    </div>
+        )
+      }
+    />
   )
 }

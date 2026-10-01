@@ -410,7 +410,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           <SchemaSelector
                             size="small"
                             showError={false}
-                            stopScrollPropagation
                             selectedSchemaName={field.value}
                             onSelectSchema={(name) => field.onChange(name)}
                             disabled={field.disabled}
@@ -435,7 +434,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                             size="small"
                             schema={postgresValues.schema}
                             value={field.value}
-                            stopScrollPropagation
                             onChange={field.onChange}
                             disabled={field.disabled}
                             filterFunction={(func) => {
@@ -527,7 +525,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           <div className="flex flex-row">
                             <Input {...field} className="rounded-r-none border-r-0" />
                             <Button
-                              variant="default"
                               className="rounded-l-none text-xs h-auto"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
@@ -557,10 +554,11 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
             </div>
           )}
 
-          <Button disabled={isUpdatingAuthHooks} variant="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdatingAuthHooks} onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={FORM_ID}
             type="submit"
             disabled={isUpdatingAuthHooks}

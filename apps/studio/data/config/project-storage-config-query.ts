@@ -11,7 +11,7 @@ export type ProjectStorageConfigVariables = {
   projectRef?: string
 }
 
-export type ProjectStorageConfigResponse = components['schemas']['StorageConfigResponse']
+export type ProjectStorageConfigResponse = components['schemas']['StorageConfigResponse_Output']
 
 export async function getProjectStorageConfig(
   { projectRef }: ProjectStorageConfigVariables,

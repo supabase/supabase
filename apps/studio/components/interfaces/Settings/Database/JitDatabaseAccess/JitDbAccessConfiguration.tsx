@@ -393,7 +393,7 @@ export const JitDbAccessConfiguration = () => {
               }
               actions={
                 unavailableReason === 'postgres_upgrade_required' && ref ? (
-                  <Button variant="default" asChild>
+                  <Button asChild>
                     <Link href={getServiceVersionsPath(ref)}>Upgrade Postgres</Link>
                   </Button>
                 ) : unavailableReason === 'ssl_enforcement_required' && ref ? (
@@ -402,12 +402,10 @@ export const JitDbAccessConfiguration = () => {
                     isSubmitting={isEnablingSSLEnforcement}
                     onConfirm={handleEnableSSLEnforcement}
                   >
-                    <Button variant="default" loading={isEnablingSSLEnforcement}>
-                      Enable SSL enforcement
-                    </Button>
+                    <Button loading={isEnablingSSLEnforcement}>Enable SSL enforcement</Button>
                   </SSLEnforcementConfirmDialog>
                 ) : (
-                  <Button variant="default" asChild>
+                  <Button asChild>
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.PROBLEM,

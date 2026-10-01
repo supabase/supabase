@@ -129,6 +129,7 @@ export const IndirectTaxDeclarationModal = () => {
 
           <DialogFooter>
             <ButtonTooltip
+              variant="primary"
               onClick={onSubmit}
               disabled={response === ''}
               loading={isPending}

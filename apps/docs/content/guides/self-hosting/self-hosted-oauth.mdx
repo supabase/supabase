@@ -1,5 +1,5 @@
 ---
-title: 'Configure social login (OAuth) providers'
+title: 'Configure Social Login (OAuth) Providers'
 description: 'Set up social login (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
 subtitle: 'Set up social login (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
 ---
@@ -66,8 +66,6 @@ GOOGLE_CLIENT_ID=your-client-id
 GOOGLE_SECRET=your-client-secret
 ```
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ### Step 3: Enable the matching lines in Docker Compose configuration
 
 Uncomment the corresponding `GOTRUE_EXTERNAL_` lines in the `auth` service's `environment`:
@@ -99,7 +97,7 @@ sh run.sh recreate auth
 Check that the provider is enabled:
 
 ```sh
-curl -H 'apikey: your-anon-key' https://<your-domain>/auth/v1/settings
+curl -H 'apikey: your-supabase-publishable-key' https://<your-domain>/auth/v1/settings
 ```
 
 The response should include your provider under `external`:
@@ -350,9 +348,9 @@ You can test OAuth with the following minimal HTML page:
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         const SUPABASE_URL = 'https://<your-domain>'
-        const SUPABASE_ANON_KEY = 'your-anon-key'
+        const SUPABASE_PUBLISHABLE_KEY = 'your-supabase-publishable-key'
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
 
         const button = document.getElementById('loginBtn')
 
@@ -406,8 +404,6 @@ After a successful OAuth sign-in, the Auth service redirects to `SITE_URL` or a 
 
 - `SITE_URL` in `.env` is set to your **application's URL**
 - If your app uses a different redirect URL, add it to `ADDITIONAL_REDIRECT_URLS` (comma-separated)
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Nonce check failure on mobile (Google Sign In)
 

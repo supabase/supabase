@@ -7,6 +7,8 @@ tmp
 *.swp
 
 coverage
+# vitest reporter output (json/junit/html/attachments)
+.vitest
 allure-results
 allure-report
 .nyc_output
@@ -166,3 +168,6 @@ keys.json
 examples/**/package-lock.json
 examples/**/yarn.lock
 examples/**/pnpm-lock.yaml
+
+# local-only lockfile for the mcp-server registry block
+apps/ui-library/registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.lock

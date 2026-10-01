@@ -30,7 +30,7 @@ export async function getResourceWarnings(
   return Array.isArray(data) ? data : EMPTY_ARR
 }
 
-export type ResourceWarning = components['schemas']['ProjectResourceWarningsResponse']
+export type ResourceWarning = components['schemas']['ProjectResourceWarningsResponse_Output']
 export type ResourceWarningsData = Awaited<ReturnType<typeof getResourceWarnings>>
 export type ResourceWarningsError = ResponseError
 

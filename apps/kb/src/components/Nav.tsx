@@ -9,15 +9,16 @@ import {
   navigationMenuTriggerStyle,
 } from 'ui'
 
+import { TOPICS, topicToSlug } from '../lib/topics'
+
+const topics = TOPICS.map((topic) => ({
+  label: topic.name,
+  href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`,
+}))
+
 /**
  * Hard-codding links in here for now until we have actual content. Might be worth putting these arrays in their on data file too.
  */
-const topics = [
-  { label: 'Troubleshooting', href: '#' },
-  { label: 'Migrations', href: '#' },
-  { label: 'Comparisons', href: '#' },
-]
-
 const resources = [
   { label: 'Status', href: 'https://status.supabase.com' },
   { label: 'Changelog', href: 'https://supabase.com/changelog' },
@@ -37,7 +38,7 @@ const triggerClass =
 // unconditional here; without it, an open menu pushes its siblings around
 // below the `md` breakpoint instead of overlaying them.
 const contentClass =
-  'absolute top-[calc(100%+4px)]! min-w-56 max-h-[calc(100vh-4rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md duration-0!'
+  'absolute top-[calc(100%+4px)]! z-50 min-w-56 max-h-[calc(100vh-4rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md duration-0!'
 const itemClass =
   'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground'
 

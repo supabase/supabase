@@ -15,21 +15,9 @@ export const normalizePipelineStatusName = (statusName?: string): PipelineStatus
     ? (statusName as PipelineStatusName)
     : undefined
 
-export const PIPELINE_ENABLE_ALLOWED_FROM: PipelineStatusName[] = [PipelineStatusName.STOPPED]
-export const PIPELINE_DISABLE_ALLOWED_FROM: PipelineStatusName[] = [
-  PipelineStatusName.STARTED,
-  PipelineStatusName.FAILED,
-]
-export const PIPELINE_ACTIONABLE_STATES: PipelineStatusName[] = [
-  PipelineStatusName.FAILED,
-  PipelineStatusName.STARTED,
-  PipelineStatusName.STOPPED,
-]
-
 export type PipelineDisplayStateKey =
   | 'starting'
   | 'stopping'
-  | 'restarting'
   | 'failed'
   | 'stopped'
   | 'running'
@@ -63,19 +51,11 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     badge: 'Stopping',
     type: 'loading',
   },
-  restarting: {
-    key: 'restarting',
-    label: 'Restarting',
-    title: 'Restarting pipeline',
-    message: 'Applying settings and restarting the pipeline.',
-    badge: 'Restarting',
-    type: 'loading',
-  },
   failed: {
     key: 'failed',
     label: 'Failed',
     title: 'Pipeline failed',
-    message: 'Replication has encountered an error.',
+    message: 'Replication has encountered an error',
     badge: 'Failed',
     type: 'failure',
   },
@@ -91,7 +71,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'running',
     label: 'Running',
     title: 'Pipeline running',
-    message: 'Replication is active and processing changes.',
+    message: 'Replication is active and processing changes',
     badge: 'Running',
     type: 'success',
   },
@@ -99,7 +79,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     key: 'unknown',
     label: 'Unknown',
     title: 'Pipeline status unknown',
-    message: 'Unable to determine pipeline status.',
+    message: 'Unable to determine pipeline status',
     badge: 'Unknown',
     type: 'idle',
   },
@@ -109,9 +89,6 @@ export const getPipelineDisplayState = (
   requestStatus?: PipelineStatusRequestStatus,
   statusName?: PipelineStatusName
 ): PipelineDisplayState => {
-  if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
-    return PIPELINE_DISPLAY_STATES.restarting
-  }
   if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
     return PIPELINE_DISPLAY_STATES.starting
   }
@@ -134,4 +111,12 @@ export const getPipelineDisplayState = (
     default:
       return PIPELINE_DISPLAY_STATES.unknown
   }
+}
+
+/** Resetting tables or applying settings must not imply starting an inactive pipeline. */
+export const getRestartRequestStatus = (statusName?: PipelineStatusName) => {
+  if (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED) {
+    return PipelineStatusRequestStatus.StopRequested
+  }
+  return PipelineStatusRequestStatus.None
 }

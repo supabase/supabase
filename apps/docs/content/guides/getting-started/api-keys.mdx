@@ -176,7 +176,7 @@ Pass the branch's own project ref to read the keys for a preview branch. A branc
 
 Use the Management API to fetch keys from your own tooling, such as a deploy script or an internal provisioning service.
 
-Authenticate with a [personal access token](/dashboard/account/tokens). An OAuth application needs the `secrets:read` scope, and a fine-grained token needs the `api_gateway_keys_read` permission. Without either, the request returns 403 Forbidden.
+Authenticate with a [personal access token](/dashboard/account/tokens). An OAuth application needs the `secrets:read` scope, and a [scoped personal access token](/docs/guides/platform/personal-access-tokens) needs the **API Keys** permission with **Read** access. To reveal key values with `reveal=true`, as the example below does, the scoped token also needs **API Key Secrets** with **Read** access. Without the required scope or permissions, the request returns 403 Forbidden.
 
 ```bash
 export PROJECT_REF="your-project-ref"
@@ -246,7 +246,7 @@ export const supabaseAdmin = createClient(
 Don't read the key from the environment inside an Edge Function. Use the [`@supabase/server`](/docs/guides/functions/auth) SDK instead. It verifies the caller's secret key for you and hands back a privileged client on `ctx`, so the key never appears in your code.
 
 ```ts supabase/functions/roster/index.ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
@@ -274,7 +274,7 @@ const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL')!, secretKeys['default'])
 ```
 
-`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist in the runtime, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment Variables](/docs/guides/functions/secrets) for the full list of injected variables.
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist in the runtime, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment variables](/docs/guides/functions/secrets) for the full list of injected variables.
 
 If you are replacing legacy keys in an existing application rather than starting fresh, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
 

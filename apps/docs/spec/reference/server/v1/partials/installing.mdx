@@ -82,3 +82,30 @@ slug: installing
 
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
+
+### Optional peer dependencies on Deno
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Some entry points rely on optional peer dependencies. `@supabase/server/middleware/postgres` and `@supabase/server/middleware/postgres-admin` need `pg`. Deno resolves an optional peer only when your own code imports it. A pin in `deno.json` alone is not enough: `deno check` passes and the function fails at startup with `Could not find package 'pg'`.
+
+    Add a bare import once, at the top of your entry module — no separate `deno add npm:pg` or `package.json` entry is needed. `deno info` lists `npm:/pg@...` once the package is in the module graph.
+
+    Deno 2.9 and later apply a minimum dependency age to npm packages. To use a release published the same day, pass `--minimum-dependency-age 0` to `deno check`.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts index.ts
+    import 'pg'
+    import { withPostgresClient } from '@supabase/server/middleware/postgres'
+    ```
+
+    ```sh Terminal
+    deno info index.ts | grep "npm:/pg@"
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>

@@ -84,7 +84,6 @@ export const ClientSelectDropdown = ({
         <PopoverTrigger asChild>
           <Button
             size="small"
-            variant="default"
             className="gap-0 rounded-l-none"
             iconRight={
               <ChevronDown

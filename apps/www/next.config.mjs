@@ -247,6 +247,9 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'www',
+  unstable_sentryWebpackPluginOptions: {
+    applicationKey: 'supabase-www',
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

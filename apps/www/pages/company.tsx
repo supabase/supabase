@@ -91,7 +91,9 @@ const Team = () => {
           </div>
           <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
             <a href="https://supabase.com/careers">
-              <Button size="medium">Join the team</Button>
+              <Button variant="primary" size="medium">
+                Join the team
+              </Button>
             </a>
           </div>
         </div>

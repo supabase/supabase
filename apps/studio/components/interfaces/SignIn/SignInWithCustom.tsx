@@ -50,7 +50,7 @@ export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
   }
 
   return (
-    <Button block onClick={handleCustomSignIn} size="large" variant="default" loading={loading}>
+    <Button block onClick={handleCustomSignIn} size="large" loading={loading}>
       Continue with {displayName}
     </Button>
   )

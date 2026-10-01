@@ -11,7 +11,7 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 type ProjectLintsVariables = {
   projectRef?: string
 }
-type ProjectLintResponse = components['schemas']['GetProjectLintsResponse']
+type ProjectLintResponse = components['schemas']['GetProjectLintsResponse_Output']
 export type Lint = ProjectLintResponse[0]
 export type LINT_TYPES = ProjectLintResponse[0]['name']
 

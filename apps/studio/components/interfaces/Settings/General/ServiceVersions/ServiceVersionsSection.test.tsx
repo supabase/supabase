@@ -11,6 +11,7 @@ const {
   mockUseReadReplicas,
   mockUseServiceVersions,
   mockUseUpgradeEligibility,
+  mockIsAwsK8sCloudProvider,
 } = vi.hoisted(() => ({
   mockUseFeatures: vi.fn(),
   mockUseIsOrioleDb: vi.fn(),
@@ -18,6 +19,7 @@ const {
   mockUseReadReplicas: vi.fn(),
   mockUseServiceVersions: vi.fn(),
   mockUseUpgradeEligibility: vi.fn(),
+  mockIsAwsK8sCloudProvider: vi.fn(),
 }))
 
 vi.mock('common', () => ({
@@ -118,17 +120,18 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useIsOrioleDb: mockUseIsOrioleDb,
   useSelectedProjectQuery: mockUseProject,
+  useIsAwsK8sCloudProvider: mockIsAwsK8sCloudProvider,
 }))
 
 describe('ServiceVersionsSection', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseFeatures.mockReturnValue({
       projectAuthAll: true,
       projectSettingsDatabaseUpgrades: true,
     })
     mockUseIsOrioleDb.mockReturnValue(false)
     mockUseProject.mockReturnValue({ data: { status: 'ACTIVE_HEALTHY' } })
+    mockIsAwsK8sCloudProvider.mockReturnValue(false)
     mockUseReadReplicas.mockReturnValue({ data: [{ identifier: 'project-ref' }] })
     mockUseUpgradeEligibility.mockReturnValue({
       data: {
@@ -276,5 +279,13 @@ describe('ServiceVersionsSection', () => {
 
     rerender(<ServiceVersionsSection />)
     expect(screen.getByText('Failed to retrieve versions')).toBeInTheDocument()
+  })
+
+  it('does not offer upgrade for v3 projects', () => {
+    mockIsAwsK8sCloudProvider.mockReturnValue(true)
+
+    render(<ServiceVersionsSection />)
+
+    expect(screen.queryByText('Project upgrade available')).not.toBeInTheDocument()
   })
 })

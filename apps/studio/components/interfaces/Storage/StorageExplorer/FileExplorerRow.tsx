@@ -5,12 +5,13 @@ import {
   Copy,
   Download,
   Edit,
+  Link2,
   LoaderCircle,
   MoreVertical,
   Move,
   Trash2,
 } from 'lucide-react'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import {
   Checkbox,
   cn,
@@ -38,7 +39,8 @@ import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { StorageRowIcon } from '../StorageRowIcon'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
-import { copyPathToFolder } from './StorageExplorer.utils'
+import { copyStorageExplorerUrl, copyStoragePath } from './StorageExplorer.utils'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
@@ -53,6 +55,13 @@ interface FileExplorerRowProps {
   style?: CSSProperties
 }
 
+type RowOption = {
+  name: string
+  icon?: ReactNode
+  onClick?: () => void
+  children?: { name: string; onClick: () => void }[]
+}
+
 export const FileExplorerRow = ({
   index: itemIndex,
   item,
@@ -62,23 +71,20 @@ export const FileExplorerRow = ({
   style,
 }: FileExplorerRowProps) => {
   const {
+    projectRef,
     selectedBucket,
     selectedFilePreview,
     openedFolders,
-    popColumnAtIndex,
-    popOpenedFoldersAtIndex,
-    clearSelectedItems,
-    setSelectedFilePreview,
     setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
     downloadFile,
     setSelectedItemToRename,
     setSelectedItemsToMove,
-    openFolder,
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
+  const { openFolderAtIndex, setPreviewedFile, clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
   const ctx = useFileExplorerContextMenu()
 
@@ -89,13 +95,6 @@ export const FileExplorerRow = ({
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-
-  const onSelectFile = async (columnIndex: number) => {
-    popColumnAtIndex(columnIndex)
-    popOpenedFoldersAtIndex(columnIndex - 1)
-    setSelectedFilePreview(itemWithColumnIndex)
-    clearSelectedItems()
-  }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
     // Select a range if shift is held down
@@ -110,10 +109,29 @@ export const FileExplorerRow = ({
     } else {
       setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
-    setSelectedFilePreview(undefined)
+    clearPreviewedFile()
   }
 
-  const rowOptions =
+  const copyPathOptions: RowOption[] = [
+    {
+      name: 'Copy relative path',
+      icon: <Copy size={12} className="text-foreground-light" />,
+      onClick: () => copyStoragePath(openedFolders, itemWithColumnIndex),
+    },
+    {
+      name: 'Copy link',
+      icon: <Link2 size={12} className="text-foreground-light" />,
+      onClick: () =>
+        copyStorageExplorerUrl({
+          openedFolders,
+          item: itemWithColumnIndex,
+          projectRef,
+          bucketId: selectedBucket.id,
+        }),
+    },
+  ]
+
+  const rowOptions: RowOption[] =
     item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
           ...(canUpdateFiles
@@ -130,11 +148,7 @@ export const FileExplorerRow = ({
             icon: <Download size={12} className="text-foreground-light" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
-          {
-            name: 'Copy path to folder',
-            icon: <Copy size={12} className="text-foreground-light" />,
-            onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
-          },
+          ...copyPathOptions,
           ...(canUpdateFiles
             ? [
                 { name: 'Separator', icon: undefined, onClick: undefined },
@@ -191,6 +205,7 @@ export const FileExplorerRow = ({
                   icon: <Download size={12} className="text-foreground-light" />,
                   onClick: () => downloadFile(itemWithColumnIndex),
                 },
+                ...copyPathOptions,
                 ...(canUpdateFiles
                   ? [
                       {
@@ -263,8 +278,8 @@ export const FileExplorerRow = ({
           event.preventDefault()
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
             item.type === STORAGE_ROW_TYPES.FOLDER
-              ? openFolder(columnIndex, item)
-              : onSelectFile(columnIndex)
+              ? openFolderAtIndex(columnIndex, item)
+              : setPreviewedFile(itemWithColumnIndex)
           }
         }}
       >

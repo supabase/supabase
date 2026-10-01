@@ -16,6 +16,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   Check,
+  Copy,
+  Download,
   FileText,
   Keyboard,
   Loader2,
@@ -28,7 +30,6 @@ import {
   SquareCode,
   Trash,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -36,6 +37,7 @@ import {
   Badge,
   Button,
   Checkbox,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -49,6 +51,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   findQueryCellsMatchingSql,
   isMutatingSql,
+  notebookToMarkdown,
   type QueryCellSummary,
 } from './ExplorerNotebookTab.utils'
 import {
@@ -58,14 +61,15 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
-import { useCreateChat, useLoadNotebook } from './hooks'
+import { useAnalyzeNotebook, useLoadNotebook } from './hooks'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { checkDestructiveQuery } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { useExplorerDeleteItem } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import {
   evictNotebookFromCaches,
   hasDiscardableChanges,
@@ -78,20 +82,24 @@ import {
 import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   getNotebooksStateSnapshot,
   useCurrentNotebook,
   useNotebooksStateSnapshot,
 } from '@/state/notebooks/notebooks-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNotebookTab = () => {
-  const router = useRouter()
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
   const queryClient = useQueryClient()
-  const { createChat, isCreating } = useCreateChat()
+  const { analyzeNotebook, isCreating } = useAnalyzeNotebook()
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -101,11 +109,12 @@ export const ExplorerNotebookTab = () => {
   const currentNotebook = useCurrentNotebook()
   const { name, content } = currentNotebook?.notebook ?? {}
   const { isNotFound } = useLoadNotebook({ id, projectRef: ref })
+  const { data: project } = useSelectedProjectQuery()
+  const track = useTrack()
   const cells = content?.cells ?? []
   const queryCellIds = cells.filter(isQueryCell).map((cell) => cell._id)
 
   const [isRunningNotebook, setIsRunningNotebook] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isSaveBeforeAnalyzeOpen, setIsSaveBeforeAnalyzeOpen] = useState(false)
   const [isSaveConflictOpen, setIsSaveConflictOpen] = useState(false)
   const [pendingQueryMatches, setPendingQueryMatches] = useState<{
@@ -113,14 +122,34 @@ export const ExplorerNotebookTab = () => {
     mutatingQueries: QueryCellSummary[]
   } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
+  const [isExportingPdf, setIsExportingPdf] = useState(false)
+
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
+  const confirmedCreatedNotebookIdsRef = useRef(new Set<string>())
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: () => {
+  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation<{
+    isCreation: boolean
+  }>({
+    onMutate: (variables) => ({
+      isCreation:
+        (currentNotebook?.status === 'new' ||
+          snap.serverDivergedWhileDirty.get(variables.id) === 'deleted') &&
+        !confirmedCreatedNotebookIdsRef.current.has(variables.id),
+    }),
+    onSuccess: (data, variables, context) => {
+      const { isCreation } = context
+      if (isCreation) confirmedCreatedNotebookIdsRef.current.add(variables.id)
+
+      track(
+        isCreation ? 'explorer_notebook_created' : 'explorer_notebook_updated',
+        { notebookId: variables.id },
+        { project: variables.projectRef }
+      )
+
       if (id && content === savedContentRef.current) {
-        snap.markSaved({ id })
+        snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
         if (isSaveBeforeAnalyzeOpen) {
           setIsSaveBeforeAnalyzeOpen(false)
@@ -128,19 +157,6 @@ export const ExplorerNotebookTab = () => {
         }
       }
     },
-  })
-
-  const { mutate: deleteNotebook, isPending: isDeleting } = useContentDeleteMutation({
-    onSuccess: () => {
-      toast.success('Successfully deleted notebook')
-      if (id) {
-        tabs.removeTab(createTabId('notebook', { id }))
-        snap.removeNotebook({ id })
-      }
-      setIsDeleteModalOpen(false)
-      router.push(`/project/${ref}/explorer`)
-    },
-    onError: (error) => toast.error(`Failed to delete notebook: ${error.message}`),
   })
 
   const sensors = useSensors(
@@ -266,7 +282,7 @@ export const ExplorerNotebookTab = () => {
       projectRef: ref,
       id: notebookId,
       name,
-      description: currentNotebook?.notebook.description,
+      description: currentNotebook?.notebook.description ?? undefined,
       content: writableContent,
     })
   }
@@ -280,6 +296,10 @@ export const ExplorerNotebookTab = () => {
 
     persistNotebook()
   }
+
+  useShortcut(SHORTCUT_IDS.EXPLORER_NOTEBOOK_SAVE, handleSaveNotebook, {
+    enabled: !!content && !isUpdating,
+  })
 
   const handleSaveAnyway = () => {
     setIsSaveConflictOpen(false)
@@ -297,12 +317,7 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const handleAnalyze = () => {
-    createChat({
-      name: `Analyze ${name} notebook`,
-      initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
-    })
-  }
+  const handleAnalyze = () => analyzeNotebook({ id, name })
 
   const handleClickAnalyze = () => {
     if (hasDiscardableChanges(currentNotebook)) {
@@ -312,9 +327,38 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const handleConfirmDeleteNotebook = () => {
-    if (!ref || !id) return
-    deleteNotebook({ projectRef: ref, ids: [id] })
+  const handleCopyAsMarkdown = async () => {
+    try {
+      await copyToClipboard(
+        notebookToMarkdown({
+          name: name ?? '',
+          cells,
+          getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+        }),
+        () => toast.success('Copied notebook as Markdown to clipboard')
+      )
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error('Failed to copy notebook as Markdown: ' + message)
+    }
+  }
+
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true)
+    try {
+      const { exportNotebookToPdf } = await import('./NotebookPdf/exportNotebookToPdf')
+      await exportNotebookToPdf({
+        name: name ?? 'Untitled notebook',
+        projectName: project?.name,
+        cells,
+        getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
+      })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error('Failed to export notebook as PDF: ' + message)
+    } finally {
+      setIsExportingPdf(false)
+    }
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -383,7 +427,7 @@ export const ExplorerNotebookTab = () => {
             icon={
               <AiIconAnimation
                 size={16}
-                className="text-tertiary-foreground group-hover:text-brand"
+                className="text-tertiary-foreground group-hover:text-primary"
               />
             }
             loading={isCreating}
@@ -393,13 +437,18 @@ export const ExplorerNotebookTab = () => {
           >
             Analyze
           </ExplorerToolbarAction>
-          <ExplorerToolbarAction
-            aria-label="Save changes"
-            icon={<Save size={16} strokeWidth={2} />}
-            tooltip="Save changes"
-            loading={isUpdating}
-            onClick={handleSaveNotebook}
-          />
+          <ShortcutTooltip
+            side="bottom"
+            shortcutId={SHORTCUT_IDS.EXPLORER_NOTEBOOK_SAVE}
+            label="Save changes"
+          >
+            <ExplorerToolbarAction
+              aria-label="Save changes"
+              icon={<Save size={16} strokeWidth={2} />}
+              loading={isUpdating}
+              onClick={handleSaveNotebook}
+            />
+          </ShortcutTooltip>
           <ExplorerToolbarActions>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -417,26 +466,49 @@ export const ExplorerNotebookTab = () => {
                     <Keyboard size={14} />
                     <span>Intellisense enabled</span>
                   </div>
-                  {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+                  {isIntellisenseEnabled && <Check className="text-primary" size={16} />}
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
+                  <Copy size={14} />
+                  <span>Copy as Markdown</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  disabled={isExportingPdf}
+                  onClick={handleExportPdf}
+                >
+                  {isExportingPdf ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  <span>Export as PDF</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onClick={() => id && onSelectDelete({ id, type: 'notebook', name: name ?? '' })}
+                >
                   <Trash size={14} />
                   <span>Delete notebook</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </ExplorerToolbarActions>
-          <ExplorerToolbarAction
+          <ButtonTooltip
+            type="button"
+            variant="default"
+            size="tiny"
+            className="ml-1"
             aria-label="Run notebook"
             icon={<Play size={16} strokeWidth={2} />}
-            tooltip="Run notebook"
+            tooltip={{ content: { side: 'bottom', text: 'Run notebook' } }}
             loading={isRunningNotebook}
             disabled={queryCellIds.length === 0}
             onClick={handleRunNotebook}
           >
             Run
-          </ExplorerToolbarAction>
+          </ButtonTooltip>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
@@ -450,12 +522,8 @@ export const ExplorerNotebookTab = () => {
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
             >
               <div className="flex items-center gap-x-2">
-                <Button variant="default" onClick={() => onSelectAddCell('query')}>
-                  Add query cell
-                </Button>
-                <Button variant="default" onClick={() => onSelectAddCell('markdown')}>
-                  Add markdown cell
-                </Button>
+                <Button onClick={() => onSelectAddCell('query')}>Add query</Button>
+                <Button onClick={() => onSelectAddCell('markdown')}>Add markdown</Button>
               </div>
             </EmptyStatePresentational>
           )}
@@ -490,39 +558,25 @@ export const ExplorerNotebookTab = () => {
               <div className="flex items-center justify-center gap-x-2 mt-4">
                 <ButtonTooltip
                   variant="outline"
+                  size="small"
                   icon={<SquareCode />}
-                  className="w-7"
+                  className="w-[34px]"
                   onClick={() => onSelectAddCell('query')}
-                  tooltip={{ content: { side: 'bottom', text: 'Add query cell' } }}
+                  tooltip={{ content: { side: 'bottom', text: 'Add query' } }}
                 />
                 <ButtonTooltip
                   variant="outline"
+                  size="small"
                   icon={<FileText />}
-                  className="w-7"
+                  className="w-[34px]"
                   onClick={() => onSelectAddCell('markdown')}
-                  tooltip={{ content: { side: 'bottom', text: 'Add markdown cell' } }}
+                  tooltip={{ content: { side: 'bottom', text: 'Add markdown' } }}
                 />
               </div>
             </>
           )}
         </div>
       </div>
-
-      <ConfirmationModal
-        size="small"
-        visible={isDeleteModalOpen}
-        title={`Confirm to delete notebook '${name ?? ''}'`}
-        confirmLabel="Delete notebook"
-        confirmLabelLoading="Deleting notebook"
-        variant="destructive"
-        loading={isDeleting}
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleConfirmDeleteNotebook}
-      >
-        <p className="text-sm">
-          This action cannot be undone. Are you sure you want to delete '{name}'?
-        </p>
-      </ConfirmationModal>
 
       <ConfirmationModal
         size="small"
@@ -543,7 +597,7 @@ export const ExplorerNotebookTab = () => {
       <ConfirmationModal
         size="small"
         visible={isSaveConflictOpen}
-        title="Assistant changes detected"
+        title="Notebook changed on the server"
         additionalActionLabel="Discard changes"
         confirmLabel={
           id && snap.serverDivergedWhileDirty.get(id) === 'deleted' ? 'Recreate' : 'Save anyway'
@@ -554,8 +608,8 @@ export const ExplorerNotebookTab = () => {
       >
         <p className="text-sm">
           {id && snap.serverDivergedWhileDirty.get(id) === 'deleted'
-            ? 'An assistant deleted this notebook after your local changes. Saving will recreate it.'
-            : "An assistant updated this notebook after your local changes. Saving will overwrite the assistant's update."}
+            ? 'This notebook was deleted on the server after your local changes. Saving will recreate it.'
+            : 'This notebook changed on the server after your local changes. Saving will overwrite those changes.'}
         </p>
       </ConfirmationModal>
 

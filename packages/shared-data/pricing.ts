@@ -43,6 +43,7 @@ export type FeatureKey =
   | 'auth.userDataOwnership'
   | 'auth.anonSignIns'
   | 'auth.socialOAuthProviders'
+  | 'auth.oauthServer'
   | 'auth.customSMTPServer'
   | 'auth.removeSupabaseBranding'
   | 'auth.auditLogs'
@@ -64,13 +65,15 @@ export type FeatureKey =
   | 'functions.invocations'
   | 'functions.scriptSize'
   | 'functions.numberOfFunctions'
+  | 'platform.logRetention'
+  | 'platform.logQuery'
+  | 'platform.logIngestion'
   | 'realtime.postgresChanges'
   | 'realtime.concurrentConnections'
   | 'realtime.messagesPerMonth'
   | 'realtime.maxMessageSize'
   | 'dashboard.teamMembers'
   | 'security.platformAuditLogs'
-  | 'security.logRetention'
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
@@ -267,6 +270,17 @@ export const pricing: Pricing = {
       {
         key: 'auth.socialOAuthProviders',
         title: 'Social OAuth providers',
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        key: 'auth.oauthServer',
+        title: 'OAuth 2.1 Server',
         plans: {
           free: true,
           pro: true,
@@ -572,7 +586,7 @@ export const pricing: Pricing = {
     icon: 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z',
     features: [
       {
-        key: 'security.logRetention',
+        key: 'platform.logRetention',
         title: 'Log retention (API & Database)',
         plans: {
           free: '1 day',
@@ -581,6 +595,28 @@ export const pricing: Pricing = {
           enterprise: '90 days',
         },
         usage_based: false,
+      },
+      {
+        key: 'platform.logIngestion',
+        title: 'Log Ingestion',
+        plans: {
+          free: '1 GB included',
+          pro: ['20 GB included', 'then $0.50 per GB'],
+          team: ['20 GB included', 'then $0.50 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        key: 'platform.logQuery',
+        title: 'Log Query',
+        plans: {
+          free: '100 GB included',
+          pro: 'Log Ingestion Usage x 100',
+          team: 'Log Ingestion Usage x 100',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
       },
       {
         key: 'security.logDrain',

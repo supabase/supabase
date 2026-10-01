@@ -8,6 +8,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -19,6 +20,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
@@ -40,24 +42,24 @@ export const AdvancedSettings = ({
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
   const handleNumberChange =
-    (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
+    (field: { onChange: (value: number | '') => void }) => (e: ChangeEvent<HTMLInputElement>) => {
       const parsed = e.target.valueAsNumber
-      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? undefined : parsed)
+      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? '' : parsed)
     }
 
   return (
-    <div className="px-5">
+    <div className="w-full">
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
+          <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional settings to control the pipeline in more depth
+                Customize how the pipeline syncs and replicates data.
               </span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
             <FormField
               control={form.control}
               name="maxFillMs"
@@ -65,7 +67,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description="How long the pipeline waits before sending a partially filled batch."
+                  description="Maximum time before sending a partially filled batch."
                 >
                   <FormControl>
                     <InputGroup>
@@ -76,7 +78,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
+                        placeholder={String(DEFAULT_MAX_FILL_MS)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>
@@ -217,7 +219,7 @@ export const AdvancedSettings = ({
                     <FormItemLayout
                       label="Maximum staleness"
                       layout="horizontal"
-                      description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
+                      description="Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results."
                     >
                       <FormControl>
                         <InputGroup>
@@ -237,7 +239,37 @@ export const AdvancedSettings = ({
                     </FormItemLayout>
                   )}
                 />
+
+                <div className="flex flex-col gap-y-3">
+                  <div className="flex flex-col gap-y-1">
+                    <span className="text-sm text-foreground">Table layout</span>
+                    <p className="text-sm text-foreground-lighter">
+                      Partitioning and clustering for each BigQuery table. Applied when a
+                      destination table is first created or reset.
+                    </p>
+                  </div>
+                  <TableOptions control={form.control} />
+                </div>
               </>
+            )}
+
+            {type === 'Snowflake' && (
+              <FormField
+                control={form.control}
+                name="snowflakeRole"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Role"
+                    labelOptional="Optional"
+                    layout="horizontal"
+                    description="Role for SQL requests. Leave blank to use the service user’s default role."
+                  >
+                    <FormControl>
+                      <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
             )}
           </AccordionContent>
         </AccordionItem>

@@ -73,7 +73,7 @@ describe('connect.schema:structure', () => {
 describe('connect.schema:fields', () => {
   test('framework field should have correct type', () => {
     const field = connectSchema.fields.framework
-    expect(field.type).toBe('select')
+    expect(field.type).toBe('combobox')
     expect(field.options).toEqual({ source: 'frameworks' })
     expect(field.defaultValue).toBe('nextjs')
   })
@@ -112,9 +112,9 @@ describe('connect.schema:fields', () => {
     expect(field.defaultValue).toBe('prisma')
   })
 
-  test('mcpClient field should have select type', () => {
+  test('mcpClient field should have combobox type', () => {
     const field = connectSchema.fields.mcpClient
-    expect(field.type).toBe('select')
+    expect(field.type).toBe('combobox')
     expect(field.options).toEqual({ source: 'mcpClients' })
     expect(field.defaultValue).toBe('claude-code')
   })

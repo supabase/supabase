@@ -38,6 +38,13 @@
     "author_image_url": "https://github.com/darora.png"
   },
   {
+    "author_id": "elsa_heffernan",
+    "author": "Elsa Heffernan",
+    "position": "Partnerships",
+    "author_url": "https://www.linkedin.com/in/elsaheffernan/",
+    "author_image_url": "/images/blog/avatars/elsa-heffernan.png"
+  },
+  {
     "author_id": "fracek",
     "author": "Francesco Ceccon",
     "username": "fracek",
@@ -97,6 +104,14 @@
     "position": "Head of Growth",
     "author_url": "https://github.com/roryw10",
     "author_image_url": "https://github.com/roryw10.png"
+  },
+  {
+    "author_id": "shaziya_bandukia",
+    "author": "Shaziya Bandukia",
+    "username": "shaziyabandukia",
+    "position": "Product + Partnerships",
+    "author_url": "https://github.com/shaziyabandukia",
+    "author_image_url": "https://github.com/shaziyabandukia.png"
   },
   {
     "author_id": "steve_chavez",
