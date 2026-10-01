@@ -369,4 +369,43 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(await screen.findByText('tailspin-shop')).toBeInTheDocument()
     expect(screen.getByRole('combobox')).not.toHaveTextContent('tailspin-warehouse')
   })
+
+  test('reconsent shows the permissions differences', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
+    })
+
+    await screen.findByText('Already granted (2)')
+    await screen.findByText((_, element) => element?.textContent == 'Environment (New)', {
+      selector: 'span',
+    })
+    await screen.findByText(
+      (_, element) => element?.textContent == 'Analytics (Upgraded from Read)',
+      { selector: 'span' }
+    )
+    await screen.findByText(
+      (_, element) => element?.textContent == 'Secrets (Demoted from Read-write)',
+      { selector: 'span' }
+    )
+    await screen.findByText((_, element) => element?.textContent == 'Edge Functions (New)', {
+      selector: 'span',
+    })
+    await screen.findByText((_, element) => element?.textContent == 'Storage (New)', {
+      selector: 'span',
+    })
+    await screen.findByText((_, element) => element?.textContent == 'Rest (Read)', {
+      selector: 'span',
+    })
+  })
+
+  test('reconsent shows the previous permissions hidden by default', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
+    })
+
+    await screen.findByText('Already granted (2)')
+    expect(screen.queryByText('Database')).toBeNull()
+    fireEvent.click(await screen.findByText('Already granted (2)'))
+    await screen.findByText('Database')
+  })
 })
