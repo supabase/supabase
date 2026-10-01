@@ -1,6 +1,6 @@
 import { AuthError, AuthMFARecoveryCodesGenerateResponseData } from '@supabase/auth-js'
 import { UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { Check, Copy } from 'lucide-react'
+import { Check, Copy, Download } from 'lucide-react'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Button,
@@ -49,6 +49,20 @@ export const RecoveryCodesModal = <T = unknown,>({
         return 'Save your recovery codes'
     }
   }, [status])
+
+  const downloadCodes = () => {
+    const blob = new Blob([codes.map((code) => formatRecoveryCode(code)).join('\n')], {
+      type: 'text/plain;charset=utf-8;',
+    })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.setAttribute('download', 'supabase-recovery-codes.txt')
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
+  }
 
   useEffect(() => {
     if (copiedToClipboard) {
@@ -110,21 +124,27 @@ export const RecoveryCodesModal = <T = unknown,>({
                   ))}
                 </ul>
 
-                <Button
-                  icon={copiedToClipboard ? <Check className="text-brand-default" /> : <Copy />}
-                  className="ml-auto w-min"
-                  onClick={() =>
-                    copyToClipboard(
-                      codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
-                      () => {
-                        setCopiedToClipboard(true)
-                        setCopied(true)
-                      }
-                    )
-                  }
-                >
-                  {copiedToClipboard ? 'Copied' : 'Copy'}
-                </Button>
+                <div className="flex items-center gap-x-2">
+                  <Button
+                    icon={copiedToClipboard ? <Check className="text-brand-default" /> : <Copy />}
+                    className="ml-auto w-min"
+                    onClick={() =>
+                      copyToClipboard(
+                        codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
+                        () => {
+                          setCopiedToClipboard(true)
+                          setCopied(true)
+                        }
+                      )
+                    }
+                  >
+                    {copiedToClipboard ? 'Copied' : 'Copy'}
+                  </Button>
+
+                  <Button icon={<Download />} onClick={downloadCodes}>
+                    Download
+                  </Button>
+                </div>
               </div>
 
               <Admonition
