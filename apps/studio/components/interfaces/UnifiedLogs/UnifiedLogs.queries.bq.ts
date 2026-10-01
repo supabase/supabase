@@ -430,6 +430,7 @@ export const getFacetCountCTE = ({
   const facetSearchClause = facetSearch
     ? safeSql`AND ${facetCol} LIKE ${lit('%' + facetSearch + '%')}`
     : safeSql``
+  const facetOrder = facet === 'pathname' ? safeSql`ORDER BY count DESC` : safeSql``
 
   const where =
     baseConditions.length > 0
@@ -443,6 +444,7 @@ ${cteName} AS (
   ${where}
   ${facetSearchClause}
   GROUP BY ${facetCol}
+  ${facetOrder}
   LIMIT ${lit(MAX_FACETS_QUANTITY)}
 )
 `

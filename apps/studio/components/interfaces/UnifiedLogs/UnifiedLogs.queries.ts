@@ -501,6 +501,7 @@ SELECT ${lit(facet)} AS facet, (${facetExpr}) AS value, count() AS count
 FROM logs
 ${whereClause(conditions)}
 GROUP BY value
+ORDER BY count DESC
 LIMIT ${lit(MAX_FACETS_QUANTITY)}
 `
 }

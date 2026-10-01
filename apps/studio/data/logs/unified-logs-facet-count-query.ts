@@ -64,15 +64,18 @@ SELECT dimension, value, count from ${cteName};
     iso_timestamp_end: isoTimestampEnd,
     signal,
   })
-  return facetRowsSchema.parse(data.result ?? []).map((row) => ({
-    label: row.value,
-    value: row.value,
-    count: row.count,
-  }))
+  return facetRowsSchema
+    .parse(data.result ?? [])
+    .sort((a, b) => b.count - a.count)
+    .map((row) => ({
+      label: row.value,
+      value: row.value,
+      count: row.count,
+    }))
 }
 
 export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>
-export type UnifiedLogsFacetCountError = ResponseError
+export type UnifiedLogsFacetCountError = ResponseError | z.ZodError
 
 export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>(
   { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,
