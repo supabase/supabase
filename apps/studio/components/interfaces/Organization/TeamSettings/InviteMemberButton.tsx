@@ -363,7 +363,8 @@ export const InviteMemberButton = () => {
                           const isApplyingProjectRole = !applyToOrg
                           const disabledForProjectRole = isApplyingProjectRole && isNoAccessRole
 
-                          const disabled = !canAssignRole || disabledForStripe || disabledForProjectRole
+                          const disabled =
+                            !canAssignRole || disabledForStripe || disabledForProjectRole
                           const disabledReason = disabledForStripe
                             ? 'Cannot be assigned in Stripe Projects organizations'
                             : disabledForProjectRole
