@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
+import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
 import { CancellationFlow } from './CancellationFlow'
 import {
   isFullScreenPresentation,
@@ -271,6 +272,10 @@ export const PlanUpdateSidePanel = () => {
     />
   )
 
+  const awsMarketplaceCallout = isPlanPresentationEligible ? (
+    <AwsMarketplacePurchaseCallout />
+  ) : null
+
   return (
     <>
       {isFullScreen && isPanelOpen && (
@@ -281,6 +286,7 @@ export const PlanUpdateSidePanel = () => {
           contentDelay={contentDelay}
           onClose={onClose}
         >
+          {awsMarketplaceCallout}
           {planCards}
         </PlanUpdateFullScreenShell>
       )}
@@ -292,6 +298,7 @@ export const PlanUpdateSidePanel = () => {
           notice={notice}
           onClose={onClose}
         >
+          {awsMarketplaceCallout}
           {planCards}
         </PlanUpdateSheetShell>
       )}

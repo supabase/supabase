@@ -27,6 +27,12 @@ vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
 }))
 
+vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
+  useSelectedOrganizationQuery: () => ({
+    data: { managed_by: 'supabase' },
+  }),
+}))
+
 vi.mock('@/state/organization-settings', () => ({
   useOrgSettingsPageStateSnapshot: () => ({
     setPanelKey: mockSetPanelKey,
@@ -68,6 +74,16 @@ describe('Subscription', () => {
     fireEvent.click(button)
 
     expect(mockSetPanelKey).toHaveBeenCalledWith('subscriptionPlan')
+  })
+
+  it('shows AWS Marketplace as an alternative purchasing route', () => {
+    render(<Subscription />)
+
+    expect(screen.getByText('Purchase through AWS Marketplace')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View purchase options' })).toHaveAttribute(
+      'href',
+      'https://supabase.com/aws-marketplace'
+    )
   })
 
   it('shows the support fallback when plan changes are not available', () => {
