@@ -91,7 +91,7 @@ export const ReferenceRecordPeek = ({ table, filters }: ReferenceRecordPeekProps
             {isPrimaryKey && (
               <Tooltip>
                 <TooltipTrigger>
-                  <Key size={14} strokeWidth={2} className="text-brand rotate-45" />
+                  <Key size={14} strokeWidth={2} className="text-primary rotate-45" />
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Primary key</TooltipContent>
               </Tooltip>

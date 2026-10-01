@@ -8,6 +8,7 @@ import { ExplorerChatToolbar } from './ExplorerChatToolbar'
 import { useCreateChat } from './hooks'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AssistantChat } from '@/components/ui/AIAssistantPanel/AssistantChat'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -20,6 +21,7 @@ export const ExplorerChatTab = () => {
   const aiAssistantState = useAiAssistantState()
   const { createChat, openChat } = useCreateChat()
   const { activeSidebar } = useSidebarManagerSnapshot()
+  const { setLastVisitedExplorerTab } = useDashboardHistory()
   const chat = id ? aiAssistant.chats[id] : undefined
   const chatInstance = id ? aiAssistant.chatInstances[id] : undefined
   const tabId = id ? createTabId('chat', { id }) : undefined
@@ -37,7 +39,7 @@ export const ExplorerChatTab = () => {
       id: tabId,
       router,
       editor: 'explorer',
-      onClearDashboardHistory: () => {},
+      onClearDashboardHistory: () => setLastVisitedExplorerTab(undefined),
     })
   })
 

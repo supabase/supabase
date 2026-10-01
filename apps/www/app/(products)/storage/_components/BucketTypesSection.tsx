@@ -22,7 +22,7 @@ const BUCKET_TYPES = [
       'Historical and time-series data',
       'Optionally expose via Postgres',
     ],
-    cta: { label: 'Learn more', href: '/docs/guides/storage/analytics-buckets' },
+    cta: { label: 'Learn more', href: '/docs/guides/storage/analytics/introduction' },
   },
   {
     title: 'Vector buckets',
@@ -32,7 +32,7 @@ const BUCKET_TYPES = [
       'Metadata filtering and similarity queries',
       'RAG systems and AI-powered search',
     ],
-    cta: { label: 'Learn more', href: '/docs/guides/storage/vector-buckets' },
+    cta: { label: 'Learn more', href: '/docs/guides/storage/vector/introduction' },
   },
 ]
 
@@ -57,7 +57,7 @@ export function BucketTypesSection() {
                 <ul className="flex flex-col text-foreground-lighter text-sm gap-1.5">
                   {bucket.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-brand" />
+                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-primary" />
                       <span>{feature}</span>
                     </li>
                   ))}

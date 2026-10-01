@@ -191,7 +191,7 @@ export const TextConfirmModal = forwardRef<
                             className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
                             iconRight={
                               showCopied ? (
-                                <Check strokeWidth={2} className="text-brand" />
+                                <Check strokeWidth={2} className="text-primary" />
                               ) : (
                                 <Copy />
                               )

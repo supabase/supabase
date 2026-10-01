@@ -440,7 +440,7 @@ const data: () => {
                 href="https://www.multigres.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground underline hover:text-brand transition-colors"
+                className="text-foreground underline hover:text-primary transition-colors"
               >
                 Multigres
               </a>{' '}

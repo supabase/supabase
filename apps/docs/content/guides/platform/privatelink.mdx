@@ -61,7 +61,6 @@ Supabase will send you an AWS Resource Share containing the VPC Lattice Resource
 
 1. Sign in to your AWS Management Console, ensure you are in the AWS region where your Supabase project is located
 2. Navigate to the AWS Resource Access Manager (RAM) console
-   {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 3. Go to [Shared with me > Resource shares](https://console.aws.amazon.com/ram/home#SharedResourceShares)
 4. Locate the resource share from Supabase.
    - The resource share has the format `sspl-[project_ref]-[random alphanumeric string]`
@@ -70,7 +69,6 @@ Supabase will send you an AWS Resource Share containing the VPC Lattice Resource
 6. Click **Accept resource share**
 7. Confirm the acceptance in the dialog box
 
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 After accepting, you'll see the resource configurations appear in your [Shared with me > Shared resources](https://console.aws.amazon.com/ram/home#SharedResources) section of the RAM console and the [PrivateLink and Lattice > Resource configurations](https://console.aws.amazon.com/vpcconsole/home#ResourceConfigs) section of the VPC console.
 
 ### Step 3: Configure security groups
@@ -102,16 +100,15 @@ In your AWS account, you have two options to establish connectivity:
    - The resource configuration name will be in the format `[organisation]-[project-ref]-rc`
    - If you have multiple connections, match the **Resource configuration ID** shown for that connection in **View connection** to confirm you select the configuration for the correct database
 7. Select your VPC from the dropdown. This should match the VPC you selected for your security group in Step 3
-8. Enable the **Enable DNS name** option if you want to use a DNS record instead of the endpoints IP address(es)
-9. Choose the appropriate subnets for your network
+8. Choose the appropriate subnets for your network
    - AWS will provision a private ENI for you in each selected subnet
    - IP address type should be set to IPv4
-10. Choose the security group you created in Step 3.
-11. Click **Create endpoint**
-12. After creation, you will see the endpoint in the [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) section with a status of "Available"
-13. For connectivity:
+9. Choose the security group you created in Step 3.
+10. Click **Create endpoint**
+11. After creation, you will see the endpoint in the [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) section with a status of "Available"
+12. For connectivity:
     - The IP addresses of the endpoint will be listed in the **Subnets** section of the endpoint details
-    - The DNS record will be in the **Associations** section of the endpoint details in the **DNS Name** field if you enabled it in step 8
+    - The DNS record will be in the **Associations** section of the endpoint details in the **DNS Name** field
 
 #### Option B: Attach resource configuration to an existing VPC lattice service network
 

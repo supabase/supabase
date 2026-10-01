@@ -47,7 +47,7 @@ describe('model.utils', () => {
     it('should have openai provider with models', () => {
       expect(PROVIDERS.openai).toBeDefined()
       expect(PROVIDERS.openai.models).toBeDefined()
-      expect(Object.keys(PROVIDERS.openai.models)).toContain('gpt-5.6-luna')
+      expect(Object.keys(PROVIDERS.openai.models)).toContain('gpt-6-luna')
       expect(Object.keys(PROVIDERS.openai.models)).toContain('gpt-5.4-nano')
       expect(Object.keys(PROVIDERS.openai.models)).toContain('gpt-5.3-codex')
     })
@@ -112,36 +112,37 @@ describe('model.utils', () => {
     })
 
     it('defaults should satisfy unions', () => {
-      expect(DEFAULT_ASSISTANT_BASE_MODEL_ID).toBe('gpt-5.6-luna')
+      expect(DEFAULT_ASSISTANT_BASE_MODEL_ID).toBe('gpt-6-luna')
       expect(DEFAULT_ASSISTANT_ADVANCE_MODEL_ID).toBe('gpt-5.3-codex')
       expect(defaultAssistantModelId(false)).toBe(DEFAULT_ASSISTANT_BASE_MODEL_ID)
       expect(defaultAssistantModelId(true)).toBe(DEFAULT_ASSISTANT_BASE_MODEL_ID)
     })
 
     it('isAssistantBaseModelId / isAdvanceOnlyModelId', () => {
-      expect(isAssistantBaseModelId('gpt-5.6-luna')).toBe(true)
+      expect(isAssistantBaseModelId('gpt-6-luna')).toBe(true)
       expect(isAssistantBaseModelId('gpt-5.4-nano')).toBe(true)
       expect(isAssistantBaseModelId('gpt-5.3-codex')).toBe(false)
       expect(isAdvanceOnlyModelId('gpt-5.3-codex')).toBe(true)
       expect(isAdvanceOnlyModelId('gpt-5.4-nano')).toBe(false)
-      expect(isAdvanceOnlyModelId('gpt-5.6-luna')).toBe(false)
+      expect(isAdvanceOnlyModelId('gpt-6-luna')).toBe(false)
     })
 
     it('isKnownAssistantModelId', () => {
-      expect(isKnownAssistantModelId('gpt-5.6-luna')).toBe(true)
+      expect(isKnownAssistantModelId('gpt-6-luna')).toBe(true)
       expect(isKnownAssistantModelId('gpt-5.4-nano')).toBe(true)
       expect(isKnownAssistantModelId('gpt-5.3-codex')).toBe(true)
+      expect(isKnownAssistantModelId('gpt-5.6-luna')).toBe(false)
       expect(isKnownAssistantModelId('gpt-5')).toBe(false)
       expect(isKnownAssistantModelId('gpt-5-mini')).toBe(false)
       expect(isKnownAssistantModelId('unknown')).toBe(false)
     })
 
     it('getAssistantModelEntry returns config for known ids', () => {
-      expect(getAssistantModelEntry('gpt-5.6-luna').reasoningEffort).toBe('medium')
+      expect(getAssistantModelEntry('gpt-6-luna').reasoningEffort).toBe('medium')
       expect(getAssistantModelEntry('gpt-5.4-nano').reasoningEffort).toBe('low')
       expect(getAssistantModelEntry('gpt-5.3-codex').reasoningEffort).toBe('low')
-      expect(getAssistantModelEntry('gpt-5.6-luna')).toEqual(
-        ASSISTANT_MODELS.find((m) => m.id === 'gpt-5.6-luna')
+      expect(getAssistantModelEntry('gpt-6-luna')).toEqual(
+        ASSISTANT_MODELS.find((m) => m.id === 'gpt-6-luna')
       )
     })
 
@@ -152,12 +153,12 @@ describe('model.utils', () => {
 
     it('openaiModelEntry enforces valid reasoning effort at compile time', () => {
       const withEffort = openaiModelEntry({
-        id: 'gpt-5.6-luna',
+        id: 'gpt-6-luna',
         reasoningEffort: 'low',
       })
       expect(withEffort.reasoningEffort).toBe('low')
 
-      const withoutEffort = openaiModelEntry({ id: 'gpt-5.6-luna' })
+      const withoutEffort = openaiModelEntry({ id: 'gpt-6-luna' })
       expect(withoutEffort.reasoningEffort).toBeUndefined()
     })
   })

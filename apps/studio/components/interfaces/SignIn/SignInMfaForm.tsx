@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { useAuthError, useParams } from 'common'
+import { useAuthError, useFlag, useParams } from 'common'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
@@ -16,6 +17,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { useSignOut } from '@/lib/auth'
 import { getReturnToPath } from '@/lib/gotrue'
 import { useTrack } from '@/lib/telemetry/track'
@@ -41,7 +43,12 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
   const { method: signInMethod = 'unknown' } = useParams()
+  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
+  const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
+    enabled: enableAuthRecoveryCodes,
+  })
 
   const track = useTrack()
   const { mutate: addLoginEvent } = useAddLoginEvent()
@@ -230,7 +237,8 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         <ul className="list-disc pl-6">
           {factors?.totp.length === 2 && (
             <li>
-              <a
+              <button
+                tabIndex={0}
                 className="text-sm text-foreground-light hover:text-foreground cursor-pointer"
                 onClick={() =>
                   setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
@@ -241,7 +249,17 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                   {getFactorDisplayName(factors.totp.find((f) => f.id !== selectedFactor?.id))}
                 </strong>
                 ?
-              </a>
+              </button>
+            </li>
+          )}
+          {enableAuthRecoveryCodes && recoveryCodesStatus?.status === 'available' && (
+            <li>
+              <Link
+                href={`/sign-in-recovery-code?${searchParams}`}
+                className="text-sm transition text-foreground-light hover:text-foreground"
+              >
+                Authenticate using a recovery code
+              </Link>
             </li>
           )}
           <li>

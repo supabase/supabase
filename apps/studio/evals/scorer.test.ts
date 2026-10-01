@@ -70,7 +70,7 @@ describe('scorers with online (null) output', () => {
     const { trace, getThread } = mockTrace(THREAD_WITH_DOCS_URL)
     const result = await runUrlValidityScorer(null, trace)
 
-    expect(getThread).toHaveBeenCalled()
+    expect(getThread).toHaveBeenCalledWith({ preprocessor: 'thread' })
     expect(result).toMatchObject({ name: 'URL Validity', score: 1, metadata: { urls: [DOCS_URL] } })
 
     vi.unstubAllGlobals()

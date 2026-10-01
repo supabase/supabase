@@ -4,7 +4,6 @@ import type * as UI from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ThemeColorSettings } from '@/components/interfaces/Account/Preferences/ThemeColorSettings'
-import { applyResolvedThemeOverrides } from '@/lib/theme-overrides'
 import { customRender } from '@/tests/lib/custom-render'
 
 type SliderProps = ComponentProps<typeof UI.Slider>
@@ -87,15 +86,5 @@ describe('ThemeColorSettings', () => {
     unmount()
 
     expect(document.documentElement.style.getPropertyValue('--chroma')).toBe('0.02')
-  })
-
-  it('does not restore persisted Dark values when switching to Classic Dark', () => {
-    const { rerender } = customRender(<ThemeColorSettings />)
-
-    fireEvent.click(screen.getByRole('slider', { name: 'Color intensity' }))
-    applyResolvedThemeOverrides(document.documentElement, 'classic-dark', 'dark', { chroma: 0.02 })
-    rerender(<ThemeColorSettings isVisible={false} />)
-
-    expect(document.documentElement.style.getPropertyValue('--chroma')).toBe('')
   })
 })

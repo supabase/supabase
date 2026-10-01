@@ -221,7 +221,7 @@ export function DiskManagementForm({
     DISK_LIMITS[DiskType.GP3].minIops
   )
   // Suggested target when prompting a resize, sits above the floor so users
-  // aren't pinned at the minimum between disk-config modifications.
+  // aren't pinned at the minimum during the 4-hour disk-config cooldown.
   const suggestedDiskSizeForCustomIops = PLAN_DETAILS.pro.includedDiskGB.gp3
   const isDiskTooSmallForCustomIops =
     watchedStorageType === 'gp3' && watchedTotalSize < minDiskSizeForCustomIops

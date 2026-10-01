@@ -43,7 +43,7 @@ Go to your [Table Editor](/dashboard/project/_/editor/) and navigate to the net 
 
 The `_http_response` table saves all the response messages from the past 6 hours. If every column contains NULL values, except for the `id`, `error_msg`, and `created` columns, then you are experiencing [a timeout bug](https://github.com/supabase/pg_net/issues/86).
 
-By default, webhooks will execute the next 200 available queued requests. If the requests are too intense, it may result in a mass timeout. In the [Webhook Dashboard](/dashboard/project/_/database/hooks), you should increase your webhook's timeout to minimize this issue.
+By default, webhooks will execute the next 200 available queued requests. If the requests are too intense, it may result in a mass timeout. In the [Webhook Dashboard](/dashboard/project/_/integrations/webhooks/overview), you should increase your webhook's timeout to minimize this issue.
 
 **4. Inspect endpoints**
 The below code makes a request to the Postman Echo API through PG_NET

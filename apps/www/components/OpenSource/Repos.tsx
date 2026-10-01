@@ -32,7 +32,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={cn('text-foreground-light shrink-0', isActive && 'text-brand')}
+          className={cn('text-foreground-light shrink-0', isActive && 'text-primary')}
         >
           <path
             d={icon}

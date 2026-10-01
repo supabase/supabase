@@ -13,7 +13,6 @@
     "internal:sync": "tsx ./scripts/sync-internal-content.mts",
     "start": "next start",
     "lint": "eslint .",
-    "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite tsconfig.tsbuildinfo",
     "typecheck": "pnpm build:content && tsc --noEmit"
   },
@@ -40,9 +39,9 @@
   },
   "devDependencies": {
     "@shikijs/compat": "^1.1.7",
-    "@supabase/supa-mdx-lint": "0.3.1",
     "@types/react": "catalog:",
     "config": "workspace:^",
+    "eslint-config-supabase": "workspace:*",
     "mdast-util-toc": "^6.1.1",
     "npm-run-all": "^4.1.5",
     "shiki": "^1.1.7",

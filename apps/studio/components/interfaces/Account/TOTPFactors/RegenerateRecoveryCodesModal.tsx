@@ -9,7 +9,12 @@ export const RegenerateRecoveryCodesModal = () => {
   const [showConfirm, setShowConfirm] = useState(false)
   const [open, setOpen] = useState(false)
 
-  const recoveryCodesRegenerateMutation = useRecoveryCodesRegenerateMutation()
+  const recoveryCodesRegenerateMutation = useRecoveryCodesRegenerateMutation({
+    onSettled: () => {
+      setShowConfirm(false)
+      setOpen(true)
+    },
+  })
 
   return (
     <>
@@ -24,8 +29,6 @@ export const RegenerateRecoveryCodesModal = () => {
         confirmLabel="Regenerate"
         loading={recoveryCodesRegenerateMutation.isPending}
         onConfirm={() => {
-          setShowConfirm(false)
-          setOpen(true)
           recoveryCodesRegenerateMutation.mutate()
         }}
         onCancel={() => setShowConfirm(false)}
