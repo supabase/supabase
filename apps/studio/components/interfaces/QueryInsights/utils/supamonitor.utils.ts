@@ -10,10 +10,7 @@ import {
 } from '../QueryInsights.constants'
 import type { ChartDataPoint, ParsedLogEntry } from '../QueryInsights.types'
 
-export function filterSystemLogs(
-  logs: ParsedLogEntry[],
-  { includeIntrospection = false }: { includeIntrospection?: boolean } = {}
-): ParsedLogEntry[] {
+export function filterSystemLogs(logs: ParsedLogEntry[]): ParsedLogEntry[] {
   return logs.filter((log) => {
     if (log.user_name && (SUPAMONITOR_EXCLUDED_ROLES as readonly string[]).includes(log.user_name))
       return false
@@ -23,8 +20,7 @@ export function filterSystemLogs(
     )
       return false
     if (log.query && TRANSACTION_CONTROL_REGEX.test(log.query)) return false
-    if (!includeIntrospection && log.query && SCHEMA_INTROSPECTION_REGEX.test(log.query))
-      return false
+    if (log.query && SCHEMA_INTROSPECTION_REGEX.test(log.query)) return false
     return true
   })
 }

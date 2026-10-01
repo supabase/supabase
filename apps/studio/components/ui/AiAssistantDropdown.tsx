@@ -13,9 +13,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 
 import { useTrack } from '@/lib/telemetry/track'
@@ -49,7 +46,6 @@ export interface AiAssistantDropdownItem {
 export interface AiAssistantDropdownProps {
   buildPrompt: () => string
   label: string
-  iconOnly?: boolean
   onOpenAssistant: () => void
   onCopyPrompt?: () => void
   telemetrySource?: TelemetrySource
@@ -58,7 +54,6 @@ export interface AiAssistantDropdownProps {
   disabled?: boolean
   loading?: boolean
   className?: string
-  tooltip?: string
   copyLabel?: string
   showExternalAI?: boolean
   additionalDropdownItems?: AiAssistantDropdownItem[]
@@ -67,7 +62,6 @@ export interface AiAssistantDropdownProps {
 export function AiAssistantDropdown({
   buildPrompt,
   label,
-  iconOnly = false,
   onOpenAssistant,
   onCopyPrompt,
   telemetrySource,
@@ -76,7 +70,6 @@ export function AiAssistantDropdown({
   disabled = false,
   loading = false,
   className,
-  tooltip,
   copyLabel = 'Copy prompt',
   showExternalAI = false,
   additionalDropdownItems,
@@ -125,21 +118,20 @@ export function AiAssistantDropdown({
   }
 
   const buttonContent = (
-    <div className={cn('flex items-center', iconOnly ? 'gap-0' : 'gap-0')}>
+    <div className="flex items-center gap-0">
       {/* Main button */}
       <Button
         variant={variant}
         size={size}
         disabled={disabled}
         onClick={handleOpenAssistant}
-        icon={<AiIconAnimation size={iconOnly ? 16 : 14} loading={loading} />}
+        icon={<AiIconAnimation size={14} loading={loading} />}
         className={cn(
           'rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm',
-          iconOnly && 'px-1.5',
           className
         )}
       >
-        {!iconOnly && label}
+        {label}
       </Button>
 
       {/* Dropdown trigger */}
@@ -200,18 +192,6 @@ export function AiAssistantDropdown({
       </DropdownMenu>
     </div>
   )
-
-  // Wrap in tooltip for icon-only mode
-  if (iconOnly && tooltip) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="inline-flex">{buttonContent}</div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">{tooltip}</TooltipContent>
-      </Tooltip>
-    )
-  }
 
   return buttonContent
 }

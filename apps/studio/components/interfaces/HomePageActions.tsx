@@ -25,16 +25,14 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface HomePageActionsProps {
-  slug?: string
   hideNewProject?: boolean
 }
 
-export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePageActionsProps) => {
-  const { slug: urlSlug } = useParams()
+export const HomePageActions = ({ hideNewProject = false }: HomePageActionsProps) => {
+  const { slug } = useParams()
   const router = useRouter()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
-  const slug = _slug ?? urlSlug
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const debouncedSearch = useDebounce(search, 500)
   const [filterStatus, setFilterStatus] = useQueryState(

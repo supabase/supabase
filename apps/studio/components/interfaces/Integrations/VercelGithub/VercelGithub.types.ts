@@ -28,7 +28,6 @@ export interface ProjectLinkerProps {
   choosePrompt?: string
   onSkip?: () => void
   loadingForeignProjects?: boolean
-  showNoEntitiesState?: boolean
   defaultSupabaseProject?: Project
   defaultForeignProjectId?: string
   mode: 'Vercel' | 'GitHub'

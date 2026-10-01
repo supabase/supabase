@@ -47,7 +47,6 @@ interface CodeEditorProps {
   className?: string
   wrapperClassName?: string
   placeholderClassName?: string
-  loading?: boolean
   options?: EditorProps['options']
   value?: string
   placeholder?: string
@@ -77,7 +76,6 @@ export const CodeEditor = ({
   className,
   wrapperClassName,
   placeholderClassName,
-  loading,
   options,
   value,
   placeholder,
@@ -266,7 +264,7 @@ export const CodeEditor = ({
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
-        loading={loading || <Loader2 className="animate-spin" strokeWidth={2} size={20} />}
+        loading={<Loader2 className="animate-spin" strokeWidth={2} size={20} />}
         options={optionsMerged}
         onMount={handleMount}
         onChange={onChangeContent}

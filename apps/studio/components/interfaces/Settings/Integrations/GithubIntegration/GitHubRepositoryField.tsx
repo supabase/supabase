@@ -98,7 +98,6 @@ interface GitHubRepositoryFieldProps<TFormValues extends FieldValues> {
   gitHubAuthorization: unknown | null
   hasPartialResponseDueToSSO?: boolean
   isLoading?: boolean
-  placeholder?: string
   refetch: () => void
   onConnectClick?: () => void
   onRepositorySelect?: (repo: GitHubRepository) => void
@@ -118,7 +117,6 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
   gitHubAuthorization,
   hasPartialResponseDueToSSO = false,
   isLoading = false,
-  placeholder = 'Choose GitHub repository',
   refetch,
   onConnectClick,
   onRepositorySelect,
@@ -165,7 +163,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                   >
                     {selectedRepository?.name ||
                       selectedRepositoryName ||
-                      (isLoading ? 'Loading GitHub repositories...' : placeholder)}
+                      (isLoading ? 'Loading GitHub repositories...' : 'Choose GitHub repository')}
                   </Button>
                 </FormControl>
               </PopoverTrigger>

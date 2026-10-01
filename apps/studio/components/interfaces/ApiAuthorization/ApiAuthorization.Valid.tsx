@@ -47,19 +47,16 @@ function preselectOrganizationSlug({
   }
 }
 
-function useOrganizationsState(organization_slug: string | undefined, enabled = true) {
+function useOrganizationsState(organization_slug: string | undefined) {
   const {
     data: organizations,
     isPending: isLoadingOrganizations,
     isError: isErrorOrganizations,
     error: organizationsError,
-  } = useOrganizationsQuery({ enabled })
+  } = useOrganizationsQuery()
 
   const organizationsState = useMemo(
     function calculateOrganizationsState() {
-      if (!enabled) {
-        return { _tag: 'loading' as const }
-      }
       if (isLoadingOrganizations) {
         return { _tag: 'loading' as const }
       }
@@ -78,7 +75,6 @@ function useOrganizationsState(organization_slug: string | undefined, enabled = 
       return { _tag: 'success' as const, organizations }
     },
     [
-      enabled,
       isLoadingOrganizations,
       isErrorOrganizations,
       organizationsError,

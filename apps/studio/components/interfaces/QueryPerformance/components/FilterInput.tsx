@@ -7,11 +7,10 @@ import { onSearchInputEscape } from '@/lib/keyboard'
 interface FilterInputProps {
   value: string
   onChange: (value: string) => void
-  placeholder?: string
   className?: string
 }
 
-export const FilterInput = ({ value, onChange, placeholder, className }: FilterInputProps) => {
+export const FilterInput = ({ value, onChange, className }: FilterInputProps) => {
   return (
     <Input
       size="tiny"
@@ -22,7 +21,7 @@ export const FilterInput = ({ value, onChange, placeholder, className }: FilterI
       onKeyDown={onSearchInputEscape(value, onChange)}
       name="keyword"
       id="keyword"
-      placeholder={placeholder || 'Filter by query'}
+      placeholder="Filter by query"
       className={className || 'w-56'}
       actions={[
         value && (

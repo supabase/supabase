@@ -4,7 +4,6 @@ import { ArrowRight, Calendar } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
-  ButtonProps,
   Calendar as CalendarPicker,
   Popover,
   PopoverContent,
@@ -18,18 +17,12 @@ import type { DatePickerToFrom } from '@/components/interfaces/Settings/Logs/Log
 interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
   to?: string // ISO string
-  from?: string // ISO string
-  triggerButtonVariant?: ButtonProps['variant']
   triggerButtonClassName?: string
-  triggerButtonTitle?: string
   triggerButtonSize?: 'tiny' | 'small'
   contentSide?: 'bottom' | 'top'
   minDate?: Date
   maxDate?: Date
-  hideTime?: boolean
-  hideClear?: boolean
   selectsRange?: boolean
-  renderFooter?: (args: DatePickerToFrom) => ReactNode | void
   children?: ReactNode | ReactNode[] | null
 }
 
@@ -57,19 +50,13 @@ const calculateDisabledDays = (minDate?: Date, maxDate?: Date) => {
 
 export function DatePicker({
   to,
-  from,
   onChange,
-  triggerButtonVariant = 'default',
   triggerButtonClassName = '',
-  triggerButtonTitle,
   triggerButtonSize,
   contentSide = 'bottom',
   minDate,
   maxDate,
-  hideTime = false,
-  hideClear = false,
   selectsRange = true,
-  renderFooter = () => null,
   children,
 }: DatePickerProps) {
   const [open, setOpen] = useState<boolean>(false)
@@ -133,19 +120,7 @@ export function DatePicker({
   }, [minDate, maxDate, clampDateToRange])
 
   useEffect(() => {
-    if (!from) {
-      setAppliedStartDate(null)
-    } else if (from !== appliedStartDate?.toISOString()) {
-      const start = dayjs(from)
-      const startDate = start.toDate()
-      setAppliedStartDate(startDate)
-      setStartDate(startDate)
-      setStartTime({
-        HH: start.format('HH'),
-        mm: start.format('mm'),
-        ss: start.format('ss'),
-      })
-    }
+    setAppliedStartDate(null)
 
     if (!to) {
       setAppliedEndDate(null)
@@ -161,7 +136,7 @@ export function DatePicker({
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [to, from])
+  }, [to])
 
   function handleDatePickerChange(dates: Date | [from: Date | null, to: Date | null] | null) {
     if (!dates) {
@@ -216,8 +191,7 @@ export function DatePicker({
     <Popover modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          title={triggerButtonTitle}
-          variant={triggerButtonVariant}
+          variant="default"
           icon={<Calendar />}
           size={triggerButtonSize}
           className={triggerButtonClassName}
@@ -246,45 +220,41 @@ export function DatePicker({
       </PopoverTrigger>
       <PopoverContent align="center" side={contentSide} className="p-0">
         <>
-          {hideTime ? null : (
-            <>
-              <div className="flex items-stretch justify-between p-2">
-                {!selectsRange ? null : (
-                  <>
-                    <div className="flex grow flex-col gap-1">
-                      <TimeSplitInput
-                        type="start"
-                        startTime={startTime}
-                        endTime={endTime}
-                        time={startTime}
-                        setTime={setStartTime}
-                        setStartTime={setStartTime}
-                        setEndTime={setEndTime}
-                        startDate={startDate}
-                        endDate={endDate}
-                      />
-                    </div>
-                    <div className="flex items-center justify-center w-12 text-foreground-lighter">
-                      <ArrowRight strokeWidth={1.5} size={14} />
-                    </div>
-                  </>
-                )}
+          <div className="flex items-stretch justify-between p-2">
+            {!selectsRange ? null : (
+              <>
                 <div className="flex grow flex-col gap-1">
                   <TimeSplitInput
-                    type="end"
+                    type="start"
                     startTime={startTime}
                     endTime={endTime}
-                    time={endTime}
-                    setTime={setEndTime}
+                    time={startTime}
+                    setTime={setStartTime}
                     setStartTime={setStartTime}
                     setEndTime={setEndTime}
                     startDate={startDate}
                     endDate={endDate}
                   />
                 </div>
-              </div>
-            </>
-          )}
+                <div className="flex items-center justify-center w-12 text-foreground-lighter">
+                  <ArrowRight strokeWidth={1.5} size={14} />
+                </div>
+              </>
+            )}
+            <div className="flex grow flex-col gap-1">
+              <TimeSplitInput
+                type="end"
+                startTime={startTime}
+                endTime={endTime}
+                time={endTime}
+                setTime={setEndTime}
+                setStartTime={setStartTime}
+                setEndTime={setEndTime}
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </div>
+          </div>
           <div className="p-2">
             {selectsRange ? (
               <CalendarPicker
@@ -310,13 +280,9 @@ export function DatePicker({
               />
             )}
           </div>
-          {renderFooter({
-            from: startDate?.toISOString() || null,
-            to: endDate?.toISOString() || null,
-          })}
           <PopoverSeparator />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
-            {!hideClear && <Button onClick={() => handleClear()}>Clear</Button>}
+            <Button onClick={() => handleClear()}>Clear</Button>
             <Button variant="primary" onClick={() => handleSubmit()}>
               Apply
             </Button>

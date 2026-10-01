@@ -9,8 +9,6 @@ export type AddToolApprovalResponse = (args: {
 export interface MessageInfo {
   id: string
 
-  variant?: 'default' | 'warning'
-
   isLoading: boolean
   readOnly?: boolean
 

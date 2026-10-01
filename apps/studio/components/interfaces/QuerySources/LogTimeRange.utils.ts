@@ -78,13 +78,11 @@ export function logTimeRangeToDatePickerValue(range: TimeRange): DatePickerValue
 export function customDateRangeToLogTimeRange({
   from,
   to,
-  now = new Date(),
 }: {
   from: Date
   to: Date
-  now?: Date
 }): Extract<TimeRange, { _tag: 'absolute_time_range' }> {
-  const nowValue = dayjs(now)
+  const nowValue = dayjs()
   const requestedEnd = dayjs(to).endOf('day')
 
   return {

@@ -21,9 +21,6 @@ export interface ProjectBranchSelectorSheetProps {
   selectedOrganization?: Organization | null
   displayProject?: ProjectDetail | null
   selectedBranch?: Branch | null
-  selectedOrganizationName?: string | null
-  selectedProjectName?: string | null
-  selectedBranchName?: string | null
   isMainBranch?: boolean
 }
 
@@ -35,14 +32,11 @@ export function ProjectBranchSelectorSheet({
   selectedOrganization,
   displayProject,
   selectedBranch,
-  selectedOrganizationName,
-  selectedProjectName,
-  selectedBranchName,
   isMainBranch,
 }: ProjectBranchSelectorSheetProps) {
-  const orgLabel = selectedOrganizationName ?? selectedOrganization?.name
-  const projectLabel = selectedProjectName ?? displayProject?.name
-  const branchLabel = selectedBranchName ?? selectedBranch?.name ?? 'main'
+  const orgLabel = selectedOrganization?.name
+  const projectLabel = displayProject?.name
+  const branchLabel = selectedBranch?.name ?? 'main'
 
   const tabs = [
     orgLabel && {

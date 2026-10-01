@@ -13,7 +13,6 @@ export interface OrgSelectorSheetProps {
   onOpenChange: (open: boolean) => void
   onClose: () => void
   selectedOrganization?: Organization | null
-  selectedOrganizationName?: string | null
 }
 
 export function OrgSelectorSheet({
@@ -21,9 +20,8 @@ export function OrgSelectorSheet({
   onOpenChange,
   onClose,
   selectedOrganization,
-  selectedOrganizationName,
 }: OrgSelectorSheetProps) {
-  const orgLabel = selectedOrganizationName ?? selectedOrganization?.name ?? 'Select organization'
+  const orgLabel = selectedOrganization?.name ?? 'Select organization'
 
   return (
     <MobileSheetNav

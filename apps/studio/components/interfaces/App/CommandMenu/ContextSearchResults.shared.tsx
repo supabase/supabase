@@ -48,7 +48,6 @@ interface ResultsListProps {
   results: SearchResult[]
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   getIcon?: (result: SearchResult) => React.ComponentType<React.SVGProps<SVGSVGElement>>
-  onResultClick?: (result: SearchResult) => void
   getRoute?: (result: SearchResult) => `/${string}` | `http${string}`
   className?: string
   infiniteLoadingObserverRef?: (node: Element | null) => void
@@ -58,7 +57,6 @@ export function ResultsList({
   results,
   icon: Icon,
   getIcon,
-  onResultClick,
   getRoute,
   className,
   infiniteLoadingObserverRef,
@@ -81,7 +79,7 @@ export function ResultsList({
 
     return {
       ...baseCommand,
-      action: () => onResultClick?.(result),
+      action: () => {},
     } as IActionCommand
   })
 

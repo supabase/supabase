@@ -85,10 +85,9 @@ export const generateColumnField = (
     table?: string
     schema?: string
     format?: string
-    formatSchema?: string
   } = {}
 ): ColumnField => {
-  const { name, table, schema, format, formatSchema } = field
+  const { name, table, schema, format } = field
   return {
     id: uuidv4(),
     name: name || '',
@@ -96,7 +95,7 @@ export const generateColumnField = (
     schema: schema || '',
     comment: '',
     format: format || '',
-    formatSchema,
+    formatSchema: undefined,
     defaultValue: null,
     foreignKey: undefined,
     check: null,

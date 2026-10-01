@@ -24,11 +24,7 @@ import { wrapperMetaComparator } from './Wrappers.utils'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-interface WrapperTableProps {
-  isLatest?: boolean
-}
-
-export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
+export const WrapperTable = () => {
   const { id, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const integration = INTEGRATIONS.find((i) => i.id === id)
@@ -103,7 +99,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => (
+            {wrappers.map((x) => (
               <WrapperRow key={x.id} wrapper={x} isShared={isSharedWrapper(x)} />
             ))}
           </TableBody>

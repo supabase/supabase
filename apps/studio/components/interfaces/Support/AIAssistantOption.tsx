@@ -10,14 +10,9 @@ import { useTrack } from '@/lib/telemetry/track'
 interface AIAssistantOptionProps {
   projectRef?: string | null
   organizationSlug?: string | null
-  onClick?: () => void
 }
 
-export const AIAssistantOption = ({
-  projectRef,
-  organizationSlug,
-  onClick,
-}: AIAssistantOptionProps) => {
+export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
   const track = useTrack()
   const [isVisible, setIsVisible] = useState(false)
 
@@ -34,9 +29,7 @@ export const AIAssistantOption = ({
           ? undefined
           : organizationSlug,
     })
-
-    onClick?.()
-  }, [onClick, projectRef, organizationSlug, track])
+  }, [projectRef, organizationSlug, track])
 
   // If no specific project selected, use the wildcard route
   const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?sidebar=ai-assistant&slug=${organizationSlug}`
@@ -61,21 +54,11 @@ export const AIAssistantOption = ({
                 </p>
               </div>
               <div>
-                {onClick ? (
-                  <Button
-                    size="tiny"
-                    icon={<AiIconAnimation size={14} />}
-                    onClick={onAiAssistantClicked}
-                  >
+                <Link href={aiLink} onClick={onAiAssistantClicked}>
+                  <Button size="tiny" icon={<AiIconAnimation size={14} />}>
                     Ask the Assistant
                   </Button>
-                ) : (
-                  <Link href={aiLink} onClick={onAiAssistantClicked}>
-                    <Button size="tiny" icon={<AiIconAnimation size={14} />}>
-                      Ask the Assistant
-                    </Button>
-                  </Link>
-                )}
+                </Link>
               </div>
             </div>
             {/* Decorative background */}

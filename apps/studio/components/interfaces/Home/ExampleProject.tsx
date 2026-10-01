@@ -11,29 +11,20 @@ interface ExampleProjectProps {
   description: string
   url: string
   framework?: string
-  iconUrl?: string
 }
 
-export const ExampleProject = ({
-  framework,
-  title,
-  description,
-  url,
-  iconUrl,
-}: ExampleProjectProps) => {
+export const ExampleProject = ({ framework, title, description, url }: ExampleProjectProps) => {
   const { resolvedTheme } = useTheme()
   const track = useTrack()
-  const iconImgSrc = iconUrl
-    ? iconUrl
-    : !!framework
-      ? `${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
-          ['expo', 'nextjs'].includes(framework.toLowerCase())
-            ? resolvedTheme?.includes('dark')
-              ? '-dark'
-              : ''
+  const iconImgSrc = !!framework
+    ? `${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
+        ['expo', 'nextjs'].includes(framework.toLowerCase())
+          ? resolvedTheme?.includes('dark')
+            ? '-dark'
             : ''
-        }-icon.svg`
-      : ''
+          : ''
+      }-icon.svg`
+    : ''
 
   return (
     <Link

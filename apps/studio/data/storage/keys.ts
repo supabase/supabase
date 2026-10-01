@@ -41,8 +41,6 @@ export const storageKeys = {
     params: {
       limit?: number
       search?: string
-      sortColumn?: string
-      sortOrder?: string
     } = {}
   ) =>
     [

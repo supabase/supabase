@@ -148,12 +148,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     )
   }
 
-  const generateCreatePullRequestURL = (branch?: string) => {
+  const generateCreatePullRequestURL = () => {
     if (githubConnection === undefined) return 'https://github.com'
 
-    return branch !== undefined
-      ? `https://github.com/${githubConnection.repository.name}/compare/${mainBranch?.git_branch}...${branch}`
-      : `https://github.com/${githubConnection.repository.name}/compare`
+    return `https://github.com/${githubConnection.repository.name}/compare`
   }
 
   return (

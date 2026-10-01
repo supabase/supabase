@@ -54,12 +54,10 @@ function getIntegrationImage(integration: IntegrationDefinition): ThemedImage | 
 const CoverImage = ({
   image,
   alt,
-  sizes,
   className,
 }: {
   image: ThemedImage
   alt: string
-  sizes?: string
   className?: string
 }) => (
   <>
@@ -67,7 +65,6 @@ const CoverImage = ({
       fill
       src={image.dark}
       alt={alt}
-      sizes={sizes}
       className={cn('object-cover', image.light ? 'hidden dark:block' : '', className)}
     />
     {image.light && (
@@ -75,7 +72,6 @@ const CoverImage = ({
         fill
         src={image.light}
         alt={alt}
-        sizes={sizes}
         className={cn('object-cover dark:hidden', className)}
       />
     )}

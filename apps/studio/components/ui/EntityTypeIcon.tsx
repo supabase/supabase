@@ -47,24 +47,16 @@ interface EntityTypeIconProps {
     | 'query'
     | 'chat'
     | 'explorer-home'
-  size?: number
-  strokeWidth?: number
   isActive?: boolean
   sqlSource?: SqlSnippetSource
 }
 
-export const EntityTypeIcon = ({
-  type,
-  size = 15,
-  strokeWidth = 1.5,
-  isActive,
-  sqlSource,
-}: EntityTypeIconProps) => {
+export const EntityTypeIcon = ({ type, isActive, sqlSource }: EntityTypeIconProps) => {
   if (type === 'sql' && sqlSource === 'logs') {
     return (
       <LogsSnippetIcon
-        size={size}
-        strokeWidth={strokeWidth}
+        size={15}
+        strokeWidth={1.5}
         className={cn(
           'text-foreground-muted',
           'group-aria-selected:text-foreground',
@@ -78,7 +70,7 @@ export const EntityTypeIcon = ({
   if (type === 'sql') {
     return (
       <SQL_ICON
-        size={size}
+        size={15}
         className={cn(
           'transition-colors',
           'fill-foreground-muted',
@@ -86,7 +78,7 @@ export const EntityTypeIcon = ({
           'w-4 h-4',
           '-ml-0.5'
         )}
-        strokeWidth={strokeWidth}
+        strokeWidth={1.5}
       />
     )
   }
@@ -94,8 +86,8 @@ export const EntityTypeIcon = ({
   if (type === ENTITY_TYPE.TABLE) {
     return (
       <Table2
-        size={size}
-        strokeWidth={strokeWidth}
+        size={15}
+        strokeWidth={1.5}
         className={cn(
           'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
           isActive && 'text-foreground-light',
@@ -106,14 +98,14 @@ export const EntityTypeIcon = ({
   }
 
   if (type === 'schema') {
-    return <GitBranch size={size} strokeWidth={strokeWidth} />
+    return <GitBranch size={15} strokeWidth={1.5} />
   }
 
   if (type === ENTITY_TYPE.VIEW) {
     return (
       <Eye
-        size={size}
-        strokeWidth={strokeWidth}
+        size={15}
+        strokeWidth={1.5}
         className={cn(
           'text-foreground-muted group-hover:text-foreground-lighter',
           isActive && 'text-foreground-lighter',
@@ -124,15 +116,15 @@ export const EntityTypeIcon = ({
   }
 
   if (type === 'notebook') {
-    return <NotebookText size={size} strokeWidth={strokeWidth} className={''} />
+    return <NotebookText size={15} strokeWidth={1.5} className={''} />
   }
 
   if (type === 'query') {
-    return <SquareCode size={size} strokeWidth={strokeWidth} />
+    return <SquareCode size={15} strokeWidth={1.5} />
   }
 
   if (type === 'chat') {
-    return <MessageSquare size={size} strokeWidth={strokeWidth} />
+    return <MessageSquare size={15} strokeWidth={1.5} />
   }
 
   return (

@@ -1,7 +1,7 @@
 import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { mergeRefs } from 'common'
-import type { HTMLAttributes, ReactElement, ReactNode, Ref } from 'react'
+import type { ReactElement, ReactNode, Ref } from 'react'
 import {
   cloneElement,
   createContext,
@@ -27,11 +27,9 @@ import {
 type TableComponentProps = React.ComponentProps<typeof Table>
 
 interface VirtualizedTableProps<TItem> extends TableComponentProps {
-  scrollContainerProps?: HTMLAttributes<HTMLDivElement>
   scrollContainerRef: React.Ref<HTMLDivElement>
   data: TItem[]
   children: ReactNode
-  overscan?: number
   estimateSize: (index: number) => number
   getItemKey?: (item: TItem, index: number) => string
 }
@@ -56,12 +54,10 @@ const useVirtualizedTableContext = <TItem,>() => {
 }
 
 export const VirtualizedTable = <TItem,>({
-  scrollContainerProps,
   scrollContainerRef: externalScrollContainerRef,
   containerProps,
   data,
   children,
-  overscan = 5,
   estimateSize,
   getItemKey,
   ...tableProps
@@ -87,7 +83,7 @@ export const VirtualizedTable = <TItem,>({
   const virtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
     count: data.length,
     getScrollElement: () => scrollContainerRef.current,
-    overscan,
+    overscan: 5,
     estimateSize,
     getItemKey: getItemKeyFromIndex,
   })
@@ -119,14 +115,8 @@ export const VirtualizedTable = <TItem,>({
     [containerProps]
   )
 
-  const { className: scrollClassName, ...restScrollContainerProps } = scrollContainerProps ?? {}
-
   return (
-    <div
-      ref={scrollContainerMergedRef}
-      className={cn('h-full overflow-auto', scrollClassName)}
-      {...restScrollContainerProps}
-    >
+    <div ref={scrollContainerMergedRef} className="h-full overflow-auto">
       <VirtualizedTableContext.Provider
         value={contextValue as VirtualizedTableContextValue<unknown>}
       >
@@ -143,20 +133,16 @@ interface VirtualizedTableBodyProps<TItem> extends Omit<
   'children'
 > {
   emptyContent?: ReactNode
-  leadingContent?: ReactNode
   trailingContent?: ReactNode
   children: (item: TItem, index: number) => ReactElement
   paddingColSpan?: number
-  paddingCellClassName?: string
 }
 
 export const VirtualizedTableBody = <TItem,>({
   emptyContent,
-  leadingContent,
   trailingContent,
   children,
   paddingColSpan = 1,
-  paddingCellClassName,
   ...props
 }: VirtualizedTableBodyProps<TItem>) => {
   const { virtualizer, virtualItems, data, paddingTop, paddingBottom, getRowKey } =
@@ -166,17 +152,13 @@ export const VirtualizedTableBody = <TItem,>({
 
   return (
     <TableBody {...props}>
-      {leadingContent}
       {data.length === 0 ? (
         (emptyContent ?? null)
       ) : (
         <>
           {paddingTop > 0 && (
             <TableRow aria-hidden="true" style={{ height: paddingTop }}>
-              <VirtualizedTableCell
-                colSpan={paddingColSpan}
-                className={cn('p-0', paddingCellClassName)}
-              />
+              <VirtualizedTableCell colSpan={paddingColSpan} className="p-0" />
             </TableRow>
           )}
           {virtualItems.map((virtualItem) => {
@@ -213,10 +195,7 @@ export const VirtualizedTableBody = <TItem,>({
           })}
           {paddingBottom > 0 && (
             <TableRow aria-hidden="true" style={{ height: paddingBottom }}>
-              <VirtualizedTableCell
-                colSpan={paddingColSpan}
-                className={cn('p-0', paddingCellClassName)}
-              />
+              <VirtualizedTableCell colSpan={paddingColSpan} className="p-0" />
             </TableRow>
           )}
         </>

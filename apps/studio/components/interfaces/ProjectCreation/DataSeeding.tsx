@@ -7,13 +7,12 @@ import Panel from '@/components/ui/Panel'
 
 interface DataSeedingProps {
   form: UseFormReturn<CreateProjectForm>
-  layout?: 'vertical' | 'horizontal'
 }
 
-export const DataSeeding = ({ form, layout = 'horizontal' }: DataSeedingProps) => {
+export const DataSeeding = ({ form }: DataSeedingProps) => {
   return (
     <Panel.Content className="pb-8">
-      <FormItemLayout layout={layout} label="Data seeding" isReactForm={false}>
+      <FormItemLayout layout="horizontal" label="Data seeding" isReactForm={false}>
         <div className="flex flex-col gap-4">
           <FormField
             name="shouldRunMigrations"

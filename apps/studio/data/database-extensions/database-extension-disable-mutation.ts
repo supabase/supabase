@@ -11,19 +11,17 @@ export type DatabaseExtensionDisableVariables = {
   projectRef: string
   connectionString?: string | null
   id: string
-  cascade?: boolean
 }
 
 export async function disableDatabaseExtension({
   projectRef,
   connectionString,
   id,
-  cascade,
 }: DatabaseExtensionDisableVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { sql } = pgMeta.extensions.remove(id, { cascade })
+  const { sql } = pgMeta.extensions.remove(id)
   const { result } = await executeSql({
     projectRef,
     connectionString,

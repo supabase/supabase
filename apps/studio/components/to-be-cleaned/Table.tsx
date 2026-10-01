@@ -5,28 +5,16 @@ interface TableProps {
   head?: ReactNode
   className?: string
   containerClassName?: string
-  borderless?: boolean
   headTrClasses?: string
-  bodyClassName?: string
   style?: React.StyleHTMLAttributes<HTMLTableElement>
 }
 
 /**
  * @deprecated Use `Table` from `ui` instead
  */
-function Table({
-  body,
-  head,
-  className,
-  containerClassName,
-  borderless,
-  headTrClasses,
-  bodyClassName,
-  style,
-}: TableProps) {
+function Table({ body, head, className, containerClassName, headTrClasses, style }: TableProps) {
   let containerClasses = ['table-container']
   if (containerClassName) containerClasses.push(containerClassName)
-  if (borderless) containerClasses.push('table-container--borderless')
 
   let classes = ['table']
   if (className) classes.push(className)
@@ -37,7 +25,7 @@ function Table({
         <thead>
           <tr className={headTrClasses}>{head}</tr>
         </thead>
-        <tbody className={bodyClassName}>{body}</tbody>
+        <tbody>{body}</tbody>
       </table>
     </div>
   )

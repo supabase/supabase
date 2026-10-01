@@ -13,7 +13,6 @@ type UsePgGraphqlIntrospectionStatusArgs = {
   projectRef: string | undefined
   connectionString: string | null | undefined
   schema: string
-  enabled?: boolean
 }
 
 /**
@@ -36,14 +35,12 @@ export const usePgGraphqlIntrospectionStatus = ({
   projectRef,
   connectionString,
   schema,
-  enabled = true,
 }: UsePgGraphqlIntrospectionStatusArgs): PgGraphqlIntrospectionStatus => {
   const { data: pgGraphqlVersion, isLoading: isVersionLoading } = useDatabaseExtensionsQuery<
     string | null
   >(
     { projectRef, connectionString },
     {
-      enabled,
       select: (extensions) =>
         extensions.find((ext) => ext.name === PG_GRAPHQL_EXTENSION_NAME)?.installed_version ?? null,
     }
@@ -60,7 +57,7 @@ export const usePgGraphqlIntrospectionStatus = ({
     isError: isCommentError,
   } = useSchemaCommentQuery(
     { projectRef, connectionString, schema },
-    { enabled: enabled && versionRequiresOptIn }
+    { enabled: versionRequiresOptIn }
   )
 
   const notice = useMemo<IntrospectionNotice>(() => {

@@ -77,8 +77,6 @@ export const EdgeFunctionRenderer = ({
     approveDeploy()
   }
 
-  const isConfirming = confirmState !== undefined
-
   return (
     <Confirm
       className="my-4"
@@ -99,14 +97,12 @@ export const EdgeFunctionRenderer = ({
         label={label}
         code={code}
         functionName={functionName}
-        disabled={isConfirming}
         isDeploying={isDeploying}
         isDeployed={initialIsDeployed}
         errorText={errorText}
         functionUrl={functionUrl}
         deploymentDetailsUrl={deploymentDetailsUrl}
         downloadCommand={downloadCommand}
-        hideDeployButton={isConfirming || initialIsDeployed}
         showReplaceWarning={showReplaceWarning}
         onCancelReplace={() => setShowReplaceWarning(false)}
         onConfirmReplace={approveDeploy}

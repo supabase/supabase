@@ -7,7 +7,7 @@ import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/C
 import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
+export function useProjectLevelTableEditorCommands() {
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
@@ -22,9 +22,8 @@ export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
       },
     ],
     {
-      ...options,
       deps: [ref],
-      enabled: (options?.enabled ?? true) && !!project,
+      enabled: !!project,
       orderSection: orderCommandSectionsByPriority,
       sectionMeta: { priority: 3 },
     }

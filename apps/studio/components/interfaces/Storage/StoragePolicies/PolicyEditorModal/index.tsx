@@ -55,7 +55,6 @@ interface PolicyEditorModalProps {
   schema?: string
   table?: string
   selectedPolicyToEdit?: PGPolicy
-  showAssistantPreview?: boolean
   onSelectCancel: () => void
   onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
   onUpdatePolicy: (payload: PostgresPolicyUpdatePayload) => Promise<boolean>
@@ -67,7 +66,6 @@ export const PolicyEditorModal = ({
   schema = '',
   table = '',
   selectedPolicyToEdit,
-  showAssistantPreview = false,
   onSelectCancel = noop,
   onCreatePolicy,
   onUpdatePolicy,
@@ -212,7 +210,7 @@ export const PolicyEditorModal = ({
               isNewPolicy={isNewPolicy}
               schema={schema}
               table={table}
-              showAssistantPreview={showAssistantPreview}
+              showAssistantPreview={false}
               onSelectBackFromTemplates={onSelectBackFromTemplates}
               onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
             />
@@ -225,7 +223,7 @@ export const PolicyEditorModal = ({
               description="Write rules with PostgreSQL's policies to fit your unique business needs."
               onViewTemplates={onViewTemplates}
               onViewEditor={onViewEditor}
-              showAssistantPreview={showAssistantPreview}
+              showAssistantPreview={false}
               onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
             />
           ) : view === POLICY_MODAL_VIEWS.EDITOR ? (

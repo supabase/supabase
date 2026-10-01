@@ -24,11 +24,10 @@ import { DOCS_URL } from '@/lib/constants'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
-  layout?: 'vertical' | 'horizontal'
   surface: 'main' | 'vercel'
 }
 
-export const SecurityOptions = ({ form, layout = 'horizontal', surface }: SecurityOptionsProps) => {
+export const SecurityOptions = ({ form, surface }: SecurityOptionsProps) => {
   const { slug } = useParams()
   const dataApi = useWatch({ control: form.control, name: 'dataApi' })
   const dataApiDefaultPrivileges = useWatch({
@@ -54,7 +53,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
 
   return (
     <Panel.Content className="pb-8">
-      <FormItemLayout layout={layout} label="Security" isReactForm={false}>
+      <FormItemLayout layout="horizontal" label="Security" isReactForm={false}>
         <div className="flex flex-col gap-4">
           <FormField
             name="dataApi"

@@ -19,11 +19,10 @@ export type UtilityTabResultsProps = {
   isDisabled?: boolean
   onDebug: () => void
   buildDebugPrompt: () => string
-  isDebugging?: boolean
 }
 
 export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
-  ({ id, isExecuting, isDisabled, isDebugging, onDebug, buildDebugPrompt }) => {
+  ({ id, isExecuting, isDisabled, onDebug, buildDebugPrompt }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const sessionSnap = useSqlEditorSessionSnapshot()
@@ -149,8 +148,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
                 buildPrompt={buildDebugPrompt}
                 onOpenAssistant={onDebug}
                 telemetrySource="sql_debug"
-                disabled={!!isDisabled || isDebugging}
-                loading={isDebugging}
+                disabled={!!isDisabled}
               />
             </div>
           </div>

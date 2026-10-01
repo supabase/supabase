@@ -6,22 +6,18 @@ import { invalidateRolesQuery } from './database-roles-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-type DropRoleBody = Parameters<typeof pgMeta.roles.remove>[1]
-
 export type DatabaseRoleDeleteVariables = {
   projectRef: string
   connectionString?: string | null
   id: number
-  payload?: DropRoleBody
 }
 
 export async function deleteDatabaseRole({
   projectRef,
   connectionString,
   id,
-  payload,
 }: DatabaseRoleDeleteVariables) {
-  const sql = pgMeta.roles.remove({ id }, payload).sql
+  const sql = pgMeta.roles.remove({ id }).sql
   const { result } = await executeSql({
     projectRef,
     connectionString,

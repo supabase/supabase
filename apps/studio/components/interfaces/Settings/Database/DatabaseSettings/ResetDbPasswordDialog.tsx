@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import type { ChangeEvent, ComponentProps, ReactNode } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -30,19 +30,15 @@ import { generateStrongPassword } from '@/lib/project'
 export type ResetDbPasswordDialogProps = {
   disabled?: boolean
   onPasswordReset?: (password: string) => void
-  triggerClassName?: string
   triggerIcon?: ReactNode
   triggerLabel?: string
-  triggerVariant?: ComponentProps<typeof ButtonTooltip>['variant']
 }
 
 export const ResetDbPasswordDialog = ({
   disabled = false,
   onPasswordReset,
-  triggerClassName,
   triggerIcon,
   triggerLabel = 'Reset password',
-  triggerVariant = 'default',
 }: ResetDbPasswordDialogProps) => {
   const { ref } = useParams()
   const isProjectActive = useIsProjectActive()
@@ -132,8 +128,7 @@ export const ResetDbPasswordDialog = ({
     <Dialog open={showResetDbPass} onOpenChange={(open) => setShowResetDbPass(open)}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          variant={triggerVariant}
-          className={triggerClassName}
+          variant="default"
           icon={triggerIcon}
           disabled={!canResetDbPassword || !isProjectActive || disabled}
           tooltip={{

@@ -254,7 +254,7 @@ function snippetValue(snippet: SnippetWithContent) {
 
 const QUERY_TABLE_PAGE_NAME = 'Query a table'
 
-export function useQueryTableCommands(options?: CommandOptions) {
+export function useQueryTableCommands() {
   const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
@@ -292,7 +292,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
         action: () => setPage(QUERY_TABLE_PAGE_NAME),
       },
     ],
-    { ...options, enabled: (options?.enabled ?? true) && !!project }
+    { enabled: !!project }
   )
 }
 

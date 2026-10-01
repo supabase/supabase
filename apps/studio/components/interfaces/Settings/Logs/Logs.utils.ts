@@ -142,13 +142,8 @@ export const buildWhereClauses = (
     .filter((s) => s !== null)
 }
 
-export const genWhereStatement = (
-  table: LogsTableName,
-  filters: Filters,
-  filterTemplates?: Record<string, SqlFilterEntry>,
-  resolveUnknownClause?: (dotKey: string, value: unknown) => SafeLogSqlFragment | null
-): SafeLogSqlFragment => {
-  const clauses = buildWhereClauses(table, filters, filterTemplates, resolveUnknownClause)
+export const genWhereStatement = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
+  const clauses = buildWhereClauses(table, filters)
   return clauses.length > 0 ? safeSql`where ${joinSqlFragments(clauses, ' and ')}` : safeSql``
 }
 

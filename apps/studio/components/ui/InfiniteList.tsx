@@ -22,13 +22,8 @@ import { cn, Skeleton } from 'ui'
 // any here is intentional to allow for generic components and does not affect
 // type safety of the wrapped component
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const typedMemo = <Component extends (props: any) => ReactNode>(
-  component: Component,
-  propsAreEqual?: (
-    prevProps: Readonly<Parameters<Component>[0]>,
-    nextProps: Readonly<Parameters<Component>[0]>
-  ) => boolean
-) => memo(component, propsAreEqual) as unknown as Component & { displayName?: string }
+const typedMemo = <Component extends (props: any) => ReactNode>(component: Component) =>
+  memo(component) as unknown as Component & { displayName?: string }
 
 const createStyleObject = ({ size, start }: { size: number; start: number }): CSSProperties => ({
   position: 'absolute',

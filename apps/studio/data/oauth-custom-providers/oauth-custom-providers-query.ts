@@ -10,7 +10,6 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OAuthCustomProvidersVariables = {
   projectRef: string | undefined
-  page?: number
 }
 
 export async function getOAuthCustomProviders({

@@ -6,15 +6,11 @@ const DEFAULT_MAX_ATTEMPTS = 60
 export async function pollUntilBucketEmpty({
   projectRef,
   bucketId,
-  intervalMs = DEFAULT_INTERVAL_MS,
-  maxAttempts = DEFAULT_MAX_ATTEMPTS,
 }: {
   projectRef: string
   bucketId: string
-  intervalMs?: number
-  maxAttempts?: number
 }): Promise<void> {
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+  for (let attempt = 0; attempt < DEFAULT_MAX_ATTEMPTS; attempt++) {
     const objects = await listBucketObjects({
       projectRef,
       bucketId,
@@ -28,7 +24,7 @@ export async function pollUntilBucketEmpty({
       return
     }
 
-    await new Promise((resolve) => setTimeout(resolve, intervalMs))
+    await new Promise((resolve) => setTimeout(resolve, DEFAULT_INTERVAL_MS))
   }
 
   throw new Error('Failed to empty bucket. Please try again in a few minutes.')

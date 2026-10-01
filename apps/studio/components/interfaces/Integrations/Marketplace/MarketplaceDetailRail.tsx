@@ -9,15 +9,13 @@ interface RailRowProps {
   label?: string
   value: ReactNode
   href?: string
-  mono?: boolean
   icon?: ReactNode
 }
 
-const RailRow = ({ label, value, href, mono, icon }: RailRowProps) => {
+const RailRow = ({ label, value, href, icon }: RailRowProps) => {
   const valueCls = cn(
     'flex items-center gap-1 text-sm',
-    href ? 'text-foreground-lighter hover:text-foreground' : 'text-foreground',
-    mono && 'font-mono'
+    href ? 'text-foreground-lighter hover:text-foreground' : 'text-foreground'
   )
   const content = (
     <>

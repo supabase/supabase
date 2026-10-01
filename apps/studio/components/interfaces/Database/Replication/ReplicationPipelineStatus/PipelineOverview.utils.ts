@@ -42,8 +42,8 @@ export interface PipelineStateNotice {
   showLogsLink: boolean
 }
 
-const plural = (count: number, singular: string, pluralForm = `${singular}s`) =>
-  `${count} ${count === 1 ? singular : pluralForm}`
+const plural = (count: number, singular: string) =>
+  `${count} ${count === 1 ? singular : `${singular}s`}`
 
 export const getInitialSyncSummary = ({
   copyingCount,

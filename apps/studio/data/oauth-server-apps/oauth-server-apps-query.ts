@@ -10,7 +10,6 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OAuthServerAppsVariables = {
   projectRef: string | undefined
-  page?: number
 }
 
 const APPS_PER_PAGE = 100
@@ -20,7 +19,6 @@ export type OAuthApp = components['schemas']['OAuthAppResponse_Output']
 export async function getOAuthServerApps({
   projectRef,
   clientEndpoint,
-  page = 1,
 }: OAuthServerAppsVariables & { clientEndpoint: string | undefined }) {
   if (!projectRef) throw new Error('Project reference is required')
   if (!clientEndpoint) throw new Error('Client endpoint is required')
@@ -28,7 +26,7 @@ export async function getOAuthServerApps({
   const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
 
   const { data, error } = await supabaseClient.auth.admin.oauth.listClients({
-    page,
+    page: 1,
     perPage: APPS_PER_PAGE,
   })
 

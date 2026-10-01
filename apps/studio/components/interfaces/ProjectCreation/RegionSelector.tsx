@@ -50,7 +50,6 @@ interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
   hasSelectedOrganization: boolean
   instanceSize?: DesiredInstanceSize
-  layout?: 'vertical' | 'horizontal'
   showBestAvailableRegionOption: boolean
   isBestAvailableSelected: boolean
   onBestAvailableSelectedChange: (value: boolean) => void
@@ -80,7 +79,6 @@ export const RegionSelector = ({
   form,
   hasSelectedOrganization,
   instanceSize,
-  layout = 'horizontal',
   showBestAvailableRegionOption,
   isBestAvailableSelected,
   onBestAvailableSelectedChange,
@@ -253,7 +251,7 @@ export const RegionSelector = ({
             <>
               <FormItemLayout
                 id="region"
-                layout={layout}
+                layout="horizontal"
                 label="Region"
                 description={
                   restrictHighAvailabilityRegion ? (

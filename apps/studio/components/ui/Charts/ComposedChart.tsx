@@ -3,7 +3,6 @@ import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   Bar,
-  CartesianGrid,
   Customized,
   Label,
   Line,
@@ -14,7 +13,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 
 import { ChartHeader } from './ChartHeader'
@@ -54,13 +52,8 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
   xAxisKey: string
   displayDateInUtc?: boolean
-  onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
-  emptyStateMessage?: string
   showLegend?: boolean
-  xAxisIsDate?: boolean
-  XAxisProps?: ComponentProps<typeof XAxis>
   YAxisProps?: ComponentProps<typeof YAxis>
-  showGrid?: boolean
   showTooltip?: boolean
   showTotal?: boolean
   showMaxValue?: boolean
@@ -70,10 +63,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   onChartStyleChange?: (style: string) => void
   updateDateRange: any
   titleTooltip?: string
-  hideYAxis?: boolean
   hideHighlightedValue?: boolean
-  hideHighlightedLabel?: boolean
-  hideHighlightArea?: boolean
   syncId?: string
   docsUrl?: string
   sql?: string
@@ -114,13 +104,8 @@ export function ComposedChart({
   valuePrecision,
   className = '',
   size = 'normal',
-  emptyStateMessage,
-  onBarClick,
   showLegend = false,
-  xAxisIsDate = true,
-  XAxisProps,
   YAxisProps,
-  showGrid = false,
   showTooltip = false,
   showTotal = true,
   showMaxValue = false,
@@ -129,10 +114,7 @@ export function ComposedChart({
   chartStyle,
   onChartStyleChange,
   updateDateRange,
-  hideYAxis,
   hideHighlightedValue,
-  hideHighlightedLabel = false,
-  hideHighlightArea = false,
   syncId,
   docsUrl,
   sql,
@@ -178,7 +160,7 @@ export function ComposedChart({
     return formatChartDate(ts)
   }
 
-  const _XAxisProps = XAxisProps || {
+  const _XAxisProps = {
     interval: data.length - 2,
     angle: 0,
     tick: false,
@@ -200,10 +182,6 @@ export function ComposedChart({
   }, [_YAxisProps.padding, chartStyle, normalizeVisibleStackToPercent])
 
   function getHeaderLabel() {
-    if (!xAxisIsDate) {
-      if (!focusDataIndex) return highlightedLabel
-      return data[focusDataIndex]?.[xAxisKey]
-    }
     return (
       (focusDataIndex !== null &&
         data &&
@@ -420,7 +398,6 @@ export function ComposedChart({
     return (
       <NoDataPlaceholder
         hideTotalPlaceholder={highlightedValue === undefined}
-        message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
@@ -439,8 +416,6 @@ export function ComposedChart({
         title={title}
         showNewBadge={showNewBadge}
         format={format}
-        hideHighlightedLabel={hideHighlightedLabel}
-        hideHighlightArea={hideHighlightArea}
         titleTooltip={titleTooltip}
         customDateFormat={customDateFormat}
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
@@ -456,7 +431,6 @@ export function ComposedChart({
         data={data}
         xAxisKey={xAxisKey}
         yAxisKey={yAxisKey}
-        xAxisIsDate={xAxisIsDate}
         displayDateInUtc={displayDateInUtc}
         valuePrecision={valuePrecision}
         shouldFormatBytes={shouldFormatBytes}
@@ -517,15 +491,9 @@ export function ComposedChart({
 
             clearHover()
           }}
-          onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
-          }}
         >
-          {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
           <YAxis
             {..._YAxisProps}
-            hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
             domain={_YAxisProps.domain ?? yAxisDomain}
@@ -710,12 +678,8 @@ export function ComposedChart({
           className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"
           style={{ marginLeft: YAxisProps?.width }}
         >
-          <span>{xAxisIsDate ? formatTimestamp(data[0]?.[xAxisKey]) : data[0]?.[xAxisKey]}</span>
-          <span>
-            {xAxisIsDate
-              ? formatTimestamp(data[data.length - 1]?.[xAxisKey])
-              : data[data.length - 1]?.[xAxisKey]}
-          </span>
+          <span>{formatTimestamp(data[0]?.[xAxisKey])}</span>
+          <span>{formatTimestamp(data[data.length - 1]?.[xAxisKey])}</span>
         </div>
       )}
       {showLegend && (

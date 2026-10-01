@@ -152,13 +152,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
 
 export default LogSelection
 
-function LogDetailEmptyState({
-  title = 'Select an Event',
-  message = 'Select an Event to view the complete JSON payload',
-}: {
-  title?: string
-  message?: string
-}) {
+function LogDetailEmptyState() {
   return (
     <div
       className={cn(
@@ -177,8 +171,10 @@ function LogDetailEmptyState({
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          <h3 className="text-sm text-foreground">{title}</h3>
-          <p className="text-xs text-foreground-lighter">{message}</p>
+          <h3 className="text-sm text-foreground">Select an Event</h3>
+          <p className="text-xs text-foreground-lighter">
+            Select an Event to view the complete JSON payload
+          </p>
         </div>
       </div>
     </div>

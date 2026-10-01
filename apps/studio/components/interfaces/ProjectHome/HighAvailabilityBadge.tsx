@@ -5,11 +5,7 @@ import { cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui
 import { ServerLightGrid } from './ServerLightGrid'
 import { DOCS_URL } from '@/lib/constants'
 
-interface HighAvailabilityBadgeProps {
-  size?: 'default' | 'small'
-}
-
-export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadgeProps) {
+export function HighAvailabilityBadge() {
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
@@ -22,7 +18,7 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
             'bg-purple-400 text-purple-1100 dark:bg-purple-100'
           )}
         >
-          {size === 'small' ? 'HA' : 'High Availability'}
+          High Availability
           <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-white/35 to-transparent blur-md" />
         </div>
       </HoverCardTrigger>

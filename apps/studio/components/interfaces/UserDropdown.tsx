@@ -31,13 +31,7 @@ import { useProfileNameAndPicture } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
-export function UserDropdown({
-  triggerClassName,
-  contentClassName,
-}: {
-  triggerClassName?: string
-  contentClassName?: string
-}) {
+export function UserDropdown({ triggerClassName }: { triggerClassName?: string }) {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
@@ -81,7 +75,7 @@ export function UserDropdown({
         </ButtonTooltip>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
+      <DropdownMenuContent side="bottom" align="end">
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">

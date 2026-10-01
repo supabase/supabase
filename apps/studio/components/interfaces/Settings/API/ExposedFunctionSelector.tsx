@@ -26,7 +26,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
 
 interface ExposedFunctionSelectorProps {
-  disabled?: boolean
   selectedSchemas: string[]
   pendingAddFunctionNames: string[]
   pendingRemoveFunctionNames: string[]
@@ -35,7 +34,6 @@ interface ExposedFunctionSelectorProps {
 }
 
 export const ExposedFunctionSelector = ({
-  disabled = false,
   selectedSchemas,
   pendingAddFunctionNames,
   pendingRemoveFunctionNames,
@@ -100,7 +98,6 @@ export const ExposedFunctionSelector = ({
       <PopoverTrigger asChild>
         <Button
           size="small"
-          disabled={disabled}
           className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >

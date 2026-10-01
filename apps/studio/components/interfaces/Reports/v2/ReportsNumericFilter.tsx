@@ -43,7 +43,6 @@ interface ReportsNumericFilterProps {
   placeholder?: string
   min?: number
   max?: number
-  step?: number
   isLoading?: boolean
   className?: string
 }
@@ -57,7 +56,6 @@ export const ReportsNumericFilter = ({
   placeholder = 'Enter value',
   min,
   max,
-  step = 1,
   isLoading = false,
   className,
 }: ReportsNumericFilterProps) => {
@@ -169,7 +167,7 @@ export const ReportsNumericFilter = ({
               onChange={(e) => handleValueChange(e.target.value)}
               min={min}
               max={max}
-              step={step}
+              step={1}
             />
             {(min !== undefined || max !== undefined) && (
               <p className="text-xs text-foreground-light">

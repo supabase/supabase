@@ -47,7 +47,6 @@ export function getGridColumns(
   options?: {
     tableId?: number
     editable?: boolean
-    defaultWidth?: string | number
     onAddColumn?: () => void
     onExpandJSONEditor: (column: string, row: SupaRow) => void
     onExpandTextEditor: (column: string, row: SupaRow) => void
@@ -58,11 +57,8 @@ export function getGridColumns(
     const columnDefaultWidth = getColumnDefaultWidth(x)
     const columnWidthBasedOnName =
       (x.name.length + x.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
-    const columnWidth = options?.defaultWidth
-      ? options.defaultWidth
-      : columnDefaultWidth < columnWidthBasedOnName
-        ? columnWidthBasedOnName
-        : columnDefaultWidth
+    const columnWidth =
+      columnDefaultWidth < columnWidthBasedOnName ? columnWidthBasedOnName : columnDefaultWidth
 
     const columnDefinition: CalculatedColumn<SupaRow> = {
       key: x.name,

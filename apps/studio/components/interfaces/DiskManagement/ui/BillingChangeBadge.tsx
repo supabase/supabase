@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipTrigger } from 'ui'
 
 import { formatCurrency } from '@/lib/helpers'
 
@@ -8,7 +8,6 @@ interface BillingChangeBadgeProps {
   beforePrice?: number
   afterPrice?: number
   show: boolean | undefined
-  tooltip?: string
   className?: string
   free?: boolean
 }
@@ -17,7 +16,6 @@ export const BillingChangeBadge = ({
   beforePrice,
   afterPrice,
   show,
-  tooltip,
   className,
   free,
 }: BillingChangeBadgeProps) => {
@@ -59,7 +57,6 @@ export const BillingChangeBadge = ({
                   </motion.span>
                 </div>
               </TooltipTrigger>
-              {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
             </Tooltip>
           </Badge>
         </motion.div>

@@ -58,10 +58,11 @@ export async function getExposedFunctions(
 export type ExposedFunctionsData = Awaited<ReturnType<typeof getExposedFunctions>>
 export type ExposedFunctionsError = ResponseError
 
-export const exposedFunctionsInfiniteQueryOptions = (
-  { projectRef, connectionString, search }: ExposedFunctionsVariables,
-  { enabled = true }: { enabled?: boolean } = {}
-) => {
+export const exposedFunctionsInfiniteQueryOptions = ({
+  projectRef,
+  connectionString,
+  search,
+}: ExposedFunctionsVariables) => {
   return infiniteQueryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: privilegeKeys.exposedFunctionsInfinite(projectRef, search),
@@ -75,7 +76,7 @@ export const exposedFunctionsInfiniteQueryOptions = (
         },
         signal
       ),
-    enabled: enabled && typeof projectRef !== 'undefined',
+    enabled: typeof projectRef !== 'undefined',
     initialPageParam: 0,
     getNextPageParam(lastPage, pages) {
       const page = pages.length

@@ -9,7 +9,6 @@ import { BASE_PATH } from '@/lib/constants'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
-  disabled?: boolean
   status?: 'ADD' | 'UPDATE' | 'REMOVE'
   layout?: 'vertical' | 'horizontal'
   closePanel: () => void
@@ -20,7 +19,6 @@ interface ForeignKeyProps {
 
 export const ForeignKeyRow = ({
   foreignKey,
-  disabled = false,
   status,
   layout = 'horizontal',
   closePanel: _closePanel,
@@ -102,16 +100,14 @@ export const ForeignKeyRow = ({
           ))}
         </div>
       </div>
-      {!disabled && (
-        <div className="flex items-center gap-x-2">
-          <Button onClick={onSelectEdit}>Edit</Button>
-          {foreignKey.toRemove ? (
-            <Button onClick={onSelectUndoRemove}>Cancel remove</Button>
-          ) : (
-            <Button onClick={onSelectRemove}>Remove</Button>
-          )}
-        </div>
-      )}
+      <div className="flex items-center gap-x-2">
+        <Button onClick={onSelectEdit}>Edit</Button>
+        {foreignKey.toRemove ? (
+          <Button onClick={onSelectUndoRemove}>Cancel remove</Button>
+        ) : (
+          <Button onClick={onSelectRemove}>Remove</Button>
+        )}
+      </div>
     </div>
   )
 }

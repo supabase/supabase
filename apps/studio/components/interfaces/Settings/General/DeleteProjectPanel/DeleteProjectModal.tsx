@@ -10,33 +10,23 @@ import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout
 import { InlineLink } from '@/components/ui/InlineLink'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useSendDowngradeFeedbackMutation } from '@/data/feedback/exit-survey-send'
-import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDeleteMutation } from '@/data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import type { Organization } from '@/types'
 
 export const DeleteProjectModal = ({
   visible,
   onClose,
-  project: projectProp,
-  organization: organizationProp,
 }: {
   visible: boolean
   onClose: () => void
-  project?: OrgProject
-  organization?: Organization
 }) => {
   const router = useRouter()
-  const { data: projectFromQuery } = useSelectedProjectQuery()
-  const { data: organizationFromQuery } = useSelectedOrganizationQuery()
-
-  // Use props if provided, otherwise fall back to hooks
-  const project = projectProp || projectFromQuery
-  const organization = organizationProp || organizationFromQuery
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 

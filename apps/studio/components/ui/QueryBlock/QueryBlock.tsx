@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { Code, Play } from 'lucide-react'
-import { DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
 import { Badge, Button, ChartContainer, ChartTooltipContent, cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -45,7 +45,6 @@ export interface QueryBlockProps {
   errorText?: string
   isExecuting?: boolean
   initialHideSql?: boolean
-  draggable?: boolean
   disabled?: boolean
   blockWriteQueries?: boolean
   /** Render the chart tooltip in a portal so it isn't clipped by overflow-hidden ancestors (e.g. report cards). */
@@ -54,7 +53,6 @@ export interface QueryBlockProps {
   onExecute?: (queryType: 'select' | 'mutation') => void
   onRemoveChart?: () => void
   onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
-  onDragStart?: (e: DragEvent<Element>) => void
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -70,7 +68,6 @@ export const QueryBlock = ({
   isWriteQuery = false,
   isExecuting = false,
   initialHideSql = false,
-  draggable = false,
   disabled = false,
   blockWriteQueries = false,
   portalTooltip = false,
@@ -78,7 +75,6 @@ export const QueryBlock = ({
   onExecute,
   onRemoveChart,
   onUpdateChartConfig,
-  onDragStart,
 }: QueryBlockProps) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
@@ -157,9 +153,6 @@ export const QueryBlock = ({
 
   return (
     <ReportBlockContainer
-      draggable={draggable}
-      showDragHandle={draggable}
-      onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
       loading={isExecuting}
       label={label}
       badge={isWriteQuery && <Badge variant="warning">Write</Badge>}

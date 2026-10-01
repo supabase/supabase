@@ -15,10 +15,9 @@ export interface OverviewTable<T> {
   columns: OverviewTableColumn<T>[]
   data: T[]
   isLoading?: boolean
-  emptyMessage?: string
 }
 
-export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: OverviewTable<T>) {
+export function OverviewTable<T>({ columns, data, isLoading }: OverviewTable<T>) {
   const hasData = !isLoading && data.length > 0
 
   return (
@@ -47,11 +46,7 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
           <TableRow className="[&>td]:hover:bg-transparent">
             <TableCell colSpan={columns.length} className="text-center text-foreground-light">
               <div className="p-2 pt-0">
-                <NoDataPlaceholder
-                  size="normal"
-                  message={emptyMessage || 'No data available'}
-                  isFullHeight
-                />
+                <NoDataPlaceholder size="normal" message="No data available" isFullHeight />
               </div>
             </TableCell>
           </TableRow>

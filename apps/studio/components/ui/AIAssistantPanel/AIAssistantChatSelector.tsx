@@ -23,12 +23,10 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface AIAssistantChatSelectorProps {
-  disabled?: boolean
   shortcutsEnabled?: boolean
 }
 
 export const AIAssistantChatSelector = ({
-  disabled = false,
   shortcutsEnabled = true,
 }: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
@@ -122,7 +120,6 @@ export const AIAssistantChatSelector = ({
                     onSelect={() => handleSelectChat(id)}
                     className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden group"
                     keywords={!!chat.name ? [chat.name] : undefined}
-                    disabled={disabled}
                   >
                     <div className="flex items-center w-full flex-1 min-w-0">
                       {editingChatId === id ? (
@@ -216,7 +213,6 @@ export const AIAssistantChatSelector = ({
                   snap.newChat()
                   setChatSelectorOpen(false)
                 }}
-                disabled={disabled}
               >
                 <Plus size={14} strokeWidth={1.5} />
                 <span>Start a new chat</span>

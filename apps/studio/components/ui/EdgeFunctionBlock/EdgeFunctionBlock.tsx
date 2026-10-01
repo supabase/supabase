@@ -1,6 +1,5 @@
 import { Code } from 'lucide-react'
 import Link from 'next/link'
-import type { DragEvent, ReactNode } from 'react'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
@@ -14,20 +13,8 @@ interface EdgeFunctionBlockProps {
   code: string
   /** Function name/slug */
   functionName: string
-  /** Any other actions specific to the parent to be rendered in the header */
-  actions?: ReactNode
   /** Toggle visiblity of code on render */
   showCode?: boolean
-  /** Whether function block is draggable */
-  draggable?: boolean
-  /** Tooltip when hovering over the header of the block */
-  tooltip?: ReactNode
-  /** Optional callback on drag start */
-  onDragStart?: (e: DragEvent) => void
-  /** Hide the header deploy button (used when an external confirm footer is shown) */
-  hideDeployButton?: boolean
-  /** Disable interactive actions */
-  disabled?: boolean
   /** Whether a deploy action is currently running */
   isDeploying?: boolean
   /** Whether a deploy action has completed */
@@ -46,8 +33,6 @@ interface EdgeFunctionBlockProps {
   onCancelReplace?: () => void
   /** Confirm handler when replacing an existing function */
   onConfirmReplace?: () => void
-  /** Handler for triggering a deploy */
-  onDeploy?: () => void
   className?: string
 }
 
@@ -55,10 +40,6 @@ export const EdgeFunctionBlock = ({
   label,
   code,
   functionName,
-  actions,
-  tooltip,
-  hideDeployButton = false,
-  disabled = false,
   isDeploying = false,
   isDeployed = false,
   errorText,
@@ -68,9 +49,6 @@ export const EdgeFunctionBlock = ({
   showReplaceWarning = false,
   onCancelReplace,
   onConfirmReplace,
-  onDeploy,
-  draggable = false,
-  onDragStart,
   className,
 }: EdgeFunctionBlockProps) => {
   const resolvedFunctionUrl = functionUrl ?? 'Function URL will be available after deployment'
@@ -80,32 +58,11 @@ export const EdgeFunctionBlock = ({
 
   return (
     <ReportBlockContainer
-      tooltip={tooltip}
       icon={<Code size={16} strokeWidth={1.5} className="text-foreground-muted" />}
       label={label}
       loading={isDeploying}
-      draggable={draggable}
-      onDragStart={onDragStart}
       className={className}
-      actions={
-        hideDeployButton || !onDeploy ? (
-          (actions ?? null)
-        ) : (
-          <>
-            <Button
-              variant="outline"
-              size="tiny"
-              loading={isDeploying}
-              disabled={disabled || isDeploying}
-              onClick={onDeploy}
-            >
-              {isDeploying ? 'Deploying...' : 'Deploy'}
-            </Button>
-
-            {actions}
-          </>
-        )
-      }
+      actions={null}
     >
       {showReplaceWarning && (
         <Admonition

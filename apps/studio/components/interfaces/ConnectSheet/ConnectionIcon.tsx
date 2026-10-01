@@ -5,23 +5,14 @@ import { BASE_PATH } from '@/lib/constants'
 
 interface ConnectionIconProps {
   icon: string
-  iconFolder?: string
   supportsDarkMode?: boolean
-  size?: number
   className?: string
 }
 
-export const ConnectionIcon = ({
-  icon,
-  iconFolder,
-  supportsDarkMode,
-  size = 14,
-  className,
-}: ConnectionIconProps) => {
+export const ConnectionIcon = ({ icon, supportsDarkMode, className }: ConnectionIconProps) => {
   const { resolvedTheme } = useTheme()
 
-  const imageFolder =
-    iconFolder || (['ionic-angular'].includes(icon) ? 'icons/frameworks' : 'libraries')
+  const imageFolder = ['ionic-angular'].includes(icon) ? 'icons/frameworks' : 'libraries'
 
   const imageExtension = imageFolder === 'icons/frameworks' ? '' : '-icon'
 
@@ -36,6 +27,6 @@ export const ConnectionIcon = ({
       }${imageExtension}.svg`
 
   return (
-    <Image className={className} src={iconImgSrc} alt={`${icon} logo`} width={size} height={size} />
+    <Image className={className} src={iconImgSrc} alt={`${icon} logo`} width={14} height={14} />
   )
 }

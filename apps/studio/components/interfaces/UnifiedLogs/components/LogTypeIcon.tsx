@@ -7,7 +7,6 @@ import { type LOG_TYPES } from '../UnifiedLogs.constants'
 interface LogTypeIconProps {
   type: (typeof LOG_TYPES)[number]
   size?: number
-  strokeWidth?: number
   className?: string
 }
 
@@ -28,19 +27,14 @@ const ICON_MAP: Partial<Record<(typeof LOG_TYPES)[number], IconComponent>> = {
   compute: Compute,
 }
 
-export const LogTypeIcon = ({
-  type,
-  size = 14,
-  strokeWidth = 1.5,
-  className,
-}: LogTypeIconProps) => {
+export const LogTypeIcon = ({ type, size = 14, className }: LogTypeIconProps) => {
   const Icon = ICON_MAP[type] ?? Box
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <span className="inline-flex" role="img" aria-label={type}>
-          <Icon size={size} strokeWidth={strokeWidth} className={className} />
+          <Icon size={size} strokeWidth={1.5} className={className} />
         </span>
       </TooltipTrigger>
       <TooltipContent side="left">

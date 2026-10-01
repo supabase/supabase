@@ -1,4 +1,3 @@
-import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useParams } from 'common/hooks'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
@@ -21,7 +20,6 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 interface AIAssistantProps {
-  initialMessages?: MessageType[] | undefined
   className?: string
 }
 

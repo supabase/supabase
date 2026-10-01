@@ -23,7 +23,6 @@ interface FilterPopoverProps<T> {
   labelKey: keyof T
   iconKey?: string
   name: string
-  variant?: 'rectangular' | 'rounded'
   buttonType?: 'default' | 'dashed'
   disabled?: boolean
   labelClass?: string
@@ -44,7 +43,6 @@ interface FilterPopoverProps<T> {
   fetchNextPage?: () => void
 
   // Support for grouped options with separators
-  groupKey?: keyof T
   groups?: Array<{ name: string; options: string[] }>
 
   // Support for custom label rendering (e.g., for tooltips)
@@ -62,7 +60,6 @@ export const FilterPopover = <T extends Record<string, any>>({
   labelKey,
   iconKey = 'icon',
   name = 'default',
-  variant = 'rectangular',
   buttonType,
   disabled,
   labelClass,
@@ -184,7 +181,6 @@ export const FilterPopover = <T extends Record<string, any>>({
           disabled={disabled}
           variant={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
           onClick={() => setOpen(false)}
-          className={variant === 'rounded' ? 'rounded-full' : ''}
           iconRight={<ChevronDown />}
         >
           <div>

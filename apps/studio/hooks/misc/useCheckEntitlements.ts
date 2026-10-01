@@ -55,13 +55,10 @@ function getEntitlementMax(entitlement: Entitlement | null): number | undefined 
     : getEntitlementNumericValue(entitlement)
 }
 
-export function useHasEntitlementAccess(organizationSlug?: string) {
-  const shouldGetSelectedOrg = !organizationSlug
-  const { data: selectedOrg } = useSelectedOrganizationQuery({
-    enabled: shouldGetSelectedOrg,
-  })
+export function useHasEntitlementAccess() {
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
-  const finalOrgSlug = organizationSlug || selectedOrg?.slug
+  const finalOrgSlug = selectedOrg?.slug
   const enabled = IS_PLATFORM && !!finalOrgSlug
 
   const { data: entitlementsData } = useEntitlementsQuery({ slug: finalOrgSlug! }, { enabled })

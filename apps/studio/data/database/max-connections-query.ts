@@ -8,8 +8,6 @@ import { ResponseError, UseCustomQueryOptions } from '@/types'
 export type MaxConnectionsVariables = {
   projectRef?: string
   connectionString?: string | null
-  table?: string
-  schema?: string
 }
 
 export async function getMaxConnections(

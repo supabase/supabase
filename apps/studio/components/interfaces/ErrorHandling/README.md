@@ -124,8 +124,8 @@ That's it. `ErrorMatcher` picks it up automatically.
 
 ## Available section components
 
-| Component                               | Props                                                   |
-| --------------------------------------- | ------------------------------------------------------- |
-| `RestartDatabaseTroubleshootingSection` | `number`, `errorType`, `onRestartProject?`              |
-| `TroubleshootingGuideSection`           | `number`, `errorType`, `href`, `title?`, `description?` |
-| `FixWithAITroubleshootingSection`       | `number`, `errorType`, `buildPrompt`, `onDebugWithAI?`  |
+| Component                               | Props                                                  |
+| --------------------------------------- | ------------------------------------------------------ |
+| `RestartDatabaseTroubleshootingSection` | `number`, `errorType`                                  |
+| `TroubleshootingGuideSection`           | `number`, `errorType`, `href`, `description?`          |
+| `FixWithAITroubleshootingSection`       | `number`, `errorType`, `buildPrompt`, `onDebugWithAI?` |

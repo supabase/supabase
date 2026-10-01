@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 import { toast } from 'sonner'
 import {
@@ -26,14 +26,12 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { AWS_REGIONS_DEFAULT } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
-  typeSelection?: ReactNode
   onSuccess: () => void
   onClose: () => void
   onRecommendCompute: (size: RecommendedComputeForReadReplicas) => void
 }
 
 export const ReadReplicaForm = ({
-  typeSelection,
   onSuccess,
   onClose,
   onRecommendCompute,
@@ -80,7 +78,6 @@ export const ReadReplicaForm = ({
   return (
     <>
       <DialogSection className="flex flex-col p-0!">
-        {typeSelection}
         <FormItemLayout
           isReactForm={false}
           layout="vertical"

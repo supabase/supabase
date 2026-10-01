@@ -25,16 +25,9 @@ interface EditQueryButtonProps {
   title: string
   sql?: string
   className?: string
-  variant?: 'default' | 'text'
 }
 
-export const EditQueryButton = ({
-  id,
-  sql,
-  title,
-  className,
-  variant = 'text',
-}: EditQueryButtonProps) => {
+export const EditQueryButton = ({ id, sql, title, className }: EditQueryButtonProps) => {
   const router = useRouter()
   const { newQuery } = useNewQuery()
 
@@ -53,7 +46,7 @@ export const EditQueryButton = ({
   if (id !== undefined) {
     return (
       <ButtonTooltip
-        variant={variant}
+        variant="text"
         size="tiny"
         className={cn('w-7 h-7', className)}
         icon={<Edit size={14} strokeWidth={1.5} />}
@@ -68,7 +61,7 @@ export const EditQueryButton = ({
 
   return !isInSQLEditor || isInNewSnippet ? (
     <ButtonTooltip
-      variant={variant}
+      variant="text"
       size="tiny"
       className={cn('w-7 h-7', className)}
       icon={<Edit size={14} strokeWidth={1.5} />}
@@ -92,7 +85,7 @@ export const EditQueryButton = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <ButtonTooltip
-          variant={variant}
+          variant="text"
           size="tiny"
           disabled={!sql}
           className={cn('w-7 h-7', className)}

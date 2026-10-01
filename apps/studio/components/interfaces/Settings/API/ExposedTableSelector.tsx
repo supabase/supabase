@@ -26,7 +26,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
 
 interface ExposedTableSelectorProps {
-  disabled?: boolean
   selectedSchemas: string[]
   pendingAddTableIds: number[]
   pendingRemoveTableIds: number[]
@@ -35,7 +34,6 @@ interface ExposedTableSelectorProps {
 }
 
 export const ExposedTableSelector = ({
-  disabled = false,
   selectedSchemas,
   pendingAddTableIds,
   pendingRemoveTableIds,
@@ -94,7 +92,6 @@ export const ExposedTableSelector = ({
       <PopoverTrigger asChild>
         <Button
           size="small"
-          disabled={disabled}
           className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >

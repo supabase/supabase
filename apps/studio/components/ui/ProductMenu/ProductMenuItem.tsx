@@ -8,7 +8,6 @@ interface ProductMenuItemProps {
   item: ProductMenuGroupItem
   isActive: boolean
   target?: '_blank' | '_self'
-  hoverText?: string
   onClick?: () => void
 }
 
@@ -16,7 +15,6 @@ export const ProductMenuItem = ({
   item,
   isActive,
   target = '_self',
-  hoverText = '',
   onClick,
 }: ProductMenuItemProps) => {
   const {
@@ -36,9 +34,7 @@ export const ProductMenuItem = ({
       <div className="flex w-full items-center justify-between gap-1">
         <div
           className="flex items-center gap-1 min-w-0 flex-1"
-          title={
-            shortcutId ? undefined : hoverText ? hoverText : typeof name === 'string' ? name : ''
-          }
+          title={shortcutId ? undefined : typeof name === 'string' ? name : ''}
         >
           <span className="truncate flex-1 min-w-0">{name}</span>
           {label !== undefined && (

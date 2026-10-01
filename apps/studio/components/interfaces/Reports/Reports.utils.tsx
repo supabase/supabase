@@ -89,12 +89,11 @@ export function getLogsSql(
  *
  * @param timestamp - The timestamp to format
  * @param returnUtc - Whether to return the timestamp in UTC
- * @param format - The format to use for the timestamp
  * @returns The formatted timestamp string
  */
 export const formatTimestamp = (
   timestamp: number | string,
-  { returnUtc = false, format = 'MMM D, h:mma' }: { returnUtc?: boolean; format?: string } = {}
+  { returnUtc = false }: { returnUtc?: boolean } = {}
 ) => {
   try {
     const isSeconds = String(timestamp).length === 10
@@ -107,9 +106,9 @@ export const formatTimestamp = (
         : Number(timestamp)
 
     if (returnUtc) {
-      return dayjs.utc(timestampInMs).format(format)
+      return dayjs.utc(timestampInMs).format('MMM D, h:mma')
     } else {
-      return dayjs(timestampInMs).format(format)
+      return dayjs(timestampInMs).format('MMM D, h:mma')
     }
   } catch (error) {
     console.error(error)

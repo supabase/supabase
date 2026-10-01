@@ -32,7 +32,7 @@ export const useNewQuery = () => {
     }
   )
 
-  const newQuery = async (sql: string, name: string, shouldRedirect: boolean = true) => {
+  const newQuery = async (sql: string, name: string) => {
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
@@ -51,12 +51,8 @@ export const useNewQuery = () => {
       })
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
-      if (shouldRedirect) {
-        router.push(`/project/${ref}/sql/${snippet.id}`)
-        return undefined
-      } else {
-        return snippet.id
-      }
+      router.push(`/project/${ref}/sql/${snippet.id}`)
+      return undefined
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
       return undefined

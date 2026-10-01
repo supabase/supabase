@@ -22,7 +22,6 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
-  isDebugging?: boolean
   isDisabled?: boolean
   onDebug: () => void
   buildDebugPrompt: () => string
@@ -42,7 +41,6 @@ const DEFAULT_CHART_CONFIG: ChartConfig = {
 export const UtilityPanel = ({
   id,
   isExecuting,
-  isDebugging,
   isDisabled,
   onDebug,
   buildDebugPrompt,
@@ -179,7 +177,6 @@ export const UtilityPanel = ({
           isDisabled={isDisabled}
           onDebug={onDebug}
           buildDebugPrompt={buildDebugPrompt}
-          isDebugging={isDebugging}
         />
       </TabsContent>
 

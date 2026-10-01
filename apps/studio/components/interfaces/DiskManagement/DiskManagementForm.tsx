@@ -66,13 +66,11 @@ import {
 import { GB, PROJECT_STATUS } from '@/lib/constants'
 
 export function DiskManagementForm({
-  chartsClassName,
   overviewExtra,
   beforeScaling,
   recommendedCompute,
   onRecommendedComputeApplied,
 }: {
-  chartsClassName?: string
   /** Rendered above usage charts in the overview block (for example topology). */
   overviewExtra?: ReactNode
   /** Rendered between overview and the Scaling section (for example read replicas). */
@@ -476,7 +474,7 @@ export function DiskManagementForm({
           <PageSection>
             <PageSectionContent>
               {overviewExtra}
-              <ComputeAndDiskUsageCharts className={cn(overviewExtra && 'mt-6', chartsClassName)} />
+              <ComputeAndDiskUsageCharts className={cn(overviewExtra && 'mt-6')} />
             </PageSectionContent>
           </PageSection>
 

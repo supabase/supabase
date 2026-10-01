@@ -32,12 +32,8 @@ function createBucketFilePickerState({
 
     selectedItems: [] as StorageItemWithColumn[],
     setSelectedItems: (items: StorageItemWithColumn[]) => (state.selectedItems = items),
-    clearSelectedItems: (columnIndex?: number) => {
-      if (columnIndex !== undefined) {
-        state.selectedItems = state.selectedItems.filter((item) => item.columnIndex !== columnIndex)
-      } else {
-        state.selectedItems = []
-      }
+    clearSelectedItems: () => {
+      state.selectedItems = []
     },
 
     itemSearchString: '',

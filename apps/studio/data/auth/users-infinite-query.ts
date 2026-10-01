@@ -14,7 +14,6 @@ type UsersError = ResponseError
 type UsersVariables = {
   projectRef?: string
   connectionString?: string | null
-  page?: number
   keywords?: string
   filter?: Filter
   providers?: string[]
@@ -22,7 +21,6 @@ type UsersVariables = {
   order?: 'asc' | 'desc'
   /** If set, uses optimized prefix search for the specified column */
   column?: OptimizedSearchColumns
-  startAt?: string
 
   improvedSearchEnabled?: boolean
 }

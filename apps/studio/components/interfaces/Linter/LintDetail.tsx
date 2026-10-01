@@ -17,16 +17,10 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 interface LintDetailProps {
   lint: Lint
   projectRef: string
-  onAskAssistant?: () => void
   onAfterAction?: () => void
 }
 
-export const LintDetail = ({
-  lint,
-  projectRef,
-  onAskAssistant,
-  onAfterAction,
-}: LintDetailProps) => {
+export const LintDetail = ({ lint, projectRef, onAfterAction }: LintDetailProps) => {
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -40,7 +34,6 @@ export const LintDetail = ({
       advisorLevel: lint.level,
     })
 
-    onAskAssistant?.()
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     snap.newChat({
       name: 'Summarize lint',

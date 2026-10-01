@@ -25,7 +25,6 @@ import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-a
 
 interface CreateClerkAuthIntegrationProps {
   visible: boolean
-  prod?: boolean
   onClose: () => void
   // TODO: Remove this if this Dialog is only used for creating.
   onDelete: () => void

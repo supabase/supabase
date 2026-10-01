@@ -161,8 +161,7 @@ export const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithForma
 
 export function mapResponseToAnalyticsData(
   response: InfraMonitoringMultiData,
-  attributes: InfraMonitoringAttribute[],
-  dateFormat: string = DEFAULT_DATE_FORMAT
+  attributes: InfraMonitoringAttribute[]
 ): Record<string, AnalyticsData> {
   const needs2MinAggregation = (response as { _originalInterval?: '2m' })._originalInterval === '2m'
 
@@ -176,7 +175,7 @@ export function mapResponseToAnalyticsData(
         const value = point.values?.[attribute]
         return {
           period_start: point.period_start,
-          periodStartFormatted: dayjs(point.period_start).format(dateFormat),
+          periodStartFormatted: dayjs(point.period_start).format(DEFAULT_DATE_FORMAT),
           [attribute]: value === undefined ? 0 : Number(value),
         }
       })
@@ -207,7 +206,7 @@ export function mapResponseToAnalyticsData(
     const value = point[attribute]
     return {
       period_start: point.period_start,
-      periodStartFormatted: dayjs(point.period_start).format(dateFormat),
+      periodStartFormatted: dayjs(point.period_start).format(DEFAULT_DATE_FORMAT),
       [attribute]: value === undefined ? 0 : Number(value),
     }
   })

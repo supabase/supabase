@@ -2,7 +2,6 @@ import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -18,7 +17,6 @@ import {
 } from './ThirdPartyAuthForm.utils'
 
 interface AddIntegrationDropdownProps {
-  buttonText?: string
   align?: 'end' | 'center'
   variant?: 'primary' | 'default'
   open?: boolean
@@ -27,11 +25,9 @@ interface AddIntegrationDropdownProps {
 }
 
 const ProviderDropdownItem = ({
-  disabled,
   type,
   onSelectIntegrationType,
 }: {
-  disabled?: boolean
   type: INTEGRATION_TYPES
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }) => {
@@ -39,8 +35,7 @@ const ProviderDropdownItem = ({
     <DropdownMenuItem
       key={type}
       onClick={() => onSelectIntegrationType(type)}
-      className={cn('flex items-center gap-x-2 p-2', disabled && 'cursor-not-allowed')}
-      disabled={disabled}
+      className="flex items-center gap-x-2 p-2"
     >
       <Image src={getIntegrationTypeIcon(type)} width={16} height={16} alt={`${type} icon`} />
       <span>{getIntegrationTypeLabel(type)}</span>

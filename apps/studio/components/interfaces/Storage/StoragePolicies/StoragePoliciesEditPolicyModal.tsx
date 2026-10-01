@@ -93,14 +93,7 @@ export const StoragePoliciesEditPolicyModal = ({
     })
   }
 
-  const onToggleOperation = (operation: any, isSingleOperation = false) => {
-    if (isSingleOperation) {
-      return setPolicyFormFields({
-        ...policyFormFields,
-        allowedOperations: [operation],
-      })
-    }
-
+  const onToggleOperation = (operation: any) => {
     const currentOps = policyFormFields.allowedOperations
     const isRemoving = currentOps.includes(operation)
     let updatedAllowedOperations = isRemoving

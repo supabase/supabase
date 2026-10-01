@@ -79,28 +79,22 @@ export function doPermissionsCheck(
   return doPermissionConditionCheck(orgPermissions, { resource_name: resource, ...data })
 }
 
-export function useGetPermissions(
-  permissionsOverride?: Permission[],
-  organizationSlugOverride?: string,
-  enabled = true
-) {
-  return useGetProjectPermissions(permissionsOverride, organizationSlugOverride, undefined, enabled)
+export function useGetPermissions() {
+  return useGetProjectPermissions()
 }
 
 function useGetProjectPermissions(
-  permissionsOverride?: Permission[],
   organizationSlugOverride?: string,
   projectRefOverride?: string | null,
   enabled = true
 ) {
   const {
-    data,
+    data: permissions,
     isPending: isLoadingPermissions,
     isSuccess: isSuccessPermissions,
   } = usePermissionsQuery({
-    enabled: permissionsOverride === undefined && enabled,
+    enabled,
   })
-  const permissions = permissionsOverride === undefined ? data : permissionsOverride
 
   const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
   const {
@@ -162,11 +156,10 @@ export function useAsyncCheckPermissions(
   overrides?: {
     organizationSlug?: string
     projectRef?: string | null
-    permissions?: Permission[]
   }
 ) {
   const isLoggedIn = useIsLoggedIn()
-  const { organizationSlug, projectRef, permissions } = overrides ?? {}
+  const { organizationSlug, projectRef } = overrides ?? {}
 
   const {
     permissions: allPermissions,
@@ -174,7 +167,7 @@ export function useAsyncCheckPermissions(
     projectRef: _projectRef,
     isLoading: isPermissionsLoading,
     isSuccess: isPermissionsSuccess,
-  } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
+  } = useGetProjectPermissions(organizationSlug, projectRef, isLoggedIn)
 
   const can = useMemo(() => {
     if (!IS_PLATFORM) return true

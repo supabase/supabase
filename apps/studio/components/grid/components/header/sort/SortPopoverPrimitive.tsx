@@ -37,10 +37,8 @@ import {
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface SortPopoverPrimitiveProps {
-  buttonText?: string
   sorts: Sort[]
   onApplySorts: (sorts: Sort[]) => void
-  defaultOpen?: boolean
   tableQueriesEnabled?: boolean
 }
 
@@ -54,10 +52,8 @@ export interface SortPopoverPrimitiveProps {
  * that properly detects external vs. internal updates.
  */
 export const SortPopoverPrimitive = ({
-  buttonText,
   sorts,
   onApplySorts,
-  defaultOpen = false,
   tableQueriesEnabled = true,
 }: SortPopoverPrimitiveProps) => {
   const { ref } = useParams()
@@ -69,7 +65,7 @@ export const SortPopoverPrimitive = ({
   const tableName = snap.table?.name || ''
   const tableSchema = snap.table.schema || ''
 
-  const [open, setOpen] = useState(defaultOpen)
+  const [open, setOpen] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
   // Local state for draft sorts
   const [localSorts, setLocalSorts] = useState<Sort[]>(sorts)
@@ -93,10 +89,9 @@ export const SortPopoverPrimitive = ({
 
   // Fix: Use localSorts for button text, not sorts
   const displayButtonText =
-    buttonText ??
-    (localSorts.length > 0
+    localSorts.length > 0
       ? `Sorted by ${localSorts.length} rule${localSorts.length > 1 ? 's' : ''}`
-      : 'Sort')
+      : 'Sort'
 
   // Filter available columns to exclude columns already in sorts
   const columns = useMemo(() => {

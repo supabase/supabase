@@ -19,9 +19,8 @@ function isStaffEmail(email: string): boolean {
   return STAFF_EMAIL_DOMAINS.includes(domain)
 }
 
-function buildUser(userEmail?: TrustedUserEmail, customAttributes?: Record<string, string>) {
+function buildUser(userEmail?: TrustedUserEmail) {
   const _customAttributes = {
-    ...customAttributes,
     is_staff: (!!userEmail && isStaffEmail(userEmail)).toString(),
   }
 
@@ -60,17 +59,14 @@ function getServerClient() {
   }
 }
 
-export async function getServerFlags(
-  userEmail?: TrustedUserEmail,
-  customAttributes?: Record<string, string>
-) {
+export async function getServerFlags(userEmail?: TrustedUserEmail) {
   const client = getServerClient()
 
   if (!client) {
     return []
   }
 
-  return client.getAllValuesAsync(buildUser(userEmail, customAttributes))
+  return client.getAllValuesAsync(buildUser(userEmail))
 }
 
 export async function isServerFlagEnabled(name: string): Promise<boolean> {

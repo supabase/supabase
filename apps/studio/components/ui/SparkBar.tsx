@@ -10,7 +10,6 @@ interface SparkBarProps {
   labelBottomClass?: string
   barClass?: string
   bgClass?: string
-  borderClass?: string
 }
 
 export const SparkBar = ({
@@ -19,7 +18,6 @@ export const SparkBar = ({
   barClass = 'bg-foreground',
   bgClass = '',
   type = 'vertical',
-  borderClass = '',
   labelBottom = '',
   labelBottomClass = 'tabular-nums',
   labelTop = '',
@@ -49,7 +47,7 @@ export const SparkBar = ({
         <div
           className={`relative rounded-sm h-1 overflow-hidden w-full border p-0 ${
             bgClass ? bgClass : 'bg-surface-400'
-          } ${borderClass ? borderClass : 'border-none'}`}
+          } border-none`}
         >
           <div
             className={`absolute rounded-sm inset-x-0 bottom-0 h-1 ${barClass} transition-all`}
@@ -67,7 +65,7 @@ export const SparkBar = ({
       <div
         className={`relative rounded-sm w-5 overflow-hidden border p-1 ${
           bgClass ? bgClass : 'bg-gray-400'
-        } ${borderClass ? borderClass : 'border-none'}`}
+        } border-none`}
         style={{ height: totalHeight }}
       >
         <div className={`absolute inset-x-0 bottom-0 w-5 ${barClass}`} style={{ height }}></div>

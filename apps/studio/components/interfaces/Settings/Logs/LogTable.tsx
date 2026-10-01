@@ -60,7 +60,6 @@ interface Props {
   isLoading?: boolean
   isSaving?: boolean
   error?: LogQueryError | null
-  showDownload?: boolean
   queryType?: QueryType
   projectRef: string
   onRun?: () => void

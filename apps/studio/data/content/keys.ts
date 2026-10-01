@@ -38,8 +38,6 @@ export const contentKeys = {
     projectRef: string | undefined,
     type?: string,
     options?: {
-      visibility?: string
-      favorite?: boolean
       name?: string
     }
   ) => ['projects', projectRef, 'content', 'count', type, options].filter(Boolean),

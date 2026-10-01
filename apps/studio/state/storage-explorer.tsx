@@ -179,9 +179,9 @@ export function createStorageExplorerState({
       return state.columns.length - 1
     },
 
-    setColumnIsLoadingMore: (index: number, isLoadingMoreItems: boolean = true) => {
+    setColumnIsLoadingMore: (index: number) => {
       state.columns = state.columns.map((col, idx) => {
-        return idx === index ? { ...col, isLoadingMoreItems } : col
+        return idx === index ? { ...col, isLoadingMoreItems: true } : col
       })
     },
 
@@ -1540,7 +1540,7 @@ export function createStorageExplorerState({
       }
     },
 
-    downloadFile: async (file: StorageItemWithColumn, showToast = true) => {
+    downloadFile: async (file: StorageItemWithColumn) => {
       if (!file.path) {
         toast.error('Failed to download: Unable to find path to file')
         return false
@@ -1549,7 +1549,7 @@ export function createStorageExplorerState({
       const fileName: string = file.name
       const fileMimeType = file?.metadata?.mimetype ?? undefined
 
-      const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
+      const toastId = toast.loading(`Retrieving ${fileName}...`)
 
       try {
         const url = await fetchFileUrl(
@@ -1572,22 +1572,18 @@ export function createStorageExplorerState({
         link.parentNode?.removeChild(link)
         window.URL.revokeObjectURL(blobUrl)
 
-        if (toastId) {
-          toast.success(`Downloading ${fileName}`, {
-            id: toastId,
-            closeButton: true,
-            duration: SONNER_DEFAULT_DURATION,
-          })
-        }
+        toast.success(`Downloading ${fileName}`, {
+          id: toastId,
+          closeButton: true,
+          duration: SONNER_DEFAULT_DURATION,
+        })
         return true
       } catch (err) {
-        if (toastId) {
-          toast.error(`Failed to download ${fileName}`, {
-            id: toastId,
-            closeButton: true,
-            duration: SONNER_DEFAULT_DURATION,
-          })
-        }
+        toast.error(`Failed to download ${fileName}`, {
+          id: toastId,
+          closeButton: true,
+          duration: SONNER_DEFAULT_DURATION,
+        })
         return false
       }
     },

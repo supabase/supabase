@@ -13,7 +13,6 @@ interface RLSCodeEditorProps {
   id: string
   defaultValue?: string
   onInputChange?: (value?: string) => void
-  wrapperClassName?: string
   className?: string
   value?: string
   placeholder?: string
@@ -31,7 +30,6 @@ export const RLSCodeEditor = ({
   id,
   defaultValue,
   onInputChange,
-  wrapperClassName,
   className,
   value,
   placeholder,
@@ -60,7 +58,6 @@ export const RLSCodeEditor = ({
       isReadOnly={readOnly}
       language="pgsql"
       className={className}
-      wrapperClassName={wrapperClassName}
       placeholder={placeholder}
       value={value ?? undefined}
       defaultValue={defaultValue ?? undefined}

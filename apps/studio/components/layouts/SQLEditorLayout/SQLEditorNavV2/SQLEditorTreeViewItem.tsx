@@ -61,7 +61,6 @@ interface SQLEditorTreeViewItemProps extends Omit<
   onSelectShare?: () => void
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
-  onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
 
@@ -71,7 +70,6 @@ interface SQLEditorTreeViewItemProps extends Omit<
   fetchNextPage?: () => void
   isFetchingNextPage?: boolean
   sort?: 'inserted_at' | 'name'
-  name?: string
   onFolderContentsChange?: (info: { isLoading: boolean; snippets?: Snippet[] }) => void
 }
 
@@ -98,7 +96,6 @@ export const SQLEditorTreeViewItem = ({
   fetchNextPage: _fetchNextPage,
   isFetchingNextPage: _isFetchingNextPage,
   sort,
-  name,
   onFolderContentsChange,
   ...props
 }: SQLEditorTreeViewItemProps) => {
@@ -145,7 +142,6 @@ export const SQLEditorTreeViewItem = ({
     {
       projectRef,
       folderId: parentId ?? element.id,
-      name,
       sort,
     },
     {
