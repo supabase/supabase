@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /kb/
 Content-Signal: ai-train=yes, search=yes, ai-input=yes
 
 User-agent: GPTBot
