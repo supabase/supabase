@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Card,
@@ -35,7 +35,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
 
-  const { data, isError } = useFDWsQuery({
+  const { data, isError, isSuccess } = useFDWsQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
   })
@@ -49,14 +49,36 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   )
 
   const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
-  const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
+  const isSharedWrapper = (wrapper: (typeof wrappers)[number]) =>
+    data?.some((other) => other.id !== wrapper.id && other.name === wrapper.name) ?? false
+  const selectedWrapper = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
+  const isSelectedWrapperShared = selectedWrapper !== undefined && isSharedWrapper(selectedWrapper)
+  const selectedWrapperToEdit = isSelectedWrapperShared ? undefined : selectedWrapper
+  const openedWrapperId = useRef<string | null>(null)
 
   useEffect(() => {
-    if (isError && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
-      toast('Wrapper not found')
+    if (!selectedWrapperIdToEdit) {
+      openedWrapperId.current = null
+    } else if (selectedWrapperToEdit) {
+      openedWrapperId.current = selectedWrapperIdToEdit
+    } else if (isSuccess || isError) {
+      if (openedWrapperId.current !== selectedWrapperIdToEdit) {
+        toast(
+          isSelectedWrapperShared
+            ? 'Shared wrappers cannot be edited in the dashboard. Use the SQL Editor to edit this connection.'
+            : 'Wrapper not found'
+        )
+      }
       setSelectedWrapperToEdit(null)
     }
-  }, [isError, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
+  }, [
+    isError,
+    isSelectedWrapperShared,
+    isSuccess,
+    selectedWrapperIdToEdit,
+    selectedWrapperToEdit,
+    setSelectedWrapperToEdit,
+  ])
 
   if (!integration || integration.type !== 'wrapper') {
     return (
@@ -81,9 +103,9 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
-              return <WrapperRow key={x.id} wrapper={x} />
-            })}
+            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => (
+              <WrapperRow key={x.id} wrapper={x} isShared={isSharedWrapper(x)} />
+            ))}
           </TableBody>
           <TableFooter
             className={cn(

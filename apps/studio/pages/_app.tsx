@@ -48,6 +48,7 @@ import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProv
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { clearBootTimeoutFallback } from '@/components/ui/BootTimeoutFallback/BootTimeoutFallback'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
@@ -156,6 +157,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   }
 
   useThemeSandbox()
+
+  useEffect(() => {
+    clearBootTimeoutFallback()
+  }, [])
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 

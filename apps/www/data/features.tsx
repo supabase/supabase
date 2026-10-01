@@ -2763,7 +2763,7 @@ This feature is particularly valuable for developers looking to build dynamic we
     icon: JsIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/introduction',
     slug: 'client-library-javascript',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2788,7 +2788,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     icon: FlutterIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    docsUrl: 'https://supabase.com/docs/reference/dart/introduction',
     slug: 'client-library-flutter',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2897,7 +2897,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
     slug: 'orioledb',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },

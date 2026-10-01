@@ -3,6 +3,7 @@ import { getCreateMigrationsTableSQL, getInsertMigrationSQL } from '@supabase/pg
 import { isResponseOk } from './api/apiWrapper'
 import { fetchHandler } from '@/data/fetchers'
 import type { Integration } from '@/data/integrations/integrations.types'
+import { BASE_PATH } from '@/lib/constants'
 import { ResponseError, type SupaResponse } from '@/types'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
@@ -131,4 +132,54 @@ function getGitHubConfigurationUrl(integration: GitHubIntegration) {
       ? `organizations/${integration.metadata?.account.name}/`
       : ''
   }settings/installations/${integration.metadata?.installation_id}`
+}
+
+export const FRAMEWORK_ICON_SLUGS: ReadonlySet<string> = new Set([
+  'angular',
+  'astro',
+  'blitzjs',
+  'brunch',
+  'create-react-app',
+  'docusaurus',
+  'docusaurus-2',
+  'dojo',
+  'eleventy',
+  'ember',
+  'gatsby',
+  'gridsome',
+  'hexo',
+  'hugo',
+  'hydrogen',
+  'ionic-angular',
+  'ionic-react',
+  'jekyll',
+  'middleman',
+  'nextjs',
+  'nuxtjs',
+  'parcel',
+  'polymer',
+  'preact',
+  'redwoodjs',
+  'remix',
+  'saber',
+  'sanity',
+  'sapper',
+  'scully',
+  'solidstart',
+  'stencil',
+  'storybook',
+  'svelte',
+  'sveltekit',
+  'sveltekit-1',
+  'umijs',
+  'vite',
+  'vitepress',
+  'vue',
+  'vuepress',
+  'zola',
+])
+
+export function getFrameworkIconUrl(framework?: string | null): string | undefined {
+  if (!framework || !FRAMEWORK_ICON_SLUGS.has(framework)) return undefined
+  return `${BASE_PATH}/img/icons/frameworks/${framework}.svg`
 }
