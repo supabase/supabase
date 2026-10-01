@@ -19,6 +19,7 @@
     "@astrojs/mdx": "^7.0.7",
     "@astrojs/react": "^6.0.4",
     "astro": "^7.2.6",
+    "cmdk": "^1.1.1",
     "lucide-react": "*",
     "react": "catalog:",
     "react-dom": "catalog:",
