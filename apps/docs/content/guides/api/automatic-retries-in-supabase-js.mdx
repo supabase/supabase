@@ -18,6 +18,17 @@ Starting with `supabase-js` v2.102.0, PostgREST queries (`.from()`, `.rpc()`) in
 
 Because `.rpc()` sends POST by default, RPC calls aren't retried. Pass `{ get: true }` or `{ head: true }` to send the call as GET or HEAD, which the built-in retries cover.
 
+### Set a request timeout
+
+Retries only run once a request fails. A request that hangs rather than failing outright — for example during a slow upstream timeout — never reaches the retry logic. Pass an `AbortSignal` to cap how long a request can take:
+
+```javascript
+const { data, error } = await supabase
+  .from('your_table')
+  .select('*')
+  .abortSignal(AbortSignal.timeout(10_000))
+```
+
 ### Disable built-in retries
 
 If you prefer to handle retries yourself, you can disable the built-in retry behavior:
