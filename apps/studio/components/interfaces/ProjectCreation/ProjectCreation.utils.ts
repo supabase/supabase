@@ -68,6 +68,26 @@ export function resolveDefaultDbRegion({
     : fixedDefaultRegion
 }
 
+type ResolveSelectedRegionOptionTypeArgs = {
+  isBestAvailableSelected: boolean
+  dbRegion: string | undefined
+  smartGroupRegions: Array<{ name: string }>
+  specificRegions: Array<{ name: string }>
+}
+
+export function resolveSelectedRegionOptionType({
+  isBestAvailableSelected,
+  dbRegion,
+  smartGroupRegions,
+  specificRegions,
+}: ResolveSelectedRegionOptionTypeArgs): 'general' | 'specific' | undefined {
+  // The "Best available region" shortcut always resolves to a smart-group recommendation
+  if (isBestAvailableSelected) return 'general'
+  if (smartGroupRegions.some((region) => region.name === dbRegion)) return 'general'
+  if (specificRegions.some((region) => region.name === dbRegion)) return 'specific'
+  return undefined
+}
+
 /**
  * When launching new projects, they only get assigned a compute size once successfully launched,
  * this might assume wrong compute size, but only for projects being rapidly launched after one another on non-default compute sizes.

@@ -1,12 +1,20 @@
+import { waitFor } from '@testing-library/react'
 import dayjs from 'dayjs'
+import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
-import { aggregate1MinTo2Min, mapResponseToAnalyticsData } from './infra-monitoring-queries'
+import {
+  aggregate1MinTo2Min,
+  mapResponseToAnalyticsData,
+  useInfraMonitoringQueries,
+} from './infra-monitoring-queries'
 import type {
   InfraMonitoringMultiData,
   InfraMonitoringMultiResponse,
   InfraMonitoringSingleResponse,
 } from './infra-monitoring-query'
+import { customRenderHook } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 
 const mockMultiResponse: InfraMonitoringMultiResponse = {
   data: [
@@ -498,5 +506,45 @@ describe('aggregate1MinTo2Min', () => {
 
     expect(result[0].periodStartFormatted).toBeDefined()
     expect(typeof result[0].periodStartFormatted).toBe('string')
+  })
+})
+
+describe('useInfraMonitoringQueries partial failures', () => {
+  it('reports errors only for failed attributes in a successful batch response', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/infra-monitoring',
+      response: () =>
+        HttpResponse.json<InfraMonitoringMultiResponse>({
+          ...mockMultiResponse,
+          series: { ram_usage: mockMultiResponse.series.ram_usage },
+          errors: { max_cpu_usage: { message: 'CPU unavailable' } },
+        }),
+    })
+    const { result } = customRenderHook(() =>
+      useInfraMonitoringQueries(
+        ['max_cpu_usage', 'ram_usage'],
+        'default',
+        '2024-01-02T00:00:00Z',
+        '2024-01-03T00:00:00Z',
+        '1h',
+        undefined,
+        undefined,
+        true
+      )
+    )
+
+    await waitFor(() => expect(result.current[1].status).toBe('success'))
+    expect(result.current[0]).toMatchObject({
+      data: undefined,
+      error: { message: 'CPU unavailable' },
+      isError: true,
+      status: 'error',
+    })
+    expect(result.current[1]).toMatchObject({
+      error: null,
+      isError: false,
+      data: { total: 3 },
+    })
   })
 })

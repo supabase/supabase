@@ -157,6 +157,35 @@ export const pricingTooltips: PricingTooltips = {
       </span>
     ),
   },
+
+  'platform.logIngestion': {
+    main: (
+      <span className="prose text-xs">
+        You are charged for the total volume of log data that Supabase ingests across all your
+        project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and
+        others) during the billing cycle. Read more in our{' '}
+        <Link href="/docs/guides/platform/manage-your-usage/logs-ingest" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
+
+  'platform.logQuery': {
+    main: (
+      <span className="prose text-xs">
+        Logs Query usage isn't billed directly. Instead, your organization gets a log query
+        allowance that scales with how much log data you ingest. The allowance covers the volume of
+        log data scanned when you read logs through the Studio UI, the Management API, the CLI, or
+        any other interface. Read more in our{' '}
+        <Link href="/docs/guides/platform/manage-your-usage/logs-query" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
 }
 
 export const PricingTableRowDesktop = (props: any) => {

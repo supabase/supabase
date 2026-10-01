@@ -2,7 +2,7 @@ import { type FetchNextPageOptions } from '@tanstack/react-query'
 import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
-import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, KeyboardEvent, MouseEvent, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -47,7 +47,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   errorSubject = 'Failed to retrieve data',
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const tableRef = useRef<HTMLTableElement>(null)
-  const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId } = useDataTable()
+  const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId, onSelectRow } =
+    useDataTable()
 
   const headerGroups = table.getHeaderGroups()
   const headers = headerGroups[0].headers
@@ -141,13 +142,15 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         >
           {rows.length ? (
             rows.map((row) => (
-              // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
               <DataTableRow
                 key={row.id}
                 row={row}
                 table={table}
-                selected={row.id === openRowId}
-                onSelect={() => setOpenRowId(row.id === openRowId ? undefined : row.id)}
+                selected={onSelectRow ? row.getIsSelected() : row.id === openRowId}
+                onSelect={(event) => {
+                  if (onSelectRow) onSelectRow(row.id, event)
+                  else setOpenRowId(row.id === openRowId ? undefined : row.id)
+                }}
               />
             ))
           ) : isLoading ? (
@@ -274,7 +277,7 @@ function DataTableRow<TData>({
   row: Row<TData>
   table: TTable<TData>
   selected?: boolean
-  onSelect: () => void
+  onSelect: (event: MouseEvent<HTMLTableRowElement> | KeyboardEvent<HTMLTableRowElement>) => void
 }) {
   const rowClassName = cn('group/row', (table.options.meta as any)?.getRowClassName?.(row))
   const cells = row.getVisibleCells()
@@ -284,14 +287,19 @@ function DataTableRow<TData>({
       id={row.id}
       tabIndex={0}
       data-state={selected && 'selected'}
+      aria-selected={!!selected}
       onClick={onSelect}
+      onMouseDown={(event) => {
+        if (event.shiftKey) event.preventDefault()
+      }}
       onKeyDown={(event) => {
-        if (event.key === 'Enter') {
+        if (event.target !== event.currentTarget) return
+        if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
-          onSelect()
+          onSelect(event)
         }
       }}
-      className={cn(TableRowClassName, rowClassName)}
+      className={cn(TableRowClassName, 'cursor-pointer', rowClassName)}
     >
       {cells.map((cell) => {
         const cellClassName = (cell.column.columnDef.meta as any)?.cellClassName

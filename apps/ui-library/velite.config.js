@@ -37,12 +37,12 @@ const docs = s
   .object({
     title: s.string(),
     description: s.string(),
+    preview: s.mdx({ copyLinkedFiles: false }).optional(),
     published: s.boolean().default(true),
     links: LinksProperties.optional(),
     featured: s.boolean().default(false),
     component: s.boolean().default(false),
     fragment: s.boolean().default(false),
-    toc: s.boolean().default(true),
     source: NestedProperties.optional(),
     // mirrors contentlayer2's `_raw.flattenedPath`: file path relative to the
     // content dir, extension stripped, trailing `/index` dropped.

@@ -22,7 +22,7 @@ const BUCKET_TYPES = [
       'Historical and time-series data',
       'Optionally expose via Postgres',
     ],
-    cta: { label: 'Learn more', href: '/docs/guides/storage/analytics-buckets' },
+    cta: { label: 'Learn more', href: '/docs/guides/storage/analytics/introduction' },
   },
   {
     title: 'Vector buckets',
@@ -32,7 +32,7 @@ const BUCKET_TYPES = [
       'Metadata filtering and similarity queries',
       'RAG systems and AI-powered search',
     ],
-    cta: { label: 'Learn more', href: '/docs/guides/storage/vector-buckets' },
+    cta: { label: 'Learn more', href: '/docs/guides/storage/vector/introduction' },
   },
 ]
 
