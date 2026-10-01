@@ -193,7 +193,7 @@ export const ColumnType = ({
                             </div>
                             <span className="absolute right-3 top-2">
                               {option.name === field.value ? (
-                                <Check className="text-brand" size={14} />
+                                <Check className="text-primary" size={14} />
                               ) : (
                                 ''
                               )}
@@ -244,7 +244,7 @@ export const ColumnType = ({
                                   )}
                                   {option.format === field.value && (
                                     <span className="absolute right-3 top-2">
-                                      <Check className="text-brand" size={14} />
+                                      <Check className="text-primary" size={14} />
                                     </span>
                                   )}
                                 </div>
@@ -273,7 +273,7 @@ export const ColumnType = ({
                     specific use case.
                   </p>
                   <div className="flex items-center space-x-2 mt-3">
-                    <Button asChild variant="default" icon={<ExternalLink />}>
+                    <Button asChild icon={<ExternalLink />}>
                       <Link href={recommendation.reference} target="_blank" rel="noreferrer">
                         Read more
                       </Link>

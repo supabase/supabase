@@ -67,13 +67,7 @@ export function OrganizationDropdownCommandContent({
             </Link>
           </Button>
           {organizationCreationEnabled && (
-            <Button
-              variant="default"
-              block
-              size="small"
-              asChild
-              icon={<Plus size={14} strokeWidth={1.5} />}
-            >
+            <Button block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
               <Link
                 href="/new"
                 className="text-xs text-foreground-light hover:text-foreground"

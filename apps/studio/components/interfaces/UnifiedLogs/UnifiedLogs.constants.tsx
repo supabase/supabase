@@ -27,14 +27,14 @@ export const LOG_TYPES_LABELS = {
   supavisor: 'Supavisor',
   pgbouncer: 'PgBouncer',
   multigres: 'Multigres',
-  workers: 'Workers',
+  compute: 'Compute',
 }
 
 type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
 export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
 
-export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'workers'>, string> = {
+export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   edge: 'edge_logs',
   postgrest: 'postgrest_logs',
   storage: 'storage_logs',

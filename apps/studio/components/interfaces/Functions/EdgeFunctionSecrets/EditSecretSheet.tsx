@@ -162,7 +162,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
         </SheetSection>
 
         <SheetFooter>
-          <Button disabled={isUpdating} variant="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdating} onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button

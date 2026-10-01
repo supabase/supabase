@@ -8,8 +8,8 @@ import { SSLConfiguration } from './SSLConfiguration'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse']
-type SslEnforcementResponse = components['schemas']['SslEnforcementResponse']
+type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
+type SslEnforcementResponse = components['schemas']['SslEnforcementResponse_Output']
 type JitAccessConfigResponse =
   paths['/v1/projects/{ref}/jit-access']['get']['responses'][200]['content']['application/json']
 

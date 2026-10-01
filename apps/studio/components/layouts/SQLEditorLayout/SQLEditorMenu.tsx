@@ -146,7 +146,6 @@ export const SQLEditorMenu = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     data-testid="sql-editor-new-query-button"
-                    variant="default"
                     icon={<Plus className="text-foreground" />}
                     className="w-[26px]"
                     aria-label="Create a new query"
@@ -178,7 +177,7 @@ export const SQLEditorMenu = () => {
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button asChild block variant="default">
+        <Button asChild block>
           <Link href={`/project/${ref}/observability/connections`}>View running queries</Link>
         </Button>
       </div>

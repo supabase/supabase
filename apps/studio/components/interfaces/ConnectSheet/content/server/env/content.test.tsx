@@ -7,8 +7,8 @@ import ServerEnvContent from './content'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ApiKeyResponse = components['schemas']['ApiKeyResponse']
-type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse']
+type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
+type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
 
 const { mockUseAsyncCheckPermissions } = vi.hoisted(() => ({
   mockUseAsyncCheckPermissions: vi.fn(),

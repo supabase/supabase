@@ -24,12 +24,7 @@ export const AlphaNotice = ({
       type="note"
       layout="horizontal"
       actions={
-        <Button
-          asChild
-          variant="default"
-          icon={<ExternalLink strokeWidth={1.5} />}
-          className="mt-2"
-        >
+        <Button asChild icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
           <Link target="_blank" rel="noopener noreferrer" href={feedbackUrl}>
             Share feedback
           </Link>

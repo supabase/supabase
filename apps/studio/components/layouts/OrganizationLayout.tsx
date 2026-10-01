@@ -151,7 +151,7 @@ const OrganizationLayoutContent = ({
           </div>
           <div className="flex items-center gap-2">
             {selectedRedirectQuery?.data?.url && (
-              <Button asChild variant="default" iconRight={<ExternalLink />}>
+              <Button asChild iconRight={<ExternalLink />}>
                 <a href={selectedRedirectQuery.data.url} target="_blank" rel="noopener noreferrer">
                   Manage
                 </a>

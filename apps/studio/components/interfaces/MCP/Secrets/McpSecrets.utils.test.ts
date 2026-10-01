@@ -35,9 +35,7 @@ describe('getSecretsCopy', () => {
   it('names the generic client, because v1 never learns which one sent the user', () => {
     const copy = getSecretsCopy({ status: 'stored', request, timedOut: false })
 
-    expect(copy.calloutBody).toBe(
-      `Go back to your AI client and choose "I've completed it" to finish the tool call.`
-    )
+    expect(copy.calloutBody).toBe(`Head back to your agent and let it know you're finished.`)
   })
 
   it('sends the user back to the agent instead of the client on timeout', () => {

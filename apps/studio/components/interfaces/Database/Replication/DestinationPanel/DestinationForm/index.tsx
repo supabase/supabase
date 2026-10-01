@@ -45,7 +45,10 @@ import { PipelineCostDialog } from './PipelineCostDialog'
 import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
-import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
+import {
+  getSnowflakeValidationIssues,
+  SNOWFLAKE_PRIVATE_KEY_FORMAT_MESSAGE,
+} from './Snowflake/Snowflake.utils'
 import { TableCopySelection } from './TableCopySelection'
 import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
@@ -223,11 +226,12 @@ export const DestinationForm = ({
             }
           )
         } else if (selectedType === 'Snowflake') {
-          getSnowflakeValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
+          getSnowflakeValidationIssues(data, {
+            secretsOptional: editMode,
+            validatePrivateKeyFormat: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'ClickHouse') {
           getClickHouseValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
@@ -280,16 +284,21 @@ export const DestinationForm = ({
 
   const getSubmitButtonText = () => {
     if (editMode) {
-      return existingDestination?.enabled
-        ? 'Apply and restart pipeline'
-        : 'Apply and start pipeline'
+      return existingDestination?.enabled ? 'Apply and restart pipeline' : 'Apply changes'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Create and start pipeline anyway'
+        return 'Start pipeline anyway'
       }
 
-      return 'Create and start pipeline'
+      return 'Start pipeline'
     }
+  }
+
+  const getSavingMessage = () => {
+    if (isValidating) return 'Validating destination configuration...'
+    if (!editMode) return 'Creating pipeline...'
+    if (existingDestination?.enabled) return 'Updating destination and restarting pipeline...'
+    return 'Updating destination...'
   }
 
   // Stages the form values and opens the cost-estimation dialog, which is the final gate before
@@ -336,6 +345,16 @@ export const DestinationForm = ({
       )
       if (jsonIssue) {
         form.setError(jsonIssue.path, { message: jsonIssue.message })
+        return
+      }
+    }
+
+    if (selectedType === 'Snowflake') {
+      const privateKeyIssue = getSnowflakeValidationIssues(data, {
+        secretsOptional: editMode,
+      }).find((issue) => issue.message === SNOWFLAKE_PRIVATE_KEY_FORMAT_MESSAGE)
+      if (privateKeyIssue) {
+        form.setError(privateKeyIssue.path, { message: privateKeyIssue.message })
         return
       }
     }
@@ -455,7 +474,7 @@ export const DestinationForm = ({
                   <p className="text-sm font-medium text-foreground">Destination details</p>
 
                   <div className="flex flex-col gap-y-4">
-                    <DestinationNameInput form={form} />
+                    <DestinationNameInput form={form} destinationType={selectedType} />
                     <PublicationSelection
                       form={form}
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}
@@ -467,21 +486,25 @@ export const DestinationForm = ({
 
                 <DialogSectionSeparator />
 
-                {selectedType === 'BigQuery' && etlEnableBigQuery ? (
+                {selectedType === 'BigQuery' && etlEnableBigQuery && (
                   <BigQueryFields form={form} editMode={editMode} />
-                ) : selectedType === 'Analytics Bucket' && etlEnableIceberg ? (
+                )}
+                {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
                   <AnalyticsBucketFields
                     form={form}
                     editMode={editMode}
                     onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                   />
-                ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
+                )}
+                {selectedType === 'DuckLake' && etlEnableDucklake && (
                   <DuckLakeFields form={form} editMode={editMode} />
-                ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
+                )}
+                {selectedType === 'Snowflake' && etlEnableSnowflake && (
                   <SnowflakeFields form={form} editMode={editMode} />
-                ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
+                )}
+                {selectedType === 'ClickHouse' && etlEnableClickHouse && (
                   <ClickHouseFields form={form} editMode={editMode} />
-                ) : null}
+                )}
 
                 <DialogSectionSeparator />
 
@@ -516,22 +539,14 @@ export const DestinationForm = ({
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               <Loader2 className="animate-spin" size={14} />
-              <p className="text-foreground-light text-sm">
-                {isValidating
-                  ? 'Validating destination configuration...'
-                  : editMode
-                    ? existingDestination?.enabled
-                      ? 'Updating destination and restarting pipeline...'
-                      : 'Updating destination and starting pipeline...'
-                    : 'Creating pipeline...'}
-              </p>
+              <p className="text-foreground-light text-sm">{getSavingMessage()}</p>
             </motion.div>
           ) : (
             <div />
           )}
         </AnimatePresence>
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSaving} variant="default" onClick={onCancel}>
+          <Button disabled={isSaving} onClick={onCancel}>
             Cancel
           </Button>
           <Button

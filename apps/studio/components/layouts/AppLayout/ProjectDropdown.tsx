@@ -41,13 +41,7 @@ function ProjectDropdownNewProjectActions({
 
   if (embedded) {
     return (
-      <Button
-        variant="default"
-        block
-        size="small"
-        asChild
-        icon={<Plus size={14} strokeWidth={1.5} />}
-      >
+      <Button block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
         <Link
           href={href}
           onClick={onClose}

@@ -16,7 +16,6 @@ export const AdminStudioButton = () => {
   return (
     <ButtonTooltip
       asChild
-      variant="default"
       className="rounded-full w-[26px] h-[26px]"
       icon={<Wrench size={16} strokeWidth={1.5} />}
       tooltip={{

@@ -78,7 +78,6 @@ export const BannerExplorer = () => {
         </div>
         <div className="flex gap-2">
           <Button
-            variant="default"
             size="tiny"
             onClick={() => {
               selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER)

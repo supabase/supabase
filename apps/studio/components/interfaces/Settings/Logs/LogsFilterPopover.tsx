@@ -107,7 +107,7 @@ const LogsFilterPopover = ({
           ))}
 
           <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-            <Button size="tiny" variant="default" onClick={handleReset} type="button">
+            <Button size="tiny" onClick={handleReset} type="button">
               Clear
             </Button>
             <Button loading={isLoading} variant="primary" type="submit">

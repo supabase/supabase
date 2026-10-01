@@ -125,7 +125,7 @@ export const RestoringState = () => {
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <CheckCircle className="text-brand" size={18} strokeWidth={2} />
+                <CheckCircle className="text-primary" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
@@ -166,7 +166,7 @@ export const RestoringState = () => {
                       layout="responsive"
                       description="Contact support if this project remains in a restoring state."
                       actions={
-                        <Button asChild variant="default">
+                        <Button asChild>
                           <SupportLink
                             queryParams={{
                               category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -187,7 +187,6 @@ export const RestoringState = () => {
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
               <ButtonTooltip
-                variant="default"
                 icon={<Download />}
                 loading={isDownloading}
                 disabled={logicalBackups.length === 0}

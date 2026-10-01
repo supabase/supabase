@@ -60,7 +60,6 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
-                variant="default"
                 role="combobox"
                 size={'small'}
                 aria-expanded={open}

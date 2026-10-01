@@ -87,6 +87,25 @@ const LARGE_COLUMNS_TYPES_SET = new Set(LARGE_COLUMNS_TYPES)
 // Threshold count for applying default sort
 export const THRESHOLD_COUNT = 100000
 
+// Operators that perform SQL pattern matching, where a bare value with no `%`/`_`
+// wildcard should be treated as a "contains" search rather than an exact match
+const PATTERN_MATCH_OPERATORS: Filter['operator'][] = ['~~', '~~*', '!~~', '!~~*']
+
+export function formatPatternMatchFilterValue(
+  value: Filter['value'],
+  operator: Filter['operator']
+) {
+  if (
+    PATTERN_MATCH_OPERATORS.includes(operator) &&
+    typeof value === 'string' &&
+    !value.includes('%') &&
+    !value.includes('_')
+  ) {
+    return `%${value}%`
+  }
+  return value
+}
+
 // Return the primary key columns if exists, otherwise return the first column to use as a default sort
 export const getDefaultOrderByColumns = (
   table: Pick<PGTable, 'primary_keys' | 'columns'>,
@@ -149,11 +168,11 @@ export const getTableRowsSql = ({
   filters.forEach((x) => {
     const col = table.columns?.find((y) => y.name === x.column)
     const isStringTypeColumn = !!col ? (TEXT_TYPES as string[]).includes(col.format) : true
-    queryChains = queryChains.filter(
-      x.column,
-      x.operator,
-      !isStringTypeColumn && x.value === '' ? null : x.value
-    )
+    const value =
+      !isStringTypeColumn && x.value === ''
+        ? null
+        : formatPatternMatchFilterValue(x.value, x.operator)
+    queryChains = queryChains.filter(x.column, x.operator, value)
   })
 
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort.

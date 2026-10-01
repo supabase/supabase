@@ -1,7 +1,7 @@
 import React from 'react'
 import { cn } from 'ui'
 
-const explorerQueryClassName = 'flex flex-col overflow-hidden bg-muted'
+const explorerQueryClassName = 'flex flex-col overflow-hidden'
 
 export type ExplorerQueryProps = React.ComponentProps<'div'>
 
@@ -15,7 +15,11 @@ const ExplorerQuery = ({ className, ...props }: ExplorerQueryProps) => (
   <div
     data-slot="explorer-query"
     data-variant="embedded"
-    className={cn(explorerQueryClassName, 'min-h-64 rounded-md border shadow-xs', className)}
+    className={cn(
+      explorerQueryClassName,
+      'min-h-64 rounded-md border bg-card dark:bg-muted shadow-xs',
+      className
+    )}
     {...props}
   />
 )
@@ -31,7 +35,7 @@ const ExplorerQueryViewport = ({ className, ...props }: ExplorerQueryViewportPro
   <div
     data-slot="explorer-query"
     data-variant="viewport"
-    className={cn(explorerQueryClassName, 'h-full min-h-0', className)}
+    className={cn(explorerQueryClassName, 'h-full min-h-0 bg-card dark:bg-muted', className)}
     {...props}
   />
 )

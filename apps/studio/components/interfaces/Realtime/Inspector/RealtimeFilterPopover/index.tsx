@@ -252,9 +252,7 @@ export const RealtimeFilterPopover = ({
             </>
           )}
           <div className="px-4 py-2 gap-2 flex justify-end">
-            <Button variant="default" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
             <Button variant="primary" onClick={() => setApplyConfigOpen(true)}>
               Apply
             </Button>

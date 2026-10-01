@@ -1,10 +1,13 @@
 import { z } from 'zod'
 
 /**
- * [Jordi] Use instances.vantage.sh as source of truth for compute disk limits.
- * Eg: https://instances.vantage.sh/aws/ec2/t4g.nano?currency=USD
+ * Size-wide floor values for disk limits.
  *
- * All compute from medium down are t4g and the bigger ones are m6g.
+ * Each value is the minimum across all configurations a compute size can run
+ * on, so every project gets at least these limits; the actual limits of a
+ * given project can be higher. Derived from the AWS EBS-optimized performance
+ * tables (https://instances.vantage.sh, mirroring
+ * `aws ec2 describe-instance-types`). Last verified: 2026-09-04.
  *
  * Throughput values are stored in MB/s (AWS lists Mbps, so we convert with toMBps).
  */
@@ -45,7 +48,7 @@ export const COMPUTE_DISK = {
     name: 'Medium',
     baselineIops: 2000,
     maxIops: 11800,
-    baselineThroughputMBps: toMBps(347),
+    baselineThroughputMBps: toMBps(315),
     maxThroughputMBps: toMBps(2085),
   },
   ci_large: {

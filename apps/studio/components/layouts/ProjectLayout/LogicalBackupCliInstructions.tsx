@@ -125,7 +125,6 @@ export const LogicalBackupCliInstructions = ({
 
       {showResetPassword && (
         <ButtonTooltip
-          variant="default"
           disabled={resetDisabled}
           onClick={() => {
             if (!resetDisabled && ref) {

@@ -269,7 +269,7 @@ export const FileExplorerColumn = ({
             <div
               className={`
                 ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
-                px-2 py-1 my-1 flex shrink-0 flex-col space-y-2 overflow-auto
+                px-2 py-1 my-1 flex flex-grow shrink-0 flex-col space-y-2 overflow-auto
               `}
             >
               <ShimmeringLoader />

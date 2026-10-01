@@ -210,7 +210,6 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                       <FormControl className="col-span-6">
                         <PopoverTrigger asChild>
                           <Button
-                            variant="default"
                             size={'medium'}
                             className={`w-full [&>span]:w-full text-left`}
                             iconRight={
@@ -260,7 +259,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                                 >
                                   <Check
                                     className={cn(
-                                      'text-brand',
+                                      'text-primary',
                                       schema.name === field.value ? 'opacity-100' : 'opacity-0'
                                     )}
                                     strokeWidth={2}
@@ -306,7 +305,6 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                           disabled={isSelectEntityDisabled || isLoadingEntities}
                         >
                           <Button
-                            variant="default"
                             size="medium"
                             className={cn(
                               'w-full [&>span]:w-full text-left',
@@ -372,7 +370,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                                 >
                                   <Check
                                     className={cn(
-                                      'text-brand',
+                                      'text-primary',
                                       entity.name === field.value ? 'opacity-100' : 'opacity-0'
                                     )}
                                     strokeWidth={2}
@@ -512,7 +510,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 <SheetSection>
                   <div className="flex items-center justify-between">
                     <p className="text-sm">Preview of SQL statement</p>
-                    <Button asChild variant="default">
+                    <Button asChild>
                       <Link
                         href={
                           project !== undefined
@@ -544,7 +542,6 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
         </Form>
         <SheetFooter>
           <Button
-            variant="default"
             disabled={isExecuting}
             onClick={() => {
               form.reset()

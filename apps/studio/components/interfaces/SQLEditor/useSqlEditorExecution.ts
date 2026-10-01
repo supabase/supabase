@@ -72,7 +72,7 @@ export function useSqlEditorExecution({
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
       refocusEditorAfterRunIfNeeded()
     },
-    onError(error: any, vars) {
+    onError(error, vars) {
       if (id) {
         editor.highlightErrorLine(error, hasSelection)
         sessionSnap.addResultError(id, error, vars.autoLimit)

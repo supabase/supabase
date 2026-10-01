@@ -250,11 +250,7 @@ export const ResumeProjectButton = ({
             </p>
           </DialogSection>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="default"
-              onClick={() => setShowFreeProjectLimitWarning(false)}
-            >
+            <Button type="button" onClick={() => setShowFreeProjectLimitWarning(false)}>
               Understood
             </Button>
           </DialogFooter>

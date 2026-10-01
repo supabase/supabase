@@ -60,6 +60,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -376,12 +377,7 @@ function RootComponent() {
                   <DynamicTitle />
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
+                      <ThemeProvider>
                         <DevToolbarProvider apiUrl={API_URL}>
                           <AiAssistantStateContextProvider>
                             <CommandProvider>
@@ -401,6 +397,7 @@ function RootComponent() {
                               <Toaster />
                               <ToastErrorTracker />
                               <MonacoThemeProvider />
+                              <AppearanceSettingsProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
                           <DevToolbar extraTabs={devToolbarExtraTabs} />

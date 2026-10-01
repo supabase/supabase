@@ -419,7 +419,7 @@ export const Page = () => {
               />
             </SheetSection>
             <SheetFooter>
-              <Button variant="default">Cancel</Button>
+              <Button>Cancel</Button>
               <Button variant="primary" type="submit">
                 Submit
               </Button>

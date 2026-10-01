@@ -424,7 +424,6 @@ export const StorageSettings = () => {
                       <CardFooter className="justify-end space-x-2">
                         {form.formState.isDirty && (
                           <Button
-                            variant="default"
                             type="reset"
                             onClick={() => form.reset()}
                             disabled={
