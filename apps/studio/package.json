@@ -87,7 +87,7 @@
     "@tanstack/react-query-devtools": "~5.90.2",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-devtools": "^1.166.13",
-    "@tanstack/react-router-ssr-query": "^1.166.12",
+    "@tanstack/react-router-ssr-query": "^1.167.3",
     "@tanstack/react-start": "catalog:",
     "@tanstack/react-table": "catalog:",
     "@tanstack/react-virtual": "^3.13.24",
