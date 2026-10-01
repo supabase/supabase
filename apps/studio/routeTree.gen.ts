@@ -84,6 +84,7 @@ import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-func
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
 import { Route as ApiAiDocsRouteImport } from './routes/api/ai/docs'
 import { Route as AuthCliLoginRouteImport } from './routes/_auth/cli/login'
+import { Route as AuthCliAuthRouteImport } from './routes/_auth/cli/auth'
 import { Route as AppSupportNewRouteImport } from './routes/_app/support/new'
 import { Route as AppSupportLinkRouteImport } from './routes/_app/support/link'
 import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/security'
@@ -714,6 +715,11 @@ const ApiAiDocsRoute = ApiAiDocsRouteImport.update({
 const AuthCliLoginRoute = AuthCliLoginRouteImport.update({
   id: '/cli/login',
   path: '/cli/login',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthCliAuthRoute = AuthCliAuthRouteImport.update({
+  id: '/cli/auth',
+  path: '/cli/auth',
   getParentRoute: () => AuthRoute,
 } as any)
 const AppSupportNewRoute = AppSupportNewRouteImport.update({
@@ -2193,6 +2199,7 @@ export interface FileRoutesByFullPath {
   '/account/security': typeof AppAccountSecurityRoute
   '/support/link': typeof AppSupportLinkRoute
   '/support/new': typeof AppSupportNewRoute
+  '/cli/auth': typeof AuthCliAuthRoute
   '/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
@@ -2515,6 +2522,7 @@ export interface FileRoutesByTo {
   '/account/security': typeof AppAccountSecurityRoute
   '/support/link': typeof AppSupportLinkRoute
   '/support/new': typeof AppSupportNewRoute
+  '/cli/auth': typeof AuthCliAuthRoute
   '/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
@@ -2829,6 +2837,7 @@ export interface FileRoutesById {
   '/_app/account/security': typeof AppAccountSecurityRoute
   '/_app/support/link': typeof AppSupportLinkRoute
   '/_app/support/new': typeof AppSupportNewRoute
+  '/_auth/cli/auth': typeof AuthCliAuthRoute
   '/_auth/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
@@ -3155,6 +3164,7 @@ export interface FileRouteTypes {
     | '/account/security'
     | '/support/link'
     | '/support/new'
+    | '/cli/auth'
     | '/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
@@ -3477,6 +3487,7 @@ export interface FileRouteTypes {
     | '/account/security'
     | '/support/link'
     | '/support/new'
+    | '/cli/auth'
     | '/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
@@ -3790,6 +3801,7 @@ export interface FileRouteTypes {
     | '/_app/account/security'
     | '/_app/support/link'
     | '/_app/support/new'
+    | '/_auth/cli/auth'
     | '/_auth/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
@@ -4719,6 +4731,13 @@ declare module '@tanstack/react-router' {
       path: '/cli/login'
       fullPath: '/cli/login'
       preLoaderRoute: typeof AuthCliLoginRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/cli/auth': {
+      id: '/_auth/cli/auth'
+      path: '/cli/auth'
+      fullPath: '/cli/auth'
+      preLoaderRoute: typeof AuthCliAuthRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_app/support/new': {
@@ -6558,6 +6577,7 @@ interface AuthRouteChildren {
   AuthSignInRecoveryCodeRoute: typeof AuthSignInRecoveryCodeRoute
   AuthSignInSsoRoute: typeof AuthSignInSsoRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
+  AuthCliAuthRoute: typeof AuthCliAuthRoute
   AuthCliLoginRoute: typeof AuthCliLoginRoute
   AuthPartnersStripeProjectsLoginRoute: typeof AuthPartnersStripeProjectsLoginRoute
 }
@@ -6572,6 +6592,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthSignInRecoveryCodeRoute: AuthSignInRecoveryCodeRoute,
   AuthSignInSsoRoute: AuthSignInSsoRoute,
   AuthSignUpRoute: AuthSignUpRoute,
+  AuthCliAuthRoute: AuthCliAuthRoute,
   AuthCliLoginRoute: AuthCliLoginRoute,
   AuthPartnersStripeProjectsLoginRoute: AuthPartnersStripeProjectsLoginRoute,
 }
