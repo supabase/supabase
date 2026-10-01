@@ -48,13 +48,16 @@ export const selfHostingThirdPartyGuides: ContentListingGroup = {
   id: 'self-hosting-third-party-guides',
   heading: 'Third-party guides',
   headingLevel: 'h2',
-  type: 'list',
+  type: 'grid',
+  columns: 2,
   description:
     "Guides written by other projects and companies. Supabase doesn't maintain or review them, so check that they match your version of self-hosted Supabase.",
   items: [
     {
       title: 'Secure self-hosted Supabase with NetBird',
       href: 'https://netbird.io/knowledge-hub/supabase-self-hosted-netbird',
+      icon: { kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' },
+      subtitle: 'By NetBird',
       description:
         'Keep Studio and Postgres off the public internet with NetBird network access controls.',
     },
