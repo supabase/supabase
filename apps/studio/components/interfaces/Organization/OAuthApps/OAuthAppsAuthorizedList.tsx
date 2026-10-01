@@ -97,8 +97,8 @@ export const OAuthAppsAuthorizedList = () => {
                   <>
                     {data.pages.map((page, pageIndex) => (
                       <Fragment key={pageIndex}>
-                        {page.data.map((app) => (
-                          <OAuthAppsAuthorizedRow key={app.id} app={app} />
+                        {page.data.map((approval) => (
+                          <OAuthAppsAuthorizedRow key={approval.app.id} approval={approval} />
                         ))}
                       </Fragment>
                     ))}
