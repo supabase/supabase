@@ -161,7 +161,7 @@ export async function reportEmptyBodyResponse({
     Sentry.captureMessage('Empty response body on successful API request', {
       level: 'warning',
       fingerprint: ['empty-body-response', endpoint],
-      tags: { endpoint, probe_has_body },
+      tags: { endpoint, probe_has_body, empty_body_diagnostic: 'true' },
       extra: { ...context, ...probeContext },
     })
   } catch (error) {

@@ -87,7 +87,11 @@ describe('reportEmptyBodyResponse', () => {
     expect(context).toMatchObject({
       level: 'warning',
       fingerprint: ['empty-body-response', '/platform/projects/{ref}/a'],
-      tags: { endpoint: '/platform/projects/{ref}/a', probe_has_body: 'true' },
+      tags: {
+        endpoint: '/platform/projects/{ref}/a',
+        probe_has_body: 'true',
+        empty_body_diagnostic: 'true',
+      },
       extra: {
         method: 'GET',
         status: 200,
