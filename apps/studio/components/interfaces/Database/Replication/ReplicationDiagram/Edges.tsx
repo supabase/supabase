@@ -3,7 +3,6 @@ import { useParams, useReducedMotion } from 'common'
 import { useMemo } from 'react'
 
 import { getStatusName } from '../Pipeline.utils'
-import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import {
   EdgeVisualChip,
   getEdgeVisual,
@@ -43,7 +42,7 @@ export const SmoothstepEdge = ({
   )
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
-    { enabled: !!pipeline?.id, refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
+    { enabled: !!pipeline?.id }
   )
   const { getRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
@@ -60,14 +59,18 @@ export const SmoothstepEdge = ({
     }
   }, [pipelineStatusData?.status, requestStatus])
 
+  const edgeTargetX = shiftEdgeEnd ? targetX - 8 : targetX
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
-    targetX: shiftEdgeEnd ? targetX - 8 : targetX,
+    targetX: edgeTargetX,
     targetY,
     targetPosition,
   })
+  // Branched paths label their shared vertical bend, so move the chip onto each final segment.
+  const chipX = shiftEdgeEnd ? (labelX + edgeTargetX) / 2 : labelX
+  const chipY = shiftEdgeEnd ? targetY : labelY
 
   const visual = getEdgeVisual(replicationState)
 
@@ -92,7 +95,7 @@ export const SmoothstepEdge = ({
         <div
           style={{
             position: 'absolute',
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            transform: `translate(-50%, -50%) translate(${chipX}px,${chipY}px)`,
             pointerEvents: 'all',
           }}
           className="nodrag nopan"

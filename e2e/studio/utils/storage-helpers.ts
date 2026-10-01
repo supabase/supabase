@@ -176,7 +176,9 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   const fileInput = page.locator('input[type="file"]')
   await fileInput.setInputFiles(filePath)
 
-  await expect(page.getByRole('status')).not.toBeVisible()
+  // Wait out the upload progress toast. Scoped to the toast itself — a page-wide
+  // `getByRole('status')` also matches any live region the explorer renders.
+  await expect(page.locator('[data-sonner-toast]')).not.toBeVisible()
   // Verify file appears in the explorer by title
   await expect(
     page.getByTitle(fileName),

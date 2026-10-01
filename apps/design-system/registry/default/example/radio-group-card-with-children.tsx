@@ -6,7 +6,6 @@ import { BASE_PATH } from '@/lib/constants'
 export default function RadioGroupDemo() {
   const singleThemes = [
     { name: 'Dark', value: 'dark' }, // Classic Supabase dark
-    { name: 'Classic dark', value: 'classic-dark' }, // Deep Dark Supabase dark
     { name: 'Light', value: 'light' }, // Classic Supabase light
     { name: 'System', value: 'system' }, // Classic Supabase light
   ] as const

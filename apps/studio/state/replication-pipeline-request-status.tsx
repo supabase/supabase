@@ -1,150 +1,80 @@
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { createContext, useContext, useState, type ReactNode } from 'react'
+
+import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
   StartRequested = 'StartRequested',
   StopRequested = 'StopRequested',
-  RestartRequested = 'RestartRequested',
+}
+
+type PipelineRequest = {
+  id: symbol
+  status: PipelineStatusRequestStatus
 }
 
 interface PipelineRequestStatusContextType {
-  requestStatus: Record<number, PipelineStatusRequestStatus>
-  pipelineStatusSnapshot: Record<number, string | undefined>
-  setRequestStatus: (
+  getRequestStatus: (pipelineId: number) => PipelineStatusRequestStatus
+  isRequestPending: (pipelineId: number) => boolean
+  runWithRequestStatus: <T>(
     pipelineId: number,
     status: PipelineStatusRequestStatus,
-    snapshotStatus?: string
-  ) => void
-  getRequestStatus: (pipelineId: number) => PipelineStatusRequestStatus
-  setTableResetting: (pipelineId: number, isResetting: boolean) => void
-  getIsTableResetting: (pipelineId: number) => boolean
-  updatePipelineStatus: (pipelineId: number, backendStatus: string | undefined) => void
-}
-
-interface PipelineRequestStatusProviderProps {
-  children: ReactNode
+    action: () => Promise<T>
+  ) => Promise<T>
 }
 
 const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextType | undefined>(
   undefined
 )
 
-// [Joshen] Leaving a comment for future investigation
-// Do we need this? Afaict the status is getting returned from the API so we might not need
-// to track the pipeline status on the client side
-export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatusProviderProps) => {
-  const [requestStatus, setRequestStatusState] = useState<
-    Record<number, PipelineStatusRequestStatus>
-  >({})
-  const [pipelineStatusSnapshot, setPipelineStatusSnapshot] = useState<
-    Record<number, string | undefined>
-  >({})
-  const [tableResetStatus, setTableResetStatus] = useState<Record<number, boolean>>({})
-  const timeoutsRef = useRef<Record<number, number>>({})
-  const REQUEST_TIMEOUT_MS = 10_000
+export const PipelineRequestStatusProvider = ({ children }: { children: ReactNode }) => {
+  const { ref: projectRef } = useParams()
+  const queryClient = useQueryClient()
+  const [requests, setRequests] = useState<Record<number, PipelineRequest>>({})
 
-  const setRequestStatus = (
-    pipelineId: number,
-    status: PipelineStatusRequestStatus,
-    snapshotStatus?: string
+  const runWithRequestStatus: PipelineRequestStatusContextType['runWithRequestStatus'] = async (
+    pipelineId,
+    status,
+    action
   ) => {
-    setRequestStatusState((prev) => ({
-      ...prev,
-      [pipelineId]: status,
-    }))
-    setPipelineStatusSnapshot((prev) => {
-      if (status === PipelineStatusRequestStatus.None) {
-        const { [pipelineId]: _omit, ...rest } = prev
+    const id = Symbol('pipeline request')
+    setRequests((previous) => ({ ...previous, [pipelineId]: { id, status } }))
+    try {
+      return await action()
+    } finally {
+      const options = {
+        ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId }),
+        staleTime: 0,
+      }
+      // A status fetch that was already in flight started before this mutation resolved, so it
+      // may resolve with pre-mutation data. `fetchQuery` dedupes against it instead of starting
+      // a new request, so first wait for it to drain.
+      const hasFetchInFlight =
+        queryClient.getQueryState(options.queryKey)?.fetchStatus === 'fetching'
+      if (hasFetchInFlight) await queryClient.fetchQuery(options).catch(() => {})
+
+      // Nothing is in flight now, so this always starts a fresh request reflecting the
+      // post-mutation state. Errors are swallowed: query consumers already display fetch
+      // failures, and we don't want that to override the mutation's own result/error.
+      await queryClient.fetchQuery(options).catch(() => {})
+
+      setRequests((previous) => {
+        if (previous[pipelineId]?.id !== id) return previous
+        const { [pipelineId]: _removed, ...rest } = previous
         return rest
-      }
-      // Only set snapshot when provided to avoid undefined entries
-      if (snapshotStatus !== undefined) {
-        return { ...prev, [pipelineId]: snapshotStatus }
-      }
-      return prev
-    })
-
-    // Clear existing timeout for this pipeline
-    const existing = timeoutsRef.current[pipelineId]
-    if (existing !== undefined) {
-      clearTimeout(existing)
-      delete timeoutsRef.current[pipelineId]
-    }
-
-    // Start auto-reset timer for non-None states
-    if (status !== PipelineStatusRequestStatus.None) {
-      const id = window.setTimeout(() => {
-        // If still pending, clear to None to show backend state
-        setRequestStatusState((prev) => {
-          if (prev[pipelineId] && prev[pipelineId] !== PipelineStatusRequestStatus.None) {
-            return { ...prev, [pipelineId]: PipelineStatusRequestStatus.None }
-          }
-          return prev
-        })
-        setPipelineStatusSnapshot((prev) => {
-          const { [pipelineId]: _omit, ...rest } = prev
-          return rest
-        })
-        delete timeoutsRef.current[pipelineId]
-      }, REQUEST_TIMEOUT_MS)
-      timeoutsRef.current[pipelineId] = id
+      })
     }
   }
-
-  const getRequestStatus = (pipelineId: number): PipelineStatusRequestStatus => {
-    return requestStatus[pipelineId] || PipelineStatusRequestStatus.None
-  }
-
-  const setTableResetting = (pipelineId: number, isResetting: boolean) => {
-    setTableResetStatus((prev) => {
-      if (isResetting) return { ...prev, [pipelineId]: true }
-      const { [pipelineId]: _omit, ...rest } = prev
-      return rest
-    })
-  }
-
-  const getIsTableResetting = (pipelineId: number) => tableResetStatus[pipelineId] === true
-
-  const updatePipelineStatus = useCallback(
-    (pipelineId: number, newStatus: string | undefined) => {
-      const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
-      if (currentRequestStatus === PipelineStatusRequestStatus.None) return
-
-      // Only remove when backend status differs from snapshot
-      const snapshotStatus = pipelineStatusSnapshot[pipelineId]
-      if (newStatus !== snapshotStatus) {
-        setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
-      }
-    },
-    [requestStatus, pipelineStatusSnapshot]
-  )
-
-  // Cleanup all timers on unmount
-  useEffect(() => {
-    return () => {
-      Object.values(timeoutsRef.current).forEach((id) => clearTimeout(id))
-      timeoutsRef.current = {}
-    }
-  }, [])
 
   return (
     <PipelineRequestStatusContext.Provider
       value={{
-        requestStatus,
-        pipelineStatusSnapshot,
-        setRequestStatus,
-        getRequestStatus,
-        setTableResetting,
-        getIsTableResetting,
-        updatePipelineStatus,
+        getRequestStatus: (pipelineId) =>
+          requests[pipelineId]?.status ?? PipelineStatusRequestStatus.None,
+        isRequestPending: (pipelineId) => requests[pipelineId] !== undefined,
+        runWithRequestStatus,
       }}
     >
       {children}
@@ -154,8 +84,7 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
 
 export const usePipelineRequestStatus = () => {
   const context = useContext(PipelineRequestStatusContext)
-  if (context === undefined) {
+  if (context === undefined)
     throw new Error('usePipelineRequestStatus must be used within a PipelineRequestStatusProvider')
-  }
   return context
 }

@@ -39,12 +39,22 @@ const ATTR = {
 } as const
 
 // The HTTP status code lives under different OTEL attribute keys per service:
-// gateway rows (edge / postgrest / storage / edge function) expose it as
-// `response.status_code`, while auth-service rows expose it as `status`. This
-// normalizes the two so both the displayed status and the derived severity are
-// correct for auth logs (which would otherwise have an empty status and fall
+// gateway rows (edge / postgrest / edge function) expose it as
+// `response.status_code`, auth-service rows expose it as `status`, and
+// storage-service rows expose it as `res.statusCode`. This normalizes the
+// three so both the displayed status and the derived severity are correct
+// for those sources (which would otherwise have an empty status and fall
 // back to their `severity_text` of INFO, classifying every 4xx/5xx as success).
-const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', log_attributes['status'], ${ATTR.status})`
+const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
+      WHEN source = 'auth_logs' THEN log_attributes['status']
+      WHEN source = 'storage_logs' THEN log_attributes['res.statusCode']
+      ELSE ${ATTR.status}
+    END`
+
+// storage-service rows expose method/path under `req.method` / `req.url`
+// rather than the gateway's `request.method` / `request.path`.
+const HTTP_METHOD_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.method'], ${ATTR.method})`
+const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.url'], ${ATTR.path})`
 
 /**
  * Condition that matches rows belonging to a given log_type. Mirrors the
@@ -99,8 +109,8 @@ const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
       ELSE toString((${HTTP_STATUS_EXPR}))
     END`
 
-const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${ATTR.method})`
-const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${ATTR.path})`
+const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
+const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_PATH_EXPR})`
 const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, log_attributes, map())`
 
 // SQL expression for derived `level`. Used inline (not as alias reference)
@@ -174,23 +184,29 @@ const translateFilter = (
       // No simple raw column for level; reference the inline CASE expression.
       return safeSql`(${LEVEL_EXPR}) ${inOp} ${inList(values)}`
     case 'method':
-      return safeSql`${ATTR.method} ${inOp} ${inList(values)}`
+      // Match the displayed method: gateway rows read `request.method`,
+      // storage rows read `req.method`. Inline HTTP_METHOD_EXPR so filtering
+      // picks up storage rows too.
+      return safeSql`(${HTTP_METHOD_EXPR}) ${inOp} ${inList(values)}`
     case 'status':
       // Match the displayed status: HTTP response code for gateway rows,
       // Postgres SQLSTATE for postgres rows. Inline STATUS_EXPR so e.g.
       // filtering on '00000' picks up postgres success rows.
       return safeSql`(${STATUS_EXPR}) ${inOp} ${inList(values)}`
     case 'pathname': {
+      // Match the displayed pathname: gateway rows read `request.path`,
+      // storage rows read `req.url`. Inline HTTP_PATH_EXPR so filtering
+      // picks up storage rows too.
       if (operator === '~~*' || operator === '!~~*') {
         const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
         const join = operator === '!~~*' ? ' AND ' : ' OR '
         return safeSql`(${joinSqlFragments(
-          values.map((v) => safeSql`${ATTR.path} ${op} ${lit(wrapIlikePattern(v))}`),
+          values.map((v) => safeSql`(${HTTP_PATH_EXPR}) ${op} ${lit(wrapIlikePattern(v))}`),
           join
         )})`
       }
       return safeSql`(${joinSqlFragments(
-        values.map((v) => safeSql`${ATTR.path} ${likeOp} ${lit('%' + v + '%')}`),
+        values.map((v) => safeSql`(${HTTP_PATH_EXPR}) ${likeOp} ${lit('%' + v + '%')}`),
         joinAndOr
       )})`
     }

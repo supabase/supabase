@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "realtime-cursor-nuxtjs",
-  "type": "registry:component",
   "title": "Realtime Cursor for Nuxt and Supabase",
   "description": "Component which renders realtime cursors from other users in a room.",
   "dependencies": [
@@ -28,5 +27,6 @@
       "type": "registry:component",
       "target": "app/composables/useRealtimeCursors.ts"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

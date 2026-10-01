@@ -30,16 +30,20 @@ import {
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getAvailableRegions,
   getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
+  resolveSelectedRegionOptionType,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
 import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
+import { getRegionRestrictionMessage } from './RegionSelector.utils'
 import { SecurityOptions } from './SecurityOptions'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import {
   GitHubRepositoryField,
@@ -118,6 +122,7 @@ export const ProjectCreationForm = ({
   const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
+  const hasSelectedOrganization = currentOrg !== undefined
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
@@ -136,6 +141,19 @@ export const ProjectCreationForm = ({
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
+  const { getRegionRestriction } = useRegionRestriction()
+
+  // [Joshen] Temp experiment - to clean up once completed
+  const showBestAvailableRegionFeature = useIsFeatureEnabled(
+    'project_creation:show_best_available_region'
+  )
+  const showBestAvailableRegionFlag = useFlag('showBestAvailableRegion')
+  const showBestAvailableRegionOption =
+    showBestAvailableRegionFeature && showBestAvailableRegionFlag && isFreePlan
+  const [isBestAvailableSelected, setIsBestAvailableSelected] = useState(false)
+
+  const shouldTrackRegionRecommendation = isFreePlan && showBestAvailableRegionFeature
+  const initialRecommendedRegionRef = useRef<string | undefined>(undefined)
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -181,7 +199,7 @@ export const ProjectCreationForm = ({
       shouldRunMigrations: true,
     },
   })
-  const { getFieldState, resetField, setValue } = form
+  const { getFieldState, resetField, setError, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -261,21 +279,25 @@ export const ProjectCreationForm = ({
     }
   )
 
-  const { data: availableRegionsData, error: availableRegionsError } =
-    useOrganizationAvailableRegionsQuery(
-      {
-        slug: slug,
-        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
-        desiredInstanceSize: instanceSize as DesiredInstanceSize,
-      },
-      {
-        enabled: flagsLoaded && smartRegionEnabled,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchInterval: false,
-        refetchOnReconnect: false,
-      }
-    )
+  const {
+    data: availableRegionsData,
+    error: availableRegionsError,
+    isFetching: isFetchingAvailableRegions,
+  } = useOrganizationAvailableRegionsQuery(
+    {
+      slug: slug,
+      cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
+      desiredInstanceSize: instanceSize as DesiredInstanceSize,
+      highAvailability,
+    },
+    {
+      enabled: flagsLoaded && smartRegionEnabled && hasSelectedOrganization,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+      refetchOnReconnect: false,
+    }
+  )
 
   const highAvailabilityRegion =
     highAvailability && highAvailabilityRegionCode !== undefined
@@ -286,6 +308,16 @@ export const ProjectCreationForm = ({
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
+
+  if (
+    initialRecommendedRegionRef.current === undefined &&
+    flagsLoaded &&
+    shouldTrackRegionRecommendation
+  ) {
+    initialRecommendedRegionRef.current = showBestAvailableRegionOption
+      ? 'best_available'
+      : recommendedSmartRegion || undefined
+  }
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
@@ -311,6 +343,7 @@ export const ProjectCreationForm = ({
       cloudProvider: cloudProvider as CloudProvider,
       dbRegion: smartRegionEnabled ? dbRegionExact : (dbRegion ?? ''),
       organizationSlug: organization,
+      highAvailability,
     },
     { enabled: currentOrg !== null }
   )
@@ -338,6 +371,15 @@ export const ProjectCreationForm = ({
   } = useProjectCreateMutation({
     onSuccess: (res) => {
       setProjectCreationError(undefined)
+      const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+      const submittedDbRegion = form.getValues('dbRegion')
+      const selectedRegionOption = isBestAvailableSelected ? 'best_available' : submittedDbRegion
+      const selectedRegionOptionType = resolveSelectedRegionOptionType({
+        isBestAvailableSelected,
+        dbRegion: submittedDbRegion,
+        smartGroupRegions: smartGroup,
+        specificRegions: specific,
+      })
       track(
         'project_creation_simple_version_submitted',
         {
@@ -349,6 +391,11 @@ export const ProjectCreationForm = ({
           useOrioleDb: form.getValues('useOrioleDb'),
           ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
             dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
+          }),
+          ...(shouldTrackRegionRecommendation && {
+            selectedRegionOption,
+            selectedRegionOptionType,
+            initialRecommendedRegion: initialRecommendedRegionRef.current,
           }),
         },
         {
@@ -469,6 +516,29 @@ export const ProjectCreationForm = ({
       return toast.error(
         `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
       )
+    }
+
+    const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
+    const selectedStaticRegion = smartRegionEnabled
+      ? undefined
+      : Object.values(getAvailableRegions(cloudProvider as CloudProvider)).find(
+          (region) => region.displayName === dbRegion
+        )
+    const selectedRegionRestriction = getRegionRestriction(
+      selectedSpecificRegion ?? selectedStaticRegion
+    )
+    if (selectedRegionRestriction !== undefined) {
+      setError(
+        'dbRegion',
+        { type: 'manual', message: getRegionRestrictionMessage(selectedRegionRestriction) },
+        { shouldFocus: true }
+      )
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'region_unavailable' },
+        'form'
+      )
+      return
     }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
@@ -684,6 +754,7 @@ export const ProjectCreationForm = ({
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
+              isLoadingAvailableRegions={isFetchingAvailableRegions}
               cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
@@ -745,7 +816,11 @@ export const ProjectCreationForm = ({
 
                     <RegionSelector
                       form={form}
+                      hasSelectedOrganization={hasSelectedOrganization}
                       instanceSize={instanceSize as DesiredInstanceSize}
+                      showBestAvailableRegionOption={showBestAvailableRegionOption}
+                      isBestAvailableSelected={isBestAvailableSelected}
+                      onBestAvailableSelectedChange={setIsBestAvailableSelected}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}

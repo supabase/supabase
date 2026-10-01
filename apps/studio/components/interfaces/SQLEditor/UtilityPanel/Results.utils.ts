@@ -4,7 +4,7 @@ import Papa from 'papaparse'
 type ResultRow = Record<string, unknown>
 
 export function formatResults(
-  results: ResultRow[]
+  results: readonly ResultRow[]
 ): Record<string, string | number | boolean | null | undefined>[] {
   return results.map((row) => {
     const formatted: Record<string, string | number | boolean> = {}
@@ -17,7 +17,7 @@ export function formatResults(
   })
 }
 
-export function convertResultsToMarkdown(results: ResultRow[]): string | undefined {
+export function convertResultsToMarkdown(results: readonly ResultRow[]): string | undefined {
   const formatted = formatResults(results)
   if (formatted.length === 0) return undefined
 
@@ -32,18 +32,18 @@ export function convertResultsToMarkdown(results: ResultRow[]): string | undefin
   return markdownTable(table)
 }
 
-export function convertResultsToJSON(results: ResultRow[]): string | undefined {
+export function convertResultsToJSON(results: readonly ResultRow[]): string | undefined {
   if (results.length === 0) return undefined
   return JSON.stringify(results, null, 2)
 }
 
-export function getResultsHeaders(results: ResultRow[]): string[] | undefined {
+export function getResultsHeaders(results: readonly ResultRow[]): string[] | undefined {
   const firstRow = Array.from(results)[0]
   if (firstRow) return Object.keys(firstRow)
   return undefined
 }
 
-export function convertResultsToCSV(results: ResultRow[]): string | undefined {
+export function convertResultsToCSV(results: readonly ResultRow[]): string | undefined {
   if (results.length === 0) return undefined
 
   const headers = getResultsHeaders(results)

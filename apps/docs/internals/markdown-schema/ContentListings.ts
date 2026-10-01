@@ -34,11 +34,6 @@ export function serializeContentListingGroupToMarkdown(
   }
 
   for (const item of items) {
-    if (!item.href) {
-      lines.push(`- **${item.title}:** ${item.description}`)
-      continue
-    }
-
     const href = isExternalContentListingHref(item.href)
       ? item.href
       : `${linkBaseUrl}${withDocsBasePath(item.href)}`

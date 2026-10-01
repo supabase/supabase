@@ -18,6 +18,7 @@ Alex Hsu
 Alexander Alexandrov
 Alexander Korotkov
 Ali Waseem
+Alice Crosbie
 Allan S
 Amir Issaei
 Amogh Rao
@@ -50,6 +51,7 @@ Brent Schroeter
 Bruno Kilian
 Burhan A
 Carel de Waal
+Carson Adam
 Cameron Blackwood
 Cameron Michie
 Cemal Kılıç
@@ -112,6 +114,7 @@ Ferhat Elmas
 Filipe Cabaco
 Firas El Rachidi
 Francesco Sansalvadore
+Franek Richardson
 Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
@@ -136,6 +139,7 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Iryna Deans
+Isaac Dawson
 Ivan Vasilov
 Jamie Boyd
 Jake Ng
@@ -164,13 +168,16 @@ Johan Bergström
 John Pena
 John Schaeffer
 Jon M
+Jonathan Smock
 Jonny Summers-Muir
 Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
+Juan Manuel Valenzuela
 Julian Domke
 Julien Goux
+Kacper Mentel
 Kai M
 Kalleby Santos
 Kanad Gupta
@@ -185,7 +192,10 @@ Keith Fiske
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Shaffer-Morrison
 Kevin Strong-Holte
+Kevin Webb
+Kody Jackson
 Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
@@ -206,6 +216,7 @@ Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Marija Milicevic
+Mario Karuza
 Mark Burggraf
 Márton Boros
 Matthew Hambright
@@ -218,7 +229,9 @@ Matthias Luft
 Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
+Michal Olszewski
 Michelle Jubrey
+Mike Podobnik
 Miranda Limonczenko
 Mo Khan
 Monica Khoury
@@ -262,6 +275,7 @@ Richard Kasprzak
 Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
+Román Cuellar
 Roman Hernandez
 Ronan Lehane
 Rory Wilding
@@ -292,6 +306,7 @@ Shreekar Shetty
 Simon Tomlinson
 Sreyas Udayavarman
 Stephanie Jackson (stejacks)
+Stephen Denham
 Stephen Morgan
 Steve Chavez
 Steven Eubank
@@ -332,6 +347,7 @@ Yara Lacerda
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov
+Zoë Braddock
 Zsolt Pazmandy
 ____________
 

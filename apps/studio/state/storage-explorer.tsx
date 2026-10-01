@@ -70,7 +70,7 @@ if (typeof window !== 'undefined') {
   abortController = new AbortController()
 }
 
-function createStorageExplorerState({
+export function createStorageExplorerState({
   projectRef,
   connectionString,
   bucket,
@@ -328,7 +328,10 @@ function createStorageExplorerState({
             path: prefix,
             status: STORAGE_ROW_STATUS.READY,
             items: formattedItems,
-            hasMoreItems: formattedItems.length === LIMIT,
+            // Compare the raw page, not the formatted one: formatFolderItems drops the
+            // .emptyFolderPlaceholder, so a full page can format to LIMIT - 1 and stop
+            // pagination a page early.
+            hasMoreItems: (data ?? []).length === LIMIT,
             isLoadingMoreItems: false,
           },
           index
@@ -409,6 +412,10 @@ function createStorageExplorerState({
       }
     },
 
+    /**
+     * Rebuilds the column stack (and `openedFolders`) from an absolute folder path,
+     * returning the segments it could not find so a URL restore can recover.
+     */
     fetchFoldersByPath: async ({
       paths,
       searchString = '',
@@ -417,8 +424,14 @@ function createStorageExplorerState({
       paths: string[]
       searchString?: string
       showLoading?: boolean
-    }) => {
-      if (state.selectedBucket.id === undefined) return
+    }): Promise<{ missingPaths: string[] }> => {
+      if (state.selectedBucket.id === undefined) return { missingPaths: [] }
+
+      // The listings below are issued against this bucket. The provider is keyed per
+      // project rather than per bucket, so a bucket switch mid-flight would otherwise
+      // commit these items under the *new* bucket's name — and because columns[0].name
+      // would then match, nothing downstream would notice and refetch.
+      const bucketIdAtStart = state.selectedBucket.id
 
       const pathsWithEmptyPrefix = [''].concat(paths)
 
@@ -445,36 +458,48 @@ function createStorageExplorerState({
               path: prefix,
               options,
             })
-            return data
+            return { items: data, isComplete: true }
           } catch (error: any) {
             toast.error(`Failed to fetch folders: ${error.message}`)
-            return []
+            // Flagged so an empty listing isn't read as "the folder has nothing in it"
+            return { items: [], isComplete: false }
           }
         })
       )
 
-      const formattedFolders = foldersItems.map((folderItems, idx) => {
+      const formattedFolders = foldersItems.map(({ items }, idx) => {
         const prefix = paths.slice(0, idx).join('/')
-        const formattedItems = formatFolderItems(folderItems, prefix)
+        const formattedItems = formatFolderItems(items, prefix)
         return {
           id: null,
           status: STORAGE_ROW_STATUS.READY,
           name: idx === 0 ? state.selectedBucket.name : pathsWithEmptyPrefix[idx],
           path: prefix,
           items: formattedItems,
-          hasMoreItems: formattedItems.length === LIMIT,
+          // Raw page length — see fetchFolderContents. Getting this wrong here also
+          // makes isParentListingExhaustive below claim a folder is missing.
+          hasMoreItems: items.length === LIMIT,
           isLoadingMoreItems: false,
         }
       })
+
+      if (state.selectedBucket.id !== bucketIdAtStart) return { missingPaths: [] }
 
       // Package into columns and update this.columns
       state.columns = formattedFolders
 
       // Update openedFolders as well
+      const missingPaths: string[] = []
       const updatedOpenedFolders: StorageItem[] = paths.map((path, idx) => {
-        const folderInfo = find(formattedFolders[idx].items, { name: path })
+        const parentColumn = formattedFolders[idx]
+        const folderInfo = find(parentColumn.items, { name: path })
         // Folder doesnt exist, FE just scaffolds a "fake" folder
         if (!folderInfo) {
+          // Only report a missing segment when the parent listing proves it: a failed
+          // request, a search filter, or a LIMIT cap can all drop a folder that exists.
+          const isParentListingExhaustive =
+            foldersItems[idx].isComplete && !searchString && !parentColumn.hasMoreItems
+          if (isParentListingExhaustive) missingPaths.push(path)
           return {
             id: null,
             name: path,
@@ -490,6 +515,8 @@ function createStorageExplorerState({
         return folderInfo
       })
       state.openedFolders = updatedOpenedFolders
+
+      return { missingPaths }
     },
 
     /**

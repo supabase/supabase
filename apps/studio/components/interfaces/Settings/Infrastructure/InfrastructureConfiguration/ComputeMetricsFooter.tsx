@@ -10,7 +10,11 @@ import { useComputeMetrics } from '@/hooks/analytics/useComputeMetrics'
  * to the database report. Metrics are project-scoped, which reports the
  * primary on both standard and High Availability projects.
  */
-export const ComputeMetricsFooter = ({ showConnections = true }: { showConnections?: boolean }) => {
+export const ComputeMetricsFooter = ({
+  isConnectionsAvailable = true,
+}: {
+  isConnectionsAvailable?: boolean
+}) => {
   const { ref } = useParams()
 
   const {
@@ -25,6 +29,7 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
   })
 
   const observabilityUrl = `/project/${ref}/observability/database`
+  const hasConnectionMetrics = isConnectionsAvailable && connections !== null && connections.max > 0
 
   return (
     <Tooltip>
@@ -33,10 +38,18 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
           href={observabilityUrl}
           className="border-t px-3 py-2 hover:bg-surface-200 transition flex items-center gap-x-3 text-xs"
         >
-          {/* Stable live region: announces loading/failure, never the polled values */}
+          {/* Stable live region: announces loading/unavailability, never the polled values */}
           <span role="status" className="sr-only">
             {isMetricsLoading && 'Loading metrics'}
             {!isMetricsLoading && isMetricsError && 'Metrics unavailable'}
+            {!isMetricsLoading && !isMetricsError && (
+              <>
+                {cpu === null && 'CPU unavailable. '}
+                {disk === null && 'Disk unavailable. '}
+                {memory === null && 'RAM unavailable. '}
+                {!hasConnectionMetrics && 'Connection metrics unavailable.'}
+              </>
+            )}
           </span>
           {/* h-4 matches the text-xs line height so the card doesn't shift when metrics load */}
           {isMetricsLoading && (
@@ -53,24 +66,28 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
           {!isMetricsLoading && !isMetricsError && (
             <>
               <span>
-                CPU <span className={metricColor(cpu)}>{cpu.toFixed(0)}%</span>
+                CPU <MetricValue value={cpu} />
               </span>
               <span className="text-foreground-lighter">·</span>
               <span>
-                Disk <span className={metricColor(disk)}>{disk.toFixed(0)}%</span>
+                Disk <MetricValue value={disk} />
               </span>
               <span className="text-foreground-lighter">·</span>
               <span>
-                RAM <span className={metricColor(memory)}>{memory.toFixed(0)}%</span>
+                RAM <MetricValue value={memory} />
               </span>
-              {showConnections && connections.max > 0 && (
-                <>
-                  <span className="text-foreground-lighter">·</span>
-                  <span className="text-foreground-light">
+              <span className="text-foreground-lighter">·</span>
+              <span className="text-foreground-light">
+                {hasConnectionMetrics ? (
+                  <>
                     {connections.peak}/{connections.max} conns
-                  </span>
-                </>
-              )}
+                  </>
+                ) : (
+                  <>
+                    Conns <span className="text-foreground-lighter">Unavailable</span>
+                  </>
+                )}
+              </span>
             </>
           )}
         </Link>
@@ -78,4 +95,12 @@ export const ComputeMetricsFooter = ({ showConnections = true }: { showConnectio
       <TooltipContent side="bottom">Go to Database Report</TooltipContent>
     </Tooltip>
   )
+}
+
+function MetricValue({ value }: { value: number | null }) {
+  if (value === null) {
+    return <span className="text-foreground-lighter">Unavailable</span>
+  }
+
+  return <span className={metricColor(value)}>{value.toFixed(0)}%</span>
 }

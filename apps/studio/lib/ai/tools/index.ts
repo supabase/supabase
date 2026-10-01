@@ -17,19 +17,17 @@ export const getTools = async ({
   connectionString,
   authorization,
   aiOptInLevel,
-  isRestrictedByHipaa,
   accessToken,
   baseUrl,
   supportMode,
   isExplorerEnabled,
+  useStatusPageWidget,
   signal,
 }: {
   projectRef: string
   connectionString: string
   authorization?: string
   aiOptInLevel: AiOptInLevel
-  // Only changes the blocked-tool wording.
-  isRestrictedByHipaa: boolean
   accessToken?: string
   baseUrl?: string
   supportMode?: boolean
@@ -37,6 +35,7 @@ export const getTools = async ({
   // assistant must not advertise list_notebooks/get_notebook until the caller confirms the
   // flag is on for this user.
   isExplorerEnabled?: boolean
+  useStatusPageWidget?: boolean
   // Required: tools fetched from the remote MCP server hold an HTTP connection
   // that is closed when this signal aborts (i.e. when the request ends).
   signal: AbortSignal
@@ -66,7 +65,6 @@ export const getTools = async ({
         accessToken,
         projectRef,
         aiOptInLevel,
-        isRestrictedByHipaa,
         signal,
       })
     } catch (error) {
@@ -79,6 +77,7 @@ export const getTools = async ({
       ...getSchemaTools({
         projectRef,
         connectionString,
+        authorization,
       }),
       ...getReportTools({ projectRef, authorization }),
       ...(isExplorerEnabled
@@ -89,17 +88,13 @@ export const getTools = async ({
             aiOptInLevel,
           })
         : {}),
-      ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
+      ...(baseUrl ? getIncidentTools({ baseUrl, useStatusPageWidget }) : {}),
     }
   }
 
   // Filter all tools based on the (potentially modified) AI opt-in level
   const toolsWithSupport = supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
-  const filteredTools: ToolSet = filterToolsByOptInLevel(
-    toolsWithSupport,
-    aiOptInLevel,
-    isRestrictedByHipaa
-  )
+  const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel)
 
   return filteredTools
 }

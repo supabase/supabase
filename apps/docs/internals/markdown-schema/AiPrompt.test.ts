@@ -14,7 +14,7 @@ describe('AiPrompt markdown schema', () => {
       props: { id: 'nextjs', includeInMarkdown: true },
     })
 
-    expect(markdown).toContain('**AI Prompt**')
+    expect(markdown).toContain('**Agent Prompt**')
     expect(markdown).toContain('Help me add Supabase to my Next.js project.')
     expect(markdown).toContain('```text')
   })

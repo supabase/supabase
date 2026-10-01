@@ -13,10 +13,10 @@ import {
 } from 'ui'
 
 import { ErroredTableDetails } from '../ErroredTableDetails'
-import { StateDot } from '../StateDot'
 import { SlotLagMetrics as SlotLagMetricsType, TableState } from './ReplicationPipelineStatus.types'
 import { getStatusConfig, getTableSyncLagLabel } from './ReplicationPipelineStatus.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { StateDot } from '@/components/ui/StateDot'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface TableReplicationRowProps {
@@ -62,7 +62,10 @@ export const TableReplicationRow = ({
 
   return (
     <TableRow>
-      <TableCell>{tableName}</TableCell>
+      <TableCell>
+        <span className="text-foreground-lighter">{table.schema}.</span>
+        <span className="text-foreground">{table.name}</span>
+      </TableCell>
 
       <TableCell>
         {isRestarting ? (

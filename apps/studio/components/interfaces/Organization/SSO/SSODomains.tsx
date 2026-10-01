@@ -37,7 +37,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
       >
         <div className="grid gap-2 w-full">
           {fields.map((field, idx) => (
-            <div key={field.id} className="flex gap-2 items-top">
+            <div key={field.id} className="flex gap-2 items-start">
               <FormField
                 name={`domains.${idx}.value`}
                 render={({ field }) => (

@@ -76,8 +76,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
 
       expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
-      expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.method'])`)
-      expect(sql).toContain(`if(${workerCondition}, null, log_attributes['request.path'])`)
+      expect(sql).toContain(
+        `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
+      )
+      expect(sql).toContain(
+        `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
+      )
       expect(sql).toContain(`if(${workerCondition}, log_attributes, map()) AS metadata`)
     })
 
@@ -96,17 +100,25 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getUnifiedLogsQuery(
         withFilters('method:eq:GET', 'status:eq:401', 'pathname:eq:/customers')
       )
-      expect(sql).toContain(`log_attributes['request.method'] IN ('GET')`)
+      // Method/pathname filters wrap the if() that picks the gateway or
+      // storage-service attribute key so storage rows match too.
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method'])) IN ('GET')`
+      )
       // Status filter wraps the CASE that picks HTTP code or Postgres SQLSTATE
       // so e.g. '00000' matches postgres success rows.
       expect(sql).toContain(`log_attributes['parsed.sql_state_code']`)
       expect(sql).toMatch(/END\) IN \('401'\)/)
-      expect(sql).toContain(`log_attributes['request.path'] LIKE '%/customers%'`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) LIKE '%/customers%'`
+      )
     })
 
     it('flips IN to NOT IN when the operator is `<>`', () => {
       const sql = getUnifiedLogsQuery(withFilters('method:neq:GET', 'status:neq:401'))
-      expect(sql).toContain(`log_attributes['request.method'] NOT IN ('GET')`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method'])) NOT IN ('GET')`
+      )
       expect(sql).toMatch(/END\) NOT IN \('401'\)/)
     })
 
@@ -115,45 +127,73 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       // `response.status_code`, so without this their 4xx/5xx classify as
       // success and the severity filter returns nothing.
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:auth'))
+      expect(sql).toContain(`WHEN source = 'auth_logs' THEN log_attributes['status']`)
+    })
+
+    it('reads the HTTP status from log_attributes[res.statusCode] for storage rows', () => {
+      // Storage-service logs expose their status under `res.statusCode`, not the
+      // gateway's `response.status_code`.
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
+      expect(sql).toContain(`WHEN source = 'storage_logs' THEN log_attributes['res.statusCode']`)
+    })
+
+    it('reads the method/pathname from log_attributes[req.method/req.url] for storage rows', () => {
+      // Storage-service logs expose method/path under `req.method` / `req.url`,
+      // not the gateway's `request.method` / `request.path`.
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
       expect(sql).toContain(
-        `if(source = 'auth_logs', log_attributes['status'], log_attributes['response.status_code'])`
+        `if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method'])`
+      )
+      expect(sql).toContain(
+        `if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])`
       )
     })
 
     it('flips LIKE to NOT LIKE when the pathname/host operator is `<>`', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:neq:/health', 'host:neq:cdn.foo'))
-      expect(sql).toContain(`log_attributes['request.path'] NOT LIKE '%/health%'`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) NOT LIKE '%/health%'`
+      )
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
     it('emits ILIKE for pathname `~~*`, case-insensitive unlike the `=` LIKE behavior', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:Customers'))
-      expect(sql).toContain(`log_attributes['request.path'] ILIKE '%Customers%'`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) ILIKE '%Customers%'`
+      )
     })
 
     it('emits NOT ILIKE for pathname `!~~*` so rows matching the term are excluded', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:notilike:health'))
-      expect(sql).toContain(`log_attributes['request.path'] NOT ILIKE '%health%'`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) NOT ILIKE '%health%'`
+      )
     })
 
     it('joins multiple pathname NOT ILIKE values with AND (row must match none)', () => {
       const sql = getUnifiedLogsQuery(
         withFilters('pathname:notilike:health', 'pathname:notilike:metrics')
       )
-      expect(sql).toMatch(
-        /log_attributes\['request\.path'\] NOT ILIKE '%health%' AND log_attributes\['request\.path'\] NOT ILIKE '%metrics%'/
+      const pathExpr = `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
+      expect(sql).toContain(
+        `${pathExpr} NOT ILIKE '%health%' AND ${pathExpr} NOT ILIKE '%metrics%'`
       )
     })
 
     it('passes through user-supplied `%` wildcards on pathname ILIKE without double-wrapping', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:foo%'))
-      expect(sql).toContain(`log_attributes['request.path'] ILIKE 'foo%'`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) ILIKE 'foo%'`
+      )
       expect(sql).not.toContain(`'%foo%%'`)
     })
 
     it('passes through user-supplied `_` wildcards on pathname ILIKE without wrapping', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:fo_bar'))
-      expect(sql).toContain(`log_attributes['request.path'] ILIKE 'fo_bar'`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) ILIKE 'fo_bar'`
+      )
       expect(sql).not.toContain(`'%fo_bar%'`)
     })
 
@@ -330,9 +370,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 
     it('buckets auth rows by their log_attributes[status] so 4xx/5xx are not counted as success', () => {
       const sql = getLogsChartQuery(baseSearch)
-      expect(sql).toContain(
-        `if(source = 'auth_logs', log_attributes['status'], log_attributes['response.status_code'])`
-      )
+      expect(sql).toContain(`WHEN source = 'auth_logs' THEN log_attributes['status']`)
     })
 
     it('does not classify Compute rows into a severity bucket', () => {
@@ -443,13 +481,17 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       // Postgres-only and rejected by both analytics engines. analyticsLiteral
       // doubles the backslash inside plain `'…'` delimiters instead.
       const sql = getUnifiedLogsQuery(withFilters('method:eq:a\\b'))
-      expect(sql).toContain(`log_attributes['request.method'] IN ('a\\\\b')`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method'])) IN ('a\\\\b')`
+      )
       expect(sql).not.toContain(`E'a`)
     })
 
     it("escapes single quotes by doubling them ('' rather than \\')", () => {
       const sql = getUnifiedLogsQuery(withFilters("method:eq:GET' OR '1'='1"))
-      expect(sql).toContain(`log_attributes['request.method'] IN ('GET'' OR ''1''=''1')`)
+      expect(sql).toContain(
+        `(if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method'])) IN ('GET'' OR ''1''=''1')`
+      )
     })
   })
 })
@@ -529,7 +571,9 @@ describe('pathname ILIKE prefix matching (cross-builder)', () => {
     const clickhouseSql = getUnifiedLogsQuery(withFilters('pathname:ilike:foo%'))
     const bqSql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:foo%'))
 
-    expect(clickhouseSql).toContain(`log_attributes['request.path'] ILIKE 'foo%'`)
+    expect(clickhouseSql).toContain(
+      `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) ILIKE 'foo%'`
+    )
     expect(bqSql).toContain("LOWER(`pathname`) LIKE LOWER('foo%')")
 
     // Neither backend should have double-wrapped the wildcard into a

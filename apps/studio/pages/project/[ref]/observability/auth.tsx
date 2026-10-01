@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -64,7 +64,9 @@ const REPORT_TITLE = 'Auth'
 
 const AuthUsage = () => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelReports')
   const chartSyncId = `auth-report`
+  const queryGroup = useOtel ? 'auth-otel' : 'auth-bigquery'
 
   const {
     selectedDateRange,
@@ -143,6 +145,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: { provider: usageProviderFilter },
+    useOtel,
   })
 
   const errorsReportConfig = createErrorsReportConfig({
@@ -151,6 +154,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: { status_code: monitoringStatusCodeFilter },
+    useOtel,
   })
 
   const latencyReportConfig = createLatencyReportConfig({
@@ -159,6 +163,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: {},
+    useOtel,
   })
 
   const onRefreshReport = useRefreshHandler(
@@ -292,6 +297,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{ provider: usageProviderFilter }}
                   highlightActions={highlightActions}
                 />
@@ -326,6 +332,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{ status_code: monitoringStatusCodeFilter }}
                   highlightActions={highlightActions}
                 />
@@ -350,6 +357,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{}}
                   highlightActions={highlightActions}
                 />

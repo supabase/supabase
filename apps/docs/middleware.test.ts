@@ -163,3 +163,23 @@ describe('docs middleware — /guides/* content negotiation', () => {
     expect(rewrite).not.toContain('/api/guides-md/')
   })
 })
+
+describe('docs middleware — reference paths', () => {
+  it('does not mistake listv2 for a version segment', () => {
+    const path = '/docs/reference/javascript/file-buckets-listv2'
+    expect(
+      middleware(makeRequest(path, { userAgent: 'Googlebot' })).headers.get(REWRITE_HEADER)
+    ).toBe('https://supabase.com/docs/api/crawlers')
+    expect(middleware(makeRequest(path)).headers.get(REWRITE_HEADER)).toBe(
+      'https://supabase.com/docs/reference/javascript'
+    )
+  })
+
+  it('sends the Kotlin root to the crawler renderer for bots', () => {
+    expect(
+      middleware(makeRequest('/docs/reference/kotlin', { userAgent: 'Googlebot' })).headers.get(
+        REWRITE_HEADER
+      )
+    ).toBe('https://supabase.com/docs/api/crawlers')
+  })
+})

@@ -133,6 +133,7 @@ export const ExplorerQueryTab = () => {
     <QueryEditor
       ref={queryEditorRef}
       id={id}
+      location={{ surface: 'query_tab', queryId: id }}
       variant="viewport"
       title={draft.name}
       query={query}
@@ -166,7 +167,10 @@ export const ExplorerQueryTab = () => {
       }}
       toolbarActions={
         <>
-          <SaveQueryDropdown query={{ title: draft.name, sql: draft.uncheckedSql }} />
+          <SaveQueryDropdown
+            query={{ title: draft.name, sql: draft.uncheckedSql }}
+            source={toQuerySourceBinding(draft)}
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <ExplorerToolbarAction icon={<MoreVertical size={16} strokeWidth={2} />} />
@@ -180,7 +184,7 @@ export const ExplorerQueryTab = () => {
                   <Keyboard size={14} />
                   <span>Intellisense enabled</span>
                 </div>
-                {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+                {isIntellisenseEnabled && <Check className="text-primary" size={16} />}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

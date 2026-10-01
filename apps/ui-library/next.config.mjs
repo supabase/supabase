@@ -12,6 +12,7 @@ const nextConfig = {
   },
   outputFileTracingIncludes: {
     '/api/docs-md/**/*': ['./public/markdown/docs/**/*'],
+    '/api/index-md/**/*': ['./public/markdown/index.md'],
   },
   async redirects() {
     return [
@@ -29,6 +30,17 @@ const nextConfig = {
       {
         source: '/r/tanstack-db-nextjs.json',
         destination: '/api/registry/tanstack-db',
+        permanent: true,
+      },
+      // The MCP server block was renamed from mcp-server to mcp
+      {
+        source: '/r/mcp-server.json',
+        destination: '/r/mcp.json',
+        permanent: true,
+      },
+      {
+        source: '/docs/headless/mcp-server',
+        destination: '/docs/headless/mcp',
         permanent: true,
       },
     ]

@@ -17,7 +17,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRNotice } from '@/components/interfaces/Database/Backups/PITR/PITRNotice'
 import { PITRSelection } from '@/components/interfaces/Database/Backups/PITR/PITRSelection'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -97,7 +97,7 @@ const PITR = () => {
       <Admonition
         type="default"
         title="Database backups are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+        description="OrioleDB is currently in public beta and Point-in-Time Recovery is unavailable on OrioleDB projects"
       >
         <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
       </Admonition>

@@ -77,7 +77,7 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                               label={
                                 <>
                                   Postgres with OrioleDB
-                                  <Badge variant="warning">Alpha</Badge>
+                                  <Badge variant="warning">Beta</Badge>
                                 </>
                               }
                               description="Not recommended for production workloads"
@@ -104,7 +104,7 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                     type="warning"
                     className="rounded-t-none [&>div]:text-xs"
                     title="OrioleDB is not production ready"
-                    description="Postgres with OrioleDB extension is currently in Public Alpha and not recommended for production usage yet."
+                    description="Postgres with OrioleDB extension is currently in Public Beta and not recommended for production usage yet."
                   >
                     <DocsButton className="mt-2" href={`${DOCS_URL}/guides/database/orioledb`} />
                   </Admonition>

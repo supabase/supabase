@@ -3,7 +3,7 @@ import { Button, CardContent, Slider } from 'ui'
 
 import { useThemeOverrides } from '@/hooks/misc/useThemeOverrides'
 import {
-  applyResolvedThemeOverrides,
+  applyThemeOverrides,
   getThemeOverrideValue,
   hasThemeOverrides,
   previewThemeOverride,
@@ -14,7 +14,7 @@ import {
   themeOverrideToSliderValue,
 } from '@/lib/theme-overrides'
 
-export const ThemeColorSettings = ({ isVisible = true }: { isVisible?: boolean }) => {
+export const ThemeColorSettings = () => {
   const { mode, overrides, setOverride, resetOverrides } = useThemeOverrides()
   const [draft, setDraft] = useState<ThemeOverrides>({})
   const draftRef = useRef<ThemeOverrides>({})
@@ -33,8 +33,7 @@ export const ThemeColorSettings = ({ isVisible = true }: { isVisible?: boolean }
 
   useEffect(
     () => () => {
-      const root = document.documentElement
-      applyResolvedThemeOverrides(root, root.dataset.theme, modeRef.current, overridesRef.current)
+      applyThemeOverrides(document.documentElement, modeRef.current, overridesRef.current)
     },
     []
   )
@@ -55,8 +54,6 @@ export const ThemeColorSettings = ({ isVisible = true }: { isVisible?: boolean }
     },
     [setOverride, writeDraft]
   )
-
-  if (!isVisible) return null
 
   return (
     <CardContent className="grid grid-cols-12 gap-6">

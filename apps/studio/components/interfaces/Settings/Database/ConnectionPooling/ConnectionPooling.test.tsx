@@ -46,6 +46,7 @@ vi.mock('@/hooks/misc/useHighAvailability', () => ({
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: mockUseSelectedProjectQuery,
   useIsHighAvailability: () => mockUseHighAvailability().isHighAvailability ?? false,
+  useIsAwsCloudProvider: () => false,
 }))
 
 vi.mock('@/data/database/max-connections-query', () => ({

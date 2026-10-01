@@ -1,198 +1,46 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
-import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
-import { ConfirmDeleteModal } from './ConfirmDeleteModal'
-import { CustomExpiryModal } from './CustomExpiryModal'
-import { FileExplorer } from './FileExplorer'
-import { FileExplorerHeader } from './FileExplorerHeader'
-import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
-import { MoveItemsModal } from './MoveItemsModal'
-import { PreviewPane } from './PreviewPane'
-import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
-import { useStoragePreference } from './useStoragePreference'
+import { StorageExplorerContent } from './StorageExplorerContent'
+import { StorageExplorerNavigationProvider } from './StorageExplorerNavigation'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
-import type { Bucket } from '@/data/storage/buckets-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()
-  const storageExplorerRef = useRef(null)
-  const {
-    projectRef,
-    columns,
-    selectedItems,
-    openedFolders,
-    selectedItemsToMove,
-    selectedBucket,
-    fetchFolderContents,
-    fetchMoreFolderContents,
-    fetchFoldersByPath,
-    uploadFiles,
-    moveFiles,
-    popColumnAtIndex,
-    popOpenedFoldersAtIndex,
-    setSelectedItems,
-    clearSelectedItems,
-    setSelectedFilePreview,
-    setSelectedItemsToMove,
-    setIsSearching,
-  } = useStorageExplorerStateSnapshot()
-  const { view } = useStoragePreference(projectRef)
+  const { selectedBucket } = useStorageExplorerStateSnapshot()
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
 
-  // Detect when transitioning between buckets to avoid showing stale content from the previous bucket.
-  // This happens because the bucket query and effects that update the store run after the first render.
-  const isLoading = isBucketQueryLoading || (!!bucketId && bucketId !== selectedBucket.id)
+  // Guards the gap where the query has settled but the store still holds another bucket.
+  const isBucketReady = !isBucketQueryLoading && !!bucket && bucketId === selectedBucket.id
 
-  // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
-  // Things like showing results from a search filter is "temporary", hence we use react state to manage
+  // Deliberately not in the URL, so a shared link points at a folder, not someone's filter.
   const [itemSearchString, setItemSearchString] = useState('')
   const debouncedSearchString = useDebounce(itemSearchString, 500)
 
-  const handleClearSearch = useCallback(() => {
-    setIsSearching(false)
-    setItemSearchString('')
-  }, [setIsSearching])
-
-  useStorageExplorerShortcuts({ onClearSearch: handleClearSearch })
-
-  const fetchContents = useEffectEvent(async (bucket: Bucket) => {
-    if (view === STORAGE_VIEWS.LIST) {
-      const currentFolderIdx = openedFolders.length - 1
-      const currentFolder = openedFolders[currentFolderIdx]
-
-      const folderId = !currentFolder ? bucket.id : currentFolder.id
-      const folderName = !currentFolder ? bucket.name : currentFolder.name
-      const index = !currentFolder ? -1 : currentFolderIdx
-
-      await fetchFolderContents({
-        bucketId: bucket.id,
-        folderId,
-        folderName,
-        index,
-        searchString: debouncedSearchString,
-      })
-    } else if (view === STORAGE_VIEWS.COLUMNS) {
-      if (openedFolders.length > 0) {
-        const paths = openedFolders.map((folder) => folder.name)
-        fetchFoldersByPath({
-          paths,
-          searchString: debouncedSearchString,
-          showLoading: true,
-        })
-      } else {
-        await fetchFolderContents({
-          bucketId: bucket.id,
-          folderId: bucket.id,
-          folderName: bucket.name,
-          index: -1,
-          searchString: debouncedSearchString,
-        })
-      }
-    }
-  })
-
-  useEffect(() => {
-    if (bucket && projectRef) fetchContents(bucket)
-  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id])
-
-  /** Checkbox selection methods */
-  /** [Joshen] We'll only support checkbox selection for files ONLY */
-
-  const onSelectAllItemsInColumn = (columnIndex: number) => {
-    const columnFiles = columns[columnIndex].items
-      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
-      .map((item) => {
-        return { ...item, columnIndex }
-      })
-    const columnFilesId = compact(columnFiles.map((item) => item.id))
-    const selectedItemsFromColumn = selectedItems.filter(
-      (item) => item.id && columnFilesId.includes(item.id)
-    )
-
-    if (selectedItemsFromColumn.length === columnFiles.length) {
-      // Deselect all items from column
-      const updatedSelectedItems = selectedItems.filter(
-        (item) => item.id && !columnFilesId.includes(item.id)
-      )
-      setSelectedItems(updatedSelectedItems)
-    } else {
-      // Select all items from column
-      const updatedSelectedItems = uniqBy(selectedItems.concat(columnFiles), 'id')
-      setSelectedItems(updatedSelectedItems)
-    }
-  }
-
-  /** File manipulation methods */
-
-  const onFilesUpload = async (event: any, columnIndex: number = -1) => {
-    event.persist()
-    const items = event.target.files || event.dataTransfer.items
-    const isDrop = !isEmpty(get(event, ['dataTransfer', 'items'], []))
-    await uploadFiles({ files: items, columnIndex, isDrop })
-    event.target.value = ''
-  }
-
-  const onMoveSelectedFiles = async (newPath: string) => {
-    await moveFiles(newPath)
-  }
-
-  /** Misc UI methods */
-  const onSelectColumnEmptySpace = (columnIndex: number) => {
-    popColumnAtIndex(columnIndex)
-    popOpenedFoldersAtIndex(columnIndex - 1)
-    setSelectedFilePreview(undefined)
-    clearSelectedItems()
-  }
-
   return (
-    <div ref={storageExplorerRef} className="bg-studio flex h-full w-full flex-col">
-      {selectedItems.length === 0 ? (
-        <FileExplorerHeader
+    <div className="bg-studio flex h-full w-full flex-col">
+      {/* The skeleton swap is silent, and a live region must be mounted before it changes.
+          `aria-live` rather than `role="status"`: that role is how toasts announce
+          themselves here, and tests wait on it to tell when an upload has finished. */}
+      <span aria-live="polite" aria-atomic="true" className="sr-only">
+        {isBucketReady ? 'Bucket contents loaded' : 'Loading bucket contents'}
+      </span>
+      <StorageExplorerNavigationProvider
+        isBucketReady={isBucketReady}
+        searchString={debouncedSearchString}
+      >
+        <StorageExplorerContent
           itemSearchString={itemSearchString}
           setItemSearchString={setItemSearchString}
-          onFilesUpload={onFilesUpload}
+          isLoading={!isBucketReady}
         />
-      ) : (
-        <FileExplorerHeaderSelection />
-      )}
-      <div className="flex flex-1 min-h-0">
-        <FileExplorer
-          columns={columns}
-          selectedItems={selectedItems}
-          itemSearchString={itemSearchString}
-          isLoading={isLoading}
-          onFilesUpload={onFilesUpload}
-          onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-          onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-          onColumnLoadMore={(index, column) =>
-            fetchMoreFolderContents({ index, column, searchString: itemSearchString })
-          }
-        />
-        <PreviewPane />
-      </div>
-
-      <ConfirmDeleteModal />
-
-      <MoveItemsModal
-        visible={selectedItemsToMove.length > 0}
-        projectRef={projectRef}
-        bucketId={selectedBucket.id}
-        bucketName={selectedBucket.name}
-        selectedItemsToMove={selectedItemsToMove}
-        openedFolders={openedFolders}
-        onSelectCancel={() => setSelectedItemsToMove([])}
-        onSelectMove={onMoveSelectedFiles}
-      />
-
-      <CustomExpiryModal />
+      </StorageExplorerNavigationProvider>
     </div>
   )
 }

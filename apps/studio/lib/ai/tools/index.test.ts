@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getTools } from './index'
 import { getMcpTools } from './mcp-tools'
+import { getSchemaTools } from './schema-tools'
 
 vi.mock('common', () => ({ IS_PLATFORM: true }))
 
@@ -18,7 +19,6 @@ const BASE_PARAMS = {
   connectionString: 'postgresql://localhost',
   authorization: 'Bearer token',
   aiOptInLevel: 'schema_and_log_and_data' as const,
-  isRestrictedByHipaa: false,
   accessToken: 'access-token',
   baseUrl: 'https://supabase.com/dashboard',
   signal: new AbortController().signal,
@@ -40,13 +40,22 @@ describe('ai/tools getTools', () => {
       accessToken: BASE_PARAMS.accessToken,
       projectRef: BASE_PARAMS.projectRef,
       aiOptInLevel: BASE_PARAMS.aiOptInLevel,
-      isRestrictedByHipaa: BASE_PARAMS.isRestrictedByHipaa,
       signal: BASE_PARAMS.signal,
     })
     expect(tools).toHaveProperty('studio_tool')
     expect(tools).toHaveProperty('list_tables')
     expect(tools).toHaveProperty('schema_tool')
     expect(tools).toHaveProperty('incident_tool')
+  })
+
+  it('passes authorization through to schema tools', async () => {
+    await getTools(BASE_PARAMS)
+
+    expect(getSchemaTools).toHaveBeenCalledWith({
+      projectRef: BASE_PARAMS.projectRef,
+      connectionString: BASE_PARAMS.connectionString,
+      authorization: BASE_PARAMS.authorization,
+    })
   })
 
   it('degrades gracefully to the remaining tools when remote MCP fetch fails', async () => {
