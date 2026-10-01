@@ -147,6 +147,15 @@ overrides:
   webpack: ^5.104.1
   'codemirror-graphql>@codemirror/language': 6.11.0
   '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
+  # @tanstack/start-server-core@1.169.39 (latest as of this writing) is the
+  # only package that depends on something named `h3-v2` (its own alias for
+  # an embedded h3 v2 copy), so overriding this name only affects it — no
+  # `pkg>dep` selector needed. It pins that embedded copy to 2.0.1-rc.20,
+  # which predates h3's fixes for hanging/aborting piped requests on client
+  # disconnect (rc.23, rc.26, rc.28 — see https://github.com/h3js/h3/releases).
+  # That's the cause of the Selfhosted Studio E2E "AbortError"/500s on slow
+  # pg-meta queries.
+  'h3-v2': npm:h3@2.0.1-rc.32
 
 patchedDependencies:
   react-data-grid: patches/react-data-grid.patch
