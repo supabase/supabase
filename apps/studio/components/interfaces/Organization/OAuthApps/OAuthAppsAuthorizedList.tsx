@@ -27,6 +27,11 @@ export const OAuthAppsAuthorizedList = () => {
     'approved_oauth_apps'
   )
 
+  const { can: canRevokeOAuthApps } = useAsyncCheckPermissions(
+    PermissionAction.DELETE,
+    'approved_oauth_apps'
+  )
+
   const {
     data,
     isPending,
@@ -66,7 +71,6 @@ export const OAuthAppsAuthorizedList = () => {
           <div className="space-y-2">
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
           </div>
         )}
 
@@ -102,7 +106,11 @@ export const OAuthAppsAuthorizedList = () => {
                     {data.pages.map((page, pageIndex) => (
                       <Fragment key={pageIndex}>
                         {page.data.map((approval) => (
-                          <OAuthAppsAuthorizedRow key={approval.app.id} approval={approval} />
+                          <OAuthAppsAuthorizedRow
+                            key={approval.app.id}
+                            approval={approval}
+                            canRevoke={canRevokeOAuthApps}
+                          />
                         ))}
                       </Fragment>
                     ))}

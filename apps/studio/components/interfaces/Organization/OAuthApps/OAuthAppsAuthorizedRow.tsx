@@ -16,13 +16,15 @@ import {
 } from 'ui'
 
 import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
+import { OAuthAppsRevokeDialogContent } from './OAuthAppsRevokeDialogContent'
 import type { OAuthApprovalItem, OAuthApprovalTarget } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsAuthorizedRowProps {
   approval: OAuthApprovalItem
+  canRevoke: boolean
 }
 
-export const OAuthAppsAuthorizedRow = ({ approval }: OAuthAppsAuthorizedRowProps) => {
+export const OAuthAppsAuthorizedRow = ({ approval, canRevoke }: OAuthAppsAuthorizedRowProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogContent, setDialogContent] = useState<'grants' | 'revoke' | null>(null)
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
@@ -78,9 +80,25 @@ export const OAuthAppsAuthorizedRow = ({ approval }: OAuthAppsAuthorizedRowProps
                   View grants
                 </DropdownMenuItem>
               </DialogTrigger>
+              {canRevoke && (
+                <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => setDialogContent('revoke')}
+                  >
+                    Revoke
+                  </DropdownMenuItem>
+                </DialogTrigger>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           {dialogContent === 'grants' && <OAuthAppsMemberGrantsDialogContent approval={approval} />}
+          {dialogContent === 'revoke' && (
+            <OAuthAppsRevokeDialogContent
+              approval={approval}
+              onClose={() => setDialogContent(null)}
+            />
+          )}
         </Dialog>
       </TableCell>
     </TableRow>
