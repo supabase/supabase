@@ -130,7 +130,7 @@ export const RestoreToNewProject = () => {
       <Admonition
         type="default"
         title="Restoring to new projects are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+        description="OrioleDB is currently in public beta and restoring to a new project is unavailable on OrioleDB projects"
       />
     )
   }

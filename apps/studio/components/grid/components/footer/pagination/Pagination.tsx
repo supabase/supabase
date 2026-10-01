@@ -345,7 +345,9 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
                   ? `This is an estimated value as your table has more than ${THRESHOLD_COUNT.toLocaleString()} rows.`
                   : `Count not automatically loaded as your table has more than ${THRESHOLD_COUNT.toLocaleString()} rows.`}{' '}
                 <br />
-                <span className="text-brand">Click to retrieve the exact count of the table.</span>
+                <span className="text-primary">
+                  Click to retrieve the exact count of the table.
+                </span>
               </TooltipContent>
             </Tooltip>
           )}

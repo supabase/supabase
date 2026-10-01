@@ -19,7 +19,7 @@ const fullGettingStartedEnabled = isFeatureEnabled('docs:full_getting_started')
 
 function SetupPrompt({ cliCode }: { cliCode: ReactNode }) {
   return (
-    <PromptPanel>
+    <PromptPanel telemetry={{ source: 'homepage' }}>
       <Prompt value="prompt" expandable>
         <PromptTitle>Agent Prompt</PromptTitle>
         <PromptCopy>{setupPrompt}</PromptCopy>

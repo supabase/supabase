@@ -55,6 +55,22 @@ export function isSelectableWarehouseSchema(schemaName: string): boolean {
   )
 }
 
+/**
+ * Groups the project's tables under the schemas Warehouse can replicate, sorted by schema name.
+ */
+export function buildSchemasWithTables(
+  schemas: { name: string }[],
+  tables: { schema: string; name: string }[]
+): SchemaWithTables[] {
+  return schemas
+    .filter((schema) => isSelectableWarehouseSchema(schema.name))
+    .map((schema) => ({
+      schema: schema.name,
+      tables: tables.filter((table) => table.schema === schema.name).map((table) => table.name),
+    }))
+    .sort((a, b) => a.schema.localeCompare(b.schema))
+}
+
 export function getSelectedTableCount(selection: SchemaTableSelection): number {
   return Object.values(selection).filter(Boolean).length
 }

@@ -21,6 +21,7 @@ export const getTools = async ({
   baseUrl,
   supportMode,
   isExplorerEnabled,
+  useStatusPageWidget,
   signal,
 }: {
   projectRef: string
@@ -34,6 +35,7 @@ export const getTools = async ({
   // assistant must not advertise list_notebooks/get_notebook until the caller confirms the
   // flag is on for this user.
   isExplorerEnabled?: boolean
+  useStatusPageWidget?: boolean
   // Required: tools fetched from the remote MCP server hold an HTTP connection
   // that is closed when this signal aborts (i.e. when the request ends).
   signal: AbortSignal
@@ -75,6 +77,7 @@ export const getTools = async ({
       ...getSchemaTools({
         projectRef,
         connectionString,
+        authorization,
       }),
       ...getReportTools({ projectRef, authorization }),
       ...(isExplorerEnabled
@@ -85,7 +88,7 @@ export const getTools = async ({
             aiOptInLevel,
           })
         : {}),
-      ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
+      ...(baseUrl ? getIncidentTools({ baseUrl, useStatusPageWidget }) : {}),
     }
   }
 

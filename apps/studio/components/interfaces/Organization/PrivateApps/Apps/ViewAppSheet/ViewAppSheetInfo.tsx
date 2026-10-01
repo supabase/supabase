@@ -44,7 +44,7 @@ function CopyableId({ id, label }: { id: string; label: string }) {
     >
       <span className="truncate">{id}</span>
       {isCopied ? (
-        <Check size={12} strokeWidth={1.25} className="text-brand shrink-0" />
+        <Check size={12} strokeWidth={1.25} className="text-primary shrink-0" />
       ) : (
         <Copy
           size={12}

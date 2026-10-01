@@ -2,7 +2,7 @@ export type ProviderName = 'bedrock' | 'openai'
 
 export type BedrockModel = 'anthropic.claude-3-7-sonnet-20250219-v1:0' | 'openai.gpt-oss-120b-1:0'
 
-export type OpenAIModelId = 'gpt-5.4-nano' | 'gpt-5.3-codex' | 'gpt-5.6-luna'
+export type OpenAIModelId = 'gpt-5.4-nano' | 'gpt-5.3-codex' | 'gpt-6-luna'
 
 // Source: https://developers.openai.com/api/docs/guides/reasoning + per-model pages
 export type ReasoningEffort = 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh' | 'max'
@@ -10,11 +10,11 @@ export type ReasoningEffort = 'none' | 'minimal' | 'low' | 'medium' | 'high' | '
 // Per-model reasoning effort compatibility.
 // Sources: https://developers.openai.com/api/docs/models/gpt-5.4-nano
 //          https://developers.openai.com/api/docs/models/gpt-5.3-codex
-//          https://developers.openai.com/api/docs/models/gpt-5.6-luna
+//          https://developers.openai.com/api/docs/models/gpt-6-luna
 type ModelReasoningSupport = {
   'gpt-5.4-nano': 'none' | 'low' | 'medium' | 'high' | 'xhigh'
   'gpt-5.3-codex': 'low' | 'medium' | 'high' | 'xhigh'
-  'gpt-5.6-luna': 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max'
+  'gpt-6-luna': 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max'
 }
 
 type ReasoningEffortFor<ModelId extends OpenAIModelId> = ModelId extends keyof ModelReasoningSupport
@@ -62,7 +62,7 @@ export const LOGS_REWRITE_MODEL = openaiModelEntry({
 // Models with requiresAdvanceModelEntitlement false are available to all users; true requires the assistant.advance_model entitlement.
 export const ASSISTANT_MODELS = [
   openaiModelEntry({
-    id: 'gpt-5.6-luna',
+    id: 'gpt-6-luna',
     requiresAdvanceModelEntitlement: false,
     reasoningEffort: 'medium',
   }),
@@ -89,7 +89,7 @@ const ASSISTANT_MODELS_MAP = Object.fromEntries(ASSISTANT_MODELS.map((m) => [m.i
   (typeof ASSISTANT_MODELS)[number]
 >
 
-export const DEFAULT_ASSISTANT_BASE_MODEL_ID = 'gpt-5.6-luna' satisfies AssistantBaseModelId
+export const DEFAULT_ASSISTANT_BASE_MODEL_ID = 'gpt-6-luna' satisfies AssistantBaseModelId
 
 export const DEFAULT_ASSISTANT_ADVANCE_MODEL_ID = 'gpt-5.3-codex' satisfies AssistantModelId
 
@@ -158,7 +158,7 @@ export const PROVIDERS: ProviderRegistry = {
   },
   openai: {
     models: {
-      'gpt-5.6-luna': { default: false },
+      'gpt-6-luna': { default: false },
       'gpt-5.3-codex': { default: false },
       'gpt-5.4-nano': { default: true },
     },

@@ -22,7 +22,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
@@ -300,7 +300,7 @@ export const Destinations = () => {
                 aria-label="More actions"
                 variant="default"
                 icon={<MoreVertical />}
-                className="px-1.25"
+                className="w-6.5 hit-area-1"
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
@@ -363,7 +363,9 @@ export const Destinations = () => {
           <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
         )}
 
-        {isDestinationsLoading && <GenericSkeletonLoader />}
+        {isDestinationsLoading && (
+          <GenericTableLoader headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]} />
+        )}
 
         {!isDestinationsLoading && hasDestinations && (
           <Card>

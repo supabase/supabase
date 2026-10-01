@@ -157,7 +157,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
           <TableCell>
             <div className="flex items-center justify-center">
               {x.enabled_mode !== 'DISABLED' ? (
-                <Check strokeWidth={2} className="text-brand" />
+                <Check strokeWidth={2} className="text-primary" />
               ) : (
                 <X strokeWidth={2} />
               )}

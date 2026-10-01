@@ -11,6 +11,7 @@ import {
   getAvailableRegions,
   getHighAvailabilityRegionCode,
   resolveDefaultDbRegion,
+  resolveSelectedRegionOptionType,
 } from './ProjectCreation.utils'
 
 describe('resolveDefaultDbRegion', () => {
@@ -66,6 +67,55 @@ describe('resolveDefaultDbRegion', () => {
 
   it('falls back to the fixed default when no geolocated region resolved', () => {
     expect(resolveDefaultDbRegion(base)).toBe(AWS_REGIONS.EAST_US.displayName)
+  })
+})
+
+describe('resolveSelectedRegionOptionType', () => {
+  const smartGroupRegions = [{ name: 'Americas' }, { name: 'APAC' }]
+  const specificRegions = [{ name: 'ap-southeast-1' }, { name: 'us-east-1' }]
+
+  it('returns general when the "Best available region" shortcut was used', () => {
+    expect(
+      resolveSelectedRegionOptionType({
+        isBestAvailableSelected: true,
+        dbRegion: 'ap-southeast-1',
+        smartGroupRegions,
+        specificRegions,
+      })
+    ).toBe('general')
+  })
+
+  it('returns general when the region was picked from the smart group list', () => {
+    expect(
+      resolveSelectedRegionOptionType({
+        isBestAvailableSelected: false,
+        dbRegion: 'Americas',
+        smartGroupRegions,
+        specificRegions,
+      })
+    ).toBe('general')
+  })
+
+  it('returns specific when the region was picked from the specific regions list', () => {
+    expect(
+      resolveSelectedRegionOptionType({
+        isBestAvailableSelected: false,
+        dbRegion: 'ap-southeast-1',
+        smartGroupRegions,
+        specificRegions,
+      })
+    ).toBe('specific')
+  })
+
+  it('returns undefined when the region matches neither list', () => {
+    expect(
+      resolveSelectedRegionOptionType({
+        isBestAvailableSelected: false,
+        dbRegion: undefined,
+        smartGroupRegions,
+        specificRegions,
+      })
+    ).toBeUndefined()
   })
 })
 

@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useRef } from 'react'
@@ -53,7 +53,7 @@ export const DisplayApiSettings = ({
   const isApiKeysEmpty = apiKeys.length === 0
 
   const now = useRef(new Date()).current
-  const showApiKeyLastUsed = useFlag('showApiKeysLastUsed')
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
   const {
     isLoading: isLoadingLastUsed,
     isError: isLastUsedError,
@@ -64,16 +64,11 @@ export const DisplayApiSettings = ({
       isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
       isoTimestampEnd: now.toISOString(),
     },
-    { enabled: showApiKeyLastUsed }
+    { enabled: canReadAPIKeys && showApiKeysLastUsed }
   )
 
   const lastUsedAPIKeys = useMemo(() => {
-    if (
-      apiKeys.length < 1 ||
-      !lastUsedLogData ||
-      lastUsedLogData.length < 1 ||
-      !showApiKeyLastUsed
-    ) {
+    if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
       return {}
     }
 
@@ -84,7 +79,7 @@ export const DisplayApiSettings = ({
       console.error(e)
       return {}
     }
-  }, [lastUsedLogData, apiKeys, showApiKeyLastUsed])
+  }, [lastUsedLogData, apiKeys])
 
   return (
     <Panel
@@ -216,7 +211,7 @@ export const DisplayApiSettings = ({
               />
             </FormLayout>
 
-            {showApiKeyLastUsed && (
+            {IS_PLATFORM && showApiKeysLastUsed && (
               <div
                 className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
                 data-invisible={isLoadingLastUsed}
