@@ -245,6 +245,8 @@ export const EditWrapperSheet = ({
               <FormSection>
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <ForeignTablesSelector
+                    // getEditionFormSchema's option fields are dynamic (index signature),
+                    // which defeats RHF's field-array type inference.
                     tables={tablesField as unknown as FormattedWrapperTable[]}
                     wrapperTables={wrapperMeta.tables}
                     errorMessage={errors.tables?.message?.toString()}

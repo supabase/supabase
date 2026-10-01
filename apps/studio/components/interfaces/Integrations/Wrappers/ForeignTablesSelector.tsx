@@ -80,19 +80,12 @@ export const ForeignTablesSelector = ({
                     setSelectedTableFieldIndex(tableIndex)
                     setSelectedTableToEdit(table)
                   }}
-                  tooltip={{
-                    content: { side: 'bottom', text: `Edit ${table.table_name} foreign table` },
-                  }}
+                  tooltip={{ content: { side: 'bottom', text: 'Edit foreign table' } }}
                 />
                 <ButtonTooltip
                   icon={<Trash />}
                   onClick={() => onRemove(tableIndex)}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: `Remove ${table.table_name} foreign table`,
-                    },
-                  }}
+                  tooltip={{ content: { side: 'bottom', text: 'Remove foreign table' } }}
                 />
               </div>
             </div>
