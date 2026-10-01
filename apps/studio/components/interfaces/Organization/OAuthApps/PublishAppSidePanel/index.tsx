@@ -35,6 +35,8 @@ import * as z from 'zod'
 
 import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
+import { AuthorizationSection } from './Authorization'
+import { isAuthorizationConfirmationPending } from './Authorization.utils'
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -91,6 +93,8 @@ const getFormDefaultValues = (selectedApp: OAuthApp | undefined) => {
 
 type FormSchema = z.infer<typeof formSchema>
 
+const FORM_ID = 'publish-oauth-app-form'
+
 export const PublishAppSidePanel = ({
   visible,
   selectedApp,
@@ -125,6 +129,14 @@ export const PublishAppSidePanel = ({
   const [iconUrl, setIconUrl] = useState<string>()
   const [scopes, setScopes] = useState<OAuthScope[]>([])
 
+  const [isMemberBoundGrant, setIsMemberBoundGrant] = useState(false)
+  const [isMemberBoundGrantLocked, setIsMemberBoundGrantLocked] = useState(false)
+  const [isMemberBoundGrantConfirmed, setIsMemberBoundGrantConfirmed] = useState(false)
+
+  const [isProjectScopingEnabled, setIsProjectScopingEnabled] = useState(false)
+  const [isProjectScopingLocked, setIsProjectScopingLocked] = useState(false)
+  const [isProjectScopingConfirmed, setIsProjectScopingConfirmed] = useState(false)
+
   useEffect(() => {
     if (visible) {
       setIconFile(undefined)
@@ -136,12 +148,33 @@ export const PublishAppSidePanel = ({
         setScopes([])
         setIconUrl(undefined)
       }
+
+      setIsMemberBoundGrant(false)
+      setIsMemberBoundGrantLocked(false)
+      setIsMemberBoundGrantConfirmed(false)
+      setIsProjectScopingEnabled(false)
+      setIsProjectScopingLocked(false)
+      setIsProjectScopingConfirmed(false)
     }
   }, [visible, selectedApp])
 
+  const isAuthorizationPendingConfirmation = isAuthorizationConfirmationPending(
+    {
+      checked: isMemberBoundGrant,
+      locked: isMemberBoundGrantLocked,
+      confirmed: isMemberBoundGrantConfirmed,
+    },
+    {
+      checked: isProjectScopingEnabled,
+      locked: isProjectScopingLocked,
+      confirmed: isProjectScopingConfirmed,
+    }
+  )
+
   const onFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.persist()
-    const [file] = event.target.files || (event as any).dataTransfer.items
+    const file = event.target.files?.[0]
+    if (!file) return
     setIconFile(file)
     setIconUrl(URL.createObjectURL(file))
     event.target.value = ''
@@ -217,227 +250,234 @@ export const PublishAppSidePanel = ({
 
   return (
     <SidePanel
-      hideFooter
       size="large"
       visible={visible}
       header={
         selectedApp !== undefined ? 'Update OAuth application' : 'Publish a new OAuth application'
       }
       onCancel={() => onClose()}
+      customFooter={
+        <div className="flex items-center justify-between w-full px-4 sm:px-6 py-4 border-t bg-overlay">
+          <Button
+            onClick={() => setShowPreview(true)}
+            disabled={name.length === 0 || website.length === 0}
+          >
+            Preview consent for users
+          </Button>
+          <div className="flex items-center space-x-2">
+            <Button disabled={isSubmitting} onClick={() => onClose()}>
+              Cancel
+            </Button>
+            <Shortcut
+              id={SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT}
+              onTrigger={() => form.handleSubmit(onSubmit)()}
+              options={{ enabled: visible && !isSubmitting }}
+              side="top"
+            >
+              <Button
+                variant="primary"
+                type="submit"
+                form={FORM_ID}
+                loading={isSubmitting}
+                disabled={isSubmitting || isAuthorizationPendingConfirmation}
+              >
+                Confirm
+              </Button>
+            </Shortcut>
+          </div>
+        </div>
+      }
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="h-full flex flex-col">
-            <div className="grow">
-              <SidePanel.Content>
-                <div className="py-4 flex items-start justify-between gap-10">
-                  <div className="space-y-4 w-full">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          layout="vertical"
-                          label="Application name"
-                          description={selectedApp?.id && `ID: ${selectedApp.id}`}
-                        >
-                          <FormControl className="col-span-6">
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItemLayout>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="website"
-                      render={({ field }) => (
-                        <FormItemLayout layout="vertical" label="Website URL">
-                          <FormControl className="col-span-6">
-                            <Input {...field} placeholder="https://my-website.com" />
-                          </FormControl>
-                        </FormItemLayout>
-                      )}
-                    />
-                  </div>
-                  <div>
-                    {iconUrl !== undefined ? (
-                      <div
-                        className={cn(
-                          'shadow-sm transition group relative',
-                          'bg-center bg-cover bg-no-repeat',
-                          'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center'
-                        )}
-                        style={{
-                          backgroundImage: iconUrl ? `url("${iconUrl}")` : 'none',
-                        }}
-                      >
-                        <div className="absolute bottom-1 right-1">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button className="px-1">
-                                <Edit />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" side="bottom">
-                              <DropdownMenuItem
-                                key="upload"
-                                onClick={() => {
-                                  if (uploadButtonRef.current)
-                                    (uploadButtonRef.current as any).click()
-                                }}
-                              >
-                                <p>Upload image</p>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                key="remove"
-                                onClick={() => {
-                                  setIconFile(undefined)
-                                  setIconUrl(undefined)
-                                }}
-                              >
-                                <p>Remove image</p>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
-                    ) : (
-                      <div
-                        className={cn(
-                          'border border-strong transition opacity-75 hover:opacity-100',
-                          'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer'
-                        )}
-                        onClick={() => {
-                          if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
-                        }}
-                      >
-                        <Upload size={18} strokeWidth={1.5} className="text-foreground" />
-                        <p className="text-xs text-foreground-light">Upload logo</p>
-                      </div>
+        <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+          <SidePanel.Content>
+            <div className="py-4 flex items-start justify-between gap-10">
+              <div className="space-y-4 w-full">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="vertical"
+                      label="Application name"
+                      description={selectedApp?.id && `ID: ${selectedApp.id}`}
+                    >
+                      <FormControl className="col-span-6">
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="website"
+                  render={({ field }) => (
+                    <FormItemLayout layout="vertical" label="Website URL">
+                      <FormControl className="col-span-6">
+                        <Input {...field} placeholder="https://my-website.com" />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+              <div>
+                {iconUrl !== undefined ? (
+                  <div
+                    className={cn(
+                      'shadow-sm transition group relative',
+                      'bg-center bg-cover bg-no-repeat',
+                      'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center'
                     )}
-                    <input
-                      multiple
-                      type="file"
-                      ref={uploadButtonRef}
-                      className="hidden"
-                      accept="image/png, image/jpeg"
-                      onChange={onFileUpload}
-                    />
+                    style={{
+                      backgroundImage: iconUrl ? `url("${iconUrl}")` : 'none',
+                    }}
+                  >
+                    <div className="absolute bottom-1 right-1">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button className="px-1">
+                            <Edit />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" side="bottom">
+                          <DropdownMenuItem
+                            key="upload"
+                            onClick={() => {
+                              uploadButtonRef.current?.click()
+                            }}
+                          >
+                            <p>Upload image</p>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            key="remove"
+                            onClick={() => {
+                              setIconFile(undefined)
+                              setIconUrl(undefined)
+                            }}
+                          >
+                            <p>Remove image</p>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
-                </div>
-              </SidePanel.Content>
-
-              <SidePanel.Separator />
-
-              <SidePanel.Content className="py-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <div>
-                    <p className="text-foreground text-sm">Authorization callback URLs</p>
-                    <p className="text-sm text-foreground-light">
-                      All URLs must use HTTPS, except for localhost
-                    </p>
+                ) : (
+                  <div
+                    className={cn(
+                      'border border-strong transition opacity-75 hover:opacity-100',
+                      'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer'
+                    )}
+                    onClick={() => {
+                      uploadButtonRef.current?.click()
+                    }}
+                  >
+                    <Upload size={18} strokeWidth={1.5} className="text-foreground" />
+                    <p className="text-xs text-foreground-light">Upload logo</p>
                   </div>
-                  <Button onClick={() => appendCallbackUrl({ id: uuidv4(), value: '' })}>
-                    Add URL
-                  </Button>
-                </div>
-                <div className="space-y-2 pb-2">
-                  {callbackUrlsFields.map((url, index) => (
-                    <FormField
-                      key={url.id}
-                      control={form.control}
-                      name={`redirect_uris.${index}.value`}
-                      render={({ field }) => (
-                        <FormItemLayout
-                          layout="vertical"
-                          label={<span className="sr-only">Callback URL</span>}
-                        >
-                          <FormControl>
-                            <InputGroup>
-                              <InputGroupInput
-                                {...field}
-                                placeholder="e.g https://my-website.com"
-                              />
-                              {callbackUrlsFields.length > 1 ? (
-                                <InputGroupAddon align="inline-end">
-                                  <InputGroupButton
-                                    variant="default"
-                                    onClick={() => removeCallbackUrl(index)}
-                                  >
-                                    Remove
-                                  </InputGroupButton>
-                                </InputGroupAddon>
-                              ) : null}
-                            </InputGroup>
-                          </FormControl>
-                        </FormItemLayout>
-                      )}
-                    />
-                  ))}
-                  {errors.redirect_uris?.root != null ? (
-                    <p className="text-red-900 text-sm">{errors.redirect_uris?.root.message}</p>
-                  ) : null}
-                </div>
-              </SidePanel.Content>
-
-              {selectedApp !== undefined && (
-                <>
-                  <SidePanel.Separator />
-                  <SidePanel.Content className="py-4">
-                    <OAuthSecrets selectedApp={selectedApp} />
-                  </SidePanel.Content>
-                </>
-              )}
-
-              <SidePanel.Separator />
-              <div className="p-6 ">
-                <div className="flex items-start justify-between space-x-4 pb-4">
-                  <div className="flex flex-col">
-                    <span className="text-sm text-foreground">Application permissions</span>
-                    <span className="text-sm text-foreground-light">
-                      The application permissions are organized in scopes and will be presented to
-                      the user when adding an app to their organization and all of its projects.
-                    </span>
-                  </div>
-                  <DocsButton href={`${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`} />
-                </div>
-
-                <ScopesPanel scopes={scopes} setScopes={setScopes} />
+                )}
+                <input
+                  multiple
+                  type="file"
+                  ref={uploadButtonRef}
+                  className="hidden"
+                  accept="image/png, image/jpeg"
+                  onChange={onFileUpload}
+                />
               </div>
             </div>
+          </SidePanel.Content>
 
-            <SidePanel.Separator />
+          <SidePanel.Separator />
 
-            <SidePanel.Content>
-              <div className="pt-2 pb-3 flex items-center justify-between">
-                <Button
-                  onClick={() => setShowPreview(true)}
-                  disabled={name.length === 0 || website.length === 0}
-                >
-                  Preview consent for users
-                </Button>
-                <div className="flex items-center space-x-2">
-                  <Button disabled={isSubmitting} onClick={() => onClose()}>
-                    Cancel
-                  </Button>
-                  <Shortcut
-                    id={SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT}
-                    onTrigger={() => form.handleSubmit(onSubmit)()}
-                    options={{ enabled: visible && !isSubmitting }}
-                    side="top"
-                  >
-                    <Button
-                      variant="primary"
-                      type="submit"
-                      loading={isSubmitting}
-                      disabled={isSubmitting}
-                    >
-                      Confirm
-                    </Button>
-                  </Shortcut>
-                </div>
+          <SidePanel.Content className="py-4">
+            <div className="mb-2 flex items-center justify-between">
+              <div>
+                <p className="text-foreground text-sm">Authorization callback URLs</p>
+                <p className="text-sm text-foreground-light">
+                  All URLs must use HTTPS, except for localhost
+                </p>
               </div>
-            </SidePanel.Content>
+              <Button onClick={() => appendCallbackUrl({ id: uuidv4(), value: '' })}>
+                Add URL
+              </Button>
+            </div>
+            <div className="space-y-2 pb-2">
+              {callbackUrlsFields.map((url, index) => (
+                <FormField
+                  key={url.id}
+                  control={form.control}
+                  name={`redirect_uris.${index}.value`}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="vertical"
+                      label={<span className="sr-only">Callback URL</span>}
+                    >
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupInput {...field} placeholder="e.g https://my-website.com" />
+                          {callbackUrlsFields.length > 1 ? (
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                variant="default"
+                                onClick={() => removeCallbackUrl(index)}
+                              >
+                                Remove
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          ) : null}
+                        </InputGroup>
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              ))}
+              {errors.redirect_uris?.root != null ? (
+                <p className="text-red-900 text-sm">{errors.redirect_uris?.root.message}</p>
+              ) : null}
+            </div>
+          </SidePanel.Content>
+
+          {selectedApp !== undefined && (
+            <>
+              <SidePanel.Separator />
+              <SidePanel.Content className="py-4">
+                <OAuthSecrets selectedApp={selectedApp} />
+              </SidePanel.Content>
+            </>
+          )}
+
+          <SidePanel.Separator />
+          <AuthorizationSection
+            memberBoundGrant={{
+              checked: isMemberBoundGrant,
+              locked: isMemberBoundGrantLocked,
+              confirmed: isMemberBoundGrantConfirmed,
+            }}
+            onMemberBoundGrantChange={setIsMemberBoundGrant}
+            onMemberBoundGrantConfirmedChange={setIsMemberBoundGrantConfirmed}
+            projectScoping={{
+              checked: isProjectScopingEnabled,
+              locked: isProjectScopingLocked,
+              confirmed: isProjectScopingConfirmed,
+            }}
+            onProjectScopingChange={setIsProjectScopingEnabled}
+            onProjectScopingConfirmedChange={setIsProjectScopingConfirmed}
+          />
+
+          <SidePanel.Separator />
+          <div className="p-6 ">
+            <div className="flex items-start justify-between space-x-4 pb-4">
+              <div className="flex flex-col">
+                <span className="text-sm text-foreground">Application permissions</span>
+                <span className="text-sm text-foreground-light">
+                  The application permissions are organized in scopes and will be presented to the
+                  user when adding an app to their organization and all of its projects.
+                </span>
+              </div>
+              <DocsButton href={`${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`} />
+            </div>
+
+            <ScopesPanel scopes={scopes} setScopes={setScopes} />
           </div>
 
           <AlertDialog open={showPreview} onOpenChange={(open) => setShowPreview(open)}>
