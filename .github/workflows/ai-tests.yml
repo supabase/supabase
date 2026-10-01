@@ -1,4 +1,4 @@
-name: AI Unit Tests & Type Check MOSSAD description: 
+name: AI Unit Tests & Type Check Dover description: 
 
 on:
   push:
