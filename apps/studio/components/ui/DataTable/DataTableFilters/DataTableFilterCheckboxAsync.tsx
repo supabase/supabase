@@ -8,7 +8,11 @@ import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
-import { isLogsFilterColumnValue } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
+import {
+  columnFiltersToLogsFilters,
+  isLogsFilterColumnValue,
+  logsFiltersToUrlParams,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { AlertError } from '@/components/ui/AlertError'
 import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
@@ -21,11 +25,8 @@ export function DataTableFilterCheckboxAsync<TData>({
   const value = _value as string
   const [inputValue, setInputValue] = useState('')
 
-  const { table, searchParameters, columnFilters } = useDataTable<
-    TData,
-    unknown,
-    QuerySearchParamsType
-  >()
+  const { table, searchParameters, columnFilters, filterFields, hasPendingFilterChange } =
+    useDataTable<TData, unknown, QuerySearchParamsType>()
 
   // [Joshen] JFYI for simplicity currently, i'm adding UnifiedLogs logic into this file
   // despite this supposedly being a reusable component - tbh really, this doesn't need to
@@ -34,6 +35,23 @@ export function DataTableFilterCheckboxAsync<TData>({
   const { ref: projectRef } = useParams()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const debouncedSearch = useDebounce(inputValue, 700)
+  const filterableNames = new Set(
+    filterFields.filter((field) => field.type !== 'timerange').map((field) => String(field.value))
+  )
+  const dateValue = columnFilters.find((filter) => filter.id === 'date')?.value
+  const date =
+    Array.isArray(dateValue) &&
+    dateValue.length === 2 &&
+    dateValue.every((value) => value instanceof Date)
+      ? dateValue
+      : null
+  const scopedSearch = hasPendingFilterChange
+    ? {
+        ...searchParameters,
+        filter: logsFiltersToUrlParams(columnFiltersToLogsFilters(columnFilters, filterableNames)),
+        date,
+      }
+    : searchParameters
   const {
     data: facetOptions,
     error,
@@ -43,7 +61,7 @@ export function DataTableFilterCheckboxAsync<TData>({
   } = useUnifiedLogsFacetCountQuery(
     {
       projectRef,
-      search: searchParameters,
+      search: scopedSearch,
       facet: value,
       facetSearch: debouncedSearch,
     },
