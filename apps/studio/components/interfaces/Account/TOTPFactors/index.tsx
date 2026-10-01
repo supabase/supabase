@@ -48,50 +48,6 @@ export const TOTPFactors = () => {
 
   return (
     <>
-      {shouldVerifyRecoveryCodes && (
-        <PageSection>
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Recovery codes</PageSectionTitle>
-              <PageSectionDescription>
-                Recovery codes allow you to recover your account in case you lost access to your MFA
-                apps.
-              </PageSectionDescription>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent aria-live="polite">
-            {recoveryCodesStatusQuery.isError && (
-              <ErrorDisplay
-                title="Failed to load recovery codes"
-                errorMessage="An error occurred while loading recovery codes."
-              />
-            )}
-            {recoveryCodesStatusQuery.data?.status === 'unenrolled' && (
-              <GenerateRecoveryCodesModal />
-            )}
-            {recoveryCodesStatusQuery.data?.status === 'available' &&
-              recoveryCodesStatusQuery.data?.data && (
-                <Card>
-                  <CardContent className="flex flex-col gap-2">
-                    <p
-                      className={cn(
-                        'text-sm',
-                        recoveryCodesStatusQuery.data.data.remaining < 2 ? 'text-warning' : ''
-                      )}
-                    >
-                      {recoveryCodesStatusQuery.data.data.remaining}/
-                      {recoveryCodesStatusQuery.data.data.total} recovery codes available
-                    </p>
-                    <div className="flex gap-2 ml-auto">
-                      <RegenerateRecoveryCodesModal />
-                      <UnenrollRecoveryCodesModal />
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-          </PageSectionContent>
-        </PageSection>
-      )}
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
@@ -164,10 +120,57 @@ export const TOTPFactors = () => {
           )}
         </PageSectionContent>
       </PageSection>
+
+      {shouldVerifyRecoveryCodes && (
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Recovery codes</PageSectionTitle>
+              <PageSectionDescription>
+                Recovery codes allow you to recover your account in case you lost access to your MFA
+                apps.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent aria-live="polite">
+            {recoveryCodesStatusQuery.isError && (
+              <ErrorDisplay
+                title="Failed to load recovery codes"
+                errorMessage="An error occurred while loading recovery codes."
+              />
+            )}
+            {recoveryCodesStatusQuery.data?.status === 'unenrolled' && (
+              <GenerateRecoveryCodesModal />
+            )}
+            {recoveryCodesStatusQuery.data?.status === 'available' &&
+              recoveryCodesStatusQuery.data?.data && (
+                <Card>
+                  <CardContent className="flex flex-col gap-2">
+                    <p
+                      className={cn(
+                        'text-sm',
+                        recoveryCodesStatusQuery.data.data.remaining < 2 ? 'text-warning' : ''
+                      )}
+                    >
+                      {recoveryCodesStatusQuery.data.data.remaining}/
+                      {recoveryCodesStatusQuery.data.data.total} recovery codes available
+                    </p>
+                    <div className="flex gap-2 ml-auto">
+                      <RegenerateRecoveryCodesModal />
+                      <UnenrollRecoveryCodesModal />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+          </PageSectionContent>
+        </PageSection>
+      )}
+
       <AddNewFactorModal
         visible={isAddNewFactorOpen}
         onClose={() => setIsAddNewFactorOpen(false)}
       />
+
       <DeleteFactorModal
         visible={factorToBeDeleted !== null}
         factorId={factorToBeDeleted}
