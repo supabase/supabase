@@ -281,10 +281,10 @@ Supabase considers a delivery successful when your endpoint returns a `2xx` resp
 | Attempt   | Wait after the previous failure | Approximate time since the event |
 | --------- | ------------------------------- | -------------------------------- |
 | 1         | Not applicable                  | Immediately                      |
-| 2         | 30 seconds                      | ~30 seconds                      |
-| 3         | 3 minutes                       | ~3.5 minutes                     |
-| 4         | 18 minutes                      | ~22 minutes                      |
-| 5 (final) | 1 hour 48 minutes               | ~2 hours 10 minutes              |
+| 2         | 10 seconds                      | ~10 seconds                      |
+| 3         | 30 seconds                      | ~40 seconds                      |
+| 4         | 1 minute 30 seconds             | ~2 minutes 10 seconds            |
+| 5 (final) | 4 minutes 30 seconds            | ~6 minutes 40 seconds            |
 
 After five failed attempts, the delivery is marked as failed with no further retries. Supabase does not notify you when this happens — check delivery history to find permanently failed deliveries.
 
