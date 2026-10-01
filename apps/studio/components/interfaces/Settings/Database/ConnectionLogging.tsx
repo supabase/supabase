@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect, useMemo } from 'react'
@@ -22,9 +21,9 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { usePostgresConfigurationUpdateMutation } from '@/data/config/postgres-config-mutation'
 import { postgresConfigurationQueryOptions } from '@/data/config/postgres-config-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FormSchema = z.object({
   log_connections: z.boolean(),
@@ -34,10 +33,9 @@ const FormSchema = z.object({
 export const ConnectionLogging = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { can: canUpdatePostgresConfiguration } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+  const { can: canUpdatePostgresConfiguration } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE,
+    { projectRef: project?.parentRef }
   )
 
   const {

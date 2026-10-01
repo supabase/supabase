@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useMemo, useRef, useState, type ComponentPropsWithoutRef } from 'react'
@@ -30,10 +29,10 @@ import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from '@/data/projects/project-restore-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FormSchema = z.object({
   postgresVersionSelection: z.string(),
@@ -81,9 +80,8 @@ export const ResumeProjectButton = ({
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
-  const { can: canResumeProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_jobs.projects.initialize_or_resume'
+  const { can: canResumeProject } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
   )
 
   const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({

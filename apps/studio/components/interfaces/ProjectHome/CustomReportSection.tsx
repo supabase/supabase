@@ -7,7 +7,6 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { arrayMove, rectSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -34,13 +33,13 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
@@ -70,23 +69,12 @@ export function CustomReportSection() {
   )
   const [isDraggingOver, setIsDraggingOver] = useState(false)
 
-  const { can: canCreateReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    { resource: { type: 'report', owner_id: profile?.id }, subject: { id: profile?.id } }
+  const { can: canCreateReport } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
   )
 
-  const { can: canUpdateReport } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: homeReport?.visibility,
-        owner_id: homeReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
+  const { can: canUpdateReport } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
   )
 
   const { mutate: upsertContent } = useContentUpsertMutation()

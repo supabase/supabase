@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import Link from 'next/link'
@@ -46,11 +45,11 @@ import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from '@/data/database/pgbouncer-config-update-mutation'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const formId = 'pooling-configuration-form'
 const HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS = 100_000
@@ -70,10 +69,8 @@ export const ConnectionPooling = () => {
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
   const canLoadPoolingConfig = !isHighAvailability && !isHighAvailabilityPending
-  const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+  const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_WRITE
   )
 
   const {

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
@@ -19,9 +18,9 @@ import { useOrganizationMembersQuery } from '@/data/organizations/organization-m
 import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -38,13 +37,13 @@ export const SecuritySettings = () => {
     isSuccess: isSuccessMembers,
   } = useOrganizationMembersQuery({ slug })
 
-  const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'organizations'
+  // TODO(Hieu): org member (aka project scoped user) can already access organization_admin_read, so we should gate org config
+  // reads behind a new dedicated permission with readonly as the minimum required role.
+  const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    'organization_config_read'
   )
-  const { can: canUpdateMfaConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canUpdateMfaConfig } = useAsyncCheckPermissionsV2(
+    'organization_config_write'
   )
   const track = useTrack()
 

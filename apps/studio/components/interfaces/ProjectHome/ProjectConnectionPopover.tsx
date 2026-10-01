@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronDown, Copy, Database, KeyRound, Link2, Terminal } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -19,10 +18,10 @@ import { appendHighAvailabilitySslParams } from '@/components/interfaces/Connect
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user'] as const
 const EMPTY_CONNECTION_INFO = {
@@ -41,9 +40,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
 
   const { data: projectUrl, isPending: isLoadingApiUrl } = useProjectApiUrl({ projectRef })

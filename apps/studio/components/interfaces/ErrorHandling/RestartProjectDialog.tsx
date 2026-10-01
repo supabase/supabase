@@ -27,6 +27,8 @@ export function RestartProjectDialog({
   const { data: project } = useSelectedProjectQuery()
   const { setProjectStatus } = useSetProjectStatus()
 
+  // TODO(Hieu): project_admin_write requires admin+, but project restart should be
+  // available to developer+. Add a dedicated permission for project restart.
   const { can: canRestartProject } = useAsyncCheckPermissionsV2(
     'project_operations_write'
   )

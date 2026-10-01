@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { useRouter } from 'next/router'
@@ -8,11 +7,11 @@ import { cn, SQL_ICON } from 'ui'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import { SQL_TEMPLATES } from '@/components/interfaces/SQLEditor/SQLEditor.queries'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const SQLTemplates = () => {
   const router = useRouter()
@@ -24,13 +23,8 @@ const SQLTemplates = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const track = useTrack()
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
   )
 
   const handleNewQuery = async (sql: string, name: string) => {

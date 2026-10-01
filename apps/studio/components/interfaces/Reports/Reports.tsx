@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { groupBy, isEqual, isNull } from 'lodash'
@@ -27,7 +26,6 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
@@ -36,6 +34,7 @@ import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DEFAULT_CHART_COLUMN_COUNT = 1
 const DEFAULT_CHART_ROW_COUNT = 1
@@ -78,29 +77,11 @@ const Reports = () => {
   )
   const currentReportContent = currentReport?.content as Dashboards.Content
 
-  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: currentReport?.visibility,
-        owner_id: currentReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
+  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_READ
   )
-  const { can: canUpdateReport } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: currentReport?.visibility,
-        owner_id: currentReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
+  const { can: canUpdateReport } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
   )
 
   function handleDateRangePicker({ period_start, period_end }: any) {

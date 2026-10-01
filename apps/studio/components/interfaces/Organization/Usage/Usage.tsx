@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChartArea, Check, ChevronDown } from 'lucide-react'
@@ -32,9 +31,9 @@ import { OrganizationProjectSelector } from '@/components/ui/OrganizationProject
 import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const Usage = () => {
   const { slug } = useParams()
@@ -50,9 +49,8 @@ export const Usage = () => {
   const isHighAvailability = resolveHighAvailability(selectedProject)
   const canLoadUsage = !selectedProjectRef || (!isLoadingSelectedProject && !isHighAvailability)
 
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    'billing_read'
   )
 
   const {

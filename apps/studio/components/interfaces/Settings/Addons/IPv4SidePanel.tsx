@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,11 +13,11 @@ import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addo
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import type { AddonVariantId } from '@/data/subscriptions/types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsAwsCloudProvider } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 import { useAddonsPagePanel } from '@/state/addons-page'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
@@ -26,9 +25,8 @@ const IPv4SidePanel = () => {
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
-  const { can: canUpdateIPv4 } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateIPv4 } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
 
   const { panel, closePanel } = useAddonsPagePanel()

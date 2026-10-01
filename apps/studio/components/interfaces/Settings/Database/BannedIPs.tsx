@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Globe } from 'lucide-react'
 import { useState } from 'react'
@@ -21,10 +20,9 @@ import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvail
 import { useBannedIPsDeleteMutation } from '@/data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from '@/data/misc/user-ip-address-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const HA_DISABLED_TITLE = 'Network bans unavailable on High Availability projects'
 const HA_DISABLED_DESCRIPTION =
@@ -32,7 +30,6 @@ const HA_DISABLED_DESCRIPTION =
 
 export const BannedIPs = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability } = useHighAvailability()
 
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
@@ -53,11 +50,9 @@ export const BannedIPs = () => {
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
 
-  const { can: canUnbanNetworks } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUnbanNetworks } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_WRITE,
+  )
 
   const isSectionDisabled = isHighAvailability || !canUnbanNetworks
   const sectionDisabledReason = isHighAvailability
