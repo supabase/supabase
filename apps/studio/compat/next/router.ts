@@ -293,12 +293,12 @@ export function useRouter() {
       // route tree's strict typing: Next-style hrefs are free-form strings
       // that can't satisfy the route-path union at compile time.
       const { to, search, hash } = splitInternalUrl(target)
-      await router.navigate<AnyRouter, string>({
-        to,
-        search: search ?? {},
-        hash: hash ?? '',
-        replace: options?._replace,
-      })
+      const destination = { to, search: search ?? {}, hash: hash ?? '' }
+      const { href } = router.buildLocation<AnyRouter, string>(destination)
+      const isInFlight =
+        href === router.latestLocation.href && href !== router.state.resolvedLocation?.href
+      if (isInFlight) return true
+      await router.navigate<AnyRouter, string>({ ...destination, replace: options?._replace })
       return true
     }
 
