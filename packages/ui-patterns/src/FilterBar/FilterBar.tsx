@@ -59,7 +59,7 @@ function FilterBarContent({ className }: { className?: string }) {
     <div className="w-full space-y-2 relative">
       <div
         className={cn(
-          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 pr-2 overflow-auto',
+          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 overflow-auto',
           className
         )}
       >

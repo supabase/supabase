@@ -120,7 +120,11 @@ describe('DestinationTypeSelection', () => {
     fireEvent.click(await screen.findByRole('combobox'))
     fireEvent.click(await screen.findByText('BigQuery'))
 
-    expect(await screen.findByText(/In public alpha and may change/)).toBeInTheDocument()
+    expect(
+      await screen.findByText(
+        'Destination type cannot be changed after creation. BigQuery support is in public alpha.'
+      )
+    ).toBeInTheDocument()
   })
 
   test('disables the selector in edit mode so the destination type cannot be changed', async () => {

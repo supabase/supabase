@@ -40,6 +40,7 @@ export type FilterBarContextValue = {
   isLoading: boolean
   error: string | null
   highlightedConditionPath: number[] | null
+  setHighlightedConditionPath: (path: number[] | null) => void
 
   onFilterChange: (filters: FilterGroup) => void
   commitFilters: (filters: FilterGroup) => void
@@ -370,6 +371,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     isLoading: loading,
     error,
     highlightedConditionPath,
+    setHighlightedConditionPath,
 
     onFilterChange,
     commitFilters,

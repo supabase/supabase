@@ -155,10 +155,10 @@ allow_dynamic_registration = true
 
 ### Step 2: Create the MCP server
 
-The fastest path is the [MCP Server block](/library/docs/headless/mcp-server) in the Supabase Library. It installs an Edge Function with the middleware already wired, a `whoami` tool, and a small tool registry to extend:
+The fastest path is the [MCP Server block](/library/docs/headless/mcp) in the Supabase Library. It installs an Edge Function with the middleware already wired, a `whoami` tool, and a small tool registry to extend:
 
 ```bash
-npx shadcn@latest add https://supabase.com/library/r/mcp-server.json
+npx shadcn@latest add https://supabase.com/library/r/mcp.json
 ```
 
 To write the function yourself, start with a table for the tools to work on. Create it with RLS so each user only sees their own rows; the `user_id` default means inserts don't need to pass it. Save this as a migration with `supabase migration new create_todos` and paste it into the generated file:
@@ -196,8 +196,8 @@ Replace the contents of `supabase/functions/mcp/index.ts`. Compared with the pub
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0'
-import { pipeline } from 'npm:@supabase/middleware@^0.5.0'
-import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@^1.6.0'
+import { pipeline } from 'npm:@supabase/middleware@1'
+import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
 import { z } from 'npm:zod@^4.3.6'
 
 import type { Database } from './database.types.ts'
@@ -254,7 +254,7 @@ Deno.serve(
 
 <Admonition type="note">
 
-Composing `withSupabase` as a `pipeline` entry is alpha and tracks `@supabase/middleware` 0.x. The nested form, `withOAuthProtectedResource(withSupabase({ auth: 'user' }, handler))`, is stable and behaves the same. Both need `@supabase/server` 1.6.0 or later.
+The nested form, `withOAuthProtectedResource(withSupabase({ auth: 'user' }, handler))`, behaves the same. Both need `@supabase/server` 1.6.0 or later.
 
 </Admonition>
 
@@ -380,7 +380,7 @@ Both examples in this guide are in the `supabase/supabase` repository, ready to 
 
 ## Resources
 
-- [MCP Server block](/library/docs/headless/mcp-server) and [Headless App block](/library/docs/tanstack/headless-app) in the Supabase Library
+- [MCP Server block](/library/docs/headless/mcp) and [Headless App block](/library/docs/tanstack/headless-app) in the Supabase Library
 - [`@supabase/server` reference](/docs/reference/server/introduction)
 - [MCP authentication with Supabase Auth](/docs/guides/auth/oauth-server/mcp-authentication)
 - [OAuth 2.1 server](/docs/guides/auth/oauth-server)
