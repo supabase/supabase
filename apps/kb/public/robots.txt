@@ -2,3 +2,4 @@ User-agent: *
 Disallow: /
 
 Sitemap: https://supabase.com/kb/sitemap-index.xml
+Content-Signal: ai-train=no, search=no, ai-input=no
