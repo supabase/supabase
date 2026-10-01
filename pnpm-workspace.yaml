@@ -20,7 +20,7 @@ catalog:
   '@supabase/ssr': 0.12.7
   '@supabase/supabase-js': 2.116.0
   '@tanstack/react-router': ^1.169.2
-  '@tanstack/react-start': ^1.167.65
+  '@tanstack/react-start': ^1.168.60
   '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
@@ -104,6 +104,24 @@ minimumReleaseAgeExclude:
   - '@next/swc-linux-x64-musl@16.3.5'
   - '@next/swc-win32-arm64-msvc@16.3.5'
   - '@next/swc-win32-x64-msvc@16.3.5'
+  # TanStack Start CVE-2026-102989 (GHSA-qx66-fv34-fjm8). The patched releases
+  # are newer than minimumReleaseAge, and Vercel blocks every deployment in the
+  # repo until they are installed. Pinned to exact versions rather than
+  # '@tanstack/*' so the quarantine still covers future TanStack releases.
+  - '@tanstack/react-router@1.170.41'
+  - '@tanstack/react-start@1.168.60'
+  - '@tanstack/react-start-client@1.168.39'
+  - '@tanstack/react-start-rsc@0.1.59'
+  - '@tanstack/react-start-server@1.167.46'
+  - '@tanstack/react-store@0.11.2'
+  - '@tanstack/router-core@1.171.34'
+  - '@tanstack/router-generator@1.167.40'
+  - '@tanstack/router-plugin@1.168.42'
+  - '@tanstack/start-client-core@1.170.34'
+  - '@tanstack/start-plugin-core@1.171.49'
+  - '@tanstack/start-server-core@1.169.39'
+  - '@tanstack/start-storage-context@1.167.36'
+  - '@tanstack/store@0.11.2'
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
