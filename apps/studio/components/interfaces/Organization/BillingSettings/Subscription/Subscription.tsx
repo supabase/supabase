@@ -6,6 +6,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../Restriction'
+import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
 import { InitiateCancellationFlowButton } from './CancellationFlow'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -18,12 +19,15 @@ import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const Subscription = () => {
   const { slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -43,6 +47,9 @@ const Subscription = () => {
 
   const canChangeTier =
     !projectUpdateDisabled && !['enterprise', 'platform'].includes(currentPlan?.id ?? '')
+  const isDirectlyManaged = selectedOrganization?.managed_by === MANAGED_BY.SUPABASE
+  const canPurchaseThroughAws =
+    canChangeTier && isDirectlyManaged && subscription?.billing_via_partner !== true
 
   return (
     <>
@@ -99,6 +106,8 @@ const Subscription = () => {
                       </div>
                     )}
                   </div>
+
+                  {canPurchaseThroughAws && <AwsMarketplacePurchaseCallout />}
 
                   {!canChangeTier && (
                     <div>
