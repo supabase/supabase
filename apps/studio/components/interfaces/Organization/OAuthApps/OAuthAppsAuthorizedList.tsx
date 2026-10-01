@@ -66,6 +66,7 @@ export const OAuthAppsAuthorizedList = () => {
           <div className="space-y-2">
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
           </div>
         )}
 
@@ -82,12 +83,15 @@ export const OAuthAppsAuthorizedList = () => {
                 <TableRow>
                   <TableHead>App</TableHead>
                   <TableHead>Access</TableHead>
+                  <TableHead className="text-right">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.pages.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
-                    <TableCell colSpan={2}>
+                    <TableCell colSpan={3}>
                       <p className="text-sm text-foreground-lighter">
                         No apps have been authorized in this organization yet.
                       </p>
@@ -103,7 +107,7 @@ export const OAuthAppsAuthorizedList = () => {
                       </Fragment>
                     ))}
                     <TableRow ref={sentinelRef} className="[&>td]:hover:bg-inherit">
-                      <TableCell colSpan={2} className={isFetchingNextPage ? '' : 'p-0 hidden'}>
+                      <TableCell colSpan={3} className={isFetchingNextPage ? '' : 'p-0 hidden'}>
                         <p aria-live="polite" className="text-sm text-foreground-lighter">
                           {isFetchingNextPage ? 'Loading...' : ''}
                         </p>

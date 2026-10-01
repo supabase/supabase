@@ -1,5 +1,21 @@
-import { TableCell, TableRow } from 'ui'
+import { MoreVerticalIcon } from 'lucide-react'
+import { useRef, useState } from 'react'
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  TableCell,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
+import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
 import type { OAuthApprovalItem, OAuthApprovalTarget } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsAuthorizedRowProps {
@@ -7,6 +23,10 @@ export interface OAuthAppsAuthorizedRowProps {
 }
 
 export const OAuthAppsAuthorizedRow = ({ approval }: OAuthAppsAuthorizedRowProps) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [dialogContent, setDialogContent] = useState<'grants' | 'revoke' | null>(null)
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
+
   return (
     <TableRow>
       <TableCell>
@@ -23,6 +43,46 @@ export const OAuthAppsAuthorizedRow = ({ approval }: OAuthAppsAuthorizedRowProps
         </div>
       </TableCell>
       <TableCell>{getGrantTargetLabel(approval.grant_target)}</TableCell>
+      <TableCell className="text-right">
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(open) => {
+            setIsDialogOpen(open)
+            // When users close the dialogs, we need to restore the focus on the menu button
+            // Done in a setTimeout because the dialog tries to restore focus on the trigger despite onCloseAutoFocus being cancelled in the dialog contents
+            setTimeout(() => {
+              if (!open && menuTriggerRef.current) {
+                menuTriggerRef.current.focus()
+              }
+            })
+          }}
+        >
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    ref={menuTriggerRef}
+                    icon={<MoreVerticalIcon />}
+                    className="px-1"
+                    aria-label="Manage app"
+                    aria-describedby={undefined}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Manage app</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="end" side="bottom" className="w-40">
+              <DialogTrigger asChild>
+                <DropdownMenuItem onClick={() => setDialogContent('grants')}>
+                  View grants
+                </DropdownMenuItem>
+              </DialogTrigger>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {dialogContent === 'grants' && <OAuthAppsMemberGrantsDialogContent approval={approval} />}
+        </Dialog>
+      </TableCell>
     </TableRow>
   )
 }
