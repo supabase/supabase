@@ -62,6 +62,7 @@ export const RecoveryCodesModal = <T = unknown,>({
     a.click()
     document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
+    setCopied(true)
   }
 
   useEffect(() => {
