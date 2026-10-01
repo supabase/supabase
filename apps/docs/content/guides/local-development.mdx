@@ -122,12 +122,16 @@ Pick an install method and use the same tab in every step below. **Homebrew** gi
 
 <Admonition type="caution">
 
-If your local development machine is connected to an untrusted public network, you should create a separate Docker network and bind to 127.0.0.1 before starting the local development stack. This restricts network access to only your localhost machine.
+If your local development machine is connected to an untrusted public network, you should create a separate Docker network and bind to 127.0.0.1 before starting the local development stack. With Docker Engine on Linux, this restricts network access to only your localhost machine.
 
 ```sh
 docker network create -o 'com.docker.network.bridge.host_binding_ipv4=127.0.0.1' local-network
 npx supabase start --network-id local-network
 ```
+
+Docker Desktop doesn't apply this network option to published ports, so the stack stays reachable from other devices on your network. To restrict it, open Docker Desktop and go to **Settings** > **Resources** > **Network**, then set **Port binding behavior** to **Localhost by default**. Other Docker providers, such as OrbStack, have their own setting for exposing ports to your network.
+
+To confirm the restriction, run `lsof -nP -iTCP:54323 -sTCP:LISTEN` while the stack is running. A listener on `127.0.0.1:54323` is limited to your machine, and a listener on `*:54323` is reachable from your network.
 
 You should never expose your local development stack publicly.
 
