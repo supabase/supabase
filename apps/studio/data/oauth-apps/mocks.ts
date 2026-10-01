@@ -71,10 +71,11 @@ const VERCEL_SCOPES: OAuthScope[] = [
   'environment:read',
   'environment:write',
   'secrets:read',
-  'secrets:write',
   'projects:read',
   'edge_functions:read',
   'storage:read',
+  'analytics:read',
+  'analytics:write',
 ]
 
 const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
@@ -277,7 +278,15 @@ const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationP
 }
 
 const TAILSPIN_VERCEL_EXISTING_GRANT: OAuthExistingGrant = {
-  approved_scopes: ['database:read', 'database:write', 'projects:read'],
+  approved_scopes: [
+    'database:read',
+    'database:write',
+    'analytics:read',
+    'projects:read',
+    'secrets:read',
+    'secrets:write',
+    'rest:read',
+  ],
   project_refs: ['tailspinshop1', 'tailspindeleted1'],
   approved_at: '2026-08-14T09:12:00.000Z',
 }
