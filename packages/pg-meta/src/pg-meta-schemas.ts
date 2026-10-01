@@ -82,6 +82,13 @@ type SchemaUpdateParams = {
   name?: string
   owner?: string
 }
+/**
+ * Renames a schema and/or transfers ownership.
+ *
+ * Accepts either the OID or the current schema name as the locator.
+ * A `null` value for `name` or `owner` in `params` leaves the corresponding
+ * attribute unchanged.
+ */
 function update({ id }: { id: number }, params: SchemaUpdateParams): { sql: SafeSqlFragment }
 function update({ name }: { name: string }, params: SchemaUpdateParams): { sql: SafeSqlFragment }
 function update(
@@ -95,7 +102,7 @@ function update(
   { name: newName, owner }: SchemaUpdateParams
 ): { sql: SafeSqlFragment } {
   const sql = safeSql`
-do $$
+do $pgmeta$
 declare
   id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
@@ -116,7 +123,7 @@ begin
     execute(format('alter schema %I rename to %I;', old.nspname, new_name));
   end if;
 end
-$$;
+$pgmeta$;
 `
   return { sql }
 }
@@ -124,6 +131,12 @@ $$;
 type SchemaRemoveParams = {
   cascade?: boolean
 }
+/**
+ * Drops a schema by OID or name.
+ *
+ * Pass `cascade: true` to drop all objects inside the schema together with it;
+ * the default is `restrict` (fails if the schema is not empty).
+ */
 function remove({ id }: { id: number }, params?: SchemaRemoveParams): { sql: SafeSqlFragment }
 function remove({ name }: { name: string }, params?: SchemaRemoveParams): { sql: SafeSqlFragment }
 function remove(
@@ -137,7 +150,7 @@ function remove(
   { cascade = false }: SchemaRemoveParams = {}
 ): { sql: SafeSqlFragment } {
   const sql = safeSql`
-do $$
+do $pgmeta$
 declare
   id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
@@ -150,7 +163,7 @@ begin
 
   execute(format('drop schema %I %s;', old.nspname, case when cascade then 'cascade' else 'restrict' end));
 end
-$$;
+$pgmeta$;
 `
   return { sql }
 }
