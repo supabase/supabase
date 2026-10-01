@@ -7,6 +7,7 @@ import {
   DiffScopePermission,
   formatPermissionName,
   getDiffBetweenScopes,
+  ScopeGroupLevel,
 } from './OAuthAppsAuthorizeScreen.utils'
 import { ScopeGroupCardItem } from './ScopeGroupCardItem'
 import type { OAuthScope } from '@/data/oauth-apps/types'
@@ -30,10 +31,18 @@ export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCar
   return (
     <>
       <div className="divide-y rounded-md border bg-surface-75 px-4">
-        <DiffScopeGroupItem label="READ-WRITE" permissions={diff.changed['read-write']} />
-        <DiffScopeGroupItem label="WRITE" permissions={diff.changed['write']} />
-        <DiffScopeGroupItem label="READ" permissions={diff.changed['read']} />
-        <DiffScopeGroupItem label="REMOVED" permissions={diff.changed['removed']} removed />
+        <DiffScopeGroupItem
+          label="READ-WRITE"
+          level="read-write"
+          permissions={diff.changed['read-write']}
+        />
+        <DiffScopeGroupItem label="WRITE" level="write" permissions={diff.changed['write']} />
+        <DiffScopeGroupItem label="READ" level="read" permissions={diff.changed['read']} />
+        <DiffScopeGroupItem
+          label="REMOVED"
+          level={undefined}
+          permissions={diff.changed['removed']}
+        />
       </div>
       <Collapsible className="flex flex-col gap-2">
         <CollapsibleTrigger asChild>
@@ -61,12 +70,12 @@ export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCar
 
 const DiffScopeGroupItem = ({
   label,
+  level,
   permissions,
-  removed = false,
 }: {
   label: ReactNode
+  level: ScopeGroupLevel | undefined
   permissions: DiffScopePermission[]
-  removed?: boolean
 }) => {
   if (permissions.length === 0) return null
   return (
@@ -75,50 +84,48 @@ const DiffScopeGroupItem = ({
         {label}
       </p>
       <p className="text-xs font-medium text-foreground">
-        {permissions.map((permission, index) => {
-          if (removed) {
-            return (
-              <span key={permission.permission}>
-                {formatPermissionName(permission.permission)}{' '}
-                <span className="text-foreground-lighter">
-                  ({capitalize(permission.previousLevel)})
-                </span>
-                {index < permissions.length - 1 ? ', ' : ''}
-              </span>
-            )
-          }
-
-          if (permission.previousLevel == null) {
-            return (
-              <span key={permission.permission}>
-                {formatPermissionName(permission.permission)}{' '}
-                <span className="text-foreground-lighter">(New)</span>
-                {index < permissions.length - 1 ? ', ' : ''}
-              </span>
-            )
-          }
-
-          if (permission.previousLevel == 'read') {
-            return (
-              <span key={permission.permission}>
-                {formatPermissionName(permission.permission)}{' '}
-                <span className="text-foreground-lighter">(Upgraded from Read)</span>
-                {index < permissions.length - 1 ? ', ' : ''}
-              </span>
-            )
-          }
-
-          return (
-            <span key={permission.permission}>
+        {permissions.map((permission, index) => (
+          <>
+            <span>
               {formatPermissionName(permission.permission)}{' '}
               <span className="text-foreground-lighter">
-                (Demoted from {permission.previousLevel})
+                (
+                <DiffDescription
+                  key={permission.permission}
+                  level={level}
+                  previousLevel={permission.previousLevel}
+                />
+                )
               </span>
-              {index < permissions.length - 1 ? ', ' : ''}
             </span>
-          )
-        })}
+            {index < permissions.length - 1 ? ', ' : ''}
+          </>
+        ))}
       </p>
     </div>
   )
+}
+
+const DiffDescription = ({
+  level,
+  previousLevel,
+}: {
+  level: ScopeGroupLevel | undefined
+  previousLevel: ScopeGroupLevel | undefined
+}) => {
+  // Removed
+  if (level == null) return capitalize(previousLevel!)
+
+  // New
+  if (previousLevel == null) return 'New'
+
+  // Upgraded
+  if (level === 'read-write') return `Upgraded from ${capitalize(previousLevel)}`
+
+  // Modified
+  if (['read', 'write'].includes(level!) && ['read', 'write'].includes(previousLevel))
+    return `Changed from ${capitalize(previousLevel)}`
+
+  // Downgraded
+  return `Demoted from ${capitalize(previousLevel)}`
 }
