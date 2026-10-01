@@ -101,7 +101,10 @@ For an app that already has a `config.toml`, remove the port lines from each app
    - `port` under `[api]`, `[db]`, `[db.pooler]`, `[studio]`, `[local_smtp]`, and `[analytics]`
    - `shadow_port` under `[db]`
    - `inspector_port` under `[edge_runtime]`
+   - `smtp_port` and `pop3_port` under `[local_smtp]`, and `vector_port` under `[analytics]`, if you set them. `supabase init` writes the SMTP ports commented out.
 3. Save the file and commit it, so everyone on the team gets the same behavior.
+
+Remove the ports before the app's first `supabase start` with the setting on. A local project keeps the ports it was created with. If you already started one with the fixed ports, removing them afterward makes `supabase start` fail with `cannot change on the saved stack`. Start a new local project with a different `--stack` name, or run `supabase stack destroy` and start again. Destroying deletes the local project's data.
 
 The CLI also treats ports you set with an environment variable, such as `SUPABASE_API_PORT` or `SUPABASE_DB_PORT`, as exact requests. If another process already listens on that port, the start fails. When the port belongs to another local project, the error names that local project.
 
@@ -129,7 +132,7 @@ The following steps start two independent local projects from two app directorie
 
 The first start in each runtime takes longer. By default, the command downloads or pulls every enabled service before it returns. Later starts reuse the cache. To defer each download until the service's first request, pass `--preparation on-demand`.
 
-Postgres starts right away. Other services start on their first request, and stop again after 60 seconds without traffic. Studio stops after 5 minutes, and Functions doesn't stop on its own. To start every enabled service before the command returns and turn off idle stops, pass `--eager`.
+Postgres starts right away. Other services start on their first request. By default, they stop again after 60 seconds idle, and Studio after 5 minutes. Functions doesn't stop on its own. A service also stays up while a running service depends on it, such as pgmeta while Studio runs. To start every enabled service before the command returns and turn off idle stops, pass `--eager`.
 
 To leave services out, pass `--exclude` with one or more of `rest`, `auth`, `realtime`, `storage`, `functions`, `studio`, `mail`, `analytics`, and `pooler`:
 
@@ -137,9 +140,11 @@ To leave services out, pass `--exclude` with one or more of `rest`, `auth`, `rea
 supabase start --exclude studio,mail
 ```
 
-The database can't be excluded. Studio needs the REST API, so to exclude `rest`, exclude `studio` too.
+The database can't be excluded. Studio needs the REST API, so to exclude `rest`, exclude `studio` too. Excluding `studio` also removes the MCP server, because Studio serves `/mcp`.
 
 Running `supabase start` again on a running local project keeps its current settings and prints `Stack is already running with its current services`. To apply a change to `config.toml`, `--exclude`, or `--eager`, stop the local project and start it again. Starting without `--exclude` restores the services enabled in `config.toml`.
+
+Stopping and starting doesn't apply changes to ports or to the Postgres major version. For those, start a new local project with a different `--stack` name, or run `supabase stack destroy` and start again.
 
 ## Run named local projects for one app
 
@@ -248,7 +253,9 @@ supabase stack destroy --stack test --yes
 `destroy` keeps two kinds of data:
 
 - Storage upload files, which live in your app at `supabase/.temp/stack-uploads/<id>/`. Delete that directory to remove them.
-- Container engine resources, if Docker or Podman isn't running. The command removes the local project's registration. It also prints the commands that remove its containers and database volume, to run after the engine starts again.
+- Container engine resources, if Docker or Podman isn't running. If no process for the local project is still running, the command removes the local project's registration. It prints cleanup commands to run after the engine starts again. Otherwise it fails and asks you to start the engine and retry.
+
+The printed cleanup command deletes only this local project's database data, from a Docker volume that other local projects share. Don't delete the volume itself.
 
 ## Differences from the default `supabase start`
 

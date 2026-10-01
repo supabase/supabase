@@ -29,14 +29,14 @@ The following table compares how each runtime runs services, what it needs, and 
 | -------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | Flag                             | `--runtime docker` or `--runtime podman`                                          | `--runtime native`                                                                     |
 | How services run                 | One container per service, from images the CLI pulls                              | One process per service, from archives the CLI downloads and verifies                  |
-| Requires                         | A running Docker or Podman engine                                                 | A supported platform and, on first start, network access to the archive download hosts |
-| Database data                    | A Docker volume on Docker 26 and later, or a host directory on earlier versions   | `~/.supabase/stacks/<id>/` in your home directory                                      |
+| Requires                         | A running Docker or Podman engine                                                 | A supported platform, `tar` on the host, and, on first start, network access to the archive download hosts |
+| Database data                    | A Docker volume when the Docker client and daemon are both version 26 or later, or a host directory otherwise | `~/.supabase/stacks/<id>/` in your home directory                                      |
 | Downloaded artifacts             | The engine's image cache                                                          | `~/.supabase/cache/stack` in your home directory, shared by all local projects         |
 | Isolation between local projects | Separate network namespaces and file systems                                      | Shared host process table and file locks                                               |
 
-Both runtimes keep each local project's state under `~/.supabase/stacks/<id>/`. If you set `SUPABASE_HOME`, the CLI uses that directory instead of `~/.supabase`.
+Both runtimes keep each local project's saved settings under `~/.supabase/stacks/<id>/`. The native runtime keeps its database data there too. If you set `SUPABASE_HOME`, the CLI uses that directory instead of `~/.supabase`.
 
-In both runtimes, Postgres starts right away and other services start on their first request. Services that started this way stop again after 60 seconds without traffic. Studio stops after 5 minutes, and Functions doesn't stop on its own. Pass `--eager` to start every enabled service before the command returns and turn off idle stops.
+In both runtimes, Postgres starts right away and other services start on their first request. By default, services that started this way stop again after 60 seconds idle, and Studio after 5 minutes. Functions doesn't stop on its own. A service also stays up while a running service depends on it, such as pgmeta while Studio runs. Pass `--eager` to start every enabled service before the command returns and turn off idle stops.
 
 Starting a service on demand doesn't mean downloading it on demand. By default, the first `supabase start` pulls or downloads every enabled service before it returns. Pass `--preparation on-demand` to defer each download until the service's first request.
 
@@ -62,14 +62,14 @@ The native runtime runs on these platforms:
 
 | Platform                    | Support                                                                                                                                           |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Linux on `amd64` or `arm64` | Supported. The binaries include their own dynamic loader, so no particular glibc version is required. Verified on Ubuntu 20.04, 22.04, and 24.04. |
-| macOS on Apple silicon      | Supported.                                                                                                                                        |
+| Linux on `amd64` or `arm64` | Supported on Ubuntu 22.04 or later, or another distribution with glibc 2.35 or later. Some services use the host's glibc. |
+| macOS on Apple silicon      | Supported on macOS 14 or later. |
 | Windows                     | Not supported. Use Docker.                                                                                                                        |
 | macOS on Intel              | Not supported. Use Docker.                                                                                                                        |
 
 The native runtime doesn't run as `root`, because Postgres `initdb` can't. To run it as `root`, such as in a CI container, set `SUPABASE_NATIVE_POSTGRES_USER` to a non-root account. Create the account first if it doesn't exist. The CLI then runs Postgres as that user. In some supported coding agent sandboxes, the CLI finds a suitable non-root account without the variable.
 
-On first start, the CLI downloads service archives from the [`supabase/slim-services` GitHub releases](https://github.com/supabase/slim-services/releases), with `supabase-cli-artifacts.s3.us-east-1.amazonaws.com` as a fallback. It verifies their checksums before extracting them. In a sandbox with an allowlist, allow `github.com` or that S3 host. Allowing only `ghcr.io` isn't enough.
+On first start, the CLI downloads service archives from the [`supabase/slim-services` GitHub releases](https://github.com/supabase/slim-services/releases), with `supabase-cli-artifacts.s3.us-east-1.amazonaws.com` as a fallback. It verifies their checksums and extracts them with the system `tar`, so install `tar` in minimal sandbox images. In a sandbox with an allowlist, allow `github.com` or that S3 host. Allowing only `ghcr.io` isn't enough.
 
 To download the archives ahead of time without starting any services, such as when you build a sandbox image, run:
 
