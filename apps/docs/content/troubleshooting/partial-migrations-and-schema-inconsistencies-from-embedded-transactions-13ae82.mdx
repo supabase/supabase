@@ -1,0 +1,21 @@
+---
+title: 'Partial migrations and schema inconsistencies from embedded transactions'
+topics:
+  - 'Troubleshooting'
+  - 'Database'
+---
+
+If a failed migration leaves partial schema changes or table data in your database without recording the version in `supabase_migrations.schema_migrations`, this is usually caused by explicit transaction control commands inside the migration file.
+
+### Why this happens
+
+When migration files include explicit `BEGIN` and `COMMIT` statements, they break the migration runner's built-in transaction wrapper. Any statements executed prior to an embedded `COMMIT` persist durably in your database, even if subsequent statements fail.
+
+### How to resolve and prevent partial migrations
+
+1. **Remove explicit transaction commands**: Remove `BEGIN`, `COMMIT`, or other transaction-control statements from your migration SQL files so the migration runner can handle atomicity automatically.
+2. **Clean up partial objects**: If a migration containing an embedded `COMMIT` has failed midway, inspect the database and manually roll back or drop any partially created objects before running the migration again.
+3. **Verify migration history**: Check the recorded migration history against your actual schema by querying `supabase_migrations.schema_migrations` or running:
+   ```bash
+   supabase migration list
+   ```
