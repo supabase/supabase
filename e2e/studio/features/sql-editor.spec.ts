@@ -546,8 +546,8 @@ test.describe('SQL Editor', () => {
     // export as CSV
     const downloadPromise = page.waitForEvent('download')
     await page.getByRole('button', { name: 'Export' }).click()
-    await page.getByRole('menuitem', { name: 'Download CSV' }).click()
-    await expect(page.getByRole('menuitem', { name: 'Download CSV' })).not.toBeVisible()
+    await page.getByRole('menuitem', { name: 'Download as CSV' }).click()
+    await expect(page.getByRole('menuitem', { name: 'Download as CSV' })).not.toBeVisible()
     const download = await downloadPromise
     expect(download.suggestedFilename()).toContain('.csv')
     const downloadPath = await download.path()

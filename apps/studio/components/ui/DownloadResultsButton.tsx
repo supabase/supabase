@@ -182,7 +182,7 @@ export const DownloadResultsButton = ({
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>
           <Download size={14} />
-          <p>Download CSV</p>
+          <p>Download as CSV</p>
           {enableCopyShortcuts && (
             <span className="ml-auto">
               <KeyboardShortcut keys={['Shift', 'Meta', 'd']} />
