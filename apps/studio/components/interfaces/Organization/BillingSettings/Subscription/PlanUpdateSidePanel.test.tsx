@@ -292,6 +292,16 @@ describe('PlanUpdateSidePanel', () => {
       ).toBeInTheDocument()
       expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
     })
+
+    it('offers AWS Marketplace as a separate purchasing route', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByText('Purchase through AWS Marketplace')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'View purchase options' })).toHaveAttribute(
+        'href',
+        'https://supabase.com/aws-marketplace'
+      )
+    })
   })
 
   describe('fullscreen variant', () => {
@@ -368,6 +378,7 @@ describe('PlanUpdateSidePanel', () => {
 
       expect(screen.getByRole('link', { name: 'Pricing' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /Go back to Studio/ })).not.toBeInTheDocument()
+      expect(screen.getByText('Purchase through AWS Marketplace')).toBeInTheDocument()
     })
   })
 
