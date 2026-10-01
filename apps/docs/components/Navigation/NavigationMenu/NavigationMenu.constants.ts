@@ -3068,6 +3068,7 @@ export const telemetry: NavMenuConstant = {
         { name: 'Log sources and fields', url: '/guides/observability/log-field-reference' },
         { name: 'Inspect the database', url: '/guides/observability/inspect' },
         { name: 'Advisors', url: '/guides/observability/advisors' },
+        { name: 'Health Advisor', url: '/guides/observability/health-advisor' },
         { name: 'Reports', url: '/guides/observability/reports' },
         {
           name: 'Metrics API',

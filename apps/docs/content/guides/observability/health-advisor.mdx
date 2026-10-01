@@ -1,0 +1,23 @@
+---
+id: 'health-advisor'
+title: 'Health Advisor'
+description: 'On-demand service error rate checks across Data API, Auth, Storage, and Edge Functions.'
+---
+
+Health Advisor checks live service error rates. Unlike Security and Performance advisors, which inspect the schema, Health checks read log data and return findings only when a rate is elevated.
+
+You or an agent can run the checks from:
+
+- Studio: [Advisors → Health](/dashboard/project/_/advisors/health)
+- Management API: `POST /v2/projects/{ref}/advisors/run`
+
+## Available checks
+
+| Check | Service | Signal |
+| --- | --- | --- |
+| `log_data_api_error_rate_high` | Data API | PostgREST 5xx rate is elevated |
+| `log_auth_error_rate_high` | Auth | Error rate is elevated |
+| `log_storage_error_rate_high` | Storage | Error rate is elevated |
+| `log_edge_function_error_rate_high` | Edge Functions | Error rate is elevated |
+
+An empty result means all checks ran and found nothing elevated. `advisor_check_unavailable` means a check could not run — so you can distinguish between healthy and unchecked. From there, use the [Detection checks](/docs/guides/observability/detecting) or [logs](/docs/guides/observability/logs) to investigate further.
