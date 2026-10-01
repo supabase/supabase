@@ -51,7 +51,7 @@ export const selfHostingThirdPartyGuides: ContentListingGroup = {
   type: 'grid',
   columns: 2,
   description:
-    "Guides written by other projects and companies. Supabase doesn't maintain or review them, so check that they match your version of self-hosted Supabase.",
+    "Guides written by other projects and companies. Supabase doesn't maintain them, so check that they match your version of self-hosted Supabase.",
   items: [
     {
       title: 'Secure self-hosted Supabase with NetBird',
