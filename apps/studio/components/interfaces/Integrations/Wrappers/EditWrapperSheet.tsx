@@ -105,6 +105,7 @@ export const EditWrapperSheet = ({
   } = useFieldArray({
     control: form.control,
     name: 'tables',
+    keyName: '_fieldId',
   })
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
@@ -293,13 +294,16 @@ export const EditWrapperSheet = ({
         }}
         onConfirm={() => {
           const { tables, ...values } = getValues()
+          const sanitizedTables = (tables as Record<string, unknown>[]).map(
+            ({ _fieldId, ...table }) => table
+          )
           updateFDW({
             projectRef: project?.ref,
             connectionString: project?.connectionString,
             wrapper,
             wrapperMeta,
             formState: values,
-            tables,
+            tables: sanitizedTables,
           })
           setIsUpdateConfirmationOpen(false)
         }}

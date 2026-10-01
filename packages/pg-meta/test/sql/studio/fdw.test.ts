@@ -373,6 +373,7 @@ test('foreign table diffing: creates new tables, drops removed tables, and skips
     },
     tables: [
       {
+        id: 1,
         schema_name: 'public',
         table_name: 'unchanged_table',
         columns: [{ name: 'id', type: 'text' }],
@@ -393,6 +394,133 @@ test('foreign table diffing: creates new tables, drops removed tables, and skips
   expect(sql).toContain('drop foreign table if exists public.removed_table')
   expect(sql).not.toContain('unchanged_table (')
   expect(sql).not.toContain('drop foreign table if exists public.unchanged_table')
+})
+
+test('foreign table diffing: a table without an id is always treated as new, even if its schema/name match an existing table', () => {
+  const sql = getUpdateFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'bigquery_server',
+      server_options: [],
+      tables: [
+        {
+          id: 1,
+          schema: 'public',
+          name: 'orders',
+          columns: [{ name: 'id', type: 'text' }],
+          options: [],
+        },
+      ],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [] },
+    },
+    formState: {
+      wrapper_name: 'bigquery_fdw',
+      server_name: 'bigquery_server',
+    },
+    tables: [
+      {
+        schema_name: 'public',
+        table_name: 'orders',
+        columns: [{ name: 'id', type: 'text' }],
+        is_new_schema: false,
+      },
+    ],
+  })
+
+  expect(sql).toContain('create foreign table public.orders')
+  expect(sql).toContain('drop foreign table if exists public.orders')
+})
+
+test('foreign table diffing: renaming a table emits an explicit ALTER ... RENAME instead of drop and recreate', () => {
+  const sql = getUpdateFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'bigquery_server',
+      server_options: [],
+      tables: [
+        {
+          id: 1,
+          schema: 'public',
+          name: 'accounts',
+          columns: [{ name: 'id', type: 'text' }],
+          options: [],
+        },
+      ],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [] },
+    },
+    formState: {
+      wrapper_name: 'bigquery_fdw',
+      server_name: 'bigquery_server',
+    },
+    tables: [
+      {
+        id: 1,
+        schema_name: 'public',
+        table_name: 'wot',
+        columns: [{ name: 'id', type: 'text' }],
+        is_new_schema: false,
+      },
+    ],
+  })
+
+  expect(sql).toContain('alter foreign table public.accounts rename to wot')
+  expect(sql).not.toContain('create foreign table')
+  expect(sql).not.toContain('drop foreign table')
+})
+
+test('foreign table diffing: moving a table to a new schema emits SET SCHEMA before any rename', () => {
+  const sql = getUpdateFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'bigquery_server',
+      server_options: [],
+      tables: [
+        {
+          id: 1,
+          schema: 'public',
+          name: 'accounts',
+          columns: [{ name: 'id', type: 'text' }],
+          options: [],
+        },
+      ],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [] },
+    },
+    formState: {
+      wrapper_name: 'bigquery_fdw',
+      server_name: 'bigquery_server',
+    },
+    tables: [
+      {
+        id: 1,
+        schema_name: 'stripe',
+        table_name: 'wot',
+        columns: [{ name: 'id', type: 'text' }],
+        is_new_schema: false,
+      },
+    ],
+  })
+
+  expect(sql).toContain('alter foreign table public.accounts set schema stripe')
+  expect(sql).toContain('alter foreign table stripe.accounts rename to wot')
+  expect(sql.indexOf('set schema')).toBeLessThan(sql.indexOf('rename to'))
 })
 
 test('foreign table diffing: retyping a column drops and re-adds it, since ALTER COLUMN TYPE is unsupported for foreign tables', () => {
@@ -424,6 +552,7 @@ test('foreign table diffing: retyping a column drops and re-adds it, since ALTER
     },
     tables: [
       {
+        id: 1,
         schema_name: 'public',
         table_name: 'orders',
         columns: [{ name: 'amount', type: 'numeric' }],

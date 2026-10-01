@@ -5,6 +5,7 @@ import {
   literal,
   safeSql,
   type SafeSqlFragment,
+  type SqlFragmentSeparator,
 } from '../../../pg-format'
 
 type SimplifiedWrapperMeta = {
@@ -23,6 +24,7 @@ type WrapperExistingTable = {
 }
 
 type WrapperFormTable = {
+  id?: string | number
   schema_name: string
   table_name: string
   columns: { name: string; type: string }[]
@@ -94,6 +96,20 @@ function getTableOptionsMap(table: Record<string, unknown>): Record<string, stri
   )
 }
 
+// Many of this file's SQL fragments are optional (e.g. "only if renaming"),
+// but composing them via a fixed multi-line template leaves the template's own
+// line breaks behind even when the fragment is empty. Filtering empties out
+// before joining keeps the generated SQL free of stray blank lines.
+function joinNonEmptyFragments(
+  fragments: SafeSqlFragment[],
+  separator: SqlFragmentSeparator = '\n'
+): SafeSqlFragment {
+  return joinSqlFragments(
+    fragments.filter((fragment) => fragment.trim().length > 0),
+    separator
+  )
+}
+
 function buildCreateForeignTableSql(
   table: {
     schema_name: string
@@ -121,8 +137,24 @@ function buildCreateForeignTableSql(
   `
 }
 
-function tableKey(schema: string, table: string): string {
-  return `${schema}.${table}`
+function buildRenameForeignTableSql(
+  current: WrapperExistingTable,
+  desired: WrapperFormTable
+): SafeSqlFragment {
+  const schemaChanged = desired.schema_name !== current.schema
+  const nameChanged = desired.table_name !== current.name
+
+  const setSchemaSql = schemaChanged
+    ? safeSql`alter foreign table ${ident(current.schema)}.${ident(current.name)} set schema ${ident(desired.schema_name)};`
+    : safeSql``
+
+  // Once SET SCHEMA has run, the table is addressed by its new schema but still its old name.
+  const effectiveSchema = schemaChanged ? desired.schema_name : current.schema
+  const renameSql = nameChanged
+    ? safeSql`alter foreign table ${ident(effectiveSchema)}.${ident(current.name)} rename to ${ident(desired.table_name)};`
+    : safeSql``
+
+  return joinNonEmptyFragments([setSchemaSql, renameSql])
 }
 
 // ALTER FOREIGN TABLE doesn't support changing a column's type in place, so a
@@ -210,11 +242,7 @@ function buildAlterForeignTableSql(
         `
       : safeSql``
 
-  return safeSql`
-    ${dropColumnsSql}
-    ${addColumnsSql}
-    ${optionsSql}
-  `
+  return joinNonEmptyFragments([dropColumnsSql, addColumnsSql, optionsSql])
 }
 
 export const getFDWsSql = (): SafeSqlFragment => {
@@ -406,17 +434,16 @@ export function getCreateFDWSql({
 `
   }
 
-  const sql = safeSql`
-    ${newSchemasSql}
-
-    ${createEncryptedKeysSql}
-
-    ${createServerSql}
-
-    ${mode === 'tables' ? createTablesSql : safeSql``}
-
-    ${mode === 'schema' ? createImportForeignSchemaSql() : safeSql``}
-  `
+  const sql = joinNonEmptyFragments(
+    [
+      newSchemasSql,
+      createEncryptedKeysSql,
+      createServerSql,
+      mode === 'tables' ? createTablesSql : safeSql``,
+      mode === 'schema' ? createImportForeignSchemaSql() : safeSql``,
+    ],
+    '\n\n'
+  )
 
   return sql
 }
@@ -632,19 +659,25 @@ export const getUpdateFDWSql = ({
   const encryptedOptionsSql = joinSqlFragments(encryptedOptionSqlArray, '\n')
 
   const currentTables = wrapper.tables ?? []
-  const currentTableByKey = new Map(
-    currentTables.map((table) => [tableKey(table.schema, table.name), table])
-  )
-  const desiredTableByKey = new Map(
-    tables.map((table) => [tableKey(table.schema_name, table.table_name), table])
+  const currentTableById = new Map(currentTables.map((table) => [table.id, table]))
+  const desiredTableIds = new Set(
+    tables.map((table) => table.id).filter((id): id is string | number => id !== undefined)
   )
 
   const tablesToCreate = tables.filter(
-    (table) => !currentTableByKey.has(tableKey(table.schema_name, table.table_name))
+    (table) => table.id === undefined || !currentTableById.has(table.id)
   )
-  const tablesToDrop = currentTables.filter(
-    (table) => !desiredTableByKey.has(tableKey(table.schema, table.name))
-  )
+  const tablesToDrop = currentTables.filter((table) => !desiredTableIds.has(table.id))
+  const matchedTables = tables
+    .map((desired) => {
+      if (desired.id === undefined) return null
+      const current = currentTableById.get(desired.id)
+      return current ? { current, desired } : null
+    })
+    .filter(
+      (match): match is { current: WrapperExistingTable; desired: WrapperFormTable } =>
+        match !== null
+    )
 
   const newSchemasSql = joinSqlFragments(
     tablesToCreate
@@ -662,26 +695,27 @@ export const getUpdateFDWSql = ({
     ),
     '\n'
   )
+  const renameTablesSql = joinSqlFragments(
+    matchedTables.map(({ current, desired }) => buildRenameForeignTableSql(current, desired)),
+    '\n'
+  )
   const alterTablesSql = joinSqlFragments(
-    tables
-      .map((desired) => {
-        const current = currentTableByKey.get(tableKey(desired.schema_name, desired.table_name))
-        if (!current) return null
-        return buildAlterForeignTableSql(desired.schema_name, desired.table_name, current, desired)
-      })
-      .filter((sql): sql is SafeSqlFragment => sql !== null),
+    matchedTables.map(({ current, desired }) =>
+      buildAlterForeignTableSql(desired.schema_name, desired.table_name, current, desired)
+    ),
     '\n'
   )
 
-  const sql = safeSql`
-    ${renameServerSql}
-    ${alterServerOptionsSql}
-    ${encryptedOptionsSql}
-    ${newSchemasSql}
-    ${dropTablesSql}
-    ${createTablesSql}
-    ${alterTablesSql}
-  `
+  const sql = joinNonEmptyFragments([
+    renameServerSql,
+    alterServerOptionsSql,
+    encryptedOptionsSql,
+    newSchemasSql,
+    dropTablesSql,
+    createTablesSql,
+    renameTablesSql,
+    alterTablesSql,
+  ])
 
   return sql
 }
