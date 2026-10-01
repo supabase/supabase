@@ -323,21 +323,33 @@ const MOCK_ORGANIZATIONS_BY_SLUG: Record<string, OAuthOrganizationRole> = {
 const MOCK_APPROVALS: ListOAuthApprovalsResponse = {
   data: [
     {
-      id: 'vercel',
-      name: 'Vercel',
-      icon: null,
+      app: {
+        id: 'vercel',
+        name: 'Vercel',
+        icon: null,
+        created_by: '',
+      },
+      grant_target: 'members',
       org_grant: null,
     },
     {
-      id: 'dynamic-mcp-client',
-      name: 'Northwind MCP',
-      icon: null,
+      app: {
+        id: 'dynamic-mcp-client',
+        name: 'Northwind MCP',
+        icon: null,
+        created_by: '',
+      },
+      grant_target: 'members',
       org_grant: null,
     },
     {
-      id: 'contoso-analytics',
-      name: 'Contoso Analytics',
-      icon: null,
+      app: {
+        id: 'contoso-analytics',
+        name: 'Contoso Analytics',
+        icon: null,
+        created_by: '',
+      },
+      grant_target: 'organization',
       org_grant: {
         grant_id: 'grant-contoso-analytics-org',
         approved_scopes: ['analytics:read', 'projects:read'],
