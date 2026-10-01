@@ -1,6 +1,6 @@
 import { TableCell, TableRow } from 'ui'
 
-import type { OAuthApprovalItem } from '@/data/oauth-apps/types'
+import type { OAuthApprovalItem, OAuthApprovalTarget } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsAuthorizedRowProps {
   approval: OAuthApprovalItem
@@ -22,7 +22,13 @@ export const OAuthAppsAuthorizedRow = ({ approval }: OAuthAppsAuthorizedRowProps
           </p>
         </div>
       </TableCell>
-      <TableCell>{approval.org_grant ? 'Organization' : 'Members'}</TableCell>
+      <TableCell>{getGrantTargetLabel(approval.grant_target)}</TableCell>
     </TableRow>
   )
+}
+
+const getGrantTargetLabel = (target: OAuthApprovalTarget) => {
+  if (target === 'members') return 'Members'
+  if (target === 'organization') return 'Organization'
+  return 'Organization & members'
 }
