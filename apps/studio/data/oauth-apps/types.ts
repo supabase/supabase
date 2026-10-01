@@ -134,10 +134,16 @@ export function isPreflightValidationFailure(
   return 'error_code' in result && result.error_code === 'role_validation_failed'
 }
 
+export type type OAuthApprovalTarget = 'organization' | 'members' | 'organization_and_members'
+
 export type OAuthApprovalItem = {
-  id: string
-  name: string
-  icon: string | null
+  app: {
+    id: string
+    name: string
+    created_by: string
+    icon: string | null
+  }
+  grant_target: OAuthApprovalTarget
   org_grant: {
     grant_id: string
     approved_scopes: string[]
