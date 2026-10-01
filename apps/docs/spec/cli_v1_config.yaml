@@ -154,6 +154,16 @@ parameters:
       - name: 'PostgreSQL configuration'
         link: 'https://postgrest.org/en/stable/configuration.html'
 
+  - id: 'db.orioledb_version'
+    title: 'db.orioledb_version'
+    tags: ['database']
+    required: false
+    description: |
+      OrioleDB version of the Postgres image to use for the local database. Leave empty to use the default storage engine. Requires `db.major_version` 15 or 17. `supabase init --use-orioledb` sets this value.
+    links:
+      - name: 'OrioleDB'
+        link: 'https://supabase.com/docs/guides/database/orioledb'
+
   - id: 'db.pooler.enabled'
     title: 'db.pooler.enabled'
     tags: ['database']
@@ -1778,8 +1788,7 @@ parameters:
     tags: ['experimental']
     required: false
     description: |
-      Configures Postgres storage engine to use OrioleDB with S3 support.
-      Note: This is an experimental feature and may change in future releases.
+      Deprecated. Use `db.orioledb_version` instead. The CLI still reads this setting and prints a deprecation warning when it is set.
     links: []
 
   - id: 'experimental.s3_host'
