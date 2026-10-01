@@ -45,7 +45,6 @@ import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import {
-  deduplicateUnifiedLogs,
   gateLogTypeFilters,
   gateLogTypeOptions,
   getComputeLogsAvailability,
@@ -69,6 +68,7 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useTrack } from '@/lib/telemetry/track'
