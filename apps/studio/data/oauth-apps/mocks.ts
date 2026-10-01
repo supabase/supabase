@@ -331,7 +331,7 @@ const MOCK_APPROVALS: ListOAuthApprovalsResponse = {
         icon: null,
         created_by: '',
       },
-      grant_target: 'members',
+      grant_target: 'organization_and_members',
       org_grant: null,
     },
     {
