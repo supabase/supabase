@@ -11,7 +11,6 @@ export const FIXED_ROLE_ORDER = [
   'Developer',
   'Read-only',
   'None',
-  'No-access',
 ]
 export type OrganizationRolesVariables = { slug?: string }
 export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponse_Output']
