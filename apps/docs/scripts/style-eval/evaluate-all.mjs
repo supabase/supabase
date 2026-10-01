@@ -37,6 +37,8 @@ const slugs = (await readdir(GUIDES, { recursive: true }))
 
 console.log(`Evaluating ${slugs.length} guides at concurrency ${CONCURRENCY}.`)
 
+const startedAt = Date.now()
+
 const pages = []
 const failures = []
 let done = 0
@@ -110,6 +112,7 @@ const reportPages = pages
   .sort((a, b) => a.overall - b.overall)
 
 const totalCost = pages.reduce((sum, page) => sum + Number(page.cost ?? 0), 0)
+const elapsedSeconds = Math.round((Date.now() - startedAt) / 100) / 10
 
 // A human sample for judging whether the scores mean anything. Each entry links
 // to the published page so a reader can open it and disagree with the score.
@@ -133,6 +136,9 @@ const report = {
     pagesFailed: failures.length,
     inputTokens: pages.reduce((sum, page) => sum + (page.usage?.inputTokens ?? 0), 0),
     cost: `$${totalCost.toFixed(4)}`,
+    elapsedSeconds,
+    concurrency: CONCURRENCY,
+    pagesPerSecond: Math.round((pages.length / elapsedSeconds) * 10) / 10,
     byRubric,
     byCategory: Object.fromEntries(
       Object.entries(byCategory)
@@ -152,7 +158,9 @@ const destination = join(DOCS_ROOT, 'style-eval-report.json')
 await writeFile(destination, `${JSON.stringify(report, null, 2)}\n`)
 
 console.log(`\nWrote ${destination}`)
-console.log(`  ${pages.length} evaluated, ${failures.length} failed, ${report.summary.cost}`)
+console.log(
+  `  ${pages.length} evaluated, ${failures.length} failed, ${report.summary.cost}, ${elapsedSeconds}s at concurrency ${CONCURRENCY}`
+)
 for (const [name, stats] of Object.entries(byRubric)) {
   console.log(`  ${name.padEnd(20)} mean ${String(stats.mean).padStart(5)}%`)
 }
