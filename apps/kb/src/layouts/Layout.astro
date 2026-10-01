@@ -29,6 +29,14 @@ const { title, description } = Astro.props
 				} catch (_) {}
 			})()
 		</script>
+		<script is:inline>
+			;(function () {
+				var hero = new URLSearchParams(window.location.search).get('hero')
+				if (hero === 'wormhole' || hero === 'bend') {
+					document.documentElement.setAttribute('data-hero-kind', 'funnel')
+				}
+			})()
+		</script>
 		<!-- Same favicon set as apps/docs (packages/common/MetaFavicons/app-router.ts).
 		     Files live in public/, which Astro's `base` config doesn't rewrite on its
 		     own, so the base is prepended by hand here — see
@@ -89,6 +97,7 @@ html[data-theme*='dark'] {
 		margin: 0;
 		width: 100%;
 		height: 100%;
+		overscroll-behavior-y: none;
 	}
 
 	body {
