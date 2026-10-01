@@ -136,7 +136,7 @@ export const ComputeList = ({
         </Select>
 
         <div className="flex items-center gap-3 md:ml-auto">
-          <Button icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
+          <Button aria-label="Refresh compute instances" title="Refresh" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
             Refresh
           </Button>
           <Button variant="primary" icon={<Terminal />} onClick={onDeploy}>
