@@ -8,7 +8,7 @@ packages = [{include = "image_search"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-sentence-transformers = "^2.7.0"
+sentence-transformers = "^5.6.0"
 vecs = "^0.2.4"
 matplotlib = "^3.10.1"
 
