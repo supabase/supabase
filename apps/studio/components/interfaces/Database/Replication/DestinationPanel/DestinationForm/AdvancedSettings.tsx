@@ -23,6 +23,7 @@ import { DestinationType } from '../DestinationPanel.types'
 import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_DUCKLAKE_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
   DEFAULT_MAX_FILL_MS,
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
@@ -80,6 +81,7 @@ export const AdvancedSettings = ({
                         max={6}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
+                        placeholder={String(DEFAULT_DUCKLAKE_POOL_SIZE)}
                       />
                     </FormControl>
                   </FormItemLayout>
@@ -134,7 +136,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
+                        placeholder={String(DEFAULT_MAX_TABLE_SYNC_WORKERS)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>workers</InputGroupText>
@@ -163,7 +165,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
+                        placeholder={String(DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>connections</InputGroupText>
@@ -228,7 +230,7 @@ export const AdvancedSettings = ({
                             step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
+                            placeholder={String(DEFAULT_CONNECTION_POOL_SIZE)}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>connections</InputGroupText>

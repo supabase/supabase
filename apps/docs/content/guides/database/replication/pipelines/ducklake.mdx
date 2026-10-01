@@ -18,7 +18,7 @@ Insert-only tables don't require a primary key or replica identity. Updates and 
 
 ## Prepare DuckLake resources [#understand-the-ducklake-components]
 
-DuckLake uses a Postgres catalog and object storage. With **Select Supabase projects**, you choose catalog and storage projects, which can be the same project, and a Storage bucket. Pipelines creates the connection credentials. With **Enter connection details**, you provide the catalog URL and storage credentials. You also need a compatible query engine to read the replicated data.
+DuckLake stores metadata in a Postgres catalog and data in object storage. With **Select Supabase projects**, choose a project for the catalog, then a project and bucket for storage. The catalog and storage can use the same project. Pipelines creates the connection credentials. With **Enter connection details**, you provide the catalog URL and storage credentials. You also need a compatible query engine to read the replicated data.
 
 | Component        | Purpose                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -40,7 +40,7 @@ Before you begin:
 
 - Choose active, healthy, non-branch projects from the same organization for the catalog and storage. You can use the same project for both.
 - Make sure your organization role can administer SQL in the catalog project and Storage in the storage project.
-- Choose a private standard Storage bucket. You can create one from the destination form.
+- Choose a Files bucket for DuckLake data. You can create a private bucket from the destination form.
 - Choose an unused metadata schema name for this DuckLake. Pipelines creates the schema and its tables. Use only letters, numbers, and underscores. If the catalog project already uses the default `ducklake` schema for Warehouse, enter a different name.
 - Keep catalog and storage in the same region when possible, near the [managed pipeline region](/docs/guides/database/replication/pipelines#region).
 
@@ -48,7 +48,7 @@ To configure the destination:
 
 1. Select **Select Supabase projects** under **Configuration method**.
 2. Choose the **Catalog project** and **Metadata schema**.
-3. Choose the **Storage project** and private **Bucket**. Select **New bucket** at the bottom of the bucket list if you haven't created one yet.
+3. Choose the **Storage project** and **Bucket**. Select **New bucket** at the bottom of the bucket list if you haven't created one yet.
 4. Optionally adjust **Pool size** under **Advanced settings**. It allows 1 to 6 concurrent DuckDB connections; the default is 4.
 5. Click **Start pipeline**. Review any validation warnings, then confirm the estimated cost with **Create and start pipeline**.
 

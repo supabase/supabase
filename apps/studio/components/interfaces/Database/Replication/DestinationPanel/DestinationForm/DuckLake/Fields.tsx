@@ -225,7 +225,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <FormItemLayout
             layout="horizontal"
             label="Metadata schema"
-            description="Name for a new schema Pipelines creates for DuckLake metadata."
+            description="New schema where DuckLake metadata will be stored."
           >
             <FormControl>
               <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
@@ -612,7 +612,7 @@ const DuckLakeCustomFields = ({
               description={
                 editMode
                   ? 'Schema containing this destination’s DuckLake metadata tables.'
-                  : 'Name for a new schema Pipelines creates for DuckLake metadata.'
+                  : 'New schema where DuckLake metadata will be stored.'
               }
             >
               <FormControl>

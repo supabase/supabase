@@ -35,7 +35,7 @@ export const DUCKLAKE_STORAGE_PROJECT_FIELD_COPY = {
 
 export const DUCKLAKE_BUCKET_FIELD_COPY = {
   label: 'Bucket',
-  description: 'Private standard bucket for DuckLake data files.',
+  description: 'Files bucket for DuckLake data.',
 } as const
 
 export const DUCKLAKE_CATALOG_URL_FIELD_COPY = {
