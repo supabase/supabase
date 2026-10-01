@@ -16,7 +16,7 @@ The way Broadcast works changes based on the channel you are using:
 
 <Admonition type="note">
 
-The public flag (the last argument in `realtime.send(payload, event, topic, is_private)`) only affects who can subscribe to the topic not who can read messages from the database.
+The `private` flag (the last argument in `realtime.send(payload, event, topic, is_private)`) only affects who can subscribe to the topic not who can read messages from the database.
 
 - Public (`false`) → Anyone can subscribe to that topic without authentication
 - Private (`true`) → Only authenticated clients can subscribe to that topic
