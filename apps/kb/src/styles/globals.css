@@ -21,6 +21,7 @@
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-manrope, var(--font-sans));
   --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
+  --font-serif: 'Newsreader', Georgia, serif;
 }
 
 /* Same type scale as apps/docs/styles/globals.css — without this, utilities
@@ -114,4 +115,11 @@ h6:not(.font-mono),
 
 .shadow-codeblock {
   box-shadow: var(--shadow-codeblock, none);
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
 }
