@@ -1,11 +1,16 @@
+import dayjs from 'dayjs'
+import { ChevronRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { cn, Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '@/components/ui/AlertError'
-import { useOrgUpcomingInvoiceQuery } from '@/data/invoices/org-invoice-upcoming-query'
+import {
+  UpcomingInvoiceResponse,
+  useOrgUpcomingInvoiceQuery,
+} from '@/data/invoices/org-invoice-upcoming-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import { formatCurrency } from '@/lib/helpers'
 
@@ -13,10 +18,20 @@ export interface UpcomingInvoiceProps {
   slug?: string
 }
 
+type UsageLineItem =
+  UpcomingInvoiceResponse['upcomingInvoice']['currentCosts']['usage']['lineItems'][number]
+type ProjectBreakdown = UsageLineItem['breakdown'][number]
+type UsageUnit = Extract<UsageLineItem, { schema: 'compute' }>['usage_unit']
+
 interface InvoiceLineItem {
   name: string
+  description?: string
   pre_tax_amount: number
   pre_tax_amount_before_discount: number
+  breakdown?: ProjectBreakdown[]
+  compute_credits_used?: number | null
+  usage_unit?: UsageUnit
+  unit_price_desc?: string | null
 }
 
 export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
@@ -34,10 +49,13 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const invoice = upcomingInvoice?.upcomingInvoice
 
+  const hasMinimumFee = (invoice?.minimum_fee.expectedAtEndOfCycle ?? 0) > 0
   const hasPrepaidCredits = (invoice?.prepaidCredits.expectedWithdrawnAtEndOfCycle ?? 0) !== 0
   const hasAppliedCustomerBalance = (invoice?.appliedCustomerBalance ?? 0) !== 0
-  const hasTax = invoice?.taxes.status === 'calculated' && invoice.taxes.expectedAtEndOfCycle > 0
-  const hasTaxFailed = invoice?.taxes.status === 'failed'
+  const hasTax = invoice?.taxes.status === 'calculated'
+  const hasProjectedCosts =
+    (invoice?.projectedCosts.projectedInRemainingCycle ?? 0) !== 0 &&
+    (invoice?.projectedCosts.usage.lineItems.length ?? 0) > 0
   const isPlanFeePaidInAdvance =
     invoice?.fixed_fees_billing_mode === 'in_arrears' &&
     invoice.currentCosts.fixedFees.lineItems.length === 0
@@ -55,144 +73,340 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
       {isError && <AlertError subject="Failed to retrieve upcoming invoice" error={error} />}
 
       {isSuccess && invoice && (
-        <Table className="w-full text-sm">
-          <TableBody>
-            <InvoiceSectionRow
-              title="Current Costs"
-              tooltip="Costs accumulated from the beginning of the billing cycle up to now."
+        <div className="w-full text-sm">
+          <Accordion type="multiple" defaultValue={['current-costs']}>
+            <InvoiceSection
+              value="current-costs"
+              title="Costs to Date"
+              tooltip="Fixed fees for this billing cycle and usage costs accumulated from the start of the cycle up to now."
               amount={invoice.currentCosts.actualInElapsedCycle}
-            />
-            <InvoiceCategory
-              title="Fixed Fees"
-              lineItems={invoice.currentCosts.fixedFees.lineItems}
-            />
-            <InvoiceCategory title="Usage" lineItems={invoice.currentCosts.usage.lineItems} />
-
-            <InvoiceSectionRow
-              title="Projected Costs"
-              tooltip="Projected costs for the remainder of the billing cycle. Includes predictable costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no costs for metrics like MAU, storage or function invocations. Final amounts may vary depending on your usage."
-              amount={invoice.projectedCosts.projectedInRemainingCycle}
-            />
-            <InvoiceCategory title="Usage" lineItems={invoice.projectedCosts.usage.lineItems} />
-          </TableBody>
-
-          <TableFooter>
-            {hasPrepaidCredits && (
-              <InvoiceTotalRow
-                title="Prepaid Credits"
-                tooltip="Prepaid credits purchased upfront, applied automatically against your invoice. Any remaining balance rolls over to the next billing cycle."
-                amount={-invoice.prepaidCredits.expectedWithdrawnAtEndOfCycle}
+            >
+              <InvoiceLineItemList
+                lineItems={[
+                  ...invoice.currentCosts.fixedFees.lineItems,
+                  ...invoice.currentCosts.usage.lineItems,
+                ]}
               />
-            )}
+            </InvoiceSection>
 
+            {hasProjectedCosts && (
+              <InvoiceSection
+                value="projected-costs"
+                title="Projected Costs"
+                tooltip="Estimated costs for the rest of the billing cycle. Includes predictable costs like Compute Hours, IPv4, Custom Domain and Point-in-Time Recovery, but not usage-based metrics like MAU, storage or function invocations. Final amounts depend on your usage."
+                amount={invoice.projectedCosts.projectedInRemainingCycle}
+              >
+                <InvoiceLineItemList lineItems={invoice.projectedCosts.usage.lineItems} />
+              </InvoiceSection>
+            )}
+          </Accordion>
+
+          {hasMinimumFee && (
             <InvoiceTotalRow
-              title="Pre-tax Total"
-              amount={invoice.total.gross.expectedAtEndOfCycle}
-              isEmphasized
+              title={invoice.minimum_fee.prorated ? 'Minimum Fee (prorated)' : 'Minimum Fee'}
+              tooltip="If your costs for the billing cycle are below the minimum fee, you're charged the difference."
+              amount={invoice.minimum_fee.expectedAtEndOfCycle}
             />
+          )}
 
-            {hasTax && (
-              <InvoiceTotalRow
-                title={`Tax (${invoice.taxes.percentage}%)`}
-                tooltip="Estimated based on your organization's billing address. The final amount may be adjusted at the end of the billing cycle."
-                amount={invoice.taxes.expectedAtEndOfCycle}
-              />
-            )}
-
-            {hasTaxFailed && (
-              <InvoiceTotalRow
-                title="Tax"
-                tooltip={
-                  <p className="text-warning">
-                    We were unable to estimate tax for your organization. Please verify your billing
-                    address in your organization settings.
-                  </p>
-                }
-              />
-            )}
-
-            {hasAppliedCustomerBalance && (
-              <InvoiceTotalRow
-                title="Applied Customer Balance"
-                amount={invoice.appliedCustomerBalance}
-              />
-            )}
-
+          {hasPrepaidCredits && (
             <InvoiceTotalRow
-              title="Net Total"
-              amount={invoice.total.net.expectedAtEndOfCycle}
-              isEmphasized
+              title="Prepaid Credits"
+              tooltip={<PrepaidCreditsTooltip prepaidCredits={invoice.prepaidCredits} />}
+              amount={-invoice.prepaidCredits.expectedWithdrawnAtEndOfCycle}
             />
+          )}
 
-            {isPlanFeePaidInAdvance && (
-              <TableRow className="border-0 hover:bg-transparent">
-                <TableCell
-                  className="pt-2! pb-0! px-0 text-foreground-light text-xs text-right"
-                  colSpan={2}
-                >
-                  Your {organization?.plan?.name && `${organization.plan.name} `}Plan fee for this
-                  period has already been paid. This invoice will only reflect usage charges.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableFooter>
-        </Table>
+          <InvoiceTotalRow
+            title="Subtotal"
+            amount={invoice.total.gross.expectedAtEndOfCycle}
+            isEmphasized
+          />
+
+          {hasTax && (
+            <InvoiceTotalRow
+              title={
+                invoice.taxes.expectedAtEndOfCycle === 0
+                  ? 'Tax'
+                  : `Tax (${invoice.taxes.percentage}%)`
+              }
+              tooltip="Estimated based on your organization's billing address. The final amount may be adjusted at the end of the billing cycle."
+              amount={invoice.taxes.expectedAtEndOfCycle}
+            />
+          )}
+
+          {hasAppliedCustomerBalance && (
+            <InvoiceTotalRow
+              title={invoice.appliedCustomerBalance < 0 ? 'Account Balance' : 'Owed Balance'}
+              tooltip={
+                invoice.appliedCustomerBalance < 0
+                  ? 'Credited balance from earlier billing changes, such as mid-cycle plan changes, applied to this invoice.'
+                  : 'Owed balance from earlier billing changes or invoices that were too small to be charged directly.'
+              }
+              amount={invoice.appliedCustomerBalance}
+            />
+          )}
+
+          <InvoiceTotalRow
+            title={`Projected Total (due on ${dayjs(invoice.billing_cycle_end).format('MMMM Do')})`}
+            tooltip="The amount we expect to charge at the end of the billing cycle. The final amount depends on your usage."
+            amount={invoice.total.net.expectedAtEndOfCycle}
+            isEmphasized
+          />
+
+          {isPlanFeePaidInAdvance && (
+            <p className="pt-2 text-foreground-light text-xs text-right">
+              Your {organization?.plan?.name && `${organization.plan.name} `}Plan fee for this
+              period has already been paid. This invoice will only reflect usage charges.
+            </p>
+          )}
+        </div>
       )}
     </div>
   )
 }
 
-function InvoiceSectionRow({
+function InvoiceAccordionHeader({
   title,
   tooltip,
   amount,
+  className,
 }: {
   title: string
   tooltip?: ReactNode
-  amount: number
+  amount: ReactNode
+  className?: string
 }) {
   return (
-    <TableRow>
-      <TableCell className="font-medium py-2 px-0">
-        <div className="flex items-center gap-1">
+    <div className={cn('flex items-center gap-1', className)}>
+      {/* Wrapper keeps the trigger content-sized so the tooltip (a button) can sit outside it */}
+      <div>
+        <AccordionTrigger
+          hideIcon
+          className="py-2 gap-1 justify-start font-[inherit] hover:no-underline [&[data-state=open]>svg]:rotate-90"
+        >
+          <ChevronRight
+            aria-hidden="true"
+            className="h-4 w-4 shrink-0 text-foreground-lighter transition-transform duration-200 motion-reduce:transition-none"
+          />
           <span>{title}</span>
-          {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
-        </div>
-      </TableCell>
-      <TableCell className="text-right font-medium py-2 px-0" translate="no">
-        {formatCurrency(amount) ?? '-'}
-      </TableCell>
-    </TableRow>
+        </AccordionTrigger>
+      </div>
+      {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
+      <div className="ml-auto text-right" translate="no">
+        {amount}
+      </div>
+    </div>
   )
 }
 
-function InvoiceCategory({ title, lineItems }: { title: string; lineItems: InvoiceLineItem[] }) {
-  if (lineItems.length === 0) return null
+function InvoiceSection({
+  value,
+  title,
+  tooltip,
+  amount,
+  children,
+}: {
+  value: string
+  title: string
+  tooltip?: ReactNode
+  amount: number
+  children: ReactNode
+}) {
+  return (
+    <AccordionItem value={value}>
+      <InvoiceAccordionHeader
+        title={title}
+        tooltip={tooltip}
+        amount={formatCurrency(amount) ?? '-'}
+        className="font-medium"
+      />
+      <AccordionContent className="[&>div]:pb-2 pl-5">{children}</AccordionContent>
+    </AccordionItem>
+  )
+}
+
+function InvoiceLineItemList({ lineItems }: { lineItems: InvoiceLineItem[] }) {
+  return (
+    <Accordion type="multiple">
+      {lineItems.map((item, index) => (
+        <InvoiceLineItemRow
+          key={`${item.description ?? item.name}-${index}`}
+          value={`${item.description ?? item.name}-${index}`}
+          item={item}
+        />
+      ))}
+    </Accordion>
+  )
+}
+
+function InvoiceLineItemRow({ value, item }: { value: string; item: InvoiceLineItem }) {
+  const breakdown = item.breakdown ?? []
+  // Compute line items have no description
+  const title = item.description ?? item.name
+  const hasComputeCredits = item.compute_credits_used != null
+  const pricingTooltip = formatPricingTooltip(item.unit_price_desc)
+
+  if (breakdown.length === 0 && !hasComputeCredits) {
+    return (
+      <InvoiceAmountRow
+        title={title}
+        tooltip={pricingTooltip}
+        amount={item.pre_tax_amount}
+        amountBeforeDiscount={item.pre_tax_amount_before_discount}
+      />
+    )
+  }
+
+  return (
+    <AccordionItem value={value} className="border-b-0">
+      <InvoiceAccordionHeader
+        title={title}
+        tooltip={pricingTooltip}
+        amount={
+          <InvoiceLineItemAmount
+            amount={item.pre_tax_amount}
+            amountBeforeDiscount={item.pre_tax_amount_before_discount}
+          />
+        }
+      />
+      <AccordionContent className="[&>div]:pb-0 pl-5">
+        <Accordion type="multiple">
+          {breakdown.map((project) => (
+            <InvoiceProjectBreakdownRow
+              key={project.project_ref}
+              project={project}
+              usageUnit={item.usage_unit}
+            />
+          ))}
+        </Accordion>
+        {hasComputeCredits && (
+          // Credits are a deduction; normalize the sign regardless of how the API sends it
+          <InvoiceAmountRow
+            title="Compute Credits"
+            amount={-Math.abs(item.compute_credits_used!)}
+          />
+        )}
+      </AccordionContent>
+    </AccordionItem>
+  )
+}
+
+function InvoiceProjectBreakdownRow({
+  project,
+  usageUnit,
+}: {
+  project: ProjectBreakdown
+  usageUnit?: UsageUnit
+}) {
+  const amountBeforeDiscount = project.variants.reduce(
+    (sum, variant) => sum + variant.pre_tax_amount_before_discount,
+    0
+  )
+  const amount =
+    project.total_pre_tax_amount ??
+    project.variants.reduce((sum, variant) => sum + variant.pre_tax_amount, 0)
+
+  if (project.variants.length === 0) {
+    return (
+      <InvoiceAmountRow
+        title={project.project_name}
+        detail={usageUnit && formatUsageWithUnit(project.total_usage, usageUnit)}
+        amount={amount}
+        amountBeforeDiscount={amountBeforeDiscount}
+      />
+    )
+  }
+
+  return (
+    <AccordionItem value={project.project_ref} className="border-b-0">
+      <InvoiceAccordionHeader
+        title={project.project_name}
+        amount={
+          <InvoiceLineItemAmount amount={amount} amountBeforeDiscount={amountBeforeDiscount} />
+        }
+      />
+      <AccordionContent className="[&>div]:pb-0 pl-5">
+        {project.variants.map((variant) => (
+          <InvoiceAmountRow
+            key={variant.name}
+            title={variant.name}
+            detail={usageUnit && formatUsageWithUnit(variant.usage, usageUnit)}
+            tooltip={formatPricingTooltip(variant.unit_price_desc)}
+            amount={variant.pre_tax_amount}
+            amountBeforeDiscount={variant.pre_tax_amount_before_discount}
+          />
+        ))}
+      </AccordionContent>
+    </AccordionItem>
+  )
+}
+
+/** Leaf row, indented to line up with sibling accordion titles (chevron width + gap) */
+function InvoiceAmountRow({
+  title,
+  detail,
+  tooltip,
+  amount,
+  amountBeforeDiscount,
+}: {
+  title: string
+  detail?: string
+  tooltip?: ReactNode
+  amount: number
+  amountBeforeDiscount?: number
+}) {
+  const isFree = amount === 0 && !amountBeforeDiscount
+
+  return (
+    <div className="flex items-center justify-between py-2 pl-5">
+      <div className="flex items-center gap-1">
+        <span>
+          {title}
+          {detail && <span className="text-foreground-lighter"> ({detail})</span>}
+        </span>
+        {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
+      </div>
+      {isFree ? (
+        <span>-</span>
+      ) : (
+        <InvoiceLineItemAmount amount={amount} amountBeforeDiscount={amountBeforeDiscount} />
+      )}
+    </div>
+  )
+}
+
+function PrepaidCreditsTooltip({
+  prepaidCredits,
+}: {
+  prepaidCredits: UpcomingInvoiceResponse['upcomingInvoice']['prepaidCredits']
+}) {
+  const hasProjectedWithdrawal = prepaidCredits.projectedWithdrawnInRemainingCycle > 0
 
   return (
     <>
-      <TableRow className="hover:bg-transparent">
-        <TableCell className="py-2 px-0 pl-4 text-foreground-light text-xs" colSpan={2}>
-          {title}
-        </TableCell>
-      </TableRow>
-      {lineItems.map((item) => (
-        <TableRow key={item.name}>
-          <TableCell className="py-2 px-0 pl-8">{item.name}</TableCell>
-          <TableCell className="text-right py-2 px-0">
-            {item.pre_tax_amount === 0 ? (
-              '-'
-            ) : (
-              <InvoiceLineItemAmount
-                amount={item.pre_tax_amount}
-                amountBeforeDiscount={item.pre_tax_amount_before_discount}
-              />
-            )}
-          </TableCell>
-        </TableRow>
-      ))}
+      <p>
+        Prepaid credits are applied automatically against your invoice. Any remaining balance rolls
+        over to the next billing cycle.
+      </p>
+      <p className="mt-2">
+        {formatCurrency(prepaidCredits.actualWithdrawnInElapsedCycle)} of prepaid credits are
+        already applied to your invoice. You currently have{' '}
+        {formatCurrency(prepaidCredits.currentBalance)} remaining.
+        {hasProjectedWithdrawal &&
+          ` We expect your usage to consume another ${formatCurrency(prepaidCredits.projectedWithdrawnInRemainingCycle)} of credits, which would leave you at ${formatCurrency(prepaidCredits.expectedBalanceAtEndOfCycle)} at the end of the billing cycle.`}
+      </p>
+      <p className="mt-2">
+        Credits for fixed fees, like your plan or the HIPAA add-on, are applied daily. The amount
+        applied so far only covers the days elapsed in the current billing cycle.
+      </p>
     </>
   )
+}
+
+function formatPricingTooltip(unitPriceDesc?: string | null) {
+  if (!unitPriceDesc) return undefined
+  return <span translate="no">Pricing: {unitPriceDesc}</span>
 }
 
 function InvoiceTotalRow({
@@ -207,20 +421,20 @@ function InvoiceTotalRow({
   isEmphasized?: boolean
 }) {
   return (
-    <TableRow>
-      <TableCell className={cn('py-2 px-0', isEmphasized && 'font-medium')}>
-        <div className="flex items-center gap-1">
-          <span>{title}</span>
-          {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
-        </div>
-      </TableCell>
-      <TableCell
-        className={cn('text-right py-2 px-0', isEmphasized && 'font-medium')}
-        translate="no"
-      >
+    <div
+      className={cn(
+        'flex items-center justify-between py-2 border-b',
+        isEmphasized && 'font-medium'
+      )}
+    >
+      <div className="flex items-center gap-1">
+        <span>{title}</span>
+        {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
+      </div>
+      <span className="text-right" translate="no">
         {amount === undefined ? '-' : (formatCurrency(amount) ?? '-')}
-      </TableCell>
-    </TableRow>
+      </span>
+    </div>
   )
 }
 
@@ -243,4 +457,50 @@ function InvoiceLineItemAmount({
   }
 
   return <span translate="no">{formatCurrency(amount)}</span>
+}
+
+const USAGE_UNIT_LABELS: Record<
+  Exclude<UsageUnit, 'byte'>,
+  { singular: string; plural: string } | null
+> = {
+  gigabyte: { singular: 'GB', plural: 'GB' },
+  hour: { singular: 'hour', plural: 'hours' },
+  gbhr: { singular: 'GB-hour', plural: 'GB-hours' },
+  mbpshr: { singular: 'Mbps-hour', plural: 'Mbps-hours' },
+  iopshr: { singular: 'IOPS-hour', plural: 'IOPS-hours' },
+  // Counts (invocations, MAU, messages, …) read fine as a bare number
+  count: null,
+}
+
+const BYTE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+
+// Above this, full numbers get hard to scan (e.g. IOPS-hours), so switch to 2.2M-style notation
+const COMPACT_NOTATION_THRESHOLD = 1_000_000
+
+function formatNumber(value: number) {
+  // Avoid very low usage displaying as "0"
+  if (value > 0 && value < 0.01) return '<0.01'
+
+  return value.toLocaleString(undefined, {
+    maximumFractionDigits: 2,
+    notation: Math.abs(value) >= COMPACT_NOTATION_THRESHOLD ? 'compact' : 'standard',
+  })
+}
+
+/** Decimal (base 1000) units, matching how usage is billed — unlike `formatBytes` (base 1024) */
+function formatDecimalBytes(bytes: number) {
+  if (bytes === 0) return '0 B'
+
+  const exponent = Math.min(Math.floor(Math.log10(Math.abs(bytes)) / 3), BYTE_UNITS.length - 1)
+  return `${formatNumber(bytes / 1000 ** Math.max(exponent, 0))} ${BYTE_UNITS[Math.max(exponent, 0)]}`
+}
+
+function formatUsageWithUnit(usage: number, unit: UsageUnit) {
+  if (unit === 'byte') return formatDecimalBytes(usage)
+
+  const formattedUsage = formatNumber(usage)
+  const label = USAGE_UNIT_LABELS[unit]
+  if (!label) return formattedUsage
+
+  return `${formattedUsage} ${usage === 1 ? label.singular : label.plural}`
 }

@@ -13283,6 +13283,8 @@ export interface components {
                   schema: 'compute'
                   /** @enum {string} */
                   type: 'compute' | 'branch' | 'replica'
+                  /** @enum {string} */
+                  usage_unit: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
                 }
               | {
                   breakdown: {
@@ -13459,6 +13461,8 @@ export interface components {
                     | 'LOG_QUERYING'
                     | 'LOG_STORAGE'
                     | 'ACTIVE_COMPUTE_HOURS'
+                  /** @enum {string} */
+                  usage_unit?: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
                 }
             )[]
           }
@@ -13471,6 +13475,7 @@ export interface components {
         }
         prepaidCredits: {
           actualWithdrawnInElapsedCycle: number
+          currentBalance: number
           expectedBalanceAtEndOfCycle: number
           expectedWithdrawnAtEndOfCycle: number
           projectedWithdrawnInRemainingCycle: number
@@ -13599,6 +13604,8 @@ export interface components {
                   schema: 'compute'
                   /** @enum {string} */
                   type: 'compute' | 'branch' | 'replica'
+                  /** @enum {string} */
+                  usage_unit: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
                 }
               | {
                   breakdown: {
@@ -13775,6 +13782,8 @@ export interface components {
                     | 'LOG_QUERYING'
                     | 'LOG_STORAGE'
                     | 'ACTIVE_COMPUTE_HOURS'
+                  /** @enum {string} */
+                  usage_unit?: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
                 }
             )[]
           }
