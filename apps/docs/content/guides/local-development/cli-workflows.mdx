@@ -520,4 +520,4 @@ If problems persist, `supabase stop --no-backup` for a clean restart (this remov
 
 **`supabase start` fails because a port is already allocated**
 
-Another local Supabase project is using the default ports. Stop it with `supabase stop` from its directory, or run both projects at the same time with the experimental `supabase stack` commands. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
+Another local Supabase project is using the default ports. Stop it with `supabase stop` from its directory. To run both projects at the same time, turn on the experimental `supabase stack` commands and remove the fixed ports from each project's `config.toml`. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).

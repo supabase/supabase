@@ -9,8 +9,7 @@ export const localDevelopmentParallelProjectsLearnMore: ContentListingGroup = {
     {
       title: 'Install and run the CLI',
       href: '/guides/local-development/cli/getting-started',
-      description:
-        'Install the CLI, switch to the beta channel, and start your first local project.',
+      description: 'Install the CLI and start your first local project.',
     },
     {
       title: 'Local development workflow',
@@ -52,8 +51,7 @@ export const localDevelopmentRuntimesLearnMore: ContentListingGroup = {
     {
       title: 'Install and run the CLI',
       href: '/guides/local-development/cli/getting-started',
-      description:
-        'Install the CLI, switch to the beta channel, and start your first local project.',
+      description: 'Install the CLI and start your first local project.',
     },
     {
       title: 'CLI configuration',

@@ -2157,18 +2157,18 @@ By leveraging the Supabase CLI, you can significantly improve your development w
   },
   {
     title: 'Parallel local projects',
-    subtitle: 'Run a local Supabase project for every app, worktree, or agent.',
+    subtitle: 'Run a local Supabase project for every app or git worktree.',
     description: `
-The Supabase CLI can run more than one local Supabase project on the same machine. Each local project belongs to the directory it starts in, so every app, git worktree, or coding agent session gets its own Postgres database, Auth, Storage, and the rest of the services, with its own ports and its own data.
+The Supabase CLI can run more than one local Supabase project on the same machine. Each local project belongs to its project directory and git branch. Every app or git worktree gets its own Postgres database, Auth, Storage, and other services, with separate ports and data.
 
-With the default \`supabase start\`, every local project uses the same ports, so a second one fails with a port conflict. The experimental \`supabase stack\` commands assign ports automatically and keep them stable across restarts. One app can also run several named local projects, such as \`dev\` and \`test\`, so a destructive test run never touches your development data.
+With the default ports, a second \`supabase start\` on the same machine fails with a port conflict. The experimental \`supabase stack\` commands assign ports automatically and keep them stable across restarts. One app can also run several named local projects, such as \`dev\` and \`test\`, so a destructive test run never touches your development data.
 
 ## Key benefits
-1. One local project per worktree: Run several branches or coding agents in parallel, each against its own database.
-2. Automatic ports: You no longer edit \`config.toml\` to avoid collisions. The CLI assigns ports from a shared range and keeps them across restarts.
+1. One local project per worktree: Run coding agents in separate git worktrees, each against its own database.
+2. Automatic ports: The CLI assigns ports from a shared range and keeps them across restarts. Remove the fixed ports from \`config.toml\` once, or create the project with the stack commands turned on.
 3. Named environments: Start \`--stack dev\` and \`--stack test\` side by side in one app.
 4. Docker or native runtime: Run in containers, or as processes on your machine without Docker on Linux and on macOS on Apple silicon. Use Docker when you run several local projects on one machine.
-5. Services start on demand: Postgres starts right away and other services start on their first request, which keeps idle local projects light.
+5. Services start on demand: Postgres starts right away. Other services start on their first request and stop when idle, which keeps idle local projects light.
 
 ## Parallel local projects are valuable for:
 - Developers running coding agents in git worktrees
@@ -2176,7 +2176,7 @@ With the default \`supabase start\`, every local project uses the same ports, so
 - Freelancers and consultants switching between several client apps
 - CI jobs and agent sandboxes that run without a Docker daemon
 
-The \`supabase stack\` commands are experimental and their interface can change between releases. See the documentation for the full workflow and current limitations.
+The \`supabase stack\` commands are experimental. Their interface can change between releases. See the documentation for the full workflow and limitations.
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
@@ -2192,13 +2192,13 @@ The \`supabase stack\` commands are experimental and their interface can change 
     title: 'Native runtime for local development',
     subtitle: 'Run a local Supabase project as processes on your machine, without Docker.',
     description: `
-The Supabase CLI can run a local Supabase project as native processes instead of containers. Where there is no Docker daemon, such as coding agent sandboxes and CI runners without Docker, \`supabase stack start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the rest of the services directly on the host.
+The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. There, \`supabase stack start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host.
 
-It is the same local project you get from \`supabase start\`, with the same services and the same configuration. The CLI picks Docker when the \`docker\` command is installed and native otherwise, and you can require either with \`--runtime docker\` or \`--runtime native\`.
+It is the same local project you get from \`supabase start\`, with the same services and most of the same \`config.toml\` settings. The CLI picks Docker when its daemon responds, then Podman, then native. To require one, pass \`--runtime docker\`, \`--runtime podman\`, or \`--runtime native\`.
 
 ## Key benefits
 1. Works without Docker: Bring up a real local Supabase project in environments that can't run a container engine.
-2. Verified binaries: The CLI downloads service archives from Supabase's registry and checks them before extracting.
+2. Verified binaries: The CLI downloads service archives from Supabase's GitHub releases and checks them before extracting.
 3. Same project, same services: Postgres with the full extension set, Auth, PostgREST, Realtime, Storage, Edge Functions, Studio, and more.
 
 ## The native runtime is valuable for:

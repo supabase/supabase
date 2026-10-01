@@ -204,7 +204,7 @@ const data: () => {
         },
         {
           name: 'Claude & Cursor',
-          description: 'AI-powered local development, one local project per agent',
+          description: 'AI-powered local development, one local project per git worktree',
         },
         {
           name: 'Figma',
