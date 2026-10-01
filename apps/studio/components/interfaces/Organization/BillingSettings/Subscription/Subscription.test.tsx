@@ -23,8 +23,9 @@ vi.mock('@/data/subscriptions/org-subscription-query', () => ({
   useOrgSubscriptionQuery: () => mockSubscription(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true, isSuccess: true }),
+  FGA_PERMISSIONS: {},
 }))
 
 vi.mock('@/state/organization-settings', () => ({

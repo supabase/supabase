@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Edit, MoreVertical, Trash } from 'lucide-react'
 import {
   Button,
@@ -17,7 +16,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import CopyButton from '@/components/ui/CopyButton'
 import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface OAuthAppRowProps {
   app: OAuthApp
@@ -26,13 +25,11 @@ export interface OAuthAppRowProps {
 }
 
 export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
-  const { can: canUpdateOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'approved_oauth_apps'
+  const { can: canUpdateOAuthApps } = useAsyncCheckPermissionsV2(
+    'oauth_apps_write'
   )
-  const { can: canDeleteOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.DELETE,
-    'approved_oauth_apps'
+  const { can: canDeleteOAuthApps } = useAsyncCheckPermissionsV2(
+    'oauth_apps_write'
   )
 
   return (

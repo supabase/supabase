@@ -1,6 +1,5 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, StripeAddressElement, StripeElementsOptions } from '@stripe/stripe-js'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
@@ -29,9 +28,9 @@ import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-ut
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -42,10 +41,9 @@ export const BillingCustomerData = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.customer'
+    useAsyncCheckPermissionsV2('billing_read')
+  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissionsV2(
+    'billing_write'
   )
 
   const { ref, inView } = useInView({ triggerOnce: true })

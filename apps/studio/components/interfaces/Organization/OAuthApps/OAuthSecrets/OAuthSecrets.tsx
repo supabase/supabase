@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { Alert, AlertTitle, InfoIcon } from 'ui'
@@ -9,8 +8,8 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useClientSecretCreateMutation } from '@/data/oauth-secrets/client-secret-create-mutation'
 import { CreatedSecret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
 import { OAuthApp } from '@/data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface Props {
   selectedApp?: OAuthApp
@@ -19,7 +18,9 @@ interface Props {
 export const OAuthSecrets = ({ selectedApp }: Props) => {
   const { slug } = useParams()
   const [createdSecret, setCreatedSecret] = useState<CreatedSecret>()
-  const { can: canManageSecrets } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    'oauth_apps_write'
+  )
 
   const { id: appId } = selectedApp ?? {}
 

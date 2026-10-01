@@ -1,6 +1,5 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Calendar, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -33,8 +32,8 @@ import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FORM_ID = 'credit-code-redemption'
 
@@ -65,10 +64,8 @@ export const CreditCodeRedemption = ({
   )
   const combinedCreditBalanceCents = orgBalance?.total_balance_cents
 
-  const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions',
-    undefined,
+  const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    'billing_write',
     { organizationSlug: slug }
   )
 

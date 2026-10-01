@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
@@ -34,9 +33,9 @@ import { useOrganizationMembersQuery } from '@/data/organizations/organization-m
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -64,9 +63,8 @@ export const AuditLogs = () => {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
 
-  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'notifications'
+  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    'audit_logs_read'
   )
 
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
@@ -439,3 +437,4 @@ export const AuditLogs = () => {
     </>
   )
 }
+2026 - 10-01T09: 56: 10 +07:00

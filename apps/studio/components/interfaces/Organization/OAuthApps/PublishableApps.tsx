@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Check, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -36,8 +35,8 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { OAuthAppCreateResponse } from '@/data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from '@/data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 type PublishedAppsSort = 'created:asc' | 'created:desc'
 type PublishedAppsSortColumn = 'created'
@@ -50,13 +49,11 @@ export const PublishableApps = () => {
   const [selectedAppToUpdate, setSelectedAppToUpdate] = useState<OAuthApp>()
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
 
-  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'approved_oauth_apps'
+  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    'oauth_apps_read'
   )
-  const { can: canCreateOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'approved_oauth_apps'
+  const { can: canCreateOAuthApps } = useAsyncCheckPermissionsV2(
+    'oauth_apps_write'
   )
 
   const {

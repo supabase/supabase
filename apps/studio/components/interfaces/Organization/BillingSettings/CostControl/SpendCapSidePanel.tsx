@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -13,9 +12,9 @@ import { Admonition } from 'ui-patterns/Admonition'
 import Table from '@/components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from '@/lib/constants'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -44,9 +43,8 @@ const SpendCapSidePanel = () => {
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const { can: canUpdateSpendCap } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateSpendCap } = useAsyncCheckPermissionsV2(
+    'billing_write'
   )
 
   const snap = useOrgSettingsPageStateSnapshot()

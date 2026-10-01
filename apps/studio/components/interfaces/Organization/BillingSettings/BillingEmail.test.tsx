@@ -31,8 +31,10 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: (action: string) => mockCheckPermissions(action),
+
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: (permission: string) => mockCheckPermissions(permission),
+  FGA_PERMISSIONS: {},
 }))
 
 vi.mock('react-intersection-observer', () => ({
@@ -110,8 +112,8 @@ describe('BillingEmail', () => {
   })
 
   test('shows a permission notice when the user cannot read billing data', async () => {
-    mockCheckPermissions.mockImplementation((action: string) => ({
-      can: action !== PermissionAction.BILLING_READ,
+    mockCheckPermissions.mockImplementation((permission) => ({
+      can: permission !== 'billing_read',
       isSuccess: true,
     }))
 
@@ -122,8 +124,8 @@ describe('BillingEmail', () => {
   })
 
   test('disables the email controls when the user cannot update billing data', async () => {
-    mockCheckPermissions.mockImplementation((action: string) => ({
-      can: action !== PermissionAction.BILLING_WRITE,
+    mockCheckPermissions.mockImplementation((permission) => ({
+      can: permission !== 'billing_write',
       isSuccess: true,
     }))
     mockCustomerProfile({ email: 'billing@example.com', additional_emails: [] })
