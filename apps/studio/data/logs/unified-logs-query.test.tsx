@@ -1,11 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
+import type { FeatureFlagContextType } from 'common'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { useUnifiedLogsChartQuery } from './unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from './unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from './unified-logs-infinite-query'
+import type { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 
 const { mockExecuteAnalyticsSql, mockIsPlatform } = vi.hoisted(() => ({
   mockExecuteAnalyticsSql: vi.fn(),
@@ -28,18 +30,19 @@ vi.mock('@/lib/constants', async () => {
 
 type FlagState = {
   hasLoaded: boolean
-  configcatError?: boolean
   otelUnifiedLogs?: boolean
+  unrelatedFlag?: boolean
 }
 
 const flagState: FlagState = { hasLoaded: false }
 
 const createWrapper = (queryClient: QueryClient) => {
   return function QueryWrapper({ children }: { children: React.ReactNode }) {
-    const configcat =
-      flagState.otelUnifiedLogs === undefined
-        ? {}
-        : { otelUnifiedLogs: flagState.otelUnifiedLogs }
+    const otelUnifiedLogs = flagState.otelUnifiedLogs
+    const configcat: FeatureFlagContextType['configcat'] = {
+      ...(otelUnifiedLogs === undefined ? {} : { otelUnifiedLogs }),
+      ...(flagState.unrelatedFlag ? { unrelatedFlag: true } : {}),
+    }
 
     return (
       <QueryClientProvider client={queryClient}>
@@ -48,7 +51,6 @@ const createWrapper = (queryClient: QueryClient) => {
             configcat,
             posthog: {},
             hasLoaded: flagState.hasLoaded,
-            configcatError: flagState.configcatError,
           }}
         >
           {children}
@@ -59,7 +61,28 @@ const createWrapper = (queryClient: QueryClient) => {
 }
 
 const useUnifiedLogsQueries = () => {
-  const variables = { projectRef: 'project-ref', search: {} }
+  const search: QuerySearchParamsType = {
+    filter: null,
+    latency: null,
+    'timing.dns': null,
+    'timing.connection': null,
+    'timing.tls': null,
+    'timing.ttfb': null,
+    'timing.transfer': null,
+    date: null,
+    sort: null,
+    size: 40,
+    start: 0,
+    direction: 'next',
+    cursor: new Date(),
+    id: null,
+    show_connection_logs: true,
+    edge_auth: true,
+    edge_storage: true,
+    edge_postgrest: true,
+    user: null,
+  }
+  const variables = { projectRef: 'project-ref', search }
   return {
     chart: useUnifiedLogsChartQuery(variables),
     count: useUnifiedLogsCountQuery(variables),
@@ -75,8 +98,8 @@ describe('unified logs queries', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
     flagState.hasLoaded = false
-    flagState.configcatError = undefined
     flagState.otelUnifiedLogs = undefined
+    flagState.unrelatedFlag = undefined
     mockExecuteAnalyticsSql.mockResolvedValue({ result: [] })
     queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   })
@@ -135,7 +158,17 @@ describe('unified logs queries', () => {
 
   test('does not select BigQuery when ConfigCat fails', async () => {
     flagState.hasLoaded = true
-    flagState.configcatError = true
+
+    renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
+
+    await Promise.resolve()
+
+    expect(mockExecuteAnalyticsSql).not.toHaveBeenCalled()
+  })
+
+  test('does not select BigQuery when the loaded flags omit the backend flag', async () => {
+    flagState.hasLoaded = true
+    flagState.unrelatedFlag = true
 
     renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
 

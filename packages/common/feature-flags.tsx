@@ -51,7 +51,6 @@ export type FeatureFlagContextType = {
   configcat: { [key: string]: boolean | number | string | null }
   posthog: CallFeatureFlagsResponse
   hasLoaded?: boolean
-  configcatError?: boolean
 }
 
 export const FeatureFlagContext = createContext<FeatureFlagContextType>({
@@ -227,7 +226,6 @@ export const FeatureFlagProvider = ({
       }
 
       flagStore.hasLoaded = true
-      flagStore.configcatError = ccResult.status === 'rejected'
 
       if (mounted) {
         setStore(flagStore)

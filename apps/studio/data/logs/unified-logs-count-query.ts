@@ -6,8 +6,8 @@ import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
-  useUnifiedLogsBackend,
   UnifiedLogsVariables,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
@@ -92,7 +92,7 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
 ) => {
   const { isReady, useOtel } = useUnifiedLogsBackend()
   return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
-    queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
+    queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel, ready: isReady }],
     queryFn: ({ signal }) => {
       if (!isReady) throw new Error('Unified Logs backend is not ready')
       return getUnifiedLogsCount({ projectRef, search, useOtel }, signal)

@@ -5,8 +5,8 @@ import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import {
   UNIFIED_LOGS_QUERY_OPTIONS,
-  useUnifiedLogsBackend,
   UnifiedLogsVariables,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
 import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
@@ -168,7 +168,7 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
 ) => {
   const { isReady, useOtel } = useUnifiedLogsBackend()
   return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
-    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
+    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel, ready: isReady }],
     queryFn: ({ signal }) => {
       if (!isReady) throw new Error('Unified Logs backend is not ready')
       return getUnifiedLogsChart({ projectRef, search, useOtel }, signal)

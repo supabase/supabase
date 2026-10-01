@@ -1,5 +1,5 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
-import { useFeatureFlags, useFlag } from 'common'
+import { useFeatureFlags } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -33,9 +33,10 @@ export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 
 export const useUnifiedLogsBackend = () => {
-  const { hasLoaded, configcatError } = useFeatureFlags()
-  const useOtel = !!useFlag('otelUnifiedLogs')
-  const isReady = !IS_PLATFORM || (hasLoaded && !configcatError)
+  const { hasLoaded, configcat } = useFeatureFlags()
+  const useOtel = IS_PLATFORM && configcat.otelUnifiedLogs === true
+  const isReady =
+    !IS_PLATFORM || (hasLoaded === true && typeof configcat.otelUnifiedLogs === 'boolean')
 
   return { isReady, useOtel }
 }
@@ -190,7 +191,10 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
 ) => {
   const { isReady, useOtel } = useUnifiedLogsBackend()
   return useInfiniteQuery({
-    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
+    queryKey: [
+      ...logsKeys.unifiedLogsInfinite(projectRef, search),
+      { otel: useOtel, ready: isReady },
+    ],
     queryFn: ({ signal, pageParam }) => {
       if (!isReady) throw new Error('Unified Logs backend is not ready')
       return getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal)
