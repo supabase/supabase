@@ -1,15 +1,17 @@
+import { useTheme } from 'next-themes'
 import { cn, StatusIcon } from 'ui'
 
 import { DestinationIcon } from './DestinationIcon'
 import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { BASE_PATH } from '@/lib/constants'
+import { BRAND_ICONS, resolveThemedIconSrc, type ThemedIconSrc } from '@/lib/brand-icons'
+import { resolveThemeOverrideMode } from '@/lib/theme-overrides'
 
-type DestinationBrand = { type: 'mark'; src: string } | { type: 'monogram'; label: string }
+type DestinationBrand = { type: 'mark'; src: ThemedIconSrc } | { type: 'monogram'; label: string }
 
 const BRAND_BY_TYPE: Partial<Record<DestinationType, DestinationBrand>> = {
-  BigQuery: { type: 'mark', src: `${BASE_PATH}/img/icons/bigquery-icon.svg` },
-  ClickHouse: { type: 'monogram', label: 'CH' },
-  DuckLake: { type: 'mark', src: `${BASE_PATH}/img/icons/ducklake-icon.svg` },
+  BigQuery: { type: 'mark', src: BRAND_ICONS.bigquery },
+  ClickHouse: { type: 'mark', src: BRAND_ICONS.clickhouse },
+  DuckLake: { type: 'mark', src: BRAND_ICONS.ducklake },
   Snowflake: { type: 'monogram', label: 'SF' },
 }
 
@@ -36,8 +38,11 @@ export const DestinationLogo = ({
   className,
   hasErrors = false,
 }: DestinationLogoProps) => {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolveThemeOverrideMode(resolvedTheme) === 'dark'
   const sizing = SIZE_CLASS_NAME[size]
   const brand = BRAND_BY_TYPE[type]
+  const brandMarkSrc = brand?.type === 'mark' ? resolveThemedIconSrc(brand.src, isDark) : undefined
 
   return (
     <span className={cn('relative inline-flex shrink-0', className)}>
@@ -46,7 +51,7 @@ export const DestinationLogo = ({
           <DestinationIcon type={type} size={sizing.icon} className="text-foreground-light" />
         )}
         {brand?.type === 'mark' && (
-          <img src={brand.src} alt="" aria-hidden className={sizing.mark} />
+          <img src={brandMarkSrc} alt="" aria-hidden className={sizing.mark} />
         )}
         {brand?.type === 'monogram' && (
           <span
