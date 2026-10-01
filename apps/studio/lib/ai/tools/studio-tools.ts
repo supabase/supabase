@@ -72,13 +72,13 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
         'Asks the user to execute a SQL statement and return the results. Requires user approval before executing.',
       inputSchema: executeSqlInputSchema,
       needsApproval: true,
-      execute: async ({ sql }) => {
+      execute: async ({ sql }, { abortSignal }) => {
         // The `needsApproval: true` gate on this tool means the user has
         // explicitly approved this AI-generated SQL before execute runs —
         // that approval is the user gesture that promotes untrusted to safe.
         const { result } = await executeSql(
           { projectRef, connectionString, sql: acceptUntrustedSql(untrustedSql(sql)) },
-          undefined,
+          abortSignal,
           authHeaders
         )
         return result

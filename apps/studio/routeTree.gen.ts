@@ -27,6 +27,7 @@ import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as McpSecretsRouteImport } from './routes/mcp/secrets'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
+import { Route as ApiStatusPageRouteImport } from './routes/api/status-page'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
 import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
@@ -329,6 +330,7 @@ import { Route as ApiPlatformStorageRefBucketsIdObjectsSignMultiRouteImport } fr
 import { Route as ApiPlatformStorageRefBucketsIdObjectsSignRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/sign'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsPublicUrlRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/public-url'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsMoveRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/move'
+import { Route as ApiPlatformStorageRefBucketsIdObjectsListV2RouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/list-v2'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsListRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/list'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsDownloadRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/download'
 
@@ -419,6 +421,11 @@ const McpSecretsRoute = McpSecretsRouteImport.update({
 const IntegrationsVercelRoute = IntegrationsVercelRouteImport.update({
   id: '/integrations/vercel',
   path: '/integrations/vercel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStatusPageRoute = ApiStatusPageRouteImport.update({
+  id: '/api/status-page',
+  path: '/api/status-page',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
@@ -2119,6 +2126,12 @@ const ApiPlatformStorageRefBucketsIdObjectsMoveRoute =
     path: '/api/platform/storage/$ref/buckets/$id/objects/move',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPlatformStorageRefBucketsIdObjectsListV2Route =
+  ApiPlatformStorageRefBucketsIdObjectsListV2RouteImport.update({
+    id: '/api/platform/storage/$ref/buckets/$id/objects/list-v2',
+    path: '/api/platform/storage/$ref/buckets/$id/objects/list-v2',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformStorageRefBucketsIdObjectsListRoute =
   ApiPlatformStorageRefBucketsIdObjectsListRouteImport.update({
     id: '/api/platform/storage/$ref/buckets/$id/objects/list',
@@ -2168,6 +2181,7 @@ export interface FileRoutesByFullPath {
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
@@ -2444,6 +2458,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/integrations/$id/$pageId/$childId/': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
+  '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
   '/api/platform/storage/$ref/buckets/$id/objects/move': typeof ApiPlatformStorageRefBucketsIdObjectsMoveRoute
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
@@ -2489,6 +2504,7 @@ export interface FileRoutesByTo {
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
@@ -2751,6 +2767,7 @@ export interface FileRoutesByTo {
   '/project/$ref/integrations/$id/$pageId/$childId': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
+  '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
   '/api/platform/storage/$ref/buckets/$id/objects/move': typeof ApiPlatformStorageRefBucketsIdObjectsMoveRoute
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
@@ -2800,6 +2817,7 @@ export interface FileRoutesById {
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
@@ -3076,6 +3094,7 @@ export interface FileRoutesById {
   '/project/$ref/integrations/$id/$pageId/$childId/': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
+  '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
   '/api/platform/storage/$ref/buckets/$id/objects/move': typeof ApiPlatformStorageRefBucketsIdObjectsMoveRoute
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
@@ -3124,6 +3143,7 @@ export interface FileRouteTypes {
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
+    | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
     | '/new/$slug'
@@ -3400,6 +3420,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id/$pageId/$childId/'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
+    | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
     | '/api/platform/storage/$ref/buckets/$id/objects/move'
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
@@ -3445,6 +3466,7 @@ export interface FileRouteTypes {
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
+    | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
     | '/new/$slug'
@@ -3707,6 +3729,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id/$pageId/$childId'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
+    | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
     | '/api/platform/storage/$ref/buckets/$id/objects/move'
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
@@ -3755,6 +3778,7 @@ export interface FileRouteTypes {
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
     | '/api/status-override'
+    | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
     | '/new/$slug'
@@ -4031,6 +4055,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations/$id/$pageId/$childId/'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
+    | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
     | '/api/platform/storage/$ref/buckets/$id/objects/move'
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
@@ -4068,6 +4093,7 @@ export interface RootRouteChildren {
   ApiParseQueryRoute: typeof ApiParseQueryRoute
   ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
+  ApiStatusPageRoute: typeof ApiStatusPageRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   McpSecretsRoute: typeof McpSecretsRoute
   NewSlugRoute: typeof NewSlugRoute
@@ -4156,6 +4182,7 @@ export interface RootRouteChildren {
   ApiV1ProjectsRefFunctionsSlugIndexRoute: typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   ApiPlatformStorageRefBucketsIdObjectsDownloadRoute: typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   ApiPlatformStorageRefBucketsIdObjectsListRoute: typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
+  ApiPlatformStorageRefBucketsIdObjectsListV2Route: typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
   ApiPlatformStorageRefBucketsIdObjectsMoveRoute: typeof ApiPlatformStorageRefBucketsIdObjectsMoveRoute
   ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute: typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   ApiPlatformStorageRefBucketsIdObjectsSignRoute: typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
@@ -4293,6 +4320,13 @@ declare module '@tanstack/react-router' {
       path: '/integrations/vercel'
       fullPath: '/integrations/vercel'
       preLoaderRoute: typeof IntegrationsVercelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/status-page': {
+      id: '/api/status-page'
+      path: '/api/status-page'
+      fullPath: '/api/status-page'
+      preLoaderRoute: typeof ApiStatusPageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/status-override': {
@@ -6409,6 +6443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformStorageRefBucketsIdObjectsMoveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/platform/storage/$ref/buckets/$id/objects/list-v2': {
+      id: '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
+      path: '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
+      fullPath: '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
+      preLoaderRoute: typeof ApiPlatformStorageRefBucketsIdObjectsListV2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/storage/$ref/buckets/$id/objects/list': {
       id: '/api/platform/storage/$ref/buckets/$id/objects/list'
       path: '/api/platform/storage/$ref/buckets/$id/objects/list'
@@ -7186,6 +7227,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiParseQueryRoute: ApiParseQueryRoute,
   ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
+  ApiStatusPageRoute: ApiStatusPageRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   McpSecretsRoute: McpSecretsRoute,
   NewSlugRoute: NewSlugRoute,
@@ -7304,6 +7346,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformStorageRefBucketsIdObjectsDownloadRoute,
   ApiPlatformStorageRefBucketsIdObjectsListRoute:
     ApiPlatformStorageRefBucketsIdObjectsListRoute,
+  ApiPlatformStorageRefBucketsIdObjectsListV2Route:
+    ApiPlatformStorageRefBucketsIdObjectsListV2Route,
   ApiPlatformStorageRefBucketsIdObjectsMoveRoute:
     ApiPlatformStorageRefBucketsIdObjectsMoveRoute,
   ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute:
