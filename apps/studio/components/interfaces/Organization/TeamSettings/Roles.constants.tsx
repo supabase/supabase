@@ -20,3 +20,11 @@ export const ROLE_DESCRIPTIONS: Record<string, ReactNode> = {
   None: 'No access to any organization or project resources',
   'No-access': 'No access to any organization or project resources',
 }
+
+const OVERRIDE_ROLE_NAMES: Record<string, string> = {
+  None: 'No-access',
+}
+
+export function getOverrideRoleName(rolename: string) {
+  return OVERRIDE_ROLE_NAMES[rolename] ?? rolename
+}

@@ -43,7 +43,7 @@ import {
   emailSchema,
   parseEmails,
 } from './InviteMemberButton.utils'
-import { ROLE_DESCRIPTIONS } from './Roles.constants'
+import { getOverrideRoleName, ROLE_DESCRIPTIONS } from './Roles.constants'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -358,12 +358,19 @@ export const InviteMemberButton = () => {
                           const canAssignRole = rolesAddable.includes(role.id)
                           const isOwnerRole = role.name === 'Owner'
                           const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                          const disabled = !canAssignRole || disabledForStripe
+
+                          const isNoAccessRole = role.name === 'None'
+                          const isApplyingProjectRole = !applyToOrg
+                          const disabledForProjectRole = isApplyingProjectRole && isNoAccessRole
+
+                          const disabled = !canAssignRole || disabledForStripe || disabledForProjectRole
                           const disabledReason = disabledForStripe
                             ? 'Cannot be assigned in Stripe Projects organizations'
-                            : !canAssignRole
-                              ? 'Additional permissions required to assign role'
-                              : undefined
+                            : disabledForProjectRole
+                              ? 'Cannot assign No-access role to project-scoped members'
+                              : !canAssignRole
+                                ? 'Additional permissions required to assign role'
+                                : undefined
 
                           return (
                             <FormItem asChild key={role.id}>
@@ -371,7 +378,7 @@ export const InviteMemberButton = () => {
                                 <RadioGroupStackedItem
                                   value={role.id.toString()}
                                   disabled={disabled}
-                                  label={role.name == 'None' ? 'No-access' : role.name}
+                                  label={getOverrideRoleName(role.name)}
                                   description={
                                     <>
                                       {ROLE_DESCRIPTIONS[role.name] ??
