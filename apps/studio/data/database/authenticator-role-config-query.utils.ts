@@ -5,10 +5,8 @@
  * `ALTER ROLE authenticator SET pgrst.db_schemas = '...'` overrides the Dashboard's "Exposed
  * schemas" setting at the PostgREST level, so this is used to detect that override.
  */
-export function getAuthenticatorDbSchemasOverride(
-  rolconfig: string[] | null
-): string[] | undefined {
-  if (!rolconfig) return undefined
+export function getAuthenticatorDbSchemasOverride(rolconfig: string[] | null): string[] | null {
+  if (!rolconfig) return null
 
   for (const entry of rolconfig) {
     const separatorIndex = entry.indexOf('=')
@@ -24,5 +22,5 @@ export function getAuthenticatorDbSchemasOverride(
       .filter(Boolean)
   }
 
-  return undefined
+  return null
 }

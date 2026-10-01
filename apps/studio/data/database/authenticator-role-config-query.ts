@@ -47,8 +47,11 @@ export const authenticatorRoleConfigQueryOptions = ({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: databaseKeys.authenticatorRoleConfig(projectRef),
     queryFn: ({ signal }) => getAuthenticatorRoleConfig({ projectRef, connectionString }, signal),
-    // The authenticator role's config only changes via an explicit `ALTER ROLE` statement, so
-    // there's no need to refetch this every time the API settings page mounts.
-    staleTime: 5 * 60 * 1000,
+    // The fix for this override is usually applied outside the Dashboard (SQL editor, another
+    // client), so there's no cache-invalidation event to react to. Always refetch on mount and
+    // window focus so navigating back to this page (or back to this browser tab) picks up a fix
+    // immediately, instead of silently serving a stale cached result.
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: 'always',
     enabled: typeof projectRef !== 'undefined',
   })
