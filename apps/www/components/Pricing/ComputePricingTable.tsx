@@ -51,7 +51,7 @@ const ComputePricingTable = () => {
                       {column.url ? (
                         <Link
                           href={column.url}
-                          className="underline text-brand hover:text-brand-600"
+                          className="underline text-primary hover:text-brand-600"
                           target="_blank"
                         >
                           {column.value}
@@ -83,7 +83,7 @@ const ComputePricingTable = () => {
                   </th>
                   <td
                     className={`px-4 py-3 ${
-                      column.key === 'plan' ? 'text-brand pt-16 lg:pt-3' : ''
+                      column.key === 'plan' ? 'text-primary pt-16 lg:pt-3' : ''
                     }`}
                   >
                     {column.value}

@@ -21,7 +21,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
       description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
       actions={
         <Button asChild>
-          <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
+          <Link href={`/project/${ref}/settings/infrastructure`}>Manage read replicas</Link>
         </Button>
       }
     />

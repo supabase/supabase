@@ -74,7 +74,7 @@ const PricingDiskSection = () => (
             <tbody key={`${diskType.name}-mobile`}>
               <tr>
                 <th className="py-3 pl-4 text-left font-medium pt-16 lg:pt-3 w-[60%]">Disk Type</th>
-                <td className="px-4 py-3 text-brand pt-16 lg:pt-3">{diskType.name}</td>
+                <td className="px-4 py-3 text-primary pt-16 lg:pt-3">{diskType.name}</td>
               </tr>
               <tr>
                 <th className="py-3 pl-4 text-left font-medium ">Max Size</th>

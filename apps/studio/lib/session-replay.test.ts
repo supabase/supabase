@@ -314,7 +314,7 @@ describe('maskReplayAttribute', () => {
     expect(maskReplayAttribute(name, value)).toBe(value)
   })
 
-  it.each(['dark', 'light', 'classic-dark', 'system'])(
+  it.each(['dark', 'light', 'system'])(
     'keeps data-theme=%o, which monaco.css and grid.css select on',
     (theme) => {
       expect(maskReplayAttribute('data-theme', theme)).toBe(theme)

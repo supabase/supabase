@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type React from 'react'
 import type { ReactNode } from 'react'
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, FloatingPlate } from 'ui'
 
 import { useMeasuredWidth } from './Row.utils'
 
@@ -146,23 +146,27 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   return (
     <div ref={ref} className={cn('relative w-full', className)} {...rest}>
       {showArrows && canScrollLeft && (
-        <Button
-          onClick={scrollLeft}
-          className="absolute w-8 h-8 left-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
-          aria-label="Scroll left"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </Button>
+        <FloatingPlate rounded="full" className="absolute left-0 top-1/2 z-10 -translate-y-1/2">
+          <Button
+            onClick={scrollLeft}
+            className="w-8 h-8 rounded-full p-2"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+        </FloatingPlate>
       )}
 
       {showArrows && canScrollRight && hasContentToScroll && (
-        <Button
-          onClick={scrollRight}
-          className="absolute w-8 h-8 right-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
-          aria-label="Scroll right"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </Button>
+        <FloatingPlate rounded="full" className="absolute right-0 top-1/2 z-10 -translate-y-1/2">
+          <Button
+            onClick={scrollRight}
+            className="w-8 h-8 rounded-full p-2"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </FloatingPlate>
       )}
 
       <div

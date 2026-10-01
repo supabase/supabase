@@ -43,7 +43,7 @@ export function middleware(request: NextRequest) {
     let [, lib, maybeVersion, ...slug] = pathname.replace(REFERENCE_PATH, '').split('/')
 
     if (clientSdkIds.includes(lib)) {
-      const version = /v\d+/.test(maybeVersion) ? maybeVersion : undefined
+      const version = /^v\d+$/.test(maybeVersion) ? maybeVersion : undefined
       if (!version) {
         slug = [maybeVersion, ...slug]
       }
@@ -77,7 +77,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (clientSdkIds.includes(lib)) {
-    const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
+    const version = /^v\d+$/.test(maybeVersion) ? maybeVersion : null
     const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }

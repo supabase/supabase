@@ -45,6 +45,24 @@ Calling `realtime.send` or `realtime.send_binary`, the broadcast REST endpoint, 
 
 </Admonition>
 
+## Check which partitions you have
+
+```sql
+select c.relname
+from pg_inherits i
+  join pg_class c on c.oid = i.inhrelid
+where i.inhparent = 'realtime.messages'::regclass
+order by c.relname;
+```
+
+The names are dates, so the result tells you which case you are in:
+
+- One covers today. The missing partition is not the cause, so go to [When it is a real problem](#when-it-is-a-real-problem).
+- They all end on a past date. Your window lapsed. The newest name is three days after the last time partitions were created, because each creation covers yesterday through three days ahead.
+- No rows. No client has ever connected, so no partition was ever created.
+
+Zero rows does not mean the Realtime migrations are missing. Those would fail this query with `42P01 relation "realtime.messages" does not exist`. If you see `42P01`, open a support ticket.
+
 ## How to avoid it
 
 - Connect a client before broadcasting from the database. A live WebSocket connection both creates the partitions and starts the consumer that receives the message.

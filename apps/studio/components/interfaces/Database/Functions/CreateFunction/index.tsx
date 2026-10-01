@@ -547,7 +547,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                       onClick={() => remove(index)}
                       className="h-[34px] w-[34px]"
                       aria-label="Remove argument"
-                      // Tooltip repeats the label; the description would read the name twice
+                      // Tooltip repeats the label; screen readers would read it twice
                       aria-describedby={undefined}
                     />
                   </TooltipTrigger>
