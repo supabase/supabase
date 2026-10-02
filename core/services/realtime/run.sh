@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-set -x
 ulimit -n
 
 if [ -n "${RLIMIT_NOFILE:-}" ]; then
