@@ -2,7 +2,7 @@
 title: 'Operate with confidence'
 description: 'More data, more tools and more control so your agent has what it needs to observe your project, investigate issues and propose fixes, autonomously.'
 author: steven_eubank, rand_arete, wenbo
-date: '2026-10-02'
+date: '2026-10-02T10:25:00'
 categories:
   - product
 tags:
@@ -36,6 +36,7 @@ Previously your agents were limited in what logs they could access via our MCP. 
 <Img
   alt="Health Advisor in the Supabase dashboard flagging persistently high Data API and Edge Function error rates"
   src="/images/blog/select-2026-operate-with-confidence/health-check.png"
+  wide
 />
 
 Programmatic checks can catch obvious issues and provide signal for an agent to investigate further. Advisor previously focused on security and performance checks. We’ve now extended it to health. Advisor will signal when error rates go beyond what is considered normal across Data API, Auth, Storage, and Edge Functions. Checks run on demand from the dashboard or the Management API, and results show up under a new Health tab on the Advisors page.
@@ -45,6 +46,7 @@ Programmatic checks can catch obvious issues and provide signal for an agent to 
 <Img
   alt="Database Connections page showing connections, active queries, idle in transaction, and blocked queries"
   src="/images/blog/select-2026-operate-with-confidence/connections.png"
+  wide
 />
 
 See which sessions hold connections, which queries run long, which are idle in a transaction, which are blocked, and who holds the lock. You can cancel a query or terminate its connection from there. It's on by default for every project, including self-hosted.
@@ -54,6 +56,7 @@ See which sessions hold connections, which queries run long, which are idle in a
 <Img
   alt="A notebook in Explorer combining markdown notes with database queries and charts"
   src="/images/blog/select-2026-operate-with-confidence/notebooks.png"
+  wide
 />
 
 A notebook is a file in your supabase folder that combines saved database or log queries with markdown notes. Run Notebooks yourself or get your agents to run them as part of their ongoing observations. You can create notebooks directly in the dashboard via the Assistant, then pull them down locally as files with `supabase notebooks pull` if needed. You can also create notebooks locally (including with your own agent) and push them with `supabase notebooks push` to make them accessible in the dashboard.
@@ -73,7 +76,7 @@ npx plugins add supabase-community/supabase-plugin
 
 ## Autonomy
 
-<video className="rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
   <source src="/images/blog/select-2026-operate-with-confidence/autonomy.mp4" type="video/mp4" />
 </video>
 
@@ -95,7 +98,7 @@ Limit a token to the organizations, projects, and permissions you choose. Start 
 
 ### MCP Elicitations
 
-<video className="rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
   <source
     src="/images/blog/select-2026-operate-with-confidence/mcp-elicitations.mp4"
     type="video/mp4"
