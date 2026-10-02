@@ -25,8 +25,8 @@ const items = [
 
 export default function SidebarDemo() {
   return (
-    <SidebarProvider className="h-[380px] min-h-0! w-full max-w-3xl overflow-hidden rounded-lg border">
-      <Sidebar collapsible="none">
+    <SidebarProvider className="h-[480px] min-h-0! w-full overflow-hidden">
+      <Sidebar>
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -34,7 +34,7 @@ export default function SidebarDemo() {
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild isActive={item.title === 'Home'}>
                       <a href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -48,11 +48,9 @@ export default function SidebarDemo() {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-12 items-center gap-2 border-b px-4">
-          <SidebarTrigger />
-          <span className="text-sm text-foreground-light">Dashboard</span>
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
         </header>
-        <div className="p-4 text-sm text-foreground-muted">Main content</div>
       </SidebarInset>
     </SidebarProvider>
   )
