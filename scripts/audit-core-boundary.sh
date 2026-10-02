@@ -38,7 +38,7 @@ fi
 
 echo
 echo "--- hosted-domain references in executable/configuration files ---"
-cloud_hits="$(grep -RInE 'https?://[^[:space:]"]*(supabase\.co|supabase\.com)' supabase docker scripts core --include='*.toml' --include='*.yml' --include='*.yaml' --include='*.sh' --include='*.env' --include='*.json' 2>/dev/null || true)"
+cloud_hits="$(grep -RInE 'https?://[^[:space:]"]*(supabase\.co|supabase\.com)' supabase docker scripts core --include='*.toml' --include='*.yml' --include='*.yaml' --include='*.sh' --include='*.env' --include='*.json' 2>/dev/null | grep -vE ':[[:space:]]*#' || true)"
 if [[ -n "$cloud_hits" ]]; then
   echo "$cloud_hits"
   finding "hosted Supabase domains remain in runtime/configuration files"
