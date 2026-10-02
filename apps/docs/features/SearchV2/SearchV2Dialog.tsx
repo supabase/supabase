@@ -51,10 +51,10 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
         centered={false}
         dialogOverlayProps={{
           className:
-            'data-closed:animate-out! data-closed:fade-out-0 data-closed:fill-mode-forwards data-closed:duration-150 data-closed:ease-enter max-lg:bg-transparent max-lg:backdrop-blur-none max-lg:top-(--header-height) max-lg:p-0! max-lg:data-closed:duration-200!',
+            'data-closed:animate-out! data-closed:fade-out-0 data-closed:fill-mode-forwards data-closed:duration-150 data-closed:ease-enter pt-20 sm:pt-20',
         }}
         size="large"
-        className="overflow-hidden rounded-lg border-0 p-0 inset-ring inset-ring-border shadow-(--shadow-codeblock)! max-lg:flex max-lg:flex-1 max-lg:flex-col max-lg:max-w-none! max-lg:rounded-none! max-lg:shadow-none! max-lg:inset-ring-0 max-lg:data-[state=open]:zoom-in-100! max-lg:data-[state=closed]:zoom-out-100! max-lg:motion-safe:data-[state=open]:slide-in-from-top! max-lg:motion-safe:data-[state=closed]:slide-out-to-top! max-lg:motion-reduce:data-[state=open]:fade-in-0 max-lg:duration-300 max-lg:data-[state=closed]:duration-200! max-lg:ease-enter"
+        className="overflow-hidden rounded-lg border-0 p-0 inset-ring inset-ring-border shadow-(--shadow-codeblock)!"
       >
         <SearchV2Panel onResultSelect={handleSelect} onResultOpen={handleResultOpen} />
       </DialogContent>
@@ -123,19 +123,19 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
   }
 
   return (
-    <Command shouldFilter={false} className="bg-transparent max-lg:min-h-0 max-lg:flex-1">
+    <Command shouldFilter={false} className="bg-transparent">
       <VisuallyHidden.VisuallyHidden>
         <DialogTitle>Search docs</DialogTitle>
         <DialogDescription>Search the Supabase documentation</DialogDescription>
       </VisuallyHidden.VisuallyHidden>
-      <div className="relative flex items-center gap-3 pr-4 max-lg:pr-5">
+      <div className="relative flex items-center gap-3 pr-4">
         <CommandInput
           ref={inputRef}
           value={query}
           placeholder="Search docs..."
           aria-label="Search the Supabase documentation"
           onValueChange={handleValueChange}
-          wrapperClassName="flex-1 border-0 pl-3 pr-0 text-foreground-lighter max-lg:pl-5 [&_svg]:size-4.5 [&_svg]:stroke-2 [&_svg]:opacity-100"
+          wrapperClassName="flex-1 border-0 pl-3 pr-0 text-foreground-lighter [&_svg]:size-4.5 [&_svg]:stroke-2 [&_svg]:opacity-100"
           className="h-12 pl-2.5 text-base text-foreground placeholder:text-foreground-lighter"
         />
         {query ? (
@@ -152,7 +152,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
         <LoadingBeam
           isActive={isSearching}
           direction={isDeleting ? 'backward' : 'forward'}
-          className={isListVisible ? '-bottom-px' : 'max-lg:-bottom-px'}
+          className={isListVisible ? '-bottom-px' : undefined}
         />
       </div>
       {/*
@@ -165,7 +165,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
       </div>
       <CommandList
         label="Search results"
-        className="h-(--cmdk-list-height) max-h-[min(477px,70dvh)] max-lg:h-auto max-lg:max-h-none max-lg:flex-1 inset-shadow-2xs inset-shadow-border lg:mx-px transition-all duration-150 ease-enter motion-reduce:transition-none scroll-fade-bottom"
+        className="h-(--cmdk-list-height) max-h-[min(477px,70dvh)] inset-shadow-2xs inset-shadow-border mx-px transition-all duration-150 ease-enter motion-reduce:transition-none scroll-fade-bottom"
       >
         {searchState.status === 'noResults' && <CommandEmpty>No results found.</CommandEmpty>}
         {searchState.status === 'error' && (
@@ -194,7 +194,7 @@ function SearchV2Footer() {
   return (
     <footer
       aria-hidden
-      className="flex items-center justify-end gap-3 border-t px-4 py-2.5 text-xs text-foreground-lighter max-lg:hidden lg:mx-px"
+      className="flex items-center justify-end gap-3 border-t px-4 py-2.5 text-xs text-foreground-lighter mx-px max-lg:hidden"
     >
       <span className="flex items-center gap-1.5">
         Navigate
