@@ -49,6 +49,7 @@ jobs:
           grep -Fq 'USER nobody' Dockerfile
           grep -Fq 'ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/app/run.sh"]' Dockerfile
           grep -Fq 'CMD ["/app/bin/server"]' Dockerfile
+          ! grep -Fq 'set -x' run.sh
 
           grep -Fq 'version: "2.' mix.exs
           grep -Fq 'phoenix_dep()' mix.exs
@@ -78,19 +79,23 @@ jobs:
           test "$entrypoint" = '["/usr/bin/tini","-s","-g","--","/app/run.sh"]'
           test "$cmd" = '["/app/bin/server"]'
 
+          realtime_version="$(sed -nE 's/^[[:space:]]*version:[[:space:]]*\"([^\"]+)\".*/\1/p' core/services/realtime/mix.exs | head -n1)"
+          test -n "$realtime_version"
+
           docker run --rm --entrypoint /bin/sh "$image" -ec '
             set -eu
+            version="$1"
             test -x /app/bin/server
             test -x /app/bin/migrate
             test -x /app/run.sh
             test -x /usr/local/bin/pgdelta
             test -s /usr/local/share/pgdelta/pgdelta.xz
-            test -d /app/lib/realtime-2.140.7/priv/repo/migrations
-            test -f /app/releases/2.140.7/vm.args
+            test -d "/app/lib/realtime-${version}/priv/repo/migrations"
+            test -f "/app/releases/${version}/vm.args"
             ! find /app -maxdepth 2 -type d -name _build | grep -q .
             ! find /app -maxdepth 2 -type d -name .git | grep -q .
             ! find /app -maxdepth 2 -type d -name node_modules | grep -q .
-          '
+          ' sh "$realtime_version"
 
           echo "Realtime image metadata and contents: GREEN"
 
@@ -179,11 +184,16 @@ jobs:
 
           test "$(docker exec realtime-smoke id -un)" = "nobody"
 
-          docker exec realtime-postgres psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c \
-            "select 1 from information_schema.tables where table_schema='public' and table_name='schema_migrations';" \
-            | grep -q 1
+          migration_files="$(find core/services/realtime/priv/repo/migrations -maxdepth 1 -type f -name '*.exs' | wc -l | tr -d ' ')"
+          migration_rows="$(docker exec realtime-postgres psql -U postgres -d postgres -At -v ON_ERROR_STOP=1 -c \
+            "select count(*) from public.schema_migrations;" | tr -d '[:space:]')"
 
-          echo "Runtime identity and migration state: GREEN"
+          test "$migration_rows" -ge "$migration_files"
+
+          unauthenticated_status="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:4000/api/tenants)"
+          test "$unauthenticated_status" = "403"
+
+          echo "Runtime identity, migration ledger, and protected API contract: GREEN"
 
       - name: Cleanup
         if: always()
