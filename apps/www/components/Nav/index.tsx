@@ -219,7 +219,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   {isLoggedIn ? (
                     <>
                       {isStateOfStartupsPage ? (
-                        <FloatingPlate className="hidden lg:inline-flex">
+                        <FloatingPlate rounded="md" className="hidden lg:inline-flex">
                           <Button asChild>
                             <Link href="/dashboard/projects">Dashboard</Link>
                           </Button>
@@ -234,7 +234,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   ) : (
                     <>
                       {isStateOfStartupsPage ? (
-                        <FloatingPlate className="hidden lg:inline-flex">
+                        <FloatingPlate rounded="md" className="hidden lg:inline-flex">
                           <Button asChild>
                             <Link
                               href="https://supabase.com/dashboard"
