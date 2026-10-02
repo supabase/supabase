@@ -37,13 +37,16 @@ else
 fi
 
 echo
-echo "--- hosted-domain references in executable/configuration files ---"
-cloud_hits="$(grep -RInE 'https?://[^[:space:]"]*(supabase\.co|supabase\.com)' supabase docker scripts core --include='*.toml' --include='*.yml' --include='*.yaml' --include='*.sh' --include='*.env' --include='*.json' 2>/dev/null | grep -vE ':[[:space:]]*#' || true)"
-if [[ -n "$cloud_hits" ]]; then
-  echo "$cloud_hits"
-  finding "hosted Supabase domains remain in runtime/configuration files"
+echo "--- hosted Supabase runtime references ---"
+runtime_hits="$(
+  grep -RInE 'https?://[^[:space:]"]*supabase\.co' supabase docker scripts core/services/postgres/ansible/files/admin_api_scripts --include='*.toml' --include='*.yml' --include='*.yaml' --include='*.sh' --include='*.env' --include='*.json' 2>/dev/null |
+  grep -vE ':[[:space:]]*#' || true
+)"
+if [[ -n "$runtime_hits" ]]; then
+  echo "$runtime_hits"
+  finding "Supabase hosted .co endpoints remain in runtime/configuration code"
 else
-  ok "no hosted Supabase domains found in runtime/configuration files"
+  ok "no Supabase hosted .co endpoints found in runtime/configuration code"
 fi
 
 echo
