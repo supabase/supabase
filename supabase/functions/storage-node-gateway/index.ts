@@ -252,6 +252,19 @@ async function route(req: Request) {
     const resultText = JSON.stringify(body.result ?? {});
     if (new TextEncoder().encode(resultText).byteLength > 10 * 1024 * 1024) return fail("Command result too large");
     const ok = body.ok === true;
+    if (ok && body.result?.storage_object_id) {
+      const { data: object } = await admin.from("storage_objects")
+        .select("id,owner_id,node_id,root_id")
+        .eq("id", body.result.storage_object_id)
+        .eq("node_id", current.node.id)
+        .maybeSingle();
+      if (object) {
+        const patch: Record<string, unknown> = { state: "available_local" };
+        if (Number.isSafeInteger(body.result.size_bytes)) patch.size_bytes = body.result.size_bytes;
+        if (typeof body.result.sha256 === "string" && /^[a-f0-9]{64}$/.test(body.result.sha256)) patch.sha256 = body.result.sha256;
+        await admin.from("storage_objects").update(patch).eq("id", object.id);
+      }
+    }
     await admin.from("storage_node_commands").update({
       status: ok ? "completed" : "failed",
       result: ok ? (body.result ?? {}) : null,
@@ -259,6 +272,35 @@ async function route(req: Request) {
       completed_at: new Date().toISOString(),
     }).eq("id", id);
     return json({ ok: true });
+  }
+
+  if (req.method === "POST" && path === "/objects") {
+    const user = await requireUser(req);
+    const body = await parseBody(req);
+    if (body.storage_class !== "local_node") return fail("This endpoint creates local_node metadata");
+    if (typeof body.node_id !== "string" || typeof body.root_id !== "string") return fail("node_id and root_id are required");
+    if (typeof body.filename !== "string" || body.filename.length < 1 || body.filename.length > 1024) return fail("Invalid filename");
+    const { data: node } = await admin.from("storage_nodes").select("id")
+      .eq("id", body.node_id).eq("user_id", user.id).eq("status", "online").maybeSingle();
+    if (!node) return fail("Node not found or offline", 404);
+    const { data: root } = await admin.from("storage_node_roots").select("id,enabled")
+      .eq("id", body.root_id).eq("node_id", body.node_id).maybeSingle();
+    if (!root || !root.enabled) return fail("Root is not approved", 403);
+    if (!safeRelativePath(body.object_key ?? body.filename)) return fail("Invalid object_key");
+    const { data: object, error } = await admin.from("storage_objects").insert({
+      owner_id: user.id,
+      storage_class: "local_node",
+      node_id: body.node_id,
+      root_id: body.root_id,
+      filename: body.filename,
+      mime_type: body.mime_type ?? null,
+      size_bytes: Number(body.size_bytes ?? 0),
+      sha256: body.sha256 ?? null,
+      visibility: body.visibility === "public" ? "public" : "private",
+      state: "pending",
+    }).select("id,owner_id,storage_class,node_id,root_id,filename,mime_type,size_bytes,sha256,visibility,state,created_at,updated_at").single();
+    if (error) throw error;
+    return json({ object }, 201);
   }
 
   if (req.method === "GET" && path === "/nodes") {
