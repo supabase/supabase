@@ -17,8 +17,8 @@ export const GenerateRecoveryCodesModal = () => {
     <Admonition
       type="danger"
       layout="horizontal"
-      title="You haven't generated recovery codes yet"
-      description="Recovery codes are important to ensure you can recover your account if you loose access to your MFA."
+      title="No recovery codes generated"
+      description="Recovery codes let you access your account if you lose access to your MFA device"
       className="[&>div>div>div>div>p]:text-balance"
       actions={
         <>

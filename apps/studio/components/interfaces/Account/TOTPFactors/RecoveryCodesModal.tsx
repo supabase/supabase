@@ -62,7 +62,6 @@ export const RecoveryCodesModal = <T = unknown,>({
     a.click()
     document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
-    setCopied(true)
   }
 
   useEffect(() => {
@@ -132,10 +131,7 @@ export const RecoveryCodesModal = <T = unknown,>({
                     onClick={() =>
                       copyToClipboard(
                         codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
-                        () => {
-                          setCopiedToClipboard(true)
-                          setCopied(true)
-                        }
+                        () => setCopiedToClipboard(true)
                       )
                     }
                   >
