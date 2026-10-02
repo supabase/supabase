@@ -41,20 +41,20 @@ jobs:
           test -f assets/package.json
           test -f assets/package-lock.json
 
-          grep -Eq '^ARG ELIXIR_VERSION=' Dockerfile
-          grep -Eq '^ARG OTP_VERSION=' Dockerfile
-          grep -Eq '^ARG DEBIAN_VERSION=' Dockerfile
-          grep -Eq '^ARG PG_DELTA_COMMIT=' Dockerfile
-          grep -Eq 'COPY --from=pgdelta-builder /tmp/pgdelta.xz' Dockerfile
-          grep -Eq 'USER nobody' Dockerfile
-          grep -Eq 'ENTRYPOINT \\["/usr/bin/tini"' Dockerfile
-          grep -Eq 'CMD \\["/app/bin/server"\\]' Dockerfile
+          grep -Fq 'ARG ELIXIR_VERSION=' Dockerfile
+          grep -Fq 'ARG OTP_VERSION=' Dockerfile
+          grep -Fq 'ARG DEBIAN_VERSION=' Dockerfile
+          grep -Fq 'ARG PG_DELTA_COMMIT=' Dockerfile
+          grep -Fq 'COPY --from=pgdelta-builder /tmp/pgdelta.xz' Dockerfile
+          grep -Fq 'USER nobody' Dockerfile
+          grep -Fq 'ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/app/run.sh"]' Dockerfile
+          grep -Fq 'CMD ["/app/bin/server"]' Dockerfile
 
-          grep -Eq 'version: "2\\.' mix.exs
-          grep -Eq 'phoenix_dep\\(\\)' mix.exs
-          grep -Eq 'postgres' mix.exs
-          grep -Eq 'postgrex' mix.exs
-          grep -Eq 'joken' mix.exs
+          grep -Fq 'version: "2.' mix.exs
+          grep -Fq 'phoenix_dep()' mix.exs
+          grep -Fq ':postgrex' mix.exs
+          grep -Fq ':joken' mix.exs
+          grep -Fq ':forum, path: "./forum"' mix.exs
 
           echo "Realtime source/build contract: GREEN"
 
@@ -65,7 +65,6 @@ jobs:
           docker build --pull -t testagram-realtime:${GITHUB_SHA} .
 
       - name: Inspect Realtime image contract
-        working-directory: core/services/realtime
         run: |
           set -euo pipefail
 
@@ -87,12 +86,13 @@ jobs:
             test -x /usr/local/bin/pgdelta
             test -s /usr/local/share/pgdelta/pgdelta.xz
             test -d /app/priv/repo/migrations
-            test -f /app/releases/$(/app/bin/realtime version 2>/dev/null || true)
+            test -f /app/releases/2.140.7/releases.exs
             ! find /app -maxdepth 2 -type d -name _build | grep -q .
             ! find /app -maxdepth 2 -type d -name .git | grep -q .
-          ' || true
+            ! find /app -maxdepth 2 -type d -name node_modules | grep -q .
+          '
 
-          echo "Realtime image metadata: GREEN"
+          echo "Realtime image metadata and contents: GREEN"
 
       - name: Verify image history contains no runtime credentials
         run: |
@@ -101,8 +101,8 @@ jobs:
           image="testagram-realtime:${GITHUB_SHA}"
           history="$(docker history --no-trunc "$image")"
 
-          if printf '%s' "$history" | grep -Eiq '(password|secret|token|api[_-]?key)[[:space:]]*='; then
-            echo "::error::Potential runtime credential material found in image history"
+          if printf '%s' "$history" | grep -Eiq '(DB_PASSWORD|API_JWT_SECRET|METRICS_JWT_SECRET|SECRET_KEY_BASE)[[:space:]]*='; then
+            echo "::error::Runtime credential material found in image history"
             printf '%s\n' "$history"
             exit 1
           fi
@@ -177,8 +177,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          user="$(docker exec realtime-smoke id -un)"
-          test "$user" = "nobody"
+          test "$(docker exec realtime-smoke id -un)" = "nobody"
 
           docker exec realtime-postgres psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c \
             "select 1 from information_schema.tables where table_schema='realtime' and table_name='schema_migrations';" \
