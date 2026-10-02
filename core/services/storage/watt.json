@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schemas.platformatic.dev/@platformatic/runtime/3.69.0.json",
+  "entrypoint": "storage",
+  "exitOnUnhandledErrors": false,
+  "workers": "{WORKERS_NUM}",
+  "extensions": [
+    {
+      "path": "./dist/internal/monitoring/pprof/runtime-extension.js"
+    }
+  ],
+  "logger": {
+    "level": "{LOG_LEVEL}"
+  },
+  "health": {
+    "enabled": "{WATT_HEALTH_ENABLED}",
+    "maxELU": "{WATT_HEALTH_MAX_ELU}",
+    "maxEventLoopDelayP99": "{WATT_HEALTH_MAX_EVENT_LOOP_DELAY_P99}",
+    "gracePeriod": "{WATT_HEALTH_GRACE_PERIOD}",
+    "maxUnhealthyChecks": "{WATT_HEALTH_MAX_UNHEALTHY_CHECKS}",
+    "interval": "{WATT_HEALTH_INTERVAL}"
+  },
+  "managementApi": "{PLT_MANAGEMENT_API}",
+  "management": {
+    "operations": ["getWorkers"]
+  },
+  "applications": [
+    {
+      "id": "storage",
+      "path": ".",
+      "config": "watt.storage.json"
+    }
+  ]
+}

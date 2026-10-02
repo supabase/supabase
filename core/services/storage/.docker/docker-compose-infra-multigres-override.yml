@@ -1,0 +1,29 @@
+# Overrides tenant_db to run a single Multigres cluster instead of vanilla
+# PostgreSQL. Only tenant_db changes; everything else in
+# docker-compose-infra.yml (multitenant_db, pgbouncer, rustfs, imgproxy, …) is
+# reused unchanged.
+#
+# `latest` is expected to include the pgvector extension (https://github.com/multigres/multigres/pull/1106)
+# used by local vector acceptance coverage.
+services:
+  tenant_db:
+    image: ghcr.io/multigres/multigres-cluster:latest
+    # Run an init process (tini) as PID 1 to reap the cluster's child processes.
+    init: true
+    shm_size: "1gb"
+    environment:
+      # Serve PostgreSQL on the default port so storage can reach tenant_db:5432.
+      MULTIGRES_GATEWAY_PG_PORT: "5432"
+      # 2 cells is the minimum: the shard bootstraps with an AtLeastN(2)
+      # durability policy, so a single pooler can never elect a leader.
+      MULTIGRES_NUM_CELLS: "2"
+    # Bootstrapping a cluster takes longer than starting a bare postgres image,
+    # so allow a generous start period before the gateway answers queries.
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "PGPASSWORD=postgres psql -h 127.0.0.1 -p 5432 -U postgres -d postgres -tAc 'SELECT 1' || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s

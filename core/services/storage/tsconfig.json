@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@internal/*": ["./src/internal/*"],
+      "@storage/*": ["./src/storage/*"]
+    },
+    "types": ["node", "vitest/globals"],
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "rootDir": "src",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "ES2024",
+    "outDir": "dist",
+    "sourceMap": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,70 @@
+services:
+  pg_bouncer_exporter:
+    image: spreaker/prometheus-pgbouncer-exporter
+    environment:
+      PGBOUNCER_EXPORTER_HOST: 0.0.0.0
+      PGBOUNCER_EXPORTER_PORT: 9127
+      PGBOUNCER_HOST: pg_bouncer
+      PGBOUNCER_PORT: 6432
+      PGBOUNCER_USER: postgres
+      PGBOUNCER_PASS: postgres
+    depends_on:
+      - pg_bouncer
+    ports:
+      - 9127:9127
+
+  postgres_exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_NAME: postgres://postgres:postgres@tenant_db:5432/postgres?sslmode=disable
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-remote-write-receiver"
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ../monitoring/prometheus:/etc/prometheus
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ../monitoring/grafana/config:/etc/grafana/provisioning
+      - ../monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.57.0
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "14250:14250" # GRPC
+      - "14268:14268" # HTTP
+      - "14269:14269" # HTTP
+      - "6831:6831/udp" # UDP
+      - "6832:6832/udp" # UDP
+      - "5778:5778" # HTTP
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.100.0
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP Http receiver
+      - "55680:55680" # OTLP HTTP receiver
+      - "9200:9200" # Prometheus metrics receiver
+    command: ["--config=/etc/otel/otel-collector-config.yml"]
+    depends_on:
+      - jaeger
+    volumes:
+      - ../monitoring/otel/config:/etc/otel

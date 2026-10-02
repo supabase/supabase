@@ -1,0 +1,1 @@
+ALTER TABLE storage.s3_multipart_uploads ADD COLUMN IF NOT EXISTS metadata jsonb NULL;

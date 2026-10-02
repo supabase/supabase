@@ -1,0 +1,175 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  POSTGRES_VERSION: "13"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint_build:
+    name: Lint & Build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Node dependencies
+        uses: ./.github/actions/setup-node-dependencies
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+
+  test_unit:
+    name: Test / Unit
+    needs: lint_build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Node dependencies
+        uses: ./.github/actions/setup-node-dependencies
+      - name: Prepare env files
+        run: |
+          cp .env.sample .env
+          cp .env.test.sample .env.test
+      - name: Unit tests pass
+        run: npm run test:unit:coverage
+      - name: Upload coverage results to Coveralls
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/lcov.info
+          format: lcov
+          parallel: true
+          flag-name: unit
+          fail-on-error: false
+        continue-on-error: true
+
+  test_postgres_versions:
+    name: Test / Postgres ${{ matrix.postgres }}
+    needs: lint_build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: ["13", "14", "15", "16", "17", "18"]
+    env:
+      POSTGRES_VERSION: ${{ matrix.postgres }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Node dependencies
+        uses: ./.github/actions/setup-node-dependencies
+      - name: Prepare env files
+        run: |
+          cp .env.sample .env
+          cp .env.test.sample .env.test
+      - name: Tests pass
+        run: |
+          mkdir -p data && chmod -R 777 data && \
+          npm run ${{ matrix.postgres == '18' && 'test:coverage:ci' || 'test:integration:ci' }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.postgres == '18'
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/lcov.info
+          format: lcov
+          parallel: true
+          flag-name: rest-pg${{ matrix.postgres }}
+          fail-on-error: false
+        continue-on-error: true
+      - name: Verify migration idempotency
+        uses: ./.github/actions/verify-migration-idempotency
+        with:
+          label: postgres-${{ matrix.postgres }}
+
+  test_postgres:
+    name: Test / Postgres
+    needs: test_postgres_versions
+    if: ${{ always() }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 5
+    steps:
+      - name: Require every PostgreSQL version to pass
+        env:
+          POSTGRES_TEST_RESULT: ${{ needs.test_postgres_versions.result }}
+        run: test "$POSTGRES_TEST_RESULT" = success
+
+  test_oriole:
+    name: Test / OrioleDB
+    needs: lint_build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Node dependencies
+        uses: ./.github/actions/setup-node-dependencies
+      - name: Prepare env files
+        run: |
+          cp .env.sample .env
+          cp .env.test.sample .env.test
+      - name: Tests pass with OrioleDB
+        run: |
+          mkdir -p data && chmod -R 777 data && \
+          npm run test:oriole:ci
+      - name: Verify OrioleDB migration idempotency
+        uses: ./.github/actions/verify-migration-idempotency
+        with:
+          override-file: ./.docker/docker-compose-infra-oriole-override.yml
+          label: oriole
+
+  test_multigres:
+    name: Test / Multigres
+    needs: lint_build
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Node dependencies
+        uses: ./.github/actions/setup-node-dependencies
+      - name: Prepare env files
+        run: |
+          cp .env.sample .env
+          cp .env.test.sample .env.test
+      - name: Pull Multigres cluster image
+        uses: ./.github/actions/pull-multigres-cluster
+      - name: Tests pass with Multigres
+        run: |
+          mkdir -p data && chmod -R 777 data && \
+          npm run test:multigres:ci
+      - name: Verify Multigres migration idempotency
+        uses: ./.github/actions/verify-migration-idempotency
+        with:
+          override-file: ./.docker/docker-compose-infra-multigres-override.yml
+          label: multigres
+          additional-exclude-table-data: multigres.heartbeat
+
+  coveralls_finish:
+    name: Coveralls / Finalize
+    needs:
+      - test_unit
+      - test_postgres
+    if: ${{ always() }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 5
+    steps:
+      - name: Finalize parallel Coveralls build
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
+          fail-on-error: false
+        continue-on-error: true
