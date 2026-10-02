@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Slider, Toggle } from 'ui'
+import { Slider } from 'ui'
 import { Trace, useSpan, type Span, type TimeWindow } from 'ui-patterns/Trace'
 
 import { createSampleTrace } from './trace-sample'
@@ -7,6 +7,7 @@ import { createSampleTrace } from './trace-sample'
 const sample = createSampleTrace()
 const root = sample.spans[0]
 const base = root.startMs
+const TRACE_MS = sample.nowMs - base
 
 function make(id: string, name: string, overrides: Partial<Span> = {}): Span {
   return { ...root, id, parentId: null, name, status: 'ok', events: [], ...overrides }
@@ -59,29 +60,24 @@ function Gallery() {
 }
 
 export default function TraceSpanBarDemo() {
-  const [isZoomed, setIsZoomed] = useState(false)
-  const [offset, setOffset] = useState(120)
-  const window: TimeWindow | undefined = isZoomed ? [base + offset, base + offset + 180] : undefined
+  const [range, setRange] = useState<[number, number]>([0, TRACE_MS])
+  const isFull = range[0] === 0 && range[1] === TRACE_MS
+  const window: TimeWindow | undefined = isFull ? undefined : [base + range[0], base + range[1]]
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-4">
-        <Toggle variant="outline" size="sm" pressed={isZoomed} onPressedChange={setIsZoomed}>
-          Zoom window (clips bars)
-        </Toggle>
-        <label className="flex flex-1 items-center gap-2 text-xs text-foreground-light">
-          Window start
-          <Slider
-            className="min-w-40 flex-1"
-            min={0}
-            max={250}
-            step={5}
-            disabled={!isZoomed}
-            value={[offset]}
-            onValueChange={([value]) => setOffset(value)}
-          />
-        </label>
-      </div>
+      <label className="flex items-center gap-2 text-xs text-foreground-light">
+        Window (narrow it to clip bars)
+        <Slider
+          className="min-w-40 flex-1"
+          min={0}
+          max={TRACE_MS}
+          step={5}
+          minStepsBetweenThumbs={4}
+          value={range}
+          onValueChange={([start, end]) => setRange([start, end])}
+        />
+      </label>
       <Trace.Root trace={{ spans, nowMs: sample.nowMs }} window={window} selectedId="selected">
         <Gallery />
       </Trace.Root>

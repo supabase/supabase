@@ -1933,7 +1933,7 @@ export const examples: Registry = [
   {
     name: 'trace-span-bar-demo',
     type: 'components:example',
-    registryDependencies: ['slider', 'toggle'],
+    registryDependencies: ['slider'],
     files: ['example/trace-span-bar-demo.tsx'],
   },
   {
