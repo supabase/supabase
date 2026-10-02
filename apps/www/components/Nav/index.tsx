@@ -13,6 +13,7 @@ import {
   Button,
   buttonVariants,
   cn,
+  FloatingPlate,
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
@@ -217,26 +218,52 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   <GitHubButton />
                   {isLoggedIn ? (
                     <>
-                      <Button className="hidden lg:inline-flex" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
-                      </Button>
+                      {isStateOfStartupsPage ? (
+                        <FloatingPlate className="hidden lg:inline-flex">
+                          <Button asChild>
+                            <Link href="/dashboard/projects">Dashboard</Link>
+                          </Button>
+                        </FloatingPlate>
+                      ) : (
+                        <Button className="hidden lg:inline-flex" asChild>
+                          <Link href="/dashboard/projects">Dashboard</Link>
+                        </Button>
+                      )}
                       <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
                     </>
                   ) : (
                     <>
-                      <Button className="hidden lg:inline-flex" asChild>
-                        <Link
-                          href="https://supabase.com/dashboard"
-                          onClick={() =>
-                            sendTelemetryEvent({
-                              action: 'sign_in_button_clicked',
-                              properties: { buttonLocation: 'Header Nav' },
-                            })
-                          }
-                        >
-                          Sign in
-                        </Link>
-                      </Button>
+                      {isStateOfStartupsPage ? (
+                        <FloatingPlate className="hidden lg:inline-flex">
+                          <Button asChild>
+                            <Link
+                              href="https://supabase.com/dashboard"
+                              onClick={() =>
+                                sendTelemetryEvent({
+                                  action: 'sign_in_button_clicked',
+                                  properties: { buttonLocation: 'Header Nav' },
+                                })
+                              }
+                            >
+                              Sign in
+                            </Link>
+                          </Button>
+                        </FloatingPlate>
+                      ) : (
+                        <Button className="hidden lg:inline-flex" asChild>
+                          <Link
+                            href="https://supabase.com/dashboard"
+                            onClick={() =>
+                              sendTelemetryEvent({
+                                action: 'sign_in_button_clicked',
+                                properties: { buttonLocation: 'Header Nav' },
+                              })
+                            }
+                          >
+                            Sign in
+                          </Link>
+                        </Button>
+                      )}
                       <Button variant="primary" className="hidden lg:inline-flex" asChild>
                         <Link
                           href="https://supabase.com/dashboard/sign-up"
