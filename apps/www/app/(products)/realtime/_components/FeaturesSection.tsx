@@ -374,15 +374,15 @@ function PresenceSkeleton() {
       onMouseMove={handleMouseMove}
     >
       {/* Stacked avatars — top right */}
-      <div className="absolute right-6 top-4 z-10 flex -space-x-2">
+      <div className="absolute right-6 top-4 z-10 flex -space-x-1.5">
         {PRESENCE_USERS.map((user, i) => (
           <div
             key={user.name}
-            className="relative flex h-7 w-7 items-center justify-center rounded-full bg-surface-100 text-[9px] font-medium text-foreground"
+            className="relative flex h-6 w-6 items-center justify-center rounded-full bg-surface-100 text-[8px] font-medium text-foreground"
             style={{
               zIndex: i + 1,
-              // surface-200 aliases translucent muted; surface-75 gap keeps colour rings from merging
-              boxShadow: `0 0 0 3px var(--background-surface-75), 0 0 0 4px ${user.color}`,
+              // Colour ring, then card-coloured cutout outside so stacked discs separate
+              boxShadow: `0 0 0 2px ${user.color}, 0 0 0 4px var(--background-surface-75)`,
             }}
           >
             {user.initials}
@@ -390,15 +390,15 @@ function PresenceSkeleton() {
         ))}
         {/* Your avatar — appears on hover */}
         <motion.div
-          className="relative flex h-7 w-7 items-center justify-center rounded-full bg-surface-100 text-[9px] font-medium text-foreground"
+          className="relative flex h-6 w-6 items-center justify-center rounded-full bg-surface-100 text-[8px] font-medium text-foreground"
           style={{
             zIndex: PRESENCE_USERS.length + 1,
-            boxShadow: `0 0 0 3px var(--background-surface-75), 0 0 0 5px ${YOU_COLOR}`,
+            boxShadow: `0 0 0 2px ${YOU_COLOR}, 0 0 0 4px var(--background-surface-75)`,
           }}
           initial={{ opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }}
           animate={
             hovered
-              ? { opacity: 1, scale: 1, width: 28, marginLeft: -8 }
+              ? { opacity: 1, scale: 1, width: 24, marginLeft: -6 }
               : { opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }
           }
           transition={{ type: 'spring', duration: 0.47, bounce: 0 }}
