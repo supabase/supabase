@@ -91,6 +91,10 @@ const page: GoPageInput = {
         href: '/docs',
         variant: 'secondary',
       },
+      {
+        label: 'Join our Discord',
+        href: 'https://discord.supabase.com/',
+      },
     ],
   },
   sections: [
