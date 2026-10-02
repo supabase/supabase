@@ -3,6 +3,8 @@
 import { compact, debounce } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
+import { useMountEffect } from './useMountEffect'
+
 // This app's own base path, set only for apps deployed under a path prefix (docs' is '/docs').
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 // Public URL of the docs deployment, which hosts the search API routes.
@@ -121,6 +123,8 @@ const useDocsSearchV2 = () => {
   const debounceCancel = useCallback(() => {
     debouncedSearch.cancel()
   }, [debouncedSearch])
+
+  useMountEffect(() => debounceCancel)
 
   const resetSearch = useCallback(() => {
     debounceCancel()
