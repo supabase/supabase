@@ -5,32 +5,32 @@ const features = [
   {
     title: 'Short-lived credentials',
     paragraph: 'Access runs through Supabase Auth with short-lived keys, not standing secrets.',
-    icon: <KeyRound className="w-5 h-5 stroke-[1.4px]" />,
+    icon: <KeyRound className="w-5 h-5" strokeWidth={1.4} />,
   },
   {
     title: 'Zero-config data access',
     paragraph: 'Reach your database and Storage with the permissions your key already carries.',
-    icon: <Plug className="w-5 h-5 stroke-[1.4px]" />,
+    icon: <Plug className="w-5 h-5" strokeWidth={1.4} />,
   },
   {
     title: 'Per-workload firewalls',
     paragraph: 'Define which external endpoints and ports each workload can reach.',
-    icon: <Network className="w-5 h-5 stroke-[1.4px]" />,
+    icon: <Network className="w-5 h-5" strokeWidth={1.4} />,
   },
   {
     title: 'Cloaked secrets',
     paragraph: 'Scope secrets per workload, and cloak values so your code never sees them.',
-    icon: <EyeOff className="w-5 h-5 stroke-[1.4px]" />,
+    icon: <EyeOff className="w-5 h-5" strokeWidth={1.4} />,
   },
   {
     title: 'Patched automatically',
     paragraph: 'Kernel-level security patches roll out automatically. Nothing to do on your part.',
-    icon: <ShieldCheck className="w-5 h-5 stroke-[1.4px]" />,
+    icon: <ShieldCheck className="w-5 h-5" strokeWidth={1.4} />,
   },
   {
     title: 'Dependency scanning',
     paragraph: 'Dependencies are scanned at runtime, with alerts as new vulnerabilities land.',
-    icon: <ScanSearch className="w-5 h-5 stroke-[1.4px]" />,
+    icon: <ScanSearch className="w-5 h-5" strokeWidth={1.4} />,
   },
 ]
 
@@ -46,9 +46,9 @@ export function TrustBoundarySection() {
           <span className="text-foreground-lighter block">preconfigured</span>
         </h2>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          Every sandbox and service inherits your project's auth, roles, and permissions the moment
-          it starts, running in its own microVM with dedicated CPU and memory. Agents get a sandbox
-          that is already scoped to the data it is allowed to touch — nothing more.
+          Every sandbox and service inherits your project&apos;s auth, roles, and permissions the
+          moment it starts, running in its own microVM with dedicated CPU and memory. Agents get a
+          sandbox that is already scoped to the data it is allowed to touch — nothing more.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
