@@ -3,10 +3,11 @@ import { useQueryClient } from '@tanstack/react-query'
 import { compact } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   Form,
   FormControl,
   FormField,
@@ -15,15 +16,12 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import InputField from './InputField'
+import { InputField } from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
   convertKVStringArrayToJson,
@@ -68,6 +66,16 @@ export const EditWrapperSheet = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
 
+  const [isLoadingSecrets, setIsLoadingSecrets] = useState(false)
+  const [secretsReady, setSecretsReady] = useState(false)
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
+    undefined
+  )
+  const [selectedTableFieldIndex, setSelectedTableFieldIndex] = useState<number | undefined>(
+    undefined
+  )
+  const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
+
   const { mutate: updateFDW, isPending: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated ${wrapperMeta?.label} foreign data wrapper`)
@@ -81,7 +89,6 @@ export const EditWrapperSheet = ({
 
   const initialValues: Record<string, any> = useMemo(
     () => ({
-      wrapper_name: wrapper?.name,
       server_name: wrapper?.server_name,
       ...convertKVStringArrayToJson(wrapper?.server_options ?? []),
       tables: formatWrapperTables(wrapper, wrapperMeta),
@@ -109,18 +116,14 @@ export const EditWrapperSheet = ({
     name: 'tables',
   })
 
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
-    undefined
-  )
-  const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
-
   const onUpdateTable = (values: FormattedWrapperTable) => {
-    if (values.index !== undefined) {
-      updateTable(values.index, values)
+    if (selectedTableFieldIndex !== undefined) {
+      updateTable(selectedTableFieldIndex, values)
     } else {
       appendTable(values)
     }
     setSelectedTableToEdit(undefined)
+    setSelectedTableFieldIndex(undefined)
   }
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
@@ -150,11 +153,6 @@ export const EditWrapperSheet = ({
     setIsClosing(false)
   }, [isDirty, confirmOnClose, isClosing, onClose, setIsClosing])
 
-  const wrapper_name = useWatch({ name: 'wrapper_name', control: form.control })
-
-  const [isLoadingSecrets, setIsLoadingSecrets] = useState(false)
-  const [secretsReady, setSecretsReady] = useState(false)
-
   useEffect(() => {
     let isCurrent = true
 
@@ -168,8 +166,8 @@ export const EditWrapperSheet = ({
     ).filter((x) => UUID_REGEX.test(x))
 
     if (encryptedIdsToFetch.length === 0) {
-      setSecretsReady(true)
       setIsLoadingSecrets(false)
+      setSecretsReady(true)
       return
     }
 
@@ -218,33 +216,20 @@ export const EditWrapperSheet = ({
           >
             <SheetHeader>
               <SheetTitle>
-                Edit {wrapperMeta.label} wrapper: {wrapper.name}
+                Edit {wrapperMeta.label} wrapper connection: {wrapper.server_name}
               </SheetTitle>
             </SheetHeader>
             <div className="grow overflow-y-auto">
-              <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+              <FormSection
+                className="p-5!"
+                header={<FormSectionLabel>Server configuration</FormSectionLabel>}
+              >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
-                    name="wrapper_name"
+                    name="server_name"
                     render={({ field }) => (
-                      <FormItemLayout
-                        layout="vertical"
-                        label="Wrapper Name"
-                        description={
-                          wrapper_name !== initialValues.wrapper_name ? (
-                            <>
-                              Your wrapper's server name will be updated to{' '}
-                              <code className="text-code-inline">{wrapper_name}_server</code>
-                            </>
-                          ) : (
-                            <>
-                              Your wrapper's server name is{' '}
-                              <code className="text-code-inline">{wrapper_name}_server</code>
-                            </>
-                          )
-                        }
-                      >
+                      <FormItemLayout layout="horizontal" label="Server name">
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -272,81 +257,86 @@ export const EditWrapperSheet = ({
                     ))}
                 </FormSectionContent>
               </FormSection>
+
               <Separator />
-              <FormSection
-                header={
-                  <FormSectionLabel>
-                    <p>Foreign Tables</p>
-                    <p className="text-foreground-light mt-2 w-[90%]">
-                      You can query your data from these foreign tables after the wrapper is created
-                    </p>
-                  </FormSectionLabel>
-                }
-              >
+
+              <FormSection>
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
-                  {tablesField.map((t, tableIndex) => {
-                    // FIXME: make inference work
-                    const table = t as unknown as FormattedWrapperTable
-                    return (
-                      <div
-                        key={t.id}
-                        className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
-                      >
-                        <div>
-                          <p className="text-sm">
-                            {table.schema_name}.{table.table_name}
-                          </p>
-                          <p className="text-sm text-foreground-light">
-                            Columns:{' '}
-                            {(table.columns ?? []).map((column: any) => column.name).join(', ')}
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                className="px-1"
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Foreign tables"
+                    labelOptional="You can query your data from these foreign tables after the wrapper is
+                                          created"
+                    isReactForm={false}
+                    className={cn(
+                      '[&>div>span]:text-balance',
+                      tablesField.length === 0 &&
+                        '[&>div:last-child]:flex [&>div:last-child]:items-center [&>div:last-child]:justify-end'
+                    )}
+                  >
+                    <div className="flex flex-col gap-y-2">
+                      {tablesField.map((t, tableIndex) => {
+                        // FIXME: make inference work
+                        const table = t as unknown as FormattedWrapperTable
+                        return (
+                          <div
+                            key={t.id}
+                            className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
+                          >
+                            <div>
+                              <p className="text-sm">
+                                {table.schema_name}.{table.table_name}
+                              </p>
+                              <p className="text-sm text-foreground-light">
+                                Columns:{' '}
+                                {(table.columns ?? []).map((column) => column.name).join(', ')}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <ButtonTooltip
                                 icon={<Edit />}
                                 onClick={() => {
+                                  setSelectedTableFieldIndex(tableIndex)
                                   setSelectedTableToEdit(table)
                                 }}
-                                aria-label={`Edit ${table.table_name} foreign table`}
-                                // Tooltip repeats the label; screen readers would read it twice
-                                aria-describedby={undefined}
-                              />
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">{`Edit ${table.table_name} foreign table`}</TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                className="px-1"
-                                icon={<Trash />}
-                                onClick={() => {
-                                  removeTable(tableIndex)
+                                tooltip={{
+                                  content: {
+                                    side: 'bottom',
+                                    text: `Edit ${table.table_name} foreign table`,
+                                  },
                                 }}
-                                aria-label={`Remove ${table.table_name} foreign table`}
-                                // Tooltip repeats the label; screen readers would read it twice
-                                aria-describedby={undefined}
                               />
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">{`Remove ${table.table_name} foreign table`}</TooltipContent>
-                          </Tooltip>
-                        </div>
+                              <ButtonTooltip
+                                icon={<Trash />}
+                                onClick={() => removeTable(tableIndex)}
+                                tooltip={{
+                                  content: {
+                                    side: 'bottom',
+                                    text: `Remove ${table.table_name} foreign table`,
+                                  },
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )
+                      })}
+                      <div className="flex justify-end">
+                        <Button
+                          onClick={() => {
+                            setSelectedTableFieldIndex(undefined)
+                            setSelectedTableToEdit(NewTable)
+                          }}
+                        >
+                          Add foreign table
+                        </Button>
                       </div>
-                    )
-                  })}
-
-                  <div className="flex justify-end">
-                    <Button onClick={() => setSelectedTableToEdit(NewTable)}>
-                      Add foreign table
-                    </Button>
-                  </div>
-                  {tablesField.length === 0 && errors.tables && (
-                    <p className="text-sm text-right text-red-900">
-                      {errors.tables.message?.toString()}
-                    </p>
-                  )}
+                      {tablesField.length === 0 && errors.tables && (
+                        <p className="text-sm text-right text-red-900">
+                          {errors.tables.message?.toString()}
+                        </p>
+                      )}
+                    </div>
+                  </FormItemLayout>
                 </FormSectionContent>
               </FormSection>
             </div>
@@ -413,6 +403,7 @@ export const EditWrapperSheet = ({
         tables={wrapperMeta.tables}
         onCancel={() => {
           setSelectedTableToEdit(undefined)
+          setSelectedTableFieldIndex(undefined)
         }}
         onSave={onUpdateTable}
         initialData={selectedTableToEdit}
