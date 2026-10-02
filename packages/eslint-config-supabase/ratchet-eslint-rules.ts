@@ -4,15 +4,15 @@
  *
  * Examples:
  *   # Initialize baselines for two rules
- *   tsx scripts/ratchet-eslint-rules.ts --init \
+ *   tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts --init \
  *     --rule react-hooks/exhaustive-deps --rule no-console
  *
  *   # Compare current counts vs baselines
- *   tsx scripts/ratchet-eslint-rules.ts \
+ *   tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts \
  *     --rule react-hooks/exhaustive-deps --rule no-console
  *
 	 # Decrease baselines when improvements occur
- *   tsx scripts/ratchet-eslint-rules.ts \
+ *   tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts \
 	 *   --rule react-hooks/exhaustive-deps --rule no-console \
 	 *   --decrease-baselines
  *
@@ -32,7 +32,14 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -43,7 +50,7 @@ interface Args {
   eslintArgs: string
   decreaseBaselines: boolean
   rules: string[]
-  rulesFile?: string
+  rulesFiles: string[]
 }
 
 interface ESLintMessage {
@@ -103,6 +110,7 @@ function parseArgs(argv: string[]): Args {
     eslintArgs: '',
     decreaseBaselines: false,
     rules: [],
+    rulesFiles: [],
   }
 
   for (let i = 2; i < argv.length; i += 1) {
@@ -126,7 +134,7 @@ function parseArgs(argv: string[]): Args {
         )
       }
     } else if (a === '--rules-file') {
-      args.rulesFile = argv[++i]
+      args.rulesFiles.push(argv[++i])
     } else if (a === '--decrease-baselines') {
       args.decreaseBaselines = true
     } else {
@@ -134,14 +142,14 @@ function parseArgs(argv: string[]): Args {
     }
   }
 
-  if (args.rulesFile) {
-    args.rules.push(...readRulesFile(args.rulesFile))
+  for (const rulesFile of args.rulesFiles) {
+    args.rules.push(...readRulesFile(rulesFile))
   }
 
   if (args.rules.length === 0) {
     console.error('Error: You must provide at least one --rule <rule-id> or a --rules-file.')
     console.error('Example: --rule exhaustive-deps --rule no-console')
-    console.error('Example: --rules-file scripts/ratchet-rules.json')
+    console.error('Example: --rules-file node_modules/eslint-config-supabase/ratchet-rules.json')
     process.exit(2)
   }
 
@@ -412,7 +420,7 @@ function main(): void {
 }
 
 if (process.argv[1]) {
-  const invokedPath = pathToFileURL(path.resolve(process.argv[1])).href
+  const invokedPath = pathToFileURL(realpathSync(path.resolve(process.argv[1]))).href
   if (import.meta.url === invokedPath) {
     main()
   }
