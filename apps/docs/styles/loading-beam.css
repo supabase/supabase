@@ -31,6 +31,10 @@
     animation: loading-beam-sweep 2s ease-in-out -0.25s infinite paused;
   }
 
+  :is([data-theme='light'], .light) .loading-beam {
+    --loading-beam-color: var(--primary);
+  }
+
   .loading-beam[data-direction='backward'] {
     animation-delay: -1.25s;
   }
