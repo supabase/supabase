@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { isNaN, noop } from 'lodash'
 import { Clock } from 'lucide-react'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Time } from './PITR.types'
@@ -17,50 +17,49 @@ import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
 
 interface TimeInputProps {
   defaultTime?: Time
-  minimumTime?: Time
-  maximumTime?: Time
+  resetIdentity?: string
+  rangeError?: string
   onChange?: (time: Time) => void
+  onValidityChange?: (isValid: boolean) => void
 }
 
-const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: TimeInputProps) => {
+const TimeInput = ({
+  defaultTime,
+  resetIdentity,
+  rangeError,
+  onChange = noop,
+  onValidityChange = noop,
+}: TimeInputProps) => {
   const [isFocused, setIsFocused] = useState(false)
   const [error, setError] = useState<string>()
   const [time, setTime] = useState<Time>(defaultTime || { h: 0, m: 0, s: 0 })
+  const visibleError = error ?? rangeError
+  const defaultHour = defaultTime?.h
+  const defaultMinute = defaultTime?.m
+  const defaultSecond = defaultTime?.s
+  let borderClassName = 'border-strong'
+  if (isFocused) borderClassName = 'border-stronger'
+  else if (visibleError !== undefined) borderClassName = 'border-red-800'
 
-  const formattedMinimumTime = minimumTime
-    ? dayjs(formatTimeToTimeString(minimumTime), 'HH:mm:ss', true)
-    : undefined
+  const validate = useCallback(
+    (time: Time) => {
+      const formattedTime = dayjs(formatTimeToTimeString(time), 'HH:mm:ss', true)
+      const nextError = formattedTime.isValid() ? undefined : 'Please enter a valid time'
 
-  const formattedMaximumTime = maximumTime
-    ? dayjs(formatTimeToTimeString(maximumTime), 'HH:mm:ss', true)
-    : undefined
+      setError(nextError)
+      onValidityChange(nextError === undefined)
+      return nextError === undefined
+    },
+    [onValidityChange]
+  )
 
   useEffect(() => {
-    if (minimumTime || maximumTime) validate(time)
-  }, [JSON.stringify(minimumTime), JSON.stringify(maximumTime)])
-
-  useEffect(() => {
-    if (defaultTime) {
-      setTime(defaultTime)
-      validate(defaultTime)
+    if (defaultHour !== undefined && defaultMinute !== undefined && defaultSecond !== undefined) {
+      const nextTime = { h: defaultHour, m: defaultMinute, s: defaultSecond }
+      setTime(nextTime)
+      validate(nextTime)
     }
-  }, [defaultTime])
-
-  const validate = (time: Time) => {
-    let error = undefined
-    const formattedTime = dayjs(formatTimeToTimeString(time), 'HH:mm:ss', true)
-
-    if (!formattedTime.isValid()) {
-      error = 'Please enter a valid time'
-    } else if (formattedMinimumTime && formattedTime.isBefore(formattedMinimumTime)) {
-      error = 'Selected time is before the minimum time allowed'
-    } else if (formattedMaximumTime && formattedTime.isAfter(formattedMaximumTime)) {
-      error = 'Selected time is after the maximum time allowed'
-    }
-
-    setError(error)
-    return error === undefined
-  }
+  }, [defaultHour, defaultMinute, defaultSecond, resetIdentity, validate])
 
   const onFocus = () => setIsFocused(true)
 
@@ -74,8 +73,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
     const updatedTime = { ...time, [unit]: formattedInput }
     setTime(updatedTime)
 
-    validate(updatedTime)
-    onChange(updatedTime)
+    if (validate(updatedTime)) onChange(updatedTime)
     setIsFocused(false)
   }
 
@@ -85,9 +83,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
         className={[
           'flex items-center justify-between transition',
           'rounded-md bg-studio border px-3.5 py-2 w-[200px]',
-          `${
-            isFocused ? 'border-stronger' : error === undefined ? 'border-strong' : 'border-red-800'
-          }`,
+          borderClassName,
         ].join(' ')}
       >
         <Clock className="text-foreground-light" size={18} strokeWidth={1.5} />
@@ -147,7 +143,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
           <TooltipContent side="bottom">Seconds (SS)</TooltipContent>
         </Tooltip>
       </div>
-      {error && <p className="text-sm text-red-900">{error}</p>}
+      {visibleError && <p className="text-sm text-red-900">{visibleError}</p>}
     </>
   )
 }
