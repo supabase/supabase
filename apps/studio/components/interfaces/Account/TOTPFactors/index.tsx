@@ -4,7 +4,6 @@ import { Plus, RectangleEllipsis } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { ErrorDisplay } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
 import {
   PageSection,
   PageSectionAside,
@@ -39,8 +38,9 @@ export const TOTPFactors = () => {
 
   const {
     data: recoveryCodesStatus,
-    isError: isErrorCodes,
-    isPending: isPendingCodes,
+    error: recoveryCodesError,
+    isError: recoveryCodesIsError,
+    isPending: recoveryCodesIsPending,
   } = useRecoveryCodesStatusQuery({
     enabled: shouldVerifyRecoveryCodes,
   })
@@ -49,7 +49,7 @@ export const TOTPFactors = () => {
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
   // If recovery codes are enabled, we can't allow to remove an MFA until we know their status
-  const disableDeleteFactor = shouldVerifyRecoveryCodes && isPendingCodes
+  const disableDeleteFactor = shouldVerifyRecoveryCodes && recoveryCodesIsPending
 
   return (
     <>
@@ -138,11 +138,8 @@ export const TOTPFactors = () => {
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent aria-live="polite">
-            {isErrorCodes && (
-              <ErrorDisplay
-                title="Failed to load recovery codes"
-                errorMessage="An error occurred while loading recovery codes."
-              />
+            {recoveryCodesIsError && (
+              <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
             )}
             {status === 'unenrolled' && <GenerateRecoveryCodesModal />}
             {status === 'available' && codes && (
