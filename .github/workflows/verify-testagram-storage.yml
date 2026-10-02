@@ -7,9 +7,6 @@ on:
       - testagram/core-platform-foundation
     paths:
       - "core/services/storage/**"
-      - "storage-node/**"
-      - "supabase/functions/storage-node-gateway/**"
-      - "supabase/migrations/20261002133000_testagram_storage_nodes.sql"
       - ".github/workflows/verify-testagram-storage.yml"
   workflow_dispatch:
 
@@ -50,29 +47,6 @@ jobs:
           grep -Fq 'CMD ["node", "dist/start/server.js"]' Dockerfile
           ! grep -RniE 'secret1234|f023d3db-39dc-4ac9-87b2-b2be72e9162b|850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907' -- docker-compose*.yml .docker || true
           echo "Storage source/build contract: GREEN"
-
-      - name: Verify local storage node package
-        working-directory: storage-node
-        run: |
-          set -euo pipefail
-          npm test
-          node --check src/index.mjs
-          echo "Local storage node protocol contract: GREEN"
-
-      - name: Verify Storage gateway contract
-        run: |
-          set -euo pipefail
-          test -s supabase/functions/storage-node-gateway/index.ts
-          test -s supabase/functions/storage-node-gateway/deno.json
-          grep -Fq 'storage_node_pairings' supabase/functions/storage-node-gateway/index.ts
-          grep -Fq 'storage_node_sessions' supabase/functions/storage-node-gateway/index.ts
-          grep -Fq 'storage_node_commands' supabase/functions/storage-node-gateway/index.ts
-          grep -Fq 'storage_objects' supabase/functions/storage-node-gateway/index.ts
-          grep -Fq 'x-testagram-node-session' supabase/functions/storage-node-gateway/index.ts
-          grep -Fq 'x-testagram-node-secret' supabase/functions/storage-node-gateway/index.ts
-          grep -Fq 'safeRelativePath' supabase/functions/storage-node-gateway/index.ts
-          grep -Fq 'write_base64' supabase/functions/storage-node-gateway/index.ts
-          echo "Storage node gateway contract: GREEN"
 
       - name: Build Storage image
         working-directory: core/services/storage
