@@ -35,6 +35,7 @@ ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
+FUNCTIONS_VERIFY_JWT=$(grep '^FUNCTIONS_VERIFY_JWT=' .env | cut -d= -f2-)
 
 pass=0
 fail=0
@@ -59,15 +60,16 @@ http_status() {
     curl -s -o /dev/null -w "%{http_code}" "$@" "$url"
 }
 
-# Like http_status, but appends " sdk" when the response carries the
-# @supabase/server error header, i.e. the gateway passed the request through
-# and the function itself rejected it.
+# Like http_status, but identifies whether a 401 came from the main service
+# (sb-error-code) or the function SDK (x-supabase-server-error).
 fn_status() {
     url="$1"
     shift
     out=$(curl -s -o /dev/null -D - -w '\n%{http_code}' "$@" "$url")
     code=$(printf '%s\n' "$out" | tail -n 1)
-    if printf '%s\n' "$out" | grep -qi '^x-supabase-server-error:'; then
+    if printf '%s\n' "$out" | grep -qi '^sb-error-code: UNAUTHORIZED_'; then
+        echo "$code runtime"
+    elif printf '%s\n' "$out" | grep -qi '^x-supabase-server-error:'; then
         echo "$code sdk"
     else
         echo "$code"
@@ -196,14 +198,20 @@ echo "--- Edge Functions (/functions/v1/) ---"
 
 # hello uses withSupabase({ auth: ["publishable", "secret"] }), which requires
 # an sb_ key in the apikey header. "401 sdk" means the gateway passed the
-# request through and the function rejected it; a bare "401" is the gateway.
-check "No auth -> passed to function, rejected by SDK" "401 sdk" \
+# request through and the function rejected it. With JWT verification enabled,
+# the main service rejects requests without a bearer JWT before calling hello.
+if [ "$FUNCTIONS_VERIFY_JWT" = "true" ]; then
+    unauthenticated_fn_status="401 runtime"
+else
+    unauthenticated_fn_status="401 sdk"
+fi
+check "No auth -> rejected by Functions" "$unauthenticated_fn_status" \
     "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -d '{}')"
 
 # Non-sb_ values (legacy JWT, typo, third-party JWT) are not validated at the gateway.
-check "Legacy ANON_KEY -> passed to function, rejected by SDK" "401 sdk" \
+check "Legacy ANON_KEY as apikey -> rejected by Functions" "$unauthenticated_fn_status" \
     "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $ANON_KEY" -d '{}')"
-check "Non-sb_ invalid apikey -> passed to function, rejected by SDK" "401 sdk" \
+check "Non-sb_ invalid apikey -> rejected by Functions" "$unauthenticated_fn_status" \
     "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: invalid-key" -d '{}')"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
@@ -224,7 +232,7 @@ if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
         check "Conflicting sb_ keys -> 401 at gateway (Envoy)" "401" \
             "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
     else
-        check "Invalid sb_ apikey -> passed to function, rejected by SDK (Kong)" "401 sdk" \
+        check "Invalid sb_ apikey -> rejected by Functions (Kong)" "$unauthenticated_fn_status" \
             "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
     fi
 fi
