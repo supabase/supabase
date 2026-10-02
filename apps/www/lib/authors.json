@@ -1063,5 +1063,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/danielmitterdorfer",
     "author_image_url": "https://github.com/danielmitterdorfer.png"
+  },
+  {
+    "author_id": "alexander_korotkov",
+    "author": "Alexander Korotkov",
+    "username": "akorotkov",
+    "position": "Engineering",
+    "author_url": "https://github.com/akorotkov",
+    "author_image_url": "https://github.com/akorotkov.png"
   }
 ]
