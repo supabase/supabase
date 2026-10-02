@@ -144,8 +144,8 @@ services:
       timeout: 20s
       retries: 10
     environment:
-      RUSTFS_ACCESS_KEY: supa-storage
-      RUSTFS_SECRET_KEY: secret1234
+      RUSTFS_ACCESS_KEY: ${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}
+      RUSTFS_SECRET_KEY: ${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY}
       RUSTFS_ADDRESS: ":9000"
       RUSTFS_CONSOLE_ADDRESS: ":9001"
       RUSTFS_CONSOLE_ENABLE: "true"
@@ -160,7 +160,7 @@ services:
       /bin/sh -c "
       set -e;
       for b in supa-storage-bucket warehouse--table-s3 supa-storage-profiles; do
-      curl -fsS --aws-sigv4 'aws:amz:us-east-1:s3' -u supa-storage:secret1234 -X PUT http://rustfs:9000/\$$b;
+      curl -fsS --aws-sigv4 'aws:amz:us-east-1:s3' -u ${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}:${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY} -X PUT http://rustfs:9000/\$b;
       done
       "
 
@@ -191,8 +191,8 @@ services:
     ports:
       - 8181:8181
     environment:
-      - AWS_ACCESS_KEY_ID=supa-storage
-      - AWS_SECRET_ACCESS_KEY=secret1234
+      - AWS_ACCESS_KEY_ID=${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY}
       - AWS_REGION=us-east-1
       - CATALOG_WAREHOUSE=s3://warehouse--table-s3/
       - CATALOG_IO__IMPL=org.apache.iceberg.aws.s3.S3FileIO
