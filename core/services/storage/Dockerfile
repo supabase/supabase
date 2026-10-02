@@ -34,14 +34,16 @@ RUN --network=none npm prune --omit=dev --offline --ignore-scripts
 FROM base AS final
 ARG VERSION
 ENV VERSION=$VERSION
-COPY migrations migrations
+COPY --chown=node:node migrations migrations
 
 # Copy production node_modules from the production dependencies stage
-COPY --from=production-deps /app/node_modules node_modules
+COPY --chown=node:node --from=production-deps /app/node_modules node_modules
 # Copy build artifacts from the build stage
-COPY --from=build /app/dist dist
-COPY --from=build /app/watt.json /app
-COPY --from=build /app/watt.storage.json /app
+COPY --chown=node:node --from=build /app/dist dist
+COPY --chown=node:node --from=build /app/watt.json /app
+COPY --chown=node:node --from=build /app/watt.storage.json /app
+
+USER node
 
 EXPOSE 5000
 CMD ["node", "dist/start/server.js"]
