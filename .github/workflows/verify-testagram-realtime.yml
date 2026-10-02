@@ -184,11 +184,12 @@ jobs:
 
           test "$(docker exec realtime-smoke id -un)" = "nobody"
 
-          migration_files="$(find core/services/realtime/priv/repo/migrations -maxdepth 1 -type f -name '*.exs' | wc -l | tr -d ' ')"
+          migration_files="$(find core/services/realtime/priv/repo/migrations -maxdepth 1 -type f -name '*.exs' ! -name '.*' | wc -l | tr -d ' ')"
           migration_rows="$(docker exec realtime-postgres psql -U postgres -d postgres -At -v ON_ERROR_STOP=1 -c \
             "select count(*) from public.schema_migrations;" | tr -d '[:space:]')"
 
-          test "$migration_rows" -ge "$migration_files"
+          echo "Migration files: $migration_files; migration ledger rows: $migration_rows"
+          test "$migration_rows" -eq "$migration_files"
 
           unauthenticated_status="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:4000/api/tenants)"
           test "$unauthenticated_status" = "403"
