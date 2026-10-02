@@ -30,7 +30,7 @@ done < <(grep -RInE '^[[:space:]]*image:[[:space:]]*(supabase/|postgrest/)' dock
 
 echo
 echo "--- hosted project configuration ---"
-if grep -RInE '^[[:space:]]*\[remotes\.|project_id[[:space:]]*=[[:space:]]*"[^"]+"' supabase/config.toml; then
+if grep -nE '^\[remotes\.' supabase/config.toml; then
   finding "hosted/remote project configuration remains in supabase/config.toml"
 else
   ok "no remotes.prod/project binding in supabase/config.toml"
