@@ -42,7 +42,8 @@ const TableEditorPage: NextPageWithLayout = () => {
         // the bare table id, so look up the tab by its metadata instead of by key.
         const lastOpenedTableData = Object.values(tabStore.tabsMap).find(
           (tab) =>
-            editorEntityTypes.table.includes(tab.type) && tab.metadata?.tableId === lastOpenedTableId
+            editorEntityTypes.table.includes(tab.type) &&
+            tab.metadata?.tableId === lastOpenedTableId
         )
         router.push(
           buildTableEditorUrl({
