@@ -1,0 +1,13 @@
+[Unit]
+Description=Postgresql optimizations
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/environment.d/postgresql.env
+# we do not want failures from these commands to cause downstream service startup to fail
+ExecStart=-/opt/supabase-admin-api optimize db --destination-config-file-path /etc/postgresql-custom/generated-optimizations.conf
+ExecStart=-/opt/supabase-admin-api optimize pgbouncer --destination-config-file-path /etc/pgbouncer-custom/generated-optimizations.ini
+User=adminapi
+
+[Install]
+WantedBy=multi-user.target

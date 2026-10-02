@@ -1,0 +1,38 @@
+-- supautils.conf.j2 sets supautils.restrict_extension_versions = 'warn':
+-- CREATE/ALTER EXTENSION version clauses from non-exempt roles are ignored
+-- with a WARNING and the extension's default_version is used instead.
+--
+-- This suite runs against the rendered supautils.conf.j2 with the real
+-- migrations applied (see nix/tools/run-server.sh.in), so the restriction
+-- can be asserted as the actual platform roles. The supautils regress suite
+-- covers the GUC logic (all modes, ALTER, duplicate clauses); this test
+-- covers the platform wiring. See PSQL-1159.
+
+-- the platform config sets warn mode
+show supautils.restrict_extension_versions;
+
+-- precondition: postgres is not a superuser, else it would be exempt
+select rolsuper from pg_roles where rolname = 'postgres';
+
+-- drop the hstore created by prime.sql so the creates below are observable
+drop extension hstore;
+
+-- non-exempt role: the version clause is ignored with a warning and the
+-- default version is installed
+set role postgres;
+create extension hstore version '1.4';
+select extversion = default_version as installed_default
+  from pg_extension, pg_available_extensions
+ where extname = name and extname = 'hstore';
+reset role;
+
+drop extension hstore;
+
+-- exempt role (supabase_admin, via supautils.privileged_extensions_superuser):
+-- the version clause is honored, with no warning
+create extension hstore version '1.4';
+select extversion from pg_extension where extname = 'hstore';
+
+-- restore the state prime.sql created (hstore at default version)
+drop extension hstore;
+create extension hstore;

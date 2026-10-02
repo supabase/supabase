@@ -1,0 +1,49 @@
+- name: Collect Postgres binaries - create collection directory
+  file:
+    path: /tmp/pg_binaries/{{ postgresql_major }}/
+    state: directory
+
+- name: Collect Postgres binaries - collect binaries and libraries
+  copy:
+    remote_src: yes
+    src: /usr/lib/postgresql/{{ postgresql_major }}/{{ item }}/
+    dest: /tmp/pg_binaries/{{ postgresql_major }}/{{ item }}/
+  with_items:
+    - bin
+    - lib
+
+- name: Collect Postgres libraries - collect libraries which are in /usr/lib/postgresql/lib/
+  copy:
+    remote_src: yes
+    src: /usr/lib/postgresql/lib/
+    dest: /tmp/pg_binaries/{{ postgresql_major }}/lib/
+
+- name: Collect Postgres libraries - collect libraries which are in /var/lib/postgresql/extension/
+  copy:
+    remote_src: yes
+    src: /var/lib/postgresql/extension/
+    dest: /tmp/pg_binaries/{{ postgresql_major }}/lib/
+
+- name: Collect Postgres libraries - collect latest libpq
+  copy:
+    remote_src: yes
+    src: /usr/lib/aarch64-linux-gnu/libpq.so.5
+    dest: /tmp/pg_binaries/{{ postgresql_major }}/lib/libpq.so.5
+
+- name: Collect Postgres binaries - collect shared files
+  copy:
+    remote_src: yes
+    src: /usr/share/postgresql/{{ postgresql_major }}/
+    dest: /tmp/pg_binaries/{{ postgresql_major }}/share/
+
+- name: Collect Postgres binaries - create tarfile
+  archive:
+    path: /tmp/pg_binaries/
+    dest: /tmp/pg_binaries.tar.gz
+    remove: yes
+
+- name: Fetch tarfile to local
+  fetch:
+    src: /tmp/pg_binaries.tar.gz
+    dest: /tmp/
+    flat: true

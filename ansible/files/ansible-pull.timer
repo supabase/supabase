@@ -1,0 +1,11 @@
+[Unit]
+Description=Run ansible roughly every 3 hours
+
+[Timer]
+OnBootSec=1h
+OnUnitActiveSec=3h
+RandomizedDelaySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

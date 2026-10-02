@@ -1,0 +1,106 @@
+-- Tests role privileges on the vault objects
+-- INSERT and UPDATE privileges should not be present on the vault tables for postgres and service_role, only SELECT and DELETE
+WITH schema_obj AS (
+  SELECT oid, nspname
+  FROM pg_namespace
+  WHERE nspname = 'vault'
+)
+SELECT
+  s.nspname AS schema,
+  c.relname AS object_name,
+  acl.grantee::regrole::text AS grantee,
+  acl.privilege_type
+FROM pg_class c
+JOIN schema_obj s ON s.oid = c.relnamespace
+CROSS JOIN LATERAL aclexplode(c.relacl) AS acl
+WHERE c.relkind IN ('r', 'v', 'm', 'f', 'p')
+  AND acl.privilege_type <> 'MAINTAIN'
+UNION ALL
+SELECT
+  s.nspname AS schema,
+  p.proname AS object_name,
+  acl.grantee::regrole::text AS grantee,
+  acl.privilege_type
+FROM pg_proc p
+JOIN schema_obj s ON s.oid = p.pronamespace
+CROSS JOIN LATERAL aclexplode(p.proacl) AS acl
+ORDER BY object_name, grantee, privilege_type;
+ schema |        object_name        |    grantee     | privilege_type 
+--------+---------------------------+----------------+----------------
+ vault  | _crypto_aead_det_decrypt  | postgres       | EXECUTE
+ vault  | _crypto_aead_det_decrypt  | service_role   | EXECUTE
+ vault  | _crypto_aead_det_decrypt  | supabase_admin | EXECUTE
+ vault  | _crypto_aead_det_encrypt  | supabase_admin | EXECUTE
+ vault  | _crypto_aead_det_noncegen | supabase_admin | EXECUTE
+ vault  | create_secret             | postgres       | EXECUTE
+ vault  | create_secret             | service_role   | EXECUTE
+ vault  | create_secret             | supabase_admin | EXECUTE
+ vault  | decrypted_secrets         | postgres       | DELETE
+ vault  | decrypted_secrets         | postgres       | REFERENCES
+ vault  | decrypted_secrets         | postgres       | SELECT
+ vault  | decrypted_secrets         | postgres       | TRUNCATE
+ vault  | decrypted_secrets         | service_role   | DELETE
+ vault  | decrypted_secrets         | service_role   | SELECT
+ vault  | decrypted_secrets         | supabase_admin | DELETE
+ vault  | decrypted_secrets         | supabase_admin | INSERT
+ vault  | decrypted_secrets         | supabase_admin | REFERENCES
+ vault  | decrypted_secrets         | supabase_admin | SELECT
+ vault  | decrypted_secrets         | supabase_admin | TRIGGER
+ vault  | decrypted_secrets         | supabase_admin | TRUNCATE
+ vault  | decrypted_secrets         | supabase_admin | UPDATE
+ vault  | secrets                   | postgres       | DELETE
+ vault  | secrets                   | postgres       | REFERENCES
+ vault  | secrets                   | postgres       | SELECT
+ vault  | secrets                   | postgres       | TRUNCATE
+ vault  | secrets                   | service_role   | DELETE
+ vault  | secrets                   | service_role   | SELECT
+ vault  | secrets                   | supabase_admin | DELETE
+ vault  | secrets                   | supabase_admin | INSERT
+ vault  | secrets                   | supabase_admin | REFERENCES
+ vault  | secrets                   | supabase_admin | SELECT
+ vault  | secrets                   | supabase_admin | TRIGGER
+ vault  | secrets                   | supabase_admin | TRUNCATE
+ vault  | secrets                   | supabase_admin | UPDATE
+ vault  | update_secret             | postgres       | EXECUTE
+ vault  | update_secret             | service_role   | EXECUTE
+ vault  | update_secret             | supabase_admin | EXECUTE
+(37 rows)
+
+-- vault indexes with owners
+SELECT
+    ns.nspname AS schema,
+    t.relname AS table,
+    i.relname AS index_name,
+    r.rolname AS index_owner,
+    CASE
+        WHEN idx.indisunique THEN 'Unique'
+        ELSE 'Non Unique'
+    END AS index_type
+FROM
+    pg_class t
+JOIN
+    pg_namespace ns ON t.relnamespace = ns.oid
+JOIN
+    pg_index idx ON t.oid = idx.indrelid
+JOIN
+    pg_class i ON idx.indexrelid = i.oid
+JOIN
+    pg_roles r ON i.relowner = r.oid
+WHERE
+    ns.nspname = 'vault'
+ORDER BY
+    t.relname,
+    i.relname;
+ schema |  table  |    index_name    |  index_owner   | index_type 
+--------+---------+------------------+----------------+------------
+ vault  | secrets | secrets_name_idx | supabase_admin | Unique
+ vault  | secrets | secrets_pkey     | supabase_admin | Unique
+(2 rows)
+
+-- assert search_path is preserved after after-create script is run
+show search_path;
+            search_path             
+------------------------------------
+ "\$user", public, auth, extensions
+(1 row)
+

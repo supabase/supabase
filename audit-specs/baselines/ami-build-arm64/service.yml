@@ -1,0 +1,136 @@
+# Service baseline for AMI build
+# Only checks that critical services exist - not their enabled/running state during build
+# Services are configured but many are stopped during AMI build process
+service:
+  # Core system services (should be running during build)
+  cron:
+    enabled: true
+    running: true
+  cloud-config:
+    enabled: true
+    running: true
+  cloud-final:
+    enabled: true
+    running: true
+  cloud-init:
+    enabled: true
+    running: true
+  cloud-init-local:
+    enabled: true
+    running: true
+  systemd-resolved:
+    enabled: true
+    running: true
+  systemd-timesyncd:
+    enabled: true
+    running: true
+  ufw:
+    enabled: true
+    running: true
+  unattended-upgrades:
+    enabled: true
+    running: true
+  sysstat:
+    enabled: true
+    running: true
+  nix-daemon:
+    enabled: false
+    running: true
+  nftables:
+    enabled: false
+    running: true
+  ssh:
+    enabled: false
+    running: true
+  atd:
+    enabled: true
+    running: true
+  getty@tty1:
+    enabled: true
+    running: true
+  grub-common:
+    enabled: true
+    running: false
+  grub-initrd-fallback:
+    enabled: true
+    running: false
+  hibinit-agent:
+    enabled: true
+    running: false
+  ec2-instance-connect-harvest-hostkeys:
+    enabled: true
+    running: false
+  networkd-dispatcher:
+    enabled: true
+    running: false
+  systemd-pstore:
+    enabled: true
+    running: false
+  e2scrub_reap:
+    enabled: true
+    running: false
+
+  # Supabase services - these are STOPPED during AMI build but should exist
+  # We check enabled: false because they're disabled during build
+  postgresql:
+    enabled: false
+    running: false
+  pgbouncer:
+    enabled: false
+    running: false
+  postgrest:
+    enabled: false
+    running: false
+  gotrue:
+    enabled: false
+    running: false
+  adminapi:
+    enabled: false
+    running: false
+  envoy:
+    enabled: false
+    running: false
+  vector:
+    enabled: false
+    running: false
+  postgres_exporter:
+    enabled: false
+    running: false
+  pg_egress_collect:
+    enabled: false
+    running: false
+  fail2ban:
+    enabled: false
+    running: false
+  auditd:
+    enabled: false
+    running: false
+  apparmor:
+    enabled: false
+    running: false
+
+  # Services that should not be running
+  kong:
+    enabled: false
+    running: false
+  supabase-admin-agent_salt:
+    enabled: false
+    running: false
+  database_optimizations:
+    enabled: false
+    running: false
+  postgrest-optimizations:
+    enabled: false
+    running: false
+  NetworkManager:
+    enabled: false
+    running: false
+  firewalld:
+    enabled: false
+    running: false
+  iptables:
+    enabled: false
+    running: false
+  display-manager:
+    enabled: false
+    running: false

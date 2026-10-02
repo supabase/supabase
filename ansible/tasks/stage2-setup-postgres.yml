@@ -1,0 +1,247 @@
+- name: Check psql_version and modify supautils.conf and postgresql.conf if necessary
+  block:
+    - name: Check if psql_version is psql_orioledb-17 and if psql_version is psql_15 or psql_17
+      ansible.builtin.set_fact:
+        is_psql_oriole: "{{ psql_version in ['psql_orioledb-17'] }}"
+        is_psql_17: "{{ psql_version in ['psql_17'] }}"
+        is_psql_15: "{{ psql_version in ['psql_15'] }}"
+
+    - name: Execute tasks when (is_psql_oriole or is_psql_17) and stage2
+      when: stage2 and (is_psql_oriole or is_psql_17)
+      become: true
+      block:
+        - name: Remove specified extensions from postgresql.conf if orioledb-17 or 17 build
+          ansible.builtin.replace:
+            path: '/etc/postgresql/postgresql.conf'
+            regexp: '\ timescaledb,'
+            replace: ''
+
+        - name: Remove specified extensions from supautils.conf if orioledb-17 or 17 build
+          ansible.builtin.replace:
+            path: '/etc/postgresql-custom/supautils.conf'
+            regexp: "{{ regex_item }}"
+          loop:
+            - '\ timescaledb,'
+            - '\ plv8,'
+          loop_control:
+            loop_var: 'regex_item'
+
+        - name: Remove db_user_namespace from postgresql.conf if orioledb-17 or 17 build
+          ansible.builtin.replace:
+            path: '/etc/postgresql/postgresql.conf'
+            regexp: 'db_user_namespace\ =\ off'
+            replace: '#db_user_namespace\ =\ off'
+
+    - name: Execute things when is_psql_oriole and stage2
+      when: stage2 and is_psql_oriole
+      become: true
+      block:
+        - name: Append orioledb to shared_preload_libraries append within closing quote
+          ansible.builtin.replace:
+            path: '/etc/postgresql/postgresql.conf'
+            regexp: "(shared_preload_libraries).*(\\'.*)\\'"
+            replace: "\\1 = \\2, orioledb'"
+
+        - name: Add default_table_access_method setting
+          ansible.builtin.lineinfile:
+            line: "default_table_access_method = 'orioledb'"
+            path: '/etc/postgresql/postgresql.conf'
+            state: 'present'
+
+        - name: Add ORIOLEDB_ENABLED environment variable
+          ansible.builtin.lineinfile:
+            line: 'ORIOLEDB_ENABLED=true'
+            path: '/etc/environment'
+
+        - name: Add ORIOLEDB_ENABLED environment variable to postgresql.env
+          ansible.builtin.lineinfile:
+            line: 'ORIOLEDB_ENABLED=true'
+            path: '/etc/environment.d/postgresql.env'
+
+- name: Execute things when stage2
+  when: stage2
+  become: true
+  block:
+    - name: Resolve postgres env store path
+      ansible.builtin.shell: |
+        sudo -u postgres bash -c "
+          . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh &&
+          nix build --no-link --print-out-paths github:supabase/postgres/{{ git_commit_sha }}#postgres-env-{{ postgresql_major_version }}
+        "
+      register: postgres_env_path
+
+    - name: Install postgres env from nix binary cache
+      ansible.builtin.shell: |
+        sudo -u postgres bash -c "
+          . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh &&
+          nix-env --set {{ postgres_env_path.stdout }}
+        "
+
+    - name: Install supascan for baseline validation
+      ansible.builtin.shell: |
+        sudo -u ubuntu bash -c ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix profile install github:supabase/postgres/{{ git_commit_sha }}#supascan"
+
+    - name: nix collect garbage after supascan install
+      ansible.builtin.shell:
+        cmd: sudo -u ubuntu bash -c ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix-collect-garbage -d"
+
+    - name: Set ownership and permissions for file and dirs
+      ansible.builtin.file:
+        group: 'postgres'
+        mode: "{{ file_item['mode'] | default('0755', true) }}"
+        owner: "{{ file_item['owner'] | default('postgres', true) }}"
+        path: "{{ file_item['path'] }}"
+        state: "{{ file_item['state'] | default('directory', true) }}"
+      loop:
+        - { mode: '0750', path: '/etc/ssl/private', owner: 'root' }
+        - { mode: '0644', path: '/etc/environment.d/postgresql.env' , state: 'file'}
+        - { path: '/usr/lib/postgresql/bin' }
+        - { path: '/usr/lib/postgresql/share/postgresql' }
+        - { path: '/usr/lib/postgresql/share/postgresql/contrib' }
+        - { path: '/usr/lib/postgresql/share/postgresql/timezonesets' }
+        - { path: '/usr/lib/postgresql/share/postgresql/tsearch_data' }
+        - { path: '/usr/lib/postgresql/share/postgresql/extension' }
+      loop_control:
+        loop_var: 'file_item'
+
+    - name: import pgsodium_getkey script
+      ansible.builtin.template:
+        dest: '/usr/lib/postgresql/bin/pgsodium_getkey.sh'
+        group: 'postgres'
+        mode: '0700'
+        owner: 'postgres'
+        src: 'files/pgsodium_getkey_readonly.sh.j2'
+
+    - name: Find all files in /var/lib/postgresql/.nix-profile/bin/
+      ansible.builtin.find:
+        depth: 1
+        file_type: 'file'
+        path: '/var/lib/postgresql/.nix-profile/bin/'
+      register: 'nix_files'
+
+    - name: Find all the symlinks in /var/lib/postgresql/.nix-profile/bin/
+      ansible.builtin.find:
+        depth: 1
+        file_type: 'link'
+        path: '/var/lib/postgresql/.nix-profile/bin/'
+      register: 'nix_links'
+
+    - name: setup gatekeeper
+      block:
+        - name: Check if psql_version is psql_15
+          ansible.builtin.set_fact:
+            is_psql_15: "{{ psql_version == 'psql_15' }}"
+
+        - name: Install gatekeeper if not pg15
+          when: stage2 and not is_psql_15
+          block:
+            - name: Create symbolic link for linux-pam to find pam_jit_pg.so
+              become: yes
+              shell: |
+                sudo ln -s /var/lib/postgresql/.nix-profile/lib/security/pam_jit_pg.so $(find /nix/store -type d -path "/nix/store/*-linux-pam-*/lib/security" -print -quit)/pam_jit_pg.so
+
+            - name: Get gatekeeper version
+              ansible.builtin.shell: |
+                sudo -u postgres bash -c "/nix/var/nix/profiles/default/bin/nix-store -q --requisites ~/.nix-profile | awk -F- '/gatekeeper/{print \$NF}'"
+              register: gatekeeper_version
+
+            - name: Write version file
+              ansible.builtin.copy:
+                dest: "/root/pam_jit_pg-version"
+                group: "root"
+                owner: "root"
+                content: "{{ gatekeeper_version.stdout }}"
+
+    - name: Create symlinks for Nix files into /usr/lib/postgresql/bin
+      ansible.builtin.file:
+        group: 'postgres'
+        owner: 'postgres'
+        path: "/usr/lib/postgresql/bin/{{ file_item['path'] | basename }}"
+        src: "{{ file_item['path'] }}"
+        state: 'link'
+      loop: "{{ nix_files['files'] }}"
+      loop_control:
+        loop_var: 'file_item'
+
+    - name: Create symlinks for Nix files into /usr/bin
+      ansible.builtin.file:
+        group: 'root'
+        owner: 'root'
+        path: "/usr/bin/{{ file_item['path'] | basename }}"
+        src: "{{ file_item['path'] }}"
+        state: 'link'
+      loop: "{{ nix_files['files'] }}"
+      loop_control:
+        loop_var: 'file_item'
+
+    - name: Create symlinks for Nix symlinks into /usr/lib/postgresql/bin
+      ansible.builtin.file:
+        group: 'postgres'
+        owner: 'postgres'
+        path: "/usr/lib/postgresql/bin/{{ link_item['path'] | basename }}"
+        src: "{{ link_item['path'] }}"
+        state: 'link'
+      loop: "{{ nix_links['files'] }}"
+      loop_control:
+        loop_var: 'link_item'
+
+    - name: Create symlinks for Nix files into /usr/bin
+      ansible.builtin.file:
+        group: 'root'
+        owner: 'root'
+        path: "/usr/bin/{{ link_item['path'] | basename }}"
+        src: "{{ link_item['path'] }}"
+        state: 'link'
+      loop: "{{ nix_links['files'] }}"
+      loop_control:
+        loop_var: 'link_item'
+
+    # this task should be redundant, no?
+    - name: Force /usr/bin/pg_config to be a symlink
+      ansible.builtin.file:
+        force: true
+        path: '/usr/bin/pg_config'
+        src: '/var/lib/postgresql/.nix-profile/bin/pg_config'
+        state: 'link'
+
+    - name: Nuke /usr/lib/postgresql/share so we can recreate it as a symlink
+      ansible.builtin.file:
+        path: '/usr/lib/postgresql/share'
+        state: 'absent'
+
+    - name: Create symlinks for PG share links into /usr/lib/postgresql/share
+      ansible.builtin.file:
+        group: 'postgres'
+        owner: 'postgres'
+        path: '/usr/lib/postgresql/share'
+        src: '/var/lib/postgresql/.nix-profile/share'
+        state: 'link'
+
+    - name: create destination directory
+      ansible.builtin.file:
+        path: '/usr/lib/postgresql/share/postgresql/contrib/'
+        recurse: true
+        state: 'directory'
+
+    - name: Set the PG bin dir as a fact
+      ansible.builtin.set_fact:
+        pg_bindir: '/usr/lib/postgresql/bin'
+
+    # script is expected to be placed by finalization tasks for different target platforms
+    - name: pgsodium - set pgsodium.getkey_script
+      ansible.builtin.lineinfile:
+        line: "pgsodium.getkey_script= '{{ pg_bindir }}/pgsodium_getkey.sh'"
+        path: '/etc/postgresql/postgresql.conf'
+        state: 'present'
+
+    - name: Create symbolic link for pgsodium_getkey script
+      ansible.builtin.file:
+        dest: '/usr/lib/postgresql/share/postgresql/extension/pgsodium_getkey'
+        src: '/usr/lib/postgresql/bin/pgsodium_getkey.sh'
+        state: 'link'
+
+- name: Append GRN_PLUGINS_DIR to /etc/environment.d/postgresql.env
+  ansible.builtin.lineinfile:
+    line: 'GRN_PLUGINS_DIR=/var/lib/postgresql/.nix-profile/lib/groonga/plugins'
+    path: '/etc/environment.d/postgresql.env'
+  become: true

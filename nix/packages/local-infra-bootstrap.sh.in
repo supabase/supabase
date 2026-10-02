@@ -1,0 +1,407 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+
+[ ! -z "$DEBUG" ] && set -x
+
+# Colors
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
+
+INFRA_REPO_DIR=""
+SUPABASE_REPO=""
+SETUP_FLAG=false
+NODE_VERSION="20"  # Default Node.js version
+
+print_help() {
+    echo "Usage: nix run .#local-infra-bootstrap -- [options]"
+    echo
+    echo "Options:"
+    echo "  -h, --help                        Show this help message"
+    echo "  -s, --setup                       Setup the local infrastructure for development NOTE: Requires --infrastructure-repo and --supabase-repo"
+    echo "  --infrastructure-repo <path>           Full path to infrastructure repository directory"
+    echo "  --supabase-repo <path>            Full path to Supabase repository directory"
+    echo "  --aws-yubikey-setup               Install AWS CLI tools with YubiKey support"
+    echo "  --aws-yubikey-setup-no-key        Install AWS CLI tools without YubiKey"
+    echo "  --node-version <version>          Specify Node.js version to install/use (default: $NODE_VERSION)"
+    echo
+    echo "Description:"
+    echo "  Bootstrap the local infrastructure for development."
+    echo "  This tool wraps homebrew and other tools to install the necessary dependencies."
+    echo
+    echo "Examples:"
+    echo "  nix run .#local-infra-bootstrap -- --setup --infrastructure-repo /path/to/infrastructure --supabase-repo /path/to/supabase"
+    echo "  nix run .#local-infra-bootstrap -- --aws-yubikey-setup"
+    echo "  nix run .#local-infra-bootstrap -- --setup --node-version 18"
+}
+
+check_brew() {
+    if command -v brew >/dev/null 2>&1; then
+        echo "Homebrew is installed."
+        echo "Version: $(brew --version)"
+    else
+        echo "Homebrew is not installed."
+        echo "To install Homebrew, run the following command:"
+        echo
+        echo '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+        echo
+        echo "After installation, you may need to add Homebrew to your PATH:"
+        echo
+        echo "For Intel Macs:"
+        echo 'echo '\''eval "$(/usr/local/bin/brew shellenv)"'\'' >> ~/.zprofile'
+        echo 'eval "$(/usr/local/bin/brew shellenv)"'
+        echo
+        echo "For Apple Silicon Macs (M1/M2/M3):"
+        echo 'echo '\''eval "$(/opt/homebrew/bin/brew shellenv)"'\'' >> ~/.zprofile'
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"'
+        exit 1
+    fi
+}
+
+check_and_setup_node() {
+    echo -e "\n${BOLD}Checking Node.js installation...${NC}"
+    
+    # Check if the specified node version is installed
+    if ! brew list "node@$NODE_VERSION" &>/dev/null; then
+        echo "Node.js $NODE_VERSION is not installed. Installing..."
+        brew install "node@$NODE_VERSION"
+    fi
+    
+    # Unlink any existing node version
+    brew unlink node@* 2>/dev/null || true
+    
+    # Link the desired version with overwrite
+    echo "Linking Node.js $NODE_VERSION..."
+    brew link --overwrite --force "node@$NODE_VERSION"
+    
+    # Verify installation
+    if ! command -v node &>/dev/null; then
+        echo -e "${RED}❌ Failed to install Node.js $NODE_VERSION${NC}"
+        return 1
+    fi
+    
+    current_version=$(node -v | cut -d 'v' -f2 | cut -d '.' -f1)
+    if [ "$current_version" = "$NODE_VERSION" ]; then
+        echo -e "${GREEN}✅ Node.js $NODE_VERSION is now active${NC}"
+        return 0
+    else
+        echo -e "${RED}❌ Failed to switch to Node.js $NODE_VERSION${NC}"
+        return 1
+    fi
+}
+
+configure_ngrok() {
+    echo -e "\n${BOLD}Configuring ngrok settings...${NC}"
+    
+    if [ -z "$INFRA_REPO_DIR" ]; then
+        echo -e "${RED}Error: Infrastructure repository directory not specified${NC}"
+        return 1
+    fi
+    
+    local env_file="$INFRA_REPO_DIR/.local.env"
+    mkdir -p "$INFRA_REPO_DIR"
+    
+    read -p "Enter your ngrok static domain (example.ngrok-free.app): " static_domain
+    read -p "Enter your ngrok auth token: " auth_token
+    
+    if [[ -z "$static_domain" || -z "$auth_token" ]]; then
+        echo -e "${RED}Error: Both static domain and auth token are required${NC}"
+        return 1
+    fi
+    
+    cat > "$env_file" << EOF
+EXTERNAL_SUPABASE_API_URL=http://${static_domain}
+NGROK_AUTHTOKEN=${auth_token}
+NGROK_STATIC_DOMAIN=${static_domain}
+WARP_ALWAYS_ENABLED=true
+SUPABASE_PATH=${SUPABASE_REPO}
+EOF
+    
+    echo -e "${GREEN}✅ ngrok configuration saved to ${env_file}${NC}"
+}
+
+check_app() {
+    local brew_name=$1
+    local check_command=$2
+
+    echo "Checking $brew_name..."
+    
+    # Special case for OrbStack
+    if [ "$brew_name" = "orbstack" ]; then
+        if [ -d "/Applications/OrbStack.app" ]; then
+            echo "✅ $brew_name is installed"
+            return 0
+        else
+            echo "❌ $brew_name is not installed"
+            return 1
+        fi
+    fi
+
+    # Standard command check
+    if command -v "$check_command" >/dev/null 2>&1; then
+        echo "✅ $brew_name is installed"
+        return 0
+    else
+        echo "❌ $brew_name is not installed"
+        return 1
+    fi
+}
+
+install_app() {
+    local app=$1
+    echo "Installing $app..."
+    
+    case "$app" in
+        "orbstack")
+            brew install --cask "$app"
+            if [ -d "/Applications/OrbStack.app" ]; then
+                echo "✅ OrbStack installed successfully"
+                echo "⚠️  Important: Please open OrbStack.app to complete the setup"
+                return 0
+            fi
+            ;;
+        "aws-vault")
+            brew install --cask "$app"
+            # Give the system a moment to complete the linking
+            sleep 1
+            if [ -f "/opt/homebrew/bin/aws-vault" ] || [ -f "/usr/local/bin/aws-vault" ]; then
+                echo "✅ aws-vault installed successfully"
+                return 0
+            fi
+            ;;
+        "awscli")
+            brew install "$app"
+            # Reload shell environment to ensure AWS CLI is in PATH
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+            if command -v aws >/dev/null 2>&1; then
+                echo "✅ $app installed successfully"
+                return 0
+            fi
+            ;;
+        "dbmate"|*)
+            brew install "$app"
+            if command -v "$app" >/dev/null 2>&1; then
+                echo "✅ $app installed successfully"
+                return 0
+            fi
+            ;;
+    esac
+
+    echo "❌ Failed to install $app"
+    return 1
+}
+
+check_corepack_pnpm() {
+    echo -e "\nChecking Corepack PNPM setup..."
+    
+    # First check if pnpm binary exists in common locations
+    if [ -f "$(which pnpm 2>/dev/null)" ]; then
+        # Try to get version without executing pnpm
+        echo -e "${GREEN}✅ PNPM is enabled${NC}"
+        return 0
+    else
+        echo -e "${RED}❌ PNPM is not installed${NC}"
+        return 1
+    fi
+}
+
+enable_corepack_pnpm() {
+    local pnpm_checked=false
+    
+    if [ "$pnpm_checked" = false ]; then
+        if ! check_corepack_pnpm; then
+            read -p "Would you like to enable PNPM through Corepack? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                echo "Running corepack enable pnpm..."
+                # Remove existing symlinks if present
+                sudo rm -f /opt/homebrew/bin/pnpm /opt/homebrew/bin/pnpx
+                if NODE_OPTIONS="" corepack enable pnpm; then
+                    echo -e "${GREEN}✅ Successfully enabled PNPM through Corepack${NC}"
+                    pnpm_checked=true
+                    return 0
+                else
+                    echo -e "${RED}❌ Failed to enable PNPM through Corepack${NC}"
+                    pnpm_checked=true
+                    return 1
+                fi
+            else
+                echo -e "\n${BOLD}Skipping PNPM setup...${NC}"
+                pnpm_checked=true
+                return 0
+            fi
+        else
+            pnpm_checked=true
+            return 0
+        fi
+    fi
+    return 0
+}
+
+install_prerequisites() {
+    echo -e "\n${BOLD}Checking Prerequisites ...${NC}"
+    echo
+
+    # Define apps and their check commands
+    local apps=("awscli" "dbmate" "orbstack" "corepack" "aws-vault" "tmux" "tmuxp" "ngrok")
+    local commands=("aws" "dbmate" "orbstack" "corepack" "aws-vault" "tmux" "tmuxp" "ngrok")
+    local pnpm_checked=false
+    
+    # Check each app and prompt for installation if missing
+    for i in "${!apps[@]}"; do
+        local brew_name="${apps[$i]}"
+        local check_command="${commands[$i]}"
+        
+        check_app "$brew_name" "$check_command"
+        if [ $? -eq 1 ]; then
+            read -p "Would you like to install $brew_name? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                case "$brew_name" in
+                    "tmux"|"tmuxp")
+                        echo "Installing $brew_name..."
+                        brew install "$brew_name"
+                        if command -v "$brew_name" >/dev/null 2>&1; then
+                            echo -e "${GREEN}✅ $brew_name installed successfully${NC}"
+                        else
+                            echo -e "${RED}❌ Failed to install $brew_name${NC}"
+                        fi
+                        ;;
+                    *)
+                        install_app "$brew_name"
+                        ;;
+                esac
+                
+                # If we just installed corepack, check and enable pnpm
+                if [ "$brew_name" = "corepack" ] && [ "$pnpm_checked" = false ]; then
+                    NODE_OPTIONS="" enable_corepack_pnpm
+                    pnpm_checked=true
+                fi
+            else
+                echo -e "\n${BOLD}Skipping installation of $brew_name ...${NC}"
+            fi
+        elif [ "$brew_name" = "corepack" ] && [ "$pnpm_checked" = false ]; then
+            # If corepack is already installed, check pnpm once
+            NODE_OPTIONS="" enable_corepack_pnpm
+            pnpm_checked=true
+        fi
+        echo
+    done
+    if command -v ngrok >/dev/null 2>&1; then
+        configure_ngrok
+    fi
+    echo -e "\n${BOLD}Prerequisites Check Complete ${NC}"
+}
+
+# AWS YubiKey Setup Function - Only installs required tools
+install_aws_tools() {
+    echo -e "\n${BOLD}Installing required AWS CLI tools...${NC}"
+    
+    # Check and install AWS CLI
+    if ! command -v aws >/dev/null 2>&1; then
+        brew install awscli
+        echo -e "✅ AWS CLI installed"
+    else
+        echo -e "✅ AWS CLI already installed"
+    fi
+    
+    # Check and install AWS Vault
+    if ! command -v aws-vault >/dev/null 2>&1; then
+        brew install homebrew/cask/aws-vault
+        echo -e "✅ AWS Vault installed"
+    else
+        echo -e "✅ AWS Vault already installed"
+    fi
+    
+    if [[ "$1" != "--no-yubikey" ]]; then
+        # Check and install YubiKey Manager
+        if ! command -v ykman >/dev/null 2>&1; then
+            brew install ykman
+            echo -e "✅ YubiKey Manager installed"
+        else
+            echo -e "✅ YubiKey Manager already installed"
+        fi
+    fi
+
+    echo -e "\n${BOLD}✅ AWS CLI tools installation complete${NC}"
+    echo -e "Please follow the AWS CLI MFA+YubiKey setup documentation for next steps."
+}
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        -s|--setup)
+            SETUP_FLAG=true
+            shift
+            ;;
+        --node-version)
+            if [ -n "$2" ]; then
+                NODE_VERSION="$2"
+                shift 2
+            else
+                echo "Error: --node-version requires a version number"
+                exit 1
+            fi
+            ;;
+        --infrastructure-repo)
+            if [ -n "$2" ]; then
+                INFRA_REPO_DIR="$2"
+                shift 2
+            else
+                echo "Error: --infrastructure-repo requires a path argument"
+                exit 1
+            fi
+            ;;
+        --supabase-repo)
+            if [ -n "$2" ]; then
+                SUPABASE_REPO="$2"
+                shift 2
+            else
+                echo "Error: --supabase-repo requires a path argument"
+                exit 1
+            fi
+            ;;
+        --aws-yubikey-setup)
+            check_brew
+            install_aws_tools
+            shift
+            ;;
+        --aws-yubikey-setup-no-key)
+            check_brew
+            install_aws_tools "--no-yubikey"
+            shift
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            print_help
+            exit 1
+            ;;
+    esac
+done
+
+# Validate setup requirements
+if [ "$SETUP_FLAG" = true ]; then
+    if [ -z "$INFRA_REPO_DIR" ]; then
+        echo -e "${RED}Error: --infrastructure-repo is required when using --setup${NC}"
+        print_help
+        exit 1
+    fi
+    if [ -z "$SUPABASE_REPO" ]; then
+        echo -e "${RED}Error: --supabase-repo is required when using --setup${NC}"
+        print_help
+        exit 1
+    fi
+    check_brew
+    check_and_setup_node
+    install_prerequisites
+fi
+
+# If no arguments provided, show help
+if [ "$SETUP_FLAG" = false ] && [ -z "$INFRA_REPO_DIR" ]; then
+    print_help
+    exit 0
+fi

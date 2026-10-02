@@ -1,0 +1,24 @@
+- name: ensure services are stopped and disabled for first boot nix build
+  when: stage2
+  systemd:
+    enabled: no
+    name: '{{ item }}'
+    state: stopped
+  with_items:
+    - postgresql
+    - pgbouncer
+    - fail2ban
+    - motd-news
+    - vector
+    - salt-minion
+
+- name: disable man-db
+  when: stage2
+  become: yes
+  file:
+    state: absent
+    path: "/etc/cron.daily/{{ item }}"
+  with_items:
+    - man-db
+    - popularity-contest
+    - ubuntu-advantage-tools

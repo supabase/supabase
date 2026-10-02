@@ -1,0 +1,77 @@
+/*
+
+The purpose of this test is to validate the method of moving from Timescale Hypertables to Postgres native partitioned tables
+managed by pg_partman
+
+*/
+CREATE SCHEMA ts;
+-- Create a table for time-series data
+CREATE TABLE ts.readings (
+    time TIMESTAMPTZ NOT NULL,
+    sensor_id INT NOT NULL,
+    value DOUBLE PRECISION NOT NULL
+);
+-- Convert the table into a hypertable
+SELECT create_hypertable('ts.readings',  by_range('time', INTERVAL '1 day'));
+ create_hypertable 
+-------------------
+ (2,t)
+(1 row)
+
+-- Convert default 7 day chunk interval
+SELECT set_chunk_time_interval('ts.readings', INTERVAL '24 hours');
+ set_chunk_time_interval 
+-------------------------
+ 
+(1 row)
+
+-- Insert sample data
+INSERT INTO ts.readings (time, sensor_id, value)
+SELECT 
+    time_series AS time,
+    FLOOR(RANDOM() * 10 + 1)::INT AS sensor_id, -- Random sensor_id between 1 and 10
+    RANDOM() * 100 AS value -- Random value between 0 and 100
+FROM 
+    generate_series(
+        '2023-01-19 00:00:00+00'::TIMESTAMPTZ, 
+        '2025-03-26 03:00:00+00'::TIMESTAMPTZ, 
+        INTERVAL '1 second'
+    ) AS time_series
+LIMIT 600000;
+-- List hypertables
+SELECT * FROM timescaledb_information.hypertables;
+ hypertable_schema | hypertable_name |     owner      | num_dimensions | num_chunks | compression_enabled | tablespaces 
+-------------------+-----------------+----------------+----------------+------------+---------------------+-------------
+ ts                | readings        | supabase_admin |              1 |          7 | f                   | 
+(1 row)
+
+-- Rename hypertable
+ALTER TABLE ts.readings RENAME TO ht_readings;
+-- Create copy of hypertable with original name
+CREATE TABLE ts.readings (LIKE ts.ht_readings) PARTITION BY RANGE(time);
+-- Configure pg_partman for daily partitions on sensor_data
+SELECT partman.create_parent(
+    p_parent_table := 'ts.readings',
+    p_control := 'time',
+    p_type := 'range',
+    p_interval := '1 day',
+    p_premake := 7, -- Create partitions for the next 7 days
+    p_start_partition := '2023-01-19 00:00:00+00' -- Start date for partitioning
+);
+ create_parent 
+---------------
+ t
+(1 row)
+
+INSERT INTO ts.readings SELECT * FROM ts.ht_readings;
+DROP SCHEMA ts CASCADE;
+NOTICE:  drop cascades to 9 other objects
+DETAIL:  drop cascades to table ts.ht_readings
+drop cascades to table _timescaledb_internal._hyper_2_3_chunk
+drop cascades to table _timescaledb_internal._hyper_2_4_chunk
+drop cascades to table _timescaledb_internal._hyper_2_5_chunk
+drop cascades to table _timescaledb_internal._hyper_2_6_chunk
+drop cascades to table _timescaledb_internal._hyper_2_7_chunk
+drop cascades to table _timescaledb_internal._hyper_2_8_chunk
+drop cascades to table _timescaledb_internal._hyper_2_9_chunk
+drop cascades to table ts.readings

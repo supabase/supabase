@@ -1,0 +1,19 @@
+-- testing sql found in https://supabase.com/docs/guides/database/arrays
+create table arraytest (
+  id integer not null,
+  textarray text array
+);
+INSERT INTO arraytest (id, textarray) VALUES (1, ARRAY['Harry', 'Larry', 'Moe']);;
+select * from arraytest;
+ id |     textarray     
+----+-------------------
+  1 | {Harry,Larry,Moe}
+(1 row)
+
+SELECT textarray[1], array_length(textarray, 1) FROM arraytest;
+ textarray | array_length 
+-----------+--------------
+ Harry     |            3
+(1 row)
+
+drop table arraytest cascade;

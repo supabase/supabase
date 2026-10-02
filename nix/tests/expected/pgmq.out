@@ -1,0 +1,209 @@
+-- Test the standard flow
+select
+  pgmq.create('Foo');
+ create 
+--------
+ 
+(1 row)
+
+select
+  *
+from
+  pgmq.send(
+    queue_name:='Foo',
+    msg:='{"foo": "bar1"}'
+  );
+ send 
+------
+    1
+(1 row)
+
+-- Test queue is not case sensitive
+select
+  *
+from
+  pgmq.send(
+    queue_name:='foo', -- note: lowercase useage
+    msg:='{"foo": "bar2"}',
+    delay:=5
+  );
+ send 
+------
+    2
+(1 row)
+
+select
+  msg_id,
+  read_ct,
+  message
+from
+  pgmq.read(
+    queue_name:='Foo',
+    vt:=30,
+    qty:=2
+  );
+ msg_id | read_ct |     message     
+--------+---------+-----------------
+      1 |       1 | {"foo": "bar1"}
+(1 row)
+
+select
+  msg_id,
+  read_ct,
+  message
+from
+  pgmq.pop('Foo');
+ msg_id | read_ct | message 
+--------+---------+---------
+(0 rows)
+
+-- Archive message with msg_id=2.
+select
+  pgmq.archive(
+    queue_name:='Foo',
+    msg_id:=2
+  );
+ archive 
+---------
+ t
+(1 row)
+
+select
+  pgmq.create('my_queue');
+ create 
+--------
+ 
+(1 row)
+
+select
+  pgmq.send_batch(
+  queue_name:='my_queue',
+  msgs:=array['{"foo": "bar3"}','{"foo": "bar4"}','{"foo": "bar5"}']::jsonb[]
+);
+ send_batch 
+------------
+          1
+          2
+          3
+(3 rows)
+
+select
+  pgmq.archive(
+    queue_name:='my_queue',
+    msg_ids:=array[3, 4, 5]
+  );
+ archive 
+---------
+       3
+(1 row)
+
+select
+  pgmq.delete('my_queue', 6);
+ delete 
+--------
+ f
+(1 row)
+
+select
+  pgmq.drop_queue('my_queue');
+ drop_queue 
+------------
+ t
+(1 row)
+
+/*
+-- Disabled until pg_partman goes back into the image
+select
+  pgmq.create_partitioned(
+    'my_partitioned_queue',
+    '5 seconds',
+    '10 seconds'
+);
+*/
+-- Make sure SQLI enabling characters are blocked
+select pgmq.create('F--oo');
+ERROR:  queue name contains invalid characters: $, ;, --, or \'
+CONTEXT:  PL/pgSQL function pgmq.format_table_name(text,text) line 5 at RAISE
+PL/pgSQL function pgmq.create_non_partitioned(text) line 3 during statement block local variable initialization
+SQL statement "SELECT pgmq.create_non_partitioned(queue_name)"
+PL/pgSQL function pgmq."create"(text) line 3 at PERFORM
+select pgmq.create('F$oo');
+ERROR:  queue name contains invalid characters: $, ;, --, or \'
+CONTEXT:  PL/pgSQL function pgmq.format_table_name(text,text) line 5 at RAISE
+PL/pgSQL function pgmq.create_non_partitioned(text) line 3 during statement block local variable initialization
+SQL statement "SELECT pgmq.create_non_partitioned(queue_name)"
+PL/pgSQL function pgmq."create"(text) line 3 at PERFORM
+select pgmq.create($$F'oo$$);
+ERROR:  queue name contains invalid characters: $, ;, --, or \'
+CONTEXT:  PL/pgSQL function pgmq.format_table_name(text,text) line 5 at RAISE
+PL/pgSQL function pgmq.create_non_partitioned(text) line 3 during statement block local variable initialization
+SQL statement "SELECT pgmq.create_non_partitioned(queue_name)"
+PL/pgSQL function pgmq."create"(text) line 3 at PERFORM
+\echo
+
+-- pgmq schema functions with owners (ownership is modified on ansible/files/postgresql_extension_custom_scripts/pgmq/after-create.sql)
+select
+  n.nspname as schema_name,
+  p.proname as function_name,
+  r.rolname as owner
+from
+  pg_proc p
+join
+  pg_namespace n on p.pronamespace = n.oid
+join
+  pg_roles r on p.proowner = r.oid
+where
+  n.nspname = 'pgmq'
+order by
+  p.proname;
+ schema_name |         function_name         |  owner   
+-------------+-------------------------------+----------
+ pgmq        | _belongs_to_pgmq              | postgres
+ pgmq        | _ensure_pg_partman_installed  | postgres
+ pgmq        | _extension_exists             | postgres
+ pgmq        | _get_partition_col            | postgres
+ pgmq        | _get_pg_partman_major_version | postgres
+ pgmq        | _get_pg_partman_schema        | postgres
+ pgmq        | archive                       | postgres
+ pgmq        | archive                       | postgres
+ pgmq        | convert_archive_partitioned   | postgres
+ pgmq        | create                        | postgres
+ pgmq        | create_non_partitioned        | postgres
+ pgmq        | create_partitioned            | postgres
+ pgmq        | create_unlogged               | postgres
+ pgmq        | delete                        | postgres
+ pgmq        | delete                        | postgres
+ pgmq        | detach_archive                | postgres
+ pgmq        | drop_queue                    | postgres
+ pgmq        | drop_queue                    | postgres
+ pgmq        | format_table_name             | postgres
+ pgmq        | list_queues                   | postgres
+ pgmq        | metrics                       | postgres
+ pgmq        | metrics_all                   | postgres
+ pgmq        | pop                           | postgres
+ pgmq        | purge_queue                   | postgres
+ pgmq        | read                          | postgres
+ pgmq        | read_with_poll                | postgres
+ pgmq        | send                          | postgres
+ pgmq        | send                          | postgres
+ pgmq        | send                          | postgres
+ pgmq        | send                          | postgres
+ pgmq        | send                          | postgres
+ pgmq        | send                          | postgres
+ pgmq        | send_batch                    | postgres
+ pgmq        | send_batch                    | postgres
+ pgmq        | send_batch                    | postgres
+ pgmq        | send_batch                    | postgres
+ pgmq        | send_batch                    | postgres
+ pgmq        | send_batch                    | postgres
+ pgmq        | set_vt                        | postgres
+ pgmq        | validate_queue_name           | postgres
+(40 rows)
+
+-- assert search_path is preserved after after-create script is run
+show search_path;
+            search_path            
+-----------------------------------
+ "$user", public, auth, extensions
+(1 row)
+

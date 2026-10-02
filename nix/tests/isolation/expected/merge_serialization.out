@@ -1,0 +1,16 @@
+Parsed test spec with 2 sessions
+
+starting permutation: s1_begin s1_snapshot s2_update s1_merge s1_commit
+step s1_begin: BEGIN ISOLATION LEVEL REPEATABLE READ;
+step s1_snapshot: SELECT v FROM merge_target WHERE k = 1;
+v
+-
+0
+(1 row)
+
+step s2_update: UPDATE merge_target SET v = v + 100 WHERE k = 1;
+step s1_merge: MERGE INTO merge_target t
+                     USING (SELECT 1 AS k) s ON t.k = s.k
+                     WHEN MATCHED THEN UPDATE SET v = t.v + 1;
+ERROR:  could not serialize access due to concurrent update
+step s1_commit: COMMIT;

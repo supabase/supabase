@@ -1,0 +1,29 @@
+select
+  e.evtname,
+  e.evtowner::regrole as evtowner,
+  n_func.nspname as evtfunction_schema,
+  e.evtfoid::regproc as evtfunction,
+  p.proowner::regrole as function_owner
+from pg_event_trigger e
+join pg_proc p
+  on e.evtfoid = p.oid
+join pg_namespace n_func
+  on p.pronamespace = n_func.oid
+where p.prorettype = 'event_trigger'::regtype
+order by e.evtname;
+                evtname                 |    evtowner    | evtfunction_schema |            evtfunction             | function_owner 
+----------------------------------------+----------------+--------------------+------------------------------------+----------------
+ graphql_watch_ddl                      | supabase_admin | graphql            | graphql.increment_schema_version   | supabase_admin
+ graphql_watch_drop                     | supabase_admin | graphql            | graphql.increment_schema_version   | supabase_admin
+ issue_graphql_placeholder              | supabase_admin | extensions         | set_graphql_placeholder            | supabase_admin
+ issue_pg_cron_access                   | supabase_admin | extensions         | grant_pg_cron_access               | supabase_admin
+ issue_pg_graphql_access                | supabase_admin | extensions         | grant_pg_graphql_access            | supabase_admin
+ issue_pg_net_access                    | supabase_admin | extensions         | grant_pg_net_access                | supabase_admin
+ pg_tle_event_trigger_for_drop_function | supabase_admin | pgtle              | pgtle.pg_tle_feature_info_sql_drop | supabase_admin
+ pgaudit_ddl_command_end                | supabase_admin | public             | pgaudit_ddl_command_end            | supabase_admin
+ pgaudit_sql_drop                       | supabase_admin | public             | pgaudit_sql_drop                   | supabase_admin
+ pgrst_ddl_watch                        | supabase_admin | extensions         | pgrst_ddl_watch                    | supabase_admin
+ pgrst_drop_watch                       | supabase_admin | extensions         | pgrst_drop_watch                   | supabase_admin
+ pgsodium_trg_mask_update               | supabase_admin | pgsodium           | pgsodium.trg_mask_update           | supabase_admin
+(12 rows)
+

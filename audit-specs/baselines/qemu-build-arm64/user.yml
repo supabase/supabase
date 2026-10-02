@@ -1,0 +1,109 @@
+# User baseline for AMI build
+# Exact IDs are checked only for accounts pinned during provisioning
+user:
+  # System users
+  root:
+    exists: true
+    home: /root
+    shell: /bin/bash
+  ubuntu:
+    exists: true
+    home: /home/ubuntu
+    shell: /usr/bin/bash
+    uid: 1000
+    gid: 1000
+  nobody:
+    exists: true
+    shell: /usr/sbin/nologin
+
+  # PostgreSQL ecosystem
+  postgres:
+    exists: true
+    home: /var/lib/postgresql
+    shell: /bin/bash
+    uid: 999
+    gid: 1002
+  pgbouncer:
+    exists: true
+    home: /home/pgbouncer
+    uid: 1001
+    gid: 1003
+    shell: /usr/sbin/nologin
+  pgbackrest:
+    exists: true
+    home: /var/lib/pgbackrest
+    uid: 995
+    gid: 1005
+  wal-g:
+    exists: true
+    home: /home/wal-g
+    uid: 996
+    gid: 1004
+
+  # Supabase services
+  gotrue:
+    exists: true
+    home: /home/gotrue
+    uid: 1002
+    gid: 1006
+  postgrest:
+    exists: true
+    home: /home/postgrest
+    uid: 1003
+    gid: 1007
+  adminapi:
+    exists: true
+    home: /home/adminapi
+    uid: 1007
+    gid: 1011
+  kong:
+    exists: true
+    home: /home/kong
+    uid: 1005
+    gid: 1009
+  envoy:
+    exists: true
+    home: /home/envoy
+    uid: 1004
+    gid: 1008
+  vector:
+    exists: true
+    home: /var/lib/vector
+    uid: 994
+    gid: 990
+  supabase-admin-agent:
+    exists: true
+    home: /home/supabase-admin-agent
+    uid: 990
+    gid: 988
+
+  # System service users
+  sshd:
+    exists: true
+    shell: /usr/sbin/nologin
+  messagebus:
+    exists: true
+    shell: /usr/sbin/nologin
+  systemd-network:
+    exists: true
+    shell: /usr/sbin/nologin
+  systemd-resolve:
+    exists: true
+    shell: /usr/sbin/nologin
+  systemd-timesync:
+    exists: true
+    shell: /usr/sbin/nologin
+  polkitd:
+    exists: true
+    shell: /usr/sbin/nologin
+  tcpdump:
+    exists: true
+    shell: /usr/sbin/nologin
+  _apt:
+    exists: true
+    shell: /usr/sbin/nologin
+  ec2-instance-connect:
+    exists: false
+  salt:
+    exists: true
+    shell: /usr/sbin/nologin

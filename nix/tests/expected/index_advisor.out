@@ -1,0 +1,16 @@
+create schema v;
+create table v.book(
+  id int primary key,
+  title text not null
+);
+select
+  index_statements, errors
+from
+  index_advisor('select id from v.book where title = $1');
+                index_statements                | errors 
+------------------------------------------------+--------
+ {"CREATE INDEX ON v.book USING btree (title)"} | {}
+(1 row)
+
+drop schema v cascade;
+NOTICE:  drop cascades to table v.book

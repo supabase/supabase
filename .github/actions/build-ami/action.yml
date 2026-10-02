@@ -1,0 +1,116 @@
+name: Build AMI
+description: Build both stage 1 and stage 2 AMIs
+
+inputs:
+  ami_name_prefix:
+    description: 'Prefix for the AMI name'
+    required: true
+  ami_regions:
+    description: 'AMI regions as JSON array (e.g., ["us-east-1"])'
+    required: true
+  arch:
+    description: Architecture to build AMI for (amd64|arm64)
+    required: true
+  git_sha:
+    description: 'Git SHA for this build'
+    required: true
+  packages_git_sha:
+    description: 'Git SHA to install packages from'
+    required: true
+  instance_type:
+    description: 'EC2 instance type for the build'
+    required: true
+  postgres_version:
+    description: 'PostgreSQL major version (e.g., 15)'
+    required: true
+  region:
+    description: 'AWS region'
+    required: true
+
+outputs:
+  stage2_ami_id:
+    description: 'The AMI ID of the stage 2 build'
+    value: ${{ steps.build-stage2.outputs.stage2_ami_id }}
+  postgres_release_version:
+    description: 'The PostgreSQL release version'
+    value: ${{ steps.generate-vars.outputs.version }}
+  execution_id:
+    description: 'The execution ID for this build'
+    value: ${{ steps.set-execution-id.outputs.execution_id }}
+  disk_usage_json:
+    description: 'The stage 2 AMI root disk usage as json'
+    value: ${{ steps.build-stage2.outputs.disk_usage_json }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Verify arch
+      shell: bash
+      run: |
+        case ${{ inputs.arch }} in
+        amd64 | arm64) ;;
+        *) echo "Unknown arch input, expected:(amd64|arm64) got:${{ inputs.arch }}" >&2 && exit 1 ;;
+        esac
+    - name: Set execution ID
+      id: set-execution-id
+      shell: bash
+      run: |
+        PACKER_EXECUTION_ID="${{ inputs.postgres_version }}-${{ inputs.arch }}-${{ github.run_id }}"
+        echo "PACKER_EXECUTION_ID=$PACKER_EXECUTION_ID" >> $GITHUB_ENV
+        echo "execution_id=$PACKER_EXECUTION_ID" >> $GITHUB_OUTPUT
+
+    - name: Generate common-nix.vars.pkr.hcl
+      id: generate-vars
+      shell: bash
+      run: |
+        PG_VERSION=$(nix run nixpkgs#yq-go -- -r '.postgres_release["postgres${{ inputs.postgres_version }}"]' ansible/vars.yml)
+        echo 'postgres-version = "'$PG_VERSION'"' > common-nix.vars.pkr.hcl
+        echo "" >> common-nix.vars.pkr.hcl
+        git add -f common-nix.vars.pkr.hcl
+        echo "version=$PG_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Build AMI stage 1
+      shell: bash
+      env:
+        POSTGRES_MAJOR_VERSION: ${{ inputs.postgres_version }}
+        POSTGRES_VERSION: ${{ steps.generate-vars.outputs.version }}
+        AWS_MAX_ATTEMPTS: 10
+        AWS_RETRY_MODE: adaptive
+        AWS_REGION: ${{ inputs.region }}
+        GIT_SHA: ${{ inputs.git_sha }}
+      run: |
+        echo "::group::AMI Build: Stage 1"
+
+        nix run .#build-ami -- stage1 ${{ inputs.arch }} \
+          -var "ami_name=${{ inputs.ami_name_prefix }}" \
+          -var 'ami_regions=${{ inputs.ami_regions }}' \
+          -var "ansible_arguments=-e postgresql_major=${{ inputs.postgres_version }}" \
+          -var "git-head-version=${{ inputs.git_sha }}" \
+          -var "packer-execution-id=$PACKER_EXECUTION_ID" \
+          amazon-${{ inputs.arch }}-nix.pkr.hcl
+
+        echo "::endgroup::"
+
+    - name: Build AMI stage 2
+      id: build-stage2
+      shell: bash
+      env:
+        POSTGRES_MAJOR_VERSION: ${{ inputs.postgres_version }}
+        POSTGRES_VERSION: ${{ steps.generate-vars.outputs.version }}
+        AWS_MAX_ATTEMPTS: 10
+        AWS_RETRY_MODE: adaptive
+        AWS_REGION: ${{ inputs.region }}
+        GIT_SHA: ${{ inputs.git_sha }}
+      run: |
+        echo "::group::AMI Build: Stage 2"
+
+        nix run .#build-ami -- stage2 ${{ inputs.arch }} \
+          -var "ami_name=${{ inputs.ami_name_prefix }}" \
+          -var "git-head-version=${{ inputs.git_sha }}" \
+          -var "git_sha=${{ inputs.packages_git_sha }}" \
+          -var "instance_type=${{ inputs.instance_type }}" \
+          -var "packer-execution-id=$PACKER_EXECUTION_ID" \
+          -var "postgres_major_version=${{ inputs.postgres_version }}" \
+          stage2-nix-psql.pkr.hcl
+
+        echo "::endgroup::"

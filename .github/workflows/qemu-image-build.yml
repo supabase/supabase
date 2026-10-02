@@ -1,0 +1,185 @@
+name: Build QEMU image
+
+on:
+  push:
+    paths:
+      - .github/workflows/qemu-image-build.yml
+      - Dockerfile-kubernetes
+      - ansible/vars.yml
+      - ebssurrogate/scripts/*
+      - nix/packages/build-qemu-image/*
+      - qemu.pkr.hcl
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: 'Guest architecture (amd64 is experimental and publishes only to staging)'
+        type: choice
+        default: arm64
+        options:
+          - arm64
+          - amd64
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      postgres_versions: ${{ steps.set-versions.outputs.postgres_versions }}
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: Set PostgreSQL versions - only builds pg17 atm
+        id: set-versions
+        run: |
+          VERSIONS=$(yq -o=json -I=0 '[.postgres_major[1]]' ansible/vars.yml)
+          echo "postgres_versions=$VERSIONS" >> $GITHUB_OUTPUT
+
+  build:
+    needs: prepare
+    strategy:
+      matrix:
+        postgres_version: ${{ fromJson(needs.prepare.outputs.postgres_versions) }}
+        arch: ["${{ inputs.arch || 'arm64' }}"]
+    runs-on: ${{ matrix.arch == 'amd64' && 'blacksmith-16vcpu-ubuntu-2404' || 'arm-native-runner' }}
+    env:
+      TARGET_ARCH: ${{ matrix.arch }}
+    timeout-minutes: 150
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: enable KVM support
+        run: |
+          sudo chown runner /dev/kvm
+          sudo chmod 666 /dev/kvm
+
+      - name: Set PostgreSQL version environment variable
+        run: |
+          echo "POSTGRES_MAJOR_VERSION=${{ matrix.postgres_version }}" >> $GITHUB_ENV
+          echo "EXECUTION_ID=${{ github.run_id }}-${{ matrix.postgres_version }}" >> $GITHUB_ENV
+
+      - name: Install Nix
+        uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Run checks if triggered manually
+        if: ${{ github.event_name == 'workflow_dispatch' && matrix.arch == 'arm64' }}
+        run: |
+          SUFFIX=$(nix run nixpkgs#yq -- ".postgres_release[\"postgres${{ matrix.postgres_version }}\"]" ansible/vars.yml | sed -E 's/[0-9\.]+(.*)$/\1/')
+          if [[ -z $SUFFIX ]] ; then
+            echo "Version must include non-numeric characters if built manually."
+            exit 1
+          fi
+
+      - name: Verify QEMU can use KVM
+        shell: bash
+        run: |
+          case "$TARGET_ARCH" in
+            amd64) QEMU=qemu-system-x86_64; MACHINE=q35 ;;
+            arm64) QEMU=qemu-system-aarch64; MACHINE=virt,gic-version=max,highmem=on ;;
+            *) echo "Unsupported architecture: $TARGET_ARCH" >&2; exit 1 ;;
+          esac
+          printf '%s\n' '{"execute":"qmp_capabilities"}' '{"execute":"query-kvm"}' '{"execute":"quit"}' |
+            nix shell --inputs-from . nixpkgs#qemu --command \
+              "$QEMU" -machine "$MACHINE,accel=kvm" -cpu host \
+              -m 128M -nodefaults -display none -S -qmp stdio |
+            jq -se 'any(.[]; .return.enabled == true)'
+
+      - name: Resolve git sha
+        id: resolve-git-sha
+        uses: ./.github/actions/resolve-git-sha
+        with:
+          flake_input: ${{ vars.GIT_SHA_FROM_FLAKE_INPUT }}
+
+      - name: Build QEMU artifact
+        env:
+          GIT_SHA: ${{ steps.resolve-git-sha.outputs.sha }}
+        run: BUILD_QEMU_IMAGE_HW_VIRT_ONLY=1 nix run .#build-qemu-image "${{ matrix.postgres_version }}" "$TARGET_ARCH"
+
+      - name: Grab release version
+        id: process_release_version
+        run: |
+          PG_VERSION=$(nix run nixpkgs#yq -- -r '.postgres_release["postgres'${{ matrix.postgres_version }}'"]' ansible/vars.yml)
+          if [[ "$TARGET_ARCH" == amd64 ]]; then
+            PG_VERSION="$PG_VERSION-amd64-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          fi
+          echo "version=$PG_VERSION" >> $GITHUB_OUTPUT
+
+      - name: configure aws credentials - staging
+        if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/') }}
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.CONTROL_PLANE_DEV_ROLE }}
+          aws-region: "us-east-1"
+
+      - name: Login to Amazon ECR Staging
+        if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/') }}
+        id: login-ecr-private-dev
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Build image
+        env:
+          IMAGE_TAG: ${{ steps.process_release_version.outputs.version }}
+        run: |
+          docker build --platform "linux/$TARGET_ARCH" -f Dockerfile-kubernetes -t "postgres:$IMAGE_TAG" packer-work-qemu-*
+
+      - name: Push docker image to Amazon ECR
+        if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/') }}
+        env:
+          REGISTRY: 812073016711.dkr.ecr.us-east-1.amazonaws.com
+          REPOSITORY: postgres-vm-image
+          IMAGE_TAG: ${{ steps.process_release_version.outputs.version }}
+        run: |
+          docker tag "postgres:$IMAGE_TAG" "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          docker push "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
+      # TODO (darora): temporarily also push to prod account from here - add a guard to only publish proper tagged releases to prod?
+      - name: configure aws credentials - prod
+        if: ${{ matrix.arch == 'arm64' && (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/')) }}
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.CONTROL_PLANE_PROD_ROLE }}
+          aws-region: "us-east-1"
+
+      - name: Login to Amazon ECR Prod
+        if: ${{ matrix.arch == 'arm64' && (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/')) }}
+        id: login-ecr-private-prod
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Push docker image to Amazon ECR Prod
+        if: ${{ matrix.arch == 'arm64' && (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/')) }}
+        env:
+          REGISTRY: 156470330064.dkr.ecr.us-east-1.amazonaws.com
+          REPOSITORY: postgres-vm-image
+          IMAGE_TAG: ${{ steps.process_release_version.outputs.version }}
+        run: |
+          docker tag "postgres:$IMAGE_TAG" "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          docker push "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
+      - name: Slack Notification on Failure
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_NOTIFICATIONS_WEBHOOK }}
+          SLACK_USERNAME: 'gha-failures-notifier'
+          SLACK_COLOR: 'danger'
+          SLACK_MESSAGE: 'Building Postgres QEMU artifact failed'
+          SLACK_FOOTER: ''
+
+      - name: Cleanup resources after build
+        if: ${{ always() }}
+        run: |
+          aws ec2 describe-instances --filters "Name=tag:packerExecutionId,Values=${EXECUTION_ID}" --query "Reservations[].Instances[].InstanceId" --output text | xargs -r aws ec2 terminate-instances --instance-ids
+
+      - name: Cleanup resources on build cancellation
+        if: ${{ cancelled() }}
+        run: |
+          aws ec2 describe-instances --filters "Name=tag:packerExecutionId,Values=${EXECUTION_ID}" --query "Reservations[].Instances[].InstanceId" --output text | xargs -r aws ec2 terminate-instances --instance-ids

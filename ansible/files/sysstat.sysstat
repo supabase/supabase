@@ -1,0 +1,36 @@
+# How long to keep log files (in days).
+# Used by sa2(8) script
+# If value is greater than 28, then use sadc's option -D to prevent older
+# data files from being overwritten. See sadc(8) and sysstat(5) manual pages.
+HISTORY=7
+
+# Compress (using xz, gzip or bzip2) sa and sar files older than (in days):
+COMPRESSAFTER=10
+
+# Parameters for the system activity data collector (see sadc(8) manual page)
+# which are used for the generation of log files.
+# By default contains the `-S DISK' option responsible for generating disk
+# statisitcs. Use `-S XALL' to collect all available statistics.
+SADC_OPTIONS="-S DISK"
+
+# Directory where sa and sar files are saved. The directory must exist.
+SA_DIR=/var/log/sysstat
+
+# Compression program to use.
+ZIP="xz"
+
+# By default sa2 script generates yesterday's summary, since the cron job
+# usually runs right after midnight. If you want sa2 to generate the summary
+# of the same day (for example when cron job runs at 23:53) set this variable.
+#YESTERDAY=no
+
+# By default sa2 script generates reports files (the so called sarDD files).
+# Set this variable to false to disable reports generation.
+#REPORTS=false
+
+# The sa1 and sa2 scripts generate system activity data and report files in
+# the /var/log/sysstat directory. By default the files are created with umask 0022
+# and are therefore readable for all users. Change this variable to restrict
+# the permissions on the files (e.g. use 0027 to adhere to more strict
+# security standards).
+UMASK=0022

@@ -1,0 +1,30 @@
+[Unit]
+Description=PostgreSQL database server
+Documentation=man:postgres(1)
+{% if supabase_internal is defined %}
+Requires=database-optimizations.service
+After=database-optimizations.service
+{% endif %}
+
+[Service]
+Type=notify
+User=postgres
+ExecStart=/usr/lib/postgresql/bin/postgres -D /etc/postgresql
+ExecStartPre=+/usr/local/bin/postgres_prestart.sh
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGINT
+TimeoutStopSec=90
+TimeoutStartSec=86400
+Restart=always
+RestartSec=5
+OOMScoreAdjust=-1000
+EnvironmentFile=-/etc/environment.d/postgresql.env
+LimitNOFILE=16384
+{% if supabase_internal is defined %}
+ReadOnlyPaths=/etc
+InaccessiblePaths=/root -/var/lib/supabase -/var/lib/supabase-admin-agent -/var/cache/supabase-admin-agent -/opt/saltstack -/etc/salt
+AppArmorProfile=-sbpostgres
+{% endif %}
+[Install]
+WantedBy=multi-user.target

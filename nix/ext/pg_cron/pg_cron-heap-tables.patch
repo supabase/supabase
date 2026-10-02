@@ -1,0 +1,26 @@
+diff --git a/pg_cron--1.2--1.3.sql b/pg_cron--1.2--1.3.sql
+index b1e6a68..f4b94e7 100644
+--- a/pg_cron--1.2--1.3.sql
++++ b/pg_cron--1.2--1.3.sql
+@@ -12,7 +12,7 @@ CREATE TABLE cron.job_run_details (
+ 	return_message text,
+ 	start_time timestamptz,
+ 	end_time timestamptz
+-);
++) USING heap;
+ 
+ GRANT SELECT ON cron.job_run_details TO public;
+ GRANT DELETE ON cron.job_run_details TO public;
+diff --git a/pg_cron.sql b/pg_cron.sql
+index 2de23f4..e843ac7 100644
+--- a/pg_cron.sql
++++ b/pg_cron.sql
+@@ -23,7 +23,7 @@ CREATE TABLE cron.job (
+ 	nodeport int not null default pg_catalog.inet_server_port(),
+ 	database text not null default pg_catalog.current_database(),
+ 	username text not null default current_user
+-);
++) USING heap;
+ GRANT SELECT ON cron.job TO public;
+ ALTER TABLE cron.job ENABLE ROW LEVEL SECURITY;
+ CREATE POLICY cron_job_policy ON cron.job USING (username OPERATOR(pg_catalog.=) current_user);

@@ -1,0 +1,20 @@
+#include <tunables/global>
+profile /usr/local/bin/pgbouncer flags=(attach_disconnected) {
+  #include <abstractions/base>
+  #include <abstractions/bash>
+  #include <abstractions/consoles>
+  #include <abstractions/nameservice>
+  #include <abstractions/openssl>
+  #include <abstractions/ssl_keys>
+  #include <abstractions/user-tmp>
+
+  deny @{HOME}/** rwx,
+  /etc/pgbouncer-custom/** r,
+  /etc/pgbouncer/** r,
+  /proc/sys/kernel/random/uuid r,
+  /run/systemd/notify rw,
+  /usr/local/bin/pgbouncer mrix,
+  /var/log/pgbouncer.log rw,
+  /var/run/systemd/notify rw,
+  /{,var/}run/pgbouncer/** rw,
+}

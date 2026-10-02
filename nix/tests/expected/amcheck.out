@@ -1,0 +1,132 @@
+-- amcheck for customers (PSQL-1327).
+--
+-- amcheck is in supautils.privileged_extensions, so the non-superuser postgres
+-- role can install it and call bt_index_check() instead of running a full
+-- REINDEX DATABASE.
+--
+-- supautils.extensions_parameter_overrides pins it to pg_catalog, the same as pg_cron.
+--
+-- Why not public: supautils creates privileged extensions as supabase_admin, and
+-- ALTER DEFAULT PRIVILEGES (init-scripts/00000000000000-initial-schema.sql) grants
+-- EXECUTE on anything supabase_admin creates in public to anon, authenticated and
+-- service_role, the PostgREST API roles. amcheck does no permission check of its own
+-- (upstream verify_nbtree.c: "Intentionally not checking permissions"), so in public
+-- it would be callable over the REST API against any index, including auth's.
+-- pg_catalog has no such default-privilege grant, so the API roles never get access.
+--
+-- This suite asserts the placement (pg_catalog), that postgres can use it, and that
+-- the API roles cannot.
+-- the pin lives in the platform config
+show supautils.extensions_parameter_overrides;
+               supautils.extensions_parameter_overrides                
+-----------------------------------------------------------------------
+ {"pg_cron":{"schema":"pg_catalog"},"amcheck":{"schema":"pg_catalog"}}
+(1 row)
+
+-- precondition: postgres must not be a superuser, or nothing below is meaningful
+select rolsuper from pg_roles where rolname = 'postgres';
+ rolsuper 
+----------
+ f
+(1 row)
+
+-- prime.sql already created amcheck; drop it so the creates below are observable
+drop extension if exists amcheck;
+-- a non-superuser can install it, and it lands in pg_catalog rather than public
+set role postgres;
+create extension amcheck;
+reset role;
+select extowner::regrole as owner, extnamespace::regnamespace as schema
+  from pg_extension
+ where extname = 'amcheck';
+     owner      |   schema   
+----------------+------------
+ supabase_admin | pg_catalog
+(1 row)
+
+-- the override wins over an explicitly requested schema
+drop extension amcheck;
+set role postgres;
+create extension amcheck with schema public;
+reset role;
+select extnamespace::regnamespace as schema_after_requesting_public
+  from pg_extension
+ where extname = 'amcheck';
+ schema_after_requesting_public 
+--------------------------------
+ pg_catalog
+(1 row)
+
+-- The privilege matrix. Aggregated over every function the extension owns rather
+-- than named signatures, so one expected file covers PG 15 (6 functions) and
+-- PG 17 (8), and functions added by future versions are picked up automatically.
+select r.rolname,
+       bool_and(has_function_privilege(r.rolname, p.oid, 'execute')) as all_functions,
+       bool_or(has_function_privilege(r.rolname, p.oid, 'execute')) as any_function
+  from pg_proc p
+  join pg_depend d on d.objid = p.oid and d.deptype = 'e'
+  join pg_extension e on e.oid = d.refobjid and e.extname = 'amcheck'
+ cross join (values ('postgres'), ('anon'), ('authenticated'), ('service_role')) as r(rolname)
+ group by r.rolname
+ order by r.rolname;
+    rolname    | all_functions | any_function 
+---------------+---------------+--------------
+ anon          | f             | f
+ authenticated | f             | f
+ postgres      | t             | t
+ service_role  | f             | f
+(4 rows)
+
+-- The support case: postgres checks an index it owns, then one it does not.
+-- amcheck has no per relation gate, which is what makes it useful when an
+-- upgrade corrupts an index in a schema the customer does not control.
+--
+-- Both tables are heap tables in a schema created here, rather than existing
+-- relations in public or auth. On orioledb, auth.users is orioledb backed and
+-- its btree has no conventional storage. On multigres, postgres is not the
+-- database owner and has no CREATE on public.
+create schema amcheck_test;
+grant usage, create on schema amcheck_test to postgres;
+create table amcheck_test.notmine(i int primary key) using heap;
+insert into amcheck_test.notmine select generate_series(1, 100);
+revoke all on amcheck_test.notmine from postgres, anon, authenticated, service_role;
+-- postgres neither owns this table nor can write to it. It keeps SELECT via
+-- pg_read_all_data (migrations/20240606060239_grant_predefined_roles_to_postgres.sql),
+-- which no revoke undoes. Ownership is the property that matters here.
+select pg_get_userbyid(relowner) as notmine_owner,
+       has_table_privilege('postgres', 'amcheck_test.notmine', 'insert') as postgres_can_write
+  from pg_class
+ where oid = 'amcheck_test.notmine'::regclass;
+ notmine_owner  | postgres_can_write 
+----------------+--------------------
+ supabase_admin | f
+(1 row)
+
+set role postgres;
+create table amcheck_test.mine(i int primary key) using heap;
+insert into amcheck_test.mine select generate_series(1, 100);
+select pg_catalog.bt_index_check('amcheck_test.mine_pkey'::regclass);
+ bt_index_check 
+----------------
+ 
+(1 row)
+
+select pg_catalog.bt_index_check('amcheck_test.notmine_pkey'::regclass);
+ bt_index_check 
+----------------
+ 
+(1 row)
+
+reset role;
+-- the API roles must not reach it. The denial is at the function level, so it
+-- applies to every target relation.
+set role anon;
+select pg_catalog.bt_index_check('auth.users_pkey'::regclass);
+ERROR:  permission denied for function bt_index_check
+reset role;
+-- restore the state prime.sql created (amcheck present, in pg_catalog)
+set role postgres;
+drop table amcheck_test.mine;
+reset role;
+drop table amcheck_test.notmine;
+drop schema amcheck_test;

@@ -1,0 +1,11 @@
+--- a/src/include/fe_utils/print.h
++++ b/src/include/fe_utils/print.h
+@@ -18,7 +18,7 @@
+ 
+ /* This is not a particularly great place for this ... */
+ #ifndef __CYGWIN__
+-#define DEFAULT_PAGER "more"
++#define DEFAULT_PAGER "less"
+ #else
+ #define DEFAULT_PAGER "less"
+ #endif

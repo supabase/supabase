@@ -1,0 +1,72 @@
+-- version-specific role memberships
+select
+    r.rolname as member,
+    g.rolname as "member_of (can become)",
+    m.admin_option
+from
+    pg_roles r
+join
+    pg_auth_members m on r.oid = m.member
+left join
+    pg_roles g on m.roleid = g.oid
+order by
+    r.rolname, g.rolname;
+         member          |  member_of (can become)  | admin_option 
+-------------------------+--------------------------+--------------
+ authenticator           | anon                     | f
+ authenticator           | authenticated            | f
+ authenticator           | service_role             | f
+ pg_monitor              | pg_read_all_settings     | f
+ pg_monitor              | pg_read_all_stats        | f
+ pg_monitor              | pg_stat_scan_tables      | f
+ pgsodium_keyholder      | pgsodium_keyiduser       | f
+ pgsodium_keymaker       | pgsodium_keyholder       | f
+ pgsodium_keymaker       | pgsodium_keyiduser       | f
+ postgres                | anon                     | f
+ postgres                | authenticated            | f
+ postgres                | pg_monitor               | f
+ postgres                | pg_read_all_data         | f
+ postgres                | pg_signal_backend        | f
+ postgres                | pgtle_admin              | f
+ postgres                | service_role             | f
+ postgres                | supabase_privileged_role | f
+ supabase_etl_admin      | pg_monitor               | f
+ supabase_etl_admin      | pg_read_all_data         | f
+ supabase_etl_admin      | supabase_privileged_role | f
+ supabase_read_only_user | pg_monitor               | f
+ supabase_read_only_user | pg_read_all_data         | f
+ supabase_storage_admin  | authenticator            | f
+(23 rows)
+
+-- Check all privileges of non-superuser roles on functions
+select
+  p.pronamespace::regnamespace as schema,
+  p.proname as object_name,
+  acl.grantee::regrole::text as grantee,
+  acl.privilege_type
+from pg_catalog.pg_proc p
+cross join lateral pg_catalog.aclexplode(p.proacl) as acl
+where p.pronamespace::regnamespace::text = 'pg_catalog'
+  and acl.grantee::regrole::text != 'supabase_admin'
+order by object_name, grantee, privilege_type;
+   schema   |          object_name           |      grantee      | privilege_type 
+------------+--------------------------------+-------------------+----------------
+ pg_catalog | bt_index_check                 | postgres          | EXECUTE
+ pg_catalog | bt_index_check                 | postgres          | EXECUTE
+ pg_catalog | bt_index_parent_check          | postgres          | EXECUTE
+ pg_catalog | bt_index_parent_check          | postgres          | EXECUTE
+ pg_catalog | bt_index_parent_check          | postgres          | EXECUTE
+ pg_catalog | pg_get_backend_memory_contexts | pg_read_all_stats | EXECUTE
+ pg_catalog | pg_get_shmem_allocations       | pg_read_all_stats | EXECUTE
+ pg_catalog | pg_ls_archive_statusdir        | pg_monitor        | EXECUTE
+ pg_catalog | pg_ls_logdir                   | pg_monitor        | EXECUTE
+ pg_catalog | pg_ls_logicalmapdir            | pg_monitor        | EXECUTE
+ pg_catalog | pg_ls_logicalsnapdir           | pg_monitor        | EXECUTE
+ pg_catalog | pg_ls_replslotdir              | pg_monitor        | EXECUTE
+ pg_catalog | pg_ls_tmpdir                   | pg_monitor        | EXECUTE
+ pg_catalog | pg_ls_tmpdir                   | pg_monitor        | EXECUTE
+ pg_catalog | pg_ls_waldir                   | pg_monitor        | EXECUTE
+ pg_catalog | pg_reload_conf                 | postgres          | EXECUTE
+ pg_catalog | verify_heapam                  | postgres          | EXECUTE
+(17 rows)
+

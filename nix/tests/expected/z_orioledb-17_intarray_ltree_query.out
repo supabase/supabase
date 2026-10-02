@@ -1,0 +1,4 @@
+-- lquery: total length of one level's OR-variants overflows.
+SELECT (repeat('x', 1000) || repeat('|' || repeat('x', 1000), 65))::lquery IS NOT NULL AS lq_totallen;
+ERROR:  lquery level is too large
+DETAIL:  Total size of level exceeds the maximum allowed (65535 bytes).

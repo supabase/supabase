@@ -1,0 +1,4 @@
+-- lquery: total length of one level's OR-variants overflows.
+SELECT (repeat('x', 1000) || repeat('|' || repeat('x', 1000), 65))::lquery IS NOT NULL AS lq_totallen;
+ERROR:  label string is too long
+DETAIL:  Label length is 1000, must be at most 255, at character 1001.

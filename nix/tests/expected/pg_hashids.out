@@ -1,0 +1,36 @@
+select id_encode(1001); -- Result: jNl
+ id_encode 
+-----------
+ jNl
+(1 row)
+
+select id_encode(1234567, 'This is my salt'); -- Result: Pdzxp
+ id_encode 
+-----------
+ Pdzxp
+(1 row)
+
+select id_encode(1234567, 'This is my salt', 10); -- Result: PlRPdzxpR7
+ id_encode  
+------------
+ PlRPdzxpR7
+(1 row)
+
+select id_encode(1234567, 'This is my salt', 10, 'abcdefghijABCDxFGHIJ1234567890'); -- Result: 3GJ956J9B9
+ id_encode  
+------------
+ 3GJ956J9B9
+(1 row)
+
+select id_decode('PlRPdzxpR7', 'This is my salt', 10); -- Result: 1234567
+ id_decode 
+-----------
+ {1234567}
+(1 row)
+
+select id_decode('3GJ956J9B9', 'This is my salt', 10, 'abcdefghijABCDxFGHIJ1234567890'); -- Result: 1234567
+ id_decode 
+-----------
+ {1234567}
+(1 row)
+

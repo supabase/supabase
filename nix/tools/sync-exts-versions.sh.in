@@ -1,0 +1,277 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+
+[ -n "$DEBUG" ] && set -x
+
+ansible_vars=$(yq '.' "$PWD/ansible/vars.yml")
+fetch_source_url() {
+    local source_url=${1//\"/}  # Remove double quotes
+    source_url=${source_url//\'/}  # Remove single quotes
+    
+    # Check if the source URL is provided
+    if [ -z "$source_url" ]; then
+        echo "Usage: fetch_nix_url <source_url>"
+        return 1
+    fi
+    
+    echo "$source_url"
+
+    # Run nix-prefetch-url command
+    local initial_hash
+    initial_hash=$(nix-prefetch-url --type sha256 "$source_url" --unpack | cut -d ' ' -f 2)
+    #once we can bump up nix version, we can use nix hash convert --hash-algo sha256
+    local final_hash
+    final_hash=$(nix hash to-sri --type sha256 "$initial_hash")
+    echo "$final_hash"
+}
+
+sync_version() {
+
+    local package_name=$1
+    local version="\"$2\""
+    local hash="\"$3\""
+
+
+    # Update the version and hash in the Nix expression
+    nix-editor "$PWD/nix/ext/$package_name.nix" version --inplace -v "$version"
+    nix-editor "$PWD/nix/ext/$package_name.nix" src.hash --inplace -v "$hash"
+}
+
+run_sync() {
+    local varname=$1
+    local package_name=$2
+
+    version=$(echo "$ansible_vars" |  jq -r ".$varname")
+    echo "$key: $version"
+    url=$(nix eval ".#psql_15/exts/$package_name.src.url")
+    hash=$(fetch_source_url "$url" | tail -n 1)
+    sync_version "$package_name" "$version" "$hash"
+    echo "synced $package_name to version $version with hash $hash"
+
+
+}
+
+#for use where nix uses fetchurl 
+# instead of fetchFromGithub
+fetchurl_source_url() {
+    local source_url=${1//\"/}  # Remove double quotes
+    source_url=${source_url//\'/}  # Remove single quotes
+    
+    # Check if the source URL is provided
+    if [ -z "$source_url" ]; then
+        echo "Usage: fetch_nix_url <source_url>"
+        return 1
+    fi
+    
+    echo "$source_url"
+
+    # Run nix-prefetch-url command
+    local initial_hash
+    initial_hash=$(nix-prefetch-url --type sha256 "$source_url" | cut -d ' ' -f 2)
+    #once we can bump up nix version, we can use nix hash convert --hash-algo sha256
+    local final_hash
+    final_hash=$(nix hash to-sri --type sha256 "$initial_hash")
+    echo "$final_hash"
+}
+
+sync_version_fetchurl() {
+
+    local package_name=$1
+    local version="\"$2\""
+    local hash="\"$3\""
+
+
+    # Update the version and hash in the Nix expression
+    nix-editor "$PWD/nix/ext/$package_name.nix" version --inplace -v "$version"
+    nix-editor "$PWD/nix/ext/$package_name.nix" src.sha256 --inplace -v "$hash"
+}
+
+
+run_sync_fetchurl() {
+    local varname=$1
+    local package_name=$2
+
+    version=$(echo "$ansible_vars" |  jq -r ".$varname")
+    echo "$key: $version"
+    url=$(nix eval ".#psql_15/exts/$package_name.src.url")
+    hash=$(fetchurl_source_url "$url" | tail -n 1)
+    sync_version_fetchurl "$package_name" "$version" "$hash"
+    echo "synced $package_name to version $version with hash $hash"
+
+
+}
+
+#for use on derivations that use cargoHash
+update_cargo_vendor_hash() {
+    local package_name=$1
+    nix-editor "$PWD/nix/ext/$package_name.nix" cargoHash --inplace -v ""
+    if ! output=$(nix build .#psql_15/exts/"$package_name" 2>&1); then
+        # Extract the hash value after "got: "
+        hash_value_scraped=$(echo "$output" | grep "got:" | awk '{for (i=1; i<=NF; i++) if ($i ~ /^sha/) print $i}')
+        hash_value="\"$hash_value_scraped\""
+        # Continue using the captured hash value
+        nix-editor "$PWD/nix/ext/$package_name.nix" cargoHash --inplace -v "$hash_value"
+        echo "Updated cargoHash for $package_name to $hash_value"
+    else
+        echo "$package_name builds successfully, moving on..."
+    fi
+}
+
+#iterate values in ansible vars, case statement
+# to match ansible var to package name
+keys=$(echo "$ansible_vars" | jq -r 'keys[]')
+
+for key in $keys; do
+    case $key in
+        "pg_hashids_release")
+            varname="pg_hashids_release"
+            package_name="pg_hashids"
+            run_sync "$varname" "$package_name"
+            ;;
+        "hypopg_release")
+            varname="hypopg_release"
+            package_name="hypopg"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pg_graphql_release")
+            varname="pg_graphql_release"
+            package_name="pg_graphql"
+            run_sync "$varname" "$package_name"
+            update_cargo_vendor_hash "$package_name"
+            ;;
+        "pg_cron_release")
+            varname="pg_cron_release"
+            package_name="pg_cron"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pgsql_http_release")
+            varname="pgsql_http_release"
+            package_name="pgsql-http"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pg_jsonschema_release")
+            varname="pg_jsonschema_release"
+            package_name="pg_jsonschema"
+            run_sync "$varname" "$package_name"
+            update_cargo_vendor_hash "$package_name"
+            ;;
+        "pg_net_release")
+            varname="pg_net_release"
+            package_name="pg_net"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pg_plan_filter_release")
+            varname="pg_plan_filter_release"
+            package_name="pg_plan_filter"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pg_safeupdate_release")
+            varname="pg_safeupdate_release"
+            package_name="pg-safeupdate"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pgsodium_release")
+            varname="pgsodium_release"
+            package_name="pgsodium"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pg_repack_release")
+            varname="pg_repack_release"
+            package_name="pg_repack"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pgrouting_release")
+            varname="pgrouting_release"
+            package_name="pgrouting"
+            run_sync "$varname" "$package_name"
+            ;;
+        "ptap_release")
+            varname="pgtap_release"
+            package_name="pgtap"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pg_stat_monitor_release")
+            varname="pg_stat_monitor_release"
+            package_name="pg_stat_monitor"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pg_tle_release")
+            varname="pg_tle_release"
+            package_name="pg_tle"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pgaudit_release")
+            varname="pgaudit_release"
+            package_name="pgaudit"
+            run_sync "$varname" "$package_name"
+            ;;
+        "plpgsql_check_release")
+            varname="plpgsql_check_release"
+            package_name="plpgsql-check"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pgvector_release")
+            varname="pgvector_release"
+            package_name="pgvector"
+            run_sync "$varname" "$package_name"
+            ;;
+        "pgjwt_release")
+            varname="pgjwt_release"
+            package_name="pgjwt"
+            run_sync "$varname" "$package_name"
+            ;;
+        "plv8_release")
+            varname="plv8_release"
+            package_name="plv8"
+            run_sync "$varname" "$package_name"
+            ;;
+        "postgis_release")
+            varname="postgis_release"
+            package_name="postgis"
+            run_sync_fetchurl "$varname" "$package_name"
+            ;;
+        "pgroonga_release")
+            varname="pgroonga_release"
+            package_name="pgroonga"
+            run_sync_fetchurl "$varname" "$package_name"
+            ;;
+        "rum_release")
+            varname="rum_release"
+            package_name="rum"
+            run_sync "$varname" "$package_name"
+            ;;
+        "timescaledb_release")
+            varname="timescaledb_release"
+            package_name="timescaledb"
+            run_sync "$varname" "$package_name"
+            ;;
+        "supautils_release")
+            varname="supautils_release"
+            package_name="supautils"
+            run_sync "$varname" "$package_name"
+            ;;
+        "vault_release")
+            varname="vault_release"
+            package_name="vault"
+            run_sync "$varname" "$package_name"
+            ;;
+        "wal2json_release")
+            varname="wal2json_release"
+            package_name="wal2json"
+            run_sync "$varname" "$package_name"
+            ;;
+        *)
+            ;;
+    esac
+done
+
+# url=$($_nix eval .#psql_16/exts/pgvector.src.url)
+
+# fetch_nix_url "$url"
+
+#res=$editor /home/sam/postgres/nix/ext/pgvector.nix src 
+#echo $res
+# url=$($_nix eval .#psql_16/exts/pgvector.src.url)
+# #echo $url
+# hash=$(fetch_source_url $url | tail -n 1)
+# echo "$hash"

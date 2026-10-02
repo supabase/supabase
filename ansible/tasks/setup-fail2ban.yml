@@ -1,0 +1,69 @@
+# set default bantime to 1 hour
+- name: do stage1 tasks
+  when: not stage2
+  block:
+    - name: extend the default bantime to an hour
+      become: true
+      ansible.builtin.replace:
+        path: '/etc/fail2ban/jail.conf'
+        regexp: 'bantime  = 10m'
+        replace: 'bantime  = 3600'
+
+    - name: configure journald
+      ansible.builtin.copy:
+        dest: '/etc/fail2ban/jail.d/sshd.local'
+        src: 'files/fail2ban_config/jail-ssh.conf'
+
+    - name: configure fail2ban to use nftables
+      ansible.builtin.copy:
+        dest: '/etc/fail2ban/jail.local'
+        src: 'files/fail2ban_config/jail.local'
+
+    # postgresql
+    - name: import jail.d/postgresql.conf
+      ansible.builtin.template:
+        dest: '/etc/fail2ban/jail.d/postgresql.conf'
+        src: 'files/fail2ban_config/jail-postgresql.conf.j2'
+      become: true
+
+    - name: import filter.d/postgresql.conf
+      ansible.builtin.template:
+        dest: '/etc/fail2ban/filter.d/postgresql.conf'
+        src: 'files/fail2ban_config/filter-postgresql.conf.j2'
+      become: true
+
+    - name: create overrides dir
+      ansible.builtin.file:
+        group: 'root'
+        mode: '0700'
+        owner: 'root'
+        path: '/etc/systemd/system/fail2ban.service.d'
+        state: 'directory'
+
+    - name: custom systemd overrides
+      ansible.builtin.copy:
+        dest: '/etc/systemd/system/fail2ban.service.d/overrides.conf'
+        src: 'files/fail2ban_config/fail2ban.service.conf'
+
+    - name: add in supabase specific ignore filters
+      ansible.builtin.lineinfile:
+        line: "{{ ignore_item['line'] }}"
+        path: /etc/fail2ban/filter.d/postgresql.conf
+        state: present
+      become: true
+      loop:
+        - { line: '              ^.*,.*,.*,.*,"<HOST>:.*password authentication failed for user ""supabase_admin".*$' }
+        - { line: '              ^.*,.*,.*,.*,"<HOST>:.*password authentication failed for user ""supabase_auth_admin".*$' }
+        - { line: '              ^.*,.*,.*,.*,"<HOST>:.*password authentication failed for user ""supabase_storage_admin".*$' }
+        - { line: '              ^.*,.*,.*,.*,"<HOST>:.*password authentication failed for user ""authenticator".*$' }
+        - { line: '              ^.*,.*,.*,.*,"<HOST>:.*password authentication failed for user ""pgbouncer".*$' }
+      loop_control:
+        loop_var: 'ignore_item'
+      tags:
+        - install-supabase-internal
+
+    - name: fail2ban - disable service
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+        enabled: false
+        name: 'fail2ban'

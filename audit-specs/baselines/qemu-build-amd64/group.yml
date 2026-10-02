@@ -1,0 +1,103 @@
+# Group baseline for AMI build
+# Exact IDs are checked only for groups pinned during provisioning
+group:
+  # System groups
+  root:
+    exists: true
+  sudo:
+    exists: true
+  adm:
+    exists: true
+  admin:
+    exists: true
+  users:
+    exists: true
+  nogroup:
+    exists: true
+  ubuntu:
+    exists: true
+    gid: 1000
+
+  # PostgreSQL ecosystem
+  postgres:
+    exists: true
+    gid: 1002
+  pgbouncer:
+    exists: true
+    gid: 1003
+  pgbackrest:
+    exists: true
+    gid: 1005
+  wal-g:
+    exists: true
+    gid: 1004
+  ssl-cert:
+    exists: true
+    gid: 1001
+
+  # Supabase services
+  gotrue:
+    exists: true
+    gid: 1006
+  postgrest:
+    exists: true
+    gid: 1007
+  adminapi:
+    exists: true
+    gid: 1011
+  kong:
+    exists: true
+    gid: 1009
+  envoy:
+    exists: true
+    gid: 1008
+  vector:
+    exists: true
+    gid: 990
+  supabase-admin-agent:
+    exists: true
+    gid: 988
+
+  # System service groups
+  messagebus:
+    exists: true
+  systemd-network:
+    exists: true
+  systemd-resolve:
+    exists: true
+  systemd-timesync:
+    exists: true
+  systemd-journal:
+    exists: true
+  polkitd:
+    exists: true
+  tcpdump:
+    exists: true
+  _ssh:
+    exists: true
+  salt:
+    exists: true
+
+  # Nix
+  nixbld:
+    exists: true
+
+  # Other system groups
+  disk:
+    exists: true
+  tty:
+    exists: true
+  audio:
+    exists: true
+  video:
+    exists: true
+  plugdev:
+    exists: true
+  netdev:
+    exists: true
+    gid: 105
+  lxd:
+    exists: true
+    gid: 101
+  crontab:
+    exists: false

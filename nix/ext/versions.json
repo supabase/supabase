@@ -1,0 +1,955 @@
+{
+  "http": {
+    "1.5.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-+N/CXm4arRgvhglanfvO0FNOBUWV5RL8mn/9FpNvcjY="
+    },
+    "1.6.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-C8eqi0q1dnshUAZjIsZFwa5FTYc7vmATF3vv2CReWPM="
+    }
+  },
+  "hypopg": {
+    "1.3.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-AIBXy+LxyHUo+1hd8gQTwaBdFiTEzKaCVc4cx5tZgME="
+    },
+    "1.4.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-88uKPSnITRZ2VkelI56jZ9GWazG/Rn39QlyHKJKSKMM="
+    }
+  },
+  "index_advisor": {
+    "0.2.0": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-G0eQk2bY5CNPMeokN/nb05g03CuiplRf902YXFVQFbs="
+    }
+  },
+  "pg_jsonschema": {
+    "0.1.0": {
+      "postgresql": [
+        "12",
+        "13",
+        "14"
+      ],
+      "hash": "sha256-wd05ARaV88BhKxsKkdrEE7yEadOKlCCdmhK3F6tNmsM="
+    },
+    "0.1.1": {
+      "postgresql": [
+        "12",
+        "13",
+        "14"
+      ],
+      "hash": "sha256-9jdOReqfObjEG/Gxb9fI9v/5XtqCF8WErsDL+WlOl0g="
+    },
+    "0.2.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-57gZbUVi8P4EB8T0P19JBVXcetQcr6IxuIx96NNFA/0=",
+      "pgrx": "0.10.2",
+      "rust": "1.76.0"
+    },
+    "0.3.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-YdKpOEiDIz60xE7C+EzpYjBcH0HabnDbtZl23CYls6g=",
+      "pgrx": "0.11.3",
+      "rust": "1.76.0"
+    },
+    "0.3.3": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-Au1mqatoFKVq9EzJrpu1FVq5a1kBb510sfC980mDlsU=",
+      "pgrx": "0.12.6",
+      "rust": "1.80.0"
+    }
+  },
+  "pg_cron": {
+    "1.3.1": {
+      "postgresql": [
+        "15"
+      ],
+      "rev": "v1.3.1",
+      "hash": "sha256-rXotNOtQNmA55ErNxGoNSKZ0pP1uxEVlDGITFHuqGG4=",
+      "patches": [
+        "pg_cron-1.3.1-pg15.patch"
+      ]
+    },
+    "1.4.2": {
+      "postgresql": [
+        "15"
+      ],
+      "rev": "v1.4.2",
+      "hash": "sha256-P0Fd10Q1p+KrExb35G6otHpc6pD61WnMll45H2jkevM="
+    },
+    "1.5.2": {
+      "postgresql": [
+        "15"
+      ],
+      "rev": "v1.5.2",
+      "hash": "sha256-+quVWbKJy6wXpL/zwTk5FF7sYwHA7I97WhWmPO/HSZ4="
+    },
+    "1.6.4": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "rev": "v1.6.4",
+      "hash": "sha256-t1DpFkPiSfdoGG2NgNT7g1lkvSooZoRoUrix6cBID40=",
+      "patches": [
+        "pg_cron-heap-tables.patch"
+      ]
+    }
+  },
+  "pg_graphql": {
+    "1.0.2": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-HnEyijEIkKbJFQjWF1sa5h2qqGzq/aW14454zPbo6wc=",
+      "pgrx": "0.6.1",
+      "rust": "1.82.0"
+    },
+    "1.1.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-Vdi9qBjg14/SpZ1TuOvKS0gJjkLmviCzoBLnPOds0pw=",
+      "pgrx": "0.6.1",
+      "rust": "1.82.0"
+    },
+    "1.2.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-QnNwKasSvC7o5pHDC/NlqJPvWirKwMpwUmfsLJXDTsg=",
+      "pgrx": "0.7.1",
+      "rust": "1.82.0"
+    },
+    "1.2.2": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-SKbUDasdhz/L5UDyMH4gXmFfHHhGx81H90gfIclGwjU=",
+      "pgrx": "0.9.5",
+      "rust": "1.70.0"
+    },
+    "1.2.3": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-876bRLAUstBcCnhDvO+MllAC1VM//LLW1W6h028zr/8=",
+      "pgrx": "0.9.7",
+      "rust": "1.70.0"
+    },
+    "1.4.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-onyVIM5/l/cpYeAa7ya6h7bmRfqG1dPjc67oGGkgsOs=",
+      "pgrx": "0.10.2",
+      "rust": "1.70.0"
+    },
+    "1.4.2": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-/JweVmfcWqDtFeP3tBl/g6hlqAqbwPHpcHdX9HeqZuU=",
+      "pgrx": "0.10.2",
+      "rust": "1.70.0"
+    },
+    "1.4.4": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-Kxo4o8+hfSTOjvhYyGF2BpksWfW/AMCCH4qom4AGw18=",
+      "pgrx": "0.11.2",
+      "rust": "1.70.0"
+    },
+    "1.5.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-28ANRZyF22qF2YAxNAAkPfGOM3+xiO6IHdXsTp0CTQE=",
+      "pgrx": "0.11.2",
+      "rust": "1.85.1"
+    },
+    "1.5.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-cAiD2iSFmZwC+Zy0x+MABseWCxXRtRY74Dj0oBKet+o=",
+      "pgrx": "0.11.2",
+      "rust": "1.85.1"
+    },
+    "1.5.1-mergeless": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-X4YR2ishxWCQDMwxHKuGGjlpbpRrUBoHeeLfM/UIHWc=",
+      "pgrx": "0.11.2",
+      "rust": "1.85.1"
+    },
+    "1.5.4": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-419RVol44akUFZ/0B97VjAXCUrWcKFDAFuVjvJnbkP4=",
+      "pgrx": "0.11.3",
+      "rust": "1.85.1"
+    },
+    "1.5.6": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-v/40TR/1bplbQuD3Hv3gE7oh6cfn9fA6U5s+FTAwxtA=",
+      "pgrx": "0.11.3",
+      "rust": "1.85.1"
+    },
+    "1.5.7": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-Q6XfcTKVOjo5pGy8QACc4QCHolKxEGU8e0TTC6Zg8go=",
+      "pgrx": "0.11.3",
+      "rust": "1.85.1"
+    },
+    "1.5.9": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-YpLN43FtLhp2cb7cyM+4gEx8GTwsRiKTfxaMq0b8hk0=",
+      "pgrx": "0.12.6",
+      "rust": "1.81.0"
+    },
+    "1.5.11": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-BMZc9ui+2J3U24HzZZVCU5+KWhz+5qeUsRGeptiqbek=",
+      "pgrx": "0.12.9",
+      "rust": "1.81.0"
+    },
+    "1.6.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-DOmxdLuYlRoQRprN4tni6JyXZ3nWaEqVQU0DNSYRYTc=",
+      "pgrx": "0.16.1",
+      "rust": "1.88.0"
+    },
+    "1.6.2": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-/qpAfou/shsLKyUmJsya/Zph9nhdtQwXOcXpqmsOnIw=",
+      "pgrx": "0.19.2",
+      "rust": "1.97.1"
+    }
+  },
+  "pg_net": {
+    "0.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-geXGMb9MxU2vVB3ZBkGEwNqHixPbqjywyUumk7kbdbQ="
+    },
+    "0.2": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-ArJmZTh7rc6OgvA6RIndMqcDRJl91QPt6pgEeCuHA6M="
+    },
+    "0.6": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-SpQbF/ZeAVa8zf0+N6uluHrjpmGy0NLd2/hvyiOyNsY="
+    },
+    "0.7": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-FRaTZPCJQPYAFmsJg22hYJJ0+gH1tMdDQoCQgiqEnaA="
+    },
+    "0.7.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-VScRKzY/skQu9SWGx9iZvifH7pv7SRXcvLfybB+XX4Q="
+    },
+    "0.8.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-ZPsRPWV1G3lMM2mT+H139Wvgoy8QnmeUbzEnGeDJmZA="
+    },
+    "0.10.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-R9Mzw5gvV7b2R59LTOzuOc0AI99+3ncFNzijI4mySUg="
+    },
+    "0.11.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-XN441jXK1q+I/LZRNwvzbSsebXHgZ8iYsslZvcPFlAs="
+    },
+    "0.13.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-FRaTZPCJQPYAFmsJg22hYJJ0+gH1tMdDQoCQgiqEnaA="
+    },
+    "0.14.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-c1pxhTyrE5j6dY+M5eKAboQNofIORS+Dccz+7HKEKQI="
+    },
+    "0.19.5": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-Cpi2iASi1QJoED0Qs1dANqg/BNZTsz5S+pw8iYyW03Y="
+    },
+    "0.20.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-xMYS6VOWxUVErx6bXTvad6Gj7WTudxmiI9k9HzSvMDQ="
+    },
+    "0.20.3": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-uOy/ESRKXngAyDTLHEQ81ZxZCfdtqoP9OxsqzyQJdEY="
+    },
+    "0.20.4": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-wtNihaJX9NlTEC/uoaCeA6gNwiGCU3mr2qun8KI2kyY="
+    }
+  },
+  "pgaudit": {
+    "1.6.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-vxUDVq7nWkq7Qugy7HJLOXk4B61MSBIYQkzcbU6wSG8="
+    },
+    "1.7.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-8pShPr4HJaJQPjW1iPJIpj3CutTx8Tgr+rOqoXtgCcw="
+    },
+    "1.7.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-emwoTowT7WKFX0RQDqJXjIblrzqaUIUkzqSqBCHVKQ8="
+    },
+    "17.0": {
+      "postgresql": [
+        "17"
+      ],
+      "hash": "sha256-3ksq09wiudQPuBQI3dhEQi8IkXKLVIsPFgBnwLiicro="
+    },
+    "17.1": {
+      "postgresql": [
+        "17"
+      ],
+      "hash": "sha256-9St/ESPiFq2NiPKqbwHLwkIyATKUkOGxFcUrWgT+Iqo="
+   }
+  },
+  "pg_partman": {
+    "5.3.1": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-LK+z/0puUuNLz2ah/SDaxxyLS/On/cmCBhKNwTLa7Pk="
+    }
+  },
+    "pgmq": {
+      "1.4.4": {
+        "postgresql": [
+          "15"
+        ],
+        "hash": "sha256-z+8/BqIlHwlMnuIzMz6eylmYbSmhtsNt7TJf/CxbdVw="
+      },
+      "1.5.1": {
+        "postgresql": [
+          "15",
+          "17"
+        ],
+        "hash": "sha256-IU+i6ONPwtgsFKdzya6E+222ualR66gkbb0lDr+7Rb8="
+      }
+    },
+  "pgroonga": {
+    "3.0.7": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-iF/zh4zDDpAw5fxW1WG8i2bfPt4VYsnYArwOoE/lwgM="
+    },
+    "3.2.5": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-GM9EOQty72hdE4Ecq8jpDudhZLiH3pP9ODLxs8DXcSY="
+    }
+  },
+  "pgrouting": {
+    "3.4.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-QC77AnPGpPQGEWi6JtJdiNsB2su5+aV2pKg5ImR2B0k="
+    }
+  },
+
+  "pgsodium": {
+    "3.0.4": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-GbUUkSbQe05x7JssSyCdMrP6Uk9ix0JmO+JB1MsFMSg="
+    },
+    "3.1.5": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-Rv7y0gPEDHeZ+KLD+M/pUQI8Ye5GdaV144Xq05z29Sk="
+    },
+    "3.1.6": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-D07r/yF50JNihvG/0X7R+1bXnlK1z0dt+/Xbic6W1Hs="
+    },
+    "3.1.7": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-0QOh21kKtoM1L38pvkVumr4dyMdINaaMLI6z1RE8540="
+    },
+    "3.1.8": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-j5F1PPdwfQRbV8XJ8Mloi8FvZF0MTl4eyIJcBYQy1E4="
+    }
+  },
+  "plpgsql_check": {
+    "2.2": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-8HFyIzJ1iF3K2vTlibFallvkMKjFTJ2DO64fORToD8E=",
+      "revision": "2.2.6"
+    },
+    "2.7": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-vR3MvfmUP2QEAtXFpq0NCCKck3wZPD+H3QleHtyVQJs=",
+      "revision": "2.7.11"
+    },
+    "2.8": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-qeCC/rmd+qhAlpq7y5UhqDkFVGsDbBUAFWPizciPVaI=",
+      "revision": "2.8.11"
+    }
+  },
+  "plv8": {
+    "3.1.4": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-GoPP2nAeDItBt3Lug49s+brD0gIy3iDlJpbyHRuMcZ4="
+    },
+    "3.1.5": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-LodC2eQJSm5fLckrjm2RuejZhmOyQMJTv9b0iPCnzKQ="
+    },
+    "3.1.10": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-g1A/XPC0dX2360Gzvmo9/FSQnM6Wt2K4eR0pH0p9fz4="
+    }
+  },
+  "postgis": {
+    "3.3.2": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-miohnaAFoXMKOdGVmhx87GGbHvsAm2W+gP/CW60pkGg="
+    },
+    "3.3.7": {
+      "postgresql": [
+        "17"
+      ],
+      "hash": "sha256-UHJKDd5JrcJT5Z4CTYsY/va+ToU0GUPG1eHhuXTkP84="
+    }
+  },
+  "rum": {
+    "1.3": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-VsfpxQqRBu9bIAP+TfMRXd+B3hSjuhU2NsutocNiCt8=",
+      "revision": "1.3.14"
+    }
+  },
+  "supabase_vault": {
+    "0.2.8": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-+QBd4/wj1n33ynt7Gopr6g3xT+TLJ9jMhLffdYeRy4k="
+    },
+    "0.3.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-MC87bqgtynnDhmNZAu96jvfCpsGDCPB0g5TZfRQHd30="
+    }
+  },
+  "timescaledb": {
+    "2.9.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-fvVSxDiGZAewyuQ2vZDb0I6tmlDXl6trjZp8+qDBtb8="
+    },
+    "2.16.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-sLxWdBmih9mgiO51zLLxn9uwJVYc5JVHJjSWoADoJ+w="
+    }
+  },
+  "vector": {
+    "0.4.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-bOckX7zvHhgJDDhoAm+VZVIeVIf2hG/3oWZWuTtnZPo="
+    },
+    "0.5.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-ZNzq+dATZn9LUgeOczsaadr5hwdbt9y/+sAOPIdr77U="
+    },
+    "0.6.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-hXm+k0BZ9xZP1Tnek14jPoKCPQkA5ovscu9IX2mW7Kc="
+    },
+    "0.6.2": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-r+TpFJg6WrMn0L2B7RpmSRvw3XxpHzMRtpFWDCzLvgs="
+    },
+    "0.7.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-vFn7sNphOYyig6Jl1HILMaC2t9strFQBQ8ywL8Ibx1M="
+    },
+    "0.7.4": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-qwPaguQUdDHV8q6GDneLq5MuhVroPizpbqt7f08gKJI="
+    },
+    "0.8.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-JsZV+I4eRMypXTjGmjCtMBXDVpqTIPHQa28ogXncE/Q="
+    },    
+    "0.8.2": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-TLPlH+amFdeI2pEsUZuvoQ1JA0sCMiIAWdkgqGBo4mI="
+    }
+  },
+  "wrappers": {
+    "0.3.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-ogpF8NJ7kW3Ut8jaKMDiKYIXnI38nfRq2mMK4rqFAIA=",
+      "pgrx": "0.11.3",
+      "rust": "1.76.0"
+    },
+    "0.4.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-AU9Y43qEMcIBVBThu+Aor1HCtfFIg+CdkzK9IxVdkzM=",
+      "pgrx": "0.11.3",
+      "rust": "1.76.0"
+    },
+    "0.4.2": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-ut3IQED6ANXgabiHoEUdfSrwkuuYYSpRoeWdtBvSe64=",
+      "pgrx": "0.11.3",
+      "rust": "1.76.0"
+    },
+    "0.4.3": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-CkoNMoh40zbQL4V49ZNYgv3JjoNWjODtTpHn+L8DdZA=",
+      "pgrx": "0.12.6",
+      "rust": "1.80.0"
+    },
+    "0.4.4": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-QoGFJpq8PuvMM8SS+VZd7MlNl56uFivRjs1tCtwX+oE=",
+      "pgrx": "0.12.6",
+      "rust": "1.80.0"
+    },
+    "0.4.5": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-IgDfVFROMCHYLZ/Iqj12MsQjPPCdRoH+3oi3Ki/iaRI=",
+      "pgrx": "0.12.9",
+      "rust": "1.81.0"
+    },
+    "0.4.6": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-hthb3qEXT1Kf4yPoq0udEbQzlyLtI5tug6sK4YAPFjU=",
+      "pgrx": "0.12.9",
+      "rust": "1.84.0"
+    },
+    "0.5.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-FbRTUcpEHBa5DI6dutvBeahYM0RZVAXIzIAZWIaxvn0=",
+      "pgrx": "0.12.9",
+      "rust": "1.84.0"
+    },
+    "0.5.3": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-iaJriPEa0iVLpmnuUk9R3HS545Jhz7aH1clYvHEuEvs=",
+      "pgrx": "0.14.3",
+      "rust": "1.87.0"
+    },
+    "0.5.4": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-W1RokXH4Vfj2FIuEzGEP5SzzWsv2Pbzfa816nXKnSoc=",
+      "pgrx": "0.14.3",
+      "rust": "1.87.0"
+    },
+    "0.5.5": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-tWa1XewJbbqarwWkJPfvCIev7Fn0hLJRzYiz0vuebyA=",
+      "pgrx": "0.16.0",
+      "rust": "1.87.0"
+    },
+    "0.5.6": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-WanKlNY65KORzyCSV5hsYCVjQp/s23IUfzHMdpMhn1M=",
+      "pgrx": "0.16.0",
+      "rust": "1.87.0"
+    },
+    "0.5.7": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-B46ie4qlfD1Wxd7QRv1fIuRmmSrb5s5A7KpQVwadazo=",
+      "pgrx": "0.16.1",
+      "rust": "1.88.0"
+    },
+    "0.6.0": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-z4mtEn//qMwPOIpPcUdeHuwmJP5IgVuGCaXJve/f3cg=",
+      "pgrx": "0.16.1",
+      "rust": "1.88.0"
+    },
+    "0.6.1": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-s0nuhL9HkQmEUcepgKtvGEgwVi9oBz6W5DJDTKsfBC4=",
+      "pgrx": "0.16.1",
+      "rust": "1.88.0"
+    },
+    "0.6.2": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-nsblgWURnYkeE4OodhT7lnXM5+2PN4MnLeESnYudm+w=",
+      "pgrx": "0.16.1",
+      "rust": "1.88.0"
+    },
+    "0.6.3": {
+      "postgresql": [
+        "15",
+        "17",
+        "orioledb-17"
+      ],
+      "hash": "sha256-ItV9E9aCvyIDPqbqDdltst++BKWKJl8CxYK4Q+7d0HU=",
+      "pgrx": "0.19.2",
+      "rust": "1.97.1"
+    }
+  },
+  "pg_hashids": {
+    "1.2.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "revision": "v1.2.1",
+      "hash": "sha256-2yQ0JrhwZF9dGEIydOviDpQ+3ZhJ8T16dQt6KIirAJ0="
+    },
+    "1.3.0-cd0e1b31d52b394a0df64079406a14a4f7387cd6": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "revision": "cd0e1b31d52b394a0df64079406a14a4f7387cd6",
+      "hash": "sha256-Nmb7XLqQflYZfqj0yrewfb1Hl5YgEB5wfjBunPwIuOU="
+    }
+  },
+  "pg_plan_filter": {
+    "0.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "rev": "5081a7b5cb890876e67d8e7486b6a64c38c9a492",
+      "hash": "sha256-YNeIfmccT/DtOrwDmpYFCuV2/P6k3Zj23VWBDkOh6sw="
+    }
+  },
+  "pgjwt": {
+    "0.2.0": {
+      "revision": "f3d82fd30151e754e19ce5d6a06c71c20689ce3d",
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-nDZEDf5+sFc1HDcG2eBNQj+kGcdAYRXJseKi9oww+JU="
+    }
+  },
+  "pg_repack": {
+    "1.4.8": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-Et8aMRzG7ez0uy9wG6qsg57/kPPZdUhb+/gFxW86D08="
+    },
+    "1.5.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-do80phyMxwcRIkYyUt9z02z7byNQhK+pbSaCUmzG+4c="
+    },
+    "1.5.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-wJwy4qIt6/kgWqT6HbckUVqDayDkixqHpYiC1liLERw="
+    },
+    "1.5.2": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-wfjiLkx+S3zVrAynisX1GdazueVJ3EOwQEPcgUQt7eA="
+    }
+  },
+  "pg_stat_monitor": {
+    "1.0": {
+      "postgresql": [
+        "15"
+      ],
+      "revision": "1.0.1",
+      "hash": "sha256-sQEpIknAFOmvNTX2G23X4BvMdy3Ms7sXx7hLZt8jyUk="
+    },
+    "2.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "revision": "2.1.0",
+      "hash": "sha256-STJVvvrLVLe1JevNu6u6EftzAWv+X+J8lu66su7Or2s="
+    }
+  },
+  "pgtap": {
+    "1.2.0": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-lb0PRffwo6J5a6Hqw1ggvn0cW7gPZ02OEcLPi9ineI8="
+    },
+    "1.3.1": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-HOgCb1CCfsfbMbMMWuzFJ4B8CfVm9b0sI2zBY3/kqyI="
+    },
+    "1.3.3": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-YgvfLGF7pLVcCKD66NnWAydDxtoYHH1DpLiYTEKHJ0E="
+    }
+  },
+  "pg_tle": {
+    "1.0.1": {
+      "postgresql": [
+        "15"
+      ],
+      "hash": "sha256-yAe37nIgObjs0kZY1A0QBGMP/s45sC1HVRwxVRaXwXs="
+    },
+    "1.0.4": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-W/7pLy/27VatCdzUh1NZ4K2FRMD1erfHiFV2eY2x2W0="
+    },
+    "1.3.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-Q4D4+eYPBONd8IKlDVfQa8wI4PJyKHkMPPqONqEWFLE="
+    },
+    "1.4.0": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-crxj5R9jblIv0h8lpqddAoYe2UqgUlnvbOajKTzVces="
+    }
+  },
+  "safeupdate": {
+    "1.4": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-1cyvVEC9MQGMr7Tg6EUbsVBrMc8ahdFS3+CmDkmAq4Y="
+    }
+  },
+  "wal2json": {
+    "2.6": {
+      "postgresql": [
+        "15",
+        "17"
+      ],
+      "hash": "sha256-+QoACPCKiFfuT2lJfSUmgfzC5MXf75KpSoc2PzPxKyM="
+    }
+  }
+}

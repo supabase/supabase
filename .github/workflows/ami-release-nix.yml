@@ -1,0 +1,273 @@
+name: Release AMI Nix
+
+on:
+  push:
+    branches:
+      - develop
+      - release/*
+    paths:
+      - .github/workflows/ami-release-nix.yml
+      - ansible/vars.yml
+      - flake.lock
+      - flake.nix
+      - nix/packages/build-ami.nix
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  actions: write
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  prepare:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    outputs:
+      postgres_versions: ${{ steps.set-versions.outputs.postgres_versions }}
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: Install nix
+        uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Set PostgreSQL versions
+        id: set-versions
+        run: |
+          VERSIONS=$(nix run nixpkgs#yq-go -- -o=json -I=0 '.postgres_major' ansible/vars.yml)
+          echo "postgres_versions=$VERSIONS" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres_version: ${{ fromJson(needs.prepare.outputs.postgres_versions) }}
+        target:
+          - arch: amd64
+            instance_type: c6i.4xlarge
+            runner: blacksmith-2vcpu-ubuntu-2404
+            ami_name_prefix: supabase-postgres-x86_64
+          - arch: arm64
+            instance_type: c6g.4xlarge
+            runner: blacksmith-2vcpu-ubuntu-2404-arm
+            ami_name_prefix: supabase-postgres-arm64
+    runs-on: ${{ matrix.target.runner }}
+    timeout-minutes: 150
+
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: Debug AWS role secret
+        run: |
+          echo "Checking DEV_AWS_ROLE secret availability..."
+          if [ -z "${{ secrets.DEV_AWS_ROLE }}" ]; then
+            echo "❌ DEV_AWS_ROLE is empty or not available"
+          else
+            echo "✅ DEV_AWS_ROLE is available"
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+          output-credentials: true
+          role-duration-seconds: 7200
+
+      - name: Install nix
+        uses: ./.github/actions/nix-install-ephemeral
+        with:
+          push-to-cache: true
+          aws-region: ${{ env.AWS_REGION }}
+          nix-signing-key: ${{ secrets.NIX_SIGN_SECRET_KEY }}
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+
+      - name: Resolve git sha
+        id: resolve-git-sha
+        uses: ./.github/actions/resolve-git-sha
+        with:
+          flake_input: ${{ vars.GIT_SHA_FROM_FLAKE_INPUT }}
+
+      - name: Build AMI
+        id: build-ami
+        uses: ./.github/actions/build-ami
+        with:
+          ami_name_prefix: ${{ matrix.target.ami_name_prefix }}
+          ami_regions: '["${{ env.AWS_REGION }}"]'
+          arch: ${{ matrix.target.arch }}
+          git_sha: ${{ github.sha }}
+          packages_git_sha: ${{ steps.resolve-git-sha.outputs.sha }}
+          instance_type: ${{ matrix.target.instance_type }}
+          postgres_version: ${{ matrix.postgres_version }}
+          region: ${{ env.AWS_REGION }}
+
+      - name: Setup post build env vars
+        run: |
+          POSTGRES_SUPABASE_VERSION=${{ steps.build-ami.outputs.postgres_release_version }}
+          echo "::notice title=AMI Published::Postgres AMI version: $POSTGRES_SUPABASE_VERSION"
+          {
+            echo "PACKER_EXECUTION_ID=${{ steps.build-ami.outputs.execution_id }}"
+            echo "POSTGRES_MAJOR_VERSION=${{ matrix.postgres_version }}"
+            echo "POSTGRES_SUPABASE_VERSION=$POSTGRES_SUPABASE_VERSION"
+          } >>"$GITHUB_ENV"
+
+          if [ "${{ matrix.target.arch }}" = "amd64" ]; then
+            {
+              echo "ARCH_SUFFIX=-x86"
+              echo "RELEASE_TAG=${POSTGRES_SUPABASE_VERSION}-x86"
+            } >>"$GITHUB_ENV"
+          else
+            {
+              echo "ARCH_SUFFIX="
+              echo "RELEASE_TAG=${POSTGRES_SUPABASE_VERSION}"
+            } >>"$GITHUB_ENV"
+          fi
+
+      - name: Create nix flake revision tarball
+        run: |
+          GIT_SHA=${{ steps.resolve-git-sha.outputs.sha }}
+
+          mkdir -p "/tmp/pg_upgrade_bin/${POSTGRES_MAJOR_VERSION}"
+          echo "$GIT_SHA" >> "/tmp/pg_upgrade_bin/${POSTGRES_MAJOR_VERSION}/nix_flake_version"
+          tar -czf "/tmp/pg_binaries.tar.gz" -C "/tmp/pg_upgrade_bin" .
+
+      - name: configure aws credentials - staging
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload nix flake revision to s3 staging
+        run: |
+          aws s3 cp /tmp/pg_binaries.tar.gz "s3://${{ secrets.ARTIFACTS_BUCKET }}/upgrades$ARCH_SUFFIX/postgres/supabase-postgres-$POSTGRES_SUPABASE_VERSION/20.04.tar.gz"
+          aws s3 cp /tmp/pg_binaries.tar.gz "s3://${{ secrets.ARTIFACTS_BUCKET }}/upgrades$ARCH_SUFFIX/postgres/supabase-postgres-$POSTGRES_SUPABASE_VERSION/24.04.tar.gz"
+          aws s3 cp /tmp/pg_binaries.tar.gz "s3://${{ secrets.ARTIFACTS_BUCKET }}/upgrades$ARCH_SUFFIX/postgres/supabase-postgres-$POSTGRES_SUPABASE_VERSION/upgrade_bundle.tar.gz"
+
+      - name: configure aws credentials - prod
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload nix flake revision to s3 prod
+        run: |
+          aws s3 cp /tmp/pg_binaries.tar.gz "s3://${{ secrets.PROD_ARTIFACTS_BUCKET }}/upgrades$ARCH_SUFFIX/postgres/supabase-postgres-$POSTGRES_SUPABASE_VERSION/20.04.tar.gz"
+          aws s3 cp /tmp/pg_binaries.tar.gz "s3://${{ secrets.PROD_ARTIFACTS_BUCKET }}/upgrades$ARCH_SUFFIX/postgres/supabase-postgres-$POSTGRES_SUPABASE_VERSION/24.04.tar.gz"
+          aws s3 cp /tmp/pg_binaries.tar.gz "s3://${{ secrets.PROD_ARTIFACTS_BUCKET }}/upgrades$ARCH_SUFFIX/postgres/supabase-postgres-$POSTGRES_SUPABASE_VERSION/upgrade_bundle.tar.gz"
+
+      - name: GitHub OIDC Auth
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: arn:aws:iam::279559813984:role/supabase-github-oidc-role
+          role-session-name: shared-services-jump
+
+      - name: Assume destination role
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: arn:aws:iam::279559813984:role/supabase-nix-catalog-artifacts-role-6387512
+          role-skip-session-tagging: true
+          role-session-name: upload-assets
+          role-chaining: true
+
+      - name: Update nix store path catalog
+        run: |
+          GIT_SHA="${{ steps.resolve-git-sha.outputs.sha }}"
+          SYSTEM=$(nix eval --impure --raw --expr 'builtins.currentSystem')
+
+          # Get store path for this build
+          STORE_PATH=$(nix eval --raw ".#psql_${POSTGRES_MAJOR_VERSION}/bin.outPath")
+
+          # Each postgres version gets its own catalog file (no race conditions)
+          CATALOG_S3="s3://${{ secrets.SHARED_AWS_ARTIFACTS_BUCKET }}/nix-catalog/${GIT_SHA}-psql_${POSTGRES_MAJOR_VERSION}-${SYSTEM}.json"
+
+          # Create catalog JSON for this version
+          jq -n \
+             --arg ver "$POSTGRES_SUPABASE_VERSION" \
+             --arg sha "$GIT_SHA" \
+             --arg sys "$SYSTEM" \
+             --arg path "$STORE_PATH" \
+             '{version: $ver, git_sha: $sha, ($sys): $path}' > /tmp/catalog.json
+
+          echo "Catalog for psql_${POSTGRES_MAJOR_VERSION}:"
+          cat /tmp/catalog.json
+
+          # Upload catalog
+          aws s3 cp /tmp/catalog.json "$CATALOG_S3" \
+            --content-type "application/json"
+
+          echo "Catalog uploaded to ${CATALOG_S3}"
+
+      - name: Create release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
+        with:
+          name: ${{ env.RELEASE_TAG }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          target_commitish: ${{ github.sha }}
+
+      - name: Create CLI tag for PG 17 & Trigger Release
+        if: matrix.postgres_version == '17' && matrix.target.arch == 'arm64' && github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CLI_TAG="v${POSTGRES_SUPABASE_VERSION}-cli"
+          echo "Creating CLI tag: ${CLI_TAG}"
+          git tag "${CLI_TAG}" "${{ github.sha }}"
+          git push origin "${CLI_TAG}"
+
+          echo "Triggering Release Workflow: ${CLI_TAG}"
+          gh workflow run cli-release.yml \
+            --ref "${CLI_TAG}" \
+            -f version="${CLI_TAG}"
+
+      - name: Trigger pg_upgrade_scripts workflow
+        if: matrix.target.arch == 'arm64'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run publish-nix-pgupgrade-scripts.yml \
+            --ref "${{ github.ref_name }}" \
+            -f postgresVersion="$POSTGRES_SUPABASE_VERSION"
+
+      - name: Trigger pg_upgrade_bin flake version workflow
+        if: matrix.target.arch == 'arm64'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run publish-nix-pgupgrade-bin-flake-version.yml \
+            --ref "${{ github.ref_name }}" \
+            -f postgresVersion="$POSTGRES_SUPABASE_VERSION"
+
+      - name: Slack Notification on Failure
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_NOTIFICATIONS_WEBHOOK }}
+          SLACK_USERNAME: 'gha-failures-notifier'
+          SLACK_COLOR: 'danger'
+          SLACK_MESSAGE: 'Building Postgres AMI failed'
+          SLACK_FOOTER: ''
+
+      - name: configure aws credentials for cleanup
+        if: ${{ always() }}
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Cleanup resources after build
+        if: ${{ always() }}
+        run: |
+          aws ec2 --region "$AWS_REGION" describe-instances --filters "Name=tag:packerExecutionId,Values=${PACKER_EXECUTION_ID}" --query "Reservations[].Instances[].InstanceId" --output text | xargs -r aws ec2 terminate-instances --region "$AWS_REGION" --instance-ids
+          aws ec2 --region "$AWS_REGION" describe-volumes --filters "Name=tag:packerExecutionId,Values=${PACKER_EXECUTION_ID}" "Name=status,Values=available" --query "Volumes[*].VolumeId" --output text | xargs -r -n1 aws ec2 --region "$AWS_REGION" delete-volume --volume-id
+
+      - name: Cleanup resources on build cancellation
+        if: ${{ cancelled() }}
+        run: |
+          aws ec2 --region "$AWS_REGION" describe-instances --filters "Name=tag:packerExecutionId,Values=${PACKER_EXECUTION_ID}" --query "Reservations[].Instances[].InstanceId" --output text | xargs -r aws ec2 terminate-instances --region "$AWS_REGION" --instance-ids
+          aws ec2 --region "$AWS_REGION" describe-volumes --filters "Name=tag:packerExecutionId,Values=${PACKER_EXECUTION_ID}" "Name=status,Values=available" --query "Volumes[*].VolumeId" --output text | xargs -r -n1 aws ec2 --region "$AWS_REGION" delete-volume --volume-id

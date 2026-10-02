@@ -1,0 +1,143 @@
+# Project info
+site_name: Postgres by Supabase
+site_description: >-
+   Provide some of the most common Postgres extensions with a one-click install.
+
+# Repository
+repo_name: supabase/postgres
+repo_url: https://github.com/supabase/postgres
+
+nav:
+  - Home: README.md
+  - Development:
+    - Getting Started: start-here.md
+    - Nix tree structure: nix-directory-structure.md
+    - Flake-Parts Architecture: flake-parts-architecture.md
+    - Flake-Parts and nixpkgs lib: flake-parts-nixpkgs-lib.md
+    - Workflow: development-workflow.md
+    - Build PostgreSQL: build-postgres.md
+    - Start Client/Server: start-client-server.md
+    - Docker: docker.md
+    - Docker Image Size Analyzer: image-size-analyzer-usage.md
+    - Use direnv: use-direnv.md
+    - Code Formatter: nix-formatter.md
+    - Pre-commit Hooks: pre-commit-hooks.md
+    - Documentation: documentation.md
+    - Create pgrx Extension: creating-pgrx-extension.md
+    - Update pgrx Extensions: updating-pgrx-extensions.md
+    - Receipt Files: receipt-files.md
+  - Package Management:
+    - Adding New Packages: adding-new-package.md
+    - Update Extensions: update-extension.md
+    - Update Nix Dependencies: updating-dependencies.md
+    - New Major PostgreSQL: new-major-postgres.md
+    - Nix Overlays: nix-overlays.md
+  - Testing:
+    - Adding Tests: adding-tests.md
+    - Migration Tests: migration-tests.md
+    - Testing PG Upgrade Scripts: testing-pg-upgrade-scripts.md
+    - Test Docker Images: docker-testing.md
+    - NixOS Tests on macOS: nixos-tests-on-macos.md
+  - CI:
+    - Nix Build Matrix: nix-build-matrix-ci.md
+  - References: references.md
+
+validation:
+    omitted_files: warn
+    absolute_links: warn
+    unrecognized_links: warn
+
+# Configuration
+
+docs_dir: docs
+site_dir: out
+
+theme:
+    name: material
+
+    logo: assets/images/logo.png
+    favicon: assets/images/logo.png
+
+    features:
+        - content.code.annotate
+        - content.code.copy
+        - navigation.footer
+        - navigation.indexes
+        - navigation.path
+        - navigation.sections
+        - navigation.tabs
+        - navigation.tracking
+        - search.highlight
+        - search.share
+        - search.suggest
+
+    font:
+        text: Inter
+        mono: Noto Sans Mono
+    palette:
+        # Palette toggle for automatic mode
+        - media: "(prefers-color-scheme)"
+          toggle:
+              icon: material/brightness-auto
+              name: Switch to light mode
+
+        # Palette toggle for light mode
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          toggle:
+              icon: material/brightness-7
+              name: Switch to dark mode
+
+        # Palette toggle for dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          toggle:
+              icon: material/brightness-4
+              name: Switch to system preference
+
+extra:
+    version:
+        provider: mike
+    social:
+        - icon: fontawesome/brands/github
+          link: https://github.com/supabase/postgres
+
+extra_css:
+    - stylesheets/extra.css
+
+markdown_extensions:
+    - tables
+    - admonition
+    - attr_list
+    - footnotes
+    - md_in_html
+    - def_list
+    - meta
+    - pymdownx.emoji:
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - pymdownx.tasklist:
+          custom_checkbox: true
+    - pymdownx.superfences
+    - pymdownx.tabbed:
+          alternate_style: true
+    - pymdownx.details
+    - pymdownx.highlight:
+          use_pygments: true
+          linenums: true
+          anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets:
+          base_path: ../.
+    - pymdownx.keys
+    - pymdownx.superfences:
+          # make exceptions to highlighting of code:
+        custom_fences:
+          - name: mermaid
+            class: mermaid
+            format: !!python/name:mermaid2.fence_mermaid_custom
+
+plugins:
+    - mike
+    - search
+    - mermaid2

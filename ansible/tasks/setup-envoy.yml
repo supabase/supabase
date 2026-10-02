@@ -1,0 +1,75 @@
+- name: Envoy - group
+  ansible.builtin.group:
+    name: envoy
+    gid: 1008
+    state: present
+
+- name: Envoy - user
+  ansible.builtin.user:
+    name: envoy
+    uid: "{{ 1003 if not qemu else 1004 }}"
+    group: envoy
+    state: present
+
+- name: Envoy - download binary
+  ansible.builtin.get_url:
+    url: "{{ envoy_artifacts[platform]['url'] }}"
+    checksum: "{{ envoy_artifacts[platform]['checksum'] }}"
+    dest: '/opt/envoy'
+    group: 'envoy'
+    mode: '0700'
+    owner: 'envoy'
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: Envoy - download hot restarter script
+  ansible.builtin.get_url:
+    url: "{{ envoy_artifacts['hot_restarter']['url'] }}"
+    checksum: "{{ envoy_artifacts['hot_restarter']['checksum'] }}"
+    dest: '/opt/envoy-hot-restarter.py'
+    group: 'envoy'
+    mode: '0700'
+    owner: 'envoy'
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: Envoy - bump up ulimit
+  community.general.pam_limits:
+    domain: 'envoy'
+    limit_item: 'nofile'
+    limit_type: 'soft'
+    value: '4096'
+
+- name: Envoy - create script to start envoy
+  ansible.builtin.copy:
+    dest: '/opt/start-envoy.sh'
+    group: 'envoy'
+    mode: '0700'
+    owner: 'envoy'
+    src: 'files/start-envoy.sh'
+
+- name: Envoy - create configuration files
+  ansible.builtin.copy:
+    dest: '/etc/envoy/'
+    directory_mode: '0775'
+    group: 'envoy'
+    mode: '0664'
+    owner: 'envoy'
+    src: 'files/envoy_config/'
+
+- name: Envoy - create service file
+  ansible.builtin.copy:
+    dest: '/etc/systemd/system/envoy.service'
+    mode: '0644'
+    src: 'files/envoy.service'
+
+- name: Envoy - disable service
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    enabled: false
+    name: 'envoy'
+    state: 'stopped'

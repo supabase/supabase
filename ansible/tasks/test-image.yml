@@ -1,0 +1,86 @@
+- name: Execute tasks when stage2
+  when: stage2
+  block:
+    - name: Make a backup of the /etc/postgresql/postgresql.conf file
+      ansible.builtin.copy:
+        dest: '/etc/postgresql/postgresql.conf.bak'
+        src: '/etc/postgresql/postgresql.conf'
+      become: true
+
+    - name: Temporarily disable PG Sodium and Supabase Vault references in /etc/postgresql/postgresql.conf
+      ansible.builtin.replace:
+        path: '/etc/postgresql/postgresql.conf'
+        regexp: "{{ regx['in'] }}"
+        replace: "{{ regx['out'] }}"
+      become: true
+      become_user: 'postgres'
+      loop:
+        - { in: "^(shared_preload_libraries = '.*)pgsodium(.*')", out: '\1\2' }
+        - { in: "^(shared_preload_libraries = '.*)supabase_vault(.*')", out: '\1\2' }
+        - { in: "^(shared_preload_libraries = '.*)*supabase_vault(.*')", out: '\1\2' }
+        - { in: '^(pgsodium\.getkey_script=)', out: '#\1' }
+      loop_control:
+        loop_var: 'regx'
+
+    - name: Make sure we disabled all the things
+      ansible.builtin.lineinfile:
+        path: '/etc/postgresql/postgresql.conf'
+        regexp: "{{ regx }}"
+        state: 'absent'
+      check_mode: true
+      failed_when:
+        - (pgconf is changed) or (pgconf is failed)
+      loop:
+        - "^shared_preload_libraries = '.*pgsodium.*'"
+        - "^shared_preload_libraries = '.*supabase_vault.*'"
+        - '^pgsodium\.getkey_script='
+      loop_control:
+        loop_var: 'regx'
+      register: 'pgconf'
+
+    - name: Restart Postgres Database in stage 2 to load all extensions
+      ansible.builtin.command:
+        cmd: "/usr/lib/postgresql/bin/pg_ctl --pgdata /var/lib/postgresql/data --mode fast --options '-c config_file=/etc/postgresql/postgresql.conf' {{ ctlcmd }}"
+      become: true
+      become_user: 'postgres'
+      environment:
+        LANG: 'en_US.UTF-8'
+        LANGUAGE: 'en_US.UTF-8'
+        LC_ALL: 'en_US.UTF-8'
+        LC_CTYPE: 'en_US.UTF-8'
+        LOCALE_ARCHIVE: '/usr/lib/locale/locale-archive'
+      loop:
+        - stop
+        - start
+      loop_control:
+        loop_var: 'ctlcmd'
+
+    - name: Re-enable PG Sodium references in /etc/postgresql/postgresql.conf
+      ansible.builtin.command:
+        cmd: mv /etc/postgresql/postgresql.conf.bak /etc/postgresql/postgresql.conf
+      become: true
+      become_user: 'postgres'
+
+    - name: Install psycopg2
+      ansible.builtin.apt:
+        name: 'python3-psycopg2'
+        state: 'present'
+      become: true
+
+    - name: Reset db stats
+      community.postgresql.postgresql_query:
+        login_db: 'postgres'
+        login_host: 'localhost'
+        login_user: 'supabase_admin'
+        query: "{{ stat_item }}"
+      loop:
+        # - 'SELECT pg_stat_statements_reset()'
+        - 'SELECT pg_stat_reset()'
+      loop_control:
+        loop_var: 'stat_item'
+
+    - name: Restart Postgres Database in stage 2 to load all extensions
+      ansible.builtin.command:
+        cmd: /usr/lib/postgresql/bin/pg_ctl --pgdata /var/lib/postgresql/data --mode fast --options '-c config_file=/etc/postgresql/postgresql.conf' stop
+      become: true
+      become_user: 'postgres'

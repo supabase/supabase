@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# configuration reference: https://docs.coderabbit.ai/reference/configuration
+reviews:
+  auto_review:
+    enabled: false
+    drafts: false
+    base_branches:
+      - develop
+  changed_files_summary: false
+  high_level_summary: true
+  poem: false
+  review_details: false
+  review_status: false
+  sequence_diagrams: false
+  labeling_instructions:
+    - label: "ci"
+      instructions: "Apply when PR changes CI/CD workflows in .github/workflows/, GitHub Actions, or CI configuration files."
+    - label: "extensions"
+      instructions: "Apply when PR modifies PostgreSQL extension packaging in nix/ext/, nix/cargo-pgrx/, or updates extension versions."
+    - label: "infrastructure"
+      instructions: "Apply when PR changes Ansible playbooks, tasks, or system configuration templates in ansible/."
+    - label: "nix"
+      instructions: "Apply when PR modifies Nix packaging: flake.nix, flake.lock, nix/*.nix, overlays, or postgresql derivations."
+    - label: "docker"
+      instructions: "Apply when PR changes Dockerfiles (Dockerfile-*), or container build configuration."
+    - label: "ami"
+      instructions: "Apply when PR modifies Packer templates (*.pkr.hcl), AMI builds, QEMU image configuration, or ebssurrogate/."
+    - label: "security"
+      instructions: "Apply when PR touches security hardening: fail2ban rules, PAM configuration, supautils, authentication, or access control."
+    - label: "tests"
+      instructions: "Apply when PR modifies test suites in testinfra/, tests/, nix/tests/, audit-specs/, or test-docker-image.sh."
+    - label: "docs"
+      instructions: "Apply when PR changes documentation in docs/, nix/docs/, rfcs/, or significant README/markdown updates."
+    - label: "migrations"
+      instructions: "Apply when PR adds or modifies database migration scripts in migrations/."
+  tools:
+    github-checks:
+      enabled: false
+chat:
+  art: false
+  auto_reply: false
+
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - CONTRIBUTING.md

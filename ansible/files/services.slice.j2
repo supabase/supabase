@@ -1,0 +1,6 @@
+# Used for general services grouping for easy visibility when running
+#    systemctl status
+# See http://archive.vn/94IGa for an in depth article on systemd slices
+[Unit]
+Description=Slice used for PostgreSQL
+Before=slices.target

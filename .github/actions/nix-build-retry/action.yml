@@ -1,0 +1,74 @@
+name: 'Nix build with retry'
+description: |
+  Runs `nix build --accept-flake-config -L` and retries on transient network
+  errors (codeload.github.com 5xx, DNS, TLS, connection resets). Genuine build
+  failures exit immediately without retrying.
+inputs:
+  attr:
+    description: 'The flake attribute to build, including the leading `.#`, e.g. `.#psql_17_cli_portable`'
+    required: true
+  extra-args:
+    description: 'Additional arguments inserted between `-L` and the attribute, e.g. `--system aarch64-linux`'
+    required: false
+    default: ''
+  attempts:
+    description: 'Maximum number of attempts'
+    required: false
+    default: '3'
+  initial-delay-seconds:
+    description: 'Backoff before the second attempt; doubled before each subsequent attempt'
+    required: false
+    default: '30'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: nix build (with retry)
+      shell: bash
+      env:
+        ATTR: ${{ inputs.attr }}
+        EXTRA_ARGS: ${{ inputs.extra-args }}
+        ATTEMPTS: ${{ inputs.attempts }}
+        INITIAL_DELAY: ${{ inputs.initial-delay-seconds }}
+      run: |
+        set -uo pipefail
+
+        log_file=$(mktemp)
+        trap 'rm -f "$log_file"' EXIT
+
+        # Patterns that indicate a transient network/upstream failure rather
+        # than a real build error. Keep conservative — false positives waste
+        # CI minutes by re-running deterministic build failures.
+        transient_re='HTTP error 5[0-9][0-9]|error: unable to download|Failed to open archive|Connection (reset|refused|timed out)|Couldn'\''t resolve host|Could not resolve host|unexpected end[- ]of[- ]file|SSL connection|TLS connection|Resource temporarily unavailable|Temporary failure in name resolution'
+
+        delay="$INITIAL_DELAY"
+        rc=0
+        for attempt in $(seq 1 "$ATTEMPTS"); do
+          echo "::group::nix build attempt ${attempt}/${ATTEMPTS}: ${ATTR} ${EXTRA_ARGS}"
+          # Stream to console AND capture for post-hoc pattern matching.
+          # PIPESTATUS preserves nix's exit code through the tee.
+          nix build --accept-flake-config -L ${EXTRA_ARGS} "${ATTR}" 2>&1 | tee "$log_file"
+          rc=${PIPESTATUS[0]}
+          echo "::endgroup::"
+
+          if [ "$rc" -eq 0 ]; then
+            exit 0
+          fi
+
+          if [ "$attempt" -ge "$ATTEMPTS" ]; then
+            echo "::error::nix build failed after ${attempt} attempt(s) (exit ${rc})"
+            exit "$rc"
+          fi
+
+          if grep -qE "$transient_re" "$log_file"; then
+            echo "::warning::Transient error on attempt ${attempt}; sleeping ${delay}s then retrying"
+            sleep "$delay"
+            delay=$((delay * 2))
+          else
+            echo "::error::nix build failed with non-transient error on attempt ${attempt} (exit ${rc}); not retrying"
+            exit "$rc"
+          fi
+        done
+
+        # Defensive — loop should always exit via one of the branches above.
+        exit "$rc"

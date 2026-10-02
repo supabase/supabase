@@ -1,0 +1,242 @@
+- name: Create ubuntu user
+  when: not stage2 and not qemu
+  block:
+    - name: Create ubuntu primary group
+      ansible.builtin.group:
+        name: ubuntu
+        gid: "{{ 1014 if not qemu else 1000 }}"
+        state: present
+
+    - name: Create ubuntu user supplementary groups # noqa: explicit-identity-id
+      ansible.builtin.group:
+        name: "{{ item.name }}"
+        gid: "{{ item.gid }}"
+        state: present
+      loop:
+        - { name: lxd, gid: 1012 }
+        - { name: netdev, gid: 1013 }
+
+    - name: Create ubuntu user
+      ansible.builtin.user:
+        name: ubuntu
+        uid: "{{ 1007 if not qemu else 1000 }}"
+        group: ubuntu
+        groups:
+          - adm
+          - audio
+          - cdrom
+          - dialout
+          - dip
+          - floppy
+          - lxd
+          - netdev
+          - plugdev
+          - sudo
+          - video
+        comment: Ubuntu
+        create_home: true
+        password_lock: true
+        shell: /bin/bash
+        state: present
+
+- name: Execute stage1 tasks
+  when: not stage2
+  block:
+    - name: Install required security updates Ansible dependencies, security tools, and other useful things
+      ansible.builtin.apt:
+        pkg:
+          - acl
+          - bwm-ng
+          - fail2ban
+          - htop
+          - linux-libc-dev
+          - ncdu
+          - net-tools
+          - nftables
+          - ngrep
+          - sysstat
+          - tzdata
+          - vim
+    # SEE https://github.com/georchestra/ansible/issues/55#issuecomment-588313638
+    # Without this, a similar error is faced
+
+    - name: Use nftables backend
+      community.general.alternatives:
+        name: "{{ alternatives['name'] }}"
+        path: "{{ alternatives['path'] }}"
+      loop:
+        - { name: 'iptables', path: '/usr/sbin/iptables-nft' }
+        - { name: 'ip6tables', path: '/usr/sbin/ip6tables-nft' }
+        - { name: 'arptables', path: '/usr/sbin/arptables-nft' }
+        - { name: 'ebtables', path: '/usr/sbin/ebtables-nft' }
+      loop_control:
+        loop_var: 'alternatives'
+
+    - name: restart ufw
+      ansible.builtin.systemd_service:
+        name: 'ufw'
+        state: 'restarted'
+
+    - name: Create Sysstat log directory
+      ansible.builtin.file:
+        path: '/var/log/sysstat'
+        state: 'directory'
+
+    - name: Configure sysstat
+      ansible.builtin.copy:
+        dest: "/etc/{{ sysstat_item }}/sysstat"
+        src: "files/{{ sysstat_item }}.sysstat"
+      loop:
+        - default
+        - sysstat
+      loop_control:
+        loop_var: 'sysstat_item'
+
+    - name: Adjust APT update intervals
+      ansible.builtin.copy:
+        dest: '/etc/apt/apt.conf.d/10periodic'
+        src: 'files/apt_periodic'
+
+    - name: Set local ssh policy
+      ansible.builtin.copy:
+        content: |
+          Match Address 127.0.0.1,::1
+            ForceCommand /bin/false
+            DisableForwarding yes
+            PermitTunnel no
+        dest: /etc/ssh/sshd_config.d/local.conf
+        mode: '0644'
+        owner: 'root'
+        group: 'root'
+
+    - name: Disable kexec handover # Saves ~128 MiB of RAM on a nano.
+      ansible.builtin.copy:
+        content:
+          GRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT} kho=off"
+        dest: /etc/default/grub.d/51-disable-kho.cfg
+        owner: root
+        group: root
+      notify:
+        - Regenerate grub configuration
+
+- name: Disable algif_aead module autoload for Copy Fail mitigation
+  ansible.builtin.copy:
+    content: |
+      install algif_aead /bin/false
+    dest: /etc/modprobe.d/supabase-disable-algif_aead.conf
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Unload algif_aead module if currently loaded
+  ansible.builtin.command:
+    cmd: rmmod algif_aead
+  changed_when: false
+  failed_when: false
+
+- name: Ensure guest VM time synchronisation
+  ansible.builtin.import_tasks:
+    file: tasks/setup-kvm-timesync.yml
+  when:
+    - qemu
+
+- name: Execute more tasks when stage1
+  when: not stage2
+  block:
+    - name: Custom systemd overrides for resolved
+      ansible.builtin.copy:
+        dest: '/etc/systemd/system/systemd-resolved.service.d/'
+        directory_mode: '0700'
+        group: 'root'
+        mode: '0644'
+        owner: 'root'
+        src: 'files/systemd-resolved.conf'
+
+    - name: System - Create services.slice
+      ansible.builtin.template:
+        dest: '/etc/systemd/system/services.slice'
+        src: 'files/services.slice.j2'
+
+    - name: System - systemd reload
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+
+    - name: Configure journald and logind
+      ansible.builtin.copy:
+        dest: "/etc/systemd/{{ config_item }}.conf"
+        src: "files/{{ config_item }}.conf"
+      loop:
+        - journald
+        - logind
+      loop_control:
+        loop_var: 'config_item'
+
+    - name: reload systemd-journald
+      ansible.builtin.systemd_service:
+       name: "systemd-{{ config_item }}"
+       state: 'restarted'
+      loop:
+        - journald
+        - logind
+      loop_control:
+        loop_var: 'config_item'
+
+    - name: enable timestamps for shell history
+      ansible.builtin.copy:
+        content: |
+          export HISTTIMEFORMAT='%d/%m/%y %T '
+        dest: /etc/profile.d/09-history-timestamps.sh
+        mode: '0644'
+        owner: 'root'
+        group: 'root'
+
+    - name: configure systemd's pager
+      ansible.builtin.copy:
+        content: |
+          export SYSTEMD_LESS=FRXMK
+        dest: /etc/profile.d/10-systemd-pager.sh
+        mode: '0644'
+        owner: 'root'
+        group: 'root'
+
+- name: set hosts file
+  when: stage2
+  ansible.builtin.copy:
+    content: |
+      127.0.0.1   localhost
+      ::1         localhost
+    dest: '/etc/hosts'
+    mode: '0644'
+    owner: 'root'
+    group: 'root'
+
+- name: configure NTP client
+  when: stage2
+  block:
+    - name: ensure conf directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/timesyncd.conf.d
+        state: directory
+        mode: '0755'
+
+    - name: configure NTP server
+      ansible.builtin.copy:
+        content: |
+          [Time]
+          NTP=169.254.169.123 fd00:ec2::123
+        dest: /etc/systemd/timesyncd.conf.d/10-aws-time-sync.conf
+        mode: '0644'
+        owner: root
+        group: root
+
+- name: Configure Apt
+  ansible.builtin.copy:
+    content: |
+      Acquire::Retries "3";
+      Acquire::http::Timeout "20";
+      Acquire::https::Timeout "20";
+      DPkg::Lock::Timeout "300";
+    dest: /etc/apt/apt.conf.d/99supabase
+    owner: root
+    group: root
+    mode: "0644"

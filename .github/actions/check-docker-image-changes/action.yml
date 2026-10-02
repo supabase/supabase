@@ -1,0 +1,80 @@
+name: Check Docker Image Changes
+description: Determines if Docker image inputs have changed between current and base branch
+
+inputs:
+  base_ref:
+    description: 'Base branch ref for comparison (typically github.base_ref)'
+    required: false
+    default: ''
+  event_name:
+    description: 'GitHub event name (typically github.event_name)'
+    required: true
+
+outputs:
+  should_run:
+    description: 'Whether tests should run based on input changes'
+    value: ${{ steps.check.outputs.should_run }}
+  input_hash:
+    description: 'Current Docker image inputs hash'
+    value: ${{ steps.check.outputs.input_hash }}
+  base_hash:
+    description: 'Base branch Docker image inputs hash (empty if not a PR)'
+    value: ${{ steps.check.outputs.base_hash }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get current Docker image inputs hash
+      id: current
+      shell: bash
+      run: |
+        HASH=$(nix run --accept-flake-config .#docker-image-inputs -- hash)
+        echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+        echo "Current Docker image inputs hash: $HASH"
+
+    - name: Get base branch Docker image inputs hash
+      id: base
+      if: inputs.event_name == 'pull_request'
+      shell: bash
+      run: |
+        # Fetch base branch
+        git fetch origin ${{ inputs.base_ref }} --depth=1
+
+        # Checkout base branch files temporarily
+        git checkout FETCH_HEAD -- . 2>/dev/null || true
+
+        # Get hash from base branch
+        BASE_HASH=$(nix run --accept-flake-config .#docker-image-inputs -- hash 2>/dev/null || echo "")
+
+        # Restore current branch
+        git checkout HEAD -- .
+
+        echo "hash=$BASE_HASH" >> "$GITHUB_OUTPUT"
+        echo "Base branch Docker image inputs hash: $BASE_HASH"
+
+    - name: Determine if tests should run
+      id: check
+      shell: bash
+      run: |
+        CURRENT_HASH="${{ steps.current.outputs.hash }}"
+        BASE_HASH="${{ steps.base.outputs.hash }}"
+
+        echo "input_hash=$CURRENT_HASH" >> "$GITHUB_OUTPUT"
+        echo "base_hash=$BASE_HASH" >> "$GITHUB_OUTPUT"
+
+        if [[ "${{ inputs.event_name }}" == "workflow_dispatch" ]]; then
+          echo "Workflow dispatch - running tests"
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+        elif [[ "${{ inputs.event_name }}" == "push" ]]; then
+          echo "Push to protected branch - running tests"
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+        elif [[ -z "$BASE_HASH" ]]; then
+          echo "Could not get base hash - running tests to be safe"
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+        elif [[ "$CURRENT_HASH" != "$BASE_HASH" ]]; then
+          echo "Docker image inputs changed ($BASE_HASH -> $CURRENT_HASH) - running tests"
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "Docker image inputs unchanged - skipping tests"
+          echo "should_run=false" >> "$GITHUB_OUTPUT"
+        fi

@@ -1,0 +1,64 @@
+-- Test pg_repack extension
+-- pg_repack reorganizes tables to reclaim space and improve performance
+-- NOTE: This test only verifies the SQL extension components.
+-- Actual repack operations are tested in the NixOS integration test.
+create schema v;
+-- 1. Extension loads successfully
+create extension if not exists pg_repack;
+NOTICE:  extension "pg_repack" already exists, skipping
+-- 2. Version function works
+select repack.version();
+     version     
+-----------------
+ pg_repack 1.5.2
+(1 row)
+
+-- 3. Check that the repack schema exists
+select count(*) as repack_schema_exists
+from pg_namespace
+where nspname = 'repack';
+ repack_schema_exists 
+----------------------
+                    1
+(1 row)
+
+-- 4. List all functions in the repack schema
+select p.proname as function_name,
+       pg_get_function_identity_arguments(p.oid) as arguments,
+       pg_get_function_result(p.oid) as return_type
+from pg_proc p
+join pg_namespace n on p.pronamespace = n.oid
+where n.nspname = 'repack'
+order by p.proname;
+       function_name       |                                                  arguments                                                   | return_type 
+---------------------------+--------------------------------------------------------------------------------------------------------------+-------------
+ conflicted_triggers       | oid                                                                                                          | SETOF name
+ create_index_type         | oid, oid                                                                                                     | void
+ create_log_table          | oid                                                                                                          | void
+ create_table              | oid, name                                                                                                    | void
+ disable_autovacuum        | regclass                                                                                                     | void
+ get_alter_col_storage     | oid                                                                                                          | text
+ get_assign                | oid, text                                                                                                    | text
+ get_columns_for_create_as | oid                                                                                                          | text
+ get_compare_pkey          | oid, text                                                                                                    | text
+ get_create_index_type     | oid, name                                                                                                    | text
+ get_create_trigger        | relid oid, pkid oid                                                                                          | text
+ get_drop_columns          | oid, text                                                                                                    | text
+ get_enable_trigger        | relid oid                                                                                                    | text
+ get_index_columns         | oid                                                                                                          | text
+ get_order_by              | oid, oid                                                                                                     | text
+ get_storage_param         | oid                                                                                                          | text
+ get_table_and_inheritors  | regclass                                                                                                     | regclass[]
+ oid2text                  | oid                                                                                                          | text
+ repack_apply              | sql_peek cstring, sql_insert cstring, sql_delete cstring, sql_update cstring, sql_pop cstring, count integer | integer
+ repack_drop               | oid, integer                                                                                                 | void
+ repack_index_swap         | oid                                                                                                          | void
+ repack_indexdef           | oid, oid, name, boolean                                                                                      | text
+ repack_swap               | oid                                                                                                          | void
+ repack_trigger            |                                                                                                              | trigger
+ version                   |                                                                                                              | text
+ version_sql               |                                                                                                              | text
+(26 rows)
+
+-- cleanup
+drop schema v cascade;

@@ -1,0 +1,335 @@
+- name: execute stage1 tasks
+  when: not stage2
+  block:
+    # the old method of installing from debian creates this group, but we must create it explicitly
+    # for the nix built version
+    - name: create ssl-cert group # noqa: explicit-identity-id
+      ansible.builtin.group:
+        name: ssl-cert
+        gid: 1001
+        state: present
+
+    - name: create postgres group
+      ansible.builtin.group:
+        name: postgres
+        gid: 1002
+        state: present
+
+    - name: create postgres user
+      ansible.builtin.user:
+        name: 'postgres'
+        uid: 999
+        comment: 'PostgreSQL administrator'
+        create_home: false
+        group: 'postgres'
+        groups: 'ssl-cert'
+        home: '/var/lib/postgresql'
+        shell: '/bin/bash'
+        state: 'present'
+        system: true
+
+    - name: Create relevant directories
+      ansible.builtin.file:
+        group: 'postgres'
+        mode: '0750'
+        owner: 'postgres'
+        path: "{{ pg_dir_item }}"
+        recurse: true
+        state: 'directory'
+      loop:
+        - '/data/pgdata'
+        - '/home/postgres'
+        - '/var/lib/postgresql/data'
+        - '/var/log/postgresql'
+        - '/etc/postgresql-custom/conf.d'
+      loop_control:
+        loop_var: 'pg_dir_item'
+
+    - name: Set /var/lib/postgresql to 0755 for nix-profile symlink traversal
+      ansible.builtin.file:
+        group: 'postgres'
+        mode: '0755'
+        owner: 'postgres'
+        path: '/var/lib/postgresql'
+        state: 'directory'
+
+    - name: Allow adminapi to write custom config
+      ansible.builtin.file:
+        group: 'postgres'
+        mode: '0775'
+        owner: 'postgres'
+        path: "{{ pg_config_dir_item }}"
+        recurse: true
+        state: 'directory'
+      loop:
+        - '/etc/postgresql'
+        - '/etc/postgresql-custom'
+        - '/etc/postgresql-custom/conf.d'
+      loop_control:
+        loop_var: 'pg_config_dir_item'
+
+    - name: create placeholder config files
+      ansible.builtin.file:
+        group: 'postgres'
+        mode: '0664'
+        owner: 'postgres'
+        path: "/etc/postgresql-custom/{{ pg_config_item }}"
+        state: 'touch'
+      loop:
+        - 'custom-overrides.conf'
+        - 'generated-optimizations.conf'
+      loop_control:
+        loop_var: 'pg_config_item'
+
+    - name: import postgresql.conf, pg_hba.conf, and pg_ident.conf
+      ansible.builtin.template:
+        dest: '/etc/postgresql/{{ pg_config_item }}'
+        group: 'postgres'
+        src: 'files/postgresql_config/{{ pg_config_item }}.j2'
+      loop:
+        - 'postgresql.conf'
+        - 'pg_hba.conf'
+        - 'pg_ident.conf'
+      loop_control:
+        loop_var: 'pg_config_item'
+
+    - name: Set data_directory to canonical path on data volume
+      ansible.builtin.lineinfile:
+        path: '/etc/postgresql/postgresql.conf'
+        regexp: "^data_directory = '/var/lib/postgresql/data'"
+        line: "data_directory = '/data/pgdata'"
+
+    - name: Move read-replica.conf file to /etc/postgresql-custom/read-replica.conf
+      ansible.builtin.copy:
+        dest: '/etc/postgresql-custom/read-replica.conf'
+        mode: '0664'
+        owner: 'postgres'
+        group: 'postgres'
+        src: 'files/postgresql_config/custom_read_replica.conf'
+
+    - name: configure pam
+      block:
+        - name: Check if psql_version is psql_15
+          ansible.builtin.set_fact:
+            is_psql_15: "{{ psql_version in ['psql_15'] }}"
+
+        - name: create placeholder pam config
+          when: not is_psql_15
+          file:
+            path: '/etc/pam.d/postgresql'
+            state: touch
+            owner: postgres
+            group: postgres
+            mode: 0664
+
+    - name: Create directory on data volume
+      ansible.builtin.file:
+        group: 'postgres'
+        mode: '0750'
+        owner: 'postgres'
+        path: '/data/pgdata'
+        recurse: true
+        state: 'directory'
+
+    - name: Link database data_dir to data volume directory
+      ansible.builtin.file:
+        force: true
+        path: '/var/lib/postgresql/data'
+        src: '/data/pgdata'
+        state: 'link'
+
+    - name: Make sure .bashrc exists
+      ansible.builtin.file:
+        group: 'postgres'
+        owner: 'postgres'
+        path: '/var/lib/postgresql/.bashrc'
+        state: 'touch'
+
+- name: execute stage2 tasks
+  when: stage2
+  block:
+    - name: install locales
+      ansible.builtin.apt:
+        name: 'locales'
+        state: 'present'
+
+    - name: configure locales
+      ansible.builtin.lineinfile:
+        create: true
+        line: "{{ locale_item }}.UTF-8 UTF-8"
+        path: '/etc/locale.gen'
+        state: 'present'
+      loop:
+        - 'C'
+        - 'en_US'
+      loop_control:
+        loop_var: 'locale_item'
+
+    - name: locale-gen
+      ansible.builtin.command:
+        cmd: 'locale-gen'
+
+    - name: update-locale
+      ansible.builtin.command:
+        cmd: 'update-locale'
+
+    - name: Install Postgres extensions
+      ansible.builtin.import_tasks:
+        file: 'tasks/setup-supautils.yml'
+
+    - name: stage2 postgres tasks
+      ansible.builtin.import_tasks:
+        file: 'tasks/stage2-setup-postgres.yml'
+
+    - name: Ensure /data configured for production runtime
+      when: stage2 and not qemu
+      ansible.posix.mount:
+        src: "UUID={{ ansible_mounts | selectattr('mount', 'equalto', '/data') | map(attribute='uuid') | first }}"
+        path: /data
+        fstype: ext4
+        opts: defaults,discard,nofail,x-systemd.device-timeout=5s
+        dump: "0"
+        passno: "2"
+        state: mounted
+
+    - name: Initialize the database stage2 (NOT PG17 NOR PG17-OrioleDB)
+      when: psql_version not in ['psql_17', 'psql_orioledb-17']
+      become: true
+      become_user: 'postgres'
+      ansible.builtin.command:
+        cmd: /usr/lib/postgresql/bin/pg_ctl -D /var/lib/postgresql/data initdb -o "--allow-group-access" -o "--username=supabase_admin" -o "--data-checksums"
+      environment:
+        LANG: en_US.UTF-8
+        LANGUAGE: en_US.UTF-8
+        LC_ALL: en_US.UTF-8
+        LC_CTYPE: en_US.UTF-8
+        LOCALE_ARCHIVE: /usr/lib/locale/locale-archive
+      vars:
+        ansible_command_timeout: 60
+
+    - name: Initialize the database stage2 (PG17 OR PG17-OrioleDB)
+      when: psql_version in ['psql_17', 'psql_orioledb-17']
+      become: true
+      become_user: 'postgres'
+      ansible.builtin.command:
+        cmd: /usr/lib/postgresql/bin/pg_ctl -D /var/lib/postgresql/data initdb -o "--allow-group-access" -o "--username=supabase_admin" -o "--locale-provider=icu" -o "--encoding=UTF-8" -o "--icu-locale=en_US.UTF-8" -o "--data-checksums"
+      environment:
+        LANG: en_US.UTF-8
+        LANGUAGE: en_US.UTF-8
+        LC_ALL: en_US.UTF-8
+        LC_CTYPE: en_US.UTF-8
+        LOCALE_ARCHIVE: /usr/lib/locale/locale-archive
+      vars:
+        ansible_command_timeout: 60
+
+- name: copy PG apparmor profile
+  ansible.builtin.copy:
+    dest: '/etc/apparmor.d/sbpostgres'
+    group: 'root'
+    mode: '0644'
+    owner: 'root'
+    src: 'files/postgresql_config/sbpostgres_apparmor'
+
+- name: ensure apparmor-utils are installed
+  ansible.builtin.apt:
+    name: apparmor-utils
+
+- name: parse apparmor sbpostgres profile
+  ansible.builtin.command:
+    cmd: '/usr/sbin/apparmor_parser -r /etc/apparmor.d/sbpostgres'
+
+- name: reload apparmor with sbpostgres profile
+  ansible.builtin.command:
+    cmd: '/usr/sbin/aa-enforce sbpostgres'
+
+- name: copy PG and optimizations systemd units
+  when: stage2
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/{{ systemd_svc_item | basename }}"
+    src: "files/{{ systemd_svc_item }}"
+  loop:
+    - 'database-optimizations.service'
+    - 'postgresql_config/postgresql.service'
+  loop_control:
+    loop_var: 'systemd_svc_item'
+
+- name: initialize pg required state
+  ansible.builtin.file:
+    group: 'postgres'
+    owner: 'postgres'
+    path: '/run/postgresql'
+    state: 'directory'
+  when:
+    - stage2
+    - qemu
+
+- name: Restart Postgres Database without Systemd
+  when: stage2
+  become: true
+  become_user: 'postgres'
+  ansible.builtin.command:
+    cmd: '/usr/lib/postgresql/bin/pg_ctl -D /var/lib/postgresql/data start'
+  environment:
+    LANG: en_US.UTF-8
+    LANGUAGE: en_US.UTF-8
+    LC_ALL: en_US.UTF-8
+    LC_CTYPE: en_US.UTF-8
+    LOCALE_ARCHIVE: /usr/lib/locale/locale-archive
+
+# Reload
+- name: Create a Systemd override dir for PostgreSQL
+  ansible.builtin.file:
+    group: 'root'
+    mode: '0755'
+    owner: 'root'
+    path: '/etc/systemd/system/postgresql.service.d'
+    state: 'directory'
+
+- name: Ensure PostgreSQL starts after tuned
+  community.general.ini_file:
+    create: true
+    group: 'root'
+    mode: '0644'
+    no_extra_spaces: true
+    option: 'After'
+    owner: 'root'
+    path: '/etc/systemd/system/postgresql.service.d/overrides.conf'
+    section: 'Unit'
+    state: 'present'
+    value: 'tuned.service'
+
+- name: Ensure PostgreSQL wants tuned
+  community.general.ini_file:
+    create: true
+    group: 'root'
+    mode: '0644'
+    no_extra_spaces: true
+    option: 'Wants'
+    owner: 'root'
+    path: '/etc/systemd/system/postgresql.service.d/overrides.conf'
+    section: 'Unit'
+    state: 'present'
+    value: 'tuned.service'
+
+- name: System - systemd reload
+  when: stage2
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    enabled: true
+    name: 'postgresql'
+
+- name: Add lang and locale items to .bashrc
+  when: not stage2
+  ansible.builtin.lineinfile:
+    create: true
+    dest: '/var/lib/postgresql/.bashrc'
+    line: "{{ lang_item }}"
+  loop:
+    - 'export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive'
+    - 'export LANG="en_US.UTF-8"'
+    - 'export LANGUAGE="en_US.UTF-8"'
+    - 'export LC_ALL="en_US.UTF-8"'
+    - 'export LANG="en_US.UTF-8"'
+    - 'export LC_CTYPE="en_US.UTF-8"'
+  loop_control:
+    loop_var: 'lang_item'

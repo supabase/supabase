@@ -1,0 +1,18 @@
+[Unit]
+Description=Postgres Exporter
+
+StartLimitIntervalSec=0
+StartLimitBurst=0
+
+[Service]
+Type=simple
+ExecStart=/opt/postgres_exporter/postgres_exporter --disable-settings-metrics --extend.query-path="/opt/postgres_exporter/queries.yml" --disable-default-metrics --no-collector.locks --no-collector.replication --no-collector.replication_slot --no-collector.stat_bgwriter --no-collector.stat_database --no-collector.stat_user_tables --no-collector.statio_user_tables --no-collector.wal --collector.database_wraparound {% if qemu %}--no-collector.database {% endif %}
+
+User=postgres
+Group=postgres
+Restart=always
+RestartSec=3
+Environment="DATA_SOURCE_NAME=host=localhost dbname=postgres sslmode=disable user=supabase_admin pg_stat_statements.track=none application_name=postgres_exporter"
+
+[Install]
+WantedBy=multi-user.target

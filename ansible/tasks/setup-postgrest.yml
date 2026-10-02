@@ -1,0 +1,129 @@
+- name: PostgREST - group
+  ansible.builtin.group:
+    name: postgrest
+    gid: 1007
+    state: present
+
+- name: PostgREST - user
+  ansible.builtin.user:
+    name: postgrest
+    uid: "{{ 1002 if not qemu else 1003 }}"
+    group: postgrest
+    state: present
+
+- name: PostgREST - add Postgres PPA gpg key
+  ansible.builtin.get_url:
+    url: "{{postgrest_artifacts['signingkey']['url']}}"
+    checksum: "{{postgrest_artifacts['signingkey']['checksum']}}"
+    dest: /etc/apt/trusted.gpg.d/ppdg.asc
+    force: true
+    mode: '0644'
+    timeout: 60
+  register: pgdg_key_download
+  retries: 6
+  delay: 2
+  until: pgdg_key_download is succeeded
+
+- name: PostgREST - add Postgres PPA main
+  ansible.builtin.apt_repository:
+    filename: 'postgresql-pgdg'
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ noble-pgdg {{ postgresql_major }}"
+    state: 'present'
+
+- name: PostgREST - install system dependencies
+  ansible.builtin.apt:
+    package:
+      - libnuma-dev
+      - libpq5
+    state: 'present'
+
+- name: PostgREST - grab the list of installed packages
+  ansible.builtin.package_facts:
+
+- name: Show installed libpq5 version
+  ansible.builtin.debug:
+    msg: "Installed libpq5 version: {{ ansible_facts['packages']['libpq5'][0]['version'] }}"
+
+- name: PostgREST - remove Postgres PPA gpg key
+  ansible.builtin.file:
+    path: /etc/apt/trusted.gpg.d/ppdg.asc
+    state: 'absent'
+
+- name: PostgREST - remove Postgres PPA
+  ansible.builtin.apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ noble-pgdg {{ postgresql_major }}"
+    state: 'absent'
+
+- name: postgis - ensure dependencies do not get autoremoved
+  ansible.builtin.command:
+    cmd: apt-mark manual libpq5* libnuma* 
+
+- name: postgis - allow libnuma-dev to be autoremoved
+  ansible.builtin.command:
+    cmd: apt-mark auto libnuma*-dev
+
+- name: PostgREST - download ubuntu binary archive (arm)
+  ansible.builtin.get_url:
+    url: "{{ postgrest_artifacts[platform]['url'] }}"
+    checksum: "{{ postgrest_artifacts[platform]['checksum'] }}"
+    dest: '/tmp/postgrest.tar.xz'
+    timeout: 60
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: PostgREST - unpack archive in /opt
+  ansible.builtin.unarchive:
+    dest: '/opt'
+    mode: '0755'
+    owner: 'postgrest'
+    remote_src: true
+    src: '/tmp/postgrest.tar.xz'
+
+- name: create directories
+  ansible.builtin.file:
+    group: 'postgrest'
+    mode: '0775'
+    owner: 'postgrest'
+    path: '/etc/postgrest'
+    state: 'directory'
+
+- name: empty files
+  ansible.builtin.file:
+    group: 'postgrest'
+    owner: 'postgrest'
+    path: "/etc/postgrest/{{ empty_item }}"
+    state: 'touch'
+  loop:
+    - base.conf
+    - generated.conf
+  loop_control:
+    loop_var: 'empty_item'
+
+- name: create conf merging script
+  ansible.builtin.copy:
+    content: |
+      #! /usr/bin/env bash
+      set -euo pipefail
+      set -x
+      cd "$(dirname "$0")"
+      cat $@ > merged.conf
+    dest: '/etc/postgrest/merge.sh'
+    group: 'postgrest'
+    mode: '0750'
+    owner: 'postgrest'
+
+- name: PostgREST - create service files
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/{{ svc_item }}"
+    src: "files/{{ svc_item }}.j2"
+  loop:
+    - postgrest.service
+    - postgrest-optimizations.service
+  loop_control:
+    loop_var: 'svc_item'
+
+- name: PostgREST - reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true

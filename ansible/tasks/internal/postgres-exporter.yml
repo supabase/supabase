@@ -1,0 +1,52 @@
+- name: UFW - Allow connections to exporter for prometheus
+  ufw:
+    rule: allow
+    port: "9187"
+
+- name: create directories - systemd unit
+  file:
+    state: directory
+    path: /etc/systemd/system/postgres_exporter.service.d
+    owner: root
+    mode: '0700'
+  become: yes
+
+- name: create directories - service files
+  file:
+    state: directory
+    path: /opt/postgres_exporter
+    owner: postgres
+    group: postgres
+    mode: '0775'
+  become: yes
+
+- name: download postgres exporter
+  get_url:
+    url: "{{ postgres_exporter_artifacts[platform]['url'] }}"
+    checksum: "{{ postgres_exporter_artifacts[platform]['checksum'] }}"
+    dest: /tmp/postgres_exporter.tar.gz
+    timeout: 60
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: expand postgres exporter
+  unarchive:
+    remote_src: yes
+    src: /tmp/postgres_exporter.tar.gz
+    dest: /opt/postgres_exporter
+    extra_opts: [--strip-components=1]
+  become: yes
+
+- name: exporter create a service
+  template:
+    src: files/postgres_exporter.service.j2
+    dest: /etc/systemd/system/postgres_exporter.service
+
+- name: exporter ensure service is present
+  systemd:
+    enabled: no
+    name: postgres_exporter
+    daemon_reload: yes
+    state: stopped

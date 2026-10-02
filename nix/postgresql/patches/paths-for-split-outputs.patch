@@ -1,0 +1,11 @@
+--- a/src/common/config_info.c
++++ b/src/common/config_info.c
+@@ -118,7 +118,7 @@
+ 	i++;
+
+ 	configdata[i].name = pstrdup("PGXS");
++	strlcpy(path, "@out@/lib", sizeof(path));
+-	get_pkglib_path(my_exec_path, path);
+ 	strlcat(path, "/pgxs/src/makefiles/pgxs.mk", sizeof(path));
+ 	cleanup_path(path);
+ 	configdata[i].setting = pstrdup(path);

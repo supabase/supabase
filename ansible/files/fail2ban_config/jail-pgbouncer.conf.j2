@@ -1,0 +1,7 @@
+[pgbouncer]
+enabled = true
+port    = 6543
+protocol = tcp
+filter = pgbouncer
+backend = systemd[journalflags=1]
+maxretry = 3

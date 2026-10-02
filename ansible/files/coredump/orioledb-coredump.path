@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch for PostgreSQL/OrioleDB core dumps
+
+[Path]
+PathChanged=/var/lib/systemd/coredump
+Unit=orioledb-coredump.service
+
+[Install]
+WantedBy=multi-user.target

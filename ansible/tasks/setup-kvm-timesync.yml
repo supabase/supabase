@@ -1,0 +1,55 @@
+# Replace systemd-timesyncd with phc2sys which uses the KVM-exposed PTP timesource. Don't run NTP syncs within the VM
+# since that drifts more, and requires network access. phc2sys doesn't require any network access.
+- name: phc2sys - install
+  ansible.builtin.apt:
+    pkg:
+      - linuxptp
+
+- name: phc2sys - create service file
+  ansible.builtin.template:
+    src: files/phc2sys.service.j2
+    dest: /etc/systemd/system/phc2sys.service
+
+- name: phc2sys - enable service
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    enabled: true
+    name: 'phc2sys'
+    state: 'stopped'
+
+- name: phc2sys - remove systemd-timesyncd
+  ansible.builtin.apt:
+    pkg:
+      - systemd-timesyncd
+    purge: true
+    state: absent
+  when:
+    - ansible_distribution == "Ubuntu" and ansible_distribution_version == "24.04"
+
+- name: ptp_kvm.ko - enable
+  ansible.builtin.copy:
+    content: |
+      ptp_kvm
+    dest: /etc/modules-load.d/ptp_kvm.conf
+
+# On Ubuntu 24.04, ptp_kvm.ko is installed with the much larger linux-modules-extra package until after Kernel 6.8.
+# https://bugs.launchpad.net/ubuntu/+source/linux-gcp/+bug/2110241
+#
+# I didn't bisect every version because rebuilding a test image takes ~45 minutes. We can remove when we've fully
+# migrated to Ubuntu 26.04.
+- name: Upgrade running kernel
+  ansible.builtin.apt:
+    pkg:
+      - linux-virtual-7.0
+  when:
+    - ansible_distribution == "Ubuntu" and ansible_distribution_version == "24.04"
+
+- name: Remove old kernel
+  ansible.builtin.apt:
+    pkg:
+      - linux-image-virtual
+    autoremove: true
+    purge: true
+    state: absent
+  when:
+    - ansible_distribution == "Ubuntu" and ansible_distribution_version == "24.04"
