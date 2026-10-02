@@ -1,6 +1,10 @@
 name: Testagram Core Forensic Audit
 
 on:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
   pull_request:
     branches:
       - testagram/core-platform-foundation
