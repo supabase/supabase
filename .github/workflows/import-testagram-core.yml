@@ -1,0 +1,48 @@
+name: Import Testagram Core Services
+
+on:
+  push:
+    branches:
+      - testagram/core-platform-foundation
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-core:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout foundation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure Git
+        run: |
+          git config user.name "testagram-core-bot"
+          git config user.email "testagram-core-bot@users.noreply.github.com"
+
+      - name: Import upstream core services
+        run: |
+          chmod +x scripts/import-supabase-core.sh
+          bash scripts/import-supabase-core.sh
+
+      - name: Verify imported services
+        run: |
+          set -e
+          for d in postgres auth postgrest realtime storage edge-runtime supavisor postgres-meta; do
+            test -d "core/services/$d"
+            echo "verified: core/services/$d"
+          done
+
+      - name: Commit imported source
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git add core/services
+          git commit -m "chore(core): vendor upstream backend services"
+          git push origin HEAD:testagram/core-platform-foundation
