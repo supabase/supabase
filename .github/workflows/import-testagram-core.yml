@@ -1,14 +1,14 @@
 name: Import Testagram Core Services
 
 on:
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
   push:
     branches:
       - testagram/core-platform-foundation
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -25,7 +25,6 @@ jobs:
 
       - name: Normalize working tree before subtree operations
         run: |
-          # git subtree refuses to run when checkout leaves any tracked/untracked modifications.
           git reset --hard HEAD
           git clean -ffd
           test -z "$(git status --porcelain)"
@@ -36,8 +35,7 @@ jobs:
           git config user.email "testagram-core-bot@users.noreply.github.com"
 
       - name: Import upstream core services
-        run: |
-          bash scripts/import-supabase-core.sh
+        run: bash scripts/import-supabase-core.sh
 
       - name: Verify imported services
         run: |
@@ -52,9 +50,4 @@ jobs:
 
       - name: Persist imported source
         run: |
-          # git subtree add creates its own commits. Do not re-stage those commits;
-          # push the resulting branch tip directly.
-          if git diff --quiet && git diff --cached --quiet; then
-            echo "Working tree clean; subtree operations may already have produced commits."
-          fi
           git push origin HEAD:testagram/core-platform-foundation
