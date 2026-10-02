@@ -155,7 +155,7 @@ jobs:
           cmp /tmp/storage-payload.txt /tmp/storage-download.txt
 
           curl -fsS -X POST http://127.0.0.1:5000/object/sign/ci-bucket/hello.txt             -H "Authorization: Bearer $service_jwt"             -H 'Content-Type: application/json'             --data '{"expiresIn":60}' >/tmp/storage-sign.json
-          signed_path="$(node --input-type=module -e "const x=require('fs').readFileSync('/tmp/storage-sign.json','utf8'); console.log(JSON.parse(x).signedURL)")"
+          signed_path="$(node --input-type=module -e "import {readFileSync} from 'node:fs'; const x=readFileSync('/tmp/storage-sign.json','utf8'); console.log(JSON.parse(x).signedURL)")"
           curl -fsS "http://127.0.0.1:5000${signed_path}" >/tmp/storage-signed.txt
           cmp /tmp/storage-payload.txt /tmp/storage-signed.txt
 
