@@ -140,17 +140,8 @@ jobs:
           test "$migration_rows" -eq "$((migration_files + 1))"
 
           export JWT_SECRET="01234567890123456789012345678901"
-          service_jwt="$(JWT_SECRET="$JWT_SECRET" node --input-type=module <<'NODE'
-          import { createHmac, randomUUID } from 'node:crypto';
-          const secret = process.env.JWT_SECRET;
-          const b64 = (v) => Buffer.from(JSON.stringify(v)).toString('base64url');
-          const now = Math.floor(Date.now()/1000);
-          const header = b64({alg:'HS256',typ:'JWT'});
-          const payload = b64({role:'service_role',sub:randomUUID(),aud:'authenticated',iat:now,exp:now+3600});
-          const unsigned = header + '.' + payload;
-          process.stdout.write(unsigned + '.' + createHmac('sha256', secret).update(unsigned).digest('base64url'));
-          NODE
-          )"
+          service_jwt="$(JWT_SECRET="$JWT_SECRET" node --input-type=module -e "const {createHmac,randomUUID}=require('node:crypto'); const b=v=>Buffer.from(JSON.stringify(v)).toString('base64url'); const n=Math.floor(Date.now()/1000); const h=b({alg:'HS256',typ:'JWT'}); const p=b({role:'service_role',sub:randomUUID(),aud:'authenticated',iat:n,exp:n+3600}); const u=h+'.'+p; process.stdout.write(u+'.'+createHmac('sha256',process.env.JWT_SECRET).update(u).digest('base64url'))")"
+          test "${#service_jwt}" -gt 100
 
           curl -fsS -X POST http://127.0.0.1:5000/bucket             -H "Authorization: Bearer $service_jwt"             -H 'Content-Type: application/json'             --data '{"id":"ci-bucket","name":"ci-bucket","public":false}' >/tmp/storage-bucket.json
 
