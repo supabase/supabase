@@ -26,7 +26,7 @@ It eliminates the need for servers to continuously poll for database changes and
 <TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
-2. Click on **Extensions** in the sidebar.
+2. Click **Extensions** in the sidebar.
 3. Search for "pg_net" and enable the extension.
 
 </TabPanel>
@@ -66,9 +66,9 @@ The privileges that this function runs with depend on your `pg_net` version and 
 net.http_get(
     -- url for the request
     url text,
-    -- key/value pairs to be url encoded and appended to the `url`
+    -- key-value pairs to be url encoded and appended to the `url`
     params jsonb default '{}'::jsonb,
-    -- key/values to be included in request headers
+    -- key-value pairs to be included in request headers
     headers jsonb default '{}'::jsonb,
     -- the maximum number of milliseconds the request may take before being canceled
     timeout_milliseconds int default 2000
@@ -114,9 +114,9 @@ net.http_post(
     url text,
     -- body of the POST request
     body jsonb default '{}'::jsonb,
-    -- key/value pairs to be url encoded and appended to the `url`
+    -- key-value pairs to be url encoded and appended to the `url`
     params jsonb default '{}'::jsonb,
-    -- key/values to be included in request headers
+    -- key-value pairs to be included in request headers
     headers jsonb default '{"Content-Type": "application/json"}'::jsonb,
     -- the maximum number of milliseconds the request may take before being canceled
     timeout_milliseconds int default 2000
@@ -159,9 +159,9 @@ The privileges that this function runs with depend on your `pg_net` version and 
 net.http_delete(
     -- url for the request
     url text,
-    -- key/value pairs to be url encoded and appended to the `url`
+    -- key-value pairs to be url encoded and appended to the `url`
     params jsonb default '{}'::jsonb,
-    -- key/values to be included in request headers
+    -- key-value pairs to be included in request headers
     headers jsonb default '{}'::jsonb,
     -- the maximum number of milliseconds the request may take before being canceled
     timeout_milliseconds int default 2000
@@ -192,30 +192,30 @@ select
 Waiting requests are stored in the `net.http_request_queue` table. Upon execution, they are deleted.
 
 ```sql
-CREATE UNLOGGED TABLE
+create unlogged table
     net.http_request_queue (
-        id bigint NOT NULL DEFAULT nextval('net.http_request_queue_id_seq'::regclass),
-        method text NOT NULL,
-        url text NOT NULL,
-        headers jsonb NOT NULL,
-        body bytea NULL,
-        timeout_milliseconds integer NOT NULL
+        id bigint not null default nextval('net.http_request_queue_id_seq'::regclass),
+        method text not null,
+        url text not null,
+        headers jsonb not null,
+        body bytea null,
+        timeout_milliseconds integer not null
     )
 ```
 
-Once a response is returned, by default, it is stored for 6 hours in the `net._http_response` table.
+After a response is returned, by default, it is stored for 6 hours in the `net._http_response` table.
 
 ```sql
-CREATE UNLOGGED TABLE
+create unlogged table
     net._http_response (
-        id bigint NULL,
-        status_code integer NULL,
-        content_type text NULL,
-        headers jsonb NULL,
-        content text NULL,
-        timed_out boolean NULL,
-        error_msg text NULL,
-        created timestamp with time zone NOT NULL DEFAULT now()
+        id bigint null,
+        status_code integer null,
+        content_type text null,
+        headers jsonb null,
+        content text null,
+        timed_out boolean null,
+        error_msg text null,
+        created timestamp with time zone not null default now()
     )
 ```
 
@@ -308,13 +308,13 @@ order by "created" desc;
 
 ## Configuration
 
-<Admonition type="note" title="Must be on pg_net v0.12.0 or above to reconfigure ">
+<Admonition type="note" title="Must be on pg_net v0.12.0 or later to reconfigure">
 
 Supabase supports reconfiguring `pg_net` starting from v0.12.0+. For the latest release, initiate a Postgres upgrade in the [General Settings](/dashboard/project/_/settings/general).
 
 </Admonition>
 
-The extension is configured to reliably execute up to 200 requests per second. The response messages are stored for only 6 hours to prevent needless buildup. The default behavior can be modified by rewriting config variables.
+The extension is configured to reliably execute up to 200 requests per second. The response messages are stored for only 6 hours to prevent needless buildup. The default behavior can be modified by rewriting configuration variables.
 
 ### Get current settings
 
@@ -340,7 +340,7 @@ grant alter system on parameter pg_net.ttl to postgres;
 
 </Admonition>
 
-Once the privilege is assigned, apply the setting at the system level and restart the background worker:
+After the privilege is assigned, apply the setting at the system level and restart the background worker:
 
 ```sql
 alter system set pg_net.ttl to '24 hours';
@@ -390,7 +390,7 @@ Make a call to an external endpoint when a trigger event occurs.
 -- function called by trigger
 create or replace function <function_name>()
     returns trigger
-    language plpgSQL
+    language plpgsql
 as $$
 begin
     -- calls pg_net function net.http_post
@@ -404,7 +404,7 @@ begin
       headers:='{"Content-Type": "application/json"}'::jsonb
     ) as request_id;
     return new;
-END $$;
+end $$;
 
 -- trigger for table update
 create trigger <trigger_name>
@@ -427,8 +427,8 @@ select
     net.http_post(
         url := 'https://postman-echo.com/post'::text,
         body := JSON_payload
-    ) AS request_id
-FROM "selected_table_rows";
+    ) as request_id
+from "selected_table_rows";
 ```
 
 More examples can be seen on the [Extension's GitHub page](https://github.com/supabase/pg_net/)
