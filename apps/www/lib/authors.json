@@ -1047,5 +1047,13 @@
     "position": "Product Manager",
     "author_url": "https://github.com/nrichers",
     "author_image_url": "https://github.com/nrichers.png"
+  },
+  {
+    "author_id": "rand_arete",
+    "author": "Rand Arete",
+    "username": "rand",
+    "position": "Engineering",
+    "author_url": "https://github.com/rand",
+    "author_image_url": "https://github.com/rand.png"
   }
 ]
