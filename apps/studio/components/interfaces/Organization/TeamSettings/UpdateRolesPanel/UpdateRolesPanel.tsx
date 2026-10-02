@@ -28,7 +28,7 @@ import {
   WarningIcon,
 } from 'ui'
 
-import { ROLE_DESCRIPTIONS } from '../Roles.constants'
+import { getOverrideRoleName, ROLE_DESCRIPTIONS } from '../Roles.constants'
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
@@ -282,12 +282,19 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   const canAssignRole = rolesAddable.includes(role.id)
                                   const isOwnerRole = role.name === 'Owner'
                                   const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                                  const disabled = !canAssignRole || disabledForStripe
+
+                                  const isNoAccessRole = role.name === 'None'
+                                  const disabledForProjectRole =
+                                    !isApplyingRoleToAllProjects && isNoAccessRole
+                                  const disabled =
+                                    !canAssignRole || disabledForStripe || disabledForProjectRole
                                   const disabledReason = disabledForStripe
                                     ? 'Cannot be assigned in Stripe Projects organizations'
-                                    : !canAssignRole
-                                      ? 'Additional permissions required to assign role'
-                                      : undefined
+                                    : disabledForProjectRole
+                                      ? 'Cannot assign No-access role to project-scoped members'
+                                      : !canAssignRole
+                                        ? 'Additional permissions required to assign role'
+                                        : undefined
 
                                   return (
                                     <SelectItem
@@ -297,7 +304,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       disabled={disabled}
                                     >
                                       <div className="flex flex-col gap-0.5 max-w-xs">
-                                        <span>{role.name}</span>
+                                        <span>{getOverrideRoleName(role.name)}</span>
                                         <span className="text-xs text-foreground-lighter">
                                           {ROLE_DESCRIPTIONS[role.name] ??
                                             'Permissions are based on the configured organization role.'}
