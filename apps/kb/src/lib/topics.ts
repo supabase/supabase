@@ -5,41 +5,77 @@
 // `pinned` topics surface as cards on the homepage (see src/pages/index.astro)
 // — keep this to a handful so that section stays a highlights row, not a
 // second copy of the full topic list.
+//
+// `visible` controls whether the topic appears in nav and homepage sections.
+// Topics with `visible: false` still have a working listing page at /topics/[slug].
+// Some topics might not need to be visible to end users since their primary audience
+// is LLM crawlers.
 export const TOPICS = [
   {
     name: 'Migration',
     description: 'Moving data, schemas, or projects onto Supabase.',
     pinned: false,
+    visible: true,
   },
   {
     name: 'Comparison',
     description: 'How Supabase compares to other databases and platforms.',
     pinned: false,
+    visible: false,
   },
-  { name: 'Troubleshooting', description: 'Common errors and how to resolve them.', pinned: false },
+  {
+    name: 'Troubleshooting',
+    description: 'Common errors and how to resolve them.',
+    pinned: false,
+    visible: true,
+  },
   {
     name: 'Tutorial',
     description: 'Step-by-step walkthroughs for building with Supabase.',
     pinned: true,
+    visible: true,
   },
-  { name: 'Storage', description: 'Uploading, managing, and serving files.', pinned: false },
+  {
+    name: 'Storage',
+    description: 'Uploading, managing, and serving files.',
+    pinned: false,
+    visible: true,
+  },
   {
     name: 'Auth',
     description: 'Authentication, authorization, and user management.',
     pinned: true,
+    visible: true,
   },
-  { name: 'Database', description: 'Postgres schemas, queries, and performance.', pinned: true },
+  {
+    name: 'Database',
+    description: 'Postgres schemas, queries, and performance.',
+    pinned: true,
+    visible: true,
+  },
   {
     name: 'Edge Functions',
     description: 'Deploying and running serverless functions.',
     pinned: false,
+    visible: true,
   },
-  { name: 'Queues', description: 'Background jobs and message processing.', pinned: false },
-  { name: 'Realtime', description: 'Broadcast, presence, and database changes.', pinned: false },
+  {
+    name: 'Queues',
+    description: 'Background jobs and message processing.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Realtime',
+    description: 'Broadcast, presence, and database changes.',
+    pinned: false,
+    visible: true,
+  },
   {
     name: 'Supabase Platform',
     description: 'Project settings, billing, and infrastructure.',
     pinned: false,
+    visible: true,
   },
 ] as const
 
