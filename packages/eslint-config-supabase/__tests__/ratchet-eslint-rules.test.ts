@@ -1,13 +1,15 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { runRatchet } from '../ratchet-eslint-rules'
 
-const studioRoot = path.resolve(__dirname, '../..')
-const repoRoot = path.resolve(studioRoot, '..', '..')
-const scriptArgvPlaceholder = path.resolve(studioRoot, 'scripts', 'ratchet-eslint-rules.ts')
+const packageRoot = path.resolve(__dirname, '..')
+const repoRoot = path.resolve(packageRoot, '..', '..')
+const scriptArgvPlaceholder = path.resolve(packageRoot, 'ratchet-eslint-rules.ts')
 
 const tempDirs: string[] = []
 
@@ -83,6 +85,36 @@ describe('ratchet-eslint-rules integration', () => {
     expect(combinedErrors).toContain(`${relativeToCwd('apps/studio/src/b.ts')} (+1)`)
   })
 
+  it('combines rule ids from repeated --rules-file flags', () => {
+    const tmp = createTempDir()
+    const metadataPath = path.join(tmp, 'baseline.json')
+    const appRulesPath = path.join(tmp, 'app-rules.json')
+    const sharedRulesPath = path.join(tmp, 'shared-rules.json')
+    writeFileSync(appRulesPath, JSON.stringify(['no-console']))
+    writeFileSync(sharedRulesPath, JSON.stringify(['no-debugger']))
+
+    const eslintResults = buildEslintResults([
+      { filePath: repoPath('apps/studio/src/a.ts'), rules: { 'no-console': 1, 'no-debugger': 2 } },
+    ])
+
+    const result = invokeRatchet(
+      [
+        '--metadata',
+        metadataPath,
+        '--rules-file',
+        appRulesPath,
+        '--rules-file',
+        sharedRulesPath,
+        '--init',
+      ],
+      eslintResults
+    )
+
+    expect(result).toBe(0)
+    const baseline = JSON.parse(readFileSync(metadataPath, 'utf8'))
+    expect(baseline.rules).toEqual({ 'no-console': 1, 'no-debugger': 2 })
+  })
+
   it('reads rule ids from --rules-file', () => {
     const tmp = createTempDir()
     const metadataPath = path.join(tmp, 'baseline.json')
@@ -134,6 +166,20 @@ describe('ratchet-eslint-rules integration', () => {
     const combinedErrors = errorSpy.mock.calls.map((args) => args.join(' ')).join('\n')
     expect(combinedErrors).toContain('baseline missing file breakdown')
     expect(combinedErrors).toContain(`${relativeToCwd('apps/studio/src/a.ts')} (2 current)`)
+  })
+})
+
+describe('ratchet-eslint-rules CLI', () => {
+  it('runs when invoked through a symlink', () => {
+    const tmp = createTempDir()
+    const link = path.join(tmp, 'ratchet-eslint-rules.ts')
+    symlinkSync(scriptArgvPlaceholder, link)
+
+    const tsxCli = createRequire(import.meta.url).resolve('tsx/cli')
+    const proc = spawnSync(process.execPath, [tsxCli, link], { encoding: 'utf8' })
+
+    expect(proc.status).toBe(2)
+    expect(proc.stderr).toContain('You must provide at least one --rule')
   })
 })
 
