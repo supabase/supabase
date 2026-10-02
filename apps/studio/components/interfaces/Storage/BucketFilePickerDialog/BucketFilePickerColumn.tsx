@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
@@ -21,9 +20,9 @@ import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/Inf
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-infinite-query'
 import { storageKeys } from '@/data/storage/keys'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { noop } from '@/lib/void'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const SelectAllCheckbox = ({
   columnFiles,
@@ -103,7 +102,9 @@ export const BucketFilePickerColumn = ({
   const columnRef = useRef<HTMLDivElement | null>(null)
 
   const { hostEndpoint } = useProjectApiUrl({ projectRef: projectRef! })
-  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
+  )
 
   const {
     columns,

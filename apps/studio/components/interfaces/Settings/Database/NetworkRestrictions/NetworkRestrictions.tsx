@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertCircle, ChevronDown, Globe, Lock } from 'lucide-react'
 import { useState } from 'react'
@@ -32,10 +31,10 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const HA_DISABLED_TITLE = 'Network restrictions unavailable on High Availability projects'
 const HA_DISABLED_DESCRIPTION =
@@ -93,14 +92,8 @@ export const NetworkRestrictions = () => {
     { projectRef: ref },
     { enabled: Boolean(project) }
   )
-  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_WRITE
   )
 
   const isSectionDisabled = isHighAvailability || !canUpdateNetworkRestrictions

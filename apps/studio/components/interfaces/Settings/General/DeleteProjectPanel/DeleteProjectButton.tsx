@@ -1,22 +1,19 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
 import { DeleteProjectModal } from './DeleteProjectModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface DeleteProjectButtonProps {
   variant?: 'danger' | 'default'
 }
 
 export const DeleteProjectButton = ({ variant = 'danger' }: DeleteProjectButtonProps) => {
-  const { data: project } = useSelectedProjectQuery()
   const [isOpen, setIsOpen] = useState(false)
 
-  const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: { project_id: project?.id },
-  })
+  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
+  )
 
   return (
     <>

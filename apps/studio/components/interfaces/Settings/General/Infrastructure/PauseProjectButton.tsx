@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { CirclePause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -18,7 +17,6 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseMutation } from '@/data/projects/project-pause-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsHighAvailability,
@@ -26,6 +24,7 @@ import {
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const PauseProjectButton = () => {
   const router = useRouter()
@@ -40,9 +39,8 @@ export const PauseProjectButton = () => {
 
   const projectRef = project?.ref ?? ''
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const { can: canPauseProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_jobs.projects.pause'
+  const { can: canPauseProject } = useAsyncCheckPermissionsV2(
+    [FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
   )
 
   const isFreePlan = organization?.plan.id === 'free'

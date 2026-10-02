@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -30,7 +29,6 @@ import {
   type GitHubConnection,
 } from '@/data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
@@ -38,6 +36,7 @@ import {
 } from '@/lib/github'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const toIntegrationProjectConnection = (
   connection: GitHubConnection
@@ -64,14 +63,12 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   const { data: org } = useSelectedOrganizationQuery()
 
   const { can: canReadGitHubConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
-  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.github_connections'
+    useAsyncCheckPermissionsV2('organization_integrations_read')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
+    'organization_integrations_write'
   )
-  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'integrations.github_connections'
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissionsV2(
+    'organization_integrations_write'
   )
 
   const { data: gitHubAuthorization } = useGitHubAuthorizationQuery({

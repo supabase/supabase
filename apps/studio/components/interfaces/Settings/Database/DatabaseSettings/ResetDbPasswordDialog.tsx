@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { ChangeEvent, ComponentProps, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -21,11 +20,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from '@/data/database/database-password-reset-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
 import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
 import { generateStrongPassword } from '@/lib/project'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type ResetDbPasswordDialogProps = {
   disabled?: boolean
@@ -46,16 +45,9 @@ export const ResetDbPasswordDialog = ({
 }: ResetDbPasswordDialogProps) => {
   const { ref } = useParams()
   const isProjectActive = useIsProjectActive()
-  const { data: project } = useSelectedProjectQuery()
 
-  const { can: canResetDbPassword } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canResetDbPassword } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE
   )
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)

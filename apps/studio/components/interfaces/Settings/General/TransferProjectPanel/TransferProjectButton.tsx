@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import { Loader, Shield, Wrench } from 'lucide-react'
@@ -32,9 +31,9 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { projectKeys } from '@/data/projects/keys'
 import { useProjectTransferMutation } from '@/data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from '@/data/projects/project-transfer-preview-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const TransferProjectButton = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -83,9 +82,8 @@ export const TransferProjectButton = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
-  const { can: canTransferProject } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canTransferProject } = useAsyncCheckPermissionsV2(
+    [FGA_PERMISSIONS.PROJECT.ADMIN_WRITE, FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE]
   )
 
   async function handleTransferProject() {

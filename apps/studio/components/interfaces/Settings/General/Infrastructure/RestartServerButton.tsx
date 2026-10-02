@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag } from 'common'
 import { ChevronDown, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -18,11 +17,11 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from '@/data/projects/project-restart-services-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { type ResponseError } from '@/types'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const RestartServerButton = () => {
   const router = useRouter()
@@ -45,9 +44,8 @@ export const RestartServerButton = () => {
   const projectRegion = project?.region ?? ''
 
   const projectRestartDisabled = useFlag('disableProjectRestarts')
-  const { can: canRestartProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'reboot'
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2(
+    'project_operations_write'
   )
 
   const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({

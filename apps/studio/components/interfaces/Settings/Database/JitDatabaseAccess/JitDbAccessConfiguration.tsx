@@ -1,4 +1,4 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
@@ -57,10 +57,10 @@ import { useJitDbAccessUpdateMutation } from '@/data/jit-db-access/jit-db-access
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useProjectMembersQuery } from '@/data/projects/project-members-query'
 import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const JitDbAccessConfiguration = () => {
   const { ref } = useParams()
@@ -104,10 +104,8 @@ export const JitDbAccessConfiguration = () => {
     connectionString: project?.connectionString,
   })
 
-  const { can: canUpdateJitDbAccess } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+  const { can: canUpdateJitDbAccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
   )
 
   const { mutateAsync: updateJitDbAccess, isPending: isUpdatingJitDbAccess } =
@@ -125,7 +123,7 @@ export const JitDbAccessConfiguration = () => {
           )
         }
       },
-      onError: () => {},
+      onError: () => { },
     })
 
   const { mutateAsync: enableSSLEnforcement, isPending: isEnablingSSLEnforcement } =
@@ -150,7 +148,7 @@ export const JitDbAccessConfiguration = () => {
         setSelectedUserToDelete(null)
         if (ruleIdToEdit === variables.userId) resetSheetState()
       },
-      onError: () => {},
+      onError: () => { },
     })
 
   const isMutating = isUpdatingJitDbAccess || isRevokingAccess
