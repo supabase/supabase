@@ -39,7 +39,7 @@ fi
 echo
 echo "--- hosted Supabase runtime references ---"
 runtime_hits="$(
-  grep -RInE 'https?://[^[:space:]"]*supabase\.co' supabase docker scripts core/services/postgres/ansible/files/admin_api_scripts --include='*.toml' --include='*.yml' --include='*.yaml' --include='*.sh' --include='*.env' --include='*.json' 2>/dev/null |
+  grep -RInE 'https?://[^[:space:]"]*supabase\.co([/:\"]|$)' supabase docker scripts core/services/postgres/ansible/files/admin_api_scripts --include='*.toml' --include='*.yml' --include='*.yaml' --include='*.sh' --include='*.env' --include='*.json' 2>/dev/null |
   grep -vE ':[[:space:]]*#' || true
 )"
 if [[ -n "$runtime_hits" ]]; then
