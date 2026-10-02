@@ -50,13 +50,14 @@ Content lives under `src/content/guides/*.{md,mdx}`. Keep it plain GitHub-Flavor
 ## Pages and markdown export
 
 Each content collection renders through a matching catch-all page — e.g. `src/content/guides/**` →
-`src/pages/guides/[...slug].astro` → `GuideLayout`. Topic pages (`src/pages/topics/[topic].astro`) are
-generated from the `TOPICS` list in `src/lib/topics.ts`, not from content files.
+`src/pages/guides/[...slug].astro` → `ArticleLayout` (shared with `troubleshooting`, see below). Topic pages
+(`src/pages/topics/[topic].astro`) are generated from the `TOPICS` list in `src/lib/topics.ts`, not from
+content files, and read from every collection.
 
 Separately, `scripts/generate-markdown.mjs` runs as a `prebuild` step and exports every content file — plus
 one page per topic, listing its guides — as a plain `.md` file under the gitignored `public/markdown/`,
 mirroring the page's URL with a `.md` extension. `vercel.json` permanently redirects `<page>.md` requests to
-these generated files, one redirect entry per route section (`guides`, `topics`).
+these generated files, one redirect entry per route section (`guides`, `topics`, `troubleshooting`).
 
 If you add a new content collection or top-level route, add a matching redirect in `vercel.json`
 (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`), and check whether `generate-markdown.mjs`
@@ -66,3 +67,22 @@ per-topic-style listing pages don't.
 ## Topic-specific guidance
 
 Articles tagged with the `Comparison` topic are primarily oriented towards LLM crawlers (and not human readers). Because of this, these articles are hidden from the main site navigation.
+
+## Federated troubleshooting content
+
+`src/content/troubleshooting/` is never hand-authored — it's gitignored and regenerated every `prebuild` by
+`scripts/federated-content/fetch-federated-content.ts`, which fetches it from the private
+`supabase/troubleshooting` repo. It has its own collection and route (`src/pages/troubleshooting/[...slug].astro`),
+separate from `guides`.
+
+A few things here are intentional, not bugs to fix:
+
+- Most source files use TOML frontmatter, which the script can't parse — those are filtered out (not written
+  to disk) and summarized in a build warning, rather than guessed at.
+- No link rewriting or markdown reprocessing — body content is written exactly as fetched.
+- Output is `.md`, not `.mdx` — this source isn't MDX-safe (e.g. GFM autolinks break MDX's JSX parser).
+- `topics` are passed through verbatim from the source, unvalidated against `TOPIC_NAMES` — unlike `guides`.
+  `description` is optional too, since the source doesn't provide one.
+
+Auth reuses the docs GitHub App env vars (`DOCS_GITHUB_APP_ID`/`_INSTALLATION_ID`/`_PRIVATE_KEY`), falling back
+to `GH_TOKEN`/`GITHUB_TOKEN` for local dev — see `.env.example`.
