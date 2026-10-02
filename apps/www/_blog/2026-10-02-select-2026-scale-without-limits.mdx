@@ -20,7 +20,7 @@ Every Supabase project starts with a single Postgres database. As your project g
 
 Scaling Postgres isn’t a singular problem — users encounter new challenges at different stages of scale and under different workloads. Our users often report needing help scaling concurrent client connections, reducing the overhead of bloat and frequent VACUUM operations, increasing read and write throughput, avoiding transaction ID wraparound, and guaranteeing uptime with high availability.
 
-Our focus is to remove every scaling limitation from our user’s journey. That means tackling bottlenecks at every layer of Postgres, building in public, and making the improvements fully open source and available to the broader builder community.
+Our focus is to remove every scaling limitation from our users’ journey. That means tackling bottlenecks at every layer of Postgres, building in public, and making the improvements fully open source and available to the broader builder community.
 
 <svg
   className="-mb-8 mt-12 not-sr-only"
@@ -58,7 +58,7 @@ Multigres runs three Postgres nodes across availability zones in one region, so 
 
 You can also add read replicas and gateways for more read throughput and client connections. During the alpha, our team adds them for you.
 
-Multigres is in private alpha, by invite. It works with Supabase Auth, Storage, and Edge Functions, and it's built for testing during the alpha, not production workloads.
+Multigres is in private alpha, by invite. It works with Supabase Auth, Storage, and Edge Functions, and it's built for testing during the alpha, not production workloads. [Request access](https://supabase.com/go/multigres-early-access).
 
 <svg
   className="-mb-8 mt-12 not-sr-only"
@@ -103,7 +103,7 @@ With heap storage, Postgres never updates a row in place: every update writes a 
 
 OrioleDB's undo log removes this problem at the source. Instead of leaving dead tuples behind, updates and deletes write page-level undo records, which the system reclaims automatically. This eliminates bloat entirely and VACUUM is no longer needed.
 
-Allowing lock-free page reads also makes OrioleDB more efficient under high concurrency, especially in IOPS use. OrioleDB delivers up to 1.8x higher throughput than Postgres heap in our public, TPC-C-derived benchmarks, published on [dbarena.com](http://dbarena.com/).
+Allowing lock-free page reads also makes OrioleDB more efficient under high concurrency, especially in IOPS use. OrioleDB delivers up to 1.8x higher throughput than Postgres heap in our public, TPC-C-derived benchmarks, published on [dbarena.com](https://dbarena.com/).
 
 <Admonition type="note">
 
@@ -125,7 +125,7 @@ OrioleDB has been under active development by the Supabase team and open source 
   wide
 />
 
-[dbarena.com](http://dbarena.com) publishes open, reproducible database benchmarks across providers: the benchmark code, published methodology, downloadable raw data per result, and shareable comparison links. It compares Supabase, Amazon RDS, and Google Cloud SQL at launch. For each run, dbarena reports transactions per dollar, monthly total cost, transactions per minute, p95, and machine specs, and it plots throughput over time.
+[dbarena.com](https://dbarena.com) publishes open, reproducible database benchmarks across providers: the benchmark code, published methodology, downloadable raw data per result, and shareable comparison links. It compares Supabase, Amazon RDS, and Google Cloud SQL at launch. For each run, dbarena reports transactions per dollar, monthly total cost, transactions per minute, p95, and machine specs, and it plots throughput over time.
 
 Developers evaluating hosted Postgres have few trustworthy sources for comparing providers. Vendor benchmarks often run under favorable conditions, community benchmarks are one-off snapshots, and a rigorous in-house evaluation costs weeks to produce.
 
@@ -135,6 +135,6 @@ Subscribe to the [dbarena newsletter](https://dbarena.com/?subscribe) to keep up
 
 ## Get started
 
-- Multigres: private alpha.
+- Multigres: private alpha. [Request access](https://supabase.com/go/multigres-early-access).
 - OrioleDB: create a new project and choose OrioleDB at project creation. Public beta. [Docs](https://supabase.com/docs/guides/database/orioledb).
-- dbarena: public, at [dbarena.com](http://dbarena.com).
+- dbarena: public, at [dbarena.com](https://dbarena.com).
