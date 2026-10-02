@@ -150,7 +150,7 @@ export const TOTPFactors = () => {
                 <CardContent className="flex items-center justify-between">
                   <div className="flex items-center gap-x-4">
                     <div className="w-9 h-9 rounded-full bg-selection flex items-center justify-center">
-                      <RectangleEllipsis size={18} />
+                      <RectangleEllipsis size={18} className="text-foreground-lighter" />
                     </div>
                     <div className="text-sm">
                       <p className={cn(codes.remaining < 2 ? 'text-warning' : '')}>
