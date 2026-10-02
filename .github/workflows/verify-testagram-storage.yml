@@ -1,3 +1,4 @@
+# Forensic gate: Storage image + RustFS lifecycle + local-node protocol.
 name: Verify Testagram Storage
 
 on:
