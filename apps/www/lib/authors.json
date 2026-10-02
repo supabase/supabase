@@ -1055,5 +1055,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/supa-aditya",
     "author_image_url": "https://github.com/supa-aditya.png"
+  },
+  {
+    "author_id": "daniel_mitterdorfer",
+    "author": "Daniel Mitterdorfer",
+    "username": "danielmitterdorfer",
+    "position": "Engineering",
+    "author_url": "https://github.com/danielmitterdorfer",
+    "author_image_url": "https://github.com/danielmitterdorfer.png"
   }
 ]
