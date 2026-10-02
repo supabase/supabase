@@ -212,7 +212,7 @@ export const CreditCodeRedemption = ({
             </div>
 
             {codeRedemptionResult.credits_expire_at && (
-              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
                 <Calendar className="h-4 w-4" />
                 <span>
                   Your credits expire on{' '}
@@ -221,17 +221,24 @@ export const CreditCodeRedemption = ({
                     utcTimestamp={codeRedemptionResult.credits_expire_at}
                     labelFormat="MMMM DD, YYYY"
                   />
+                  .
                 </span>
               </div>
             )}
 
             {codeRedemptionResult.already_redeemed_partner_credits && (
-              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
-                <Info className="h-4 w-4" />
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
+                <Info className="h-4 w-4 shrink-0" />
                 <span>
-                  You already redeemed $
-                  {codeRedemptionResult.already_redeemed_partner_credits / 100} of credits through
-                  other deals
+                  Since you already redeemed $
+                  {codeRedemptionResult.already_redeemed_partner_credits / 100} through other deals,
+                  we couldn't grant the full $
+                  {(
+                    (codeRedemptionResult.already_redeemed_partner_credits +
+                      codeRedemptionResult.amount_cents) /
+                    100
+                  ).toFixed(0)}
+                  .
                 </span>
               </div>
             )}
