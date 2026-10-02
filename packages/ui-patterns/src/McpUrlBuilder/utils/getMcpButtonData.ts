@@ -22,7 +22,7 @@ export function getMcpButtonData({
     const imageSrc = getMcpClientIconSrc({
       icon: client.icon!,
       useDarkVariant: theme === 'light',
-      hasDistinctDarkIcon: client.hasDistinctDarkIcon,
+      hasDarkIcon: client.hasDarkIcon,
     })
 
     return {
