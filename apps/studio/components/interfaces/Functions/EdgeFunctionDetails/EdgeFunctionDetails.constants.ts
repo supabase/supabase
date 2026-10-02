@@ -23,7 +23,8 @@ export const INVOCATION_TABS: InvocationTab[] = [
       const keyValue = showKey ? apiKey : obfuscatedName
 
       return `curl -L -X POST '${functionUrl}' \\
-  -H 'Authorization: Bearer ${keyValue}' \\${apiKey.includes('publishable') ? `\n  -H 'apikey: ${keyValue}' \\` : ''}
+  // Or skip the Authorization header with verify_jwt=false (in config.toml)
+  -H 'Authorization: Bearer <JWT-TOKEN>' \\${apiKey.includes('publishable') ? `\n  -H 'apikey: ${keyValue}' \\` : ''}
   -H 'Content-Type: application/json' \\
   --data '{"name":"Functions"}'`
     },
