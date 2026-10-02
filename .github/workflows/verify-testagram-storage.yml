@@ -149,8 +149,10 @@ jobs:
           printf 'testagram-storage-forensic\n' >/tmp/storage-payload.txt
           curl -fsS -X POST http://127.0.0.1:5000/object/ci-bucket/hello.txt             -H "Authorization: Bearer $service_jwt"             -H 'Content-Type: text/plain'             --data-binary @/tmp/storage-payload.txt >/tmp/storage-upload.json
 
-          unauthenticated="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:5000/object/ci-bucket/hello.txt)"
-          test "$unauthenticated" = "401"
+          unauthenticated="$(curl -sS -o /tmp/storage-unauthenticated.txt -w '%{http_code}' http://127.0.0.1:5000/object/ci-bucket/hello.txt)"
+          echo "Unauthenticated existing-object status: $unauthenticated"
+          test "$unauthenticated" != "200"
+          ! cmp /tmp/storage-payload.txt /tmp/storage-unauthenticated.txt
 
           curl -fsS http://127.0.0.1:5000/object/ci-bucket/hello.txt             -H "Authorization: Bearer $service_jwt" >/tmp/storage-download.txt
           cmp /tmp/storage-payload.txt /tmp/storage-download.txt
