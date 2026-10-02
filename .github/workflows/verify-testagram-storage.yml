@@ -131,9 +131,6 @@ jobs:
           echo "Storage tenant migration files: $migration_files; ledger rows: $migration_rows; expected ledger rows: $((migration_files + 1)) (postgres-migrations bootstrap)"
           test "$migration_rows" -eq "$((migration_files + 1))"
 
-          unauthenticated="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:5000/object/ci-storage/unauthorized.txt)"
-          test "$unauthenticated" = "401"
-
           export JWT_SECRET="01234567890123456789012345678901"
           service_jwt="$(JWT_SECRET="$JWT_SECRET" node --input-type=module <<'NODE'
           import { createHmac, randomUUID } from 'node:crypto';
@@ -148,6 +145,9 @@ jobs:
           )"
 
           curl -fsS -X POST http://127.0.0.1:5000/bucket             -H "Authorization: Bearer $service_jwt"             -H 'Content-Type: application/json'             --data '{"id":"ci-bucket","name":"ci-bucket","public":false}' >/tmp/storage-bucket.json
+
+          unauthenticated="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:5000/object/ci-bucket/unauthorized.txt)"
+          test "$unauthenticated" = "401"
 
           printf 'testagram-storage-forensic\n' >/tmp/storage-payload.txt
           curl -fsS -X POST http://127.0.0.1:5000/object/ci-bucket/hello.txt             -H "Authorization: Bearer $service_jwt"             -H 'Content-Type: text/plain'             --data-binary @/tmp/storage-payload.txt >/tmp/storage-upload.json
