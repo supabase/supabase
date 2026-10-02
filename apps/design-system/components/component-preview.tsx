@@ -97,7 +97,8 @@ export function ComponentPreview({
       <div className={cn('@container mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
-            'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
+            'relative overflow-hidden rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio',
+            '[&_[data-sidebar=sidebar]]:bg-transparent'
           )}
         >
           {showGrid && (
@@ -141,10 +142,13 @@ export function ComponentPreview({
   return (
     <div className={cn('mt-4 mb-12', wideClasses)}>
       <div
-        className={cn('relative bg-studio', {
-          'rounded-tl-md rounded-tr-md border-t border-l border-r': !hideCode,
-          'rounded-md border': hideCode,
-        })}
+        className={cn(
+          'relative overflow-hidden bg-studio [&_[data-sidebar=sidebar]]:bg-transparent',
+          {
+            'rounded-tl-md rounded-tr-md border-t border-l border-r': !hideCode,
+            'rounded-md border': hideCode,
+          }
+        )}
       >
         {showGrid && (
           <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
