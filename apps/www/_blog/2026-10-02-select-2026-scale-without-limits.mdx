@@ -40,11 +40,18 @@ Multigres is in private alpha, by invite. It works with Supabase Auth, Storage, 
 
 ## OrioleDB
 
-<Img
+<video
   alt="Postgres heap leaves dead row versions in the table and needs VACUUM, while OrioleDB moves old versions to an undo log and reclaims space automatically"
-  src="/images/blog/select-2026-scale-without-limits/orioledb.png"
-  wide
-/>
+  className="wide rounded-md border m-0 w-full"
+  poster="/images/blog/select-2026-scale-without-limits/orioledb.png"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls
+>
+  <source src="/images/blog/select-2026-scale-without-limits/orioledb.mp4" type="video/mp4" />
+</video>
 
 OrioleDB is an open source, scalable storage engine for Postgres. It replaces Postgres traditional heap storage and eliminates its fundamental limitations, such as table bloat, VACUUM overhead, and txid wraparound inherent to the limited range of 32-bit transaction IDs.
 
