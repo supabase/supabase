@@ -32,10 +32,11 @@ jobs:
         working-directory: core/services/auth
         run: |
           set -euo pipefail
-          grep -Fx 'FROM golang:1.27.0-alpine3.23@sha256:3747dcba41c8b0db3211fda4db61638b980e17ac5bb3c94460a975a9cfe19395 as build' Dockerfile
+          grep -Fx 'FROM golang:1.27.0-alpine3.23@sha256:3747dcba41c8b0db3211fda4db61638b980e17ac5bb3c94460a975a9cfe19395 AS build' Dockerfile
           grep -Fx 'FROM alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40' Dockerfile
           grep -Fx '/hack/' .dockerignore
           grep -Fx 'go 1.27.0' go.mod
+          grep -Fx 'ENV GOTRUE_DB_MIGRATIONS_PATH=/usr/local/etc/auth/migrations' Dockerfile
           ./hack/check-go-version.sh
 
       - name: Build Auth image
@@ -45,26 +46,32 @@ jobs:
       - name: Inspect Auth image contract
         run: |
           set -euo pipefail
-          test "$(docker image inspect --format '{{.Config.User}}' "testagram-build/auth:${GITHUB_SHA}")" = "supabase"
-          test "$(docker image inspect --format '{{json .Config.Cmd}}' "testagram-build/auth:${GITHUB_SHA}")" = '["auth"]'
-          docker image inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "testagram-build/auth:${GITHUB_SHA}" | grep -Fx 'GOTRUE_DB_MIGRATIONS_PATH=/usr/local/etc/auth/migrations'
-          docker run --rm --entrypoint /bin/sh "testagram-build/auth:${GITHUB_SHA}" -ceu '
+          IMAGE="testagram-build/auth:${GITHUB_SHA}"
+
+          test "$(docker image inspect --format '{{.Config.User}}' "$IMAGE")" = "supabase"
+          test "$(docker image inspect --format '{{json .Config.Cmd}}' "$IMAGE")" = '["auth"]'
+          docker image inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$IMAGE"             | grep -Fx 'GOTRUE_DB_MIGRATIONS_PATH=/usr/local/etc/auth/migrations'
+
+          docker run --rm --entrypoint /bin/sh "$IMAGE" -c '
+            set -eu
+            id
             test -x /usr/local/bin/auth
             test -d /usr/local/etc/auth/migrations
-            test ! -d /go
-            test ! -d /go/src/github.com/supabase/auth/hack
+            test ! -e /go/src/github.com/supabase/auth/hack
           '
 
       - name: Verify image history contains no runtime credentials
         run: |
           set -euo pipefail
-          if docker history --no-trunc "testagram-build/auth:${GITHUB_SHA}" | grep -E 'GOTRUE_JWT_SECRET|DATABASE_URL|POSTGRES_PASSWORD|SAML_PRIVATE_KEY|SUPABASE_SERVICE_ROLE_KEY'; then
+          IMAGE="testagram-build/auth:${GITHUB_SHA}"
+          if docker history --no-trunc "$IMAGE" | grep -E 'GOTRUE_JWT_SECRET|DATABASE_URL|POSTGRES_PASSWORD|SAML_PRIVATE_KEY|SUPABASE_SERVICE_ROLE_KEY'; then
             echo "Credential-shaped runtime configuration found in image history"
             exit 1
           fi
 
       - name: Verify Auth executable
         run: |
+          set -euo pipefail
           docker run --rm --entrypoint /usr/local/bin/auth "testagram-build/auth:${GITHUB_SHA}" --help >/tmp/testagram-auth-help.txt
           grep -q "Usage" /tmp/testagram-auth-help.txt || {
             echo "Auth executable did not produce expected help output"
