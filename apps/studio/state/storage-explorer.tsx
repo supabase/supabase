@@ -419,8 +419,17 @@ export function createStorageExplorerState({
     },
 
     refetchAllOpenedFolders: async () => {
-      const paths = state.openedFolders.map((folder) => folder.name)
-      await state.fetchFoldersByPath({ paths, searchString: state.itemSearchString })
+      if (state.itemSearchString) {
+        const paths = state.openedFolders.map((folder) => folder.name)
+        await state.fetchFoldersByPath({ paths: paths.slice(0, -1) })
+        await state.fetchFoldersByPath({
+          paths: [paths[paths.length - 1]],
+          searchString: state.itemSearchString,
+        })
+      } else {
+        const paths = state.openedFolders.map((folder) => folder.name)
+        await state.fetchFoldersByPath({ paths })
+      }
     },
 
     refreshAll: async () => {
