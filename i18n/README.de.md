@@ -41,7 +41,7 @@ Wie Sie einen Beitrag leisten können, erfahren Sie unter [Erste Schritte](../DE
 - [x] Alpha: Wir testen Supabase mit einer geschlossenen Gruppe von Kunden
 - [x] Öffentliche Alpha: Jeder kann sich unter [supabase.com/dashboard](https://supabase.com/dashboard) anmelden. Aber seien Sie nachsichtig mit uns, es gibt noch ein paar Macken
 - [x] Öffentliche Beta: Stabil genug für die meisten nicht-unternehmerischen Anwendungsfälle
-- [Öffentlich: Allgemeine Verfügbarkeit [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [Öffentlich: Allgemeine Verfügbarkeit [[status](https://supabase.com/features)]
 
 Wir befinden uns derzeit in der Public Beta. Beobachten Sie "releases" dieses Repos, um über größere Updates informiert zu werden.
 

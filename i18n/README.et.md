@@ -41,7 +41,7 @@ Et näha, kuidas panustada, külastage [Getting Started](../DEVELOPERS.md)
 - [x] Alpha: Me testime Supabase'i suletud kliendikogumiga
 - [x] Avalik Alpha: Igaüks saab registreeruda aadressil [supabase.com/dashboard](https://supabase.com/dashboard). Kuid olge meiega ettevaatlikud, seal on mõned veidrused
 - [x] Avalik beeta: Piisavalt stabiilne enamiku mitte-ettevõtluskasutuse jaoks
-- [ ] Avalik: Üldine kättesaadavus [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Avalik: Üldine kättesaadavus [[status](https://supabase.com/features)]
 
 Oleme praegu Public Beta versioonis. Jälgige selle repo "releases", et saada teateid suuremate uuenduste kohta.
 

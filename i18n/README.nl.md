@@ -41,7 +41,7 @@ Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](../DEVELOPERS.md)
 - [Alpha: We testen Supabase met een gesloten groep klanten
 - [x] Publieke Alpha: Iedereen kan zich aanmelden op [supabase.com/dashboard](https://supabase.com/dashboard). Maar doe het rustig aan, er zijn een paar kinken
 - [Publieke Beta: Stabiel genoeg voor de meeste niet-bedrijfsmatige toepassingen
-- [Publiek: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [Publiek: General Availability [[status](https://supabase.com/features)]
 
 We zijn momenteel in Openbare Beta. Bekijk "releases" van deze repo om op de hoogte te blijven van belangrijke updates.
 
