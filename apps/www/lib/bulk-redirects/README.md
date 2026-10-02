@@ -16,10 +16,19 @@ Add static redirects (simple `/old → /new` mappings with **no** `:path*`, `:ma
 
 ## Markdown Variants
 
-The build process automatically generates `.md` variants for any `/docs/guides/` redirects in `docs.json`. For example:
+**`docs-redirects-md-variants.json` is a generated file — do not hand-edit it.**
+
+It's derived from any `/docs/guides/` redirects in `docs.json`. For example:
 
 - `/docs/guides/api/api-keys` → generates `/docs/guides/api/api-keys.md`
-- This is written to `docs-md-variants.json` which Vercel also reads
+
+Regenerate it after changing `docs.json`:
+
+```bash
+pnpm run generate:docs-redirects-md-variants
+```
+
+CI fails the build if this file is out of sync with `docs.json` (see `.github/workflows/www-tests.yml`).
 
 ## Dynamic Redirects
 
@@ -27,4 +36,4 @@ Redirects with path matching patterns (`:path*`, `:match*`, regex) stay in `lib/
 
 ## Deployment
 
-The `prebuild` hook runs `generate-docs-md-variants.mjs` before each build, creating `.md` variants. Vercel then reads all `.json` files from this folder and serves them at the edge.
+Vercel reads all `.json` files from this folder (via `vercel.json`'s `bulkRedirectsPath`) and serves them at the edge. There's no build-time generation step — `docs-redirects-md-variants.json` is committed directly, like `docs.json` and `blog.json`.
