@@ -59,7 +59,7 @@ With heap storage, Postgres never updates a row in place: every update writes a 
 
 OrioleDB's undo log removes this problem at the source. Instead of leaving dead tuples behind, updates and deletes write page-level undo records, which the system reclaims automatically. This eliminates bloat entirely and VACUUM is no longer needed.
 
-Allowing lock-free page reads also makes OrioleDB more efficient under high concurrency, especially in IOPS use. OrioleDB delivers up to 2.2X higher throughput than Postgres heap in our public, TPC-C-derived benchmarks, published on [dbarena.com](http://dbarena.com/).
+Allowing lock-free page reads also makes OrioleDB more efficient under high concurrency, especially in IOPS use. OrioleDB delivers up to 1.8x higher throughput than Postgres heap in our public, TPC-C-derived benchmarks, published on [dbarena.com](http://dbarena.com/).
 
 <Admonition type="note">
 
