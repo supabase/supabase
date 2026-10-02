@@ -13062,7 +13062,6 @@ export interface components {
               /** @enum {string} */
               category: 'fixed_fee'
               description: string
-              discounted: boolean
               name: string
               period: {
                 end: string
@@ -13183,7 +13182,6 @@ export interface components {
                     }[]
                   }[]
                   compute_credits_used: number | null
-                  discounted: boolean
                   name: string
                   period: {
                     end: string
@@ -13307,7 +13305,6 @@ export interface components {
                     }[]
                   }[]
                   description: string
-                  discounted: boolean
                   name: string
                   period: {
                     end: string
@@ -13387,13 +13384,21 @@ export interface components {
           floorPrice: number | null
           prorated: boolean
         }
-        prepaidCredits: {
-          actualWithdrawnInElapsedCycle: number
-          currentBalance: number
-          expectedBalanceAtEndOfCycle: number
-          expectedWithdrawnAtEndOfCycle: number
-          projectedWithdrawnInRemainingCycle: number
-        }
+        prepaidCredits:
+          | {
+              actualWithdrawnInElapsedCycle: number
+              currentBalance: number
+              expectedBalanceAtEndOfCycle: number
+              expectedWithdrawnAtEndOfCycle: number
+              /** @enum {string} */
+              kind: 'with_forecast'
+              projectedWithdrawnInRemainingCycle: number
+            }
+          | {
+              actualWithdrawnInElapsedCycle: number
+              /** @enum {string} */
+              kind: 'without_forecast'
+            }
         projectedCosts: {
           projectedInRemainingCycle: number
           usage: {
@@ -13507,7 +13512,6 @@ export interface components {
                     }[]
                   }[]
                   compute_credits_used: number | null
-                  discounted: boolean
                   name: string
                   period: {
                     end: string
@@ -13631,7 +13635,6 @@ export interface components {
                     }[]
                   }[]
                   description: string
-                  discounted: boolean
                   name: string
                   period: {
                     end: string

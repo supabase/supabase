@@ -49,8 +49,15 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const invoice = upcomingInvoice?.upcomingInvoice
 
-  const hasMinimumFee = (invoice?.minimum_fee.expectedAtEndOfCycle ?? 0) > 0
-  const hasPrepaidCredits = (invoice?.prepaidCredits.expectedWithdrawnAtEndOfCycle ?? 0) !== 0
+  const hasMinimumFeeTopUp = (invoice?.minimum_fee.expectedAtEndOfCycle ?? 0) > 0
+  // Once costs exceed the floor price there's no top-up; show the floor price crossed out instead
+  const hasMetMinimumFee = !hasMinimumFeeTopUp && invoice?.minimum_fee.floorPrice != null
+  // Without a forecast, only the credits applied so far are known
+  const prepaidCreditsApplied =
+    invoice?.prepaidCredits.kind === 'with_forecast'
+      ? invoice.prepaidCredits.expectedWithdrawnAtEndOfCycle
+      : (invoice?.prepaidCredits.actualWithdrawnInElapsedCycle ?? 0)
+  const hasPrepaidCredits = prepaidCreditsApplied !== 0
   const hasAppliedCustomerBalance = (invoice?.appliedCustomerBalance ?? 0) !== 0
   const hasTax = invoice?.taxes.status === 'calculated'
   const hasProjectedCosts =
@@ -101,15 +108,14 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
             )}
           </Accordion>
 
-          {hasMinimumFee && (
+          {(hasMinimumFeeTopUp || hasMetMinimumFee) && (
             <InvoiceTotalRow
               title={invoice.minimum_fee.prorated ? 'Minimum Fee (prorated)' : 'Minimum Fee'}
-              tooltip={
-                invoice.minimum_fee.floorPrice === null
-                  ? "If your costs for the billing cycle are below the minimum fee, you're charged the difference."
-                  : `Your plan has a minimum fee of ${formatCurrency(invoice.minimum_fee.floorPrice)} per billing cycle. If your costs are below it, you're charged the difference.`
-              }
+              tooltip={getMinimumFeeTooltip(invoice.minimum_fee)}
               amount={invoice.minimum_fee.expectedAtEndOfCycle}
+              amountBeforeDiscount={
+                hasMetMinimumFee ? (invoice.minimum_fee.floorPrice ?? undefined) : undefined
+              }
             />
           )}
 
@@ -117,7 +123,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
             <InvoiceTotalRow
               title="Prepaid Credits"
               tooltip={<PrepaidCreditsTooltip prepaidCredits={invoice.prepaidCredits} />}
-              amount={-invoice.prepaidCredits.expectedWithdrawnAtEndOfCycle}
+              amount={-prepaidCreditsApplied}
             />
           )}
 
@@ -385,8 +391,6 @@ function PrepaidCreditsTooltip({
 }: {
   prepaidCredits: UpcomingInvoiceResponse['upcomingInvoice']['prepaidCredits']
 }) {
-  const hasProjectedWithdrawal = prepaidCredits.projectedWithdrawnInRemainingCycle > 0
-
   return (
     <>
       <p>
@@ -395,10 +399,12 @@ function PrepaidCreditsTooltip({
       </p>
       <p className="mt-2">
         {formatCurrency(prepaidCredits.actualWithdrawnInElapsedCycle)} of prepaid credits are
-        already applied to your invoice. You currently have{' '}
-        {formatCurrency(prepaidCredits.currentBalance)} remaining.
-        {hasProjectedWithdrawal &&
-          ` We expect your usage to consume another ${formatCurrency(prepaidCredits.projectedWithdrawnInRemainingCycle)} of credits, which would leave you at ${formatCurrency(prepaidCredits.expectedBalanceAtEndOfCycle)} at the end of the billing cycle.`}
+        already applied to your invoice.
+        {prepaidCredits.kind === 'with_forecast' && (
+          <PrepaidCreditsForecast prepaidCredits={prepaidCredits} />
+        )}
+        {prepaidCredits.kind === 'without_forecast' &&
+          " We can't estimate how many more credits your usage will consume before the end of the billing cycle."}
       </p>
       <p className="mt-2">
         Credits for fixed fees, like your plan or the HIPAA add-on, are applied daily. The amount
@@ -406,6 +412,40 @@ function PrepaidCreditsTooltip({
       </p>
     </>
   )
+}
+
+function PrepaidCreditsForecast({
+  prepaidCredits,
+}: {
+  prepaidCredits: Extract<
+    UpcomingInvoiceResponse['upcomingInvoice']['prepaidCredits'],
+    { kind: 'with_forecast' }
+  >
+}) {
+  const hasProjectedWithdrawal = prepaidCredits.projectedWithdrawnInRemainingCycle > 0
+
+  return (
+    <>
+      {` You currently have ${formatCurrency(prepaidCredits.currentBalance)} remaining.`}
+      {hasProjectedWithdrawal &&
+        ` We expect your usage to consume another ${formatCurrency(prepaidCredits.projectedWithdrawnInRemainingCycle)} of credits, which would leave you at ${formatCurrency(prepaidCredits.expectedBalanceAtEndOfCycle)} at the end of the billing cycle.`}
+    </>
+  )
+}
+
+function getMinimumFeeTooltip({
+  expectedAtEndOfCycle,
+  floorPrice,
+}: UpcomingInvoiceResponse['upcomingInvoice']['minimum_fee']) {
+  if (floorPrice === null) {
+    return "If your costs for the billing cycle are below the minimum fee, you're charged the difference."
+  }
+
+  if (expectedAtEndOfCycle === 0) {
+    return `Your costs are above your plan's minimum fee of ${formatCurrency(floorPrice)} per billing cycle, so no minimum fee applies.`
+  }
+
+  return `Your plan has a minimum fee of ${formatCurrency(floorPrice)} per billing cycle. If your costs are below it, you're charged the difference.`
 }
 
 function formatPricingTooltip(unitPriceDesc?: string | null) {
@@ -417,11 +457,13 @@ function InvoiceTotalRow({
   title,
   tooltip,
   amount,
+  amountBeforeDiscount,
   isEmphasized = false,
 }: {
   title: string
   tooltip?: ReactNode
   amount?: number
+  amountBeforeDiscount?: number
   isEmphasized?: boolean
 }) {
   return (
@@ -435,9 +477,13 @@ function InvoiceTotalRow({
         <span>{title}</span>
         {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
       </div>
-      <span className="text-right" translate="no">
-        {amount === undefined ? '-' : (formatCurrency(amount) ?? '-')}
-      </span>
+      {amount !== undefined && amountBeforeDiscount !== undefined ? (
+        <InvoiceLineItemAmount amount={amount} amountBeforeDiscount={amountBeforeDiscount} />
+      ) : (
+        <span className="text-right" translate="no">
+          {amount === undefined ? '-' : (formatCurrency(amount) ?? '-')}
+        </span>
+      )}
     </div>
   )
 }
