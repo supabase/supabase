@@ -1,0 +1,9 @@
+{
+  "name": "say",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "dependencies": {
+    "cat": "0.0.1",
+    "dog": "0.0.1"
+  }
+}

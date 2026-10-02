@@ -1,0 +1,39 @@
+{
+  "name": "Rust",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/jungaretti/features/make:1": {}
+  },
+  "runArgs": [
+    "--env-file",
+    ".env",
+    "--rm",
+    "--privileged",
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "extensions.verifySignature": false,
+        "lldb.launch.preRunCommands": [
+          "script lldb.debugger.HandleCommand('settings set target.source-map /rustc/{} \"{}/lib/rustlib/src/rust\"'.format(os.popen('rustc --version --verbose').read().split('commit-hash: ')[1].split('\\n')[0].strip(), os.popen('rustc --print sysroot').readline().strip()))"
+        ]
+      },
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "eamodio.gitlens",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.hexeditor",
+        "vadimcn.vscode-lldb",
+        "denoland.vscode-deno",
+        "dprint.dprint",
+        "editorconfig.editorconfig"
+      ]
+    }
+  }
+}

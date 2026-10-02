@@ -1,0 +1,74 @@
+/*
+
+    Copy this file into '.vscode/launch.json' or merge its contents into your existing
+    configurations.
+
+*/
+
+{
+  "configurations": [
+    {
+      "name": "Debug Runtime",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=edge-runtime",
+          "--features=cli/tracing"
+        ],
+        "filter": {
+          "kind": "bin"
+        }
+      },
+      "cwd": "${workspaceFolder}",
+      "sourceLanguages": [
+        "rust"
+      ],
+      "args": [
+        "-v",
+        "start",
+        "--main-service",
+        "./examples/main",
+        "--event-worker",
+        "./examples/event-manager"
+        // To enable the inspector capability, uncomment the line below.
+        // "--inspect-brk"
+
+        // If you want to listen to the inspect session on a different port, uncomment the
+        // line below instead.
+        // "--inspect-brk=127.0.0.1:<PORT>"
+
+        // If you want to allow an inspector session to be created on the main worker,
+        // uncomment the line below.
+        //
+        // This flag must be used in combination with the flag above.
+        // "--inspect-main"
+      ],
+      "env": {
+        "RUST_BACKTRACE": "full",
+        "EDGE_RUNTIME_PORT": "9998"
+        // If you want to get a detailed log, uncomment below.
+        // Value of environment variable below is described in detail in the links below:
+        // https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html#directives
+        // "RUST_LOG": "trace"
+      }
+    },
+    {
+      "name": "Attach V8 Inspector",
+      "type": "node",
+      "address": "127.0.0.1",
+      "request": "attach",
+      "localRoot": "/",
+      "remoteRoot": "/",
+      "timeout": 1000000,
+
+      // Properties below are optional.
+      "restart": true,
+
+      // Inspector is accepting sessions on 9229 by default. If you changed the listening port
+      // via the inspector flag above, this value must also be changed.
+      "port": 9229
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "workspace": [
+    "./cat",
+    "./dog",
+    "./say",
+    "./wolf"
+  ],
+  "imports": {
+    "@workspace/sheep": "./wolf/mod.ts"
+  }
+}

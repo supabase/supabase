@@ -1,0 +1,5 @@
+{
+  "sequence": "I love making pizza",
+  "labels": ["cooking", "travel", "dancing"],
+  "scores": [0.999162, 0.000473, 0.000365]
+}

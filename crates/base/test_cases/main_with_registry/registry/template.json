@@ -1,0 +1,49 @@
+{
+  "_id": "@mockscope/foobar",
+  "_rev": "1-c30105564f195a3038d3348840c9e080",
+  "name": "@mockscope/foobar",
+  "description": "Fake module",
+  "dist-tags": {
+    "latest": "1.0.0"
+  },
+  "versions": {
+    "1.0.0": {
+      "name": "@mockscope/foobar",
+      "version": "1.0.0",
+      "description": "Fake module",
+      "main": "index.js",
+      "license": "MIT",
+      "gitHead": "2666d6874aaebbaf7188e14d94eb8488079d6c2c",
+      "_id": "@mockscope/foobar@1.0.0",
+      "_shasum": "19d13344e0b701cae3374fa6f03d2d3f90847c1c",
+      "_from": ".",
+      "_npmVersion": "2.5.1",
+      "_nodeVersion": "1.2.0",
+      "_npmUser": {
+        "name": "foobar",
+        "email": "foobar@npmjs.org"
+      },
+      "maintainers": [{
+        "name": "foobar",
+        "email": "foobar@npmjs.org"
+      }],
+      "dist": {
+        "shasum": "cd2e97011c99721c5f0a6d677c50a144ec790a2d"
+      },
+      "directories": {}
+    }
+  },
+  "readme": "Mock module!\n",
+  "maintainers": [{
+    "name": "foobar",
+    "email": "foobar@npmjs.org"
+  }],
+  "time": {
+    "modified": "2015-05-05T10:32:06.793Z",
+    "created": "2015-05-05T10:32:06.793Z",
+    "1.0.0": "2015-05-05T10:32:06.793Z"
+  },
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "_attachments": {}
+}

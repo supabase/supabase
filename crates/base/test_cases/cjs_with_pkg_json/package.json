@@ -1,0 +1,12 @@
+{
+  "name": "js_with_pkg_json",
+  "version": "1.0.0",
+  "main": "index.cjs",
+  "type": "commonjs",
+  "dependencies": {
+    "is-even": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1"
+  }
+}

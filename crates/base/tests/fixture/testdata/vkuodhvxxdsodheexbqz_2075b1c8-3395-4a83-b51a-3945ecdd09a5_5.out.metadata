@@ -1,0 +1,4 @@
+{
+    "entrypoint": "file:///Users/lakshanperera/workspace/cli/supabase/functions/import-map/index.ts",
+    "importMap": "file:///Users/lakshanperera/workspace/cli/import_map.json"
+}

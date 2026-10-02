@@ -1,0 +1,8 @@
+{
+  // https://github.com/denoland/deno/issues/25226#issuecomment-2311454504
+  "workspace": [],
+  "imports": {
+    "std/": "https://deno.land/std@0.131.0/",
+    "foo/": "./bar/"
+  }
+}

@@ -1,0 +1,77 @@
+[package]
+name = "fs"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno.workspace = true
+
+deno_ast.workspace = true
+deno_core.workspace = true
+deno_fs.workspace = true
+deno_io.workspace = true
+deno_npm.workspace = true
+deno_semver.workspace = true
+
+eszip_trait.workspace = true
+
+base_rt.workspace = true
+ext_node.workspace = true
+
+anyhow.workspace = true
+async-trait.workspace = true
+either.workspace = true
+enum-as-inner.workspace = true
+eszip.workspace = true
+futures.workspace = true
+hyper_v014.workspace = true
+import_map.workspace = true
+indexmap.workspace = true
+log.workspace = true
+once_cell.workspace = true
+rkyv = { workspace = true, features = ["validation"] }
+serde.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+url.workspace = true
+urlencoding.workspace = true
+
+aws-config = "1.2"
+aws-credential-types = "1.2"
+aws-sdk-s3 = "1.2"
+aws-smithy-runtime = "1.7"
+aws-smithy-runtime-api = "1.7"
+headers = { version = "0.3", optional = true }
+hyper-proxy = { version = "0.9", optional = true, default-features = false, features = ["rustls"] }
+hyper-rustls = { version = "0.24", optional = true }
+memmap2 = "0.9"
+normalize-path = "0.2"
+rustls = { version = "0.21", optional = true }
+
+[dev-dependencies]
+base.workspace = true
+
+ext_event_worker.workspace = true
+
+ctor.workspace = true
+dotenvy.workspace = true
+rand.workspace = true
+serial_test.workspace = true
+
+aws-smithy-runtime = { version = "1.7", features = ["test-util"] }
+aws-smithy-runtime-api = { version = "1.7", features = ["test-util"] }
+
+[features]
+unsafe-proxy = [
+  "dep:headers",
+  "dep:hyper-proxy",
+  "dep:hyper-rustls",
+  "dep:rustls",
+]

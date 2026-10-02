@@ -1,0 +1,2 @@
+worker boot error: Uncaught SyntaxError: Invalid regular expression flags
+    at file:///src/index.ts:1:1

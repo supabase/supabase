@@ -1,0 +1,77 @@
+name: Release Native
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.target }})
+    strategy:
+      matrix:
+        include:
+          - runner: macos-14
+            target: aarch64-darwin
+          - runner: ubuntu-24.04
+            target: x86_64-linux
+          - runner: ubuntu-24.04-arm
+            target: aarch64-linux
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v13
+
+      - name: Restore Nix store cache
+        uses: actions/cache@v4
+        with:
+          path: /nix/store
+          key: edge-runtime-${{ matrix.target }}-${{ hashFiles('flake.lock') }}
+          restore-keys: edge-runtime-${{ matrix.target }}-
+
+      - name: Build
+        run: |
+          nix build --extra-experimental-features "nix-command flakes" \
+            --system ${{ matrix.target }}
+      - name: Package
+        run: |
+          TAR="edge-runtime-${{ github.ref_name }}-${{ matrix.target }}.tar.gz"
+          tar czf "$TAR" \
+            --dereference \
+            -C "$(readlink -f ./result)" \
+            .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: edge-runtime-${{ matrix.target }}
+          path: edge-runtime-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
+          retention-days: 1
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List files (debug)
+        run: ls -R artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: artifacts/**/*

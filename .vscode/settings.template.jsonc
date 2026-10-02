@@ -1,0 +1,27 @@
+/*
+
+    Copy this file into '.vscode/settings.json' or merge its contents into your existing
+    configurations.
+
+*/
+
+{
+  "lldb.launch.preRunCommands": [
+    "script lldb.debugger.HandleCommand('settings set target.source-map /rustc/{} \"{}/lib/rustlib/src/rust\"'.format(os.popen('rustc --version --verbose').read().split('commit-hash: ')[1].split('\\n')[0].strip(), os.popen('rustc --print sysroot').readline().strip()))"
+  ],
+  "rust-analyzer.cargo.features": [
+    "cli/tracing"
+  ],
+  "rust-analyzer.diagnostics.disabled": [
+    "E0308"
+  ],
+  "editor.rulers": [
+    80
+  ],
+  "editor.defaultFormatter": "dprint.dprint",
+  "editor.formatOnSave": true,
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
+    "editor.defaultFormatter": "dprint.dprint",
+    "editor.formatOnSave": true
+  }
+}

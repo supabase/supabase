@@ -1,0 +1,40 @@
+// copied from https://github.com/Jahmilli/k6-example
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist",
+
+    "target": "es5",
+    "moduleResolution": "node",
+    "lib": ["es2015", "dom", "es2015.collection"],
+    "module": "commonjs",
+    "noEmit": true,
+    "removeComments": false,
+
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "downlevelIteration": true,
+
+    "allowJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "config.ts",
+    "specs/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

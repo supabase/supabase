@@ -1,0 +1,25 @@
+[package]
+name = "ext_event_worker"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno_core.workspace = true
+
+base_mem_check.workspace = true
+
+anyhow.workspace = true
+enum-as-inner.workspace = true
+log.workspace = true
+serde.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+
+[features]
+tracing = []

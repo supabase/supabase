@@ -1,0 +1,11 @@
+{
+  "workspaces": [
+    "cat",
+    "dog",
+    "say"
+  ],
+  "type": "commonjs",
+  "dependencies": {
+    "say": "0.0.1"
+  }
+}

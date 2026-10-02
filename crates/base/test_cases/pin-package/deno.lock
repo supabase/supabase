@@ -1,0 +1,17 @@
+{
+  "version": "4",
+  "specifiers": {
+    "npm:is-odd@3": "3.0.0"
+  },
+  "npm": {
+    "is-number@6.0.0": {
+      "integrity": "sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg=="
+    },
+    "is-odd@3.0.0": {
+      "integrity": "sha512-204vE5IJ0Cd6pA6x1dMyLooGk6/xeKuq90imFuJN/ndMDBP4Sk9tJpBlTedHPvt6KDbtTDTsjVzzgctFqNV7FQ==",
+      "dependencies": [
+        "is-number"
+      ]
+    }
+  }
+}

@@ -1,0 +1,5 @@
+[
+  { "entity": "B-PER", "score": 0.993074, "index": 4.0, "word": "Kalle" },
+  { "entity": "I-PER", "score": 0.997494, "index": 5.0, "word": "##by" },
+  { "entity": "B-LOC", "score": 0.999832, "index": 11.0, "word": "Brazil" }
+]

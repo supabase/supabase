@@ -1,0 +1,49 @@
+[package]
+name = "deno_facade"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno.workspace = true
+deno_config.workspace = true
+deno_core.workspace = true
+
+eszip_trait.workspace = true
+fs.workspace = true
+
+ext_node.workspace = true
+ext_runtime.workspace = true
+
+anyhow.workspace = true
+async-trait.workspace = true
+base64.workspace = true
+eszip = { workspace = true, features = ["xxhash3"] }
+futures.workspace = true
+futures-util.workspace = true
+glob.workspace = true
+import_map.workspace = true
+indexmap.workspace = true
+log.workspace = true
+monch.workspace = true
+once_cell.workspace = true
+regex.workspace = true
+rkyv = { workspace = true, features = ["validation"] }
+scopeguard.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+url.workspace = true
+
+dashmap = "5.5.3"
+hashlink = "0.8"
+pathdiff = "0.2"
+
+[dev-dependencies]
+enum-as-inner.workspace = true
+tempfile.workspace = true

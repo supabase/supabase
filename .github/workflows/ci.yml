@@ -1,0 +1,176 @@
+name: CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+    paths: &watch
+      - '.cargo/**'
+      - 'cli/**'
+      - 'crates/**'
+      - 'deno/**'
+      - 'ext/**'
+      - 'vendor/**'
+      - '.env'
+      - 'Cargo.lock'
+      - 'Cargo.toml'
+      - 'rust-toolchain.toml'
+  push:
+    branches:
+      - main
+      - develop
+    paths: *watch
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  CARGO_TERM_COLOR: always
+  RUSTUP_MAX_RETRIES: 10
+  ORT_DYLIB_PATH: /tmp/onnxruntime/lib/libonnxruntime.so
+  RUST_LOG: ext_event_worker=trace
+  ESZIP_TESTDATA_REPO: supabase/edge-runtime-test-eszip
+  EXT_AI_CACHE_DIR: /home/runner/.cache/ext-ai-cache
+
+jobs:
+  cargo-fmt:
+    if: github.event.pull_request.draft == false
+    name: 'fmt'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282 # v2.0.4
+        with:
+          deno-version: v2.x
+      - run: rustup show
+      - run: deno run --allow-write --allow-read --allow-run --allow-net ./scripts/format.js --check
+
+  cargo-clippy:
+    if: github.event.pull_request.draft == false
+    name: 'cargo clippy'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install libblas-dev liblapack-dev libopenblas-dev
+      - run: rustup show
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+      - run: ./scripts/clippy.sh
+
+  cargo-test:
+    if: github.event.pull_request.draft == false
+    name: 'cargo test'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install libblas-dev liblapack-dev libopenblas-dev
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@328a871ad8f62ecac78390391f463ccabc974b72 # v2.69.9
+        with:
+          tool: cargo-llvm-cov
+
+      - name: Remove unwanted software
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+
+          sudo apt-get remove --purge -y man-db
+          sudo apt-get remove 'clang-13*' 'clang-14*' 'clang-15*' 'llvm-13*' 'llvm-14*' 'llvm-15*' 'lld-13*' 'lld-14*' 'lld-15*'
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - run: rustup show
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+
+      - uses: cardinalby/export-env-action@b16a08b396d047e3f9e1446e3946440e2be02a73 # 2.2.2
+        with:
+          envFile: '.env'
+
+      - name: Install ONNX Runtime Library
+        run: ./scripts/install_onnx.sh "${{ env.ONNXRUNTIME_VERSION }}" linux x64 /tmp/onnxruntime
+
+      - name: Prepare test eszip binaries
+        if: |
+          github.actor != 'dependabot[bot]' &&
+          (
+            github.event_name != 'pull_request'
+            || github.event.pull_request.head.repo.full_name == github.repository
+          )
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ env.ESZIP_TESTDATA_REPO }}
+          path: ./edge-runtime-test-eszip
+          token: ${{ secrets.EDGE_RUNTIME_ORG_TOKEN }}
+      - name: Decompress test eszip binaries
+        if: |
+          github.actor != 'dependabot[bot]' &&
+          (
+            github.event_name != 'pull_request'
+            || github.event.pull_request.head.repo.full_name == github.repository
+          )
+        run: |
+          mkdir -p crates/base/tests/fixture/testdata
+          ./scripts/esbr.cjs decompress ./edge-runtime-test-eszip/testdata
+          mv ./edge-runtime-test-eszip/testdata/*.out crates/base/tests/fixture/testdata
+
+      - name: Install Supabase Storage S3 credentials for testing
+        if: |
+          github.actor != 'dependabot[bot]' &&
+          (
+            github.event_name != 'pull_request'
+            || github.event.pull_request.head.repo.full_name == github.repository
+          )
+        run: |
+          cd crates/fs/tests
+          echo "S3FS_TEST_SUPABASE_STORAGE=true" >> .env
+          echo "S3FS_TEST_APP_NAME=edge_runtime_github_ci" >> .env
+          echo "S3FS_TEST_BUCKET_NAME=$BUCKET_NAME" >> .env
+          echo "S3FS_TEST_ENDPOINT_URL=$ENDPOINT_URL" >> .env
+          echo "S3FS_TEST_REGION=$REGION" >> .env
+          echo "S3FS_TEST_ACCESS_KEY_ID=$ACCESS_KEY_ID" >> .env
+          echo "S3FS_TEST_SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY" >> .env
+        shell: bash
+        env:
+          BUCKET_NAME: ${{ secrets.SUPABASE_S3_BUCKET_NAME }}
+          ENDPOINT_URL: ${{ secrets.SUPABASE_S3_ENTRYPOINT }}
+          REGION: ${{ secrets.SUPABASE_S3_REGION }}
+          ACCESS_KEY_ID: ${{ secrets.SUPABASE_S3_ACCESS_KEY }}
+          SECRET_ACCESS_KEY: ${{ secrets.SUPABASE_S3_SECRET }}
+
+      - name: Set AI model cache directory
+        run: |
+          echo "EXT_AI_CACHE_DIR=$HOME/.cache/ext-ai-cache" >> .env
+        shell: bash
+
+      - name: Cache AI models
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ env.EXT_AI_CACHE_DIR }}
+          key: ext-ai-cache-${{ runner.os }}-v1
+          restore-keys: |
+            ext-ai-cache-${{ runner.os }}-
+
+      - name: Generate code coverage
+        id: coverage
+        run: |
+          cargo llvm-cov test --workspace --no-fail-fast --lcov -j 1 --output-path lcov.info
+      - name: Coveralls upload
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+        with:
+          fail-on-error: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: lcov.info
+          debug: true

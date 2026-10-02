@@ -1,0 +1,96 @@
+[package]
+name = "deno"
+version = "2.1.4"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno_ast = { workspace = true, features = ["bundler", "cjs", "codegen", "proposal", "react", "sourcemap", "transforms", "typescript", "view", "visit"] }
+deno_core.workspace = true
+
+deno_cache_dir.workspace = true
+deno_config = { workspace = true, features = ["workspace"] }
+deno_crypto.workspace = true
+deno_fetch.workspace = true
+deno_fs.workspace = true
+deno_graph.workspace = true
+deno_http.workspace = true
+deno_io.workspace = true
+deno_lockfile.workspace = true
+deno_net.workspace = true
+deno_npm.workspace = true
+deno_package_json.workspace = true
+deno_path_util.workspace = true
+deno_permissions.workspace = true
+deno_semver.workspace = true
+deno_telemetry.workspace = true
+deno_tls.workspace = true
+deno_url.workspace = true
+deno_web.workspace = true
+deno_webidl.workspace = true
+deno_websocket.workspace = true
+deno_webstorage.workspace = true
+
+deno_npm_cache.workspace = true
+deno_resolver.workspace = true
+node_resolver.workspace = true
+
+ext_node.workspace = true
+ext_runtime.workspace = true
+
+anyhow.workspace = true
+async-trait.workspace = true
+base32.workspace = true
+base64.workspace = true
+cache_control.workspace = true
+chrono = { workspace = true, features = ["now"] }
+dashmap.workspace = true
+dotenvy.workspace = true
+faster-hex.workspace = true
+flate2.workspace = true
+fs3.workspace = true
+http.workspace = true
+http-body.workspace = true
+http-body-util.workspace = true
+hyper.workspace = true
+hyper-util.workspace = true
+hyper_v014.workspace = true
+import_map = { workspace = true, features = ["ext"] }
+indexmap.workspace = true
+lazy-regex.workspace = true
+libc.workspace = true
+log.workspace = true
+notify.workspace = true
+once_cell.workspace = true
+percent-encoding.workspace = true
+rand = { workspace = true, features = ["small_rng"] }
+regex.workspace = true
+reqwest.workspace = true
+ring.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tar.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+twox-hash.workspace = true
+urlencoding.workspace = true
+
+bincode = "=1.3.3"
+dissimilar = "=1.0.4"
+hex = "0.4"
+pathdiff = "0.2.1"
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+junction.workspace = true
+winapi = { workspace = true, features = ["knownfolders", "mswsock", "objbase", "shlobj", "tlhelp32", "winbase", "winerror", "winsock2"] }
+
+[target.'cfg(unix)'.dependencies]
+nix.workspace = true

@@ -1,0 +1,6 @@
+{
+  "workspace": [],
+  "compilerOptions": {
+    "experimentalDecorators": true
+  }
+}

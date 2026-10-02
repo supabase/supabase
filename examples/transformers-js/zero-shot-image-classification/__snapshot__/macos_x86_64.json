@@ -1,0 +1,6 @@
+[
+  { "score": 0.982233, "label": "cat" },
+  { "score": 0.012787, "label": "dog" },
+  { "score": 0.003186, "label": "airplane" },
+  { "score": 0.001794, "label": "bird" }
+]
