@@ -29,6 +29,7 @@ enum MenuId {
   Contributing = 'contributing',
   RefServerV1 = 'reference_server_v1',
   RefMiddlewareV1 = 'reference_middleware_v1',
+  RefTanstackDbV1 = 'reference_tanstack_db_v1',
   RefJavaScriptV1 = 'reference_javascript_v1',
   RefJavaScriptV2 = 'reference_javascript_v2',
   RefDartV1 = 'reference_dart_v1',

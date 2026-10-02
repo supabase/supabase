@@ -1,0 +1,56 @@
+{
+  "title": "supabaseCollectionOptions()",
+  "description": "Builds the configuration for a TanStack DB collection backed by a Postgres table. Pass the result to `createCollection()` from `@tanstack/react-db`.",
+  "params": [
+    {
+      "name": "tableName",
+      "isOptional": false,
+      "type": "string",
+      "description": "The Postgres table this collection reads from and writes to."
+    },
+    {
+      "name": "keys",
+      "isOptional": false,
+      "type": "string[]",
+      "description": "The primary key column(s) for the table."
+    },
+    {
+      "name": "schema",
+      "isOptional": false,
+      "type": "ZodSchema | ValibotSchema",
+      "description": "A schema used to validate and type each row."
+    },
+    {
+      "name": "supabase",
+      "isOptional": false,
+      "type": "SupabaseClient",
+      "description": "The Supabase client instance to query and subscribe through."
+    },
+    {
+      "name": "queryClient",
+      "isOptional": true,
+      "type": "QueryClient",
+      "description": "An existing TanStack Query client to share, if you already use one."
+    },
+    {
+      "name": "realtime",
+      "isOptional": true,
+      "type": "boolean",
+      "description": "Keep the collection in sync across clients using Supabase Realtime."
+    },
+    {
+      "name": "realtimeUseFilter",
+      "isOptional": true,
+      "type": "boolean",
+      "description": "Apply server-side filtering to realtime updates instead of filtering on the client. Defaults to `false`."
+    }
+  ],
+  "notes": "- Realtime sync is experimental.\n- Collections work with an existing Supabase project and respect Row Level Security. No migrations required.",
+  "examples": [
+    {
+      "id": "create-collection",
+      "name": "Create a collection",
+      "code": "```tsx\nimport { createCollection } from '@tanstack/react-db'\nimport { supabaseCollectionOptions } from '@supabase-labs/tanstack-db'\n\nconst todos = createCollection(\n  supabaseCollectionOptions({\n    tableName: 'todos',\n    keys: ['id'],\n    schema: todosSchema,\n    supabase,\n    realtime: true,\n  })\n)\n```"
+    }
+  ]
+}
