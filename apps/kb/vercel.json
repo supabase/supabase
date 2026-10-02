@@ -11,6 +11,11 @@
       "source": "/kb/topics/:path+.md",
       "destination": "/kb/markdown/topics/:path+.md",
       "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/:path+.md",
+      "destination": "/kb/markdown/troubleshooting/:path+.md",
+      "permanent": true
     }
   ],
   "rewrites": [

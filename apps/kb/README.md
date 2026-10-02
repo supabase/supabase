@@ -44,3 +44,9 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Federated troubleshooting content
+
+`src/content/troubleshooting/` isn't hand-written — it's fetched from a private repo by
+`scripts/federated-content/fetch-federated-content.ts` as part of the build (`pnpm run fetch:federated-content`)
+and is gitignored. See `AGENTS.md` for how it works and what's intentionally left out for now.

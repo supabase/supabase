@@ -5,16 +5,16 @@ import { Admonition } from 'ui-patterns/Admonition'
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
 
 export async function getStaticPaths() {
-	const guides = await getCollection('guides')
-	return guides.map((guide) => ({
-		params: { slug: guide.id },
-		props: { guide },
+	const troubleshooting = await getCollection('troubleshooting')
+	return troubleshooting.map((entry) => ({
+		params: { slug: entry.id },
+		props: { entry },
 	}))
 }
 
-const { guide } = Astro.props
-const { title, description, topics, github_url } = guide.data
-const { Content } = await render(guide)
+const { entry } = Astro.props
+const { title, description, topics, github_url } = entry.data
+const { Content } = await render(entry)
 ---
 
 <ArticleLayout title={title} description={description} topics={topics} github_url={github_url}>
