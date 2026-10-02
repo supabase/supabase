@@ -4,6 +4,33 @@
  */
 
 export interface paths {
+  '/v1/webhooks/events': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Publish event
+     * @description Ingests and schedules a new webhook event to be published out to all subscribed endpoints.
+     *
+     *     In case of non-successful response status codes, early termination, networking issues,
+     *     requests to this endpoint should be retried until it succeeds, otherwise there is a risk of
+     *     loosing events.
+     *
+     *     `meta.idempotency_key` is used to ensure idempotency when retrying the requests and so it
+     *     must always be provided.
+     */
+    post: operations['v1-webhooks-events-post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/organizations/{slug}/integrations/github/connections': {
     parameters: {
       query?: never
@@ -2723,6 +2750,325 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  'v1-webhooks-events-post': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          data: {
+            attributes: {
+              /**
+               * @description Organization slug
+               * @example tsrqponmlkjihgfedcba
+               */
+              organization_slug: string
+              /** @description Extra data to pass to consumers. `organization_slug` and `project_ref` (if applicable) are always provided by default. */
+              payload?: {
+                [key: string]: unknown
+              }
+              /** @description Project's ref. If left unspecified or `null`, the event will published as organization-wide, only to organization-wide endpoints. */
+              project_ref?: string | null
+              /**
+               * Format: date-time
+               * @description Optional timestamp of event publication.
+               */
+              timestamp?: string
+              /**
+               * @description Webhook event type.
+               * @enum {string}
+               */
+              type:
+                | 'v1.project.paused'
+                | 'v1.project.created'
+                | 'v1.project.restored'
+                | 'v1.project.transferred'
+                | 'v1.project.removed'
+                | 'v1.project.restarted'
+                | 'v1.project.status.changed'
+                | 'v1.project.backup.started'
+                | 'v1.project.branch.created'
+                | 'v1.project.branch.updated'
+                | 'v1.project.branch.removed'
+                | 'v1.organization.member.invitation.created'
+                | 'v1.organization.member.invitation.canceled'
+                | 'v1.organization.member.added'
+                | 'v1.organization.member.removed'
+                | 'v1.organization.member.role.assigned'
+                | 'v1.organization.member.role.removed'
+                | 'v1.organization.member.role.updated'
+                | 'v1.organization.billing.plan.upgraded'
+                | 'v1.organization.billing.plan.downgraded'
+                | 'project.v1.paused'
+                | 'project.v1.created'
+                | 'project.v1.restored'
+                | 'project.v1.transferred'
+                | 'project.v1.removed'
+                | 'project.v1.restarted'
+                | 'project.v1.status.changed'
+                | 'project.v1.backup.started'
+                | 'project.v1.branch.created'
+                | 'project.v1.branch.updated'
+                | 'project.v1.branch.removed'
+                | 'organization.v1.member.invitation.created'
+                | 'organization.v1.member.invitation.canceled'
+                | 'organization.v1.member.added'
+                | 'organization.v1.member.removed'
+                | 'organization.v1.member.role.assigned'
+                | 'organization.v1.member.role.removed'
+                | 'organization.v1.member.role.updated'
+                | 'organization.v1.billing.plan.upgraded'
+                | 'organization.v1.billing.plan.downgraded'
+                | 'project.v1.branch.deleted'
+            }
+            /**
+             * @description Resource type.
+             * @constant
+             */
+            type: 'event'
+          }
+          meta: {
+            /** @description Idempotency key. */
+            idempotency_key: string
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Events published */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data: {
+              id: string
+              /**
+               * @description Resource type.
+               * @constant
+               */
+              type: 'ingress'
+            }
+          }
+        }
+      }
+      /** @description PermissionDenied */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'forbidden'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Forbidden'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericRequestTimeout */
+      408: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'request_timeout'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Request timed out'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description GenericTooManyRequests */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'rate_limit_exceeded'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Rate limit exceeded'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description Multiple error responses */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error:
+              | {
+                  /** @constant */
+                  code: 'internal_server_error'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Internal Server Error'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+              | {
+                  /** @constant */
+                  code: 'event_ingress_failed'
+                  description?: string
+                  id?: string
+                  issues?: components['schemas']['APIErrorObject'][]
+                  links?: {
+                    [key: string]: {
+                      describedby?: string
+                      href: string
+                      meta?: {
+                        [key: string]: unknown
+                      }
+                      rel?: string
+                      title?: string
+                      type?: string
+                    }
+                  }
+                  /** @constant */
+                  message: 'Failed to ingress the event'
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+      /** @description TemporarilyDisabled */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            error: {
+              /** @constant */
+              code: 'webhooks_disabled'
+              description?: string
+              id?: string
+              issues?: components['schemas']['APIErrorObject'][]
+              links?: {
+                [key: string]: {
+                  describedby?: string
+                  href: string
+                  meta?: {
+                    [key: string]: unknown
+                  }
+                  rel?: string
+                  title?: string
+                  type?: string
+                }
+              }
+              /** @constant */
+              message: 'Webhooks are temporarily disabled'
+              meta?: {
+                [key: string]: unknown
+              }
+            }
+            $defs: {
+              APIErrorObject: components['schemas']['APIErrorObject']
+            }
+          }
+        }
+      }
+    }
+  }
   'v2-list-organization-github-connections': {
     parameters: {
       query?: {
@@ -3340,7 +3686,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3357,14 +3703,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3381,7 +3727,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -3401,7 +3747,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.delivery'
+              code: 'delivery_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -3418,7 +3764,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Delivery not found'
+              message: 'Webhook delivery not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -3455,7 +3801,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -3475,7 +3821,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -3492,7 +3838,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -3621,7 +3967,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3638,14 +3984,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3662,7 +4008,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -3682,7 +4028,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.delivery'
+              code: 'delivery_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -3699,7 +4045,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Delivery not found'
+              message: 'Webhook delivery not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -3736,7 +4082,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -3756,7 +4102,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -3773,7 +4119,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -4005,7 +4351,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4022,14 +4368,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4046,7 +4392,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -4083,7 +4429,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -4103,7 +4449,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -4120,7 +4466,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -4397,7 +4743,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4414,14 +4760,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4438,7 +4784,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -4475,7 +4821,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -4495,7 +4841,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -4512,7 +4858,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -4715,7 +5061,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4732,14 +5078,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4756,7 +5102,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -4793,7 +5139,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -4813,7 +5159,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -4830,7 +5176,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -5035,7 +5381,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5052,14 +5398,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5076,7 +5422,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -5096,7 +5442,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5113,7 +5459,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -5150,7 +5496,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -5170,7 +5516,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5187,7 +5533,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -5392,7 +5738,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5409,14 +5755,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5433,7 +5779,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -5453,7 +5799,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5470,7 +5816,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -5507,7 +5853,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -5527,7 +5873,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5544,7 +5890,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -5820,7 +6166,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5837,14 +6183,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5861,7 +6207,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -5881,7 +6227,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5898,7 +6244,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -5935,7 +6281,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -5955,7 +6301,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5972,7 +6318,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -6170,7 +6516,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6187,14 +6533,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6211,7 +6557,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -6231,7 +6577,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -6248,7 +6594,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -6285,7 +6631,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -6305,7 +6651,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -6322,7 +6668,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -6474,7 +6820,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'bad_request.endpoint.test.disabled'
+                  code: 'endpoint_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6491,14 +6837,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Bad Request: Endpoint is disabled'
+                  message: 'Webhook endpoint is disabled'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'bad_request.endpoint.test.wrong_event_type'
+                  code: 'endpoint_event_type_not_subscribed'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6515,7 +6861,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Bad Request: Provided event type is not subscribed to by the endpoint'
+                  message: 'Webhook endpoint is not subscribed to this event type'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -6573,7 +6919,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6590,14 +6936,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6614,7 +6960,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -6634,7 +6980,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -6651,7 +6997,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -6688,7 +7034,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -6708,7 +7054,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -6725,7 +7071,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -8345,7 +8691,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8362,14 +8708,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8386,7 +8732,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -8406,7 +8752,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.delivery'
+              code: 'delivery_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -8423,7 +8769,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Delivery not found'
+              message: 'Webhook delivery not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -8460,7 +8806,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -8480,7 +8826,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -8497,7 +8843,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -8626,7 +8972,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8643,14 +8989,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8667,7 +9013,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -8687,7 +9033,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.delivery'
+              code: 'delivery_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -8704,7 +9050,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Delivery not found'
+              message: 'Webhook delivery not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -8741,7 +9087,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -8761,7 +9107,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -8778,7 +9124,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -9010,7 +9356,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9027,14 +9373,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9051,7 +9397,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -9088,7 +9434,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -9108,7 +9454,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -9125,7 +9471,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -9402,7 +9748,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9419,14 +9765,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9443,7 +9789,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -9480,7 +9826,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -9500,7 +9846,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -9517,7 +9863,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -9720,7 +10066,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9737,14 +10083,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9761,7 +10107,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -9798,7 +10144,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -9818,7 +10164,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -9835,7 +10181,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -10040,7 +10386,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10057,14 +10403,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10081,7 +10427,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -10101,7 +10447,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10118,7 +10464,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -10155,7 +10501,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -10175,7 +10521,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10192,7 +10538,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -10397,7 +10743,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10414,14 +10760,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10438,7 +10784,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -10458,7 +10804,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10475,7 +10821,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -10512,7 +10858,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -10532,7 +10878,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10549,7 +10895,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -10825,7 +11171,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10842,14 +11188,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10866,7 +11212,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -10886,7 +11232,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10903,7 +11249,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -10940,7 +11286,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -10960,7 +11306,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10977,7 +11323,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -11175,7 +11521,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11192,14 +11538,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11216,7 +11562,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -11236,7 +11582,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11253,7 +11599,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -11290,7 +11636,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -11310,7 +11656,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11327,7 +11673,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -11479,7 +11825,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'bad_request.endpoint.test.disabled'
+                  code: 'endpoint_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11496,14 +11842,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Bad Request: Endpoint is disabled'
+                  message: 'Webhook endpoint is disabled'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'bad_request.endpoint.test.wrong_event_type'
+                  code: 'endpoint_event_type_not_subscribed'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11520,7 +11866,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Bad Request: Provided event type is not subscribed to by the endpoint'
+                  message: 'Webhook endpoint is not subscribed to this event type'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -11578,7 +11924,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11595,14 +11941,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11619,7 +11965,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -11639,7 +11985,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11656,7 +12002,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -11693,7 +12039,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -11713,7 +12059,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11730,7 +12076,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
