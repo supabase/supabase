@@ -14,6 +14,6 @@ test("relative traversal is rejected by the agent protocol contract", () => {
 
 test("root identifiers are opaque and filesystem paths never enter command payloads", () => {
   const command = { root_id: "root-uuid", relative_path: "videos/show.mp4" };
-  assert.equal("root-uuid" in command, true);
+  assert.equal("root_id" in command, true);
   assert.equal("path" in command, false);
 });
