@@ -299,11 +299,11 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
     return (
       <div className="flex flex-col -space-y-px">
         <RadixPanel />
+        <ShadcnPanel />
         <VaulPanel />
         <InputOtp />
         <ReactAccesibleTreeViewPanel />
         <RechartsPanel />
-        {/* <ShadcnPanel /> */}
       </div>
     )
   }
