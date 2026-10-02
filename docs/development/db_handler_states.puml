@@ -1,0 +1,104 @@
+@startuml DbHandler State Diagram
+
+skinparam state {
+  BackgroundColor White
+  BorderColor Black
+  ArrowColor Black
+  FontSize 13
+}
+
+skinparam defaultFontName monospaced
+skinparam shadowing false
+
+' ── Top-down layout to mirror the ASCII diagram ──
+top to bottom direction
+
+' ════════════════════════════════════════════════════
+'  INIT — three branches
+' ════════════════════════════════════════════════════
+
+state init <<entryPoint>>
+
+init --> connect_cooldown : cooldown > 0
+init --> connect          : secrets ok
+init --> waiting_for_secrets_init : no secrets
+
+' ════════════════════════════════════════════════════
+'  CONNECT COOLDOWN
+' ════════════════════════════════════════════════════
+
+state connect_cooldown : (state_timeout)
+
+connect_cooldown --> connect                       : timeout\n[secrets ok]
+connect_cooldown --> waiting_for_secrets_cooldown   : timeout\n[no secrets]
+
+' ════════════════════════════════════════════════════
+'  WAITING FOR SECRETS (two entry points converge)
+' ════════════════════════════════════════════════════
+
+state waiting_for_secrets_init as "waiting_for_secrets"
+state waiting_for_secrets_cooldown as "waiting_for_secrets"
+
+waiting_for_secrets_init     --> connect : secrets_available
+waiting_for_secrets_cooldown --> connect : secrets_available
+
+waiting_for_secrets_init     --> [*] : manager DOWN
+waiting_for_secrets_cooldown --> [*] : manager DOWN
+
+' ════════════════════════════════════════════════════
+'  CONNECT
+' ════════════════════════════════════════════════════
+
+state connect : (TCP + TLS + startup)
+
+connect --> authentication         : success
+connect --> terminating_with_error : failure
+
+' ════════════════════════════════════════════════════
+'  AUTHENTICATION
+' ════════════════════════════════════════════════════
+
+authentication --> idle                     : ready_for_query
+authentication --> terminating_with_error   : error / socket closed
+
+' ════════════════════════════════════════════════════
+'  IDLE ⇄ BUSY
+' ════════════════════════════════════════════════════
+
+idle --> busy : checkout
+busy --> idle : ready_for_query
+
+idle --> [*] : socket closed
+busy --> [*] : socket closed
+
+' ════════════════════════════════════════════════════
+'  CLEANUP PATH
+' ════════════════════════════════════════════════════
+
+idle --> waiting_cleanup : cleanup (session)
+busy --> waiting_cleanup : cleanup (session)
+
+state waiting_cleanup : (state_timeout)
+
+waiting_cleanup --> idle : ready_for_query
+waiting_cleanup --> [*]  : timeout / overflow
+
+' ════════════════════════════════════════════════════
+'  TERMINATION
+' ════════════════════════════════════════════════════
+
+state terminating_with_error
+
+terminating_with_error --> [*] : finalize_termination
+
+' ════════════════════════════════════════════════════
+'  GLOBAL TRANSITIONS (from any state)
+' ════════════════════════════════════════════════════
+
+note as N1
+  **From any state:**
+  • linked ClientHandler EXIT → STOP
+  • terminate_with_error → terminating_with_error
+end note
+
+@enduml

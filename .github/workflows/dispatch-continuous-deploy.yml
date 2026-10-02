@@ -1,0 +1,30 @@
+name: Dispatch continuous deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: supabase
+          repositories: supavisor-deployments
+
+      - name: Dispatch continuous-deploy.yml
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh workflow run continuous-deploy.yml \
+            --repo supabase/supavisor-deployments \
+            --ref main \
+            -f commit_sha="${{ github.sha }}"

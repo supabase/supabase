@@ -1,0 +1,19 @@
+{
+  "name": "supavisor-integration",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test:postgres": "node ./postgres/index.js",
+    "test:prisma": "node ./prisma/index.js",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
+    "@prisma/client": "^5.7.0",
+    "postgres": "^3.4.5",
+    "prisma": "^5.7.0",
+    "ws": "^8.18.3"
+  }
+}

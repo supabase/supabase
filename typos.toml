@@ -1,0 +1,11 @@
+[files]
+extend-exclude = [
+  # Ignore integration tests, as these can be copied as-is
+  "test/integration/**"
+]
+
+[default]
+extend-ignore-re = [
+  "\\bey[A-Za-z0-9_-]{20,}\\.ey[A-Za-z0-9_-]{20,}\\.[A-Za-z0-9_-]{20,}\\b",
+  "\\bfly-local-[a-z0-9]+\\b"
+]

@@ -1,0 +1,7 @@
+{"2.9.5",
+ [{"2.9.4",
+   [{load_module,'Elixir.Supavisor.HotUpgrade'},
+    {apply,{'Elixir.Supavisor.HotUpgrade',apply_runtime_config,["2.9.5"]}}]}],
+ [{"2.9.4",
+   [{load_module,'Elixir.Supavisor.HotUpgrade'},
+    {apply,{'Elixir.Supavisor.HotUpgrade',apply_runtime_config,["2.9.4"]}}]}]}.

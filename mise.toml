@@ -1,0 +1,187 @@
+# Tool versions live in .tool-versions (also read by the Dockerfile and CI).
+
+[tasks.dev]
+description = "Run node1 in IEx"
+raw = true
+run = "iex --name node1@127.0.0.1 --cookie cookie -S mix run --no-halt"
+
+[tasks.dev.env]
+_.file = "{{config_root}}/.env.dev"
+MIX_ENV = "dev"
+FLY_ALLOC_ID = "111e4567-e89b-12d3-a456-426614174000"
+DB_POOL_SIZE = "5"
+METRICS_DISABLED = "false"
+AVAILABILITY_ZONE = "ap-southeast-1b"
+ERL_AFLAGS = "-kernel shell_history enabled +zdbbl 2097151"
+
+[tasks."dev:node2"]
+description = "Run node2 in IEx"
+raw = true
+run = "iex --name node2@127.0.0.1 --cookie cookie -S mix phx.server"
+
+[tasks."dev:node2".env]
+_.file = "{{config_root}}/.env.dev"
+MIX_ENV = "dev"
+PORT = "4001"
+PROXY_PORT_SESSION = "5442"
+PROXY_PORT_TRANSACTION = "6553"
+PROXY_PORT = "5402"
+SESSION_PROXY_PORTS = "12200,12201,12202,12203"
+TRANSACTION_PROXY_PORTS = "12204,12205,12206,12207"
+NODE_IP = "localhost"
+AVAILABILITY_ZONE = "ap-southeast-1c"
+ERL_AFLAGS = "-kernel shell_history enabled"
+
+[tasks."dev:node3"]
+description = "Run node3 in IEx"
+raw = true
+run = "iex --name node3@127.0.0.1 --cookie cookie -S mix phx.server"
+
+[tasks."dev:node3".env]
+_.file = "{{config_root}}/.env.dev"
+MIX_ENV = "dev"
+PORT = "4002"
+PROXY_PORT_SESSION = "5443"
+PROXY_PORT_TRANSACTION = "6554"
+PROXY_PORT = "5403"
+SESSION_PROXY_PORTS = "12300,12301,12302,12303"
+TRANSACTION_PROXY_PORTS = "12304,12305,12306,12307"
+NODE_IP = "localhost"
+ERL_AFLAGS = "-kernel shell_history enabled"
+
+[tasks."db:start"]
+description = "Start the metadata database"
+run = "docker-compose -f ./docker-compose.db.yml up -d"
+
+[tasks."db:stop"]
+description = "Stop the metadata database"
+run = "docker-compose -f ./docker-compose.db.yml down --remove-orphans"
+
+[tasks."db:rebuild"]
+description = "Rebuild and restart the metadata database"
+run = [
+  { task = "db:stop" },
+  "docker-compose -f ./docker-compose.db.yml build",
+  { task = "db:start" },
+]
+
+[tasks."db:migrate"]
+description = "Run metadata database migrations"
+run = "mix ecto.migrate --prefix _supavisor --log-migrator-sql"
+
+[tasks."pgbench:init"]
+description = "Initialize pgbench tables on the dev database"
+env = { PGPASSWORD = "postgres" }
+run = "pgbench -i -h 127.0.0.1 -p 6432 -U postgres -d postgres"
+
+[tasks."pgbench:short"]
+description = "Short pgbench run through the pooler"
+env = { PGPASSWORD = "postgres" }
+usage = '''
+flag "--user <user>" env="PGBENCH_USER" default="postgres.dev_tenant"
+flag "--port <port>" env="PGBENCH_PORT" default="6543"
+'''
+run = 'pgbench -M extended --transactions 5 --jobs 4 --client 1 -h localhost -p "${usage_port}" -U "${usage_user}" postgres'
+
+[tasks."pgbench:long"]
+description = "Long pgbench run through the pooler"
+env = { PGPASSWORD = "postgres" }
+usage = '''
+flag "--user <user>" env="PGBENCH_USER" default="postgres.dev_tenant"
+flag "--port <port>" env="PGBENCH_PORT" default="6543"
+'''
+run = 'pgbench -M extended --transactions 100 --jobs 10 --client 60 -h localhost -p "${usage_port}" -U "${usage_user}" postgres'
+
+[tasks.pgbench]
+description = "Rate-limited select-only pgbench load through the pooler"
+env = { PGPASSWORD = "postgres" }
+usage = '''
+flag "--user <user>" env="PGBENCH_USER" default="postgres.dev_tenant"
+flag "--port <port>" env="PGBENCH_PORT" default="6543"
+flag "--rate <rate>" env="PGBENCH_RATE" default="5000"
+flag "--duration <seconds>" env="PGBENCH_DURATION" default="60"
+flag "--clients <clients>" env="PGBENCH_CLIENTS" default="1000"
+'''
+run = '''
+pgbench "postgres://${usage_user}@localhost:${usage_port}/postgres?sslmode=disable" \
+  -Srn -T "${usage_duration}" \
+  -j 8 -c "${usage_clients}" \
+  -P 10 -M extended \
+  --rate "${usage_rate}"
+'''
+
+[tasks.cover]
+description = "Generate HTML coverage report and open it"
+usage = 'arg "[args]..." var=#true help="Extra args for mix coveralls.html"'
+run = "MIX_ENV=test mix coveralls.html ${usage_args:-}; open cover/excoveralls.html"
+
+[tasks.clean]
+description = "Remove _build and deps"
+run = "rm -rf _build deps"
+
+[tasks."test:upgrade"]
+description = "Test hot upgrade from a previous release"
+usage = 'arg "<from>" help="Version to upgrade from, e.g. 2.8.8"'
+run = 'scripts/test_upgrade.sh "${usage_from}"'
+
+[tasks."jit:setup"]
+description = "Set up the JIT dev environment"
+run = "bash scripts/jit_dev_setup.sh"
+
+[tasks."jit:stop"]
+description = "Tear down the JIT dev environment"
+run = "docker-compose -p supavisor-jit -f docker-compose.jit.yml down -v"
+
+[tasks."release:dev"]
+description = "Fetch deps, compile, and build the release"
+run = "mix deps.get && mix compile && mix release supavisor"
+
+[tasks."release:dev-up"]
+description = "Recompile supavisor and rebuild the dev release"
+run = "rm -rf _build/dev/lib/supavisor && MIX_ENV=dev mix compile && mix release supavisor"
+
+[tasks."release:prod"]
+description = "Build the prod release"
+env = { MIX_ENV = "prod", METRICS_DISABLED = "true" }
+run = "mix compile && mix release supavisor"
+
+[tasks."release:start-dev"]
+description = "Start the prod release in IEx with dev settings"
+raw = true
+run = "_build/prod/rel/supavisor/bin/supavisor start_iex"
+
+[tasks."release:start-dev".env]
+_.file = "{{config_root}}/.env.dev"
+MIX_ENV = "dev"
+FLY_ALLOC_ID = "111e4567-e89b-12d3-a456-426614174000"
+DB_POOL_SIZE = "5"
+
+[tasks."release:start"]
+description = "Start the prod release as node1 in IEx"
+raw = true
+run = "_build/prod/rel/supavisor/bin/supavisor start_iex"
+
+[tasks."release:start".env]
+_.file = "{{config_root}}/.env.dev"
+MIX_ENV = "prod"
+NODE_NAME = "node1"
+NODE_IP = "127.0.0.1"
+FLY_ALLOC_ID = "111e4567-e89b-12d3-a456-426614174000"
+DB_POOL_SIZE = "5"
+
+[tasks."release:start-node2"]
+description = "Start the prod release as node2 in IEx"
+raw = true
+run = "_build/prod/rel/supavisor/bin/supavisor start_iex"
+
+[tasks."release:start-node2".env]
+_.file = "{{config_root}}/.env.dev"
+MIX_ENV = "prod"
+NODE_NAME = "node2"
+PORT = "4001"
+PROXY_PORT = "5402"
+PROXY_PORT_SESSION = "5442"
+PROXY_PORT_TRANSACTION = "6553"
+SESSION_PROXY_PORTS = "12200,12201,12202,12203"
+TRANSACTION_PROXY_PORTS = "12204,12205,12206,12207"
+NODE_IP = "127.0.0.1"

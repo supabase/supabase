@@ -1,0 +1,74 @@
+name: Dispatch base artifact build
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Released supavisor version, leading v optional. e.g. 2.9.13 or v2.9.13-rc.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: supabase
+          repositories: supavisor-deployments
+
+      - name: Dispatch build-base-artifact.yml
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          EVENT: ${{ github.event_name }}
+          RAW_VERSION: ${{ github.event.release.tag_name || inputs.version }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          TARGET_REPO: supabase/supavisor-deployments
+          WORKFLOW: build-base-artifact.yml
+        run: |
+          set -euo pipefail
+          VERSION="${RAW_VERSION#v}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            # An odd release tag is nothing to build; a typo'd input is an error.
+            if [ "$EVENT" = "release" ]; then
+              echo "Release tag $RAW_VERSION is not a v<version> tag — nothing to build."
+              echo "No base artifact build: \`$RAW_VERSION\` is not a \`v<version>\` release tag." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "::error::version must look like 2.9.13 or v2.9.13-rc.0 (leading v optional), got: $RAW_VERSION"
+            exit 1
+          fi
+
+          # return_run_details answers 200 with the run it created instead of a
+          # bare 204, so the summary below can link to it.
+          RESPONSE=$(jq -n --arg version "$VERSION" \
+              '{ref: "main", inputs: {version: $version}, return_run_details: true}' \
+            | gh api --method POST --input - \
+                "repos/${TARGET_REPO}/actions/workflows/${WORKFLOW}/dispatches")
+          RUN_URL=$(printf '%s' "$RESPONSE" | jq -r '.html_url // empty' 2>/dev/null || true)
+          WORKFLOW_URL="https://github.com/${TARGET_REPO}/actions/workflows/${WORKFLOW}"
+
+          echo "Dispatched $WORKFLOW for $VERSION: ${RUN_URL:-$WORKFLOW_URL}"
+          {
+            echo "### Base artifact build dispatched"
+            echo
+            if [ -n "$RELEASE_URL" ]; then
+              echo "- Release: [$RAW_VERSION]($RELEASE_URL)"
+            else
+              echo "- Version: \`$VERSION\` (manual dispatch)"
+            fi
+            if [ -n "$RUN_URL" ]; then
+              echo "- Build: [\`$WORKFLOW\` in \`$TARGET_REPO\`]($RUN_URL)"
+            else
+              echo "- Build: [all \`$WORKFLOW\` runs]($WORKFLOW_URL) — dispatch returned no run details"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

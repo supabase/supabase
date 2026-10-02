@@ -1,0 +1,156 @@
+name: Release on Dockerhub
+
+on:
+  push:
+    tags:
+      - "v*"
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release to publish, without the leading v (e.g. 2.9.8). Must match an existing v<version> tag."
+        required: true
+        type: string
+      elixir_version:
+        description: "Optional ELIXIR_VERSION build-arg override. Falls back to the elixir version in .tool-versions (the -otp-NN suffix is stripped) when the tag has that file; otherwise the Dockerfile's own default applies."
+        required: false
+        type: string
+      otp_version:
+        description: "Optional OTP_VERSION build-arg override. Falls back to the erlang version in .tool-versions when the tag has that file; otherwise the Dockerfile's own default applies."
+        required: false
+        type: string
+      debian_version:
+        description: "Optional DEBIAN_VERSION build-arg override (e.g. bullseye-20260610-slim)."
+        required: false
+        type: string
+
+jobs:
+  settings:
+    runs-on: ubuntu-latest
+    outputs:
+      docker_version: ${{ steps.version.outputs.version }}
+      image_tag: supabase/supavisor:${{ steps.version.outputs.version }}
+      git_ref: refs/tags/v${{ steps.version.outputs.version }}
+      build_args: ${{ steps.args.outputs.build_args }}
+    steps:
+      - id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            version="${INPUT_VERSION#v}"
+          elif [ "$EVENT_NAME" = "release" ]; then
+            version="${RELEASE_TAG#v}"
+          else
+            version="${GITHUB_REF_NAME#v}"
+          fi
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+            echo "::error::'$version' does not look like a release version (expected e.g. 2.9.8 or 2.9.6-rc.0)"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: refs/tags/v${{ steps.version.outputs.version }}
+      - name: Verify tag against VERSION file
+        env:
+          VERSION_TO_PUBLISH: ${{ steps.version.outputs.version }}
+        run: |
+          file_version="$(sed -r 's/\s+//g' VERSION)"
+          if [ "$file_version" != "$VERSION_TO_PUBLISH" ]; then
+            echo "::error::VERSION at tag v$VERSION_TO_PUBLISH is '$file_version'; refusing to publish a mismatched image"
+            exit 1
+          fi
+      - id: args
+        env:
+          INPUT_ELIXIR_VERSION: ${{ inputs.elixir_version }}
+          INPUT_OTP_VERSION: ${{ inputs.otp_version }}
+          INPUT_DEBIAN_VERSION: ${{ inputs.debian_version }}
+        run: |
+          elixir_default=""
+          otp_default=""
+          if [ -f .tool-versions ]; then
+            elixir_default="$(awk '$1=="elixir"{print $2}' .tool-versions | sed -E 's/-otp-[0-9]+$//')"
+            otp_default="$(awk '$1=="erlang"{print $2}' .tool-versions)"
+          fi
+          elixir_version="${INPUT_ELIXIR_VERSION:-$elixir_default}"
+          otp_version="${INPUT_OTP_VERSION:-$otp_default}"
+          # An explicit override deliberately builds the tag on a toolchain it
+          # does not record, so disarm the Dockerfile's .tool-versions guard.
+          # Harmless on tags predating that ARG: an unused build-arg is only a
+          # buildx warning.
+          tool_versions_check=strict
+          if [ -n "$INPUT_ELIXIR_VERSION" ] || [ -n "$INPUT_OTP_VERSION" ]; then
+            tool_versions_check=off
+          fi
+          {
+            echo "build_args<<BUILD_ARGS"
+            if [ -n "$elixir_version" ]; then echo "ELIXIR_VERSION=$elixir_version"; fi
+            if [ -n "$otp_version" ]; then echo "OTP_VERSION=$otp_version"; fi
+            if [ -n "$INPUT_DEBIAN_VERSION" ]; then echo "DEBIAN_VERSION=$INPUT_DEBIAN_VERSION"; fi
+            echo "TOOL_VERSIONS_CHECK=$tool_versions_check"
+            echo "BUILD_ARGS"
+          } >> "$GITHUB_OUTPUT"
+
+  build_image:
+    needs: settings
+    strategy:
+      matrix:
+        include:
+          - runner: [self-hosted, X64]
+            arch: amd64
+          - runner: arm-runner
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ needs.settings.outputs.git_ref }}
+      - run: docker context create builders
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+        with:
+          endpoint: builders
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: build
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          # Build the checked-out tag, not the Git context of the triggering ref
+          context: .
+          push: true
+          tags: ${{ needs.settings.outputs.image_tag }}_${{ matrix.arch }}
+          platforms: linux/${{ matrix.arch }}
+          build-args: ${{ needs.settings.outputs.build_args }}
+          cache-from: type=gha,scope=v${{ needs.settings.outputs.docker_version }}-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=v${{ needs.settings.outputs.docker_version }}-${{ matrix.arch }}
+
+  merge_manifest:
+    needs: [settings, build_image]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Merge multi-arch manifests
+        run: |
+          docker buildx imagetools create -t ${{ needs.settings.outputs.image_tag }} \
+          ${{ needs.settings.outputs.image_tag }}_amd64 \
+          ${{ needs.settings.outputs.image_tag }}_arm64
+
+  publish:
+    needs: [settings, merge_manifest]
+    # Call workflow explicitly because events from actions cannot trigger more actions
+    uses: ./.github/workflows/mirror.yml
+    with:
+      version: ${{ needs.settings.outputs.docker_version }}
+    secrets: inherit
