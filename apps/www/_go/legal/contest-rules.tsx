@@ -41,7 +41,6 @@ const page: GoPageInput = {
   - Russia
   - Iran
   - North Korea
-  - Syria
   - Cuba
   - Belarus
   - Mainland China
