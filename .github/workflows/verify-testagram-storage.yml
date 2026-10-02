@@ -178,8 +178,10 @@ jobs:
           delete_status="$(curl -sS -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5000/object/ci-bucket/hello.txt -H "Authorization: Bearer $service_jwt")"
           test "$delete_status" = "200"
 
-          missing_status="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:5000/object/ci-bucket/hello.txt -H "Authorization: Bearer $service_jwt")"
-          test "$missing_status" = "404"
+          missing_body="$(mktemp)"
+          missing_status="$(curl -sS -o "$missing_body" -w '%{http_code}' http://127.0.0.1:5000/object/ci-bucket/hello.txt -H "Authorization: Bearer $service_jwt")"
+          test "$missing_status" = "400"
+          grep -Fq '"NoSuchKey"' "$missing_body"
 
           echo "Runtime identity, migration ledger, auth boundary, S3 upload/download/sign/delete lifecycle: GREEN"
 
