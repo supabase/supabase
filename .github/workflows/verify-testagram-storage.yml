@@ -89,7 +89,7 @@ jobs:
           test "$cmd" = '["node","dist/start/server.js"]'
           docker run --rm --entrypoint /bin/sh "$image" -ec '
             set -eu
-            test -x /app/dist/start/server.js
+            test -f /app/dist/start/server.js
             test -d /app/migrations
             test -d /app/node_modules
             ! find /app -maxdepth 2 -type d -name .git | grep -q .
