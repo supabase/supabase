@@ -43,6 +43,9 @@ jobs:
             echo "verified: core/services/$d"
           done
 
+      - name: Run forensic boundary audit
+        run: bash scripts/audit-core-boundary.sh
+
       - name: Persist imported source
         run: |
           # git subtree add creates its own commits. Do not re-stage those commits;
