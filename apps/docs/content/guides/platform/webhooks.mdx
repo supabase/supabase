@@ -128,7 +128,7 @@ curl -X POST 'https://api.supabase.com/v2/organizations/{your-org-slug}/webhooks
         "event_types": [
           { "type": "v1.project.paused" },
           { "type": "v1.project.restored" }
-        ],
+        ]
       }
     }
   }'
@@ -151,7 +151,7 @@ curl -X POST 'https://api.supabase.com/v2/projects/{your-project-ref}/webhooks/e
         "event_types": [
           { "type": "v1.project.paused" },
           { "type": "v1.project.restored" }
-        ],
+        ]
       }
     }
   }'
@@ -306,7 +306,7 @@ Best practices for consuming webhook events and building a reliable, production-
 - Check the event type version prefix before processing a payload. For unsupported versions, return `2xx` without processing and log or alert on the unrecognized version — the transition window is finite, so upgrade your handler promptly.
 - Respond to a webhook immediately and process each event asynchronously, for example, on a job queue.
 - Keep track of already processed events in persistent storage to deduplicate them, for example, in a database.
-- Keep track of the last processed event's timestamp and discard stale events. Do not rely on the order of events.
+- Keep track of the last processed event's timestamp and discard stale events of the same type. Do not rely on the order of events.
 - Treat webhook events as a trigger for an action, rather than the state of a resource.
 - Use the webhook's automatic retries as a safeguard against network partitions or timeouts, not as a fallback for listener logic errors.
 - Periodically check delivery history for permanently failed deliveries. Supabase does not notify you when all retries are exhausted.

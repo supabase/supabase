@@ -49,7 +49,7 @@ For example:
 }
 ```
 
-Organization scoped events always have `project_ref` set to `null`, since they do not relate to any project in particular.
+Organization scoped events always have `project_ref` set to `null` because they do not relate to a specific project.
 
 The version prefix in the `type` field, such as `v1`, identifies the payload schema. For how versions change over time and how to handle an unrecognized version, see [Versioning](/docs/guides/platform/webhooks#versioning).
 
@@ -77,7 +77,7 @@ Present only on test events sent through the [Send a test event](/docs/guides/pl
 
 Project events fire when a change occurs or an action is taken in a specific project. The payload always includes both non-nullable `organization_slug` and `project_ref`.
 
-| Event                                                  | Fires after                                      |
+| Event                                                  | Fires when                                      |
 | ------------------------------------------------------ | ------------------------------------------------ |
 | [`v1.project.created`](#v1projectcreated)              | A project is created                             |
 | [`v1.project.paused`](#v1projectpaused)                | A project is paused                              |

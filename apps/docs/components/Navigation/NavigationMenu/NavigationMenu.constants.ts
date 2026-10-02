@@ -2774,12 +2774,7 @@ export const platform: NavMenuConstant = {
           name: 'Personal Access Tokens',
           url: '/guides/platform/personal-access-tokens' as `/${string}`,
           enabled: fullPlatformEnabled,
-        },
-        {
-          name: 'Platform Webhooks',
-          url: '/guides/platform/webhooks' as `/${string}`,
-          enabled: fullPlatformEnabled,
-        },
+        },        
         {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
@@ -2849,6 +2844,7 @@ export const platform: NavMenuConstant = {
         {
           name: 'Platform Webhooks',
           url: '/guides/platform/webhooks',
+          enabled: fullPlatformEnabled,
           items: [
             { name: 'Overview', url: '/guides/platform/webhooks' as `/${string}` },
             { name: 'Events', url: '/guides/platform/webhooks/events' as `/${string}` },
