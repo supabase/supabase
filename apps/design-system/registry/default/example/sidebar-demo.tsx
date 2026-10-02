@@ -1,0 +1,59 @@
+'use client'
+
+import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from 'ui'
+
+const items = [
+  { title: 'Home', url: '#', icon: Home },
+  { title: 'Inbox', url: '#', icon: Inbox },
+  { title: 'Calendar', url: '#', icon: Calendar },
+  { title: 'Search', url: '#', icon: Search },
+  { title: 'Settings', url: '#', icon: Settings },
+]
+
+export default function SidebarDemo() {
+  return (
+    <SidebarProvider className="h-[380px] min-h-0! w-full max-w-3xl overflow-hidden rounded-lg border">
+      <Sidebar collapsible="none">
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Application</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+      <SidebarInset>
+        <header className="flex h-12 items-center gap-2 border-b px-4">
+          <SidebarTrigger />
+          <span className="text-sm text-foreground-light">Dashboard</span>
+        </header>
+        <div className="p-4 text-sm text-foreground-muted">Main content</div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
+}
