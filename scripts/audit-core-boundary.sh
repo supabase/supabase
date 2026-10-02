@@ -4,36 +4,77 @@ set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
 
-echo "=== Testagram Core Boundary Audit ==="
+fail=0
+finding() { echo "FINDING: $*"; fail=1; }
+ok() { echo "OK: $*"; }
+
+echo "=== Testagram Core Docker/Runtime Boundary Audit ==="
 echo "commit: $(git rev-parse HEAD)"
 echo
 
 services=(postgres auth postgrest realtime storage edge-runtime supavisor postgres-meta)
 for service in "${services[@]}"; do
-  test -d "core/services/$service"
-  echo "OK service: core/services/$service"
+  if [[ -d "core/services/$service" ]]; then
+    ok "service source exists: core/services/$service"
+  else
+    finding "missing service source: core/services/$service"
+  fi
 done
 
 echo
-echo "--- upstream runtime image references ---"
-grep -RInE '^[[:space:]]*image:[[:space:]]*(supabase/|postgrest/)' docker --include='*.yml' --include='*.yaml' || true
+echo "--- runtime images that still need ownership review ---"
+while IFS= read -r line; do
+  [[ -z "$line" ]] && continue
+  echo "$line"
+done < <(grep -RInE '^[[:space:]]*image:[[:space:]]*(supabase/|postgrest/)' docker --include='*.yml' --include='*.yaml' || true)
 
 echo
-echo "--- Supabase Cloud/project references ---"
-grep -RInE 'supabase\.co|supabase\.com|\[remotes\.|project_id[[:space:]]*=' supabase docker core --include='*.toml' --include='*.yml' --include='*.yaml' --include='*.json' 2>/dev/null || true
-
-echo
-echo "--- production-dangerous placeholders in example env ---"
-grep -nE 'your-super-secret|this_password_is_insecure|secret1234|admin@example\.com' docker/.env.example || true
-
-echo
-echo "--- submodule check ---"
-if [[ -f .gitmodules ]]; then
-  echo "WARNING: .gitmodules exists"
-  cat .gitmodules
+echo "--- hosted project configuration ---"
+if grep -RInE '^[[:space:]]*\[remotes\.|project_id[[:space:]]*=[[:space:]]*"[^"]+"' supabase/config.toml; then
+  finding "hosted/remote project configuration remains in supabase/config.toml"
 else
-  echo "OK: no git submodules"
+  ok "no remotes.prod/project binding in supabase/config.toml"
 fi
 
 echo
-echo "Audit completed. Findings are documented in docs/TESTAGRAM-CORE-FORENSIC-AUDIT.md."
+echo "--- hosted-domain references in executable/configuration files ---"
+cloud_hits="$(grep -RInE 'https?://[^[:space:]"]*(supabase\.co|supabase\.com)' supabase docker scripts core --include='*.toml' --include='*.yml' --include='*.yaml' --include='*.sh' --include='*.env' --include='*.json' 2>/dev/null || true)"
+if [[ -n "$cloud_hits" ]]; then
+  echo "$cloud_hits"
+  finding "hosted Supabase domains remain in runtime/configuration files"
+else
+  ok "no hosted Supabase domains found in runtime/configuration files"
+fi
+
+echo
+echo "--- default/example credentials ---"
+if [[ -f docker/.env.example ]] && grep -nE 'your-super-secret|this_password_is_insecure|secret1234' docker/.env.example; then
+  echo "INFO: example credentials are present in docker/.env.example; deployment must never promote them."
+else
+  ok "no known insecure placeholder credentials found"
+fi
+
+echo
+echo "--- Postgres version consistency ---"
+compose_version="$(grep -E 'image:[[:space:]]*supabase/postgres:' docker/docker-compose.yml | sed -E 's/.*supabase\/postgres:([0-9]+).*/\1/' | head -n1)"
+cli_version="$(grep -E '^major_version[[:space:]]*=' supabase/config.toml | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
+if [[ -n "$compose_version" && -n "$cli_version" && "$compose_version" == "$cli_version" ]]; then
+  ok "Postgres major version agrees: $compose_version"
+else
+  finding "Postgres major version mismatch: Compose=$compose_version CLI=$cli_version"
+fi
+
+echo
+echo "--- submodules ---"
+if [[ -f .gitmodules ]]; then
+  finding ".gitmodules exists; imported services should remain ordinary repository content"
+else
+  ok "no git submodules"
+fi
+
+echo
+if [[ "$fail" -ne 0 ]]; then
+  echo "AUDIT RESULT: FAIL"
+  exit 1
+fi
+echo "AUDIT RESULT: PASS"
