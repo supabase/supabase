@@ -25,6 +25,7 @@ import {
   selfHostingCommunity,
   selfHostingGetStarted,
   selfHostingSupport,
+  selfHostingThirdPartyGuides,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 import {
@@ -63,6 +64,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   resourcesPostgres,
   selfHostingGetStarted,
   selfHostingCommunity,
+  selfHostingThirdPartyGuides,
   selfHostingSupport,
   storageGetStarted,
   storageExamples,

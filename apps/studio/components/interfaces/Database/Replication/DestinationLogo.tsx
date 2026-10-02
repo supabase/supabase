@@ -6,13 +6,11 @@ import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { BRAND_ICONS, resolveThemedIconSrc, type ThemedIconSrc } from '@/lib/brand-icons'
 import { resolveThemeOverrideMode } from '@/lib/theme-overrides'
 
-type DestinationBrand = { type: 'mark'; src: ThemedIconSrc } | { type: 'monogram'; label: string }
-
-const BRAND_BY_TYPE: Partial<Record<DestinationType, DestinationBrand>> = {
-  BigQuery: { type: 'mark', src: BRAND_ICONS.bigquery },
-  ClickHouse: { type: 'mark', src: BRAND_ICONS.clickhouse },
-  DuckLake: { type: 'mark', src: BRAND_ICONS.ducklake },
-  Snowflake: { type: 'monogram', label: 'SF' },
+const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, ThemedIconSrc>> = {
+  BigQuery: BRAND_ICONS.bigquery,
+  ClickHouse: BRAND_ICONS.clickhouse,
+  DuckLake: BRAND_ICONS.ducklake,
+  Snowflake: BRAND_ICONS.snowflake,
 }
 
 const SIZE_CLASS_NAME = {
@@ -41,28 +39,16 @@ export const DestinationLogo = ({
   const { resolvedTheme } = useTheme()
   const isDark = resolveThemeOverrideMode(resolvedTheme) === 'dark'
   const sizing = SIZE_CLASS_NAME[size]
-  const brand = BRAND_BY_TYPE[type]
-  const brandMarkSrc = brand?.type === 'mark' ? resolveThemedIconSrc(brand.src, isDark) : undefined
+  const brandMark = BRAND_MARK_BY_TYPE[type]
+  const brandMarkSrc = brandMark === undefined ? undefined : resolveThemedIconSrc(brandMark, isDark)
 
   return (
     <span className={cn('relative inline-flex shrink-0', className)}>
       <span className={cn('flex items-center justify-center border bg-surface-100', sizing.frame)}>
-        {brand === undefined && (
+        {brandMarkSrc === undefined ? (
           <DestinationIcon type={type} size={sizing.icon} className="text-foreground-light" />
-        )}
-        {brand?.type === 'mark' && (
+        ) : (
           <img src={brandMarkSrc} alt="" aria-hidden className={sizing.mark} />
-        )}
-        {brand?.type === 'monogram' && (
-          <span
-            className={cn(
-              'font-mono font-medium leading-none text-foreground-muted',
-              size === 'small' ? 'text-xs' : 'text-lg'
-            )}
-            aria-hidden
-          >
-            {brand.label}
-          </span>
         )}
       </span>
       {hasErrors && (
