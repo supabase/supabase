@@ -589,9 +589,9 @@ test.describe('Storage', () => {
       'another-file.txt'
     )
     await page.getByPlaceholder('Search in root directory...').fill('test')
+    expect(await page.getByTitle('another-file.text').count()).toEqual(0)
     expect(await page.getByTitle('test-file.txt').count()).toEqual(1)
     expect(await page.getByTitle('test-file-2.txt').count()).toEqual(1)
-    expect(await page.getByTitle('another-file.text').count()).toEqual(0)
 
     // Delete the file
     await deleteItem(page, fileName)
