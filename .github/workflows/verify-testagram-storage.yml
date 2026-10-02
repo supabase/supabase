@@ -44,7 +44,7 @@ jobs:
           test -d src
           test -d migrations/tenant
           grep -Fq 'npm ci --ignore-scripts' Dockerfile
-          grep -Fq 'COPY migrations' Dockerfile
+          grep -Fq 'migrations migrations' Dockerfile
           grep -Fq 'USER node' Dockerfile
           grep -Fq 'CMD ["node", "dist/start/server.js"]' Dockerfile
           ! grep -RniE 'secret1234|f023d3db-39dc-4ac9-87b2-b2be72e9162b|850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907' -- docker-compose*.yml .docker || true
