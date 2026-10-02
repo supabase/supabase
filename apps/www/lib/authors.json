@@ -1047,5 +1047,13 @@
     "position": "Product Manager",
     "author_url": "https://github.com/nrichers",
     "author_image_url": "https://github.com/nrichers.png"
+  },
+  {
+    "author_id": "aditya_maruvada",
+    "author": "Aditya Maruvada",
+    "username": "supa-aditya",
+    "position": "Engineering",
+    "author_url": "https://github.com/supa-aditya",
+    "author_image_url": "https://github.com/supa-aditya.png"
   }
 ]
