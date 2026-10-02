@@ -1,0 +1,31 @@
+services:
+  auth:
+    depends_on:
+      - postgres
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    ports:
+      - '9999:9999'
+      - '9100:9100'
+    environment:
+      - GOTRUE_DB_MIGRATIONS_PATH=/go/src/github.com/supabase/auth/migrations
+    volumes:
+      - ./:/go/src/github.com/supabase/auth
+    command: CompileDaemon --build="make build" --directory=/go/src/github.com/supabase/auth --recursive=true -pattern="(.+\.go|.+\.env)" -exclude=auth -exclude=auth-arm64 -exclude=.env --command="/go/src/github.com/supabase/auth/auth -c=.env.docker"
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres.dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=postgres
+      # sets the schema name, this should match the `NAMESPACE` env var set in your .env file
+      - DB_NAMESPACE=auth
+volumes:
+  postgres_data:

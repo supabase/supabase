@@ -1,0 +1,9 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+  ],
+  "totalResults": 0,
+  "startIndex": 1,
+  "itemsPerPage": 0,
+  "Resources": []
+}

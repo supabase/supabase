@@ -1,0 +1,10 @@
+# Setup: see CONTRIBUTING.md.
+pre-commit:
+  parallel: true
+  commands:
+    gofmt:
+      glob: "*.go"
+      run: make check-format
+    lint:
+      glob: "*.go"
+      run: make -j lint
