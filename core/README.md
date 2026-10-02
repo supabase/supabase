@@ -24,7 +24,7 @@ See `core/sources.json` for the upstream repositories and integration paths.
 
 ## Import strategy
 
-Use `scripts/import-supabase-core.sh` to vendor upstream source with Git subtree. This preserves upstream history and keeps each component isolated under `core/services/<name>`.
+Use `scripts/import-supabase-core.sh` to vendor upstream source with Git subtree. This keeps each component isolated under `core/services/<name>` and records a reproducible upstream source snapshot. The current `--squash` import does not preserve the complete upstream commit history.
 
 Before importing or redistributing a component, preserve its upstream LICENSE/NOTICE files and verify its current license. The top-level Apache-2.0 license in this repository does not automatically relicense third-party components.
 
