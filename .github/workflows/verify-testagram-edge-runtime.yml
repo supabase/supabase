@@ -1,0 +1,48 @@
+name: Verify Testagram Edge Runtime Image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - testagram/core-platform-foundation
+    paths:
+      - "core/services/edge-runtime/**"
+      - ".github/workflows/verify-testagram-edge-runtime.yml"
+
+concurrency:
+  group: testagram-edge-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-edge-runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout foundation branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Verify ONNX source contract
+        working-directory: core/services/edge-runtime
+        run: |
+          set -euo pipefail
+          grep -Fx 'ONNXRUNTIME_VERSION=1.20.1' .env
+          grep -Fx 'ARG ONNXRUNTIME_VERSION=1.20.1' Dockerfile
+          test -x scripts/install_onnx.sh
+          echo "ONNX version contract verified"
+
+      - name: Build Edge Runtime
+        env:
+          DOCKER_BUILDKIT: "1"
+        run: |
+          set -euo pipefail
+          docker build             --pull             --progress=plain             --target edge-runtime             -t "testagram-build/edge-runtime:${GITHUB_SHA}"             core/services/edge-runtime
+
+      - name: Inspect image
+        run: |
+          set -euo pipefail
+          docker image inspect "testagram-build/edge-runtime:${GITHUB_SHA}"             --format '{{.Id}} {{.Architecture}} {{.Os}}'
