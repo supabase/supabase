@@ -47,20 +47,6 @@ export default function TraceRulerDemo() {
           <Trace.Ruler />
         </Trace.Waterfall>
       </Trace.Root>
-
-      <div className="flex flex-col gap-2">
-        {[
-          { durationMs: 2, label: 'Sub-millisecond' },
-          { durationMs: 412, label: 'Request-sized' },
-          { durationMs: 95 * 60_000, label: 'Minutes' },
-        ].map(({ durationMs, label }) => (
-          <Trace.Root key={label} trace={traceOf(durationMs)}>
-            <Trace.Waterfall treeWidth={120}>
-              <Trace.Ruler>{label}</Trace.Ruler>
-            </Trace.Waterfall>
-          </Trace.Root>
-        ))}
-      </div>
     </div>
   )
 }
