@@ -1,0 +1,7 @@
+{
+  "$schema": "https://schemas.platformatic.dev/@platformatic/node/3.69.0.json",
+  "node": {
+    "main": "./dist/start/server.js",
+    "disableBuildInDevelopment": true
+  }
+}

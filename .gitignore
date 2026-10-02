@@ -1,0 +1,15 @@
+node_modules
+.DS_Store
+dist/
+.env
+.env.*
+!.*.sample
+static/api.json
+static/api-admin.json
+data/
+bin/
+coverage/
+.idea/
+src/scripts/*.py
+.claude/
+swagger-ui/

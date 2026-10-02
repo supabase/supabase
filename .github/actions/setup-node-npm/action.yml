@@ -1,0 +1,34 @@
+name: Setup Node and npm
+description: Setup Node and pin npm from package.json packageManager
+
+inputs:
+  node-version:
+    description: Node.js version passed to actions/setup-node
+    default: "24"
+  firewall-token:
+    description: Auth token for the DepthFirst dependency firewall npm registry; only pass this where the secret is guaranteed available (no pull_request trigger)
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Configure DepthFirst dependency firewall
+      shell: bash
+      env:
+        FIREWALL_TOKEN: ${{ inputs.firewall-token }}
+      run: |
+        if [ -n "$FIREWALL_TOKEN" ]; then
+          {
+            echo "registry=https://firewall.depthfirst.com/npm/"
+            echo "//firewall.depthfirst.com/npm/:_authToken=${FIREWALL_TOKEN}"
+          } >> ~/.npmrc
+        fi
+
+    - name: Set up Node
+      uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Pin npm
+      shell: bash
+      run: node scripts/ensure-npm-version.cjs

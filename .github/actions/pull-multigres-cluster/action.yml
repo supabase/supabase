@@ -1,0 +1,31 @@
+name: Pull Multigres cluster image
+description: Pull the Multigres cluster image with retries
+
+inputs:
+  image:
+    description: Multigres cluster image to pull
+    default: ghcr.io/multigres/multigres-cluster:latest
+  attempts:
+    description: Number of pull attempts before failing
+    default: "3"
+  retry-delay-seconds:
+    description: Delay between failed pull attempts
+    default: "10"
+
+runs:
+  using: composite
+  steps:
+    - name: Pull image
+      shell: bash
+      run: |
+        for attempt in $(seq 1 "${{ inputs.attempts }}"); do
+          docker pull "${{ inputs.image }}" && exit 0
+
+          if [ "$attempt" -lt "${{ inputs.attempts }}" ]; then
+            echo "pull attempt $attempt failed; retrying in ${{ inputs.retry-delay-seconds }}s..."
+            sleep "${{ inputs.retry-delay-seconds }}"
+          fi
+        done
+
+        echo "failed to pull ${{ inputs.image }} after ${{ inputs.attempts }} attempts"
+        exit 1

@@ -1,0 +1,7 @@
+services:
+  tenant_db:
+    image: orioledb/orioledb:latest-pg17
+    environment:
+      POSTGRES_INITDB_ARGS: "--locale=C"
+    volumes:
+      - ./.docker/init-oriole-db:/docker-entrypoint-initdb.d

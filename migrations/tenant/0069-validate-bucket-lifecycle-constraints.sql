@@ -1,0 +1,8 @@
+ALTER TABLE storage.buckets
+VALIDATE CONSTRAINT buckets_lifecycle_configuration_pair_check;
+
+ALTER TABLE storage.buckets
+VALIDATE CONSTRAINT buckets_lifecycle_configuration_shape_check;
+
+ALTER TABLE storage.buckets
+VALIDATE CONSTRAINT buckets_lifecycle_configuration_standard_only_check;

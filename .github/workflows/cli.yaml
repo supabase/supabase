@@ -1,0 +1,80 @@
+name: Update Cli Repository
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+env:
+  service_to_update: "storage-api"
+  cli_repo_owner: supabase
+  cli_repo: cli
+  cli_repo_main_branch: "main"
+  cli_repo_pr_title: "fix(storage): update storage image version to "
+  github_user: "Supa CLI Bot"
+  github_user_email: "cli_releaser_bot@supabase.com"
+
+jobs:
+  update-remote-repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+        with:
+          app-id: ${{ secrets.GH_CLI_RELEASER_APP_ID }}
+          private-key: ${{ secrets.GH_CLI_RELEASER_APP_PRIVATE_KEY }}
+          owner: ${{ env.cli_repo_owner }}
+          repositories: |
+            ${{ env.cli_repo }}
+      - name: Setup Git config
+        run: |
+          git config --global user.name '${{ env.github_user }}'
+          git config --global user.email '${{ env.github_user_email }}'
+
+      - name: Checkout remote repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: "${{ env.cli_repo_owner }}/${{ env.cli_repo }}"
+          token: ${{ steps.app-token.outputs.token }}
+          path: "${{ env.cli_repo }}"
+
+      - name: Create a new branch
+        env:
+          GH_REF: ${{ github.ref_name }}
+        run: |
+          cd '${{ env.cli_repo }}'
+          git checkout -b "${{ env.service_to_update }}/${GH_REF}"
+
+      - name: Update file
+        env:
+          GH_REF: ${{ github.ref_name }}
+        run: |
+          cd '${{ env.cli_repo }}'
+          sed -i "s|${{ env.cli_repo_owner }}/${{ env.service_to_update }}:v[0-9]*\.[0-9]*\.[0-9]*|${{ env.cli_repo_owner }}/${{ env.service_to_update }}:${GH_REF}|" internal/utils/misc.go
+
+      - name: Commit changes
+        env:
+          GH_REF: ${{ github.ref_name }}
+        run: |
+          cd '${{ env.cli_repo }}'
+          git add .
+          git commit -m "Update ${{ env.service_to_update }} version to ${GH_REF}"
+
+      - name: Push changes
+        env:
+          GH_REF: ${{ github.ref_name }}
+        run: |
+          cd '${{ env.cli_repo }}'
+          git push origin "${{ env.service_to_update }}/${GH_REF}"
+
+      - name: Create Pull Request
+        env:
+          GH_REF: ${{ github.ref_name }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          cd '${{ env.cli_repo }}'
+          gh pr create --base '${{ env.cli_repo_main_branch }}' --title "${{ env.cli_repo_pr_title }} ${GH_REF}" --body "New version of ${{ env.service_to_update }} ${GH_REF} is now available!"
