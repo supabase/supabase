@@ -204,7 +204,6 @@ export const CreateIcebergWrapperSheet = ({
         wrapperMeta,
         formState: {
           ...formValues,
-          wrapper_name: wrapperMeta.name,
           supabase_target_schema: values.target_schema,
         },
         mode: 'schema',

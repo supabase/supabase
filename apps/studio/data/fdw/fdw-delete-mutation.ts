@@ -25,7 +25,12 @@ export async function deleteFDW({
   wrapperMeta,
 }: FDWDeleteVariables) {
   const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['delete-fdw'],
+  })
   return result
 }
 

@@ -63,10 +63,15 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
       <TableCell className="space-y-2 p-4!">
         {_tables?.map((table) => {
-          const target = table.table ?? table.object ?? table.src_key
+          const target =
+            (table.table as string | undefined) ??
+            (table.object as string | undefined) ??
+            (table.src_key as string | undefined) ??
+            table.table_name
+          const tableId = table.id as string
 
           return (
-            <div key={table.id} className="flex items-center">
+            <div key={tableId} className="flex items-center">
               <Badge className="bg-surface-300 gap-2 font-mono text-xs tracking-tight h-6 text-foreground rounded-r-none">
                 <div className="relative w-3 h-3 flex items-center justify-center">
                   {integration.icon({ className: 'p-0' })}
@@ -83,7 +88,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                 <ChevronRight size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
               </Badge>
 
-              <Link href={`/project/${ref}/editor/${table.id}`}>
+              <Link href={`/project/${ref}/editor/${tableId}`}>
                 <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-xs tracking-tight border-l-0">
                   <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                   <Tooltip>
