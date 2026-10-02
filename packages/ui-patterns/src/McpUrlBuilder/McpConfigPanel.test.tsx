@@ -70,7 +70,7 @@ describe('McpConfigPanel opt-out transitions', () => {
     selectOptOut(tool)
     expect(container.textContent).toContain(`skip_elicitations=${tool}`)
 
-    fireEvent.click(screen.getByRole('combobox', { name: '' }))
+    fireEvent.click(screen.getByRole('combobox', { name: 'Select features' }))
     fireEvent.click(screen.getByRole('option', { name: new RegExp(`^${feature}`) }))
     expect(container.textContent).not.toContain('skip_elicitations=')
 
