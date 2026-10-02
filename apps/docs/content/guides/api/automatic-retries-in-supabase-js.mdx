@@ -20,7 +20,7 @@ Because `.rpc()` sends POST by default, RPC calls aren't retried. Pass `{ get: t
 
 ### Set a request timeout
 
-Retries only run once a request fails. A request that hangs rather than failing outright — for example during a slow upstream timeout — never reaches the retry logic. Pass an `AbortSignal` to cap how long a request can take:
+Retries only run after a request fails. A request that hangs never fails, so it never reaches the retry logic. This can happen during a slow upstream timeout. Pass an `AbortSignal` to cap how long a request can take:
 
 ```javascript
 const { data, error } = await supabase
