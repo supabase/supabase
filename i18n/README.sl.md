@@ -41,7 +41,7 @@ Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/doc
 - [x] Alfa: Testiramo bazo Supabase z zaprtim naborom strank
 - [x] Javna alfa: [supabase.com/dashboard](https://supabase.com/dashboard). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
 - [x] Javna beta različica: Dovolj stabilna za večino primerov uporabe, ki niso povezani s podjetji
-- [ ] Javna: Splošna razpoložljivost [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Javna: Splošna razpoložljivost [[status](https://supabase.com/features)]
 
 Trenutno smo v javni beta različici. Spremljajte "releases" tega repozitorija, da boste obveščeni o večjih posodobitvah.
 

@@ -41,7 +41,7 @@ Lai uzzinātu, kā veikt iemaksas, apmeklējiet [Getting Started](../DEVELOPERS.
 - [x] Alfa: Mēs testējam Supabase ar slēgtu klientu kopu
 - [x] Publiskā alfa versija: [supabase.com/dashboard](https://supabase.com/dashboard). Bet nesteidzieties, ir dažas nepilnības
 - [x] Publiskā beta versija: Pietiekami stabila lielākajai daļai ar uzņēmumu nesaistītu lietošanas gadījumu
-- [ ] Publisks: Vispārēja pieejamība [[statuss](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
+- [ ] Publisks: Vispārēja pieejamība [[statuss](https://supabase.com/features)]]
 
 Pašlaik mēs esam Publiskās beta versijas fāzē. Lai saņemtu paziņojumus par galvenajiem atjauninājumiem, skatiet šīs repozitorija "releases".
 

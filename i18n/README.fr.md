@@ -41,7 +41,7 @@ Pour savoir comment contribuer, visitez [Getting Started](../DEVELOPERS.md)
 - [x] Alpha : Nous testons Supabase avec un groupe fermé de clients
 - [x] Alpha publique : Tout le monde peut s'inscrire sur [supabase.com/dashboard](https://supabase.com/dashboard). Mais allez-y doucement, il y a quelques problèmes
 - [x] Bêta publique : Suffisamment stable pour la plupart des cas d'utilisation hors entreprise
-- [ ] Public : Disponibilité générale [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Public : Disponibilité générale [[status](https://supabase.com/features)]
 
 Nous sommes actuellement en bêta publique. Surveillez les "releases" de ce repo pour être informé des mises à jour majeures.
 
