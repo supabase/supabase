@@ -374,13 +374,14 @@ function PresenceSkeleton() {
       onMouseMove={handleMouseMove}
     >
       {/* Stacked avatars — top right */}
-      <div className="absolute right-4 top-4 z-10 flex -space-x-2">
-        {PRESENCE_USERS.map((user) => (
+      <div className="absolute right-4 top-4 z-10 flex -space-x-1">
+        {PRESENCE_USERS.map((user, i) => (
           <div
             key={user.name}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
+            className="relative flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
             style={{
-              boxShadow: `0 0 0 2px var(--background-surface-75), 0 0 0 4px ${user.color}`,
+              zIndex: i + 1,
+              boxShadow: `0 0 0 2px var(--background-surface-75), 0 0 0 3px ${user.color}`,
             }}
           >
             {user.initials}
@@ -388,14 +389,15 @@ function PresenceSkeleton() {
         ))}
         {/* Your avatar — appears on hover */}
         <motion.div
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
+          className="relative flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
           style={{
-            boxShadow: `0 0 0 2px var(--background-surface-75), 0 0 0 4px ${YOU_COLOR}`,
+            zIndex: PRESENCE_USERS.length + 1,
+            boxShadow: `0 0 0 2px var(--background-surface-75), 0 0 0 3px ${YOU_COLOR}`,
           }}
           initial={{ opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }}
           animate={
             hovered
-              ? { opacity: 1, scale: 1, width: 28, marginLeft: -8 }
+              ? { opacity: 1, scale: 1, width: 28, marginLeft: -4 }
               : { opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }
           }
           transition={{ type: 'spring', duration: 0.47, bounce: 0 }}
