@@ -12,11 +12,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/blog/pricing',
-    destination: '/pricing',
-  },
-  {
-    permanent: true,
     source: '/blog/rss.xml',
     destination: '/rss.xml',
   },
@@ -64,11 +59,6 @@ module.exports = [
     permanent: true,
     source: '/auth/Auth',
     destination: '/auth',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/api/api-keys',
-    destination: '/docs/guides/getting-started/api-keys',
   },
   {
     permanent: true,
@@ -356,11 +346,6 @@ module.exports = [
     permanent: false,
     source: '/docs/common/filters/_sr',
     destination: '/docs/reference/javascript/using-filters-rangegt',
-  },
-  {
-    permanent: false,
-    source: '/docs/library/authentication',
-    destination: '/docs/guides/auth',
   },
   {
     permanent: false,
@@ -779,11 +764,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/self-hosting/overview',
     destination: '/docs/guides/self-hosting',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/javascript/delete-user',
-    destination: '/docs/reference/javascript/auth-api-deleteuser',
   },
   {
     permanent: true,
