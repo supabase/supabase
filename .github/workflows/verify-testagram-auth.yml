@@ -47,7 +47,7 @@ jobs:
           set -euo pipefail
           test "$(docker image inspect --format '{{.Config.User}}' "testagram-build/auth:${GITHUB_SHA}")" = "supabase"
           test "$(docker image inspect --format '{{json .Config.Cmd}}' "testagram-build/auth:${GITHUB_SHA}")" = '["auth"]'
-          test "$(docker image inspect --format '{{index .Config.Env 0}}' "testagram-build/auth:${GITHUB_SHA}")" = "GOTRUE_DB_MIGRATIONS_PATH=/usr/local/etc/auth/migrations"
+          docker image inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "testagram-build/auth:${GITHUB_SHA}" | grep -Fx 'GOTRUE_DB_MIGRATIONS_PATH=/usr/local/etc/auth/migrations'
           docker run --rm --entrypoint /bin/sh "testagram-build/auth:${GITHUB_SHA}" -ceu '
             test -x /usr/local/bin/auth
             test -d /usr/local/etc/auth/migrations
