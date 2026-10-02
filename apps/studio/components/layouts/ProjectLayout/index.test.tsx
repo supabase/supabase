@@ -8,16 +8,19 @@ import { ProjectLayout } from './index'
 import type { MobileMenuContentProps } from './LayoutHeader/MobileMenuContent'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
 
-const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen } = vi.hoisted(() => ({
-  mockRouter: {
-    pathname: '/project/[ref]/observability/query-performance',
-    asPath: '/project/default/observability/query-performance',
-    push: vi.fn(),
-    replace: vi.fn(),
-  },
-  mockSetSelectedDatabaseId: vi.fn(),
-  mockSetMobileMenuOpen: vi.fn(),
-}))
+const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen, mockViewport } = vi.hoisted(
+  () => ({
+    mockRouter: {
+      pathname: '/project/[ref]/observability/query-performance',
+      asPath: '/project/default/observability/query-performance',
+      push: vi.fn(),
+      replace: vi.fn(),
+    },
+    mockSetSelectedDatabaseId: vi.fn(),
+    mockSetMobileMenuOpen: vi.fn(),
+    mockViewport: { isMobile: false },
+  })
+)
 
 const {
   mockAddBanner,
@@ -93,7 +96,8 @@ vi.mock('framer-motion', () => ({
   },
 }))
 
-vi.mock('ui', () => ({
+vi.mock('ui', async () => ({
+  ...(await import('ui/src/components/shadcn/ui/resizable')),
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   Alert: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   AlertDescription: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -104,9 +108,6 @@ vi.mock('ui', () => ({
   CommandItem: { displayName: 'CommandItem' },
   CommandList: { displayName: 'CommandList' },
   LogoLoader: () => <div data-testid="logo-loader" />,
-  ResizableHandle: (props: any) => <div {...props} />,
-  ResizablePanel: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  ResizablePanelGroup: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   Sidebar: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   SidebarContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   SidebarFooter: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -114,8 +115,7 @@ vi.mock('ui', () => ({
   SidebarMenu: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   SidebarMenuButton: (props: any) => <div {...props} />,
   SidebarMenuItem: (props: any) => <div {...props} />,
-  useIsMobile: () => false,
-  usePanelRef: () => undefined,
+  useIsMobile: () => mockViewport.isMobile,
   useSidebar: () => ({ setOpen: vi.fn() }),
 }))
 
@@ -244,7 +244,7 @@ vi.mock('./LayoutHeader/MobileMenuContent', async (importOriginal) => {
 })
 
 vi.mock('../Navigation/ProductMenuBar', () => ({
-  ProductMenuBar: () => null,
+  ProductMenuBar: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
 
 const MobileSheetHarness = () => {
@@ -299,6 +299,7 @@ const renderLayout = () =>
 
 describe('ProjectLayout title', () => {
   beforeEach(() => {
+    mockViewport.isMobile = false
     mockRouter.pathname = '/project/[ref]/observability/query-performance'
     mockRouter.asPath = '/project/default/observability/query-performance'
     document.title = ''
@@ -323,6 +324,7 @@ describe('ProjectLayout title', () => {
   })
 
   it('updates the open mobile menu when resource navigation changes without replacing other sheets', () => {
+    mockViewport.isMobile = true
     render(
       <MobileSheetProvider>
         <ResourceMenuHarness />
@@ -340,6 +342,38 @@ describe('ProjectLayout title', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Change section' }))
     expect(screen.getByTestId('mobile-sheet')).toHaveTextContent('Other sheet')
   })
+
+  it.each([false, true])(
+    'keeps sidebar navigation enabled with resizableSidebar=%s and preserves handle availability',
+    (resizableSidebar) => {
+      render(
+        <MobileSheetProvider>
+          <ProjectLayout
+            product="Database"
+            isBlocking={false}
+            resizableSidebar={resizableSidebar}
+            productMenu={<a href="/project/default/database/tables">Tables</a>}
+          >
+            <div>Page Content</div>
+          </ProjectLayout>
+        </MobileSheetProvider>
+      )
+
+      const link = screen.getByRole('link', { name: 'Tables' })
+      expect(link.closest('[aria-disabled="true"]')).toBeNull()
+      link.focus()
+      expect(link).toHaveFocus()
+
+      const handle = screen.getByRole('separator')
+      if (resizableSidebar) {
+        expect(handle).not.toHaveAttribute('aria-disabled')
+        expect(handle).toHaveAttribute('tabindex', '0')
+      } else {
+        expect(handle).toHaveAttribute('aria-disabled', 'true')
+        expect(handle).not.toHaveAttribute('tabindex')
+      }
+    }
+  )
 
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
     render(
