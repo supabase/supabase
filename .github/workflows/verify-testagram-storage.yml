@@ -103,7 +103,7 @@ jobs:
           docker run --rm --network storage-ci --entrypoint /bin/sh rustfs/rc:v0.1.36 -ec '
             rc alias set ci http://storage-rustfs:9000 ci-storage ci-storage-secret
             rc mb --ignore-existing ci/ci-bucket
-            rc stat ci/ci-bucket >/dev/null
+            rc ls ci/ci-bucket >/dev/null
           '
 
       - name: Start Storage and run migration/startup smoke test
