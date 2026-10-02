@@ -137,13 +137,13 @@ export const RecoveryCodesModal = <T = unknown,>({
                   >
                     {copiedToClipboard ? 'Copied' : 'Copy'}
                   </Button>
-
                   <Button icon={<Download />} onClick={downloadCodes}>
                     Download
                   </Button>
                 </div>
               </div>
 
+              <span aria-live="polite">{copiedToClipboard && 'Codes copied to clipboard'}</span>
               <Admonition
                 type="warning"
                 title="You won't see these codes again"
