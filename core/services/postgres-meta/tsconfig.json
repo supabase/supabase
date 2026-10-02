@@ -1,0 +1,22 @@
+{
+  "include": ["src"],
+  "compilerOptions": {
+    "incremental": true,
+    "declaration": true,
+    "declarationMap": true,
+    "module": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "sourceMap": true,
+    "target": "esnext",
+
+    "strict": true,
+
+    "esModuleInterop": true,
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "stripInternal": true
+  }
+}

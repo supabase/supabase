@@ -1,0 +1,82 @@
+{
+  "name": "@supabase/postgres-meta",
+  "version": "0.0.0-automated",
+  "description": "A RESTful API for managing your Postgres.",
+  "homepage": "https://github.com/supabase/postgres-meta",
+  "bugs": "https://github.com/supabase/postgres-meta/issues",
+  "license": "MIT",
+  "author": "Supabase",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "imports": {
+    "#package.json": "./package.json"
+  },
+  "repository": {
+    "url": "git+https://github.com/supabase/postgres-meta.git"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json --noEmit",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "format": "prettier --write '{src,test}/**/*.ts' '*.ts'",
+    "build": "tsc -p tsconfig.json && cpy 'src/lib/sql/*.sql' dist/lib/sql && cpy 'src/server/format-worker.js' dist/server --flat",
+    "docs:export": "PG_META_EXPORT_DOCS=true node --loader ts-node/esm src/server/server.ts > openapi.json",
+    "gen:types:typescript": "PG_META_GENERATE_TYPES=typescript node --loader ts-node/esm src/server/server.ts",
+    "gen:types:go": "PG_META_GENERATE_TYPES=go node --loader ts-node/esm src/server/server.ts",
+    "gen:types:swift": "PG_META_GENERATE_TYPES=swift node --loader ts-node/esm src/server/server.ts",
+    "gen:types:python": "PG_META_GENERATE_TYPES=python node --loader ts-node/esm src/server/server.ts",
+    "start": "node dist/server/server.js",
+    "dev": "trap 'npm run db:clean' INT && run-s db:clean db:run &&  run-s dev:code",
+    "dev:code": "nodemon --exec node --loader ts-node/esm src/server/server.ts | pino-pretty --colorize",
+    "test": "run-s db:clean db:run test:run db:clean",
+    "db:clean": "cd test/db && docker compose down",
+    "db:run": "cd test/db && docker compose up --detach --wait",
+    "test:run": "PG_META_MAX_RESULT_SIZE_MB=20 PG_QUERY_TIMEOUT_SECS=5 PG_CONN_TIMEOUT_SECS=30 vitest run --coverage",
+    "test:update": "run-s db:clean db:run && PG_META_MAX_RESULT_SIZE_MB=20 PG_QUERY_TIMEOUT_SECS=5 PG_CONN_TIMEOUT_SECS=30 vitest run --update && run-s db:clean"
+  },
+  "engines": {
+    "node": ">=20",
+    "npm": ">=9"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@fastify/swagger": "^8.2.1",
+    "@fastify/type-provider-typebox": "^3.5.0",
+    "@sentry/node": "^9.12.0",
+    "@sentry/profiling-node": "^9.12.0",
+    "@sinclair/typebox": "^0.31.25",
+    "@supabase/postgrest-typegen": "^0.2.0",
+    "close-with-grace": "^2.1.0",
+    "crypto-js": "^4.0.0",
+    "fastify": "^4.24.3",
+    "fastify-metrics": "^10.0.0",
+    "pg": "npm:@supabase/pg@8.21.1",
+    "pg-connection-string": "^2.12.0",
+    "pg-format": "^1.0.4",
+    "pg-protocol": "npm:@supabase/pg-protocol@1.13.2",
+    "pgsql-parser": "^17.8.2",
+    "pino": "^9.5.0",
+    "piscina": "^5.3.0",
+    "postgres-array": "^3.0.1",
+    "prettier": "^3.3.3",
+    "prettier-plugin-sql": "0.17.1"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
+    "@types/node": "^20.11.14",
+    "@types/pg": "^8.11.10",
+    "@types/pg-format": "^1.0.1",
+    "@vitest/coverage-v8": "^3.0.5",
+    "cpy-cli": "^5.0.0",
+    "nodemon": "^3.1.7",
+    "npm-run-all": "^4.1.5",
+    "pino-pretty": "^13.1.1",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.6.3",
+    "vitest": "^3.0.5"
+  }
+}
