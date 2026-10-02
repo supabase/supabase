@@ -462,7 +462,11 @@ To see your `pg_net` version and the privileges on its functions, run:
 ```sql
 select extversion from pg_extension where extname = 'pg_net';
 
-select p.proname, p.prosecdef as security_definer, p.proacl
+select
+  p.proname,
+  p.prosecdef as security_definer,
+  has_function_privilege('anon', p.oid, 'execute') as anon_can_execute,
+  has_function_privilege('authenticated', p.oid, 'execute') as authenticated_can_execute
 from
   pg_proc as p
   join pg_namespace as n on n.oid = p.pronamespace
