@@ -91,8 +91,8 @@ jobs:
             set -eu
             test -x /app/dist/start/server.js
             test -d /app/migrations
+            test -d /app/node_modules
             ! find /app -maxdepth 2 -type d -name .git | grep -q .
-            ! find /app -maxdepth 2 -type d -name node_modules | grep -q . && false || true
           '
           echo "Storage image metadata: GREEN"
 
@@ -159,17 +159,6 @@ jobs:
           unauthenticated="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:5000/object/ci-storage/unauthorized.txt)"
           test "$unauthenticated" = "401"
 
-          service_jwt="$(node --input-type=module <<'NODE'
-          import { createHmac, randomUUID } from 'node:crypto';
-          const secret = process.env.JWT_SECRET;
-          const b64 = (v) => Buffer.from(JSON.stringify(v)).toString('base64url');
-          const now = Math.floor(Date.now()/1000);
-          const header = b64({alg:'HS256',typ:'JWT'});
-          const payload = b64({role:'service_role',sub:randomUUID(),aud:'authenticated',iat:now,exp:now+3600});
-          const unsigned = header + '.' + payload;
-          process.stdout.write(unsigned + '.' + createHmac('sha256', secret).update(unsigned).digest('base64url'));
-          NODE
-          )"
           export JWT_SECRET="01234567890123456789012345678901"
           service_jwt="$(JWT_SECRET="$JWT_SECRET" node --input-type=module <<'NODE'
           import { createHmac, randomUUID } from 'node:crypto';
