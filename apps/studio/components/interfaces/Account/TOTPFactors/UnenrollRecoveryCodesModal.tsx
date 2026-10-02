@@ -19,6 +19,7 @@ export const UnenrollRecoveryCodesModal = () => {
     <>
       <ButtonTooltip
         icon={<Trash />}
+        aria-label="Delete recovery codes"
         onClick={() => setShowConfirm(true)}
         tooltip={{ content: { side: 'bottom', text: 'Delete recovery codes' } }}
       />
