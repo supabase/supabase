@@ -6,6 +6,8 @@ source:
   shadcn: true
 ---
 
+<ComponentPreview name="sidebar-demo" peekCode wide className="p-0" padded={false} />
+
 Composable sidebar primitives for app chrome. The implementation lives in
 `packages/ui` and is used by Studio. Import from `'ui'`.
 
@@ -62,6 +64,15 @@ export function AppSidebar() {
 | `SidebarGroup`                    | Section inside content                               |
 | `SidebarMenu` and friends         | Nav items, actions, badges, submenus                 |
 | `SidebarTrigger` / `SidebarRail`  | Toggle controls                                      |
+
+## Examples
+
+### Icon collapse
+
+`collapsible="icon"` shrinks the sidebar to icons. Tooltips stay available via
+`SidebarMenuButton`.
+
+<ComponentPreview name="sidebar-collapsible-icon" peekCode wide className="p-0" padded={false} />
 
 ## Theming
 
