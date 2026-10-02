@@ -43,12 +43,11 @@ jobs:
             echo "verified: core/services/$d"
           done
 
-      - name: Commit imported source
+      - name: Persist imported source
         run: |
+          # git subtree add creates its own commits. Do not re-stage those commits;
+          # push the resulting branch tip directly.
           if git diff --quiet && git diff --cached --quiet; then
-            echo "No source changes to commit."
-            exit 0
+            echo "Working tree clean; subtree operations may already have produced commits."
           fi
-          git add core/services
-          git commit -m "chore(core): vendor upstream backend services"
           git push origin HEAD:testagram/core-platform-foundation
