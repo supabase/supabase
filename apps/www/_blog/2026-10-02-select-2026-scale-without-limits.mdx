@@ -14,7 +14,7 @@ imgThumb: 'select-2026-scale-without-limits/thumb.png'
 toc_depth: 2
 ---
 
-Today at Supabase Select, we announced Multigres for high availability and scalable connection pooling, OrioleDB for high performance storage, and new destinations for Supabase Pipelines. We launched dbarena, an open benchmarks site for comparing managed Postgres provider’s performance results and costs.
+Today at Supabase Select, we announced Multigres for high availability and scalable connection pooling, OrioleDB for high performance storage, and new destinations for Supabase Pipelines. We launched dbarena, an open benchmarks site for comparing managed Postgres providers’ performance results and costs.
 
 Every Supabase project starts with a single Postgres database. As your project grows, vertically upgrading the database’s available RAM & CPU resources can help, but it isn’t a solution to every challenge.
 
@@ -59,7 +59,7 @@ With heap storage, Postgres never updates a row in place: every update writes a 
 
 OrioleDB's undo log removes this problem at the source. Instead of leaving dead tuples behind, updates and deletes write page-level undo records, which the system reclaims automatically. This eliminates bloat entirely and VACUUM is no longer needed.
 
-Allowing lock-free page reads also make OrioleDB more efficient under high concurrency, especially in IOPS use. OrioleDB delivers up to 2.2X higher throughput than Postgres heap in our public, TPC-C-derived benchmarks, published on [dbarena.com](http://dbarena.com/).
+Allowing lock-free page reads also makes OrioleDB more efficient under high concurrency, especially in IOPS use. OrioleDB delivers up to 2.2X higher throughput than Postgres heap in our public, TPC-C-derived benchmarks, published on [dbarena.com](http://dbarena.com/).
 
 <Admonition type="note">
 
