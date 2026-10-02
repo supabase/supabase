@@ -373,37 +373,45 @@ function PresenceSkeleton() {
       onMouseLeave={() => setHovered(false)}
       onMouseMove={handleMouseMove}
     >
-      {/* Stacked avatars — top right */}
-      <div className="absolute right-6 top-4 z-10 flex -space-x-1.5">
+      {/* Stacked avatars — top right (inset so box-shadow rings clear overflow-hidden) */}
+      <div className="absolute right-5 top-3.5 z-10 flex -space-x-[3px] p-1">
         {PRESENCE_USERS.map((user, i) => (
           <div
             key={user.name}
-            className="relative flex h-6 w-6 items-center justify-center rounded-full bg-surface-100 text-[8px] font-medium text-foreground"
+            className="relative flex h-6.5 w-6.5 items-center justify-center rounded-full bg-surface-100 text-[9px] font-medium text-foreground"
             style={{
               zIndex: i + 1,
               // Colour ring, then card-coloured cutout outside so stacked discs separate
-              boxShadow: `0 0 0 2px ${user.color}, 0 0 0 4px var(--background-surface-75)`,
+              boxShadow: `0 0 0 1.5px ${user.color}, 0 0 0 4px var(--background-surface-75)`,
             }}
           >
             {user.initials}
           </div>
         ))}
-        {/* Your avatar — appears on hover */}
+        {/* Your avatar — appears on hover (width for layout, inner scale for pop-in) */}
         <motion.div
-          className="relative flex h-6 w-6 items-center justify-center rounded-full bg-surface-100 text-[8px] font-medium text-foreground"
-          style={{
-            zIndex: PRESENCE_USERS.length + 1,
-            boxShadow: `0 0 0 2px ${YOU_COLOR}, 0 0 0 4px var(--background-surface-75)`,
-          }}
-          initial={{ opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }}
-          animate={
-            hovered
-              ? { opacity: 1, scale: 1, width: 24, marginLeft: -6 }
-              : { opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }
-          }
-          transition={{ type: 'spring', duration: 0.47, bounce: 0 }}
+          className="relative shrink-0 min-w-0"
+          style={{ zIndex: PRESENCE_USERS.length + 1 }}
+          initial={false}
+          animate={{ width: hovered ? 26 : 0 }}
+          transition={{ type: 'spring', duration: 0.4, bounce: 0 }}
         >
-          You
+          <motion.div
+            className="flex h-6.5 w-6.5 items-center justify-center rounded-full bg-surface-100 text-[9px] font-medium text-foreground"
+            style={{
+              transformOrigin: 'center center',
+              boxShadow: `0 0 0 1.5px ${YOU_COLOR}, 0 0 0 4px var(--background-surface-75)`,
+            }}
+            initial={false}
+            animate={
+              hovered
+                ? { opacity: 1, scale: 1 }
+                : { opacity: 0, scale: 0.85, pointerEvents: 'none' }
+            }
+            transition={{ type: 'spring', duration: 0.4, bounce: 0 }}
+          >
+            You
+          </motion.div>
         </motion.div>
       </div>
 
