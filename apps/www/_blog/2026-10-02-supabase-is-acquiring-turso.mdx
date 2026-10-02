@@ -19,21 +19,23 @@ For existing users, nothing changes. Supabase will continue building around Post
 
 ## Databases for agents
 
-Supabase is already launching nearly one million databases per week. As agents build more software, database demand will outpace the world’s current capacity to support them. So we need infrastructure that can scale to meet this growth and is suited to how we build with agents.
+Supabase is already launching over one million databases per week. As agents build more software, we believe database demand will outpace the world’s current capacity to support them. So we need infrastructure that can scale to meet this growth and is suited to how we build with agents.
 
-Agents should be able to create a database as easily as creating a file. For smaller workloads, that shouldn’t require provisioning a dedicated machine every time. Databases should be cheap to create, available on demand, and have a clear path to production when needed.
-SQLite is very good at this; Postgres is what you want as your application scales.
+Agents should be able to create a database as easily as creating a file, with just as little concern about cost. For smaller workloads, that shouldn’t require provisioning a dedicated machine every time. Databases should be cheap to create, available on demand, and have a clear path to production when needed.
+
+SQLite is well suited to these small, on-demand workloads. Postgres is what you want as your application scales. We want builders to have the same developer experience from prototyping to production.
 
 ## Turso
 
-Turso has built an architecture for exactly this pattern. They rebuilt SQLite in Rust and created a cloud platform where a single server can manage millions of databases, loading them when needed and evicting them when they’re not.
+Turso has built an architecture for exactly this pattern. They rebuilt SQLite in Rust and created a cloud platform where a single server can manage millions of databases, loading them when needed and suspending them when they’re not.
 
-Their architecture enables the provisioning of on-demand per-agent databases both on Turso Cloud and  hosted in customer's own clouds like Superhuman, Sauna.ai, CTO.new, and Mastra.
-We have a shared understanding of how infrastructure will evolve to support the future of agentic AI. The Turso platform continues operations, with a clear graduation path into the rest of the Supabase ecosystem.
+This architecture makes it possible to provision a database for each agent on demand, whether on Turso Cloud or in customers’ own clouds, as Superhuman, Sauna.ai, CTO.new, and Mastra do.
+
+We share a vision for how infrastructure needs to evolve to support agentic AI. Turso will continue operating, with a clear path into the broader Supabase ecosystem as workloads grow.
 
 ## Open source
 
-Turso and Supabase have a lot in common: open source, developer experience, and an appetite to tackle hard infrastructure problems.
+Turso and Supabase have a lot in common: open source, a focus on developer experience, and an appetite to tackle hard infrastructure problems.
 We’re excited to welcome Glauber Costa and Pekka Enberg to Supabase with the rest of the Turso team. Glauber will lead this agentic infrastructure effort.
 
 Our mission is to store the world’s data, and agents are going to create a lot more of it. This gets us closer to that goal.
