@@ -1,9 +1,11 @@
-# docker-compose.yml
-
+# Testagram Storage local/dev stack.
+# Secrets are supplied by the environment; never commit production credentials.
 version: "3"
 services:
   storage:
-    image: supabase/storage-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     depends_on:
@@ -14,60 +16,49 @@ services:
       rustfs_setup:
         condition: service_completed_successfully
     environment:
-      # Server
       SERVER_PORT: 5000
-      # Auth
-      AUTH_JWT_SECRET: f023d3db-39dc-4ac9-87b2-b2be72e9162b
-      AUTH_JWT_ALGORITHM: HS256
-      # Single tenant Mode
-      DATABASE_URL: postgres://postgres:postgres@tenant_db:5432/postgres
-      DATABASE_POOL_URL: postgresql://postgres:postgres@pg_bouncer:6432/postgres
-      # Migrations
-      DB_INSTALL_ROLES: true # set to false if you want to manage roles yourself
-      # Storage
-      STORAGE_BACKEND: s3
-      STORAGE_S3_BUCKET: supa-storage-bucket # name of s3 bucket where you want to store objects
-      STORAGE_S3_ENDPOINT: http://rustfs:9000
-      STORAGE_S3_FORCE_PATH_STYLE: "true"
-      STORAGE_S3_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: supa-storage
-      AWS_SECRET_ACCESS_KEY: secret1234
-      # Upload
-      UPLOAD_FILE_SIZE_LIMIT: 524288000
-      UPLOAD_FILE_SIZE_LIMIT_STANDARD: 52428800
-      UPLOAD_SIGNED_URL_EXPIRATION_TIME: 120
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:?set AUTH_JWT_SECRET}
+      AUTH_JWT_ALGORITHM: ${AUTH_JWT_ALGORITHM:-HS256}
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@tenant_db:5432/postgres}
+      DATABASE_POOL_URL: ${DATABASE_POOL_URL:-postgresql://postgres:postgres@pg_bouncer:6432/postgres}
+      DB_INSTALL_ROLES: ${DB_INSTALL_ROLES:-true}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-s3}
+      GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET:-supa-storage-bucket}
+      GLOBAL_S3_ENDPOINT: ${GLOBAL_S3_ENDPOINT:-http://rustfs:9000}
+      GLOBAL_S3_FORCE_PATH_STYLE: ${GLOBAL_S3_FORCE_PATH_STYLE:-true}
+      AWS_ACCESS_KEY_ID: ${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY}
+      REGION: ${REGION:-us-east-1}
+      S3_PROTOCOL_ENABLED: ${S3_PROTOCOL_ENABLED:-true}
+      S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID:?set S3_PROTOCOL_ACCESS_KEY_ID}
+      S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET:?set S3_PROTOCOL_ACCESS_KEY_SECRET}
+      UPLOAD_FILE_SIZE_LIMIT: ${UPLOAD_FILE_SIZE_LIMIT:-524288000}
+      UPLOAD_FILE_SIZE_LIMIT_STANDARD: ${UPLOAD_FILE_SIZE_LIMIT_STANDARD:-52428800}
+      UPLOAD_SIGNED_URL_EXPIRATION_TIME: ${UPLOAD_SIGNED_URL_EXPIRATION_TIME:-120}
       TUS_URL_PATH: /upload/resumable
-      TUS_URL_EXPIRY_MS: 3600000
-      # Image Transformation
-      IMAGE_TRANSFORMATION_ENABLED: "true"
-      IMGPROXY_URL: http://imgproxy:8080
-      IMGPROXY_REQUEST_TIMEOUT: 15
-      # S3 Protocol
-      S3_PROTOCOL_ACCESS_KEY_ID: 625729a08b95bf1b7ff351a663f3a23c
-      S3_PROTOCOL_ACCESS_KEY_SECRET: 850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907
-      # Iceberg Protocol
-      ICEBERG_BUCKET_DETECTION_MODE: "FULL_PATH"
-      ICEBERG_WAREHOUSE: .
-      ICEBERG_CATALOG_URL: http://rest-catalog:8181/v1
-      ICEBERG_CATALOG_AUTH_TYPE: token
-      ICEBERG_CATALOG_AUTH_TOKEN: token
-      ICEBERG_S3_DELETE_ENABLED: true
+      TUS_URL_EXPIRY_MS: ${TUS_URL_EXPIRY_MS:-3600000}
+      IMAGE_TRANSFORMATION_ENABLED: ${IMAGE_TRANSFORMATION_ENABLED:-true}
+      IMGPROXY_URL: ${IMGPROXY_URL:-http://imgproxy:8080}
+      IMGPROXY_REQUEST_TIMEOUT: ${IMGPROXY_REQUEST_TIMEOUT:-15}
+      ICEBERG_BUCKET_DETECTION_MODE: ${ICEBERG_BUCKET_DETECTION_MODE:-FULL_PATH}
+      ICEBERG_WAREHOUSE: ${ICEBERG_WAREHOUSE:-.}
+      ICEBERG_CATALOG_URL: ${ICEBERG_CATALOG_URL:-http://rest-catalog:8181/v1}
+      ICEBERG_CATALOG_AUTH_TYPE: ${ICEBERG_CATALOG_AUTH_TYPE:-token}
+      ICEBERG_CATALOG_AUTH_TOKEN: ${ICEBERG_CATALOG_AUTH_TOKEN:?set ICEBERG_CATALOG_AUTH_TOKEN}
+      ICEBERG_S3_DELETE_ENABLED: ${ICEBERG_S3_DELETE_ENABLED:-true}
 
   tenant_db:
     extends:
       service: tenant_db
       file: ./.docker/docker-compose-infra.yml
-
   pg_bouncer:
     extends:
       service: pg_bouncer
       file: ./.docker/docker-compose-infra.yml
-
   rustfs:
     extends:
       service: rustfs
       file: ./.docker/docker-compose-infra.yml
-
   rustfs_setup:
     extends:
       service: rustfs_setup
@@ -75,12 +66,10 @@ services:
     depends_on:
       rustfs:
         condition: service_healthy
-
   imgproxy:
     extends:
       service: imgproxy
       file: ./.docker/docker-compose-infra.yml
-
   rest-catalog:
     depends_on:
       rustfs_setup:
@@ -88,39 +77,3 @@ services:
     extends:
       service: rest-catalog
       file: ./.docker/docker-compose-infra.yml
-#  Optional for rate-limiting
-#  redis:
-#    extends:
-#      service: redis
-#      file: ./.docker/docker-compose-infra.yml
-
-#  Optional for monitoring
-#  pg_bouncer_exporter:
-#    extends:
-#      service: pg_bouncer_exporter
-#      file: ./.docker/docker-compose-monitoring.yml
-
-#  postgres_exporter:
-#    extends:
-#      service: postgres_exporter
-#      file: ./.docker/docker-compose-monitoring.yml
-#
-#  grafana:
-#    extends:
-#      service: grafana
-#      file: ./.docker/docker-compose-monitoring.yml
-#
-#  prometheus:
-#    extends:
-#      service: prometheus
-#      file: ./.docker/docker-compose-monitoring.yml
-#
-#  otel:
-#    extends:
-#      service: otel-collector
-#      file: ./.docker/docker-compose-monitoring.yml
-#
-#  jaeger:
-#    extends:
-#      service: jaeger
-#      file: ./.docker/docker-compose-monitoring.yml
