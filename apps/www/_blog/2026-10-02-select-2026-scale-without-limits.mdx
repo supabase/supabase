@@ -2,7 +2,7 @@
 title: 'Scale without limits: Multigres, OrioleDB, dbarena, and Pipelines'
 description: 'The app your agent built in minutes stays on the same Postgres from prototype to petabyte.'
 author: joe_sciarrino, aditya_maruvada, riccardo_busetti
-date: '2026-10-02'
+date: '2026-10-02T10:35:00'
 categories:
   - product
 tags:
@@ -24,7 +24,7 @@ Our focus is to remove every scaling limitation from our user’s journey. That 
 
 ## Multigres
 
-<video className="rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
   <source src="/images/blog/select-2026-scale-without-limits/failover.mp4" type="video/mp4" />
 </video>
 
@@ -43,6 +43,7 @@ Multigres is in private alpha, by invite. It works with Supabase Auth, Storage, 
 <Img
   alt="Postgres heap leaves dead row versions in the table and needs VACUUM, while OrioleDB moves old versions to an undo log and reclaims space automatically"
   src="/images/blog/select-2026-scale-without-limits/orioledb.png"
+  wide
 />
 
 OrioleDB is an open source, scalable storage engine for Postgres. It replaces Postgres traditional heap storage and eliminates its fundamental limitations, such as table bloat, VACUUM overhead, and txid wraparound inherent to the limited range of 32-bit transaction IDs.
@@ -70,6 +71,7 @@ OrioleDB has been under active development by the Supabase team and open source 
 <Img
   alt="A dbarena comparison of two XLarge configurations, showing throughput per dollar, monthly cost, throughput, p95 latency, and throughput over time"
   src="/images/blog/select-2026-scale-without-limits/dbarena.png"
+  wide
 />
 
 [dbarena.com](http://dbarena.com) publishes open, reproducible database benchmarks across providers: the benchmark code, published methodology, downloadable raw data per result, and shareable comparison links. It compares Supabase, Amazon RDS, and Google Cloud SQL at launch. For each run, dbarena reports transactions per dollar, monthly total cost, transactions per minute, p95, and machine specs, and it plots throughput over time.
@@ -82,7 +84,7 @@ Subscribe to the [dbarena newsletter](https://dbarena.com/?subscribe) to keep up
 
 ## Supabase Pipelines
 
-<video className="rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
   <source src="/images/blog/select-2026-scale-without-limits/pipelines.mp4" type="video/mp4" />
 </video>
 
