@@ -22,26 +22,26 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick, { registerInCommandMenu: false })
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    if (!live) return
+
+    let isActive = true
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
 
     async function fetchData() {
-      if (live) {
-        await fetchPreviousPage?.()
+      await fetchPreviousPage?.().catch(() => undefined)
+      if (isActive) {
         timeoutId = setTimeout(fetchData, REFRESH_INTERVAL)
-      } else {
-        clearTimeout(timeoutId)
       }
     }
 
     fetchData()
 
     return () => {
+      isActive = false
       clearTimeout(timeoutId)
     }
   }, [live, fetchPreviousPage])
 
-  // REMINDER: make sure to reset live when date is set
-  // TODO: test properly
   useEffect(() => {
     if ((date || sort) && live) {
       setSearch((prev) => ({ ...prev, live: null }))
