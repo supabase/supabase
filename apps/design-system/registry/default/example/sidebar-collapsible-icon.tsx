@@ -24,40 +24,46 @@ const items = [
   { title: 'Settings', url: '#', icon: Settings },
 ]
 
+const menuButtonClassName =
+  '[&>svg]:size-4 text-foreground-muted data-[active=true]:text-foreground'
+
 export default function SidebarCollapsibleIcon() {
   return (
-    <SidebarProvider defaultOpen className="h-[480px] min-h-0! w-full overflow-hidden">
-      <Sidebar collapsible="icon">
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={item.title === 'Home'}
-                      tooltip={item.title}
-                    >
-                      <a href={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarRail />
-      </Sidebar>
-      <SidebarInset>
-        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-        </header>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="h-[480px] w-full overflow-hidden">
+      <SidebarProvider defaultOpen className="h-full min-h-0!">
+        <Sidebar collapsible="icon" className="[&_[data-sidebar=sidebar]]:bg-transparent">
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Application</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {items.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={item.title === 'Home'}
+                        tooltip={item.title}
+                        className={menuButtonClassName}
+                      >
+                        <a href={item.url}>
+                          <item.icon strokeWidth={1.5} />
+                          <span>{item.title}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+          <SidebarRail />
+        </Sidebar>
+        <SidebarInset>
+          <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1 text-foreground-muted" />
+          </header>
+        </SidebarInset>
+      </SidebarProvider>
+    </div>
   )
 }
