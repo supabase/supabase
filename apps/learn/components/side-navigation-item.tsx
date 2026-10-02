@@ -93,6 +93,8 @@ const NavigationItem: React.FC<NavigationItemProps> = ({
       {hasChildren ? (
         <>
           <button
+            type="button"
+            tabIndex={0}
             onClick={handleButtonClick}
             className={cn('w-full flex items-center justify-between gap-2 zans', itemClasses)}
           >

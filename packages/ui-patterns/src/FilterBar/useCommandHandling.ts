@@ -175,7 +175,7 @@ export function useCommandHandling({
         return
       }
 
-      if (item.value === 'group') {
+      if (item.value === '__new_group__') {
         handleGroupCommand()
         return
       }

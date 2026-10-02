@@ -19,9 +19,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
+  singleThemes,
 } from 'ui'
-import { themes } from 'ui/src/components/ThemeProvider/themes'
-import type { Theme } from 'ui/src/components/ThemeProvider/themes'
 
 interface Props {
   menu: menuItem[][]
@@ -53,8 +52,8 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
         <button
           title="Menu dropdown button"
           className={cn(
-            buttonVariants({ type: 'default' }),
-            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent',
+            buttonVariants({ variant: 'default' }),
+            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] px-0 data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent',
             'rounded-full overflow-hidden opacity-0 transition-opacity animate-fade-in'
           )}
         >
@@ -116,11 +115,11 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                           setTheme(value)
                         }}
                       >
-                        {themes
+                        {singleThemes
                           .filter(
                             (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
                           )
-                          .map((theme: Theme) => (
+                          .map((theme) => (
                             <DropdownMenuRadioItem
                               key={`${site}-auth-dropdown-theme-${theme.value}`}
                               value={theme.value}

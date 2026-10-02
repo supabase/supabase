@@ -2,7 +2,7 @@ import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../Restriction'
@@ -14,8 +14,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
@@ -79,21 +79,20 @@ const Subscription = () => {
               {isSuccess && (
                 <div className="space-y-6 w-full">
                   <div className="flex justify-between items-center">
-                    <p className="text-2xl text-brand leading-none">
+                    <p className="text-2xl text-primary leading-none">
                       {currentPlan?.name ?? 'Unknown'} Plan
                     </p>
 
                     {canChangeTier && (
                       <div className="flex space-x-2">
                         <Button
-                          type="default"
                           className="pointer-events-auto"
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
                           Change subscription plan
                         </Button>
                         {currentPlan && currentPlan.id !== 'free' && (
-                          <InitiateCancellationFlowButton type="danger">
+                          <InitiateCancellationFlowButton variant="danger">
                             Cancel Subscription
                           </InitiateCancellationFlowButton>
                         )}
@@ -118,7 +117,7 @@ const Subscription = () => {
                           title={`Unable to update plan from ${planName}`}
                           description="Please contact us if you'd like to change your plan."
                           actions={
-                            <Button asChild key="contact-support" type="default">
+                            <Button asChild key="contact-support">
                               <SupportLink
                                 queryParams={{
                                   category: SupportCategories.SALES_ENQUIRY,

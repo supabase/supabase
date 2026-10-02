@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import {
   Check,
   ClipboardCheck,
@@ -91,7 +92,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -121,14 +122,14 @@ const data: () => {
         logo: (
           <>
             <Image
-              src="/images/customers/logos/chatbase.png"
+              src="/images/customers/logos/on-light/chatbase.png"
               alt="Chatbase"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/chatbase.png"
+              src="/images/customers/logos/on-dark/chatbase.png"
               alt="Chatbase"
               width={128}
               height={48}
@@ -320,7 +321,7 @@ const data: () => {
       customers: [
         {
           name: 'Hyper',
-          logo: '/images/customers/logos/hyper.svg',
+          logo: '/images/customers/logos/on-light/hyper.png',
           highlights: [
             '100x cost reduction by having agents query SQL instead of live platform APIs',
             'Per-customer isolated databases for agencies managing hundreds of clients',
@@ -329,13 +330,13 @@ const data: () => {
         },
         {
           name: 'Humata',
-          logo: '/images/customers/logos/humata.png',
+          logo: '/images/customers/logos/on-light/humata.png',
           highlights: ['AI-powered document analysis at scale'],
           cta: { label: 'Read the case study', href: '/customers/humata' },
         },
         {
           name: 'Chatbase',
-          logo: '/images/customers/logos/chatbase.png',
+          logo: '/images/customers/logos/on-light/chatbase.png',
           highlights: [
             'One of the most successful single-founder AI products',
             'Built entirely on Supabase',
@@ -344,7 +345,7 @@ const data: () => {
         },
         {
           name: 'Markprompt',
-          logo: '/images/customers/logos/markprompt.png',
+          logo: '/images/customers/logos/on-light/markprompt.png',
           highlights: ['GDPR-compliant AI chatbots on Supabase'],
           cta: { label: 'Read the case study', href: '/customers/markprompt' },
         },

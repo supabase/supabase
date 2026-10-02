@@ -1,11 +1,13 @@
 import { clientSdkIds } from '~/content/navigation.references'
 import { BASE_PATH } from '~/lib/constants'
+import MARKDOWN_SLUGS from '~/public/markdown/manifest.json'
 import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { isbot } from 'isbot'
 import { NextResponse, type NextRequest } from 'next/server'
 
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
+const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
 
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
@@ -15,11 +17,8 @@ export function middleware(request: NextRequest) {
     const isMdSuffix = pathname.endsWith('.md')
     const slug = pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
     const decision = negotiateMarkdown(
-      {
-        acceptHeader: request.headers.get('accept') ?? '',
-        userAgent: request.headers.get('user-agent') ?? '',
-      },
-      { hasMarkdownVariant: true, isMarkdownSuffix: isMdSuffix }
+      { acceptHeader: request.headers.get('accept') ?? '' },
+      { hasMarkdownVariant: GUIDES_MARKDOWN_SLUGS.has(slug), isMarkdownSuffix: isMdSuffix }
     )
 
     if (decision === 'not-acceptable') {
@@ -44,7 +43,7 @@ export function middleware(request: NextRequest) {
     let [, lib, maybeVersion, ...slug] = pathname.replace(REFERENCE_PATH, '').split('/')
 
     if (clientSdkIds.includes(lib)) {
-      const version = /v\d+/.test(maybeVersion) ? maybeVersion : undefined
+      const version = /^v\d+$/.test(maybeVersion) ? maybeVersion : undefined
       if (!version) {
         slug = [maybeVersion, ...slug]
       }
@@ -64,7 +63,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
 
-  if (lib === 'api') {
+  // Spike (DOCS-1268): only the bare /reference/api needs normalizing now.
+  // /reference/api/<slug> has its own statically generated page — don't
+  // collapse it back to the monolith.
+  if (lib === 'api' && !maybeVersion) {
     const rewritePath = [REFERENCE_PATH, 'api'].join('/')
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
@@ -75,7 +77,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (clientSdkIds.includes(lib)) {
-    const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
+    const version = /^v\d+$/.test(maybeVersion) ? maybeVersion : null
     const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }

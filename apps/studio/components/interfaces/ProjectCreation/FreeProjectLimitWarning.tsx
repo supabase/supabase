@@ -1,4 +1,4 @@
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import Panel from '@/components/ui/Panel'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'

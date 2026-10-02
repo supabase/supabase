@@ -3,10 +3,11 @@ import { tool } from 'ai'
 import { z } from 'zod'
 
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import {
   EDGE_FUNCTION_PROMPT,
+  LOGS_PROMPT,
   PG_BEST_PRACTICES,
   REALTIME_PROMPT,
   RLS_PROMPT,
@@ -21,6 +22,7 @@ const KNOWLEDGE = {
   storage: STORAGE_PROMPT,
   edge_functions: EDGE_FUNCTION_PROMPT,
   realtime: REALTIME_PROMPT,
+  logs: LOGS_PROMPT,
 } as const
 
 type KnowledgeName = keyof typeof KNOWLEDGE
@@ -70,13 +72,13 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
         'Asks the user to execute a SQL statement and return the results. Requires user approval before executing.',
       inputSchema: executeSqlInputSchema,
       needsApproval: true,
-      execute: async ({ sql }) => {
+      execute: async ({ sql }, { abortSignal }) => {
         // The `needsApproval: true` gate on this tool means the user has
         // explicitly approved this AI-generated SQL before execute runs —
         // that approval is the user gesture that promotes untrusted to safe.
         const { result } = await executeSql(
           { projectRef, connectionString, sql: acceptUntrustedSql(untrustedSql(sql)) },
-          undefined,
+          abortSignal,
           authHeaders
         )
         return result

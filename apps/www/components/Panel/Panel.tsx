@@ -53,18 +53,18 @@ const Panel = ({
       const activeGlow =
         hasActiveOnHover && isActive
           ? `radial-gradient(65rem circle at ${x}px ${y}px, ${
-              activeColor === 'brand' ? 'var(--color-brand-900)' : 'hsl(var(--border-stronger))'
+              activeColor === 'brand' ? 'var(--color-brand-900)' : 'var(--border-stronger)'
             }, transparent), `
           : ''
       outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
-        shimmerFromColor ?? 'hsl(var(--border-strong))'
-      }, ${shimmerToColor ?? 'hsl(var(--background-surface-300))'})`
+        shimmerFromColor ?? 'var(--border-strong)'
+      }, ${shimmerToColor ?? 'var(--background-surface-300)'})`
     }
 
     if (hasInnerShimmer) {
       innerElement.style.backgroundImage = isActive
-        ? `radial-gradient(7rem circle at ${x}px ${y}px, hsl(var(--background-surface-300)), transparent), radial-gradient(20rem circle at ${x}px ${y}px, hsl(var(--background-surface-200)), transparent)`
+        ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--background-surface-300), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--background-surface-200), transparent)`
         : ''
     }
   }
@@ -82,10 +82,10 @@ const Panel = ({
     <Component
       ref={outerRef}
       className={cn(
-        'group/panel relative rounded-lg md:rounded-xl p-px bg-surface-75 bg-linear-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md flex items-center justify-center',
+        'group/panel relative [--panel-radius:var(--radius-lg)] md:[--panel-radius:var(--radius-xl)] rounded-(--panel-radius) p-px bg-surface-75 bg-linear-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
-            ? 'hover:bg-none hover:bg-brand!'
+            ? 'hover:bg-none hover:bg-brand-default!'
             : 'hover:bg-none hover:bg-border-stronger!'
           : '',
         outerClassName
@@ -95,7 +95,7 @@ const Panel = ({
     >
       <div
         className={cn(
-          'relative z-10 w-full h-full rounded-[7px] md:rounded-[11px] bg-surface-75 overflow-hidden text-foreground-light',
+          'relative z-10 w-full h-full rounded-[calc(var(--panel-radius)-1px)] bg-surface-75 overflow-hidden text-foreground-light',
           innerClassName
         )}
         style={innerStyle}

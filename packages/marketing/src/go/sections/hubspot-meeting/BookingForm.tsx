@@ -146,8 +146,8 @@ export default function BookingForm({
         )}
 
         <Button
-          htmlType="submit"
-          type="primary"
+          type="submit"
+          variant="primary"
           disabled={!isValid || isSubmitting}
           loading={isSubmitting}
           size="medium"

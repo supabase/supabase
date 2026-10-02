@@ -7,11 +7,11 @@ dynamic_resources:
     path_config_source:
       path: /etc/envoy/lds.yaml
     resource_api_version: V3
-    
+
 node:
   cluster: supabase_cluster
   id: supabase_node
-  
+
 overload_manager:
   resource_monitors:
     - name: envoy.resource_monitors.global_downstream_max_connections
@@ -19,7 +19,7 @@ overload_manager:
         '@type': >-
           type.googleapis.com/envoy.extensions.resource_monitors.downstream_connections.v3.DownstreamConnectionsConfig
         max_active_downstream_connections: 30000
-        
+
 admin:
   address:
     socket_address:

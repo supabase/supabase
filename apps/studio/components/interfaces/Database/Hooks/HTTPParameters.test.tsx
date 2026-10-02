@@ -35,7 +35,7 @@ describe('HTTPParameters', () => {
 
     render(<HTTPParametersHarness />)
 
-    await user.click(screen.getByRole('button', { name: 'Add a new parameter' }))
+    await user.click(screen.getByRole('button', { name: 'Add parameter' }))
 
     expect(screen.getAllByPlaceholderText('Parameter name')).toHaveLength(2)
     expect(screen.getAllByPlaceholderText('Parameter value')).toHaveLength(2)

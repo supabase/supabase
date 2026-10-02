@@ -29,6 +29,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import { SwitchToPreviewModal } from './SwitchToPreviewModal'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
@@ -126,7 +127,7 @@ export const Overview = ({
                   environments.
                 </p>
               </div>
-              <Button type="primary" asChild>
+              <Button variant="primary" asChild>
                 <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
                   Upgrade
                 </Link>
@@ -329,7 +330,8 @@ const PreviewBranchActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            type="text"
+            variant="text"
+            aria-label="More branch actions"
             icon={<MoreVertical />}
             className="px-1"
             onClick={(e) => e.stopPropagation()}
@@ -551,19 +553,11 @@ const PreviewBranchActions = ({
         </p>
       </ConfirmationModal>
 
-      <ConfirmationModal
-        variant="warning"
-        visible={showPersistentBranchDeleteConfirmationModal}
-        confirmLabel="Switch to preview"
-        title="Branch must be switched to preview before deletion"
-        loading={isUpdatingBranch}
-        onCancel={() => setShowPersistentBranchDeleteConfirmationModal(false)}
-        onConfirm={onTogglePersistent}
-      >
-        <p className="text-sm text-foreground-light">
-          You must switch the branch "{branch.name}" to preview before deleting it.
-        </p>
-      </ConfirmationModal>
+      <SwitchToPreviewModal
+        branch={branch}
+        open={showPersistentBranchDeleteConfirmationModal}
+        onClose={() => setShowPersistentBranchDeleteConfirmationModal(false)}
+      />
 
       <EditBranchModal
         branch={branch}
@@ -602,7 +596,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="text" icon={<MoreVertical />} className="px-1" />
+          <Button variant="text" icon={<MoreVertical />} className="px-1" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="bottom" align="end">
           {repo ? (

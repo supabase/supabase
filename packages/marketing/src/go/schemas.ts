@@ -134,6 +134,8 @@ export const showWhenSchema = z
 const formFieldBase = z.object({
   name: z.string().min(1),
   label: z.string().min(1),
+  /** Small italicized note rendered directly beneath the label, above the input. */
+  hint: z.string().optional(),
   /** Helper text rendered beneath the input. */
   description: z.string().optional(),
   placeholder: z.string().optional(),
@@ -166,6 +168,24 @@ export const selectFieldSchema = formFieldBase.extend({
 
 export const checkboxFieldSchema = formFieldBase.extend({
   type: z.literal('checkbox'),
+  /**
+   * Optional group identifier for related checkboxes. When any visible checkbox
+   * in a group has `groupRequired: true`, at least one checkbox in that group
+   * must be selected.
+   */
+  group: z.string().optional(),
+  groupRequired: z.boolean().optional().default(false),
+})
+
+/**
+ * Multi-select rendered as a list of checkboxes. Values are stored as a
+ * semicolon-separated string of the selected option `value`s — the format
+ * HubSpot expects for multi-select properties. Notion's multi_select type
+ * splits on the same delimiter when received.
+ */
+export const checkboxGroupFieldSchema = formFieldBase.extend({
+  type: z.literal('checkbox-group'),
+  options: z.array(z.object({ label: z.string(), value: z.string() })).min(1),
 })
 
 export const formFieldSchema = z.discriminatedUnion('type', [
@@ -175,6 +195,7 @@ export const formFieldSchema = z.discriminatedUnion('type', [
   textareaFieldSchema,
   selectFieldSchema,
   checkboxFieldSchema,
+  checkboxGroupFieldSchema,
 ])
 
 // ----- Form CRM config schemas -----
@@ -201,8 +222,22 @@ export const hubspotFormConfigSchema = z.object({
    * Example: { workEmail: 'email', companyName: 'company' }
    */
   fieldMap: z.record(z.string(), z.string()).optional(),
+  /**
+   * Form field `name`s to NOT forward to HubSpot. Use this for fields that
+   * should only reach another provider (e.g. Notion-only fields). By default
+   * every submitted field is sent to HubSpot, so an unmapped field a HubSpot
+   * form doesn't define would otherwise cause the whole submission to fail.
+   * Example: ['attending']
+   */
+  excludeFields: z.array(z.string()).optional(),
   /** Legal consent text for GDPR. */
   consent: z.string().optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const customerioFormConfigSchema = z.object({
@@ -223,6 +258,12 @@ export const customerioFormConfigSchema = z.object({
    * Example: { event_name: 'Stripe Sessions 2026 Exec Dinner' }
    */
   staticProperties: z.record(z.string(), z.unknown()).optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const notionFormConfigSchema = z.object({
@@ -244,6 +285,15 @@ export const notionFormConfigSchema = z.object({
    * Example: { source: 'Website Go Page' }
    */
   staticProperties: z.record(z.string(), z.unknown()).optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   *
+   * Example: only sync Technology partner submissions to a specialised Notion
+   * database — `{ field: 'partner_type', equals: 'technology' }`.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const formCrmConfigSchema = z

@@ -4,18 +4,11 @@ title: 'Scheduling Edge Functions'
 description: 'Schedule Edge Functions with pg_cron.'
 ---
 
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/-U6DJcjVvGo"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="-U6DJcjVvGo" title="Scheduling Edge Functions with pg_cron" />
 
-The hosted Supabase Platform supports the [`pg_cron` extension](/docs/guides/database/extensions/pgcron), a recurring job scheduler in Postgres.
+The hosted Supabase Platform supports the [`pg_cron` extension](/docs/guides/database/extensions/pg_cron), a recurring job scheduler in Postgres.
 
-In combination with the [`pg_net` extension](/docs/guides/database/extensions/pgnet), this allows us to invoke Edge Functions periodically on a set schedule.
+In combination with the [`pg_net` extension](/docs/guides/database/extensions/pg_net), this allows us to invoke Edge Functions periodically on a set schedule.
 
 <Admonition type="caution">
 
@@ -47,7 +40,7 @@ select
           url:= (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/function-name',
           headers:=jsonb_build_object(
             'Content-type', 'application/json',
-            'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'publishable_key')
+            'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'publishable_key')
           ),
           body:=concat('{"time": "', now(), '"}')::jsonb
       ) as request_id;
@@ -57,5 +50,5 @@ select
 
 ## Resources
 
-- [`pg_net` extension](/docs/guides/database/extensions/pgnet)
-- [`pg_cron` extension](/docs/guides/database/extensions/pgcron)
+- [`pg_net` extension](/docs/guides/database/extensions/pg_net)
+- [`pg_cron` extension](/docs/guides/database/extensions/pg_cron)

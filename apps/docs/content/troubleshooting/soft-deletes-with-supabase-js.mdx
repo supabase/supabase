@@ -75,7 +75,7 @@ This effectively un-deletes the record.
 
 ## Benefits of using views for soft deletes
 
-- **Cleaner Queries:** No need to add `WHERE deleted_at IS NULL` to every query. Just query the view (`active_items`).
+- **Cleaner Queries:** No need to add `WHERE deleted_at IS NULL` to every query. Query the view (`active_items`) instead.
 - **Separation of Concerns:** Views abstract the logic of filtering deleted records from your application code.
 - **Efficiency:** Postgres handles the filtering in the view, reducing the complexity in your app.
 
@@ -103,6 +103,6 @@ await supabase.from('items').update({ deleted_at: null }).eq('id', 123)
 
 ## Conclusion
 
-Soft deletes are easy to implement with Supabase and Postgres. By combining a `deleted_at` column with views, you can cleanly separate active and deleted records, keeping your application logic simple and maintainable.
+Soft deletes are easy to implement with Supabase and Postgres. By combining a `deleted_at` column with views, you can cleanly separate active and deleted records, keeping your application logic clean and maintainable.
 
 This approach provides the flexibility of retaining data for audits or recovery while keeping your app's interface clean and efficient. Start using soft deletes in your Supabase projects today!

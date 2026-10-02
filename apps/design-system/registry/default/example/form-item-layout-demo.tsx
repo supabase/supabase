@@ -45,7 +45,7 @@ export default function FormItemLayoutDemo() {
             </FormItemLayout>
           )}
         />
-        <Button size="small" type="secondary" htmlType="submit">
+        <Button size="small" variant="secondary" type="submit">
           Submit
         </Button>
       </form>

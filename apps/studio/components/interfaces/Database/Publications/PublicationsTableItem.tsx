@@ -25,7 +25,7 @@ export const PublicationsTableItem = ({
   const isProtected = protectedSchemas.map((x) => x.name).includes(table.schema)
 
   const [checked, setChecked] = useState(
-    selectedPublication.tables?.find((x: any) => x.id == table.id) != undefined
+    selectedPublication.tables?.find((x) => x.id == table.id) != undefined
   )
 
   const { can: canUpdatePublications } = useAsyncCheckPermissions(
@@ -42,14 +42,12 @@ export const PublicationsTableItem = ({
     setChecked(!checked)
 
     const publicationTables = publication?.tables ?? []
-    const exists = publicationTables.some((x: any) => x.id == table.id)
+    const exists = publicationTables.some((x) => x.id == table.id)
     const tables = !exists
       ? [`${table.schema}.${table.name}`].concat(
-          publicationTables.map((t: any) => `${t.schema}.${t.name}`)
+          publicationTables.map((t) => `${t.schema}.${t.name}`)
         )
-      : publicationTables
-          .filter((x: any) => x.id != table.id)
-          .map((x: any) => `${x.schema}.${x.name}`)
+      : publicationTables.filter((x) => x.id != table.id).map((x) => `${x.schema}.${x.name}`)
 
     updatePublications(
       {
@@ -75,7 +73,6 @@ export const PublicationsTableItem = ({
   return (
     <TableRow key={table.id}>
       <TableCell className="py-3 whitespace-nowrap">{table.name}</TableCell>
-      <TableCell className="py-3 whitespace-nowrap text-foreground-light">{table.schema}</TableCell>
       <TableCell className="py-3 whitespace-nowrap hidden lg:table-cell max-w-sm truncate text-foreground-light">
         {table.comment}
       </TableCell>
@@ -88,13 +85,16 @@ export const PublicationsTableItem = ({
             </Badge>
           ) : (
             <Tooltip>
-              <TooltipTrigger>
-                <Switch
-                  size="small"
-                  disabled={!canUpdatePublications || isPending || isProtected}
-                  checked={checked}
-                  onClick={() => toggleReplicationForTable(table, selectedPublication)}
-                />
+              <TooltipTrigger asChild>
+                <div>
+                  <Switch
+                    size="small"
+                    aria-label={`Toggle replication for ${table.name}`}
+                    disabled={!canUpdatePublications || isPending || isProtected}
+                    checked={checked}
+                    onClick={() => toggleReplicationForTable(table, selectedPublication)}
+                  />
+                </div>
               </TooltipTrigger>
               {isProtected && (
                 <TooltipContent side="bottom" className="w-64 text-center">

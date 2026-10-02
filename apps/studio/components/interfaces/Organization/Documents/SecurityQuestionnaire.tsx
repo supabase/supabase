@@ -10,7 +10,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { getDocument } from '@/data/documents/document-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -68,7 +68,7 @@ export const SecurityQuestionnaire = () => {
           <NoPermission resourceText="access our security questionnaire" />
         ) : !hasAccessToQuestionnaire ? (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button asChild type="default">
+            <Button asChild>
               <Link
                 href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
               >
@@ -78,12 +78,7 @@ export const SecurityQuestionnaire = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button
-              type="default"
-              icon={<Download />}
-              onClick={handleDownloadClick}
-              disabled={!slug}
-            >
+            <Button icon={<Download />} onClick={handleDownloadClick} disabled={!slug}>
               Download Questionnaire
             </Button>
           </div>

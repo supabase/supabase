@@ -1,5 +1,5 @@
 import { SignInSSOForm } from '@/components/interfaces/SignIn/SignInSSOForm'
-import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
+import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from '@/types'

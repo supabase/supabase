@@ -142,7 +142,7 @@ server.listen(9999)
 ### Using npm packages in Functions
 
 ```ts
-import express from 'npm:express@4.18.2'
+import express from 'npm:express@^5'
 
 const app = express()
 

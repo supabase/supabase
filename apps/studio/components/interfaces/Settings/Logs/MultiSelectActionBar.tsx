@@ -61,9 +61,10 @@ export function MultiSelectActionBar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="default"
               size="tiny"
-              icon={copiedFormat ? <Check size={12} className="text-brand" /> : <Copy size={12} />}
+              icon={
+                copiedFormat ? <Check size={12} className="text-primary" /> : <Copy size={12} />
+              }
               iconRight={<ChevronDown size={11} />}
             >
               {copiedFormat ? 'Copied!' : 'Copy'}
@@ -96,7 +97,7 @@ export function MultiSelectActionBar({
         />
 
         <Button
-          type="text"
+          variant="text"
           size="tiny"
           icon={<XIcon size={12} />}
           onClick={onClear}

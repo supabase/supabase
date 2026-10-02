@@ -54,6 +54,7 @@ export const useIsOrioleDbInAws = () => {
   return isOrioleDbInAws
 }
 
+// [Joshen TODO] There's a duplicate method `resolveHighAvailability` in `useHighAvailability.constants`
 export const useIsHighAvailability = () => {
   const { data: project } = useSelectedProjectQuery()
   return project?.high_availability ?? false

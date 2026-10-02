@@ -15,7 +15,7 @@ Serverless environments may freeze the function between requests. This causes TC
 
 **How to Resolve This:**
 
-- **Use the Data API:** Migrate read-heavy workloads to the Supabase Data API (PostgREST). This utilizes stateless HTTP requests and avoids persistent TCP socket issues.
+- **Use the Data API:** Migrate read-heavy workloads to the Supabase Data API (PostgREST). This uses stateless HTTP requests and avoids persistent TCP socket issues.
 - **Liveness Preflight:** For transactional paths using `postgres-js`, implement a preflight check by racing a `SELECT 1` query against a short timeout (e.g., a few seconds) before executing the primary query. If the preflight times out, recycle the database client.
 - **Migrate to Vercel Fluid Compute:** Use Vercel's Fluid Compute with `attachDatabasePool`. This environment supports the `waitUntil` hook, which allows the runtime to close idle connections properly before the instance suspends.
 - **Application Retries:** Implement application-level retry logic specifically for connection timeout errors to force a new connection attempt.

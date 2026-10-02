@@ -51,7 +51,7 @@ export function ComponentPreview({
     }
 
     return <Component />
-  }, [name, config.style])
+  }, [name])
 
   const Codes = React.Children.toArray(children) as React.ReactElement[]
   const Code = Codes[index]
@@ -81,18 +81,13 @@ export function ComponentPreview({
   const wideClasses = wide ? '2xl:-ml-12 2xl:-mr-12' : ''
 
   return (
-    <div className={cn('mt-4 mb-12', wideClasses)}>
-      <div
-        className={cn(
-          'relative bg-studio',
-          showCode ? 'rounded-tl-md rounded-tr-md border-t border-l border-r' : 'rounded-md border'
-        )}
-      >
+    <div className={cn('library-component-preview mt-4 mb-12', wideClasses)}>
+      <div className={cn('relative', showCode ? 'border-t border-l border-r' : 'border')}>
         {showGrid && (
-          <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,hsla(var(--foreground-default)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
+          <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
         )}
         {showDottedGrid && (
-          <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(hsla(var(--foreground-default)/0.02)_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+          <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
         )}
         <div className="z-10 relative">{ComponentPreview}</div>
       </div>

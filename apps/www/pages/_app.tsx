@@ -3,6 +3,7 @@ import 'config/code-hike.css'
 import '../styles/globals.css'
 import './launch-week/launchWeek.css'
 
+import { inter, manrope, sourceCodePro } from '~/lib/fonts'
 import {
   AuthProvider,
   FeatureFlagProvider,
@@ -45,22 +46,16 @@ export default function App({ Component, pageProps }: AppProps) {
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const forceDarkMode = isDarkLaunchWeek
 
-  let applicationName = 'Supabase'
-  let faviconRoute = DEFAULT_FAVICON_ROUTE
-  let themeColor = DEFAULT_FAVICON_THEME_COLOR
-
-  if (router.asPath?.includes('/launch-week/x')) {
-    applicationName = 'Supabase LWX'
-    faviconRoute = 'images/launchweek/lwx/favicon'
-    themeColor = 'FFFFFF'
-  }
+  const applicationName = 'Supabase'
+  const faviconRoute = DEFAULT_FAVICON_ROUTE
+  const themeColor = DEFAULT_FAVICON_THEME_COLOR
 
   // Advertise the .md version for AI agents on pages that have one.
   const cleanPath = (router.asPath ?? '/').split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
-  const mdSlug = cleanPath === '/' ? 'homepage' : cleanPath.slice(1)
+  const mdSlug = cleanPath === '/' ? 'index' : cleanPath.slice(1)
   const mdAlternateHref = MD_PAGES.has(mdSlug)
     ? cleanPath === '/'
-      ? '/homepage.md'
+      ? '/index.md'
       : `${cleanPath}.md`
     : null
 
@@ -101,29 +96,31 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       />
 
-      <AuthProvider>
-        {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
-        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
-          <DevToolbarProvider apiUrl={API_URL}>
-            <ThemeProvider forcedTheme={forceDarkMode ? 'dark' : undefined}>
-              <TooltipProvider delayDuration={0}>
-                <CommandProvider app="www" onTelemetry={onTelemetry}>
-                  <Toaster />
-                  <Component {...pageProps} />
-                  <WwwCommandMenu />
-                  <PageTelemetry
-                    API_URL={API_URL}
-                    hasAcceptedConsent={hasAcceptedConsent}
-                    enabled={IS_PLATFORM}
-                  />
-                  <DevToolbar />
-                </CommandProvider>
-              </TooltipProvider>
-            </ThemeProvider>
-          </DevToolbarProvider>
-        </FeatureFlagProvider>
-      </AuthProvider>
-      <TelemetryTagManager />
+      <div className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable}`}>
+        <AuthProvider>
+          {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
+          <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
+            <DevToolbarProvider apiUrl={API_URL}>
+              <ThemeProvider forcedTheme={forceDarkMode ? 'dark' : undefined}>
+                <TooltipProvider delayDuration={0}>
+                  <CommandProvider app="www" onTelemetry={onTelemetry}>
+                    <Toaster />
+                    <Component {...pageProps} />
+                    <WwwCommandMenu />
+                    <PageTelemetry
+                      API_URL={API_URL}
+                      hasAcceptedConsent={hasAcceptedConsent}
+                      enabled={IS_PLATFORM}
+                    />
+                    <DevToolbar />
+                  </CommandProvider>
+                </TooltipProvider>
+              </ThemeProvider>
+            </DevToolbarProvider>
+          </FeatureFlagProvider>
+        </AuthProvider>
+        <TelemetryTagManager />
+      </div>
     </>
   )
 }

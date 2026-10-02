@@ -24,7 +24,7 @@ type EditorPanelState = {
   pendingReset: boolean
 }
 
-const initialState: EditorPanelState = {
+const createInitialState = (): EditorPanelState => ({
   value: safeSql``,
   templates: [],
   results: undefined,
@@ -33,10 +33,10 @@ const initialState: EditorPanelState = {
   onChange: undefined,
   activeSnippetId: null,
   pendingReset: false,
-}
+})
 
 export const editorPanelState = proxy({
-  ...initialState,
+  ...createInitialState(),
   setValue(value: DisplayableSqlFragment) {
     editorPanelState.value = value
     editorPanelState.onChange?.(value)
@@ -65,7 +65,7 @@ export const editorPanelState = proxy({
     editorPanelState.pendingReset = true
   },
   reset() {
-    Object.assign(editorPanelState, initialState)
+    Object.assign(editorPanelState, createInitialState())
   },
 })
 

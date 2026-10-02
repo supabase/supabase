@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { KeyboardEvent, ReactNode, useRef } from 'react'
 import { useKey } from 'react-use'
 import { cn } from 'ui'
-import { useCommandMenuOpen } from 'ui-patterns'
+import { useCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 const actionButtonVariants = cva(
   'pl-1.5 pr-3 py-1.5 rounded-sm shadow-sm flex justify-center items-center gap-2 outline outline-1 -outline-offset-1 cursor-pointer flex-nowrap',

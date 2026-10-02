@@ -3,7 +3,7 @@ import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 
 import { vaultSecretsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { UseCustomQueryOptions } from '@/types'
 
 const vaultSecretDecryptedValueQuery = (id: string) => {

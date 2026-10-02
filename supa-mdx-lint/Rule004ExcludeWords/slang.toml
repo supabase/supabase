@@ -1,3 +1,0 @@
-description = "Don't use Internet slang abbreviations"
-level = "ERROR"
-words = ["tl;dr", "ymmv", "rtfm", "imo", "fwiw"]

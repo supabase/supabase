@@ -6,6 +6,7 @@ import { Button } from 'ui'
 
 import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -35,7 +36,7 @@ interface UpgradePlanButtonProps {
  */
 export const UpgradePlanButton = ({
   source,
-  variant: type = 'primary',
+  variant = 'primary',
   plan = 'Pro',
   addon,
   featureProposition,
@@ -71,7 +72,7 @@ export const UpgradePlanButton = ({
     ? `/org/${slug ?? '_'}/billing?panel=costControl&source=${source}`
     : isOnPaidPlanAndRequestingToPurchaseAddon
       ? addon === 'computeSize'
-        ? `/project/${ref ?? '_'}/settings/compute-and-disk`
+        ? `${getInfrastructurePath(ref)}#compute`
         : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
       : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 
@@ -97,7 +98,7 @@ export const UpgradePlanButton = ({
         addon={addon}
         featureProposition={featureProposition}
         className={className}
-        type={type}
+        variant={variant}
       >
         {children}
       </RequestUpgradeToBillingOwners>
@@ -108,7 +109,7 @@ export const UpgradePlanButton = ({
     return (
       <ButtonTooltip
         disabled
-        type={type}
+        variant={variant}
         className={className}
         tooltip={{
           content: {
@@ -123,7 +124,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={type} disabled={disabled} className={className} onClick={onClick}>
+    <Button asChild variant={variant} disabled={disabled} className={className} onClick={onClick}>
       {link}
     </Button>
   )

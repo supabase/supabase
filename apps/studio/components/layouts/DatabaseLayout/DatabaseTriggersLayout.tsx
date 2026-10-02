@@ -2,9 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import DatabaseLayout from './DatabaseLayout'
+import { DatabaseLayout } from './DatabaseLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 type DatabaseTriggersLayoutProps = PropsWithChildren

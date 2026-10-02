@@ -4,13 +4,13 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
-import { Button, cn, LoadingLine } from 'ui'
+import { Button, cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -96,28 +96,33 @@ export const QueuesTab = () => {
               }}
               actions={[
                 search && (
-                  <Button
-                    key="clear"
-                    size="tiny"
-                    type="text"
-                    icon={<X />}
-                    onClick={clearSearch}
-                    className="p-0 h-5 w-5"
-                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        key="clear"
+                        size="tiny"
+                        variant="text"
+                        icon={<X />}
+                        onClick={clearSearch}
+                        className="p-0 h-5 w-5"
+                        aria-label="Clear search"
+                        // Tooltip repeats the label; screen readers would read it twice
+                        aria-describedby={undefined}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Clear search</TooltipContent>
+                  </Tooltip>
                 ),
               ]}
             />
 
             <div className="flex items-center gap-x-2">
-              <Button
-                type="default"
-                icon={<RefreshCw />}
-                loading={isRefetching}
-                onClick={() => refetch()}
-              >
+              <Button icon={<RefreshCw />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
-              <Button onClick={() => setCreateQueueSheetShown(true)}>Create queue</Button>
+              <Button variant="primary" onClick={() => setCreateQueueSheetShown(true)}>
+                Create queue
+              </Button>
             </div>
           </div>
 

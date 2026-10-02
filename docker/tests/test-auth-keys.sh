@@ -59,6 +59,35 @@ http_status() {
     curl -s -o /dev/null -w "%{http_code}" "$@" "$url"
 }
 
+# Like http_status, but appends " sdk" when the response carries the
+# @supabase/server error header, i.e. the gateway passed the request through
+# and the function itself rejected it.
+fn_status() {
+    url="$1"
+    shift
+    out=$(curl -s -o /dev/null -D - -w '\n%{http_code}' "$@" "$url")
+    code=$(printf '%s\n' "$out" | tail -n 1)
+    if printf '%s\n' "$out" | grep -qi '^x-supabase-server-error:'; then
+        echo "$code sdk"
+    else
+        echo "$code"
+    fi
+}
+
+# Detect which gateway is running so gateway-specific assertions can be gated.
+detect_gateway() {
+    command -v docker >/dev/null 2>&1 || { echo unknown; return; }
+    running=$(docker ps --format '{{.Names}}' 2>/dev/null)
+    if printf '%s\n' "$running" | grep -q '^supabase-envoy$'; then
+        echo envoy
+    elif printf '%s\n' "$running" | grep -q '^supabase-kong$'; then
+        echo kong
+    else
+        echo unknown
+    fi
+}
+GATEWAY=$(detect_gateway)
+
 echo ""
 echo "=== Testing against $BASE_URL ==="
 echo ""
@@ -68,13 +97,13 @@ echo ""
 # ---------------------------------------------
 
 echo "--- REST API (/rest/v1/) ---"
-check "Legacy ANON_KEY" "200" \
+check "Legacy ANON_KEY -> 403" "403" \
     "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $ANON_KEY")"
 check "Legacy SERVICE_ROLE_KEY" "200" \
     "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SERVICE_ROLE_KEY")"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    check "New PUBLISHABLE_KEY" "200" \
+    check "New PUBLISHABLE_KEY -> 403" "403" \
         "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
     check "New SECRET_KEY" "200" \
         "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SUPABASE_SECRET_KEY")"
@@ -109,7 +138,7 @@ check "Legacy ANON_KEY" "200" \
     "$(http_status "$BASE_URL/storage/v1/bucket" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    # With opaque key, Kong translates to asymmetric JWT in Authorization
+    # With opaque key, the API gateway translates to asymmetric JWT in Authorization
     check "New PUBLISHABLE_KEY" "200" \
         "$(http_status "$BASE_URL/storage/v1/bucket" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
 fi
@@ -144,32 +173,86 @@ check "No key -> 401" "401" \
 
 echo ""
 echo "--- Realtime REST (/realtime/v1/api/) ---"
-# Realtime REST API - expect 200 or other non-401 response with valid key
-check "Legacy ANON_KEY -> not 401" "true" \
-    "$([ "$(http_status "$BASE_URL/realtime/v1/api/tenants" -H "apikey: $ANON_KEY")" != "401" ] && echo true || echo false)"
+# Realtime REST API - use /api/ping to verify key auth (expect 200 with a valid key)
+check "Legacy ANON_KEY -> 200" "200" \
+    "$(http_status "$BASE_URL/realtime/v1/api/ping" -H "apikey: $ANON_KEY")"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    check "New PUBLISHABLE_KEY -> not 401" "true" \
-        "$([ "$(http_status "$BASE_URL/realtime/v1/api/tenants" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")" != "401" ] && echo true || echo false)"
+    check "New PUBLISHABLE_KEY -> 200" "200" \
+        "$(http_status "$BASE_URL/realtime/v1/api/ping" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
 fi
 
 check "No key -> 401" "401" \
-    "$(http_status "$BASE_URL/realtime/v1/api/tenants")"
+    "$(http_status "$BASE_URL/realtime/v1/api/ping")"
+
+# Management endpoints must be blocked at the gateway (even with a valid key)
+check "/api/tenants blocked -> 403" "403" \
+    "$(http_status "$BASE_URL/realtime/v1/api/tenants" -H "apikey: $ANON_KEY")"
+check "/api/openapi blocked -> 403" "403" \
+    "$(http_status "$BASE_URL/realtime/v1/api/openapi" -H "apikey: $ANON_KEY")"
+
+echo ""
+echo "--- Edge Functions (/functions/v1/) ---"
+
+# hello uses withSupabase({ auth: ["publishable", "secret"] }), which requires
+# an sb_ key in the apikey header. "401 sdk" means the gateway passed the
+# request through and the function rejected it; a bare "401" is the gateway.
+check "No auth -> passed to function, rejected by SDK" "401 sdk" \
+    "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -d '{}')"
+
+# Non-sb_ values (legacy JWT, typo, third-party JWT) are not validated at the gateway.
+check "Legacy ANON_KEY -> passed to function, rejected by SDK" "401 sdk" \
+    "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $ANON_KEY" -d '{}')"
+check "Non-sb_ invalid apikey -> passed to function, rejected by SDK" "401 sdk" \
+    "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: invalid-key" -d '{}')"
+
+if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
+    check "PUBLISHABLE_KEY -> hello reachable" "200" \
+        "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+    check "SECRET_KEY -> hello reachable" "200" \
+        "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -d '{}')"
+    # sb_ in Authorization only: the gateway translates it and passes it through,
+    # but the SDK only accepts sb_ keys in the apikey header.
+    check "sb_ in Authorization only -> passed to function, rejected by SDK" "401 sdk" \
+        "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+
+    # Invalid sb_-prefixed key and apikey/bearer sb_ conflict are rejected at the
+    # gateway - but only by Envoy. Kong is permissive and passes them through.
+    if [ "$GATEWAY" = "envoy" ]; then
+        check "Invalid sb_ apikey -> 401 at gateway (Envoy)" "401" \
+            "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
+        check "Conflicting sb_ keys -> 401 at gateway (Envoy)" "401" \
+            "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+    else
+        check "Invalid sb_ apikey -> passed to function, rejected by SDK (Kong)" "401 sdk" \
+            "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
+    fi
+fi
 
 echo ""
 echo "--- supabase-js style requests (apikey + Authorization) ---"
 # supabase-js sends both apikey header AND Authorization: Bearer <apikey>
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    check "apikey + Authorization: Bearer sb_ (replace path)" "200" \
+    check "apikey + Authorization: Bearer sb_ (replace path)" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
             -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY")"
+
+    check "secret apikey + Authorization: Bearer sb_secret" "200" \
+        "$(http_status "$BASE_URL/rest/v1/" \
+            -H "apikey: $SUPABASE_SECRET_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SECRET_KEY")"
 fi
 
-check "Legacy apikey + Authorization: Bearer <legacy jwt>" "200" \
+check "Legacy apikey + Authorization: Bearer <legacy jwt>" "403" \
     "$(http_status "$BASE_URL/rest/v1/" \
         -H "apikey: $ANON_KEY" \
         -H "Authorization: Bearer $ANON_KEY")"
+
+check "Service role apikey + Authorization: Bearer <legacy jwt>" "200" \
+    "$(http_status "$BASE_URL/rest/v1/" \
+        -H "apikey: $SERVICE_ROLE_KEY" \
+        -H "Authorization: Bearer $SERVICE_ROLE_KEY")"
 
 echo ""
 echo "--- Edge cases ---"
@@ -265,9 +348,14 @@ if [ -n "$access_token" ]; then
     fi
 
     # Use the session JWT with PostgREST
-    check "Session JWT with PostgREST" "200" \
+    check "Session JWT with PostgREST" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $access_token")"
+
+    check "Session JWT with PostgREST + service role key" "200" \
+        "$(http_status "$BASE_URL/rest/v1/" \
+            -H "apikey: $SERVICE_ROLE_KEY" \
             -H "Authorization: Bearer $access_token")"
 
     # Use the session JWT with Storage
@@ -282,9 +370,13 @@ if [ -n "$access_token" ]; then
     if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
         echo ""
         echo "--- Authenticated user + opaque key (critical path) ---"
-        check "Opaque apikey + user JWT -> PostgREST uses user JWT" "200" \
+        check "Opaque apikey + user JWT -> PostgREST uses user JWT" "403" \
             "$(http_status "$BASE_URL/rest/v1/" \
                 -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+                -H "Authorization: Bearer $access_token")"
+        check "Secret apikey + user JWT -> PostgREST allowed" "200" \
+            "$(http_status "$BASE_URL/rest/v1/" \
+                -H "apikey: $SUPABASE_SECRET_KEY" \
                 -H "Authorization: Bearer $access_token")"
         check "Opaque apikey + user JWT -> Storage uses user JWT" "200" \
             "$(http_status "$BASE_URL/storage/v1/bucket" \
@@ -294,6 +386,13 @@ if [ -n "$access_token" ]; then
             "$(http_status "$BASE_URL/auth/v1/user" \
                 -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
                 -H "Authorization: Bearer $access_token")"
+        # Functions leaves Authorization (the user JWT) untouched and adds the
+        # translated sb-api-key alongside it; the request must reach the worker.
+        check "Opaque apikey + user JWT -> Functions reachable" "200" \
+            "$(http_status "$BASE_URL/functions/v1/hello" -X POST \
+                -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+                -H "Authorization: Bearer $access_token" \
+                -d '{}')"
     fi
 else
     check "Sign in test user" "true" "false"
@@ -329,9 +428,13 @@ console.log(header+'.'+payload+'.'+sig);
 " 2>/dev/null)
 
 if [ -n "$hs256_token" ]; then
-    check "HS256 token with PostgREST (backward compat)" "200" \
+    check "HS256 token with PostgREST (backward compat)" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $hs256_token")"
+    check "HS256 token with PostgREST + service role key" "200" \
+        "$(http_status "$BASE_URL/rest/v1/" \
+            -H "apikey: $SERVICE_ROLE_KEY" \
             -H "Authorization: Bearer $hs256_token")"
 else
     echo "  SKIP: Could not mint HS256 token (node required)"

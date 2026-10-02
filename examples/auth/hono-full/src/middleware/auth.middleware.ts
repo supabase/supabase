@@ -4,9 +4,11 @@ import type { Context, MiddlewareHandler } from 'hono'
 import { env } from 'hono/adapter'
 import { setCookie } from 'hono/cookie'
 
+import type { Database } from '../database.types'
+
 declare module 'hono' {
   interface ContextVariableMap {
-    supabase: SupabaseClient
+    supabase: SupabaseClient<Database>
   }
 }
 

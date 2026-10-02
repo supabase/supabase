@@ -5,7 +5,7 @@ import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
-import { extractLogMetadata } from './unified-logs.utils'
+import { mapUnifiedLogRow, parseUnifiedLogsQueryRows } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
@@ -16,7 +16,6 @@ import { handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
-type LogLevel = 'success' | 'warning' | 'error'
 
 export const UNIFIED_LOGS_QUERY_OPTIONS = {
   refetchOnWindowFocus: false,
@@ -121,42 +120,8 @@ export async function getUnifiedLogs(
 
   if (data.error) handleError(new Error(data.error as string))
 
-  const resultData = data?.result ?? []
-
-  const result = resultData.map((row: any) => {
-    // Disambiguate timestamp shape by format, not by Number.isFinite — a
-    // numeric string of microseconds is always finite, so checking finite-
-    // ness can't tell us whether the value is microseconds or already-ms.
-    // ISO-like strings contain `T` or `-` and are parsed via Date; anything
-    // else is treated as numeric microseconds-since-epoch.
-    const ts = String(row.timestamp ?? '')
-    const looksLikeIso = /[T-]/.test(ts)
-    const date = looksLikeIso
-      ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
-      : new Date(Number(ts) / 1000)
-
-    const { status, method, pathname } = extractLogMetadata(row)
-
-    return {
-      id: row.id,
-      date,
-      method,
-      pathname,
-      status,
-      timestamp: row.timestamp,
-      level: row.level as LogLevel,
-      host: row.host,
-      event_message: row.event_message || row.body || '',
-      headers:
-        typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
-      regions: row.region ? [row.region] : [],
-      log_type: row.log_type || '',
-      latency: row.latency || 0,
-      log_count: row.log_count || null,
-      logs: row.logs || [],
-      auth_user: row.auth_user || null,
-    }
-  })
+  const resultData = parseUnifiedLogsQueryRows(data?.result)
+  const result = resultData.map(mapUnifiedLogRow)
 
   const firstRow = result.length > 0 ? result[0] : null
   const lastRow = result.length > 0 ? result[result.length - 1] : null

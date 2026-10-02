@@ -4,6 +4,7 @@ import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEdito
 import {
   convertByteaToHex,
   generateRowObjectFromFields,
+  generateUpdateRowPayload,
   isValueTruncated,
   parseValue,
   validateFields,
@@ -95,11 +96,16 @@ describe('parseValue', () => {
   it('should return originalValue even when an error occurs', () => {
     const originalValue = 'some value'
     const format = 'some format'
-    // Mocking an error occurring during parsing
-    JSON.stringify = vi.fn(() => {
+    // Mocking an error occurring during parsing. Must be restored before the file
+    // ends: the coverage provider serializes its data with JSON.stringify.
+    const stringifySpy = vi.spyOn(JSON, 'stringify').mockImplementation(() => {
       throw new Error('Mocked error')
     })
-    expect(parseValue(originalValue, format)).toEqual(originalValue)
+    try {
+      expect(parseValue(originalValue, format)).toEqual(originalValue)
+    } finally {
+      stringifySpy.mockRestore()
+    }
   })
 })
 
@@ -116,6 +122,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -128,6 +135,7 @@ describe('generateRowObjectFromFields', () => {
         isNullable: false,
         enums: [],
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -140,6 +148,7 @@ describe('generateRowObjectFromFields', () => {
         isNullable: true,
         enums: [],
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
@@ -158,6 +167,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -170,10 +180,59 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
     const result = generateRowObjectFromFields({ fields: sampleRowFields })
+    expect(result).toEqual({ name: '' })
+  })
+  it('should omit cleared identity and default fields for new rows', () => {
+    const sampleRowFields: RowField[] = [
+      {
+        id: '1',
+        name: 'id',
+        value: '',
+        comment: '',
+        defaultValue: null,
+        format: 'int8',
+        enums: [],
+        isNullable: false,
+        isIdentity: true,
+        isGenerated: false,
+        isPrimaryKey: true,
+      },
+      {
+        id: '2',
+        name: 'created_at',
+        value: '',
+        comment: '',
+        defaultValue: 'now()',
+        format: 'timestamptz',
+        enums: [],
+        isNullable: false,
+        isIdentity: false,
+        isGenerated: false,
+        isPrimaryKey: false,
+      },
+      {
+        id: '3',
+        name: 'name',
+        value: '',
+        comment: '',
+        defaultValue: null,
+        format: 'text',
+        enums: [],
+        isNullable: false,
+        isIdentity: false,
+        isGenerated: false,
+        isPrimaryKey: false,
+      },
+    ]
+    const result = generateRowObjectFromFields({
+      fields: sampleRowFields,
+      useDefaultForEmptyValues: true,
+    })
     expect(result).toEqual({ name: '' })
   })
   it('should discern NULL values for text', () => {
@@ -188,6 +247,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -200,6 +260,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
@@ -218,6 +279,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
       {
@@ -230,6 +292,7 @@ describe('generateRowObjectFromFields', () => {
         enums: [],
         isNullable: false,
         isIdentity: false,
+        isGenerated: false,
         isPrimaryKey: false,
       },
     ]
@@ -274,12 +337,12 @@ describe('isValueTruncated', () => {
 
     // Pattern 4: Multi-dimensional array (lines 211-212)
     // column[1:50]::type[] - no special marker, just detect by [[ pattern
-    expect(isValueTruncated('[["item"]]')).toBe(true)
-    expect(isValueTruncated('[["item1","item2"]]')).toBe(true)
+    expect(isValueTruncated('[["item"]]', '_text')).toBe(true)
+    expect(isValueTruncated('[["item1","item2"]]', '_text')).toBe(true)
   })
 
   it('should detect multidimensional arrays', () => {
-    expect(isValueTruncated('[["item1", "item2"]]')).toBe(true)
+    expect(isValueTruncated('[["item1", "item2"]]', '_text')).toBe(true)
   })
 
   it('should detect truncated JSON arrays with truncated flag', () => {
@@ -301,6 +364,12 @@ describe('isValueTruncated', () => {
   it('should handle non-string values', () => {
     expect(isValueTruncated(123 as any)).toBe(false)
     expect(isValueTruncated({} as any)).toBe(false)
+  })
+
+  it('should not flag small jsonb arrays as truncated', () => {
+    expect(
+      isValueTruncated('[["infrequently","frequently","constantly"],["90","30","180"]]', 'jsonb')
+    ).toBe(false)
   })
 
   it('should test edge cases that could break coordination with table-row-query.ts', () => {
@@ -368,6 +437,7 @@ describe('validateFields', () => {
     defaultValue: null,
     isNullable: true,
     isIdentity: false,
+    isGenerated: false,
     isPrimaryKey: false,
     ...overrides,
   })
@@ -394,9 +464,7 @@ describe('validateFields', () => {
     expect(validateFields(fields)).toEqual({ tags: 'Value is an invalid array' })
   })
 
-  it('should handle JSON validation (minifyJSON dependency issue)', () => {
-    // Note: This test shows that minifyJSON currently fails on all JSON input
-    // This may be due to missing dependencies in the test environment
+  it('should accept valid JSON', () => {
     const fields: RowField[] = [
       createField({
         name: 'data',
@@ -404,8 +472,7 @@ describe('validateFields', () => {
         value: '{}',
       }),
     ]
-    // Currently all JSON fails validation in test environment
-    expect(validateFields(fields)).toEqual({ data: 'Value is invalid JSON' })
+    expect(validateFields(fields)).toEqual({})
   })
 
   it('should return error for invalid JSON', () => {
@@ -480,6 +547,18 @@ describe('validateFields', () => {
     expect(validateFields(fields)).toEqual({})
   })
 
+  it('should skip validation for generated columns', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'gen_tags',
+        format: '_text',
+        value: '[invalid array',
+        isGenerated: true,
+      }),
+    ]
+    expect(validateFields(fields)).toEqual({})
+  })
+
   it('should validate multiple fields and return all errors', () => {
     const fields: RowField[] = [
       createField({
@@ -516,6 +595,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
     defaultValue: null,
     isNullable: true,
     isIdentity: false,
+    isGenerated: false,
     isPrimaryKey: false,
     ...overrides,
   })
@@ -741,5 +821,70 @@ describe('generateRowObjectFromFields - additional cases', () => {
     ]
     const result = generateRowObjectFromFields({ fields })
     expect(result).toEqual({})
+  })
+
+  it('should omit generated columns even when they hold a value', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'price',
+        format: 'int4',
+        value: '100',
+      }),
+      createField({
+        name: 'is_discounted',
+        format: 'bool',
+        value: 'false',
+        // pg-meta populates default_value with the generation expression for generated columns
+        defaultValue: '(price < 100)',
+        isGenerated: true,
+      }),
+    ]
+    const result = generateRowObjectFromFields({ fields, useDefaultForEmptyValues: true })
+    expect(result).toEqual({ price: '100' })
+  })
+
+  it('should omit generated columns when includeUndefinedValues is true', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'price',
+        format: 'int4',
+        value: '100',
+      }),
+      createField({
+        name: 'is_discounted',
+        format: 'bool',
+        value: 'true',
+        isGenerated: true,
+      }),
+    ]
+    const result = generateRowObjectFromFields({ fields, includeUndefinedValues: true })
+    expect(result).toEqual({ price: '100' })
+  })
+})
+
+describe('generateUpdateRowPayload', () => {
+  const createField = (overrides: Partial<RowField>): RowField => ({
+    id: '1',
+    name: 'test_field',
+    comment: '',
+    format: 'text',
+    enums: [],
+    value: '',
+    defaultValue: null,
+    isNullable: true,
+    isIdentity: false,
+    isGenerated: false,
+    isPrimaryKey: false,
+    ...overrides,
+  })
+
+  it('should not include generated columns in update payloads', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'price', format: 'int4', value: '90' }),
+      createField({ name: 'is_discounted', format: 'bool', value: 'true', isGenerated: true }),
+    ]
+    const payload = generateUpdateRowPayload({ id: '1', price: '100', is_discounted: true }, fields)
+    expect(payload).toEqual({ price: '90' })
   })
 })

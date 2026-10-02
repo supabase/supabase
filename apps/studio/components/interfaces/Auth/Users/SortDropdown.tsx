@@ -39,7 +39,7 @@ export const SortDropdown = ({
     return (
       <ButtonTooltip
         disabled
-        type="default"
+        variant="default"
         icon={<ArrowDownNarrowWide />}
         tooltip={{
           content: {

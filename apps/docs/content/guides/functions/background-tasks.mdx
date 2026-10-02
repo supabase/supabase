@@ -9,7 +9,7 @@ Edge Function instances can process background tasks outside of the request hand
 
 This allows you to:
 
-- Respond quickly to users while processing continues
+- Respond to users while processing continues
 - Handle async operations without blocking the response
 
 ---
@@ -27,7 +27,7 @@ EdgeRuntime.waitUntil(asyncLongRunningTask())
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
-    return new Response(...)
+    return Response.json({ ok: true })
   }),
 }
 ```
@@ -42,7 +42,7 @@ export default {
     // Won't block the request, runs in background.
     EdgeRuntime.waitUntil(asyncLongRunningTask())
 
-    return new Response(...)
+    return Response.json({ ok: true })
   }),
 }
 ```
@@ -62,7 +62,7 @@ addEventListener('beforeunload', (ev) => {
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
-    return new Response(...)
+    return Response.json({ ok: true })
   }),
 }
 ```

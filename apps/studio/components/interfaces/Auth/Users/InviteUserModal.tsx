@@ -91,12 +91,11 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
           </DialogSection>
 
           <DialogFooter>
-            <Button type="default" onClick={handleToggle}>
-              Cancel
-            </Button>
+            <Button onClick={handleToggle}>Cancel</Button>
             <Button
+              variant="primary"
               form={formId}
-              htmlType="submit"
+              type="submit"
               loading={isInviting}
               disabled={!canInviteUsers || isInviting}
             >

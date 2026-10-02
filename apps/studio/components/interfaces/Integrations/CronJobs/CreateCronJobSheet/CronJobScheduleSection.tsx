@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   Accordion,
   AccordionContent,
@@ -69,7 +69,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue, useNaturalLanguage])
 
-  const schedule = form.watch('schedule')
+  const schedule = useWatch({ control: form.control, name: 'schedule' })
   const scheduleString = formatScheduleString(schedule)
 
   return (
@@ -131,7 +131,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   {PRESETS.map((preset) => (
                     <li key={preset.name}>
                       <Button
-                        type="outline"
+                        variant="outline"
                         onClick={() => {
                           if (useNaturalLanguage) {
                             setUseNaturalLanguage(false)

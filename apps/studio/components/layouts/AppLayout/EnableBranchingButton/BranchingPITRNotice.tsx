@@ -36,7 +36,6 @@ export const BranchingPITRNotice = () => {
           <ButtonTooltip
             disabled
             size="tiny"
-            type="default"
             tooltip={{
               content: {
                 side: 'bottom',
@@ -47,7 +46,7 @@ export const BranchingPITRNotice = () => {
             Enable PITR add-on
           </ButtonTooltip>
         ) : (
-          <Button size="tiny" type="default" asChild>
+          <Button size="tiny" asChild>
             <Link
               href={`/project/${ref}/settings/addons?panel=pitr`}
               onClick={() => snap.setShowCreateBranchModal(false)}

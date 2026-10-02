@@ -161,13 +161,11 @@ export default function PageLayoutSettings() {
                   </CardContent>
                   <CardFooter className="justify-end space-x-2">
                     {refreshTokenForm.formState.isDirty && (
-                      <Button type="default" onClick={() => refreshTokenForm.reset()}>
-                        Cancel
-                      </Button>
+                      <Button onClick={() => refreshTokenForm.reset()}>Cancel</Button>
                     )}
                     <Button
-                      type="primary"
-                      htmlType="submit"
+                      variant="primary"
+                      type="submit"
                       disabled={!refreshTokenForm.formState.isDirty}
                     >
                       Save changes
@@ -266,13 +264,11 @@ export default function PageLayoutSettings() {
 
                   <CardFooter className="justify-end space-x-2">
                     {userSessionsForm.formState.isDirty && (
-                      <Button type="default" onClick={() => userSessionsForm.reset()}>
-                        Cancel
-                      </Button>
+                      <Button onClick={() => userSessionsForm.reset()}>Cancel</Button>
                     )}
                     <Button
-                      type="primary"
-                      htmlType="submit"
+                      variant="primary"
+                      type="submit"
                       disabled={!userSessionsForm.formState.isDirty}
                     >
                       Save changes

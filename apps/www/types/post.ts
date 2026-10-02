@@ -8,6 +8,7 @@ export interface PostTypes {
   title: string
   name?: string
   date: string
+  updated?: string
   formattedDate?: string
   coverImage?: string
   author?: string
@@ -118,6 +119,7 @@ export type BlogData = {
   author?: string
   authors?: StaticAuthor[]
   date: string
+  updated?: string
   categories?: string[]
   tags?:
     | string[]

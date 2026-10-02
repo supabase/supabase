@@ -13,7 +13,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from '@/data/config/project-compliance-config-mutation'
@@ -68,7 +68,7 @@ export const ComplianceConfig = () => {
   return (
     <PageSection id="compliance-configuration">
       <PageSectionMeta>
-        <div className="flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
+        <div className="w-full flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
           <PageSectionSummary>
             <PageSectionTitle>High Compliance Configuration</PageSectionTitle>
             <PageSectionDescription>

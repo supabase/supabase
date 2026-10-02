@@ -31,6 +31,7 @@ const Command = ({ item }: any) => {
             <span>{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
+              tabIndex={0}
               className="text-foreground-lighter hover:text-foreground"
               onClick={() => {
                 function onCopy(value: any) {
@@ -42,7 +43,7 @@ const Command = ({ item }: any) => {
               }}
             >
               {isCopied ? (
-                <Check size={14} strokeWidth={3} className="text-brand" />
+                <Check size={14} strokeWidth={3} className="text-primary" />
               ) : (
                 <Copy size={14} />
               )}

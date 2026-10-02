@@ -37,7 +37,13 @@ export const getTablesPaginatedSql = ({
   const schemaFilter = filter ? safeSql`and nc.nspname ${filter}` : safeSql``
   const nameFilterClause =
     nameFilter && nameFilter.length > 0
-      ? safeSql`and c.relname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}`
+      ? schema
+        ? safeSql`and c.relname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}`
+        : safeSql`and (
+            c.relname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
+            or nc.nspname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
+            or (nc.nspname || '.' || c.relname) ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
+          )`
       : safeSql``
 
   const columnsCte = includeColumns

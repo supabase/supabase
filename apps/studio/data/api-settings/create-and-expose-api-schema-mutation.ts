@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { configKeys } from '@/data/config/keys'
 import { databaseKeys } from '@/data/database/keys'
 import { handleError, patch } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateAndExposeAPISchemaVariables = {
@@ -77,6 +77,7 @@ export const useCreateAndExposeAPISchemaMutation = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) }),
         queryClient.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },

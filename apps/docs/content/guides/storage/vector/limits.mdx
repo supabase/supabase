@@ -19,3 +19,15 @@ Vector buckets have default limits during the alpha phase. These limits are desi
 | **Indexes per bucket**  | 10           | Maximum number of indexes per bucket                  |
 | **Vector dimensions**   | Max 4096     | Maximum dimension size for embeddings                 |
 | **Batch size**          | 1000 vectors | Maximum vectors per single insert/update request      |
+
+## Query limits
+
+The `queryVectors` limits differ between hosted and local vector buckets.
+
+| Limit                            | Hosted vector buckets | Local vector buckets |
+| -------------------------------- | --------------------- | -------------------- |
+| **Maximum `topK`**               | 10,000                | 100                  |
+| **Maximum results per response** | 100                   | 100                  |
+| **`nextToken` query pagination** | Supported             | Not supported        |
+
+Hosted vector buckets use Amazon S3 Vectors. When a response includes a `nextToken`, send the same query again with that token to retrieve the next page. Local vector buckets use pgvector and return the requested results in one response.

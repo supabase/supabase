@@ -9,18 +9,11 @@ The `http` extension allows you to call RESTful endpoints within Postgres.
 
 ## Quick demo
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/rARgrELRCwY"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="rARgrELRCwY" title="Calling an external API with the http extension" />
 
 ## Overview
 
-Let's cover some basic concepts:
+This section covers basic concepts:
 
 - REST: stands for REpresentational State Transfer. It's a way to request data from external services.
 - RESTful APIs are servers which accept HTTP "calls". The calls are typically:
@@ -88,7 +81,7 @@ A successful call to a web URL from the `http` extension returns a record with t
 
 ## Examples
 
-### Simple `GET` example
+### Basic `GET` example [#simple-get-example]
 
 ```sql
 select
@@ -97,7 +90,7 @@ from
   extensions.http_get('https://jsonplaceholder.typicode.com/todos/1');
 ```
 
-### Simple `POST` example
+### Basic `POST` example [#simple-post-example]
 
 ```sql
 select

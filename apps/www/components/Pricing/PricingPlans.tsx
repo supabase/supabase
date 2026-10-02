@@ -83,7 +83,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                     <Button
                       block
                       size="large"
-                      type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                      variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
                       asChild
                     >
                       <Link href={plan.href} onClick={sendPricingEvent}>
@@ -168,7 +168,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                             <Check
                               className={cn(
                                 'h-4 w-4',
-                                plan.name === 'Enterprise' ? 'text-foreground' : 'text-brand'
+                                plan.name === 'Enterprise' ? 'text-foreground' : 'text-primary'
                               )}
                               aria-hidden="true"
                               strokeWidth={3}

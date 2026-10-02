@@ -49,7 +49,7 @@ export function CopyButton({
   return (
     <Button
       size="small"
-      type="outline"
+      variant="outline"
       className={cn(
         'relative z-10 h-6 w-6 text-foreground-muted hover:bg-surface-100 hover:text-foreground p-0',
         className
@@ -106,7 +106,7 @@ export function CopyWithClassNames({
       <DropdownMenuTrigger asChild>
         <Button
           size="small"
-          type="outline"
+          variant="outline"
           className={cn(
             'relative z-10 h-6 w-6 text-zinc-50 hover:bg-zinc-700 hover:text-zinc-50',
             className

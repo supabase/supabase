@@ -100,7 +100,7 @@ const SecurityNewsletterForm = () => {
               />
             </div>
             {errorMessage && <p className="text-destructive text-sm">{errorMessage}</p>}
-            <Button type="primary" size="large" htmlType="submit" loading={status === 'loading'}>
+            <Button variant="primary" size="large" type="submit" loading={status === 'loading'}>
               Subscribe
             </Button>
           </form>

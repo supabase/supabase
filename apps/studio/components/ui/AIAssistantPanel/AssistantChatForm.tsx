@@ -1,14 +1,15 @@
 import { useBreakpoint } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
-import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
-import { ExpandingTextArea } from 'ui'
-import { cn } from 'ui/src/lib/utils'
+import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, ReactNode, useRef } from 'react'
+import { Button, cn, ExpandingTextArea } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
-import { type SqlSnippet } from './AIAssistant.types'
+import { formatAttachedSnippets } from './AIAssistant.utils'
 import { ModelSelector } from './ModelSelector'
-import { getSnippetContent, SnippetRow } from './SnippetRow'
+import { SnippetRow } from './SnippetRow'
 import type { AssistantModelId } from '@/lib/ai/model.utils'
+import { type SqlSnippet } from '@/state/ai-assistant-state'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -46,9 +47,21 @@ export interface FormProps {
   /* If currently editing an existing message */
   isEditing?: boolean
   /* The currently selected AI model */
-  selectedModel: AssistantModelId
+  selectedModel?: AssistantModelId
   /* Callback when a model is chosen */
-  onSelectModel: (model: AssistantModelId) => void
+  onSelectModel?: (model: AssistantModelId) => void
+  /* Icon for the submit button when not loading, defaults to an up arrow */
+  submitIcon?: ReactNode
+  /* Label for the submit button when not loading, used for both aria-label and tooltip text, defaults to "Send message" */
+  submitLabel?: string
+  /**
+   * An additional action shown beside the main submit button, transitioned in/out with
+   * framer-motion. Pass undefined to hide it (e.g. when the input doesn't match its condition).
+   */
+  secondaryAction?: {
+    label: string
+    onClick: () => void
+  }
 }
 
 const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
@@ -70,6 +83,9 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       isEditing = false,
       selectedModel,
       onSelectModel,
+      submitIcon = <ArrowUp />,
+      submitLabel = 'Send message',
+      secondaryAction,
       ...props
     },
     _ref
@@ -83,10 +99,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
-        const sqlSnippetsString = sqlSnippets
-          .map((snippet: SqlSnippet) => '```sql\n' + getSnippetContent(snippet) + '\n```')
-          .join('\n')
-        finalMessage = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
+        finalMessage = [value, formatAttachedSnippets(sqlSnippets)].filter(Boolean).join('\n\n')
       }
 
       onSubmit(finalMessage)
@@ -96,10 +109,13 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault()
         handleSubmit()
+      } else if (event.key === 'Escape') {
+        event.currentTarget.blur()
       }
     }
 
     const canSubmit = !disabled && !loading && !!value
+    const showModelSelector = selectedModel !== undefined && onSelectModel !== undefined
 
     return (
       <div className="w-full">
@@ -108,7 +124,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
           ref={formRef}
           {...props}
           onSubmit={handleSubmit}
-          className={cn('relative', className)}
+          className={cn('relative rounded-lg', className)}
         >
           {sqlSnippets && sqlSnippets.length > 0 && (
             <SnippetRow
@@ -122,7 +138,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
             ref={textAreaRef}
             disabled={disabled}
             className={cn(
-              'text-base md:text-sm pr-10 pb-9 max-h-64',
+              'text-base md:text-sm pr-10 pb-9 max-h-64 rounded-lg',
               sqlSnippets && sqlSnippets.length > 0 && 'pt-10'
             )}
             placeholder={placeholder}
@@ -132,16 +148,44 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
             onChange={(event) => onValueChange(event)}
             onKeyDown={handleKeyDown}
           />
-          <div className="absolute inset-x-1.5 bottom-1.5 flex items-center justify-between pointer-events-none">
-            <div className="pointer-events-auto">
-              <ModelSelector selectedModel={selectedModel} onSelectModel={onSelectModel} />
-            </div>
+          <div
+            className={cn(
+              'absolute inset-x-2 bottom-2 flex items-center pointer-events-none',
+              showModelSelector ? 'justify-between' : 'justify-end'
+            )}
+          >
+            {showModelSelector && (
+              <div className="pointer-events-auto">
+                <ModelSelector selectedModel={selectedModel} onSelectModel={onSelectModel} />
+              </div>
+            )}
 
-            <div className="flex gap-3 items-center pointer-events-auto">
+            <div className="flex gap-x-1.5 items-center pointer-events-auto">
+              <AnimatePresence>
+                {!loading && secondaryAction && (
+                  <motion.div
+                    key="secondary-action"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <Button
+                      type="button"
+                      variant="outline"
+                      aria-label={secondaryAction.label}
+                      onClick={secondaryAction.onClick}
+                      className="h-7 rounded-full"
+                    >
+                      {secondaryAction.label}
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               {loading ? (
                 onStop ? (
                   <ButtonTooltip
-                    type="outline"
+                    variant="outline"
                     aria-label="Stop response"
                     icon={<Square fill="currentColor" className="scale-75" />}
                     onClick={onStop}
@@ -153,15 +197,16 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
                 )
               ) : (
                 <ButtonTooltip
-                  htmlType="submit"
-                  aria-label="Send message"
-                  icon={<ArrowUp />}
+                  type="submit"
+                  variant={canSubmit ? 'primary' : 'default'}
+                  aria-label={submitLabel}
+                  icon={submitIcon}
                   disabled={!canSubmit}
                   className={cn(
                     'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
                     !canSubmit ? 'opacity-50' : 'opacity-100'
                   )}
-                  tooltip={{ content: { side: 'top', text: 'Send message' } }}
+                  tooltip={{ content: { side: 'top', text: submitLabel } }}
                 />
               )}
             </div>

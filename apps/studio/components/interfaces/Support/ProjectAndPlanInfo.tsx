@@ -7,9 +7,9 @@ import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, cn, CommandGroup, CommandItem, FormControl, FormField } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -22,7 +22,8 @@ interface ProjectAndPlanProps {
   form: UseFormReturn<SupportFormValues>
   orgSlug: string | null
   projectRef: string | null
-  category: ExtendedSupportCategories
+  // Unused — kept optional so SupportFormV2 (which still passes it) doesn't need updating.
+  category?: ExtendedSupportCategories
   subscriptionPlanId: string | undefined
 }
 
@@ -30,7 +31,6 @@ export function ProjectAndPlanInfo({
   form,
   orgSlug,
   projectRef,
-  category: _category,
   subscriptionPlanId: _subscriptionPlanId,
 }: ProjectAndPlanProps) {
   const hasProjectSelected = projectRef && projectRef !== NO_PROJECT_MARKER
@@ -61,7 +61,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
       name="projectRef"
       control={form.control}
       render={({ field }) => (
-        <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
+        <FormItemLayout layout="vertical" label="Which project is affected?">
           <FormControl>
             <OrganizationProjectSelector
               key={orgSlug}
@@ -74,7 +74,6 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 const hasSelectedProject = !!projectRef && projectRef !== NO_PROJECT_MARKER
                 const hasRouteProjectInList =
                   !!routeProjectRef && projects.some((project) => project.ref === routeProjectRef)
-
                 if (!hasRouteProjectInList && !hasSelectedProject) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
                 }
@@ -84,7 +83,6 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 return (
                   <Button
                     block
-                    type="default"
                     role="combobox"
                     aria-label="Select a project"
                     aria-expanded={open}
@@ -150,7 +148,7 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
           </p>
           <CopyButton
             iconOnly
-            type="text"
+            variant="text"
             text={projectRef}
             onClick={() => toast.success('Copied project ID to clipboard')}
           />
@@ -200,14 +198,14 @@ export const PlanExpectationInfoContent = ({
 
       {shouldShowUpgradeActions && (
         <div className="flex flex-wrap gap-2 pt-1">
-          <Button asChild size="tiny">
+          <Button variant="primary" asChild size="tiny">
             <Link
               href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
             >
               Upgrade plan
             </Link>
           </Button>
-          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+          <Button asChild size="tiny" icon={<ExternalLink />}>
             <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
               Enquire about Enterprise
             </Link>

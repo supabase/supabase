@@ -19,7 +19,7 @@ Files can be any sort of media file. This includes images, GIFs, and videos. It 
 
 ### Folders
 
-Folders are a way to organize your files (just like on your computer). There is no right or wrong way to organize your files. You can store them in whichever folder structure suits your project.
+Folders are a way to organize your files (like on your computer). There is no right or wrong way to organize your files. You can store them in whichever folder structure suits your project.
 
 ### Buckets
 
@@ -69,7 +69,7 @@ values
 const { data, error } = await supabase.storage.createBucket('avatars')
 ```
 
-[Reference.](/docs/reference/javascript/storage-createbucket)
+[Reference.](/docs/reference/javascript/file-buckets-createbucket)
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -111,6 +111,17 @@ response = supabase.storage.create_bucket('avatars')
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var bucket = await supabase.Storage.CreateBucket("avatars");
+```
+
+[Reference.](/docs/reference/csharp/create-bucket)
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Upload a file
@@ -141,7 +152,7 @@ const { data, error } = await supabase.storage
   .upload('public/avatar1.png', avatarFile)
 ```
 
-[Reference.](/docs/reference/javascript/storage-from-upload)
+[Reference.](/docs/reference/javascript/file-buckets-upload)
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -162,6 +173,21 @@ void main() async {
 ```
 
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var imagePath = Path.Combine("Assets", "avatar1.png");
+
+await supabase.Storage
+  .From("avatars")
+  .Upload(imagePath, "public/avatar1.png");
+```
+
+[Reference.](/docs/reference/csharp/from-upload)
 
 </TabPanel>
 </$Show>
@@ -194,7 +220,7 @@ You can download a file from the Dashboard, or within a browser using our JS lib
 const { data, error } = await supabase.storage.from('avatars').download('public/avatar1.png')
 ```
 
-[Reference.](/docs/reference/javascript/storage-from-download)
+[Reference.](/docs/reference/javascript/file-buckets-download)
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -211,7 +237,7 @@ void main() async {
 }
 ```
 
-[Reference.](/docs/reference/dart/storage-from-download)
+[Reference.](/docs/reference/dart/file-buckets-download)
 
 </TabPanel>
 </$Show>
@@ -234,6 +260,17 @@ response = supabase.storage.from_('avatars').download('public/avatar1.png')
 ```
 
 [Reference.](/docs/reference/python/storage-from-download)
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var bytes = await supabase.Storage.From("avatars").Download("public/avatar1.png");
+```
+
+[Reference.](/docs/reference/csharp/from-download)
 
 </TabPanel>
 </$Show>
@@ -277,11 +314,4 @@ create policy "Public Access"
 
 {/* Finish with a video. This also appears in the Sidebar via the "tocVideo" metadata */}
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/J9mTPY8rIXE"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="J9mTPY8rIXE" title="Adding security rules to Supabase Storage" />

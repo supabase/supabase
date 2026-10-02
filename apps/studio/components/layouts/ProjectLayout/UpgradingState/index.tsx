@@ -4,7 +4,6 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
   AlertCircle,
-  Check,
   CheckCircle,
   Circle,
   Loader,
@@ -14,7 +13,7 @@ import {
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, SuccessCheck, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -80,7 +79,7 @@ export const UpgradingState = () => {
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <CheckCircle className="text-brand" size={40} strokeWidth={1.5} />
+                  <CheckCircle className="text-primary" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
@@ -90,7 +89,12 @@ export const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="mx-auto">
-                  <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
+                  <Button
+                    variant="primary"
+                    loading={loading}
+                    disabled={loading}
+                    onClick={refetchProjectDetails}
+                  >
                     Return to project
                   </Button>
                 </div>
@@ -108,7 +112,7 @@ export const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Button asChild type="default">
+                  <Button asChild>
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -120,7 +124,12 @@ export const UpgradingState = () => {
                       Contact support
                     </SupportLink>
                   </Button>
-                  <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
+                  <Button
+                    variant="primary"
+                    loading={loading}
+                    disabled={loading}
+                    onClick={refetchProjectDetails}
+                  >
                     Return to project
                   </Button>
                 </div>
@@ -202,9 +211,7 @@ export const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
-                                <Check size={12} className="text-white" strokeWidth={3} />
-                              </div>
+                              <SuccessCheck />
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
                             )}

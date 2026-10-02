@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -6,9 +6,10 @@ import { parseAsJson, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { SharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
@@ -25,10 +26,11 @@ import {
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import type { ChartHighlightAction } from '@/components/ui/Charts/ChartHighlightActions'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import {
@@ -58,9 +60,13 @@ AuthReport.getLayout = (page) => (
 export type UpdateDateRange = (from: string, to: string) => void
 export default AuthReport
 
+const REPORT_TITLE = 'Auth'
+
 const AuthUsage = () => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelReports')
   const chartSyncId = `auth-report`
+  const queryGroup = useOtel ? 'auth-otel' : 'auth-bigquery'
 
   const {
     selectedDateRange,
@@ -139,6 +145,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: { provider: usageProviderFilter },
+    useOtel,
   })
 
   const errorsReportConfig = createErrorsReportConfig({
@@ -147,6 +154,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: { status_code: monitoringStatusCodeFilter },
+    useOtel,
   })
 
   const latencyReportConfig = createLatencyReportConfig({
@@ -155,6 +163,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: {},
+    useOtel,
   })
 
   const onRefreshReport = useRefreshHandler(
@@ -209,18 +218,18 @@ const AuthUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Auth" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2 w-full">
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.auth} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
                 side="bottom"
               >
                 <Button
-                  type="default"
                   disabled={isRefreshing}
                   icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"
@@ -288,6 +297,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{ provider: usageProviderFilter }}
                   highlightActions={highlightActions}
                 />
@@ -322,6 +332,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{ status_code: monitoringStatusCodeFilter }}
                   highlightActions={highlightActions}
                 />
@@ -346,6 +357,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{}}
                   highlightActions={highlightActions}
                 />

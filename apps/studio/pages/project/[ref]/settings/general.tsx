@@ -11,11 +11,13 @@ import {
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { ComplianceConfig } from '@/components/interfaces/Settings/General/ComplianceConfig/ProjectComplianceMode'
 import { CustomDomainConfig } from '@/components/interfaces/Settings/General/CustomDomainConfig/CustomDomainConfig'
+import { DeleteBranchPanel } from '@/components/interfaces/Settings/General/DeleteBranchPanel'
 import { DeleteProjectPanel } from '@/components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
 import { General } from '@/components/interfaces/Settings/General/General'
 import { Project } from '@/components/interfaces/Settings/General/Project'
+import { ServiceVersionsSection } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersionsSection'
 import { TransferProjectPanel } from '@/components/interfaces/Settings/General/TransferProjectPanel/TransferProjectPanel'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -54,11 +56,12 @@ const ProjectSettings: NextPageWithLayout = () => {
         {IS_PLATFORM && (
           <>
             <Project />
+            <ServiceVersionsSection />
             {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
             {!isBranch && hasHipaaAddon && <ComplianceConfig />}
             {projectSettingsCustomDomains && <CustomDomainConfig />}
             {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
-            {!isBranch && <DeleteProjectPanel />}
+            {isBranch ? <DeleteBranchPanel /> : <DeleteProjectPanel />}
           </>
         )}
       </PageContainer>

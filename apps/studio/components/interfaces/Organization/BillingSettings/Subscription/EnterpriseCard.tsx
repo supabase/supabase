@@ -1,3 +1,4 @@
+import { motion, type Variants } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
@@ -8,9 +9,10 @@ import { useTrack } from '@/lib/telemetry/track'
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
+  variants?: Variants
 }
 
-export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
+export const EnterpriseCard = ({ plan, isCurrentPlan, variants }: EnterpriseCardProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const features = plan.features
@@ -19,8 +21,9 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
   const track = useTrack()
 
   return (
-    <div
+    <motion.div
       key={plan.id}
+      variants={variants}
       className={cn(
         'grid grid-cols-1 md:grid-cols-3 border rounded-md bg-studio',
         'py-4 col-span-12 justify-between gap-x-8'
@@ -28,13 +31,13 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
     >
       <div className="flex flex-col justify-center px-4">
         <div className="flex items-center space-x-2">
-          <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
+          <p className={cn('text-primary text-sm uppercase')}>{plan.name}</p>
           {isCurrentPlan ? (
             <div className="text-xs bg-surface-300 text-foreground-light rounded-sm px-2 py-0.5">
               Current plan
             </div>
           ) : plan.nameBadge ? (
-            <div className="text-xs bg-surface-200 text-brand rounded-sm px-2 py-0.5">
+            <div className="text-xs bg-surface-200 text-primary rounded-sm px-2 py-0.5">
               {plan.nameBadge}
             </div>
           ) : null}
@@ -45,7 +48,6 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
         <Button
           block
           asChild
-          type="default"
           size="tiny"
           onClick={() =>
             track('studio_pricing_plan_cta_clicked', {
@@ -70,7 +72,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
               key={typeof feature === 'string' ? feature : feature[0]}
               className="flex items-center py-2 first:mt-0"
             >
-              <Check className="text-brand h-4 w-4" aria-hidden="true" strokeWidth={3} />
+              <Check className="text-primary h-4 w-4" aria-hidden="true" strokeWidth={3} />
               <span className="text-foreground mb-0 ml-3 ">
                 {typeof feature === 'string' ? feature : feature[0]}
               </span>
@@ -81,7 +83,6 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
         <Button
           block
           asChild
-          type="default"
           size="tiny"
           onClick={() =>
             track('studio_pricing_plan_cta_clicked', {
@@ -95,6 +96,6 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
           </a>
         </Button>
       </div>
-    </div>
+    </motion.div>
   )
 }

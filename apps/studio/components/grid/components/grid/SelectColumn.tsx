@@ -147,7 +147,7 @@ function SelectCellFormatter({
       </ShortcutTooltip>
       {row && (
         <ButtonTooltip
-          type="text"
+          variant="text"
           size="tiny"
           className="px-1 rdg-row__select-column__edit-action"
           icon={<Maximize2 />}

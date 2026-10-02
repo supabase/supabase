@@ -5,7 +5,7 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, LoadingLine } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { Markdown } from '../../Markdown'
@@ -20,7 +20,7 @@ import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -210,7 +210,7 @@ export const WithStatements = ({
               side="top"
             >
               <Button
-                type="default"
+                aria-label="Refresh"
                 size="tiny"
                 icon={<RefreshCw />}
                 onClick={handleRefresh}
@@ -223,7 +223,7 @@ export const WithStatements = ({
               side="top"
             >
               <Button
-                type="default"
+                aria-label="Reset report"
                 size="tiny"
                 icon={<RotateCcw />}
                 onClick={() => setShowResetgPgStatStatements(true)}
@@ -239,7 +239,11 @@ export const WithStatements = ({
           </>
         }
       />
-      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+
+      <div>
+        <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+      </div>
+
       <QueryPerformanceGrid
         aggregatedData={processedData}
         isLoading={isLoading}
@@ -258,7 +262,7 @@ export const WithStatements = ({
       >
         <Button
           className="absolute top-1.5 right-3 px-1.5"
-          type="text"
+          variant="text"
           size="tiny"
           onClick={() => setShowBottomSection(false)}
         >
@@ -269,11 +273,7 @@ export const WithStatements = ({
           <p className="text-xs text-foreground-light">
             Consider resetting the analysis after optimizing any queries
           </p>
-          <Button
-            type="default"
-            className="mt-3! w-min"
-            onClick={() => setShowResetgPgStatStatements(true)}
-          >
+          <Button className="mt-3! w-min" onClick={() => setShowResetgPgStatStatements(true)}>
             Reset report
           </Button>
         </div>
@@ -291,7 +291,7 @@ export const WithStatements = ({
           <Markdown
             className="text-xs"
             content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](${DOCS_URL}/guides/database/inspect).`}
+            potential issues. [Learn more here](${DOCS_URL}/guides/observability/inspect).`}
           />
         </div>
       </div>

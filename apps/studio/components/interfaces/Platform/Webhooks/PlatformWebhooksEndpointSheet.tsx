@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   Accordion,
   AccordionContent,
@@ -196,8 +196,8 @@ export const PlatformWebhooksEndpointSheet = ({
     onClose,
   })
 
-  const subscribeAll = form.watch('subscribeAll')
-  const selectedEventTypes = form.watch('eventTypes')
+  const subscribeAll = useWatch({ control: form.control, name: 'subscribeAll' })
+  const selectedEventTypes = useWatch({ control: form.control, name: 'eventTypes' })
   const groupedEventTypes = useMemo(
     () => buildEventTypeGroups(scope, eventTypes),
     [scope, eventTypes]
@@ -582,15 +582,13 @@ export const PlatformWebhooksEndpointSheet = ({
           </Form>
         </SheetSection>
         <SheetFooter>
-          <Button type="default" onClick={confirmOnClose}>
-            Cancel
-          </Button>
+          <Button onClick={confirmOnClose}>Cancel</Button>
           <Shortcut
             id={SHORTCUT_IDS.ACTION_BAR_SAVE}
             label={mode === 'create' ? 'Create endpoint' : 'Save changes'}
             onTrigger={() => form.handleSubmit(onSubmit)()}
           >
-            <Button form="platform-webhook-endpoint-form" htmlType="submit">
+            <Button variant="primary" form="platform-webhook-endpoint-form" type="submit">
               {mode === 'create' ? 'Create endpoint' : 'Save changes'}
             </Button>
           </Shortcut>

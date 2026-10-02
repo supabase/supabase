@@ -6,13 +6,15 @@ import {
   DebuggingOperations,
   DevelopmentOperations,
   ExecuteSqlOptions,
-  GetLogsOptions,
+  QueryLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
+import { isFeatureEnabled, type Feature } from 'common/enabled-features'
+import { getEnabledFeaturesOverrideDisabledList } from 'common/enabled-features/overrides'
 
 import { DEFAULT_EXPOSED_SCHEMAS } from './constants'
 import { generateTypescriptTypes } from './generate-types'
 import { getLints } from './lints'
-import { getLogQuery, retrieveAnalyticsData } from './logs'
+import { retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
@@ -113,18 +115,42 @@ export function getDevelopmentOperations({
   }
 }
 
+// Logs are disabled by default for self-hosted; enabled via the
+// `docker-compose.logs.yml` override, which sets ENABLED_FEATURES_LOGS_ALL=true.
+function assertLogsEnabled() {
+  const disabledFeatures = getEnabledFeaturesOverrideDisabledList(process.env) as Feature[]
+
+  if (!isFeatureEnabled('logs:all', disabledFeatures)) {
+    throw new Error(
+      'Logs are disabled on this instance. Enable the `docker-compose.logs.yml` override to query logs.'
+    )
+  }
+}
+
 export function getDebuggingOperations({
   headers,
 }: GetDebuggingOperationsOptions): DebuggingOperations {
   return {
-    async getLogs(projectRef: string, options: GetLogsOptions) {
-      const sql = getLogQuery(options.service)
+    // Self-hosted logs are served by Logflare, which speaks BigQuery SQL.
+    logsDialect: 'bigquery',
+    // `query_logs` replaces `get_logs` on self-hosted. Declaring `queryLogs`
+    // makes the MCP server hide `get_logs` from clients (see `getDebuggingTools`
+    // in @supabase/mcp-server-supabase), so this method is never reached over
+    // MCP. The `DebuggingOperations` interface still requires it, so it throws
+    // defensively rather than serving logs.
+    async getLogs() {
+      throw new Error('get_logs is not supported on self-hosted; use query_logs instead.')
+    },
+    async queryLogs(projectRef: string, options: QueryLogsOptions) {
+      assertLogsEnabled()
 
+      // Pass the model's SQL straight through to the Logflare `logs.all`
+      // endpoint, which accepts an arbitrary `sql` param.
       const { data, error } = await retrieveAnalyticsData({
         name: 'logs.all',
         projectRef,
         params: {
-          sql,
+          sql: options.sql,
           iso_timestamp_start: options.iso_timestamp_start,
           iso_timestamp_end: options.iso_timestamp_end,
         },

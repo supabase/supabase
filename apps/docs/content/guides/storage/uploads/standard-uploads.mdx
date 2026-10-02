@@ -10,7 +10,7 @@ sidebar_label: 'Uploads'
 
 The standard file upload method is ideal for small files that are not larger than 6MB.
 
-It uses the traditional `multipart/form-data` format and is simple to implement using the supabase-js SDK. Here's an example of how to upload a file using the standard upload method:
+You implement file uploads with the supabase-js SDK using the traditional `multipart/form-data` format. Here's an example of how to upload a file using the standard upload method:
 
 <Admonition type="note">
 
@@ -95,6 +95,15 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file)
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Storage.From("bucket_name").Upload("local_file_path", "file_path");
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash
@@ -123,6 +132,7 @@ If you want to overwrite a file on a specific path you can set the `upsert` opti
 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
+
 const file = new Blob()
 
 // ---cut---
@@ -191,6 +201,17 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file, {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Storage
+  .From("bucket_name")
+  .Upload("local_file_path", "file_path", new FileOptions { Upsert = true });
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash
@@ -222,6 +243,7 @@ By default, Storage will assume the content type of an asset from the file exten
 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
+
 const file = new Blob()
 
 // ---cut---
@@ -286,6 +308,21 @@ supabase.storage.from("bucket_name").upload("file_path", bytes) {
 response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'content-type': 'image/jpeg',
 })
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Storage
+  .From("bucket_name")
+  .Upload(
+    "local_file_path",
+    "file_path",
+    new FileOptions { ContentType = "image/jpeg" },
+    inferContentType: false);
 ```
 
 </TabPanel>

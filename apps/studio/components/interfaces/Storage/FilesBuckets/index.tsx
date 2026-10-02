@@ -12,7 +12,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -25,7 +25,7 @@ import { STORAGE_BUCKET_SORT } from '../Storage.constants'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
 import { useFilesBucketsShortcuts } from './useFilesBucketsShortcuts'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
@@ -144,7 +144,7 @@ export const FilesBuckets = () => {
                         </ShortcutTooltip>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button type="default" icon={<ArrowDownNarrowWide />}>
+                            <Button icon={<ArrowDownNarrowWide />}>
                               Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
                             </Button>
                           </DropdownMenuTrigger>
@@ -167,7 +167,6 @@ export const FilesBuckets = () => {
                           side="bottom"
                         >
                           <Button
-                            type="default"
                             icon={<RefreshCw />}
                             loading={isFetchingBuckets}
                             onClick={handleRefresh}

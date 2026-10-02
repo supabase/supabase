@@ -146,7 +146,6 @@ export const OverviewLearnMore = () => {
                           <Button
                             key={action.label}
                             className="inline-flex"
-                            type="default"
                             icon={action.icon}
                             asChild
                           >
@@ -160,7 +159,6 @@ export const OverviewLearnMore = () => {
                           <Button
                             key={action.label}
                             onClick={action.onClick}
-                            type="default"
                             className="inline-flex"
                             icon={action.icon}
                           >

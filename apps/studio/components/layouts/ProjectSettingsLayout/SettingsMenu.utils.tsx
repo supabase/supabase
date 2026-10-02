@@ -2,6 +2,7 @@ import { useFlag, useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -10,9 +11,10 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const useGenerateSettingsMenu = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isPending } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const showDashboardPreferences = useFlag('dashboardPreferences')
+  const showConfigDrift = useFlag('ConfigDrift') && IS_PLATFORM
 
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
@@ -106,20 +108,23 @@ export const useGenerateSettingsMenu = () => {
           items: [],
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
         },
-        {
-          name: 'Compute and Disk',
-          key: 'compute-and-disk',
-          url: `/project/${ref}/settings/compute-and-disk`,
-          items: [],
-          disabled: !isProjectActive,
-          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK,
-        },
+        ...(showConfigDrift
+          ? [
+              {
+                name: 'Code configuration',
+                key: 'code-configuration',
+                url: `/project/${ref}/settings/code-configuration`,
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'Infrastructure',
           key: 'infrastructure',
-          url: `/project/${ref}/settings/infrastructure`,
+          url: getInfrastructurePath(ref),
           items: [],
           disabled: !isProjectActive,
+          isLoading: isPending,
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INFRASTRUCTURE,
         },
 
@@ -129,6 +134,7 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/integrations`,
           items: [],
           disabled: !isProjectActive,
+          isLoading: isPending,
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INTEGRATIONS,
         },
         ...(platformWebhooksEnabled
@@ -139,6 +145,7 @@ export const useGenerateSettingsMenu = () => {
                 url: `/project/${ref}/settings/webhooks`,
                 items: [],
                 disabled: !isProjectActive,
+                isLoading: isPending,
                 shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_WEBHOOKS,
               },
             ]
@@ -150,6 +157,7 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/api-keys`,
           items: [],
           disabled: !isProjectActive,
+          isLoading: isPending,
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_API_KEYS,
         },
         {
@@ -160,6 +168,7 @@ export const useGenerateSettingsMenu = () => {
             : `/project/${ref}/settings/jwt/signing-keys`,
           items: [],
           disabled: !isProjectActive,
+          isLoading: isPending,
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_JWT_KEYS,
         },
 
@@ -171,6 +180,7 @@ export const useGenerateSettingsMenu = () => {
                 url: `/project/${ref}/settings/log-drains`,
                 items: [],
                 disabled: !isProjectActive,
+                isLoading: isPending,
                 shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
               },
             ]
@@ -205,6 +215,7 @@ export const useGenerateSettingsMenu = () => {
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           disabled: !isProjectActive,
+          isLoading: isPending,
         },
         {
           name: 'Vault',
@@ -214,6 +225,7 @@ export const useGenerateSettingsMenu = () => {
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           label: 'Beta',
           disabled: !isProjectActive,
+          isLoading: isPending,
         },
       ],
     },

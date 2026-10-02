@@ -88,7 +88,7 @@ The default Postgres role. This has admin privileges.
 
 ### `anon`
 
-For unauthenticated, public access. This is the role which the API (PostgREST) will use when a user _is not_ logged in.
+For unauthenticated, public access. This is the role which the API (PostgREST) will use when a user _is not_ signed in.
 
 ### `authenticator`
 
@@ -97,7 +97,7 @@ A special role for the API (PostgREST). It has very limited access, and is used 
 
 ### `authenticated`
 
-For "authenticated access." This is the role which the API (PostgREST) will use when a user _is_ logged in.
+For "authenticated access." This is the role which the API (PostgREST) will use when a user _is_ signed in.
 
 ### `service_role`
 
@@ -109,15 +109,23 @@ Used by the Auth middleware to connect to the database and run migration. Access
 
 ### `supabase_storage_admin`
 
-Used by the Auth middleware to connect to the database and run migration. Access is scoped to the `storage` schema.
+Used by the Storage middleware to connect to the database and run migration. Access is scoped to the `storage` schema.
 
 ### `supabase_etl_admin`
 
-Used by [Replication powered by Supabase ETL](/docs/guides/database/replication) to replicate database changes to external destinations. Has read-all access and replication privileges for change data capture, bypasses Row Level Security, and can write to the `etl` schema.
+`supabase_etl_admin` is used by Supabase Pipelines for [Database replication](/docs/guides/database/replication).
+
+This role:
+
+- Replicates database changes to destination systems
+- Has read-all access
+- Has replication privileges for change data capture, bypasses Row Level Security
+- Can create event triggers
+- Can write to the `etl` schema
 
 ### `dashboard_user`
 
-For running commands via the Supabase UI.
+The Supabase Dashboard doesn't connect as this role. Queries you run in the Dashboard execute as `postgres` and include a `-- source: dashboard` comment, which you can use to [find them in the Postgres logs](/docs/guides/troubleshooting/how-to-interpret-and-explore-the-postgres-logs-OuCIOj).
 
 ### `supabase_admin`
 

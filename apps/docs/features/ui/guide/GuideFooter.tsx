@@ -17,8 +17,7 @@ export function GuideFooter({ className, editLink }: GuideFooterProps) {
         className={cn(
           'w-fit',
           'flex items-center gap-1',
-          'text-sm text-scale-1000 hover:text-scale-1200',
-          'transition-colors'
+          'text-sm text-tertiary-foreground hover:text-foreground'
         )}
         target="_blank"
         rel="noreferrer noopener edit"

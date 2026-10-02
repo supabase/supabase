@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { constructHeaders } from '@/lib/api/apiHelpers'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { applyAndTrackMigrations, listMigrationVersions } from '@/lib/api/self-hosted/migrations'
 import { PgMetaDatabaseError } from '@/lib/api/self-hosted/types'
 

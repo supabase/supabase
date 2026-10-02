@@ -9,12 +9,14 @@ export type AWSAccountCreateVariables = {
   projectRef: string
   awsAccountId: string
   accountName?: string
+  databaseIdentifier?: string
 }
 
 export async function createAWSAccount({
   projectRef,
   awsAccountId,
   accountName,
+  databaseIdentifier,
 }: AWSAccountCreateVariables) {
   const { data, error } = await post(
     '/platform/projects/{ref}/privatelink/associations/aws-account',
@@ -25,6 +27,7 @@ export async function createAWSAccount({
       body: {
         aws_account_id: awsAccountId,
         account_name: accountName,
+        database_identifier: databaseIdentifier,
       },
     }
   )
@@ -53,7 +56,7 @@ export const useAWSAccountCreateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to create AWS account: ${data.message}`)
+        toast.error(`Failed to create connection: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

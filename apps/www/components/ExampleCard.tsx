@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
-import { useBreakpoint } from 'common'
-
-import { Button } from 'ui'
-import Panel from './Panel'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useBreakpoint } from 'common'
+import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Button } from 'ui'
+
+import Panel from './Panel'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
@@ -54,7 +54,7 @@ function ExampleCard(props: any) {
                         fillRule="evenodd"
                         clipRule="evenodd"
                         d={framework.icon}
-                        fill="hsl(var(--foreground-lighter))"
+                        fill="var(--foreground-lighter)"
                       />
                     </svg>
                   </div>
@@ -111,7 +111,7 @@ function ExampleCard(props: any) {
               {props.repo_url && (
                 <Button
                   size="tiny"
-                  type="text"
+                  variant="text"
                   className="group overflow-hidden text-foreground-lighter group-hover/panel:text-foreground bg-transparent! p-0!"
                   iconRight={
                     <div className="relative w-3.5 h-3.5 flex items-center justify-center">

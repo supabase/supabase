@@ -1,4 +1,3 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
@@ -10,7 +9,7 @@ import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { IS_PLATFORM } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
@@ -23,6 +22,7 @@ export interface AccountLayoutProps {
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
   const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
   const currentPath = router.pathname
 
@@ -31,11 +31,6 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
-
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
 
   const backToDashboardURL =
     appSnap.lastRouteBeforeVisitingAccountPage.length > 0

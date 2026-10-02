@@ -15,8 +15,8 @@ export const DevelopersDropdown = () => {
   const { jobsCount, latestBlogPosts } = staticContent
 
   return (
-    <div className="flex flex-col xl:flex-row">
-      <div className="w-[550px] xl:w-[470px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
+    <div className="flex flex-col lg:flex-row">
+      <div className="w-full lg:w-[470px] px-6 py-5 bg-surface-75 grid gap-3 grid-cols-2">
         {DevelopersData['navigation'].map((column) => (
           <div key={column.label} className="p-0 flex flex-col gap-6">
             <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
@@ -27,7 +27,7 @@ export const DevelopersDropdown = () => {
                 <li key={link.text}>
                   <Link
                     href={link.url!}
-                    className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-hidden focus-visible:rounded-sm focus-visible:ring-foreground-lighter"
+                    className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-ring rounded-sm"
                   >
                     {Icon && <Icon size={16} strokeWidth={1.3} />}
                     <span>{link.text}</span>
@@ -47,11 +47,11 @@ export const DevelopersDropdown = () => {
           </div>
         ))}
       </div>
-      <div className="bg-surface-75 flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
-        <div className="flex-col gap-2 py-8 px-10">
+      <div className="bg-surface-75 flex flex-col w-full lg:flex-1 border-t lg:border-t-0 lg:border-l">
+        <div className="flex-col gap-2 p-5">
           <Link
             href="/blog"
-            className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs focus-visible:text-foreground"
+            className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative rounded-xs focus-visible:text-foreground"
           >
             <span>Blog</span>
             <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
@@ -61,7 +61,7 @@ export const DevelopersDropdown = () => {
               <li key={post.title}>
                 <Link
                   href={post.url}
-                  className="group flex flex-col focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+                  className="group flex flex-col focus-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative rounded-sm"
                 >
                   <p className="text-foreground-light mb-0 line-clamp-2 group-hover:text-foreground group-focus-visible:text-foreground">
                     {post.title}

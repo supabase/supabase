@@ -9,7 +9,13 @@ Enabling temporary access only applies to connections to Postgres and Supavisor 
 
 <Admonition type="note">
 
-Projects need to be at least on Postgres 17.6.1.081 (or higher) to enable temporary access. You can find the Postgres version of your project on the [infrastructure settings](/dashboard/project/_/settings/infrastructure) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/upgrading) to use this feature.
+[Enforce SSL](/docs/guides/platform/ssl-enforcement) on incoming connections must be enabled before temporary access can be used.
+
+</Admonition>
+
+<Admonition type="note">
+
+Projects need to be at least on Postgres 17.6.1.081 (or higher) to enable temporary access. You can find the Postgres version of your project on the [General Settings](/dashboard/project/_/settings/general) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/upgrading) to use this feature.
 
 </Admonition>
 
@@ -27,11 +33,11 @@ export SUPABASE_MANAGEMENT_API_TOKEN="your-access-token"
 export PROJECT_REF="your-project-ref"
 
 # Get current temporary access status
-curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-access" \
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
   -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN"
 
 # Enable temporary access
-curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-access" \
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
   -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -39,7 +45,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-acce
   }'
 
 # Disable temporary access
-curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-access" \
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
   -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -51,7 +57,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-acce
 
 Once temporary access has been enabled, project users must be authorized and mapped to Postgres roles they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
 
-When a user is authorized to assume a Postgres role, the user's access token (Personal Access Token (PAT) or Scoped PAT) will be used as the password for the Postgres role.
+When a user is authorized to assume a Postgres role, the user's Personal Access Token (PAT) will be used as the password for the Postgres role.
 
 <Admonition type="note">
 
@@ -97,6 +103,12 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit" \
 
 ## Using temporary access
 
+<Admonition type="note">
+
+This feature does not work with IPv6 Transaction pooler (PgBouncer). Direct connections and connections through the IPv4 connection pooler are fully supported.
+
+</Admonition>
+
 To log in to the database using temporary access, existing connection strings can be used and only the password needs to be changed to the user's API or dashboard token.
 
 For example, if a user has been authorized to assume the `postgres` role:
@@ -111,8 +123,8 @@ Connecting via the shared connection pooler requires the addition of a new conne
 
 ```
 # directly in the URI
-psql 'postgres://postgres.{project-ref}:sbp_111222333aaabbbccc@aws-1-us-west-1.pooler.supabase.com:5432/postgres?options=-c%20jit%3don'
+psql 'postgres://postgres.{project-ref}:sbp_111222333aaabbbccc@aws-1-us-west-1.pooler.supabase.com:5432/postgres?options=-c%20jit%3dtrue'
 
 # or as a connection info string
-psql "host=aws-1-us-west-1.pooler.supabase.com user=postgres.{project-ref} options='-c jit=on'"
+psql "host=aws-1-us-west-1.pooler.supabase.com user=postgres.{project-ref} options='-c jit=true'"
 ```

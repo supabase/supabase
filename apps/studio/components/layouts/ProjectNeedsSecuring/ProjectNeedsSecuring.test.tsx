@@ -170,7 +170,6 @@ describe('ProjectNeedsSecuring', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
     window.localStorage.clear()
   })
 
@@ -205,7 +204,7 @@ describe('ProjectNeedsSecuring', () => {
     fireEvent.click(screen.getByText('invoices'))
 
     expect(mockRouterPush).toHaveBeenCalledWith(
-      '/project/project-ref/auth/policies?schema=public&search=invoices'
+      '/project/project-ref/database/policies?schema=public&search=invoices'
     )
   })
 

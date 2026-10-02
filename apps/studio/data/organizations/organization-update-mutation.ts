@@ -57,7 +57,7 @@ export const useOrganizationUpdateMutation = ({
           queryKey: organizationKeys.list(),
           exact: true,
         },
-        (prev: components['schemas']['OrganizationResponse'][] | undefined) => {
+        (prev: components['schemas']['OrganizationResponse_Output'][] | undefined) => {
           if (!prev) return prev
 
           return prev.map((org) => {
@@ -78,7 +78,7 @@ export const useOrganizationUpdateMutation = ({
           queryKey: organizationKeys.customerProfile(data.slug),
           exact: true,
         },
-        (prev: components['schemas']['CustomerResponse'] | undefined) => {
+        (prev: components['schemas']['CustomerResponse_Output'] | undefined) => {
           if (!prev) return prev
           return {
             ...prev,
@@ -92,7 +92,7 @@ export const useOrganizationUpdateMutation = ({
           queryKey: organizationKeys.detail(data.slug),
           exact: true,
         },
-        (prev: components['schemas']['OrganizationSlugResponse'] | undefined) => {
+        (prev: components['schemas']['OrganizationSlugResponse_Output'] | undefined) => {
           if (!prev) return prev
           return {
             ...prev,

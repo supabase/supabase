@@ -15,7 +15,7 @@ export default function PageBreadcrumbsDemo() {
       <PageBreadcrumbs
         actions={
           <PageBreadcrumbsActions>
-            <Button type="primary" size="tiny">
+            <Button variant="primary" size="tiny">
               Create
             </Button>
           </PageBreadcrumbsActions>

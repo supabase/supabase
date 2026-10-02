@@ -38,7 +38,6 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
     functionType === 'supabase_function'
       ? buildEdgeFunctionHeaderAddActions({
           apiKey,
-          includeApiKeyHeader: serviceKey?.type === 'secret',
           createRow: (name: string, value: string) => ({ id: uuidv4(), name, value }),
         })
       : []
@@ -56,7 +55,7 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
           createEmptyRow={() => ({ id: uuidv4(), name: '', value: '' })}
           keyPlaceholder="Header name"
           valuePlaceholder="Header value"
-          addLabel="Add a new header"
+          addLabel="Add header"
           addActions={addActions}
         />
       </FormSectionContent>

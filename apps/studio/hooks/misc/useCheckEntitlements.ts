@@ -69,7 +69,7 @@ export function useHasEntitlementAccess(organizationSlug?: string) {
   return useCallback(
     (key: string) =>
       IS_PLATFORM
-        ? (entitlementsData?.entitlements.find((e) => e.feature.key === key)?.hasAccess ?? false)
+        ? (entitlementsData?.entitlements?.find((e) => e.feature.key === key)?.hasAccess ?? false)
         : true,
     [entitlementsData]
   )
@@ -107,7 +107,7 @@ export function useCheckEntitlements(
     // If no organization slug, no access
     if (!finalOrgSlug) return { entitlement: null }
 
-    const entitlement = entitlementsData?.entitlements.find(
+    const entitlement = entitlementsData?.entitlements?.find(
       (entitlement) => entitlement.feature.key === featureKey
     )
 

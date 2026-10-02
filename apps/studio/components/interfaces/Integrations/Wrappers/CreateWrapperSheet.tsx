@@ -16,9 +16,12 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -282,7 +285,6 @@ export const CreateWrapperSheet = ({
                       <FormItemLayout
                         layout="vertical"
                         label="Wrapper Name"
-                        name="wrapper_name"
                         description={
                           wrapper_name.length > 0 ? (
                             <>
@@ -295,7 +297,7 @@ export const CreateWrapperSheet = ({
                         }
                       >
                         <FormControl>
-                          <Input id="wrapper_name" {...field} />
+                          <Input {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -310,7 +312,12 @@ export const CreateWrapperSheet = ({
                   {wrapperMeta.server.options
                     .filter((option) => !option.hidden)
                     .map((option) => (
-                      <InputField option={option} control={form.control} key={option.name} />
+                      <InputField
+                        key={option.name}
+                        option={option}
+                        control={form.control}
+                        placeholder={option.defaultValue}
+                      />
                     ))}
                 </FormSectionContent>
               </FormSection>
@@ -373,7 +380,7 @@ export const CreateWrapperSheet = ({
                                     <WarningIcon />
                                     <span className="text-xs text-left">
                                       This feature requires the{' '}
-                                      <span className="text-brand">wrappers</span> extension to be
+                                      <span className="text-primary">wrappers</span> extension to be
                                       of minimum version of 0.5.0.
                                     </span>
                                   </div>
@@ -427,29 +434,43 @@ export const CreateWrapperSheet = ({
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<Edit />}
-                                onClick={() => {
-                                  setSelectedTableToEdit(table)
-                                }}
-                              />
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<Trash />}
-                                onClick={() => {
-                                  removeTable(tableIndex)
-                                }}
-                              />
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    className="px-1"
+                                    icon={<Edit />}
+                                    onClick={() => {
+                                      setSelectedTableToEdit(table)
+                                    }}
+                                    aria-label={`Edit ${table.table_name} foreign table`}
+                                    // Tooltip repeats the label; screen readers would read it twice
+                                    aria-describedby={undefined}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">{`Edit ${table.table_name} foreign table`}</TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    className="px-1"
+                                    icon={<Trash />}
+                                    onClick={() => {
+                                      removeTable(tableIndex)
+                                    }}
+                                    aria-label={`Remove ${table.table_name} foreign table`}
+                                    // Tooltip repeats the label; screen readers would read it twice
+                                    aria-describedby={undefined}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">{`Remove ${table.table_name} foreign table`}</TooltipContent>
+                              </Tooltip>
                             </div>
                           </div>
                         )
                       })}
 
                       <div className="flex justify-end">
-                        <Button type="default" onClick={() => setSelectedTableToEdit(NewTable)}>
+                        <Button onClick={() => setSelectedTableToEdit(NewTable)}>
                           Add foreign table
                         </Button>
                       </div>
@@ -507,8 +528,7 @@ export const CreateWrapperSheet = ({
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                type="button"
                 onClick={onCloseWithConfirmation}
                 disabled={isSubmitting}
               >
@@ -516,9 +536,9 @@ export const CreateWrapperSheet = ({
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 disabled={isSubmitting || isExtensionDataLoading}
                 loading={isSubmitting}
               >

@@ -1,11 +1,11 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CodeIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
-import { TEMPLATES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { getLogsTemplates } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import CardButton from '@/components/ui/CardButton'
 import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
@@ -17,14 +17,16 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { logsTemplates: isTemplatesEnabled, logsShowMetadataIpTemplate: showMetadataIpTemplate } =
     useIsFeatureEnabled(['logs:templates', 'logs:show_metadata_ip_template'])
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   if (!isTemplatesEnabled) {
     return <UnknownInterface urlBack={`/project/${projectRef}/logs/explorer`} />
   }
 
+  const templates = getLogsTemplates(useOtelEndpoint)
   const allTemplates = showMetadataIpTemplate
-    ? TEMPLATES
-    : TEMPLATES.filter((template) => template.label !== 'Metadata IP')
+    ? templates
+    : templates.filter((template) => template.label !== 'Metadata IP')
 
   return (
     <div className="mx-auto h-full w-full px-5 py-6">
@@ -60,9 +62,9 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
           className={cn(
             'duration-400 flex h-6 w-6 items-center justify-center rounded-sm transition-colors',
             'border bg-background-200',
-            'group-hover:bg-brand-300 group-hover:text-brand-600 group-hover:border-brand-500',
+            'group-hover:bg-primary-bright/15 group-hover:text-primary group-hover:border-primary-bright',
             'dark:border-background-selection dark:bg-background-200 dark:text-foreground',
-            'dark:group-hover:border-brand-600 dark:group-hover:bg-brand-300 dark:group-hover:text-brand-600'
+            'dark:group-hover:border-primary-bright dark:group-hover:bg-primary-bright/15 dark:group-hover:text-primary'
           )}
         >
           <div className="scale-100 group-hover:scale-110">
@@ -79,7 +81,6 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
             <PopoverTrigger asChild>
               <Button
                 asChild
-                type="default"
                 onClick={(e) => {
                   e.preventDefault()
                   setShowPreview(!showPreview)

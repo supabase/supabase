@@ -2,7 +2,7 @@ import { createReadStream } from 'node:fs'
 import { pipeline } from 'node:stream/promises'
 import { type NextApiRequest, type NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'
 import { uuidv4 } from '@/lib/helpers'
 

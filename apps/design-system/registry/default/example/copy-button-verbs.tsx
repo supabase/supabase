@@ -7,15 +7,15 @@ export default function CopyButtonVerbs() {
     <div className="flex flex-row gap-16">
       <div className="flex flex-col gap-4">
         <span className="text-xs text-foreground-muted">Bad Example</span>
-        <Button type="primary">Table creation</Button>
-        <Button type="primary">Save action</Button>
-        <Button type="danger">Bucket deletion</Button>
+        <Button variant="primary">Table creation</Button>
+        <Button variant="primary">Save action</Button>
+        <Button variant="danger">Bucket deletion</Button>
       </div>
       <div className="flex flex-col gap-4">
         <span className="text-xs text-foreground-muted">Good Example</span>
-        <Button type="primary">Create table</Button>
-        <Button type="primary">Save changes</Button>
-        <Button type="danger">Delete bucket</Button>
+        <Button variant="primary">Create table</Button>
+        <Button variant="primary">Save changes</Button>
+        <Button variant="danger">Delete bucket</Button>
       </div>
     </div>
   )

@@ -1,13 +1,12 @@
 import { getEntityDefinitionsSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
-// import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
 import { IS_PLATFORM } from 'common'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
 import { getDatabaseFunctions } from '@/data/database-functions/database-functions-query'
 import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const getFallbackTools = ({
@@ -35,7 +34,7 @@ export const getFallbackTools = ({
       inputSchema: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the definitions for'),
       }),
-      execute: async ({ schemas }) => {
+      execute: async ({ schemas }, { abortSignal }) => {
         try {
           const { result } = includeSchemaMetadata
             ? await executeSql(
@@ -44,7 +43,7 @@ export const getFallbackTools = ({
                   connectionString,
                   sql: getEntityDefinitionsSql({ schemas }),
                 },
-                undefined,
+                abortSignal,
                 headers,
                 IS_PLATFORM ? undefined : executeQuery
               )
@@ -85,16 +84,15 @@ export const getFallbackTools = ({
       inputSchema: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the policies for'),
       }),
-      execute: async ({ schemas }) => {
+      execute: async ({ schemas }, { abortSignal }) => {
         const data = includeSchemaMetadata
           ? await getDatabasePolicies(
               {
                 projectRef,
                 connectionString,
-                schema: schemas?.join(','),
+                schemas,
               },
-              undefined,
-              headers
+              abortSignal
             )
           : []
 
@@ -357,7 +355,7 @@ export const getFallbackTools = ({
       inputSchema: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the functions for'),
       }),
-      execute: async ({ schemas }) => {
+      execute: async ({ schemas }, { abortSignal }) => {
         try {
           const data = includeSchemaMetadata
             ? await getDatabaseFunctions(
@@ -365,7 +363,7 @@ export const getFallbackTools = ({
                   projectRef,
                   connectionString,
                 },
-                undefined,
+                abortSignal,
                 headers
               )
             : []

@@ -10,7 +10,6 @@ describe('api/self-hosted/signing-keys', () => {
   let mockAssertSelfHosted: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
-    vi.clearAllMocks()
     vi.resetModules()
 
     const util = await import('./util')
@@ -30,6 +29,7 @@ describe('api/self-hosted/signing-keys', () => {
       expect(key).toEqual({
         id: '00000000-0000-0000-0000-000000000000',
         algorithm: 'HS256',
+        public_jwk: '',
         status: 'in_use',
         created_at: '1970-01-01T00:00:00.000Z',
         updated_at: '1970-01-01T00:00:00.000Z',

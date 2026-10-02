@@ -1,16 +1,8 @@
-// Live-fetch agents only. Training crawlers (GPTBot, ClaudeBot, CCBot) are
-// governed by robots.txt; serving them content that differs from the HTML
-// page risks SEO and cloaking penalties.
-const LLM_USER_AGENT = /\bClaude-User\b|\bClaude-Web\b|\bChatGPT-User\b|\bPerplexityBot\b/i
-
 // Media ranges (RFC 9110 §5.3.2) ordered most to least specific.
 const RANGES = ['text/markdown', 'text/html', 'text/*', '*/*'] as const
 type Range = (typeof RANGES)[number]
 
 const Q_PARAM = /^\s*q\s*=\s*([\d.]+)\s*$/i
-
-// Cap UA length before the regex test to bound CPU on the edge hot path.
-const MAX_UA_LENGTH = 512
 
 function isRange(s: string): s is Range {
   return (RANGES as readonly string[]).includes(s)
@@ -54,12 +46,17 @@ export type MarkdownDecision = 'markdown' | 'not-acceptable' | 'pass'
 /**
  * Content negotiation for routes that can serve either HTML or markdown.
  *
- * `hasMarkdownVariant` is false for paths with no markdown representation (they
- * never negotiate). `isMarkdownSuffix` forces markdown for an explicit `.md`
- * request; callers that handle `.md` upstream can leave it false.
+ * Markdown is served only on an explicit client signal: a `.md` request
+ * (`isMarkdownSuffix`) or an Accept header preferring text/markdown. There is
+ * deliberately no user-agent detection: responses that vary by UA poison
+ * UA-blind CDN caches, and at least one major agent's reader hard-fails on
+ * markdown it did not explicitly ask for.
+ *
+ * `hasMarkdownVariant` is false for paths with no markdown representation
+ * (they never negotiate).
  */
 export function negotiateMarkdown(
-  { acceptHeader, userAgent }: { acceptHeader: string; userAgent: string },
+  { acceptHeader }: { acceptHeader: string },
   {
     hasMarkdownVariant,
     isMarkdownSuffix = false,
@@ -67,18 +64,14 @@ export function negotiateMarkdown(
 ): MarkdownDecision {
   if (!hasMarkdownVariant) return 'pass'
 
-  // LLM agents and an explicit `.md` request always get markdown.
-  if (LLM_USER_AGENT.test(userAgent.slice(0, MAX_UA_LENGTH)) || isMarkdownSuffix) {
-    return 'markdown'
-  }
+  if (isMarkdownSuffix) return 'markdown'
 
   // No Accept header = browser/default client: serve HTML, never 406.
   if (!acceptHeader) return 'pass'
 
   const accept = parseAccept(acceptHeader)
 
-  // 406 when Accept rejects every type this route can produce. Only reached for
-  // non-LLM, non-`.md` clients that sent an Accept header (guards above), so a
+  // 406 when Accept rejects every type this route can produce, so a
   // deliberate `Accept: application/json` gets a clean 406 instead of HTML.
   if (accept.markdown === 0 && accept.html === 0) return 'not-acceptable'
 

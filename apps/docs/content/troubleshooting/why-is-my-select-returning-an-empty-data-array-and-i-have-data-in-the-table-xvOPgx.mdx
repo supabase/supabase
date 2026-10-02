@@ -9,9 +9,9 @@ database_id = "6fa68831-6db8-4836-a1b4-e9e51296d529"
 
 Usually this means you have RLS (row level security) enabled and no policy, or do not meet the policy. It can also mean you have a filter and have no rows matching that.
 
-If you have RLS enabled you can test quickly by disable RLS on the table. If your query works then you have no policies or do not meet them.
+If you have RLS enabled you can test by disabling RLS on the table. If your query works then you have no policies or do not meet them.
 
-If you have policies that depend on having a signed in user (TO set to `authenticated` or using `auth.uid()`) then you can check by setting TO as `anon` and setting your policy to just `TRUE`. If that works then you don't have a signed in user (with a JWT in the authorization header) when you make the call.
+If you have policies that depend on having a signed in user (TO set to `authenticated` or using `auth.uid()`) then you can check by setting TO as `anon` and setting your policy to `TRUE`. If that works then you don't have a signed in user (with a JWT in the authorization header) when you make the call.
 
 For more information on RLS see https://supabase.com/docs/guides/auth/row-level-security
 

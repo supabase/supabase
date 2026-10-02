@@ -1,4 +1,7 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 import type { ShowApiKey } from '../../Docs/Docs.types'
 import { GeneralContent } from '@/components/interfaces/Docs/GeneralContent'
@@ -16,6 +19,7 @@ interface DocViewProps {
 }
 
 export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
+  const router = useRouter()
   const { ref: projectRef, page, resource, rpc } = useParams()
 
   const { data: settings, error: settingsError } = useProjectSettingsV2Query({ projectRef })
@@ -30,6 +34,27 @@ export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
   const PAGE_KEY = resource || rpc || page || 'index'
 
   const { resources, rpcs } = buildEntityMaps(paths)
+
+  const resourceMissing = !!resource && !(resource in resources)
+  const rpcMissing = !!rpc && !(rpc in rpcs)
+
+  useEffect(() => {
+    const isSchemaReady = !isLoading && !!jsonSchema && !settingsError && !jsonSchemaError
+    if (!isSchemaReady || !projectRef) return
+    if (resourceMissing || rpcMissing) {
+      toast.error(`${resourceMissing ? 'table/view' : 'function'} could not be found`)
+      router.replace(`/project/${projectRef}/integrations/data_api/docs`)
+    }
+  }, [
+    isLoading,
+    jsonSchema,
+    settingsError,
+    jsonSchemaError,
+    projectRef,
+    resourceMissing,
+    rpcMissing,
+    router,
+  ])
 
   if (settingsError || jsonSchemaError) {
     return <DocViewError error={settingsError || jsonSchemaError} />

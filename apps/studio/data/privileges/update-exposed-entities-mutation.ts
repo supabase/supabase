@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { ConnectionVars } from '@/data/common.types'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateExposedEntitiesVariables = ConnectionVars & {

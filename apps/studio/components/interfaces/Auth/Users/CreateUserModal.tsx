@@ -156,9 +156,10 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
             </FormLabel>
 
             <Button
+              variant="primary"
               block
               size="small"
-              htmlType="submit"
+              type="submit"
               loading={isCreatingUser}
               disabled={!canCreateUsers || isCreatingUser}
             >

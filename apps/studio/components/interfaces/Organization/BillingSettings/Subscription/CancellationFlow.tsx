@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import React, { ComponentProps, useEffect, useMemo, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 
 import { DowngradeModal } from './DowngradeModal'
 import { ExitSurveyModal } from './ExitSurveyModal'
@@ -113,7 +113,7 @@ export const CancellationFlow = (props: CancellationFlowProps) => {
 
 type InitiateCancellationFlowButtonProps = Pick<
   ComponentProps<typeof ButtonTooltip>,
-  'children' | 'type'
+  'children' | 'variant'
 >
 
 export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowButtonProps) => {
@@ -145,7 +145,7 @@ export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowBu
   return (
     <>
       <ButtonTooltip
-        type={props.type}
+        variant={props.variant}
         disabled={!isDowngradeablePlan || !canUpdateSubscription || isAwsManaged}
         tooltip={{
           content: {

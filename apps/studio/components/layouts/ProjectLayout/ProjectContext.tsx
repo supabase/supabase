@@ -2,6 +2,7 @@ import { PropsWithChildren } from 'react'
 
 import { DatabaseSelectorStateContextProvider } from '@/state/database-selector'
 import { RoleImpersonationStateContextProvider } from '@/state/role-impersonation-state'
+import { SqlEditorSaveCoordinatorProvider } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { TableEditorStateContextProvider } from '@/state/table-editor'
 import { TabsStateContextProvider } from '@/state/tabs'
 
@@ -18,7 +19,7 @@ export const ProjectContextProvider = ({
       <TabsStateContextProvider key={`tabs-state-${projectRef}`}>
         <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
           <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
-            {children}
+            <SqlEditorSaveCoordinatorProvider>{children}</SqlEditorSaveCoordinatorProvider>
           </RoleImpersonationStateContextProvider>
         </DatabaseSelectorStateContextProvider>
       </TabsStateContextProvider>

@@ -33,7 +33,7 @@ Analytics buckets are integrated into Supabase Studio, power table-level views i
 
 Apache Iceberg is a high-performance, open table format for large-scale analytics on object storage. It brings the performance and features of a database to the flexibility of flat files.
 
-We chose Iceberg for its bottomless data model (append-only, immutable history), built-in snapshotting and versioning (time travel), and support for schema evolution. Iceberg is also an open standard widely supported across the ecosystem. Supabase is committed to [**open standards and portability**](https://supabase.com/blog/open-data-standards-postgres-otel-iceberg), and Iceberg aligns with that goal by enabling users to move data in and out without being locked into proprietary formats.
+We chose Iceberg for its bottomless data model (append-only, immutable history), built-in snapshotting and versioning (time travel), and support for schema evolution. Iceberg is also an open standard widely supported across the ecosystem. Supabase is committed to [**open standards and portability**](/blog/open-data-standards-postgres-otel-iceberg), and Iceberg aligns with that goal by enabling users to move data in and out without being locked into proprietary formats.
 
 ## Setting up Analytics Buckets
 
@@ -131,9 +131,9 @@ from market_analytics.prices;
 
 ## Writing to Analytics Buckets
 
-Writing is a work in progress. We're actively building [**Supabase ETL**](https://github.com/supabase/etl), which will allow you to write directly from Postgres into Iceberg-backed buckets. We'll also add write capability to the Supabase Iceberg Wrapper as soon as write support lands in the upstream [iceberg-rust client library](https://github.com/apache/iceberg-rust). This will complete the workflow of **write → store → query**, all inside Supabase.
+Writing is a work in progress. For now, populate Analytics Buckets with your own ingestion pipeline or Iceberg-compatible tooling. We'll also add write capability to the Supabase Iceberg Wrapper as soon as write support lands in the upstream [iceberg-rust client library](https://github.com/apache/iceberg-rust). This will complete the workflow of **write → store → query**, all inside Supabase.
 
-Once live, that enables bottomless Postgres storage through shifting records into Analytics Buckets, all using open formats. As a bonus, Iceberg gets us time travel for free.
+Once live, this gives you analytical storage using open formats. As a bonus, Iceberg gets us time travel for free.
 
 ## Alpha Launch Limits
 

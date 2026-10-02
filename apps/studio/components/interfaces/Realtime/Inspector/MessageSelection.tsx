@@ -38,7 +38,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
   const copyButton = (
     <CopyButton
       text={selectionText}
-      type="default"
+      variant="default"
       title="Copy log to clipboard"
       onClick={() => {
         track('realtime_inspector_copy_message_clicked')
@@ -100,7 +100,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
               )}
             </div>
             <Button
-              type="text"
+              variant="text"
               className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >

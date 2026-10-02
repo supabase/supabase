@@ -25,6 +25,7 @@ const DEFAULT_OPTIONS: monacoEditor.IStandaloneDiffEditorConstructionOptions = {
   lineNumbersMinChars: 3,
   scrollBeyondLastLine: false,
   renderSideBySide: false,
+  renderGutterMenu: false,
   padding: { top: 4 },
 }
 

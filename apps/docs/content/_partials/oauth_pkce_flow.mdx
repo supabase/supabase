@@ -31,24 +31,57 @@ await supabase.auth.signInWithOAuth({
 
 In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
-```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
-const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+<Admonition type="caution">
 
-// ---cut---
-const { data, error } = await supabase.auth.signInWithOAuth({
-  provider,
-  options: {
-    redirectTo: 'http://example.com/auth/callback',
-  },
-})
+Use a [server client](/docs/guides/auth/server-side/creating-a-client) from `@supabase/ssr`, and send its cookies with the redirect. `signInWithOAuth` stores the PKCE code verifier in a cookie. When that `Set-Cookie` header doesn't reach the browser, the callback can't exchange the code for a session.
 
-if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
+</Admonition>
+
+```ts
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import type { Provider } from '@supabase/supabase-js'
+
+// A route handler that receives the incoming Request
+async function handler(request: Request) {
+  const headers = new Headers()
+  const provider = 'provider' as Provider
+
+  const supabase = createServerClient('https://your-project-id.supabase.co', 'sb_publishable_...', {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(request.headers.get('Cookie') ?? '') as {
+          name: string
+          value: string
+        }[]
+      },
+      setAll(cookiesToSet, cacheHeaders) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+        Object.entries(cacheHeaders).forEach(([key, value]) => headers.set(key, value))
+      },
+    },
+  })
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: 'http://example.com/auth/callback',
+    },
+  })
+
+  if (error) {
+    throw error
+  }
+
+  // Redirect with `headers` so the browser stores the code verifier cookie.
+  // Frameworks usually wrap this, for example `redirect(data.url, { headers })` in Remix.
+  headers.set('Location', data.url)
+  return new Response(null, { status: 303, headers })
 }
 ```
+
+When your framework sets cookies on the response for you, such as `cookies()` in Next.js or `event.cookies` in SvelteKit, write to that API in `setAll` instead. The cookie is then already on the response, and the redirect needs no extra headers.
 
 </TabPanel>
 
@@ -111,26 +144,26 @@ export async function GET(request: Request) {
 Create a new file at `src/routes/auth/callback/+server.js` and populate with the following:
 
 ```js name=src/routes/auth/callback/+server.js
-import { redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit'
 
 export const GET = async (event) => {
-	const {
-		url,
-		locals: { supabase }
-	} = event;
-	const code = url.searchParams.get('code') as string;
-	const next = url.searchParams.get('next') ?? '/';
+  const {
+    url,
+    locals: { supabase },
+  } = event
+  const code = url.searchParams.get('code')
+  const next = url.searchParams.get('next') ?? '/'
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      redirect(303, `/${next.slice(1)}`);
+      redirect(303, `/${next.slice(1)}`)
     }
   }
 
   // return the user to an error page with instructions
-  redirect(303, '/auth/auth-code-error');
-};
+  redirect(303, '/auth/auth-code-error')
+}
 ```
 
 </TabPanel>

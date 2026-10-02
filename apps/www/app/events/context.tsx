@@ -15,6 +15,14 @@ interface EventsContextValue {
   categories: { [key: string]: number }
 }
 
+// Maps Luma event tags to the app's category vocabulary. Keys are lowercased
+// for case-insensitive matching against the tag names returned by Luma.
+const LUMA_TAG_CATEGORY_MAP: Record<string, string> = {
+  hackathons: 'hackathon',
+  meetups: 'meetup',
+  events: 'conference',
+}
+
 const EventsContext = createContext<EventsContextValue | undefined>(undefined)
 
 interface EventsProviderProps {
@@ -49,12 +57,14 @@ export function EventsProvider({
 
         if (data.success) {
           const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
-            // Categorize by the originating Luma calendar: events from the
-            // Supabase Hackathons calendar → `hackathon`; everything from the
-            // Supabase Community Events calendar → `community`.
-            const categories: string[] = [
-              event?.calendar === 'hackathon' ? 'hackathon' : 'community',
-            ]
+            // Categorize by the event's Luma tags: `Hackathons` → hackathon,
+            // `Meetups` → meetup, `Events` → conference. Untagged or unrecognized
+            // events fall back to the generic `conference` bucket.
+            const mappedCategories: string[] = (Array.isArray(event?.tags) ? event.tags : [])
+              .map((tag: string) => LUMA_TAG_CATEGORY_MAP[String(tag).trim().toLowerCase()])
+              .filter(Boolean)
+            const categories: string[] =
+              mappedCategories.length > 0 ? Array.from(new Set(mappedCategories)) : ['conference']
 
             const rawUrl = event?.url || ''
             let safeUrl: string | undefined

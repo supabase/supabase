@@ -274,7 +274,7 @@ export const PublishAppSidePanel = ({
                         <div className="absolute bottom-1 right-1">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1">
+                              <Button className="px-1">
                                 <Edit />
                               </Button>
                             </DropdownMenuTrigger>
@@ -337,10 +337,7 @@ export const PublishAppSidePanel = ({
                       All URLs must use HTTPS, except for localhost
                     </p>
                   </div>
-                  <Button
-                    type="default"
-                    onClick={() => appendCallbackUrl({ id: uuidv4(), value: '' })}
-                  >
+                  <Button onClick={() => appendCallbackUrl({ id: uuidv4(), value: '' })}>
                     Add URL
                   </Button>
                 </div>
@@ -364,7 +361,7 @@ export const PublishAppSidePanel = ({
                               {callbackUrlsFields.length > 1 ? (
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupButton
-                                    type="default"
+                                    variant="default"
                                     onClick={() => removeCallbackUrl(index)}
                                   >
                                     Remove
@@ -414,14 +411,13 @@ export const PublishAppSidePanel = ({
             <SidePanel.Content>
               <div className="pt-2 pb-3 flex items-center justify-between">
                 <Button
-                  type="default"
                   onClick={() => setShowPreview(true)}
                   disabled={name.length === 0 || website.length === 0}
                 >
                   Preview consent for users
                 </Button>
                 <div className="flex items-center space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  <Button disabled={isSubmitting} onClick={() => onClose()}>
                     Cancel
                   </Button>
                   <Shortcut
@@ -430,7 +426,12 @@ export const PublishAppSidePanel = ({
                     options={{ enabled: visible && !isSubmitting }}
                     side="top"
                   >
-                    <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      loading={isSubmitting}
+                      disabled={isSubmitting}
+                    >
                       Confirm
                     </Button>
                   </Shortcut>
@@ -449,12 +450,7 @@ export const PublishAppSidePanel = ({
                   </div>
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  <AuthorizeRequesterDetails
-                    icon={iconUrl || null}
-                    name={name}
-                    domain={website}
-                    scopes={scopes}
-                  />
+                  <AuthorizeRequesterDetails name={name} domain={website} scopes={scopes} />
                   <div className="pt-4 space-y-2">
                     <p className="prose text-sm">Select an organization to grant API access to</p>
                     <div className="border border-control text-foreground-light rounded-sm px-4 py-2 text-sm bg-surface-200">

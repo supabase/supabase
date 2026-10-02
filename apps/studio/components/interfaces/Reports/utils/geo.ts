@@ -5,7 +5,7 @@ export type CountryCountRow = { country: string | null; count: number | string }
 
 export interface MapChartTheme {
   zeroFill: string // fill for countries with zero (or when max=0)
-  brandFill: string // base fill color (same for all, vary by opacity)
+  primaryFill: string // base fill color (same for all, vary by opacity)
   opacityScale: [number, number, number, number, number] // low -> high opacities
   boundaryStroke: string
   boundaryStrokeHover: string
@@ -15,21 +15,21 @@ export interface MapChartTheme {
 
 export const MAP_CHART_THEME: { light: MapChartTheme; dark: MapChartTheme } = {
   light: {
-    zeroFill: 'hsl(var(--background-surface-400))',
-    brandFill: 'hsl(var(--brand-default))',
+    zeroFill: 'var(--background-surface-400)',
+    primaryFill: 'var(--primary-bright)',
     opacityScale: [0.18, 0.32, 0.5, 0.68, 0.86],
-    boundaryStroke: 'hsla(var(--brand-300), 0.6)',
-    boundaryStrokeHover: 'hsl(var(--brand-500))',
-    markerFill: 'hsl(var(--brand-default))',
+    boundaryStroke: 'oklch(from var(--primary-bright) l c h / 60%)',
+    boundaryStrokeHover: 'var(--primary-bright-hover)',
+    markerFill: 'var(--primary-bright)',
     oceanFill: 'transparent',
   },
   dark: {
-    zeroFill: 'hsl(var(--background-selection))',
-    brandFill: 'hsl(var(--brand-default))',
+    zeroFill: 'var(--background-selection)',
+    primaryFill: 'var(--primary-bright)',
     opacityScale: [0.18, 0.32, 0.5, 0.68, 0.86],
-    boundaryStroke: 'hsla(var(--brand-300), 0.6)',
-    boundaryStrokeHover: 'hsl(var(--brand-500))',
-    markerFill: 'hsl(var(--brand-default))',
+    boundaryStroke: 'oklch(from var(--primary-bright) l c h / 60%)',
+    boundaryStrokeHover: 'var(--primary-bright-hover)',
+    markerFill: 'var(--primary-bright)',
     oceanFill: 'transparent',
   },
 }
@@ -52,7 +52,7 @@ export const getFillColor = (
   theme: MapChartTheme = MAP_CHART_THEME.dark
 ): string => {
   if (max <= 0 || !value) return theme.zeroFill
-  return theme.brandFill
+  return theme.primaryFill
 }
 
 export const getFillOpacity = (

@@ -1,18 +1,18 @@
-import { type Metadata } from 'next'
-
-import { TroubleshootingHeader, TroubleshootingEntries } from '~/features/docs/Troubleshooting.ui'
+import { TroubleshootingEntries, TroubleshootingHeader } from '~/features/docs/Troubleshooting.ui'
 import {
   TroubleshootingFilterEmptyState,
   TroubleshootingListController,
 } from '~/features/docs/Troubleshooting.ui.client'
 import {
-  type ITroubleshootingMetadata,
   getTroubleshootingEntriesByTopic,
   getTroubleshootingErrorsByTopic,
   getTroubleshootingKeywordsByTopic,
+  type ITroubleshootingMetadata,
 } from '~/features/docs/Troubleshooting.utils'
 import { PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { mdAlternate } from '~/lib/md-alternates'
+import { type Metadata } from 'next'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
@@ -66,6 +66,7 @@ export function generateSectionTroubleshootingMetadata(
     title: `${metadataTitle ?? 'Supabase'} | ${sectionName} Troubleshooting`,
     alternates: {
       canonical: `${PROD_URL}/guides/${topic}/troubleshooting`,
+      types: mdAlternate(`${topic}/troubleshooting`),
     },
   }
 }

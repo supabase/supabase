@@ -358,10 +358,6 @@ describe('getExpirationDate', () => {
     expect(result).toBe(dayjs(FIXED_DATE).add(30, 'days').toISOString())
   })
 
-  it('should return undefined for "never"', () => {
-    expect(getExpirationDate('never')).toBeUndefined()
-  })
-
   it('should return undefined for an unknown key', () => {
     expect(getExpirationDate('unknown')).toBeUndefined()
   })

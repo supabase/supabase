@@ -149,7 +149,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="outline"
+                  variant="outline"
                   size="medium"
                   iconRight={<ChevronDown />}
                   className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
@@ -193,7 +193,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           {Object.entries(categories).map(([category, count]) => (
             <Button
               key={category}
-              type={
+              variant={
                 category === 'all' && !searchTerm && !activeCategory
                   ? 'default'
                   : category === activeCategory
@@ -215,7 +215,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           {!!onDemandEvents?.length && (
             <Button
               key="on-demand"
-              type="outline"
+              variant="outline"
               size={is2XL ? 'tiny' : 'small'}
               className="rounded-full"
               iconRight={
@@ -237,12 +237,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.05 } }}
         >
-          <Button
-            className="px-2 w-9 h-9"
-            size="large"
-            type="default"
-            onClick={() => setShowSearchInput(true)}
-          >
+          <Button className="px-2 w-9 h-9" size="large" onClick={() => setShowSearchInput(true)}>
             <Search size="14" />
           </Button>
         </motion.div>

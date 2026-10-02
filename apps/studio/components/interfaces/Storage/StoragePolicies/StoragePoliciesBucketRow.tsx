@@ -18,8 +18,8 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { PolicyRow } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { PolicyRow } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyRow'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import { Bucket } from '@/data/storage/buckets-query'
 
@@ -67,7 +67,7 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
               )}
             </div>
           </div>
-          <Button type="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
+          <Button variant="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
             New policy
           </Button>
         </CardHeader>

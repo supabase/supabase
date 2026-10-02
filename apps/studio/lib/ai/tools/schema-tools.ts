@@ -17,24 +17,22 @@ export const getSchemaTools = ({
     inputSchema: z.object({
       schemas: z.array(z.string()).describe('The schema names to get the policies for'),
     }),
-    execute: async ({ schemas }) => {
+    execute: async ({ schemas }, { abortSignal }) => {
       const data = await getDatabasePolicies(
         {
           projectRef,
           connectionString,
-          schema: schemas?.join(','),
+          schemas,
         },
-        undefined,
-        {
-          'Content-Type': 'application/json',
-          ...(authorization && { Authorization: authorization }),
-        }
+        abortSignal,
+        authorization ? { Authorization: authorization } : undefined
       )
 
       const formattedPolicies = data
         .map(
           (policy) => `
               Policy Name: "${policy.name}"
+              Table: "${policy.table}"
               Action: ${policy.action}
               Roles: ${policy.roles.join(', ')}
               Command: ${policy.command}

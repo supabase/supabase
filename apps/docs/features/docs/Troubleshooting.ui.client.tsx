@@ -6,7 +6,7 @@ import { useQueryStates } from 'nuqs'
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button_Shadcn_, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Input } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
@@ -260,6 +260,7 @@ function TroubleshootingFilterInternal({
           />
           {searchState && (
             <button
+              tabIndex={0}
               className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border-alternative hover:border-stronger rounded-md p-1 transition-colors"
               onClick={() => {
                 setSearchState('')

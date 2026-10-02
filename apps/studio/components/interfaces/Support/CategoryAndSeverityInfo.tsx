@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import {
@@ -91,7 +91,11 @@ function CategorySelector({ form }: CategorySelectorProps) {
           <FormItemLayout hideMessage layout="vertical" label="What issue are you having?">
             <FormControl>
               <Select {...fieldWithoutRef} defaultValue={field.value} onValueChange={onValueChange}>
-                <SelectTrigger aria-label="Select an issue" className="w-full">
+                <SelectTrigger
+                  data-support-field="category"
+                  aria-label="Select an issue"
+                  className="w-full"
+                >
                   <SelectValue placeholder="Select an issue">
                     {field.value
                       ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
@@ -186,14 +190,11 @@ const IssueSuggestion = ({ category, projectRef }: { category: string; projectRe
       <Admonition
         type="default"
         className={className}
-        title="Have you checked your project's infrastructure activity?"
+        title="Have you checked your project's database observability reports?"
       >
         High memory or low disk IO bandwidth may be slowing down your database. Verify by checking
-        the infrastructure activity of your project{' '}
-        <InlineLink href={`${baseUrl}/settings/infrastructure#infrastructure-activity`}>
-          here
-        </InlineLink>
-        .
+        your project's database observability reports{' '}
+        <InlineLink href={`${baseUrl}/observability/database`}>here</InlineLink>.
       </Admonition>
     )
   }
@@ -205,12 +206,9 @@ const IssueSuggestion = ({ category, projectRef }: { category: string; projectRe
         className={className}
         title="Have you checked the Query Performance Advisor?"
       >
-        Identify slow running queries and get actionable insights on how to optimize them with the
-        Query Performance Advisor{' '}
-        <InlineLink href={`${baseUrl}/settings/infrastructure#infrastructure-activity`}>
-          here
-        </InlineLink>
-        .
+        Identify slow running queries and get actionable insights on how to optimize them with Query
+        Performance{' '}
+        <InlineLink href={`${baseUrl}/observability/query-performance`}>here</InlineLink>.
       </Admonition>
     )
   }

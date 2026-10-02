@@ -1,10 +1,10 @@
-import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
+  AccordionTrigger,
   Alert,
   AlertDescription,
   AlertTitle,
@@ -14,7 +14,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -30,7 +30,7 @@ import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import {
@@ -311,7 +311,7 @@ export const QueryIndexes = ({
                       {isLinterWarning ? (
                         <Alert
                           variant="default"
-                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand my-3"
+                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary my-3"
                         >
                           <Lightbulb />
                           <AlertTitle>
@@ -320,7 +320,7 @@ export const QueryIndexes = ({
                           </AlertTitle>
                           <AlertDescription>
                             You can improve this query's performance by{' '}
-                            <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
+                            <span className="text-primary">{totalImprovement.toFixed(2)}%</span> by
                             adding the following suggested{' '}
                             {index_statements.length > 1 ? 'indexes' : 'index'}
                           </AlertDescription>
@@ -435,7 +435,7 @@ export const QueryIndexes = ({
           <Button
             disabled={isExecuting}
             loading={isExecuting}
-            type="primary"
+            variant="primary"
             onClick={() => createIndex()}
           >
             Create index

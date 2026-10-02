@@ -19,7 +19,7 @@ import {
   createBucket as createBucketViaApi,
   deleteBucket as deleteBucketViaApi,
 } from '../utils/storage/index.js'
-import { test } from '../utils/test.js'
+import { test, withSetupCleanup } from '../utils/test.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
 
 const bucketNamePrefix = 'pw_bucket'
@@ -42,7 +42,14 @@ test.describe('Storage', () => {
   test('can create a private bucket', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_private`
 
-    await deleteBucketViaApi(bucketName)
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await createBucket(page, ref, bucketName, false)
 
     // Verify it's marked as private (no "Public" badge should be visible)
@@ -57,7 +64,14 @@ test.describe('Storage', () => {
   test('can create a public bucket', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_public`
 
-    await deleteBucketViaApi(bucketName)
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await createBucket(page, ref, bucketName, true)
 
     // Verify it's marked as public - wait for the badge to appear
@@ -75,8 +89,14 @@ test.describe('Storage', () => {
     const bucketName = `${bucketNamePrefix}_edit`
 
     // Create a fresh private bucket via API
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
 
     // Navigate to the bucket
@@ -109,8 +129,14 @@ test.describe('Storage', () => {
     const bucketName = `${bucketNamePrefix}_delbkt`
 
     // Create a bucket via API
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
 
     // Delete it via UI
@@ -128,10 +154,16 @@ test.describe('Storage', () => {
     const bucketName2 = `${bucketNamePrefix}_search_2`
 
     // Create two buckets via API
-    await deleteBucketViaApi(bucketName1)
-    await deleteBucketViaApi(bucketName2)
-    await createBucketViaApi(bucketName1, false)
-    await createBucketViaApi(bucketName2, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName1, false)
+        await createBucketViaApi(bucketName2, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName1)
+        await deleteBucketViaApi(bucketName2)
+      }
+    )
     await navigateToStorageFiles(page, ref)
 
     // Search for first bucket
@@ -167,8 +199,14 @@ test.describe('Storage', () => {
     const fileName = 'test-file.txt'
 
     // Create a bucket via API and navigate to it
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
@@ -182,13 +220,75 @@ test.describe('Storage', () => {
     const folderName = 'test_folder'
 
     // Create a bucket via API and navigate to it
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
     // Create a folder
     await createFolder(page, folderName)
+  })
+
+  test('deep links to a nested folder and file via the URL', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_deeplink`
+    const folderName = 'deeplink_folder'
+    const fileName = 'test-file.txt'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Creating a folder drills into it, so the upload lands inside the folder
+    await createFolder(page, folderName)
+    await expect(page.getByText('Drop your files here')).toBeVisible()
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Reload at the bucket root so opening the folder is a real navigation rather than
+    // the store drilling in on its own — only the former pushes a history entry
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+    await page.getByTitle(folderName).click()
+    // Compare the parsed params rather than regex-matching the URL, so dots and other
+    // regex metacharacters in file names are treated literally
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+
+    // Opening the file records it in the URL alongside the folder
+    await page.getByTitle(fileName).click()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+    await expect(page).toHaveURL((url) => url.searchParams.get('preview') === fileName)
+
+    // A reload restores the same location rather than dropping back to bucket root
+    const deepLink = page.url()
+    await page.reload()
+    await expect(
+      page.getByTitle(fileName),
+      'File should still be visible after reloading the deep link'
+    ).toBeVisible()
+    expect(page.url()).toBe(deepLink)
+
+    // Back walks up out of the folder
+    await page.goBack()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === null)
+    await expect(
+      page.getByTitle(folderName),
+      'Should be back at bucket root showing the folder'
+    ).toBeVisible()
+
+    await deleteBucketViaApi(bucketName)
   })
 
   test('can rename a file', async ({ page, ref }) => {
@@ -197,8 +297,14 @@ test.describe('Storage', () => {
     const newFileName = 'renamed-file.txt'
 
     // Create a bucket via API, navigate to it, and upload a file
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
@@ -215,8 +321,14 @@ test.describe('Storage', () => {
     const newFolderName = 'new_folder'
 
     // Create a bucket via API, navigate to it, and create a folder
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
@@ -235,8 +347,14 @@ test.describe('Storage', () => {
     const folderFilePath = path.join(import.meta.dirname, 'files', folderFileName)
 
     // Create a bucket via API and navigate to it
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, true)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, true)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
     await uploadFile(page, rootFilePath, rootFileName)
@@ -306,8 +424,14 @@ test.describe('Storage', () => {
     const folderName = 'folder_to_rename'
 
     // Create a bucket via API, navigate to it, and create a folder
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
     await createFolder(page, folderName)
@@ -341,8 +465,14 @@ test.describe('Storage', () => {
     const folderName = 'folder_to_blur'
 
     // Create a bucket via API, navigate to it, and create a folder
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
     await createFolder(page, folderName)
@@ -377,10 +507,16 @@ test.describe('Storage', () => {
     const fileName = 'test-file.txt'
 
     // Create 2 bucket via API, navigate to the first
-    await deleteBucketViaApi(bucketName)
-    await deleteBucketViaApi(bucketName2)
-    await createBucketViaApi(bucketName, false)
-    await createBucketViaApi(bucketName2, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+        await createBucketViaApi(bucketName2, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+        await deleteBucketViaApi(bucketName2)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
@@ -403,8 +539,14 @@ test.describe('Storage', () => {
     const fileName = 'test-file.txt'
 
     // Create a bucket via API, navigate to it, and upload a file
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
@@ -420,8 +562,14 @@ test.describe('Storage', () => {
     const folderName = 'test_folder'
 
     // Create a bucket via API, navigate to it, and create a folder
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
     await createFolder(page, folderName)
@@ -435,8 +583,14 @@ test.describe('Storage', () => {
     const fileName = 'test-file.txt'
 
     // Create a bucket via API, navigate to it, and upload a file
-    await deleteBucketViaApi(bucketName)
-    await createBucketViaApi(bucketName, false)
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 

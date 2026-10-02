@@ -55,7 +55,7 @@ export const useDeleteReplicationTenantMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to disable external replication: ${data.message}`)
+        toast.error(`Failed to disable Pipelines: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

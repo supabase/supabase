@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from 'ui'
 
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 
 export interface PrivilegesHeadProps {
   disabled: boolean
@@ -55,16 +55,11 @@ const PrivilegesHead = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button
-          type="default"
-          size="tiny"
-          onClick={resetChanges}
-          disabled={!hasChanges || isApplyingChanges}
-        >
+        <Button size="tiny" onClick={resetChanges} disabled={!hasChanges || isApplyingChanges}>
           Reset
         </Button>
         <Button
-          type="primary"
+          variant="primary"
           size="tiny"
           onClick={applyChanges}
           disabled={disabled || !hasChanges || isApplyingChanges}

@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import type { FilterProperty, OperatorDefinition } from 'ui-patterns'
+import type { FilterProperty, OperatorDefinition } from 'ui-patterns/FilterBar'
 
 import type { Filter, SupaColumn } from '@/components/grid/types'
 import {

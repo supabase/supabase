@@ -23,7 +23,7 @@ import {
   SelectValue,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -98,7 +98,6 @@ export const TransferProjectButton = () => {
     <Dialog onOpenChange={(open) => setIsOpen(open)} open={isOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          type="default"
           disabled={!canTransferProject || disableProjectTransfer}
           tooltip={{
             content: {
@@ -283,10 +282,9 @@ export const TransferProjectButton = () => {
           </Loading>
         )}
         <DialogFooter>
-          <Button type="default" onClick={() => setIsOpen(false)}>
-            Cancel
-          </Button>
+          <Button onClick={() => setIsOpen(false)}>Cancel</Button>
           <Button
+            variant="primary"
             onClick={() => handleTransferProject()}
             disabled={
               !transferPreviewData || !transferPreviewData.valid || isTransferring || !selectedOrg

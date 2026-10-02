@@ -1,0 +1,5 @@
+{
+  "id": "vector-buckets",
+  "title": "Vector Buckets",
+  "notes": "This section contains methods for working with Vector Buckets, invoked behind the `supabase.storage.vectors` namespace.\n"
+}

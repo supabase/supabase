@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'

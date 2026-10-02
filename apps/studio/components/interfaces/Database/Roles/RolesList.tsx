@@ -138,7 +138,7 @@ export const RolesList = () => {
               filterString && (
                 <Button
                   size="tiny"
-                  type="text"
+                  variant="text"
                   onClick={() => setFilterString('')}
                   className="px-1 mr-1"
                 >
@@ -149,6 +149,7 @@ export const RolesList = () => {
           />
           <div className="flex items-center border border-strong rounded-full w-min h-[26px]">
             <button
+              tabIndex={0}
               className={cn(
                 'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
                 filterType === 'all'
@@ -161,6 +162,7 @@ export const RolesList = () => {
             </button>
             <div className="h-full w-px border-r border-strong"></div>
             <button
+              tabIndex={0}
               className={cn(
                 'text-xs w-[80px] h-full text-center rounded-r-full flex items-center justify-center transition',
                 filterType === 'active'
@@ -176,7 +178,7 @@ export const RolesList = () => {
         <div className="flex items-center space-x-6">
           <Tooltip>
             <TooltipTrigger>
-              <div className="w-42">
+              <div className="w-44">
                 <SparkBar
                   type="horizontal"
                   // if the maxConnectionLimit is undefined, set totalActiveConnections so that
@@ -220,7 +222,7 @@ export const RolesList = () => {
               side="bottom"
             >
               <Button
-                type="primary"
+                variant="primary"
                 icon={<Plus size={12} />}
                 onClick={() => setIsCreatingRole(true)}
               >
@@ -229,7 +231,7 @@ export const RolesList = () => {
             </Shortcut>
           ) : (
             <ButtonTooltip
-              type="primary"
+              variant="primary"
               disabled
               icon={<Plus size={12} />}
               tooltip={{

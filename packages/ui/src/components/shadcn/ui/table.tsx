@@ -132,6 +132,7 @@ function TableHeadSort<TColumn extends string = string>({
   return (
     <button
       type="button"
+      tabIndex={0}
       className={cn(
         'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none bg-transparent! border-none p-0 w-full text-left',
         className

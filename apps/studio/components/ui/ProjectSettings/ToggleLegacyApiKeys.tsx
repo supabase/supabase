@@ -104,7 +104,6 @@ export const ToggleLegacyApiKeysPanel = () => {
             </div>
             <div className="flex items-center">
               <ButtonTooltip
-                type="default"
                 onClick={
                   isLegacyKeysEnabled && (authorizedApps?.length || isAuthorizedAppsError)
                     ? () => setIsAppsWarningOpen(true)

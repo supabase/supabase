@@ -1,8 +1,8 @@
+import { type Feature } from 'common'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { type Feature } from 'common'
 import { showRemark } from './Show'
 import { fromDocsMarkdown } from './utils.server'
 
@@ -14,10 +14,6 @@ vi.mock('common/enabled-features', () => ({
 const { isFeatureEnabled } = await import('common/enabled-features')
 
 describe('$Show', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   afterEach(() => {
     vi.restoreAllMocks()
   })

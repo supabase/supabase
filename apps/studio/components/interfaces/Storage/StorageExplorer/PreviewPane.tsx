@@ -12,6 +12,7 @@ import {
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -119,10 +120,10 @@ export const PreviewPane = () => {
     selectedBucket,
     selectedFilePreview: file,
     setSelectedItemsToDelete,
-    setSelectedFilePreview,
     setSelectedFileCustomExpiry,
     downloadFile,
   } = useStorageExplorerStateSnapshot()
+  const { clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -141,8 +142,14 @@ export const PreviewPane = () => {
       style={{ width }}
     >
       {/* Preview Header */}
-      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-        <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
+      <div className="flex w-full justify-end">
+        <Button
+          variant="text"
+          className="w-6 h-6 text-foreground-lighter hover:text-foreground"
+          icon={<X size={14} />}
+          aria-label="Close preview"
+          onClick={clearPreviewedFile}
+        />
       </div>
 
       {/* Preview Thumbnail*/}
@@ -187,7 +194,6 @@ export const PreviewPane = () => {
         {/* Actions */}
         <div className="flex space-x-2 border-b border-overlay pb-4">
           <Button
-            type="default"
             icon={<Download />}
             disabled={file.isCorrupted}
             onClick={() => downloadFile(file)}
@@ -196,7 +202,7 @@ export const PreviewPane = () => {
           </Button>
           {selectedBucket.public ? (
             <Button
-              type="outline"
+              variant="outline"
               icon={<Copy />}
               onClick={() => onCopyUrl(file.path!)}
               disabled={file.isCorrupted}
@@ -207,7 +213,7 @@ export const PreviewPane = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="outline"
+                  variant="outline"
                   icon={<Copy />}
                   iconRight={<ChevronDown />}
                   disabled={file.isCorrupted}
@@ -245,7 +251,7 @@ export const PreviewPane = () => {
           )}
         </div>
         <ButtonTooltip
-          type="outline"
+          variant="outline"
           disabled={!canUpdateFiles}
           size="tiny"
           icon={<Trash2 />}

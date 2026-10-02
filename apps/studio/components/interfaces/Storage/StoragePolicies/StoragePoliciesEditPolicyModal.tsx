@@ -8,13 +8,13 @@ import {
   createPayloadsForAddPolicy,
   createSQLPolicies,
 } from '../Storage.utils'
+import { POLICY_MODAL_VIEWS } from './PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicySelection } from './PolicySelection'
+import { PolicyTemplates } from './PolicyTemplates'
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
-import StoragePoliciesEditor from './StoragePoliciesEditor'
-import StoragePoliciesReview from './StoragePoliciesReview'
+import { StoragePoliciesEditor } from './StoragePoliciesEditor'
+import { StoragePoliciesReview } from './StoragePoliciesReview'
 import { StoragePolicyEditorModalTitle } from './StoragePolicyEditorModalTitle'
-import { POLICY_MODAL_VIEWS } from '@/components/interfaces/Auth/Policies/Policies.constants'
-import PolicySelection from '@/components/interfaces/Auth/Policies/PolicySelection'
-import PolicyTemplates from '@/components/interfaces/Auth/Policies/PolicyTemplates'
 
 const newPolicyTemplate: any = {
   name: '',
@@ -171,6 +171,7 @@ export const StoragePoliciesEditPolicyModal = ({
       <DialogContent
         size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
         hideClose={view !== POLICY_MODAL_VIEWS.TEMPLATES}
+        className="flex max-h-[calc(100vh-8rem)] flex-col gap-0 overflow-hidden p-0"
       >
         <DialogHeader>
           <DialogTitle>
@@ -182,37 +183,41 @@ export const StoragePoliciesEditPolicyModal = ({
           </DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        {view === POLICY_MODAL_VIEWS.SELECTION ? (
-          <PolicySelection
-            description="PostgreSQL policies control access to your files and folders"
-            onViewTemplates={onViewTemplates}
-            onViewEditor={() => onViewEditor('new')}
-            showAssistantPreview={false}
-          />
-        ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
-          <StoragePoliciesEditor
-            policyFormFields={policyFormFields}
-            onViewTemplates={onViewTemplates}
-            onUpdatePolicyName={onUpdatePolicyName}
-            onUpdatePolicyDefinition={onUpdatePolicyDefinition}
-            onToggleOperation={onToggleOperation}
-            onUpdatePolicyRoles={onUpdatePolicyRoles}
-            onReviewPolicy={validatePolicyEditorFormFields}
-          />
-        ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
-          <PolicyTemplates
-            templates={STORAGE_POLICY_TEMPLATES as any[]}
-            onUseTemplate={onUseTemplate}
-            templatesNote={''}
-          />
-        ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
+        {view === POLICY_MODAL_VIEWS.REVIEW ? (
           <StoragePoliciesReview
             policyStatements={policyStatementsForReview}
             onSelectBack={onViewEditor}
             onSelectSave={onReviewSave}
           />
         ) : (
-          <div />
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {view === POLICY_MODAL_VIEWS.SELECTION ? (
+              <PolicySelection
+                description="PostgreSQL policies control access to your files and folders"
+                onViewTemplates={onViewTemplates}
+                onViewEditor={() => onViewEditor('new')}
+                showAssistantPreview={false}
+              />
+            ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
+              <StoragePoliciesEditor
+                policyFormFields={policyFormFields}
+                onViewTemplates={onViewTemplates}
+                onUpdatePolicyName={onUpdatePolicyName}
+                onUpdatePolicyDefinition={onUpdatePolicyDefinition}
+                onToggleOperation={onToggleOperation}
+                onUpdatePolicyRoles={onUpdatePolicyRoles}
+                onReviewPolicy={validatePolicyEditorFormFields}
+              />
+            ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
+              <PolicyTemplates
+                templates={STORAGE_POLICY_TEMPLATES as any[]}
+                onUseTemplate={onUseTemplate}
+                templatesNote={''}
+              />
+            ) : (
+              <div />
+            )}
+          </div>
         )}
       </DialogContent>
     </Dialog>

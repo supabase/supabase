@@ -1,3 +1,3 @@
 export const EmptyValue = () => {
-  return <span className="sb-grid-empty-value opacity-50">EMPTY</span>
+  return <span className="block opacity-50">EMPTY</span>
 }

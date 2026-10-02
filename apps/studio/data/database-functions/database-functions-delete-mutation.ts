@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 import { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionDeleteVariables = {
@@ -19,7 +19,7 @@ export async function deleteDatabaseFunction({
   connectionString,
   func,
 }: DatabaseFunctionDeleteVariables) {
-  const { sql, zod } = pgMeta.functions.remove(func)
+  const { sql, zod } = pgMeta.functions.remove(func, { type: func.type })
 
   const { result } = await executeSql({
     projectRef,

@@ -1,4 +1,3 @@
-import { basename } from 'path'
 import { IS_PLATFORM } from 'common'
 import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
 import Link from 'next/link'
@@ -7,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import type { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
-import type {
-  EdgeFunctionsDiffResult,
-  FileInfo,
-  FileStatus,
+import {
+  fileKey,
+  type EdgeFunctionsDiffResult,
+  type FileInfo,
+  type FileStatus,
 } from '@/hooks/branches/useEdgeFunctionsDiff'
 import { EMPTY_ARR } from '@/lib/void'
 
@@ -31,14 +31,11 @@ interface FunctionDiffProps {
   fileInfos: FileInfo[]
 }
 
-// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
-const fileKey = (fullPath: string) => basename(fullPath)
-
 // Helper to get the status color for file indicators
 const getStatusColor = (status: FileStatus): string => {
   switch (status) {
     case 'added':
-      return 'text-brand'
+      return 'text-primary'
     case 'removed':
       return 'text-destructive'
     case 'modified':
@@ -131,6 +128,7 @@ const FunctionDiff = ({
                   <li key={fileInfo.key} className="flex">
                     <button
                       type="button"
+                      tabIndex={0}
                       onClick={() => setActiveFileKey(fileInfo.key)}
                       className={cn(
                         'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',

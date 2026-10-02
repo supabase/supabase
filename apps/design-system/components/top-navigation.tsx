@@ -18,7 +18,7 @@ export const TopNavigation = () => {
         <div className="max-w-site w-full flex flex-row items-center gap-6 mx-auto md:px-6 px-4 justify-between">
           <div className="flex items-center gap-2">
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className="px-1 md:hidden"
               onClick={toggle}

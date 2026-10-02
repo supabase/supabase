@@ -12,7 +12,7 @@
         <ion-item>
           <ion-label>
             <p>Email</p>
-            <p>{{ store.user?.email }}</p>
+            <p>{{ email }}</p>
           </ion-label>
         </ion-item>
 
@@ -28,7 +28,7 @@
 
         <ion-item>
           <ion-input
-            type="url"
+            type="text"
             name="website"
             label="Website"
             label-placement="stacked"
@@ -48,7 +48,6 @@
 </template>
 
 <script setup lang="ts">
-import { store } from '@/store';
 import { supabase } from '@/supabase';
 import {
   IonContent,
@@ -62,12 +61,13 @@ import {
   IonItem,
   IonButton,
   IonLabel,
+  useIonRouter,
 } from '@ionic/vue';
 import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import Avatar from '../components/Avatar.vue';
 
-const router = useRouter();
+const router = useIonRouter();
+const email = ref('');
 
 const profile = ref({
   username: '',
@@ -82,6 +82,8 @@ async function getProfile() {
   try {
     const { data: { claims } } = await supabase.auth.getClaims();
     if (!claims) throw new Error('No user logged in');
+
+    email.value = (claims.email as string) ?? '';
 
     const { data, error, status } = await supabase
       .from('profiles')
@@ -138,7 +140,7 @@ async function signOut() {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    await router.push('/');
+    router.push('/', 'forward', 'replace');
   } catch (error: any) {
     toast.message = error.message;
     await toast.present();

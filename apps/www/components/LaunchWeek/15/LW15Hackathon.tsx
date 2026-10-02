@@ -32,7 +32,7 @@ const LW15Hackathon: FC = () => {
             </p>
             <p>Compete solo or in a team, submit a quick demo and win.</p>
           </div>
-          <Button type="secondary" size="medium" asChild>
+          <Button variant="secondary" size="medium" asChild>
             <Link href="/blog/lw15-hackathon">Join Hackathon</Link>
           </Button>
         </div>

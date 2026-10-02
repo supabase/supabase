@@ -42,5 +42,22 @@ export function urlRegex(
   )
 }
 
+export function normalizeRedirectUrl(url: string): string {
+  return url.trim().replace(/\s*,\s*$/, '')
+}
+
+export function parseRedirectUrls(allowList?: string | null): string[] {
+  if (!allowList) return []
+
+  return Array.from(
+    new Set(
+      allowList
+        .split(',')
+        .map(normalizeRedirectUrl)
+        .filter((url) => url.length > 0)
+    )
+  )
+}
+
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 export const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'

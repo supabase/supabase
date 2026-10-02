@@ -1,16 +1,10 @@
 import type { Metadata } from 'next'
 
-import { preloadStatData, preloadSurveyData } from './lib/preload-survey-data'
 import { RegisterContent } from './register/RegisterContent'
 import StateOfStartups2026Content from './StateOfStartups2026Content'
 
 // TODO (alan): set this to true once results are available.
 const SHOW_RESULTS = true
-
-// Re-aggregate survey RPCs on the server every hour. Keeps the chart payload
-// inlined into the static HTML without forcing a full deploy whenever the
-// upstream survey data changes.
-export const revalidate = 3600
 
 export const metadata: Metadata = SHOW_RESULTS
   ? {
@@ -45,14 +39,9 @@ export const metadata: Metadata = SHOW_RESULTS
       },
     }
 
-export default async function StateOfStartupsPage() {
+export default function StateOfStartupsPage() {
   if (!SHOW_RESULTS) return <RegisterContent />
-
-  const [preloadedData, preloadedStats] = await Promise.all([
-    preloadSurveyData(),
-    preloadStatData(),
-  ])
-  return (
-    <StateOfStartups2026Content preloadedData={preloadedData} preloadedStats={preloadedStats} />
-  )
+  // All survey numbers are embedded statically (data/surveys/
+  // state-of-startups-data.json). No live database, no build-time fetch.
+  return <StateOfStartups2026Content />
 }

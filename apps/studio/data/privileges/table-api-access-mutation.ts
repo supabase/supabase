@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import type { ConnectionVars } from '@/data/common.types'
 import { lintKeys } from '@/data/lint/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import {
   API_ACCESS_ROLES,
   API_PRIVILEGE_TYPES,

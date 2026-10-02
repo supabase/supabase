@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { ProductMenuGroup } from './ProductMenu.types'
 import { ProductMenuShortcuts } from './ProductMenuShortcuts'
@@ -54,10 +54,6 @@ const menu: ProductMenuGroup[] = [
 ]
 
 describe('ProductMenuShortcuts', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('registers visible enabled internal shortcut items', () => {
     render(<ProductMenuShortcuts menu={menu} />)
 

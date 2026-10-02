@@ -107,7 +107,7 @@ const FunctionsVisual: React.FC<Props> = ({ className }) => {
       >
         <span className="mr-2">$</span>
         supabase
-        <span className="ml-1 text-brand inline-block">
+        <span className="ml-1 text-primary inline-block">
           functions <span ref={typerRef}>{firstString}</span>
         </span>
       </div>
