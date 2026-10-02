@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Import production-relevant upstream services into this single repository.
-# Git subtree preserves each service history while keeping service boundaries.
+# Git subtree keeps each service in an isolated directory; --squash records a reproducible source snapshot.
 # Usage: bash scripts/import-supabase-core.sh
 # Or:    bash scripts/import-supabase-core.sh --service realtime
 
@@ -40,7 +40,16 @@ import_one() {
     return
   fi
   echo "IMPORT: $name -> $path"
-  git subtree add --prefix="$path" "$url" master --squash
+  # Upstream repositories do not share one default branch name.
+  # Resolve the repository's advertised HEAD instead of assuming master/main.
+  local ref
+  ref="$(git ls-remote --symref "$url" HEAD 2>/dev/null | awk '/^ref:/ {sub("refs/heads/","",$2); print $2; exit}')"
+  if [[ -z "$ref" ]]; then
+    echo "ERROR: could not determine default branch for $name ($url)" >&2
+    exit 1
+  fi
+  echo "IMPORT: $name default branch -> $ref"
+  git subtree add --prefix="$path" "$url" "$ref" --squash
 }
 
 if [[ "${1:-}" == "--service" ]]; then
