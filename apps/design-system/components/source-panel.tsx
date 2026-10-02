@@ -46,9 +46,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
               </svg>
               <span className="hidden font-bold sm:inline-block">shadcn/ui</span>
             </div>
-            <span className="text-foreground-light text-sm">
-              This component is based on ui.shadcn
-            </span>
+            <span className="text-foreground-light text-sm">This component uses shadcn/ui</span>
           </div>
         )
       }
