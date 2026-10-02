@@ -96,3 +96,7 @@ url = ""
 
 [functions.search-embeddings]
 verify_jwt = false
+
+
+[functions.storage-node-gateway]
+verify_jwt = false
