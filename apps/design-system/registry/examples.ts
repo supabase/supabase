@@ -881,12 +881,6 @@ export const examples: Registry = [
     files: ['example/separator-demo.tsx'],
   },
   {
-    name: 'sidebar-collapsible-icon',
-    type: 'components:example',
-    registryDependencies: ['sidebar'],
-    files: ['example/sidebar-collapsible-icon.tsx'],
-  },
-  {
     name: 'sidebar-demo',
     type: 'components:example',
     registryDependencies: ['sidebar'],

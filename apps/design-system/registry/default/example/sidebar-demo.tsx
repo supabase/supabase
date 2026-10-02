@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarRail,
   SidebarTrigger,
 } from 'ui'
 
@@ -28,9 +29,9 @@ const menuButtonClassName =
 
 export default function SidebarDemo() {
   return (
-    <div className="h-[480px] w-full overflow-hidden">
-      <SidebarProvider className="h-full min-h-0!">
-        <Sidebar className="[&_[data-sidebar=sidebar]]:bg-transparent">
+    <div className="h-[480px] w-full">
+      <SidebarProvider defaultOpen className="h-full min-h-0!">
+        <Sidebar collapsible="icon">
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -41,6 +42,7 @@ export default function SidebarDemo() {
                       <SidebarMenuButton
                         asChild
                         isActive={item.title === 'Home'}
+                        tooltip={item.title}
                         className={menuButtonClassName}
                       >
                         <a href={item.url}>
@@ -54,6 +56,7 @@ export default function SidebarDemo() {
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
+          <SidebarRail />
         </Sidebar>
         <SidebarInset className="min-h-0">
           <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
