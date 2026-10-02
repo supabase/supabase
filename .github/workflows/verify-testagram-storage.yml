@@ -136,8 +136,9 @@ jobs:
 
           migration_files="$(find core/services/storage/migrations/tenant -maxdepth 1 -type f -name '*.sql' ! -name '.*' | wc -l | tr -d ' ')"
           migration_rows="$(docker exec storage-postgres psql -U postgres -d postgres -At -v ON_ERROR_STOP=1 -c 'select count(*) from storage.migrations;' | tr -d '[:space:]')"
-          echo "Storage tenant migration files: $migration_files; ledger rows: $migration_rows; expected ledger rows: $((migration_files + 1)) (postgres-migrations bootstrap)"
-          test "$migration_rows" -eq "$((migration_files + 1))"
+          expected_migration_rows="$((migration_files + 1))"
+          printf 'Storage tenant migration files: <%s>; ledger rows: <%s>; expected ledger rows: <%s> (postgres-migrations bootstrap)\n' "$migration_files" "$migration_rows" "$expected_migration_rows"
+          test "$migration_rows" = "$expected_migration_rows"
 
           export JWT_SECRET="01234567890123456789012345678901"
           service_jwt="$(JWT_SECRET="$JWT_SECRET" node --input-type=module -e "import {createHmac,randomUUID} from 'node:crypto'; const b=v=>Buffer.from(JSON.stringify(v)).toString('base64url'); const n=Math.floor(Date.now()/1000); const h=b({alg:'HS256',typ:'JWT'}); const p=b({role:'service_role',sub:randomUUID(),aud:'authenticated',iat:n,exp:n+3600}); const u=h+'.'+p; process.stdout.write(u+'.'+createHmac('sha256',process.env.JWT_SECRET).update(u).digest('base64url'))")"
