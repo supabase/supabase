@@ -1,6 +1,17 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM } from 'common'
-import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
+import {
+  capitalize,
+  chunk,
+  compact,
+  debounce,
+  find,
+  findIndex,
+  has,
+  isObject,
+  uniq,
+  uniqBy,
+} from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
@@ -91,6 +102,15 @@ export function createStorageExplorerState({
   const state = proxy({
     projectRef,
     connectionString,
+    itemSearchString: '',
+    debouncedSearchString: '',
+    setItemSearchString: (value: string) => {
+      state.itemSearchString = value
+      state.setDebouncedSearchString(value)
+    },
+    setDebouncedSearchString: debounce((value: string) => {
+      state.debouncedSearchString = value
+    }, 500),
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
     selectedBucket: bucket as Bucket,
@@ -400,7 +420,7 @@ export function createStorageExplorerState({
 
     refetchAllOpenedFolders: async () => {
       const paths = state.openedFolders.map((folder) => folder.name)
-      await state.fetchFoldersByPath({ paths })
+      await state.fetchFoldersByPath({ paths, searchString: state.itemSearchString })
     },
 
     refreshAll: async () => {
@@ -777,6 +797,7 @@ export function createStorageExplorerState({
         folderId: folder.id,
         folderName: folder.name,
         index: columnIndex,
+        searchString: state.itemSearchString,
       })
     },
 
