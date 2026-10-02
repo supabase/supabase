@@ -104,7 +104,11 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
           {hasMinimumFee && (
             <InvoiceTotalRow
               title={invoice.minimum_fee.prorated ? 'Minimum Fee (prorated)' : 'Minimum Fee'}
-              tooltip="If your costs for the billing cycle are below the minimum fee, you're charged the difference."
+              tooltip={
+                invoice.minimum_fee.floorPrice === null
+                  ? "If your costs for the billing cycle are below the minimum fee, you're charged the difference."
+                  : `Your plan has a minimum fee of ${formatCurrency(invoice.minimum_fee.floorPrice)} per billing cycle. If your costs are below it, you're charged the difference.`
+              }
               amount={invoice.minimum_fee.expectedAtEndOfCycle}
             />
           )}
