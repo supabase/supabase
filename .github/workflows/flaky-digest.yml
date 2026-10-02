@@ -1,0 +1,261 @@
+name: Flaky Test Digest
+
+# Drains whatever flaky-*.jsonl artifacts tests.yml's "Run tests" step has uploaded, groups
+# occurrences by file:line, sends at most one Slack message per workday and writes the same
+# digest to the run's step summary (so OSS contributors without Slack access can see and pick
+# up flaky tests too), then deletes the artifacts it just reported on. Should catch up on a
+# failed run.
+#
+# Each artifact's flaky-events.jsonl mixes two kinds of event: genuine test flakes (a failure
+# that passed on retry) and wait-margin diagnostics (a wait that timed out or ate most of its
+# budget, from test_helper.exs's WAIT_MARGIN_REPORT) - reported as their own section below.
+
+on:
+  schedule:
+    - cron: "0 8 * * 1-5" # 08:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  actions: write # write (not just read) is required to delete artifacts
+
+jobs:
+  collect:
+    name: Collect and report flaky events
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      has_events: ${{ steps.aggregate.outputs.has_events }}
+      blocks: ${{ steps.aggregate.outputs.blocks }}
+    steps:
+      - name: List and download outstanding flaky artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p flaky-artifacts
+          : > matched_artifacts.jsonl
+
+          # Repo-wide `.../actions/artifacts` returns every artifact ever
+          # created, including coverage-partition-* (which this workflow
+          # never deletes) - so paginating that directly would still mean
+          # scanning up to 90 days of history every run, deletion or not.
+          # Scope to runs instead: list tests.yml runs from a generous fixed
+          # lookback then each run's own small list.
+          SINCE="$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)"
+          RUN_IDS="$(gh run list --repo "${{ github.repository }}" --workflow=tests.yml \
+            --created ">=${SINCE}" -L 1000 --json databaseId --jq '.[].databaseId')"
+
+          for RUN_ID in $RUN_IDS; do
+            gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/artifacts?per_page=100" \
+              | jq -c '.artifacts[] | select(.expired == false) | select(.name | startswith("flaky-"))' \
+              >> matched_artifacts.jsonl
+          done
+
+          jq -r '.id' matched_artifacts.jsonl > artifact_ids.txt || true
+
+          if [ ! -s matched_artifacts.jsonl ]; then
+            echo "No outstanding flaky artifacts"
+            exit 0
+          fi
+
+          while read -r ARTIFACT_ID; do
+            curl -sSL -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${ARTIFACT_ID}/zip" \
+              -o "flaky-artifacts/${ARTIFACT_ID}.zip"
+            unzip -o -q "flaky-artifacts/${ARTIFACT_ID}.zip" -d "flaky-artifacts/${ARTIFACT_ID}"
+          done < artifact_ids.txt
+
+      - name: Aggregate by file:line and build reports
+        id: aggregate
+        run: |
+          set -euo pipefail
+
+          find flaky-artifacts -name 'flaky-events.jsonl' -exec cat {} + > all_events.jsonl 2>/dev/null || true
+
+          if [ ! -s all_events.jsonl ]; then
+            echo "has_events=false" >> "$GITHUB_OUTPUT"
+            echo "No flaky test or wait margin occurrences to report today." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Builds one Slack section block, and in parallel one markdown section for the run's
+          # step summary, per distinct file:line - instead of one giant string - so a snippet
+          # truncation can only ever clip that one entry, never the whole message/summary, and
+          # so markdown isn't nested inside an outer code fence that disables it.
+          #
+          # postgres/partition/job_url may be absent from previous runs or `job_url` failures
+          # - every use below tolerates that via `// ""`/`// empty`.
+          AGGREGATED_JSON="$(jq -sc --argjson max_entries 10 --argjson max_margin_entries 10 --argjson max_job_links 5 '
+            def truncate_at_line($budget):
+              if (. | length) <= $budget then .
+              else
+                .[0:$budget] as $cut
+                | ($cut | rindex("\n")) as $idx
+                | (if $idx then $cut[0:$idx] else $cut end) + "\n… (truncated)"
+              end;
+
+            # Distinct Postgres versions a group occurred on (partition does not matter)
+            def pg_versions:
+              map(.postgres // "")
+              | map(select(. != ""))
+              | unique;
+
+            # Up to $n most recent distinct job URLs to find patterns
+            def recent_job_urls($n):
+              map(select((.job_url // "") != ""))
+              | sort_by(.run_id | tonumber? // 0)
+              | reverse
+              | reduce .[] as $e ([]; if any(.[]; . == $e.job_url) then . else . + [$e.job_url] end)
+              | .[0:$n];
+
+            def slack_links($urls):
+              if ($urls | length) > 0 then
+                "Logs: " + ($urls | to_entries | map("<\(.value)|\(.key + 1)>") | join(" ")) + " · "
+              else
+                ""
+              end;
+
+            def md_links($urls):
+              if ($urls | length) > 0 then
+                "Logs: " + ($urls | to_entries | map("[\(.key + 1)](\(.value))") | join(" ")) + " · "
+              else
+                ""
+              end;
+
+            # Renders one group as both a Slack section and a step-summary markdown block,
+            # shared by the flaky-test and wait-margin sections below - only the headline text
+            # (and whether a test name is shown) differs between kinds.
+            def render_group:
+              . as $g
+              | (if ($g.envs | length) > 0 then "  _(seen on: \($g.envs | join(", ")))_" else "" end) as $envs_suffix
+              | (if $g.kind == "wait_margin" then "" else "\($g.test)\n" end) as $test_line
+              | (if $g.kind == "wait_margin" then "" else "`\($g.test)`\n" end) as $md_test_line
+              | ("*\($g.key)* — \($g.count)x\($envs_suffix)\n\(slack_links($g.job_urls))\($test_line)```\n\n```") as $overhead
+              | ([50, 2900 - ($overhead | length)] | max) as $budget
+              | ($g.snippet | truncate_at_line($budget)) as $snippet
+              | {
+                  slack: {
+                    type: "section",
+                    text: { type: "mrkdwn",
+                      text: "*\($g.key)* — \($g.count)x\($envs_suffix)\n\(slack_links($g.job_urls))\($test_line)```\n\($snippet)\n```" }
+                  },
+                  md: "**\($g.key)** — \($g.count)x\($envs_suffix)\n\(md_links($g.job_urls))\($md_test_line)```\n\($snippet)\n```"
+                };
+
+            # `wait_margin` events (see WAIT_MARGIN_REPORT in test_helper.exs) are a different
+            # phenomenon from a test flake - a wait close to or over its budget, possibly on a
+            # fully green run - so they group separately by file:line too, and get their own
+            # section further down rather than mixing into the flaky-test counts.
+            (group_by(if (.kind // "assertion") == "wait_margin" then "__margin__:" + (.file // "") + ":" + (.line|tostring)
+                       elif (.file // "") != "" then (.file + ":" + (.line|tostring))
+                       else .test end)
+             | map(
+                 . as $events
+                 | ($events[0]) as $first
+                 | ($events | sort_by(.run_id | tonumber? // 0) | last) as $latest
+                 | if ($first.kind // "assertion") == "wait_margin" then
+                     {
+                       key: ($first.file + ":" + ($first.line|tostring)),
+                       kind: "wait_margin",
+                       count: ($events | length),
+                       snippet: ($latest.snippet // ""),
+                       job_urls: ($events | recent_job_urls($max_job_links)),
+                       envs: ($events | pg_versions)
+                     }
+                   else
+                     {
+                       key: (if ($first.file // "") != "" then ($first.file + ":" + ($first.line|tostring)) else $first.test end),
+                       kind: "assertion",
+                       count: ($events | length),
+                       test: $first.test,
+                       snippet: ($latest.snippet // ""),
+                       job_urls: ($events | recent_job_urls($max_job_links)),
+                       envs: ($events | pg_versions)
+                     }
+                   end
+               )
+            ) as $groups
+            | ($groups | map(select(.kind != "wait_margin")) | sort_by(-.count)) as $flaky_groups
+            | ($groups | map(select(.kind == "wait_margin")) | sort_by(-.count)) as $margin_groups
+            | ($flaky_groups | length) as $total_flaky_groups
+            | ($flaky_groups | map(.count) | add // 0) as $total_occurrences
+            | ($flaky_groups[0:$max_entries]) as $flaky_shown
+            | ($margin_groups[0:$max_margin_entries]) as $margin_shown
+            | ($flaky_shown | map(render_group)) as $flaky_rendered
+            | ($margin_shown | map(render_group)) as $margin_rendered
+            | {
+                blocks: (
+                  (if $total_flaky_groups > 0 then
+                    [
+                      { type: "section", text: { type: "mrkdwn",
+                          text: "*\($total_flaky_groups) distinct flaky test(s), \($total_occurrences) total occurrence(s) today*" } }
+                    ]
+                    + ($flaky_rendered | map(.slack))
+                    + (if $total_flaky_groups > $max_entries then
+                        [{ type: "context", elements: [ { type: "mrkdwn",
+                            text: "…and \($total_flaky_groups - $max_entries) more distinct flaky test location(s) today." } ] }]
+                      else [] end)
+                  else [] end)
+                  + (if ($margin_groups | length) > 0 then
+                      (if $total_flaky_groups > 0 then [{ type: "divider" }] else [] end)
+                      + [
+                          { type: "section", text: { type: "mrkdwn",
+                              text: "*⏱️ \($margin_groups | length) wait(s) close to or over budget, \($margin_groups | map(.count) | add) occurrence(s) today*" } }
+                        ]
+                      + ($margin_rendered | map(.slack))
+                      + (if ($margin_groups | length) > $max_margin_entries then
+                          [{ type: "context", elements: [ { type: "mrkdwn",
+                              text: "…and \(($margin_groups | length) - $max_margin_entries) more wait margin location(s) today." } ] }]
+                        else [] end)
+                    else [] end)
+                ),
+                summary: (
+                  (if $total_flaky_groups > 0 then
+                    "**\($total_flaky_groups) distinct flaky test(s), \($total_occurrences) total occurrence(s) today**\n\n"
+                    + ($flaky_rendered | map(.md) | join("\n\n---\n\n"))
+                    + (if $total_flaky_groups > $max_entries then
+                        "\n\n…and \($total_flaky_groups - $max_entries) more distinct flaky test location(s) today."
+                      else "" end)
+                  else "No flaky test occurrences today." end)
+                  + (if ($margin_groups | length) > 0 then
+                      "\n\n---\n\n**⏱️ \($margin_groups | length) wait(s) close to or over budget, \($margin_groups | map(.count) | add) occurrence(s) today**\n\n"
+                      + ($margin_rendered | map(.md) | join("\n\n---\n\n"))
+                      + (if ($margin_groups | length) > $max_margin_entries then
+                          "\n\n…and \(($margin_groups | length) - $max_margin_entries) more wait margin location(s) today."
+                        else "" end)
+                    else "" end)
+                )
+              }
+          ' all_events.jsonl)"
+
+          echo "has_events=true" >> "$GITHUB_OUTPUT"
+          echo "blocks=$(echo "$AGGREGATED_JSON" | jq -c '.blocks')" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Daily flaky test & wait margin digest"
+            echo
+            echo "$AGGREGATED_JSON" | jq -r '.summary'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Delete reported-on artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [ -s artifact_ids.txt ] || exit 0
+
+          while read -r ARTIFACT_ID; do
+            gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/${ARTIFACT_ID}" || true
+          done < artifact_ids.txt
+
+  notify:
+    name: Notify Slack
+    needs: collect
+    if: ${{ needs.collect.outputs.has_events == 'true' }}
+    uses: ./.github/workflows/slack-notify.yml
+    with:
+      title: "Daily flaky test & wait margin digest"
+      status: "partial"
+      details_blocks: ${{ needs.collect.outputs.blocks }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_WEBHOOK }}

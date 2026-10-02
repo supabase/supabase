@@ -1,0 +1,120 @@
+-- Composite use cases: multiple filters combined with AND semantics, mixing
+-- every PostgREST-parity operator and negations. realtime.is_visible_through_filters requires
+-- ALL filters in the array to hold, so these exercise complex real-world
+-- subscriptions like "title matches X AND status not in Y AND score >= Z".
+
+create table public.articles(
+    id int primary key,
+    title text,
+    status text,
+    score int,
+    nickname text
+);
+
+-- A row equivalent to:
+--   articles(id=42, title='Hello World', status='active', score=10, nickname=null)
+-- expressed as a realtime.wal_column[] payload reused across the checks below.
+
+-- ── Subscription path: the trigger accepts and normalizes a complex composite ──
+insert into realtime.subscription(subscription_id, entity, claims, filters)
+values (
+    '00000000-0000-0000-0000-0000000000aa',
+    'public.articles',
+    jsonb_build_object('role', 'authenticated', 'email', 'a@example.com', 'sub', '00000000-0000-0000-0000-0000000000aa'),
+    array[
+        ('title',  'ilike', '%world%',          false),  -- matches
+        ('status', 'in',    '{pending,closed}', true),    -- NOT IN  → matches (active not listed)
+        ('score',  'gte',   '5',                false),   -- 10 >= 5 → matches
+        ('nickname','is',   'null',             false),   -- null    → matches
+        ('id',     'isdistinct', '0',           false)    -- 42 distinct from 0 → matches
+    ]::realtime.user_defined_filter[]
+);
+select filters from realtime.subscription where subscription_id = '00000000-0000-0000-0000-0000000000aa';
+
+-- ── Evaluation: all-AND composites over the example row ──
+
+-- 1. Every operator satisfied (ilike + NOT IN + gte + is null + isdistinct) → visible
+select realtime.is_visible_through_filters(
+    array[
+        ('id',      'int4', null, '42'::jsonb,            true,  true),
+        ('title',   'text', null, '"Hello World"'::jsonb, false, true),
+        ('status',  'text', null, '"active"'::jsonb,      false, true),
+        ('score',   'int4', null, '10'::jsonb,            false, true),
+        ('nickname','text', null, 'null'::jsonb,          false, true)
+    ]::realtime.wal_column[],
+    array[
+        ('title',   'ilike',      '%world%',          false),
+        ('status',  'in',         '{pending,closed}', true),
+        ('score',   'gte',        '5',                false),
+        ('nickname','is',         'null',             false),
+        ('id',      'isdistinct', '0',                false)
+    ]::realtime.user_defined_filter[]
+);
+
+-- 2. Same composite but one negation flips a clause (NOT ilike on a matching
+--    pattern) → the AND fails → not visible
+select realtime.is_visible_through_filters(
+    array[
+        ('title',   'text', null, '"Hello World"'::jsonb, false, true),
+        ('status',  'text', null, '"active"'::jsonb,      false, true)
+    ]::realtime.wal_column[],
+    array[
+        ('title',   'ilike', '%world%', true),   -- NOT ilike, but it matches → clause false
+        ('status',  'eq',    'active',  false)
+    ]::realtime.user_defined_filter[]
+);
+
+-- 3. Regex composite with negation: imatch matches AND NOT match a different
+--    pattern AND neq → visible
+select realtime.is_visible_through_filters(
+    array[
+        ('title',  'text', null, '"Hello World"'::jsonb, false, true),
+        ('status', 'text', null, '"active"'::jsonb,      false, true)
+    ]::realtime.wal_column[],
+    array[
+        ('title',  'imatch', '^hello',   false),  -- case-insensitive match
+        ('title',  'match',  '^Goodbye', true),   -- NOT match → true (no match)
+        ('status', 'neq',    'archived', false)
+    ]::realtime.user_defined_filter[]
+);
+
+-- 4. Negated isdistinct used as "IS NOT DISTINCT FROM" inside a composite:
+--    score IS NOT DISTINCT FROM 10 (true) AND id between via gt/lt → visible
+select realtime.is_visible_through_filters(
+    array[
+        ('id',    'int4', null, '42'::jsonb, true,  true),
+        ('score', 'int4', null, '10'::jsonb, false, true)
+    ]::realtime.wal_column[],
+    array[
+        ('score', 'isdistinct', '10', true),   -- IS NOT DISTINCT FROM 10 → true
+        ('id',    'gt',         '40', false),
+        ('id',    'lt',         '100', false)
+    ]::realtime.user_defined_filter[]
+);
+
+-- 5. `is not null` inside a composite where the column is NULL → clause false → not visible
+select realtime.is_visible_through_filters(
+    array[
+        ('title',   'text', null, '"Hello World"'::jsonb, false, true),
+        ('nickname','text', null, 'null'::jsonb,          false, true)
+    ]::realtime.wal_column[],
+    array[
+        ('title',   'like', 'Hello%', false),
+        ('nickname','is',   'null',   true)   -- IS NOT NULL, but nickname is null → false
+    ]::realtime.user_defined_filter[]
+);
+
+-- 6. Fail-closed within a composite: one clause references a column missing from
+--    the payload → whole composite not visible even though the others match
+select realtime.is_visible_through_filters(
+    array[
+        ('title', 'text', null, '"Hello World"'::jsonb, false, true)
+    ]::realtime.wal_column[],
+    array[
+        ('title',  'like', 'Hello%', false),  -- matches
+        ('status', 'eq',   'active', false)   -- status absent from payload → fail closed
+    ]::realtime.user_defined_filter[]
+);
+
+truncate table realtime.subscription;
+drop table public.articles;

@@ -1,0 +1,54 @@
+# fly.toml app configuration file generated for realtime-prod on 2023-08-08T09:07:09-07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "realtime-prod"
+primary_region = "sea"
+kill_signal = "SIGTERM"
+kill_timeout = "5s"
+
+[experimental]
+  auto_rollback = true
+
+[deploy]
+  release_command = "/app/bin/migrate"
+  strategy = "rolling"
+
+[env]
+  DNS_NODES = "realtime-prod.internal"
+  ERL_CRASH_DUMP = "/data/erl_crash.dump"
+  ERL_CRASH_DUMP_SECONDS = "30"
+
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 4000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 100000
+    soft_limit = 100000
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "30s"
+
+  [[services.http_checks]]
+    interval = "10s"
+    timeout = "2s"
+    grace_period = "5s"
+    method = "get"
+    path = "/"
+    protocol = "http"
+    tls_skip_verify = false

@@ -1,0 +1,105 @@
+name: Packaging
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: packaging-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker_x86_build:
+    if: github.event_name == 'pull_request'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 120
+    env:
+      arch: amd64
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@ef12d5b165b596e3aa44ea8198d8fde563eab402 # v1.4.0
+
+      - uses: useblacksmith/build-push-action@30c71162f16ea2c27c3e21523255d209b8b538c1 # v2
+        with:
+          context: .
+          push: false
+          platforms: linux/${{ env.arch }}
+
+  docker_arm_build:
+    if: github.event_name == 'pull_request'
+    runs-on: blacksmith-4vcpu-ubuntu-2404-arm
+    timeout-minutes: 120
+    env:
+      arch: arm64
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@ef12d5b165b596e3aa44ea8198d8fde563eab402 # v1.4.0
+
+      - uses: useblacksmith/build-push-action@30c71162f16ea2c27c3e21523255d209b8b538c1 # v2
+        with:
+          context: .
+          push: false
+          platforms: linux/${{ env.arch }}
+
+  nix_build:
+    name: Nix portable build
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: supabase/slim-services
+          ref: 4a4073b1e57f4422d203863decc94baa76640cf7
+          path: slim-services
+          submodules: false
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: slim-services/sources/realtime
+          submodules: false
+
+      - uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
+
+      - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-realtime-flake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('slim-services/flake.nix', 'slim-services/flake.lock', 'slim-services/nix/**', 'slim-services/services/realtime/**', 'slim-services/scripts/**', 'slim-services/sources/realtime/mix.lock', 'slim-services/sources/realtime/Dockerfile') }}
+          restore-prefixes-first-match: nix-realtime-flake-${{ runner.os }}-${{ runner.arch }}-
+          gc-max-store-size-linux: 8G
+
+      - name: Build portable artifact
+        id: artifact
+        env:
+          TARGET_OS: linux
+          ARCH: amd64
+          ARTIFACT_ARCHIVE_ON_BUILD: '0'
+        run: |
+          set -euo pipefail
+          version="$(sed -nE 's/^[[:space:]]*version: "([0-9]+\.[0-9]+\.[0-9]+)".*/\1/p' slim-services/sources/realtime/mix.exs | head -n1)"
+          [ -n "$version" ] || { echo "::error::could not read version from mix.exs" >&2; exit 1; }
+          SOURCE_REF="$(git -C slim-services/sources/realtime rev-parse HEAD)"
+          export SOURCE_REF
+          ./slim-services/scripts/build-artifact-from-nix.sh realtime "$version"
+          rootfs="$GITHUB_WORKSPACE/slim-services/artifacts/realtime/$version/linux-amd64/rootfs"
+          echo "rootfs=$rootfs" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke the release
+        env:
+          APP_NAME: realtime-smoke
+          DB_HOST: 127.0.0.1
+          METRICS_JWT_SECRET: realtime-metrics-secret-with-at-least-32
+          SECRET_KEY_BASE: realtimerealtimerealtimerealtimerealtimerealtimerealtimereal
+          ROOTFS: ${{ steps.artifact.outputs.rootfs }}
+        run: |
+          set -euo pipefail
+          "$ROOTFS/bin/realtime" eval 'IO.puts(:crypto.hash(:sha256, "ok") |> Base.encode16())'

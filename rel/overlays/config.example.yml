@@ -1,0 +1,14 @@
+endpoint_port: 4000
+db_repo:
+  - hostname: "127.0.0.1"
+    username: "postgres"
+    password: "postgres"
+    database: "postgres"
+    pool_size: 3
+    port: 5432
+cluster:
+  - cookie: "cookie_config"
+    service: "realtime-dns"
+    application_name: "realtime"
+    polling_interval: 5000
+    # debug: false

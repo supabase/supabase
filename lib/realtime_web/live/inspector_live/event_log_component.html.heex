@@ -1,0 +1,111 @@
+<div
+  id={@id}
+  class="flex flex-col min-h-0 flex-1"
+  phx-hook="logFilter"
+  data-categories={Enum.map_join(@active_categories, ",", &to_string/1)}
+>
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 mb-2">
+    <div class="relative flex-1 min-w-[200px]">
+      <input
+        type="text"
+        data-role="search"
+        aria-label="Fuzzy search the event log"
+        placeholder="Fuzzy search events and payloads"
+        autocomplete="off"
+        class="w-full text-sm rounded-md border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 pr-24"
+      />
+      <span
+        data-role="match-count"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-gray-400 dark:text-neutral-500 pointer-events-none"
+      >
+      </span>
+    </div>
+
+    <.button variant={:secondary} type="button" phx-click={if @paused, do: "resume", else: "pause"} phx-target={@myself}>
+      <%= if @paused, do: "Resume", else: "Pause" %>
+    </.button>
+    <.badge :if={@paused and @buffered_count > 0} variant={:info} pulse>
+      <%= @buffered_count %> new
+    </.badge>
+
+    <.button variant={:secondary} type="button" phx-click="clear" phx-target={@myself}>Clear</.button>
+    <.button variant={:secondary} type="button" id={"#{@id}_export"} phx-hook="exportLog">Export</.button>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-x-2 gap-y-2 mb-3">
+    <.category_group
+      label="Channel"
+      group="channel"
+      categories={channel_categories()}
+      active_categories={@active_categories}
+      myself={@myself}
+      hint="Traffic on the websocket: what your app's users would also receive."
+    />
+    <span class="hidden sm:inline text-gray-300 dark:text-neutral-700">|</span>
+    <.category_group
+      label="Client"
+      group="client_log"
+      categories={client_log_categories()}
+      active_categories={@active_categories}
+      myself={@myself}
+      hint="The browser client's own internals: transport, worker and channel lifecycle. Local to this browser, never sent over the websocket. Off by default because it is noisy."
+    />
+  </div>
+
+  <div
+    id={"#{@id}_scroll"}
+    phx-hook="autoscroll"
+    class="overflow-y-auto flex-1 min-h-[16rem] relative rounded border border-gray-200 dark:border-neutral-700"
+  >
+    <table class="table-fixed w-full text-sm text-left text-gray-700 dark:text-neutral-300">
+      <thead class="text-xs text-gray-700 dark:text-neutral-300 uppercase bg-gray-50 dark:bg-neutral-800 sticky top-0 z-10">
+        <tr>
+          <th scope="col" class="w-24 py-2 px-3">Category</th>
+          <th scope="col" class="w-24 py-2 px-3">Time</th>
+          <th scope="col" class="w-64 py-2 px-3">Event</th>
+          <th scope="col" class="py-2 px-3">Payload</th>
+        </tr>
+      </thead>
+      <tbody id={"#{@id}_rows"} phx-update="stream">
+        <tr
+          :for={{dom_id, entry} <- @streams.events}
+          id={dom_id}
+          data-category={entry.category}
+          data-event={entry.event}
+          data-label={event_label(entry.event)}
+          data-payload={Jason.encode!(entry.payload)}
+          data-received-at={DateTime.to_iso8601(entry.received_at)}
+          data-latency-ms={entry.latency_ms}
+          class="border-b border-gray-100 dark:border-neutral-800 align-top hidden"
+        >
+          <td class="py-2 px-3">
+            <.badge variant={category_variant(entry.category)}><%= entry.category %></.badge>
+          </td>
+          <td
+            class="py-2 px-3 font-mono text-xs whitespace-nowrap text-gray-500 dark:text-neutral-400"
+            title={DateTime.to_iso8601(entry.received_at)}
+          >
+            <%= time_label(entry.received_at) %>
+          </td>
+          <td class="py-2 px-3 text-xs break-words" title={entry.event} data-role="event-label">
+            <%= event_label(entry.event) %>
+          </td>
+          <td class="py-2 px-3 min-w-0">
+            <details>
+              <summary class="cursor-pointer font-mono text-xs truncate text-gray-600 dark:text-neutral-400">
+                <%= payload_summary(entry.payload) %>
+              </summary>
+              <pre class="text-xs mt-1 whitespace-pre-wrap break-all rounded bg-gray-50 dark:bg-neutral-800/60 p-2"><%= Jason.encode!(entry.payload, pretty: true) %></pre>
+            </details>
+            <div :if={entry.latency_ms} class="text-xs text-gray-500 dark:text-neutral-400 mt-1">
+              Latency: <%= Float.round(entry.latency_ms * 1.0, 1) %> ms
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p :if={@event_count == 0} class="text-sm text-gray-500 dark:text-neutral-400 p-4">
+      Nothing yet. Connect above, then events land here as they arrive.
+    </p>
+  </div>
+</div>

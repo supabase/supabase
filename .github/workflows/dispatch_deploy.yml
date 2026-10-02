@@ -1,0 +1,52 @@
+name: Dispatch Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy (no leading v). Leave blank to let the downstream pick the latest release. Example: 2.94.1'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to deploy (no leading v).'
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  dispatch:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - name: Fetch target repo
+        id: target
+        env:
+          TARGET_REPO: ${{ secrets.DEPLOY_TARGET_REPO }}
+        run: |
+          name="${TARGET_REPO##*/}"
+          echo "::add-mask::${name}"
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.GH_APP_MANAGER_ID }}
+          private-key: ${{ secrets.GH_APP_MANAGER_PRIVATE_KEY }}
+          owner: supabase
+          repositories: ${{ steps.target.outputs.name }}
+
+      - name: Dispatch version update
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TARGET_REPO: ${{ secrets.DEPLOY_TARGET_REPO }}
+          VERSION: ${{ inputs.version }}
+          SOURCE: ${{ github.event_name == 'workflow_dispatch' && 'manual-dispatch' || 'realtime-release' }}
+        run: |
+          gh api "repos/${TARGET_REPO}/dispatches" \
+            --method POST \
+            --field event_type=realtime-release \
+            --field "client_payload[version]=${VERSION}" \
+            --field "client_payload[source]=${SOURCE}"

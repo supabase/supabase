@@ -1,0 +1,99 @@
+select 1 from pg_create_logical_replication_slot('realtime', 'wal2json', false);
+ ?column? 
+----------
+        1
+(1 row)
+
+create table public.notes(
+    id int primary key,
+    identifier uuid
+);
+alter table public.notes replica identity full;
+insert into realtime.subscription(subscription_id, entity, claims, filters)
+select
+    seed_uuid(5),
+    'public.notes',
+    jsonb_build_object(
+        'role', 'authenticated',
+        'email', 'example@example.com',
+        'sub', seed_uuid(6)::text
+    ),
+    array[(
+        'identifier',
+        'in',
+        '{ace23052-568e-4951-acc8-fd510ec667f9,7057e8c3-c05f-4944-b9d9-05f8c45393d1}',
+        false
+    )::realtime.user_defined_filter];
+select clear_wal();
+ clear_wal 
+-----------
+ 
+(1 row)
+
+insert into public.notes(id, identifier) values (1, 'ace23052-568e-4951-acc8-fd510ec667f9');
+delete from public.notes;
+select subscription_id, filters from realtime.subscription;
+           subscription_id            |                                                filters                                                
+--------------------------------------+-------------------------------------------------------------------------------------------------------
+ 3fa85983-bc94-5c16-8bc7-157b8152c678 | {"(identifier,in,\"{ace23052-568e-4951-acc8-fd510ec667f9,7057e8c3-c05f-4944-b9d9-05f8c45393d1}\",f)"}
+(1 row)
+
+select
+    rec,
+    is_rls_enabled,
+    subscription_ids,
+    errors
+from
+   walrus;
+                             rec                              | is_rls_enabled |            subscription_ids            | errors 
+--------------------------------------------------------------+----------------+----------------------------------------+--------
+ {                                                           +| f              | {3fa85983-bc94-5c16-8bc7-157b8152c678} | {}
+     "type": "INSERT",                                       +|                |                                        | 
+     "table": "notes",                                       +|                |                                        | 
+     "record": {                                             +|                |                                        | 
+         "id": 1,                                            +|                |                                        | 
+         "identifier": "ace23052-568e-4951-acc8-fd510ec667f9"+|                |                                        | 
+     },                                                      +|                |                                        | 
+     "schema": "public",                                     +|                |                                        | 
+     "columns": [                                            +|                |                                        | 
+         {                                                   +|                |                                        | 
+             "name": "id",                                   +|                |                                        | 
+             "type": "int4"                                  +|                |                                        | 
+         },                                                  +|                |                                        | 
+         {                                                   +|                |                                        | 
+             "name": "identifier",                           +|                |                                        | 
+             "type": "uuid"                                  +|                |                                        | 
+         }                                                   +|                |                                        | 
+     ],                                                      +|                |                                        | 
+     "commit_timestamp": "2000-01-01T08:01:01.000Z"          +|                |                                        | 
+ }                                                            |                |                                        | 
+ {                                                           +| f              | {3fa85983-bc94-5c16-8bc7-157b8152c678} | {}
+     "type": "DELETE",                                       +|                |                                        | 
+     "table": "notes",                                       +|                |                                        | 
+     "schema": "public",                                     +|                |                                        | 
+     "columns": [                                            +|                |                                        | 
+         {                                                   +|                |                                        | 
+             "name": "id",                                   +|                |                                        | 
+             "type": "int4"                                  +|                |                                        | 
+         },                                                  +|                |                                        | 
+         {                                                   +|                |                                        | 
+             "name": "identifier",                           +|                |                                        | 
+             "type": "uuid"                                  +|                |                                        | 
+         }                                                   +|                |                                        | 
+     ],                                                      +|                |                                        | 
+     "old_record": {                                         +|                |                                        | 
+         "id": 1,                                            +|                |                                        | 
+         "identifier": "ace23052-568e-4951-acc8-fd510ec667f9"+|                |                                        | 
+     },                                                      +|                |                                        | 
+     "commit_timestamp": "2000-01-01T08:01:01.000Z"          +|                |                                        | 
+ }                                                            |                |                                        | 
+(2 rows)
+
+drop table public.notes;
+select pg_drop_replication_slot('realtime');
+ pg_drop_replication_slot 
+--------------------------
+ 
+(1 row)
+
+truncate table realtime.subscription;

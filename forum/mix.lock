@@ -1,0 +1,10 @@
+%{
+  "ex_hash_ring": {:hex, :ex_hash_ring, "6.0.4", "bef9d2d796afbbe25ab5b5a7ed746e06b99c76604f558113c273466d52fa6d6b", [:mix], [], "hexpm", "89adabf31f7d3dfaa36802ce598ce918e9b5b33bae8909ac1a4d052e1e567d18"},
+  "file_system": {:hex, :file_system, "1.1.1", "31864f4685b0148f25bd3fbef2b1228457c0c89024ad67f7a81a3ffbc0bbad3a", [:mix], [], "hexpm", "7a15ff97dfe526aeefb090a7a9d3d03aa907e100e262a0f8f7746b78f8f87a5d"},
+  "ham": {:hex, :ham, "0.3.2", "02ae195f49970ef667faf9d01bc454fb80909a83d6c775bcac724ca567aeb7b3", [:mix], [], "hexpm", "b71cc684c0e5a3d32b5f94b186770551509e93a9ae44ca1c1a313700f2f6a69a"},
+  "mimic": {:hex, :mimic, "2.4.2", "7ae12cb77be8dc359588c2b8e47afb4dd985a9b63221a914485f2a393d5a907f", [:mix], [{:ham, "~> 0.3", [hex: :ham, repo: "hexpm", optional: false]}], "hexpm", "9a557e18666c4af124132004098e004b383682e3ea44ae66b740b99c7d66e8d4"},
+  "mix_test_watch": {:hex, :mix_test_watch, "1.4.0", "d88bcc4fbe3198871266e9d2f00cd8ae350938efbb11d3fa1da091586345adbb", [:mix], [{:file_system, "~> 0.2 or ~> 1.0", [hex: :file_system, repo: "hexpm", optional: false]}], "hexpm", "2b4693e17c8ead2ef56d4f48a0329891e8c2d0d73752c0f09272a2b17dc38d1b"},
+  "snabbkaffe": {:hex, :snabbkaffe, "1.0.10", "9be2f54f61fc6862391b666b2b5b76c3fa53598e2989a17cef1b48cf347a8a63", [:rebar3], [], "hexpm", "70a98df36ae756908d55b5770891d443d63c903833e3e87d544036e13d4fac26"},
+  "snabbkaffex": {:hex, :snabbkaffex, "0.1.0", "141ac3e2c15ad48058a5076b75a032c47eaa880f0b25e95ec8754511e7979635", [:mix], [{:snabbkaffe, "~> 1.0", [hex: :snabbkaffe, repo: "hexpm", optional: false]}], "hexpm", "690700b398656531a10b08ebdeb35b331856def6dabe3bfe39a648b85bc5904e"},
+  "telemetry": {:hex, :telemetry, "1.3.0", "fedebbae410d715cf8e7062c96a1ef32ec22e764197f70cda73d82778d61e7a2", [:rebar3], [], "hexpm", "7015fc8919dbe63764f4b4b87a95b7c0996bd539e0d499be6ec9d7f3875b79e6"},
+}

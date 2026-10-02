@@ -1,0 +1,18 @@
+services:
+  realtime_db:
+    image: ${POSTGRES_IMAGE:-supabase/postgres:17.6.1.166}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ./dev/postgres/za-permit-supabase-admin.sh:/docker-entrypoint-initdb.d/za-permit-supabase-admin.sh
+      - ./dev/postgres/zb-supabase-schema.sql:/docker-entrypoint-initdb.d/zb-supabase-schema.sql
+      - ./dev/postgres/zc-template1-orioledb.sql:/docker-entrypoint-initdb.d/zc-template1-orioledb.sql
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
