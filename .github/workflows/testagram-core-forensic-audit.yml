@@ -1,9 +1,6 @@
 name: Testagram Core Forensic Audit
 
 on:
-  push:
-    branches:
-      - testagram/core-platform-foundation
   pull_request:
     branches:
       - testagram/core-platform-foundation
