@@ -5,7 +5,8 @@ import { apiWrapper } from '@/lib/api/apiWrapper'
 import { POSTGRES_PORT } from '@/lib/api/self-hosted/constants'
 import { PROJECT_DB_HOST, PROJECT_REST_URL } from '@/lib/constants/api'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+const route = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+export default route
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
