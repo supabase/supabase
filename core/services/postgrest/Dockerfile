@@ -12,9 +12,9 @@ COPY static static
 COPY docs docs
 COPY test test
 RUN cabal update \
-    && cabal build --only-dependencies postgrest \
-    && cabal build postgrest \
-    && install -Dm755 "$(cabal list-bin postgrest)" /out/postgrest
+    && cabal build --only-dependencies exe:postgrest \
+    && cabal build exe:postgrest \
+    && install -Dm755 "$(cabal list-bin exe:postgrest)" /out/postgrest
 
 FROM debian:bookworm-slim AS runtime
 RUN apt-get update \
