@@ -1,0 +1,2 @@
+worker boot error: Uncaught SyntaxError: The requested module './node_modules/express/index.js' does not provide an export named 'default'
+    at file:///src/index.ts:1:8

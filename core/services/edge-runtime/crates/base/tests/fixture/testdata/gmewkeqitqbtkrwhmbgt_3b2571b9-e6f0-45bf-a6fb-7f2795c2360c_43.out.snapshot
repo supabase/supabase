@@ -1,0 +1,2 @@
+worker boot error: Uncaught SyntaxError: Identifier 'data' has already been declared
+    at file:///tmp/user_fn_gmewkeqitqbtkrwhmbgt_3b2571b9-e6f0-45bf-a6fb-7f2795c2360c_43/supabase/functions/hello-world/index.ts:13:9

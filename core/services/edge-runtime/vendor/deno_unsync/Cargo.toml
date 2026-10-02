@@ -1,0 +1,25 @@
+[package]
+name = "deno_unsync"
+version = "0.4.2"
+edition = "2021"
+authors = ["the Deno authors"]
+license = "MIT"
+repository = "https://github.com/denoland/deno_unsync"
+description = "A collection of adapters to make working with Tokio single-threaded runtimes easier"
+readme = "README.md"
+
+[features]
+default = ["tokio"]
+tokio = ["dep:tokio", "dep:tokio-util"]
+
+[dependencies]
+futures = "0.3.21"
+parking_lot = "0.12.3"
+tokio = { version = "1", features = ["rt"], optional = true }
+tokio-util = { version = "0.7", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["io-util", "macros", "rt", "sync", "time"] }
+
+[lib]
+name = "deno_unsync"

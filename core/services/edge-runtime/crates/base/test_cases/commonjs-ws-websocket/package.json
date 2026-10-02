@@ -1,0 +1,7 @@
+{
+  "workspaces": [],
+  "type": "commonjs",
+  "dependencies": {
+    "ws": "^8.18.1"
+  }
+}

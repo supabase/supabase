@@ -1,0 +1,26 @@
+{
+  "name": "edge-runtime-load-testing",
+  "version": "1.0.0",
+  "private": "true",
+  "description": "A collection of load & performance testing scripts",
+  "scripts": {
+    "clean": "rm -rf node_modules",
+    "setup": "scripts/setup.sh",
+    "postinstall": "npm run build",
+    "build": "vite build"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/k6": "^0.49.1",
+    "@types/node": "^20.11.28",
+    "rollup-plugin-copy": "^3.5.0",
+    "typescript": "^5.4.2",
+    "vite": "^8.0.16"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1"
+  }
+}

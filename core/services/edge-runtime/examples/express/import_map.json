@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "oak": "https://deno.land/x/oak@v11.1.0/mod.ts",
+    "shared_cors": "./_shared/cors.ts",
+    "express": "npm:express@4.18.2"
+  }
+}

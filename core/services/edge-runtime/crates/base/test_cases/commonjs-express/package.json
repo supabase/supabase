@@ -1,0 +1,8 @@
+{
+  "workspaces": [],
+  "type": "commonjs",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

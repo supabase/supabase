@@ -1,0 +1,35 @@
+# Copyright 2018-2025 the Deno authors. All rights reserved. MIT license.
+
+[package]
+name = "deno_telemetry"
+version = "0.17.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+description = "Telemetry for Deno"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+base_rt = { version = "0.1.0", path = "../../crates/base_rt" }
+
+async-trait.workspace = true
+deno_core.workspace = true
+deno_tls.workspace = true
+http-body-util.workspace = true
+hyper.workspace = true
+hyper-rustls.workspace = true
+hyper-util.workspace = true
+log.workspace = true
+once_cell.workspace = true
+opentelemetry.workspace = true
+opentelemetry-http.workspace = true
+opentelemetry-otlp.workspace = true
+opentelemetry-semantic-conventions.workspace = true
+opentelemetry_sdk.workspace = true
+pin-project.workspace = true
+serde.workspace = true
+tokio.workspace = true

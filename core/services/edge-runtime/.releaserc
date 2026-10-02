@@ -1,0 +1,17 @@
+{
+  "branches": [
+    "main",
+    {
+      "name": "develop",
+      "prerelease": true
+    },
+    {
+      "name": "v1",
+      "range": "1.68.x"
+    }
+  ],
+  "plugins": [
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/github"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "name": "@workspace/say",
+  "version": "0.0.1",
+  "exports": "./mod.ts"
+}

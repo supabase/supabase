@@ -1,0 +1,127 @@
+name: Integration Postgres
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/integration-postgres.yml'
+      - 'tests/integration/postgres/**'
+  workflow_run:
+    workflows: ['Release']
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'supabase/edge-runtime image tag to test against (e.g. v1.2.3). Defaults to the latest release.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: >-
+      github.event_name == 'pull_request' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    name: test (${{ matrix.db.name }})
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    strategy:
+      fail-fast: false
+      matrix:
+        db:
+          - name: postgres
+            image: postgres:17
+            initdb_args: ''
+          - name: orioledb
+            image: orioledb/orioledb:latest-pg17
+            initdb_args: '--locale=C'
+
+    services:
+      postgres:
+        image: ${{ matrix.db.image }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_INITDB_ARGS: ${{ matrix.db.initdb_args }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4
+
+      - name: Init OrioleDB extension
+        if: matrix.db.name == 'orioledb'
+        run: |
+          psql postgres://postgres:postgres@localhost:5432/postgres \
+            -c "CREATE EXTENSION IF NOT EXISTS orioledb;" \
+            -c "ALTER DATABASE postgres SET default_table_access_method = 'orioledb';"
+
+      - name: Resolve image tag
+        id: tag
+        run: |
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            echo "value=${{ inputs.image_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            tag=$(gh release view --json tagName -q .tagName)
+            echo "value=${tag}" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract edge-runtime binary from image
+        run: |
+          docker create --name er supabase/edge-runtime:${{ steps.tag.outputs.value }}
+          docker cp er:/usr/local/bin/edge-runtime ./edge-runtime
+          docker rm er
+          chmod +x ./edge-runtime
+
+      - name: Start edge-runtime
+        run: |
+          DATABASE_URL=${{ env.DATABASE_URL }} \
+          ./edge-runtime start \
+            --main-service tests/integration/postgres \
+            --port 9998 \
+            --quiet &
+          echo $! > edge-runtime.pid
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+
+      - name: Wait for healthy
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:9998/_internal/health > /dev/null 2>&1; then
+              echo "edge-runtime is healthy"
+              exit 0
+            fi
+            sleep 0.5
+          done
+          echo "edge-runtime did not become healthy within 30s"
+          exit 1
+
+      - name: Run tests
+        run: |
+          result=$(curl -s http://localhost:9998/)
+          echo "$result" | jq -r '
+            .results[] |
+            if .passed then
+              "[PASS] \(.name) (\(.durationMs)ms)"
+            else
+              "[FAIL] \(.name) (\(.durationMs)ms)\n       \(.error)"
+            end
+          '
+          echo ""
+          echo "$result" | jq -r '"total: \(.passed + .failed) | passed: \(.passed) | failed: \(.failed) | \(.totalMs)ms"'
+          echo "$result" | jq -e '.ok == true' > /dev/null
+
+      - name: Stop edge-runtime
+        if: always()
+        run: kill $(cat edge-runtime.pid) || true

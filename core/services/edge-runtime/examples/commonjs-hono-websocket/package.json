@@ -1,0 +1,9 @@
+{
+  "workspaces": [],
+  "type": "commonjs",
+  "dependencies": {
+    "@hono/node-server": "^1.13.8",
+    "@hono/node-ws": "^1.1.0",
+    "hono": "^4.7.2"
+  }
+}

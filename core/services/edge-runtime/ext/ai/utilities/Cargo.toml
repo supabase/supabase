@@ -1,0 +1,13 @@
+[package]
+name = "ext_ai_v8_utilities"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno_core.workspace = true

@@ -1,0 +1,120 @@
+[package]
+name = "base"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+deno.workspace = true
+deno_core.workspace = true
+
+deno_broadcast_channel.workspace = true
+deno_cache.workspace = true
+deno_canvas.workspace = true
+deno_config.workspace = true
+deno_console.workspace = true
+deno_webgpu.workspace = true
+
+base_mem_check.workspace = true
+base_rt.workspace = true
+cpu_timer.workspace = true
+deno_facade.workspace = true
+fs.workspace = true
+http_utils.workspace = true
+
+ext_ai.workspace = true
+ext_env.workspace = true
+ext_event_worker.workspace = true
+ext_node.workspace = true
+ext_os.workspace = true
+ext_runtime.workspace = true
+ext_workers.workspace = true
+
+anyhow.workspace = true
+async-trait.workspace = true
+bytes.workspace = true
+ctor.workspace = true
+either.workspace = true
+enum-as-inner.workspace = true
+eszip.workspace = true
+fastwebsockets.workspace = true
+futures-util.workspace = true
+http.workspace = true
+http-body-util.workspace = true
+http_v02.workspace = true
+httparse.workspace = true
+hyper = { workspace = true, features = ["full"] }
+hyper-util = { workspace = true, features = ["server-graceful"] }
+hyper_v014 = { workspace = true, features = ["full", "backports"] }
+import_map.workspace = true
+libc.workspace = true
+log.workspace = true
+monch.workspace = true
+notify.workspace = true
+num-traits.workspace = true
+once_cell.workspace = true
+opentelemetry.workspace = true
+opentelemetry-otlp.workspace = true
+opentelemetry_sdk.workspace = true
+pin-project.workspace = true
+reqwest_v011.workspace = true
+rustls-pemfile.workspace = true
+scopeguard.workspace = true
+serde = { workspace = true, features = ["derive"] }
+tempfile.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util = { workspace = true, features = ["rt"] }
+tracing.workspace = true
+tracing-subscriber = { workspace = true, optional = true, features = ["env-filter", "tracing-log"] }
+url.workspace = true
+urlencoding.workspace = true
+uuid.workspace = true
+
+arc-swap = "1.7"
+async-scoped = { version = "0.9", features = ["use-tokio"] }
+cooked-waker = "5"
+flume = "0.11.0"
+strum = { version = "0.25", features = ["derive"] }
+tls-listener = { version = "0.10", features = ["rustls"] }
+tokio-rustls = "0.25.0"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { workspace = true, features = ["knownfolders", "mswsock", "objbase", "shlobj", "tlhelp32", "winbase", "winerror", "winsock2"] }
+
+[dev-dependencies]
+eszip_trait.workspace = true
+serial_test.workspace = true
+tokio-util = { workspace = true, features = ["rt", "compat"] }
+tracing-subscriber = { workspace = true, features = ["env-filter", "tracing-log"] }
+
+async-tungstenite = { version = "0.25.0", default-features = false }
+diff = "0.1"
+tungstenite = { version = "0.21.0", default-features = false, features = ["handshake"] }
+
+[build-dependencies]
+deno.workspace = true
+deno_core.workspace = true
+
+deno_broadcast_channel.workspace = true
+deno_cache.workspace = true
+deno_canvas.workspace = true
+deno_console.workspace = true
+deno_webgpu.workspace = true
+
+ext_ai.workspace = true
+ext_env.workspace = true
+ext_event_worker.workspace = true
+ext_node.workspace = true
+ext_os.workspace = true
+ext_workers.workspace = true
+ext_runtime.workspace = true
+
+deno_facade.workspace = true
+
+url.workspace = true
+
+[features]
+tracing = ["dep:tracing-subscriber"]
+termination-signal-ext = []

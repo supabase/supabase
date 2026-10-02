@@ -1,0 +1,19 @@
+[package]
+name = "cpu_timer"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+ctor.workspace = true
+futures.workspace = true
+libc.workspace = true
+log.workspace = true
+once_cell.workspace = true
+tokio.workspace = true
+
+nix = { version = "0.26.2", features = ["signal"] }
+signal-hook = "0.3.17"
+signal-hook-tokio = { version = "0.3.1", features = ["futures-v0_3"] }

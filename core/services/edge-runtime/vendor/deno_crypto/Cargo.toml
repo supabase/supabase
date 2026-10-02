@@ -1,0 +1,47 @@
+# Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
+
+[package]
+name = "deno_crypto"
+version = "0.196.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+description = "Web Cryptography API implementation for Deno"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+aes.workspace = true
+aes-gcm = "0.10"
+aes-kw = { version = "0.2.1", features = ["alloc"] }
+base64.workspace = true
+cbc.workspace = true
+const-oid = "0.9.0"
+ctr = "0.9.1"
+curve25519-dalek = "4.1.3"
+deno_core.workspace = true
+deno_web.workspace = true
+ed448-goldilocks = { version = "0.8.3", features = ["zeroize"] }
+elliptic-curve = { version = "0.13.1", features = ["std", "pem"] }
+num-traits = "0.2.14"
+once_cell.workspace = true
+p256 = { version = "0.13.2", features = ["ecdh"] }
+p384 = "0.13.0"
+p521 = "0.13.3"
+rand.workspace = true
+ring = { workspace = true, features = ["std"] }
+rsa.workspace = true
+sec1.workspace = true
+serde.workspace = true
+serde_bytes = "0.11"
+sha1.workspace = true
+sha2.workspace = true
+signature.workspace = true
+spki.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+x25519-dalek = "2.0.0"
