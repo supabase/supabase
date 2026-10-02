@@ -7,7 +7,12 @@ import {
   getUnifiedLogsQuery,
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
-import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
+import {
+  getFacetCountCTE as getFacetCountCTEBQ,
+  getLogsCountQuery as getLogsCountQueryBQ,
+  getUnifiedLogsQuery as getUnifiedLogsQueryBQ,
+} from './UnifiedLogs.queries.bq'
+import { safeSql } from '@/data/logs/safe-analytics-sql'
 
 const baseSearch = {
   date: [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')],
@@ -306,10 +311,9 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       for (const lvl of ['success', 'warning', 'error']) {
         expect(sql).toContain(`'${lvl}'`)
       }
-      expect(sql).toContain(`'pathname'`)
-      expect(sql).toContain('LIMIT 20')
-      // log_type + base + pathname = 3 scans
-      expect(sql.match(/FROM logs/g)?.length ?? 0).toBeLessThanOrEqual(4)
+      expect(sql).not.toContain(`'pathname' AS facet`)
+      expect(sql).not.toContain(`facet = 'pathname'`)
+      expect(sql.match(/FROM logs/g)?.length).toBe(2)
     })
 
     it('honours an active log_type filter in the total count scan', () => {
@@ -397,6 +401,19 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toMatch(/END\) IN \('200'\)/)
       expect(sql).toContain('GROUP BY value')
       expect(sql).toContain('LIMIT 20')
+    })
+
+    it('scopes pathname options to other filters and searches while excluding selected paths', () => {
+      const sql = getFacetCountQuery({
+        search: withFilters('method:eq:POST', 'pathname:eq:/selected'),
+        facet: 'pathname',
+        facetSearch: '/api',
+      })
+
+      expect(sql).toContain("log_attributes['request.method']")
+      expect(sql).toContain("IN ('POST')")
+      expect(sql).toContain("LIKE '%/api%'")
+      expect(sql).not.toContain("LIKE '%/selected%'")
     })
   })
 
@@ -493,6 +510,29 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         `(if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method'])) IN ('GET'' OR ''1''=''1')`
       )
     })
+  })
+})
+
+describe('UnifiedLogs.queries (BigQuery facets)', () => {
+  it('omits pathname aggregation from initial sidebar counts', () => {
+    const sql = getLogsCountQueryBQ(baseSearch)
+
+    expect(sql).toContain('FROM method_count')
+    expect(sql).toContain('FROM status_count')
+    expect(sql).not.toContain('pathname_count')
+  })
+
+  it('scopes pathname options to other filters and searches while excluding selected paths', () => {
+    const sql = getFacetCountCTEBQ({
+      search: withFilters('method:eq:POST', 'pathname:eq:/selected'),
+      facet: 'pathname',
+      facetSearch: '/api',
+      cteName: safeSql`pathname_count`,
+    })
+
+    expect(sql).toContain("`method` IN ('POST')")
+    expect(sql).toContain("`pathname` LIKE '%/api%'")
+    expect(sql).not.toContain("`pathname` LIKE '%/selected%'")
   })
 })
 
