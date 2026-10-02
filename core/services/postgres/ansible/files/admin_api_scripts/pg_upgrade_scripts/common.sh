@@ -2,13 +2,9 @@
 
 # Common functions and variables used by initiate.sh and complete.sh
 
-REPORTING_PROJECT_REF="ihmaxnjpcccasmrbkpvo"
-REPORTING_CREDENTIALS_FILE="/root/upgrade-reporting-credentials"
-
-REPORTING_ANON_KEY=""
-if [ -f "$REPORTING_CREDENTIALS_FILE" ]; then
-	REPORTING_ANON_KEY=$(cat "$REPORTING_CREDENTIALS_FILE")
-fi
+# Optional Testagram-owned upgrade reporting. Disabled unless both values are supplied.
+TESTAGRAM_UPGRADE_REPORTING_URL="${TESTAGRAM_UPGRADE_REPORTING_URL:-}"
+TESTAGRAM_UPGRADE_REPORTING_KEY="${TESTAGRAM_UPGRADE_REPORTING_KEY:-}"
 
 function log {
 	echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC') $*"
@@ -144,8 +140,8 @@ function conninfo_for_db {
 function ship_logs {
 	LOG_FILE=$1
 
-	if [ -z "$REPORTING_ANON_KEY" ]; then
-		log "No reporting key found. Skipping log upload."
+	if [ -z "$TESTAGRAM_UPGRADE_REPORTING_URL" ] || [ -z "$TESTAGRAM_UPGRADE_REPORTING_KEY" ]; then
+		log "No Testagram reporting endpoint/key configured. Skipping log upload."
 		return 0
 	fi
 
@@ -163,8 +159,8 @@ function ship_logs {
 	DERIVED_REF="${HOSTNAME##*-}"
 
 	printf -v BODY '{ "ref": "%s", "step": "%s", "content": %s }' "$DERIVED_REF" "completion" "$(cat "$LOG_FILE" | jq -Rs '.')"
-	curl -sf -X POST "https://$REPORTING_PROJECT_REF.supabase.co/rest/v1/error_logs" \
-		-H "apikey: ${REPORTING_ANON_KEY}" \
+	curl -sf -X POST "$TESTAGRAM_UPGRADE_REPORTING_URL" \
+		-H "Authorization: Bearer $TESTAGRAM_UPGRADE_REPORTING_KEY" \
 		-H 'Content-type: application/json' \
 		-d "$BODY"
 }
