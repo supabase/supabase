@@ -14,6 +14,7 @@ Docker is the easiest way to get started with self-hosted Supabase. It should ta
 3. [Installing Supabase](#installing-supabase)
    - [Quick start (Linux)](#quick-start-linux)
    - [Manual installation](#manual-installation)
+   - [Deploying with Portainer](#deploying-with-portainer)
 4. [Configuring and securing Supabase](#configuring-and-securing-supabase)
 5. [Starting and stopping](#starting-and-stopping)
 6. [Accessing Supabase services](#accessing-supabase-studio-dashboard)
@@ -191,6 +192,29 @@ docker compose pull
   If you are using rootless Docker, edit `.env` and set `DOCKER_SOCKET_LOCATION` to your docker socket location. For example: `/run/user/1000/docker.sock`. Otherwise, you will see an error like `container supabase-vector exited (0)`.
 
 </Admonition>
+
+### Deploying with Portainer
+
+The official self-hosted deployment is a project directory, not just a Compose file.
+The `docker-compose.yml` file mounts configuration files and directories from the same project directory.
+
+1. Follow [Manual installation](#manual-installation) to copy the `docker/` directory from a self-hosted tag into a project directory.
+2. Keep `docker-compose.yml`, `.env`, `volumes/`, and the other files from that tag together.
+   Complete [Configuring and securing Supabase](#configuring-and-securing-supabase) before deploying the stack.
+3. In Portainer Business Edition, deploy the project from Git and enable [relative path volumes](https://docs.portainer.io/advanced/relative-paths).
+   Set the file system path where Portainer should keep the checked-out project, and set the Compose path to `docker-compose.yml`.
+4. Portainer's relative path support is only available in Business Edition.
+   If you use Community Edition or your Portainer setup cannot preserve the complete project directory and its relative paths, run the stack from that directory with Docker Compose instead:
+
+   ```sh
+   cd supabase-project
+   sh run.sh start
+   ```
+
+   Do not paste only `docker-compose.yml` into Portainer's Web editor.
+   That workflow does not include the files under `volumes/` that the official configuration mounts.
+5. After deployment, verify the service status in Portainer or with `docker compose ps` from the project directory.
+   See [Starting and stopping](#starting-and-stopping) for health checks and logs.
 
 ## Configuring and securing Supabase
 
