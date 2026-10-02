@@ -100,8 +100,6 @@ PY
   else
     git subtree add --prefix="$path" "$url" "$ref" --squash
   fi
-  rm -rf "$tmp"
-  trap - RETURN
 }
 
 if [[ "${1:-}" == "--service" ]]; then
