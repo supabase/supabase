@@ -1,0 +1,57 @@
+name: Backport
+
+on:
+  # zizmor: ignore[dangerous-triggers]
+  pull_request_target:
+    types:
+      - closed
+      - labeled
+
+permissions: {}
+
+jobs:
+  backport:
+    name: Backport
+    runs-on: ubuntu-slim
+    # It triggers only when PR is already merged on either:
+    #
+    # - The merge event itself (action != labeled) or
+    # - A label event with the right label (backport ...).
+    #
+    # The result will be that we can add the label before or after merge,
+    # but the workflow will only run once the PR had been merged.
+    if: >
+      github.event.pull_request.merged &&
+      (
+        github.event.action != 'labeled' ||
+        startsWith(github.event.label.name, 'backport')
+      )
+    steps:
+
+      # This actions creates the github token using the postgrest app secrets
+      - name: Create Github App Token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.POSTGREST_CI_APP_ID }}
+          private-key: ${{ secrets.POSTGREST_CI_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-workflows: write # required when backporting CI changes
+
+      # This is required for backport action to cherry-pick the PR
+      - name: Fetch PR ref
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          allow-unsafe-pr-checkout: true
+          ref: ${{ github.event.pull_request.head.sha }}
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: true
+
+      # Backport action that creates the PR with given settings
+      - name: Create backport PR
+        uses: korthout/backport-action@6b65649031ac6d18ffdfd0c0820e9436f3fde22b # v4.6
+        with:
+          github_token: ${{ steps.app-token.outputs.token }}
+          pull_description: 'Backport for #${pull_number}.'
+          pull_title: '[${target_branch}] ${pull_title}'

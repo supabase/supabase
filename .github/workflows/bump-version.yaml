@@ -1,0 +1,33 @@
+name: Bump version
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  bump-version:
+    name: Bump version
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Configure Git identity
+        id: configure-bot
+        uses: ./.github/actions/configure-bot
+        with:
+          client-id: ${{ vars.POSTGREST_CI_APP_ID }}
+          private-key: ${{ secrets.POSTGREST_CI_PRIVATE_KEY }}
+
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          tools: release.release.bin
+
+      - name: Push bump version commit
+        env:
+          GH_TOKEN: ${{ steps.configure-bot.outputs.token }}
+        run: postgrest-release --skip-confirmation

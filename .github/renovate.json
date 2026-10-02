@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices"
+  ],
+  "baseBranchPatterns": [
+    "main",
+    "/^v[0-9]+/"
+  ],
+  "rebaseWhen": "conflicted",
+  "pip_requirements": {
+    "enabled": false
+  },
+  "packageRules": [
+    {
+      "matchManagers": [
+        "haskell-cabal"
+      ],
+      "enabled": false
+    },
+    {
+      "matchBaseBranches": [
+        "/^v[0-9]+/"
+      ],
+      "groupName": "all dependencies"
+    }
+  ]
+}

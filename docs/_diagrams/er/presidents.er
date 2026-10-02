@@ -1,0 +1,12 @@
+# Build using: -e ortho
+
+entity {font: "FreeSans"}
+relationship {font: "FreeMono"}
+
+[Presidents]
+*id
+first_name
+last_name
++predecessor_id
+
+Presidents 1--? Presidents

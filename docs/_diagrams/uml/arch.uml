@@ -1,0 +1,96 @@
+@startuml
+
+skinparam backgroundColor transparent
+
+package "PostgREST" {
+  () HTTP as HTTPAPI
+  HTTPAPI  - [Auth]
+  [Auth] -r.> [ApiRequest]
+  [ApiRequest] -r.> [Plan]
+  [Plan] -r.> [Query]
+  [Query] - () "Connection Pool" : "\t"
+  [Plan] -u-> [Schema Cache]:uses
+  [Schema Cache] <- () Listener : reloads
+
+  () HTTP as HTTPADMIN
+  [Admin]  -r- () HTTPADMIN
+  [Config] -l- () CLI
+
+  [Config] <-r~ Listener
+
+  HTTPADMIN -[hidden]r- CLI
+  [Schema Cache] -l[hidden]- [Config]
+  [Schema Cache] -l[hidden]- [Admin]
+  [Schema Cache] -l[hidden]- CLI
+}
+
+
+database "PostgreSQL" {
+  node Authorization {
+    rectangle "Roles, GRANT, RLS"
+  }
+  node "API schema" as API {
+    rectangle "Functions, Views"
+  }
+  rectangle "Tables, extensions" as tbs
+  API -d- tbs
+
+  API -l[hidden]- Authorization
+}
+
+:user:
+hexagon Proxy
+:user: .r-> Proxy : request with JWT
+HTTPAPI <.l- Proxy
+
+hexagon ExternalAuth
+ExternalAuth -u[hidden]- Proxy
+:user: .r-> ExternalAuth : login
+:user: <.r- ExternalAuth : JWT
+
+:operator: .d-> HTTPADMIN
+:operator: .d-> CLI
+
+
+PostgreSQL <.developer : "\t"
+Listener -r.> "PostgreSQL"
+"Connection Pool" -r.> "PostgreSQL" : "\t\t"
+
+note bottom of Auth
+  Validates the JWT
+end note
+
+note bottom of ApiRequest
+  Parses the URL syntax
+end note
+
+note bottom of Plan
+  Generates internal AST
+end note
+
+note bottom of Query
+  Generates the SQL
+end note
+
+note top of Listener
+  LISTEN session
+end note
+
+url of ExternalAuth is [[../explanations/external_auth.html]]
+url of Admin is [[../references/admin_server.html#admin-server]]
+url of API is [[../explanations/schema_isolation.html]]
+url of Auth is [[../references/auth.html#authn]]
+url of ApiRequest is [[../explanations/architecture.html#api-request]]
+url of Plan is [[../explanations/architecture.html#plan]]
+url of Query is [[../explanations/architecture.html#query]]
+url of Authorization is [[../explanations/db_authz.html]]
+url of CLI is [[../references/cli.html#cli]]
+url of "Connection Pool" is [[../references/connection_pool.html]]
+url of Config is [[../references/configuration.html#configuration]]
+url of HTTPADMIN is [[../references/http_server.html]]
+url of HTTPAPI is [[../references/http_server.html]]
+url of Listener is [[../references/listener.html#listener]]
+url of Proxy is [[../explanations/nginx.html]]
+url of "Schema Cache" is [[../references/schema_cache.html#schema-cache]]
+
+@enduml

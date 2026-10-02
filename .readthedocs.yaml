@@ -1,0 +1,10 @@
+version: 2
+sphinx:
+  configuration: docs/conf.py
+python:
+   install:
+   - requirements: docs/requirements.txt
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.12"

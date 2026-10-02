@@ -1,0 +1,211 @@
+cli:
+# success: valid commands
+  - name: help long
+    args: ['--help']
+  - name: help short
+    args: ['-h']
+  - name: version long
+    args: ['--version']
+  - name: version short
+    args: ['-v']
+  - name: example long
+    args: ['--example']
+  - name: example short
+    args: ['-e']
+  - name: dump config
+    args: ['--dump-config']
+  - name: dump schema
+    args: ['--dump-schema']
+    use_defaultenv: true
+  - name: no config
+# failures: config files
+  - name: non-existant config file
+    expect: error
+    args: ['does_not_exist.conf']
+  - name: invalid config file
+    expect: error
+    args: ['test/io-tests/configs/invalid.yaml']
+# failures: wrong config values
+  - name: invalid server-unix-socket-mode not octal
+    expect: error
+    use_defaultenv: true
+    env:
+      PGRST_SERVER_UNIX_SOCKET_MODE: '800'
+  - name: invalid server-unix-socket-mode < 600
+    expect: error
+    use_defaultenv: true
+    env:
+      PGRST_SERVER_UNIX_SOCKET_MODE: '599'
+  - name: invalid server-unix-socket-mode > 777
+    expect: error
+    use_defaultenv: true
+    env:
+      PGRST_SERVER_UNIX_SOCKET_MODE: '778'
+  - name: invalid jwt-aud
+    expect: error
+    use_defaultenv: true
+    env:
+      PGRST_JWT_AUD: 'http://%%localhorst.invalid'
+  - name: invalid log-level
+    expect: error
+    use_defaultenv: true
+    env:
+      PGRST_LOG_LEVEL: never
+  - name: invalid db-tx-end
+    expect: error
+    use_defaultenv: true
+    env:
+      PGRST_DB_TX_END: random
+  - name: invalid openapi-server-proxy-uri
+    expect: error
+    use_defaultenv: true
+    env:
+      PGRST_OPENAPI_SERVER_PROXY_URI: 'htp:/@@localhorst.invalid'
+  - name: invalid jwt-secret not base64
+    expect: error
+    use_defaultenv: true
+    env:
+      PGRST_JWT_SECRET_IS_BASE64: 'true'
+      PGRST_JWT_SECRET: 'no base-64!'
+# success: parsing config values
+  - name: log-level=
+    expect: 'log-level = "error"'
+    use_defaultenv: true
+    env:
+      PGRST_LOG_LEVEL: ""
+  - name: log-level=crit
+    expect: 'log-level = "crit"'
+    use_defaultenv: true
+    env:
+      PGRST_LOG_LEVEL: crit
+  - name: log-level=error
+    expect: 'log-level = "error"'
+    use_defaultenv: true
+    env:
+      PGRST_LOG_LEVEL: error
+  - name: log-level=warn
+    expect: 'log-level = "warn"'
+    use_defaultenv: true
+    env:
+      PGRST_LOG_LEVEL: warn
+  - name: log-level=info
+    expect: 'log-level = "info"'
+    use_defaultenv: true
+    env:
+      PGRST_LOG_LEVEL: info
+  - name: db-tx-end=
+    expect: 'db-tx-end = "commit"'
+    use_defaultenv: true
+    env:
+      PGRST_DB_TX_END: ""
+  - name: db-tx-end=commit
+    expect: 'db-tx-end = "commit"'
+    use_defaultenv: true
+    env:
+      PGRST_DB_TX_END: commit
+  - name: db-tx-end=commit-allow-override
+    expect: 'db-tx-end = "commit-allow-override"'
+    use_defaultenv: true
+    env:
+      PGRST_DB_TX_END: commit-allow-override
+  - name: db-tx-end=rollback-allow-override
+    expect: 'db-tx-end = "rollback-allow-override"'
+    use_defaultenv: true
+    env:
+      PGRST_DB_TX_END: rollback-allow-override
+  - name: db-tx-end=rollback
+    expect: 'db-tx-end = "rollback"'
+    use_defaultenv: true
+    env:
+      PGRST_DB_TX_END: rollback
+
+roleclaims:
+  - key: '$.postgrest.a_role'
+    data:
+      postgrest:
+        a_role: postgrest_test_author
+      other: claims
+    expected_status: 200
+  - key: '$.customObject.manyRoles[1]'
+    data:
+      customObject:
+        manyRoles:
+          - other
+          - postgrest_test_author
+      other: {}
+    expected_status: 200
+  - key: '$["https://www.example.com/roles"][0].value'
+    data:
+      'https://www.example.com/roles':
+        - value: postgrest_test_author
+      other: 666
+    expected_status: 200
+  - key: '$.myDomain[3]'
+    data:
+      myDomain:
+        - other
+        - postgrest_test_author
+      other: 1.23
+    expected_status: 401
+  - key: '$.myRole'
+    data:
+      role: postgrest_test_author
+      other: true
+    expected_status: 401
+  - key: '$.realm_access.roles[?(@ == "postgrest_test_author")]'
+    data:
+      realm_access:
+        roles:
+          - other
+          - postgrest_test_author
+    expected_status: 200
+  - key: '$.realm_access.roles[?(@ != "other")]'
+    data:
+      realm_access:
+        roles:
+          - other
+          - postgrest_test_author
+    expected_status: 200
+
+jwtaudroleclaims:
+  - key: '$.aud'
+    data:
+      aud: postgrest_test_author
+    expected_status: 200
+  - key: '$.aud'
+    data:
+      aud: postgrest_test_invalid
+    expected_status: 401
+  - key: '$.aud[0]'
+    data:
+      aud: [postgrest_test_author]
+    expected_status: 200
+  - key: '$.aud[1]' # succeeds the aud claims check, but fail when hits the db
+    data:
+      aud: [postgrest_test_author, postgrest_test_invalid]
+    expected_status: 401
+
+invalidroleclaimkeys:
+  - '.role.other'
+  - '$.my_role;;domain'
+
+invalidopenapimodes:
+  - 'follow-'
+  - 'ignore-'
+  - '.#$$%&$%/'
+
+invalidjointypes:
+  - 'left!'
+  - 'right'
+  - '.#$$%&$%/'
+
+specialhostvalues:
+  - '*4'
+  - '!4'
+  - '*6'
+  - '!6'
+  - '*'
+
+restrictedschemas:
+  - 'pg_catalog'
+  - 'information_schema'

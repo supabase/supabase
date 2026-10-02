@@ -1,0 +1,23 @@
+# When updating, update GHC version in .github/workflows/build.yaml as well.
+resolver: lts-24.48 # 2026-06-30, GHC 9.10.3
+
+nix:
+  packages:
+    - libpq
+    - libpq.pg_config
+    - pkg-config
+    - zlib
+
+extra-deps:
+  - aeson-jsonpath-0.4.2.0
+  - configurator-pg-0.2.11
+  - fuzzyset-0.2.4
+  - hasql-notifications-0.2.4.0
+  - http-semantics-0.4.0
+  - http2-5.4.0
+  - warp-3.4.14
+
+allow-newer: true
+allow-newer-deps:
+  - fuzzyset
+  - hasql

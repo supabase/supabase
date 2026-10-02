@@ -1,0 +1,51 @@
+entity {font: "FreeSans"}
+relationship {font: "FreeSerif"}
+
+[Films]
+*id
++director_id
+title
+year
+rating
+language
+
+[Directors]
+*id
+first_name
+last_name
+
+[Actors]
+*id
+first_name
+last_name
+
+[Roles]
+*+film_id
+*+actor_id
+character
+
+[Competitions]
+*id
+name
+year
+
+[Nominations]
+*+competition_id
+*+film_id
+rank
+
+[Technical_Specs]
+*+film_id
+runtime
+camera
+sound
+
+Roles *--1 Actors
+Roles *--1 Films
+
+Nominations *--1 Competitions
+Nominations *--1 Films
+
+Films *--1 Directors
+
+Films 1--1 Technical_Specs

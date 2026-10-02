@@ -1,0 +1,15 @@
+entity {font: "FreeSans"}
+relationship {font: "FreeMono"}
+
+[Box_Office]
+*bo_date
+*+film_id
+gross_revenue
+
+[Films]
+*id
++director_id
+title
+`...`
+
+Box_Office +--1 Films

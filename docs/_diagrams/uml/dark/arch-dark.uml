@@ -1,0 +1,3 @@
+@startuml
+!include ../arch.uml
+@enduml

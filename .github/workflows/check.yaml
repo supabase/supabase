@@ -1,0 +1,60 @@
+name: Check
+
+on:
+  workflow_call:
+    secrets:
+      CACHIX_AUTH_TOKEN:
+        required: false
+  pull_request:
+    branches:
+      - main
+      - v[0-9]+
+
+permissions: {}
+
+concurrency:
+  # Terminate all previous runs of the same workflow for pull requests
+  group: style-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lint-style:
+    name: Lint & Style
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          tools: hsie.bin treefmtNix.wrapper
+      - name: Run treefmt
+        run: treefmt --ci
+      - name: Checking consistency of import aliases in Haskell code
+        run: hsie check-aliases src/library src/executable
+
+  commit:
+    if: github.event_name != 'push'  # we don't run this on a push, a failure on push disrupts the release workflow
+    name: Commit
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 100  # fetch history (last 100 commits) instead of default shallow clone history, this is deemed enough for a PR history
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          tools: gitTools.commitCheck.bin
+      - name: Run commitlint (check locally with `nix-shell --run postgrest-commitlint`)
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: |
+          # Fetch target branch explicitly
+          git fetch origin "$GITHUB_BASE_REF"
+
+          # Run commitlint
+          postgrest-commitlint --from origin/"$GITHUB_BASE_REF" --to HEAD

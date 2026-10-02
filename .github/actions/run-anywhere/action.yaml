@@ -1,0 +1,37 @@
+name: Run anywhere
+
+description: Runs the same code either in a VM or on the bare machine
+
+inputs:
+  vm:
+    description: Which VM to run on.
+  envs:
+    description: List of relevant environment variables, which might need to be copied into the VM.
+  prepare:
+    description: Code to run in a prepare step, e.g. installing dependencies.
+  run:
+    description: Code to run as the main action.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - if: ${{ inputs.vm == 'freebsd' }}
+      uses: vmactions/freebsd-vm@a2f9a41fa97f6848b8c3b791087dfcdaa5b473ff # v1.5.8
+      with:
+        envs: ${{ inputs.envs }}
+        prepare: ${{ inputs.prepare }}
+        # Work around https://github.com/vmactions/freebsd-vm/issues/59
+        run: |
+          pw user add -n action -m
+          su action -c '${{ inputs.run }}'
+    - if: ${{ inputs.vm == '' }}
+      name: Prepare
+      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+      # zizmor: ignore[template-injection]
+      run: ${{ inputs.prepare }}
+    - if: ${{ inputs.vm == '' }}
+      name: Run
+      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+      # zizmor: ignore[template-injection]
+      run: ${{ inputs.run }}
