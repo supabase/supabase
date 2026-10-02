@@ -2,6 +2,7 @@
 @import './code-block.css';
 @import './reference.css';
 @import './loading-beam.css';
+@import './scroll-fade.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';
