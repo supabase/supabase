@@ -3319,11 +3319,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres/serverless-drivers',
-    destination: '/docs/guides/database/connecting-to-postgres',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
     destination: '/docs/guides/troubleshooting/http-api-issues',
   },
