@@ -25,6 +25,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ForeignTableSecurityWarning } from './ForeignTableSecurityWarning'
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
@@ -324,6 +325,7 @@ export const CreateWrapperSheet = ({
               <Separator />
               <FormSection header={<FormSectionLabel>Data target</FormSectionLabel>}>
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                  <ForeignTableSecurityWarning />
                   <FormField
                     control={form.control}
                     name="mode"
