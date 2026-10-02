@@ -105,14 +105,14 @@ Always wrap the sidebar and its trigger in `SidebarProvider`.
 
 ### Width
 
-Set width with CSS variables on the provider (also used for layout spacing):
+Override desktop width with `--sidebar-width` on the provider (also used for
+layout spacing):
 
 ```tsx
 <SidebarProvider
   style={
     {
       '--sidebar-width': '20rem',
-      '--sidebar-width-mobile': '20rem',
     } as React.CSSProperties
   }
 >
@@ -120,13 +120,10 @@ Set width with CSS variables on the provider (also used for layout spacing):
 </SidebarProvider>
 ```
 
-Defaults live as `SIDEBAR_WIDTH` / `SIDEBAR_WIDTH_MOBILE` in
-`packages/ui/src/components/shadcn/ui/sidebar.tsx`.
-
-### Keyboard shortcut
-
-Default toggle is `⌘B` / `Ctrl+B` (`SIDEBAR_KEYBOARD_SHORTCUT` in the same
-file).
+Defaults live as `SIDEBAR_WIDTH` / `SIDEBAR_WIDTH_ICON` in
+`packages/ui/src/components/shadcn/ui/sidebar.tsx`. On mobile, the sheet sets
+`--sidebar-width` from the hard-coded `SIDEBAR_WIDTH_MOBILE` constant, so there
+is no separate CSS variable to override mobile width today.
 
 ### Persisted state
 
