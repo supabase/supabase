@@ -1,0 +1,46 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    name: Publish docs
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version-file: '.nvmrc'
+
+      - run: |
+          npm clean-install
+          npm run docs:export
+
+      - name: Generate Swagger UI
+        uses: Legion2/swagger-ui-action@eff65dc3f193f0a749872be82f74baa35be0797d # v1.3.0
+        with:
+          output: docs
+          spec-file: openapi.json
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs
+          force_orphan: true
+          commit_message: 'docs: update'

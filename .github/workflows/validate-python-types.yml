@@ -1,0 +1,71 @@
+name: Validate Python Type Generation
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  validate-python-types:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          pip install pydantic mypy
+
+      - name: Start test database
+        working-directory: test/db
+        run: |
+          docker compose up -d --wait
+
+      - name: Wait for database to be ready
+        run: |
+          # Install PostgreSQL client for health check
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for database..."
+            sleep 1
+          done
+          echo "Database is ready!"
+
+      - name: Generate Python types
+        id: generate-types
+        run: |
+          node --loader ts-node/esm scripts/generate-python-types-test.ts > generated_types.py
+          echo "Generated Python types (first 30 lines):"
+          head -30 generated_types.py
+
+      - name: Validate Python types runtime
+        run: |
+          python -c "import generated_types; print('✓ Generated Python types are valid and can be imported')"
+
+      - name: Validate Python types with mypy
+        run: |
+          mypy generated_types.py --strict
+
+      - name: Cleanup
+        if: always()
+        working-directory: test/db
+        run: docker compose down

@@ -1,0 +1,107 @@
+name: Canary Deploy
+
+permissions:
+  contents: read
+  pull-requests: read
+  packages: write
+  id-token: write
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'Dockerfile'
+
+jobs:
+  build-canary:
+    # Only run if PR has the 'deploy-canary' label, is on the correct repository, and targets master branch
+    if: |
+      github.repository == 'supabase/postgres-meta' &&
+      github.event.pull_request.base.ref == 'master' &&
+      contains(github.event.pull_request.labels.*.name, 'deploy-canary')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    outputs:
+      canary-tag: ${{ steps.meta.outputs.tags }}
+      pr-number: ${{ github.event.pull_request.number }}
+    steps:
+      # Checkout fork code - safe because no secrets are available for building
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # Log PR author for auditing
+      - name: Log PR author
+        run: |
+          echo "Canary deploy triggered by: ${{ github.event.pull_request.user.login }}"
+          echo "PR #${{ github.event.pull_request.number }} from fork: ${{ github.event.pull_request.head.repo.full_name }}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies and build
+        run: |
+          npm clean-install
+          npm run build
+
+      # Generate canary tag
+      - id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: |
+            supabase/postgres-meta
+            public.ecr.aws/supabase/postgres-meta
+            ghcr.io/supabase/postgres-meta
+          tags: |
+            type=raw,value=canary-pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+            type=raw,value=canary-pr-${{ github.event.pull_request.number }}
+
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+        with:
+          platforms: amd64,arm64
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      - name: Login to DockerHub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: public.ecr.aws
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push canary image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.title=postgres-meta-canary
+            org.opencontainers.image.description=Canary build for PR #${{ github.event.pull_request.number }}
+            org.opencontainers.image.source=${{ github.event.pull_request.head.repo.html_url }}
+            org.opencontainers.image.revision=${{ github.event.pull_request.head.sha }}
+            canary.pr.number=${{ github.event.pull_request.number }}
+            canary.pr.author=${{ github.event.pull_request.user.login }}
