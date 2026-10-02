@@ -162,7 +162,10 @@ jobs:
           unauthenticated="$(curl -sS -o /tmp/storage-unauthenticated.txt -w '%{http_code}' http://127.0.0.1:5000/object/ci-bucket/hello.txt)"
           echo "Unauthenticated existing-object status: $unauthenticated"
           test "$unauthenticated" != "200"
-          ! cmp /tmp/storage-payload.txt /tmp/storage-unauthenticated.txt
+          if cmp -s /tmp/storage-payload.txt /tmp/storage-unauthenticated.txt; then
+            echo "::error::Unauthenticated request returned the protected object"
+            exit 1
+          fi
 
           curl -fsS http://127.0.0.1:5000/object/ci-bucket/hello.txt             -H "Authorization: Bearer $service_jwt" >/tmp/storage-download.txt
           cmp /tmp/storage-payload.txt /tmp/storage-download.txt
