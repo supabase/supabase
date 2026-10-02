@@ -1,6 +1,10 @@
 name: Import Testagram Core Services
 
 on:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
   push:
     branches:
       - testagram/core-platform-foundation
