@@ -419,15 +419,21 @@ export function createStorageExplorerState({
     },
 
     refetchAllOpenedFolders: async () => {
-      if (state.itemSearchString) {
-        const paths = state.openedFolders.map((folder) => folder.name)
-        await state.fetchFoldersByPath({ paths: paths.slice(0, -1) })
-        await state.fetchFoldersByPath({
-          paths: [paths[paths.length - 1]],
+      const paths = state.openedFolders.map((folder) => folder.name)
+
+      if (state.itemSearchString && paths.length === 0) {
+        await state.fetchFoldersByPath({ paths, searchString: state.itemSearchString })
+      } else if (state.itemSearchString) {
+        await state.fetchFoldersByPath({ paths })
+        // Reapply the filter to the current column only.
+        await state.fetchFolderContents({
+          bucketId: state.selectedBucket.id,
+          folderId: state.openedFolders[paths.length - 1].id,
+          folderName: paths[paths.length - 1],
+          index: paths.length - 1,
           searchString: state.itemSearchString,
         })
       } else {
-        const paths = state.openedFolders.map((folder) => folder.name)
         await state.fetchFoldersByPath({ paths })
       }
     },
