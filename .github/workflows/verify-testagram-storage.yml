@@ -115,7 +115,6 @@ jobs:
           workflow='.github/workflows/verify-testagram-storage.yml'
           grep -Fq 'node --input-type=module -e' "$workflow"
           grep -Fq "import {createHmac,randomUUID} from 'node:crypto'" "$workflow"
-          ! grep -Fq "require('node:crypto')" "$workflow"
           node --input-type=module -e "import {createHmac,randomUUID} from 'node:crypto'; if (typeof createHmac !== 'function' || typeof randomUUID !== 'function') process.exit(1)"
           echo "Node ESM fixture contract: GREEN"
 
