@@ -1,0 +1,246 @@
+- - qiName: authors_only
+    qiSchema: public
+  - tableColumns: {}
+    tableDeletable: true
+    tableDescription: null
+    tableInsertable: true
+    tableIsView: false
+    tableName: authors_only
+    tablePKCols: []
+    tableSchema: public
+    tableUpdatable: true
+
+- - qiName: cats
+    qiSchema: public
+  - tableColumns:
+      id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: id
+        colNominalType: uuid
+        colNullable: false
+        colType: uuid
+      name:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: name
+        colNominalType: text
+        colNullable: true
+        colType: text
+    tableDeletable: true
+    tableDescription: null
+    tableInsertable: true
+    tableIsView: false
+    tableName: cats
+    tablePKCols:
+    - id
+    tableSchema: public
+    tableUpdatable: true
+
+- - qiName: items_w_isolation_level
+    qiSchema: public
+  - tableColumns:
+      id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: id
+        colNominalType: integer
+        colNullable: true
+        colType: integer
+      isolation_level:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: isolation_level
+        colNominalType: text
+        colNullable: true
+        colType: text
+    tableDeletable: true
+    tableDescription: null
+    tableInsertable: true
+    tableIsView: true
+    tableName: items_w_isolation_level
+    tablePKCols: []
+    tableSchema: public
+    tableUpdatable: true
+
+- - qiName: directors
+    qiSchema: public
+  - tableColumns:
+      id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: id
+        colNominalType: integer
+        colNullable: false
+        colType: integer
+      name:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: name
+        colNominalType: text
+        colNullable: true
+        colType: text
+    tableDeletable: true
+    tableDescription: null
+    tableInsertable: true
+    tableIsView: false
+    tableName: directors
+    tablePKCols:
+    - id
+    tableSchema: public
+    tableUpdatable: true
+
+- - qiName: projects
+    qiSchema: public
+  - tableColumns: {}
+    tableDeletable: true
+    tableDescription: null
+    tableInsertable: true
+    tableIsView: false
+    tableName: projects
+    tablePKCols: []
+    tableSchema: public
+    tableUpdatable: true
+
+- - qiName: infinite_recursion
+    qiSchema: public
+  - tableColumns: {}
+    tableDeletable: false
+    tableDescription: null
+    tableInsertable: false
+    tableIsView: true
+    tableName: infinite_recursion
+    tablePKCols: []
+    tableSchema: public
+    tableUpdatable: false
+
+- - qiName: awards
+    qiSchema: public
+  - tableColumns:
+      director_id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: director_id
+        colNominalType: integer
+        colNullable: true
+        colType: integer
+      film_id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: film_id
+        colNominalType: integer
+        colNullable: true
+        colType: integer
+      id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: id
+        colNominalType: integer
+        colNullable: false
+        colType: integer
+      name:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: name
+        colNominalType: text
+        colNullable: true
+        colType: text
+      year:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: year
+        colNominalType: integer
+        colNullable: true
+        colType: integer
+    tableDeletable: true
+    tableDescription: null
+    tableInsertable: true
+    tableIsView: false
+    tableName: awards
+    tablePKCols:
+    - id
+    tableSchema: public
+    tableUpdatable: true
+
+- - qiName: films
+    qiSchema: public
+  - tableColumns:
+      director_id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: director_id
+        colNominalType: integer
+        colNullable: true
+        colType: integer
+      id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: id
+        colNominalType: integer
+        colNullable: false
+        colType: integer
+      title:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: title
+        colNominalType: text
+        colNullable: true
+        colType: text
+    tableDeletable: true
+    tableDescription: null
+    tableInsertable: true
+    tableIsView: false
+    tableName: films
+    tablePKCols:
+    - id
+    tableSchema: public
+    tableUpdatable: true
+
+- - qiName: items
+    qiSchema: public
+  - tableColumns:
+      id:
+        colDefault: null
+        colDescription: null
+        colEnum: []
+        colMaxLen: null
+        colName: id
+        colNominalType: integer
+        colNullable: true
+        colType: integer
+    tableDeletable: true
+    tableDescription: null
+    tableInsertable: true
+    tableIsView: false
+    tableName: items
+    tablePKCols: []
+    tableSchema: public
+    tableUpdatable: true

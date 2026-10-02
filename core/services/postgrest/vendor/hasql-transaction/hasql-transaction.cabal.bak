@@ -1,0 +1,66 @@
+common base
+  default-language: Haskell2010
+  default-extensions:
+    ApplicativeDo
+    BangPatterns
+    BlockArguments
+    ConstraintKinds
+    DataKinds
+    DefaultSignatures
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveTraversable
+    DerivingVia
+    EmptyDataDecls
+    FlexibleContexts
+    FlexibleInstances
+    FunctionalDependencies
+    GADTs
+    GeneralizedNewtypeDeriving
+    ImportQualifiedPost
+    LambdaCase
+    LiberalTypeSynonyms
+    MultiParamTypeClasses
+    MultiWayIf
+    NoImplicitPrelude
+    NoMonomorphismRestriction
+    OverloadedStrings
+    PatternGuards
+    QuasiQuotes
+    RankNTypes
+    RecordWildCards
+    RoleAnnotations
+    ScopedTypeVariables
+    StandaloneDeriving
+    StrictData
+    TupleSections
+    TypeFamilies
+    TypeOperators
+
+common test
+  import: base
+  ghc-options:
+    -threaded
+    -with-rtsopts=-N
+
+test-suite conflicts-test
+  import: test
+  type: exitcode-stdio-1.0
+  hs-source-dirs: conflicts-test
+  main-is: Main.hs
+  other-modules:
+    Main.Statements
+    Main.Transactions
+
+  ghc-options:
+    -O2
+    -threaded
+    -with-rtsopts=-N
+
+  build-depends:
+    async >=2.1 && <3,
+    hasql >=1.9,
+    hasql-transaction,
+    rerebase >=1.11 && <2,

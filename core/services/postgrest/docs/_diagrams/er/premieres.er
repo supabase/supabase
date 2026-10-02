@@ -1,0 +1,16 @@
+entity {font: "FreeSans"}
+relationship {font: "FreeMono"}
+
+[Premieres]
+*id
+location
+date
++film_id
+
+[Films]
+*id
++director_id
+title
+`...`
+
+Premieres *--1 Films

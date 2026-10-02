@@ -1,0 +1,14 @@
+# https://fourmolu.github.io/config
+function-arrows: leading
+haddock-style: single-line
+if-style: hanging
+import-export-style: leading
+import-grouping: by-scope-then-qualified
+in-style: left-align
+indent-wheres: true
+indentation: 2
+let-style: mixed
+respectful: false
+sort-constraints: true
+sort-derived-classes: true
+sort-deriving-clauses: true

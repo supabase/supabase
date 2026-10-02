@@ -1,0 +1,34 @@
+name: Cache on main
+
+description: Stores caches on main and release branches only, but restores them on all branches.
+
+inputs:
+  path:
+    description: Path(s) to cache
+    required: true
+  save-prs:
+    description: Whether to additionally store the cache in a pull request, too. Should only be used for very small caches.
+  prefix:
+    description: Cache key prefix to be used in both primary key and restore-keys.
+    required: true
+  suffix:
+    description: Cache key suffix to be used only in primary key.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      if: ${{ startsWith(github.ref, 'refs/heads/') || (inputs.save-prs && startsWith(github.ref, 'refs/pull/')) }}
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ inputs.prefix }}-${{ inputs.suffix }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-${{ inputs.prefix }}-
+    - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      if: ${{ !startsWith(github.ref, 'refs/heads/') && !(inputs.save-prs && startsWith(github.ref, 'refs/pull/'))  }}
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ inputs.prefix }}-${{ inputs.suffix }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-${{ inputs.prefix }}-

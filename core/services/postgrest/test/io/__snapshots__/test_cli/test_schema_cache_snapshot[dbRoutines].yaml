@@ -1,0 +1,655 @@
+- - qiName: rpc_with_two_hoisted
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings:
+      - - statement_timeout
+        - 10s
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: rpc_with_two_hoisted
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+          - qiName: items
+            qiSchema: public
+          - false
+          tag: Composite
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: terminate_pgrst
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: terminate_pgrst
+      pdParams:
+      - ppName: appname
+        ppReq: true
+        ppType: text
+        ppTypeMaxLength: text
+        ppVar: false
+      pdReturnType:
+        contents:
+          contents:
+            qiName: record
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: SetOf
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: default_isolation_level
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: default_isolation_level
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: text
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: change_db_schema_and_full_reload
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: change_db_schema_and_full_reload
+      pdParams:
+      - ppName: schemas
+        ppReq: true
+        ppType: text
+        ppTypeMaxLength: text
+        ppVar: false
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: set_statement_timeout
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: set_statement_timeout
+      pdParams:
+      - ppName: role
+        ppReq: true
+        ppType: text
+        ppTypeMaxLength: text
+        ppVar: false
+      - ppName: milliseconds
+        ppReq: true
+        ppType: integer
+        ppTypeMaxLength: integer
+        ppVar: false
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: notify_pgrst
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: notify_pgrst
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: migrate_function
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: migrate_function
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: change_role_statement_timeout
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: change_role_statement_timeout
+      pdParams:
+      - ppName: timeout
+        ppReq: true
+        ppType: text
+        ppTypeMaxLength: text
+        ppVar: false
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: reset_max_rows_config
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: reset_max_rows_config
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: reset_invalid_role_claim_key
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: reset_invalid_role_claim_key
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: get_postgres_version
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: get_postgres_version
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: int4
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: do_nothing
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: do_nothing
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: get_guc_value
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: get_guc_value
+      pdParams:
+      - ppName: name
+        ppReq: true
+        ppType: text
+        ppTypeMaxLength: text
+        ppVar: false
+      pdReturnType:
+        contents:
+          contents:
+            qiName: text
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: one_sec_timeout
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings:
+      - - statement_timeout
+        - 1s
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: one_sec_timeout
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: reload_pgrst_config
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: reload_pgrst_config
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: rpc_with_one_hoisted
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings:
+      - - statement_timeout
+        - 7s
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: rpc_with_one_hoisted
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+          - qiName: items
+            qiSchema: public
+          - false
+          tag: Composite
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: hello
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: hello
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: text
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: change_db_schemas_config
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: change_db_schemas_config
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: sleep
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: sleep
+      pdParams:
+      - ppName: seconds
+        ppReq: true
+        ppType: double precision
+        ppTypeMaxLength: double precision
+        ppVar: false
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: serializable_isolation_level
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings:
+      - - default_transaction_isolation
+        - serializable
+      pdHasVariadic: false
+      pdIsoLvl: Serializable
+      pdName: serializable_isolation_level
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: text
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: drop_change_cats
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: drop_change_cats
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: change_max_rows_config
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: change_max_rows_config
+      pdParams:
+      - ppName: val
+        ppReq: true
+        ppType: integer
+        ppTypeMaxLength: integer
+        ppVar: false
+      - ppName: notify
+        ppReq: false
+        ppType: boolean
+        ppTypeMaxLength: boolean
+        ppVar: false
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: invalid_role_claim_key_reload
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: invalid_role_claim_key_reload
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: reset_db_schemas_config
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: reset_db_schemas_config
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: root
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: root
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: json
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: create_function
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: create_function
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: get_pgrst_version
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: get_pgrst_version
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: text
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: read_committed_isolation_level
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings:
+      - - default_transaction_isolation
+        - read committed
+      pdHasVariadic: false
+      pdIsoLvl: ReadCommitted
+      pdName: read_committed_isolation_level
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: text
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: repeatable_read_isolation_level
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings:
+      - - default_transaction_isolation
+        - REPEATABLE READ
+      pdHasVariadic: false
+      pdIsoLvl: RepeatableRead
+      pdName: repeatable_read_isolation_level
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: text
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: get_work_mem
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: get_work_mem
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: text
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: notify_do_nothing
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: notify_do_nothing
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: rpc_work_mem
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings: []
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: rpc_work_mem
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+          - qiName: items
+            qiSchema: public
+          - false
+          tag: Composite
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
+
+- - qiName: four_sec_timeout
+    qiSchema: public
+  - - pdDescription: null
+      pdFuncSettings:
+      - - statement_timeout
+        - 4s
+      pdHasVariadic: false
+      pdIsoLvl: null
+      pdName: four_sec_timeout
+      pdParams: []
+      pdReturnType:
+        contents:
+          contents:
+            qiName: void
+            qiSchema: pg_catalog
+          tag: Scalar
+        tag: Single
+      pdSchema: public
+      pdVolatility: Volatile
