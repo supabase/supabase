@@ -10,15 +10,9 @@ import { toast } from 'sonner'
 import { Checkbox, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  STORAGE_ROW_STATUS,
-  STORAGE_ROW_TYPES,
-  STORAGE_SORT_BY,
-  STORAGE_SORT_BY_ORDER,
-  STORAGE_VIEWS,
-} from '../Storage.constants'
+import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageItem } from '../Storage.types'
-import { formatFolderItems } from '../StorageExplorer/StorageExplorer.utils'
+import { formatFolderItemsV2 } from '../StorageExplorer/StorageExplorer.utils'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { uploadFilesToBucket } from './BucketFilePickerDialog.utils'
 import { BucketFilePickerRow } from './BucketFilePickerRow'
@@ -141,10 +135,8 @@ export const BucketFilePickerColumn = ({
   }
   const isLastFolder = index === columns.length
 
+  // Already normalized to exclude 'last_accessed_at', which v2's sortBy.column doesn't support.
   const { view, sortBy, sortByOrder } = useStoragePreference(projectRef!)
-  // v2's sortBy.column doesn't support 'last_accessed_at'; the picker's own sort dropdown no
-  // longer offers it, but the preference is shared with the (still v1) main file explorer.
-  const sortColumn = sortBy === STORAGE_SORT_BY.LAST_ACCESSED_AT ? STORAGE_SORT_BY.NAME : sortBy
 
   const debouncedSearchString = useDebounce(itemSearchString, 500)
   const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useInfiniteQuery({
@@ -154,7 +146,7 @@ export const BucketFilePickerColumn = ({
       path,
       options: {
         sortBy: {
-          column: sortColumn,
+          column: sortBy,
           order: sortByOrder,
         },
         // When a user tries to search, only search in the last opened folder (rightmost column)
@@ -165,34 +157,14 @@ export const BucketFilePickerColumn = ({
 
   const items = useMemo(() => {
     const pages = data?.pages ?? []
-    // v2's `name` is the full key/prefix from the bucket root (folders end with a trailing
-    // slash), not the bare file/folder name — take the last path segment for display.
-    const objs = pages
-      .flatMap((page) => page.objects)
-      .map((object) => ({ ...object, name: object.name.split('/').pop() ?? object.name }))
-    // v2 returns folders and objects separately; re-combine them into the single sorted list
-    // formatFolderItems expects, tagging folders with `id: null` per its existing convention.
-    const folders = pages
-      .flatMap((page) => page.folders)
-      .map((folder) => {
-        const folderPath = folder.name.replace(/\/$/, '')
-        return {
-          id: null,
-          name: folderPath.split('/').pop() ?? folderPath,
-          created_at: null,
-          updated_at: null,
-          last_accessed_at: null,
-          metadata: null,
-        }
-      })
-    const direction = sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
-    const merged = [...folders, ...objs].sort((a, b) => {
-      const aValue = (sortColumn === STORAGE_SORT_BY.NAME ? a.name : a[sortColumn]) ?? ''
-      const bValue = (sortColumn === STORAGE_SORT_BY.NAME ? b.name : b[sortColumn]) ?? ''
-      return direction * String(aValue).localeCompare(String(bValue))
-    })
-    return formatFolderItems(merged)
-  }, [data, sortColumn, sortByOrder])
+    return formatFolderItemsV2(
+      {
+        folders: pages.flatMap((page) => page.folders),
+        objects: pages.flatMap((page) => page.objects),
+      },
+      { column: sortBy, order: sortByOrder }
+    )
+  }, [data, sortBy, sortByOrder])
 
   const haveSelectedItems = selectedItems.length > 0
   const columnItemsId = items.map((item) => item.id)
