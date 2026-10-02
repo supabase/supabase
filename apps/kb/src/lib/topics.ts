@@ -8,6 +8,8 @@
 //
 // `visible` controls whether the topic appears in nav and homepage sections.
 // Topics with `visible: false` still have a working listing page at /topics/[slug].
+// Some topics might not need to be visible to end users since their primary audience
+// is LLM crawlers.
 export const TOPICS = [
   {
     name: 'Migration',
