@@ -16,7 +16,7 @@ export default function TraceTreeCellDemo() {
         Indent {indent}px
         <Slider
           className="min-w-40 flex-1"
-          min={8}
+          min={10}
           max={32}
           step={2}
           value={[indent]}

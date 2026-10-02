@@ -126,7 +126,7 @@ export function Duration({ className, ...props }: ComponentProps<'span'>) {
     <span
       data-trace-duration
       className={cn(
-        'shrink-0 font-mono text-xs tabular-nums text-foreground-lighter',
+        'shrink-0 font-mono text-xs tabular-nums text-foreground-lighter tracking-wide',
         isRunning && 'text-foreground-light',
         className
       )}

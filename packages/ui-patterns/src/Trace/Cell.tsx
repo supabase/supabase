@@ -13,10 +13,12 @@ export interface CellProps extends ComponentProps<'div'> {
 }
 
 const TOGGLE_SIZE = 18
+export const MIN_INDENT = 10
 
-export function Cell({ indent = 14, className, style, ...props }: CellProps) {
+export function Cell({ indent: indentProp = 14, className, style, ...props }: CellProps) {
   const { row, span, readOnly } = useSpan()
   const { dispatch } = useView()
+  const indent = Math.max(MIN_INDENT, indentProp)
   const guideOffset = TOGGLE_SIZE / 2 + 4
 
   return (
@@ -49,7 +51,7 @@ export function Cell({ indent = 14, className, style, ...props }: CellProps) {
             tabIndex={-1}
             aria-label={row.isExpanded ? 'Collapse' : 'Expand'}
             disabled={readOnly}
-            className="size-[18px] p-0"
+            className="size-[18px] p-0 bg-muted rounded border border-default"
             icon={
               <ChevronRight
                 className={cn(
@@ -80,8 +82,13 @@ export function Cell({ indent = 14, className, style, ...props }: CellProps) {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <span data-trace-name className="min-w-0 flex-1 truncate">
-            {span.name}
+          <span className="flex items-center gap-1.5">
+            <span data-trace-name className="min-w-0 flex-1 truncate font-mono text-xs">
+              {span.name}
+            </span>
+            {row.hiddenDescendantCount > 0 && (
+              <Badge data-trace-hidden-count>+{row.hiddenDescendantCount}</Badge>
+            )}
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" align="start">
@@ -89,14 +96,6 @@ export function Cell({ indent = 14, className, style, ...props }: CellProps) {
           <span className="text-foreground-light"> · {span.serviceName}</span>
         </TooltipContent>
       </Tooltip>
-
-      <span
-        data-trace-service
-        data-service={span.serviceName}
-        className="max-w-[30%] shrink truncate text-xs text-foreground-lighter"
-      >
-        {span.serviceName}
-      </span>
 
       {row.isOrphan && (
         <Tooltip>
@@ -107,10 +106,6 @@ export function Cell({ indent = 14, className, style, ...props }: CellProps) {
           </TooltipTrigger>
           <TooltipContent side="top">Parent span is missing from this trace</TooltipContent>
         </Tooltip>
-      )}
-
-      {row.hiddenDescendantCount > 0 && (
-        <Badge data-trace-hidden-count>+{row.hiddenDescendantCount}</Badge>
       )}
 
       <Duration className="ml-auto" />
