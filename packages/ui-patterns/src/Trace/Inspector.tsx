@@ -108,7 +108,7 @@ function Value({ entryKey, value, kind }: ValueProps) {
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <pre className="mt-1 max-h-64 overflow-auto rounded bg-surface-200 p-2 text-xs">
+            <pre className="mt-1 max-h-64 overflow-auto rounded bg-surface-200 p-2 text-left text-xs">
               {stringifyValue(value)}
             </pre>
           </CollapsibleContent>
@@ -147,13 +147,23 @@ function KeyValue({ data, emptyMessage = 'No attributes', className }: KeyValueP
           {entries.map(([key, value]) => {
             const kind = detectValueKind(key, value)
             return (
-              <TableRow key={key} data-trace-key-value-row data-kind={kind} className="group/kv">
-                <TableCell className="w-[38%] min-w-0 py-1.5 pl-3 pr-2 align-top">
-                  <span className="block break-all font-mono text-foreground-light">{key}</span>
+              <TableRow
+                key={key}
+                data-trace-key-value-row
+                data-kind={kind}
+                className="group/kv border-muted"
+              >
+                <TableCell className="w-[40%] min-w-0 py-2.5 pl-3 pr-2 align-middle">
+                  <span className="block break-words text-xs text-foreground-light">{key}</span>
                 </TableCell>
-                <TableCell className="min-w-0 py-1.5 pl-2 pr-2 align-top font-mono">
-                  <div className="flex items-start gap-1">
-                    <div className="min-w-0 flex-1">
+                <TableCell className="min-w-0 py-2.5 pl-2 pr-3 text-right align-middle">
+                  <div className="flex items-center justify-end gap-1">
+                    <div
+                      className={cn(
+                        'min-w-0 text-xs text-foreground',
+                        kind !== 'string' && kind !== 'url' && 'font-mono'
+                      )}
+                    >
                       <Value entryKey={key} value={value} kind={kind} />
                     </div>
                     <Tooltip>
@@ -162,8 +172,8 @@ function KeyValue({ data, emptyMessage = 'No attributes', className }: KeyValueP
                           variant="text"
                           size="tiny"
                           aria-label={`Copy ${key}`}
-                          className="size-5 shrink-0 p-0 opacity-0 group-hover/kv:opacity-100 focus-visible:opacity-100"
-                          icon={<Copy />}
+                          className="size-5 shrink-0 p-0"
+                          icon={<Copy className="size-3!" />}
                           onClick={() => copy(stringifyValue(value))}
                         />
                       </TooltipTrigger>
@@ -228,23 +238,33 @@ function SpanHeader({ span }: { span: Span }) {
           {span.name}
         </TooltipContent>
       </Tooltip>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 font-mono text-xs">
-        <dt className="text-foreground-light">Duration</dt>
-        <dd className="tabular-nums text-foreground">{isRunning ? `${duration}…` : duration}</dd>
-        <dt className="text-foreground-light">Started</dt>
-        <dd className="tabular-nums text-foreground">+{formatMs(span.startMs - bounds[0])}</dd>
-        <dt className="text-foreground-light">Span ID</dt>
-        <dd className="flex min-w-0 items-center gap-1 text-foreground">
-          <span className="truncate">{span.id}</span>
-          <Button
-            variant="text"
-            size="tiny"
-            aria-label="Copy span ID"
-            className="size-5 shrink-0 p-0"
-            icon={<Copy />}
-            onClick={() => copy(span.id)}
-          />
-        </dd>
+      <dl className="mt-1 flex flex-col divide-y divide-muted text-xs">
+        <div className="flex items-center justify-between gap-3 py-2">
+          <dt className="text-foreground-light">Duration</dt>
+          <dd className="font-mono tabular-nums text-foreground">
+            {isRunning ? `${duration}…` : duration}
+          </dd>
+        </div>
+        <div className="flex items-center justify-between gap-3 py-2">
+          <dt className="text-foreground-light">Started</dt>
+          <dd className="font-mono tabular-nums text-foreground">
+            +{formatMs(span.startMs - bounds[0])}
+          </dd>
+        </div>
+        <div className="flex items-center justify-between gap-3 py-2">
+          <dt className="text-foreground-light">Span ID</dt>
+          <dd className="flex min-w-0 items-center gap-1 font-mono text-foreground">
+            <span className="truncate">{span.id}</span>
+            <Button
+              variant="text"
+              size="tiny"
+              aria-label="Copy span ID"
+              className="size-5 shrink-0 p-0"
+              icon={<Copy className="size-3!" />}
+              onClick={() => copy(span.id)}
+            />
+          </dd>
+        </div>
       </dl>
     </header>
   )
@@ -349,7 +369,7 @@ export function Inspector({ spanId, emptyMessage, className, ...props }: Inspect
       data-trace-inspector
       data-empty={span ? undefined : ''}
       className={cn(
-        'flex min-h-0 flex-col overflow-hidden border-l border-default bg-surface-100 text-sm',
+        'flex min-h-0 flex-col overflow-hidden border-l border-default bg-surface-100 text-xs',
         className
       )}
       {...props}
@@ -357,7 +377,7 @@ export function Inspector({ spanId, emptyMessage, className, ...props }: Inspect
       {!span && (
         <div
           data-trace-inspector-empty
-          className="flex flex-1 items-center justify-center p-6 text-center text-sm text-foreground-light"
+          className="flex flex-1 items-center justify-center p-6 text-center text-xs text-foreground-light"
         >
           {emptyMessage ?? 'Select a span to see its details'}
         </div>
