@@ -54,14 +54,20 @@ const OVERLAY_CLASS = cn(
   'data-closed:animate-out! data-closed:fade-out-0 data-closed:fill-mode-forwards',
   'data-closed:duration-150 data-closed:ease-enter',
   'max-lg:bg-transparent max-lg:backdrop-blur-none',
-  'max-lg:px-0! max-lg:pt-(--header-height)! max-lg:pb-0!'
+  'max-lg:top-(--header-height) max-lg:p-0!',
+  'max-lg:data-closed:duration-200!'
 )
 
 const CONTENT_CLASS = cn(
   'overflow-hidden rounded-lg border-0 p-0',
   'shadow-[inset_0_0_0_1px_var(--border-default),var(--shadow-codeblock,0_0_#0000)]!',
   'max-lg:flex max-lg:flex-1 max-lg:flex-col max-lg:max-w-none! max-lg:rounded-none!',
-  'max-lg:shadow-none!'
+  'max-lg:shadow-none!',
+  'max-lg:data-[state=open]:zoom-in-100! max-lg:data-[state=closed]:zoom-out-100!',
+  'max-lg:motion-safe:data-[state=open]:slide-in-from-top-[100%]!',
+  'max-lg:motion-safe:data-[state=closed]:slide-out-to-top-[100%]!',
+  'max-lg:motion-reduce:data-[state=open]:fade-in-0',
+  'max-lg:duration-300 max-lg:data-[state=closed]:duration-200! max-lg:ease-enter'
 )
 
 export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
