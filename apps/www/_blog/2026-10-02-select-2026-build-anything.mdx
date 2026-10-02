@@ -2,7 +2,7 @@
 title: 'Build anything: Supabase from code, and an MCP server for your app'
 description: "Your agent sets up the backend from code, your users' agents work with your app through its own MCP server, and long-running tasks run in Supabase Compute."
 author: laktek, wenbo, saxon_fletcher
-date: '2026-10-02'
+date: '2026-10-02T10:15:00'
 categories:
   - product
 tags:
@@ -24,7 +24,7 @@ Your users are already in Claude, ChatGPT, or Cursor, and when one of them asks 
 
 ## Agent-ready local development
 
-<video className="rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
   <source src="/images/blog/select-2026-build-anything/autonomy.mp4" type="video/mp4" />
 </video>
 
@@ -39,6 +39,7 @@ Config in code: settings like auth providers, API limits, and storage buckets li
 <Img
   alt="A Compute service defined in config.toml and deployed with supabase compute deploy, running three instances with 2 GB RAM and 1 CPU"
   src="/images/blog/select-2026-build-anything/compute.png"
+  wide
 />
 
 Compute runs web services and agents in any language next to your database. There's no limit on how long a service runs, you choose the memory and CPU, and each service gets a full Linux environment, which Edge Functions don't have.
@@ -52,6 +53,7 @@ Each service gets a public HTTP URL, like an Edge Function. Set the number of in
 <Img
   alt="The MCP Server block in the Supabase library, showing the files it adds under supabase/functions/mcp"
   src="/images/blog/select-2026-build-anything/mcp-server.png"
+  wide
 />
 
 MCP is the standard that lets agents talk to your app on behalf of your users. Your app's MCP server is separate from the official Supabase MCP server, which helps you build your app.
