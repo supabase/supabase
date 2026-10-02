@@ -710,6 +710,66 @@
       "import": "./src/Toc/types.ts",
       "types": "./src/Toc/types.ts"
     },
+    "./Trace/Bar": {
+      "import": "./src/Trace/Bar.tsx",
+      "types": "./src/Trace/Bar.tsx"
+    },
+    "./Trace/Cell": {
+      "import": "./src/Trace/Cell.tsx",
+      "types": "./src/Trace/Cell.tsx"
+    },
+    "./Trace/Header": {
+      "import": "./src/Trace/Header.tsx",
+      "types": "./src/Trace/Header.tsx"
+    },
+    "./Trace/Inspector": {
+      "import": "./src/Trace/Inspector.tsx",
+      "types": "./src/Trace/Inspector.tsx"
+    },
+    "./Trace/Minimap": {
+      "import": "./src/Trace/Minimap.tsx",
+      "types": "./src/Trace/Minimap.tsx"
+    },
+    "./Trace/Trace": {
+      "import": "./src/Trace/Trace.tsx",
+      "types": "./src/Trace/Trace.tsx"
+    },
+    "./Trace/Waterfall": {
+      "import": "./src/Trace/Waterfall.tsx",
+      "types": "./src/Trace/Waterfall.tsx"
+    },
+    "./Trace/hooks/useBrush": {
+      "import": "./src/Trace/hooks/useBrush.ts",
+      "types": "./src/Trace/hooks/useBrush.ts"
+    },
+    "./Trace/hooks/useKeyboard": {
+      "import": "./src/Trace/hooks/useKeyboard.ts",
+      "types": "./src/Trace/hooks/useKeyboard.ts"
+    },
+    "./Trace/hooks/useSpan": {
+      "import": "./src/Trace/hooks/useSpan.ts",
+      "types": "./src/Trace/hooks/useSpan.ts"
+    },
+    "./Trace/hooks/useTimeScale": {
+      "import": "./src/Trace/hooks/useTimeScale.ts",
+      "types": "./src/Trace/hooks/useTimeScale.ts"
+    },
+    "./Trace/hooks/useVisibleRows": {
+      "import": "./src/Trace/hooks/useVisibleRows.ts",
+      "types": "./src/Trace/hooks/useVisibleRows.ts"
+    },
+    "./Trace": {
+      "import": "./src/Trace/index.ts",
+      "types": "./src/Trace/index.ts"
+    },
+    "./Trace/types": {
+      "import": "./src/Trace/types.ts",
+      "types": "./src/Trace/types.ts"
+    },
+    "./Trace/utils": {
+      "import": "./src/Trace/utils.ts",
+      "types": "./src/Trace/utils.ts"
+    },
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
@@ -773,6 +833,7 @@
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
+    "@tanstack/react-virtual": "^3.13.24",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",

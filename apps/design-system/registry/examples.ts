@@ -1924,4 +1924,50 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/status-code-demo.tsx'],
   },
+  {
+    name: 'trace-ruler-demo',
+    type: 'components:example',
+    registryDependencies: ['slider'],
+    files: ['example/trace-ruler-demo.tsx'],
+  },
+  {
+    name: 'trace-span-bar-demo',
+    type: 'components:example',
+    registryDependencies: ['slider'],
+    files: ['example/trace-span-bar-demo.tsx'],
+  },
+  {
+    name: 'trace-tree-cell-demo',
+    type: 'components:example',
+    registryDependencies: ['slider', 'toggle'],
+    files: ['example/trace-tree-cell-demo.tsx'],
+  },
+  {
+    name: 'trace-minimap-demo',
+    type: 'components:example',
+    registryDependencies: ['slider', 'toggle'],
+    files: ['example/trace-minimap-demo.tsx'],
+  },
+  {
+    name: 'trace-inspector-demo',
+    type: 'components:example',
+    registryDependencies: ['toggle-group'],
+    files: ['example/trace-inspector-demo.tsx'],
+  },
+  {
+    name: 'trace-waterfall-demo',
+    type: 'components:example',
+    registryDependencies: ['toggle'],
+    files: ['example/trace-waterfall-demo.tsx'],
+  },
+  {
+    name: 'trace-waterfall-compact-demo',
+    type: 'components:example',
+    files: ['example/trace-waterfall-compact-demo.tsx'],
+  },
+  {
+    name: 'trace-waterfall-url-sync-demo',
+    type: 'components:example',
+    files: ['example/trace-waterfall-url-sync-demo.tsx'],
+  },
 ]
