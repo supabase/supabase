@@ -54,7 +54,7 @@ export const createSQLPolicy = (
   }
 
   if (!isEmpty(fieldsToUpdate)) {
-    return createSQLStatementForUpdatePolicy(formattedPolicyFormFields, fieldsToUpdate)
+    return createSQLStatementForUpdatePolicy(formattedPolicyFormFields, fieldsToUpdate, originalPolicyFormFields)
   }
 
   return {}
@@ -77,9 +77,11 @@ const createSQLStatementForCreatePolicy = (policyFormFields: PolicyFormField): P
 
 const createSQLStatementForUpdatePolicy = (
   policyFormFields: PolicyFormField,
-  fieldsToUpdate: Partial<PolicyFormField>
+  fieldsToUpdate: Partial<PolicyFormField>,
+  originalPolicyFormFields?: PGPolicy
 ): PolicyForReview => {
   const { name, schema, table } = policyFormFields
+  const originalName = originalPolicyFormFields?.name ?? name
 
   const definitionChanged = has(fieldsToUpdate, ['definition'])
   const checkChanged = has(fieldsToUpdate, ['check'])
@@ -97,11 +99,11 @@ const createSQLStatementForUpdatePolicy = (
   const roles =
     (fieldsToUpdate?.roles ?? []).length === 0 ? ['public'] : (fieldsToUpdate.roles as string[])
 
-  const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
+  const alterStatement = `ALTER POLICY "${originalName}" ON "${schema}"."${table}"`
   const statement = [
     'BEGIN;',
-    ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
-    ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
+    ...(definitionChanged && fieldsToUpdate.definition ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
+    ...(checkChanged && fieldsToUpdate.check ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
     ...(rolesChanged ? [`  ${alterStatement} TO ${roles.join(', ')};`] : []),
     ...(nameChanged ? [`  ${alterStatement} RENAME TO "${fieldsToUpdate.name}";`] : []),
     'COMMIT;',

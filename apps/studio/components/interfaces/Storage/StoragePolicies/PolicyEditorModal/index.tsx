@@ -180,6 +180,18 @@ export const PolicyEditorModal = ({
         'Please provide either a USING, or WITH CHECK expression, or both for your policy'
       )
     }
+    if (!isNewPolicy && selectedPolicyToEdit) {
+      if (selectedPolicyToEdit.definition !== null && !definition?.trim()) {
+        return toast.error(
+          'The USING expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+        )
+      }
+      if (selectedPolicyToEdit.check !== null && !check?.trim()) {
+        return toast.error(
+          'The WITH CHECK expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+        )
+      }
+    }
     const policySQLStatement = createSQLPolicy(policyFormFields, selectedPolicyToEdit)
     setPolicyStatementForReview(policySQLStatement)
     onReviewPolicy()
