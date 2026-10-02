@@ -375,12 +375,11 @@ function PresenceSkeleton() {
     >
       {/* Stacked avatars — top right */}
       <div className="absolute right-4 top-4 z-10 flex -space-x-2">
-        {PRESENCE_USERS.map((user, i) => (
+        {PRESENCE_USERS.map((user) => (
           <div
             key={user.name}
-            className="relative flex h-7 w-7 items-center justify-center rounded-full bg-surface-100 text-[9px] font-medium text-foreground"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
             style={{
-              zIndex: i + 1,
               boxShadow: `0 0 0 2px var(--background-surface-75), 0 0 0 4px ${user.color}`,
             }}
           >
@@ -389,9 +388,8 @@ function PresenceSkeleton() {
         ))}
         {/* Your avatar — appears on hover */}
         <motion.div
-          className="relative flex h-7 w-7 items-center justify-center rounded-full bg-surface-100 text-[9px] font-medium text-foreground"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
           style={{
-            zIndex: PRESENCE_USERS.length + 1,
             boxShadow: `0 0 0 2px var(--background-surface-75), 0 0 0 4px ${YOU_COLOR}`,
           }}
           initial={{ opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }}
