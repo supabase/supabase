@@ -94,11 +94,11 @@ jobs:
             sleep 2
           done
           for i in {1..60}; do
-            curl -fsS http://127.0.0.1:9000/health/ready >/dev/null 2>&1 && break
+            docker exec storage-rustfs curl -fsS http://127.0.0.1:9000/health/ready >/dev/null 2>&1 && break
             sleep 2
           done
           docker exec storage-postgres pg_isready -U postgres -d postgres >/dev/null
-          curl -fsS http://127.0.0.1:9000/health/ready >/dev/null
+          docker exec storage-rustfs curl -fsS http://127.0.0.1:9000/health/ready >/dev/null
 
       - name: Start Storage and run migration/startup smoke test
         run: |
