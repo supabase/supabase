@@ -1,10 +1,13 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
-import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
+import {
+  UNIFIED_LOGS_QUERY_OPTIONS,
+  UnifiedLogsVariables,
+  useUnifiedLogsBackend,
+} from './unified-logs-infinite-query'
 import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
@@ -163,11 +166,14 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const { isReady, useOtel } = useUnifiedLogsBackend()
   return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
-    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
-    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
+    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel, ready: isReady }],
+    queryFn: ({ signal }) => {
+      if (!isReady) throw new Error('Unified Logs backend is not ready')
+      return getUnifiedLogsChart({ projectRef, search, useOtel }, signal)
+    },
+    enabled: enabled && isReady && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
