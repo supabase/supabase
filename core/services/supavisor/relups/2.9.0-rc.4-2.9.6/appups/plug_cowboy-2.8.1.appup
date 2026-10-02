@@ -1,0 +1,9 @@
+{"2.8.1",
+ [{"2.7.3",
+   [{load_module,'Elixir.Plug.Cowboy.Conn',[]},
+    {load_module,'Elixir.Plug.Cowboy.Translator',[]},
+    {load_module,'Elixir.Plug.Cowboy',[]}]}],
+ [{"2.7.3",
+   [{load_module,'Elixir.Plug.Cowboy.Conn',[]},
+    {load_module,'Elixir.Plug.Cowboy.Translator',[]},
+    {load_module,'Elixir.Plug.Cowboy',[]}]}]}.

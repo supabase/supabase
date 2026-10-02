@@ -1,0 +1,11 @@
+services:
+  db:
+    image: postgres:17.5
+    volumes:
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: postgres -c hba_file=/etc/postgresql/pg_hba.conf
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "7544:5432"

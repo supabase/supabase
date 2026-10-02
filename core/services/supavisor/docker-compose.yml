@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  db:
+    image: supabase/postgres:15.1.0.148
+    container_name: supavisor-db
+    ports:
+      - "6432:5432"
+    volumes:
+      - ./dev/postgres:/docker-entrypoint-initdb.d/
+      # Uncomment to set MD5 authentication method on uninitialized databases
+      # - ./dev/postgres/md5/etc/postgresql/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      # Uncomment to set password authentication method on uninitialized databases
+      # - ./dev/postgres/password/etc/postgresql/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf -c max_prepared_transactions=2000
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: postgres
+      # Uncomment to set MD5 authentication method on uninitialized databases
+      # POSTGRES_INITDB_ARGS: --auth-host=md5
+      # Uncomment to set password authentication method on uninitialized databases
+      # POSTGRES_INITDB_ARGS: --auth-host=password
+  supavisor:
+    build: .
+    container_name: supavisor
+    ports:
+      - 4000:4000
+      - 5452:5452
+      - 6543:6543
+    environment:
+      PORT: 4000
+      PROXY_PORT_SESSION: 5452
+      PROXY_PORT_TRANSACTION: 6543
+      DATABASE_URL: "ecto://postgres:postgres@db:5432/postgres"
+      CLUSTER_POSTGRES: "true"
+      SECRET_KEY_BASE: "12345678901234567890121234567890123456789012345678903212345678901234567890123456789032123456789012345678901234567890323456789032"
+      VAULT_ENC_KEY: "12345678901234567890123456789032"
+      API_JWT_SECRET: "dev"
+      METRICS_JWT_SECRET: "dev"
+      REGION: "local"
+      ERL_AFLAGS: -proto_dist inet_tcp
+    command:  sh -c "/app/bin/migrate && /app/bin/server"
+    depends_on:
+      - db

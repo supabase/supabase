@@ -1,0 +1,4 @@
+# Decimal -- We don't use that API, fix is only available on major version bump
+GHSA-rhv4-8758-jx7v
+# Cowlib -- We don't use that API, won't be fixed upstream
+GHSA-g2wm-735q-3f56

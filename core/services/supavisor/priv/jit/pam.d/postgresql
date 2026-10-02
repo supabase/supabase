@@ -1,0 +1,2 @@
+auth required /usr/lib/security/pam_jit_pg.so apiUrl=http://api:8080/
+account required /usr/lib/security/pam_jit_pg.so
