@@ -380,7 +380,7 @@ function PresenceSkeleton() {
             key={user.name}
             className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
             style={{
-              boxShadow: `0 0 0 2px var(--background-surface-75), 0 0 0 4px ${user.color}`,
+              boxShadow: `0 0 0 2px hsl(var(--background-surface-75)), 0 0 0 4px ${user.color}`,
             }}
           >
             {user.initials}
@@ -390,7 +390,7 @@ function PresenceSkeleton() {
         <motion.div
           className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
           style={{
-            boxShadow: `0 0 0 2px var(--background-surface-75), 0 0 0 4px ${YOU_COLOR}`,
+            boxShadow: `0 0 0 2px hsl(var(--background-surface-75)), 0 0 0 4px ${YOU_COLOR}`,
           }}
           initial={{ opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }}
           animate={
