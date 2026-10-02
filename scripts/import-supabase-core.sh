@@ -53,53 +53,82 @@ import_one() {
   fi
   echo "IMPORT: $name default branch -> $ref"
 
-  if [[ "$name" == "supavisor" ]]; then
-    # Supavisor currently contains test fixtures with token-shaped credentials.
-    # Import a sanitized orphan snapshot so the upstream secret-bearing history
-    # is never introduced into the Testagram Git object graph.
-    local tmp
-    tmp="$(mktemp -d)"
-    trap 'rm -rf "$tmp"' RETURN
-    git clone --quiet --depth 1 --branch "$ref" "$url" "$tmp/repo"
+  # Import a file-only snapshot. We deliberately do not run git subtree against
+  # the upstream repository because its fetched Git history can contain credentials
+  # in old test fixtures. The Testagram repository must receive only the sanitized
+  # source tree, never those upstream objects.
+  local tmp
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
 
-    python3 - "$tmp/repo" <<'PY'
+  git clone --quiet --depth 1 --branch "$ref" "$url" "$tmp/repo"
+  rm -rf "$tmp/repo/.git"
+
+  python3 - "$tmp/repo" <<'PY'
 import pathlib
 import re
 import sys
 
 root = pathlib.Path(sys.argv[1])
-sbp = re.compile(r"sbp_[A-Za-z0-9_-]{20,}")
-bearer_jwt = re.compile(r"Bearer eyJ[A-Za-z0-9._-]+")
+
+patterns = [
+    (re.compile(r"sbp_[A-Za-z0-9_-]{20,}"), "sbp_TEST_TOKEN_REDACTED"),
+    (re.compile(r"ya29\.[A-Za-z0-9._-]+"), "TEST_GOOGLE_ACCESS_TOKEN"),
+    (re.compile(r"(?<![A-Za-z0-9_-])eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+"), "TEST_JWT_REDACTED"),
+    (re.compile(r"Bearer\s+eyJ[A-Za-z0-9._-]+"), "Bearer TEST_JWT_REDACTED"),
+]
+
 known_passwords = {
     "56lRXbZStSL9vY3cJJxLZd5wQxpWvfl9": "TEST_SUPAVISOR_PASSWORD",
 }
 
 for path in root.rglob("*"):
-    if ".git" in path.parts or not path.is_file():
+    if not path.is_file():
         continue
     try:
         data = path.read_text(encoding="utf-8")
     except (UnicodeDecodeError, OSError):
         continue
 
-    updated = sbp.sub("sbp_TEST_TOKEN_REDACTED", data)
-    updated = bearer_jwt.sub("Bearer TEST_JWT_REDACTED", updated)
+    updated = data
+    for pattern, replacement in patterns:
+        updated = pattern.sub(replacement, updated)
     for old, replacement in known_passwords.items():
         updated = updated.replace(old, replacement)
 
     if updated != data:
         path.write_text(updated, encoding="utf-8")
+
+# Fail closed if obvious credential-shaped material remains in text files.
+remaining = []
+for path in root.rglob("*"):
+    if not path.is_file():
+        continue
+    try:
+        data = path.read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError):
+        continue
+    if re.search(r"sbp_[A-Za-z0-9_-]{20,}|ya29\.[A-Za-z0-9._-]+|(?<![A-Za-z0-9_-])eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+", data):
+        remaining.append(str(path.relative_to(root)))
+
+if remaining:
+    print("ERROR: credential-shaped material remains in:", file=sys.stderr)
+    for item in remaining:
+        print(item, file=sys.stderr)
+    raise SystemExit(1)
 PY
 
-    git -C "$tmp/repo" checkout --orphan testagram-sanitized >/dev/null
-    git -C "$tmp/repo" add -A
-    git -C "$tmp/repo" -c user.name="testagram-core-bot" -c user.email="testagram-core-bot@users.noreply.github.com" commit -m "Testagram sanitized upstream snapshot $ref" >/dev/null
-    git subtree add --prefix="$path" "$tmp/repo" HEAD --squash
-    rm -rf "$tmp"
-    trap - RETURN
-  else
-    git subtree add --prefix="$path" "$url" "$ref" --squash
-  fi
+  # Turn the sanitized file tree into an orphan local commit. No upstream Git
+  # objects or upstream commit history become reachable from Testagram.
+  git -C "$tmp/repo" init --quiet
+  git -C "$tmp/repo" config user.name "testagram-core-bot"
+  git -C "$tmp/repo" config user.email "testagram-core-bot@users.noreply.github.com"
+  git -C "$tmp/repo" add -A
+  git -C "$tmp/repo" commit --quiet -m "Testagram upstream snapshot $name $ref"
+
+  git subtree add --prefix="$path" "$tmp/repo" HEAD --squash
+  rm -rf "$tmp"
+  trap - RETURN
 }
 
 if [[ "${1:-}" == "--service" ]]; then
