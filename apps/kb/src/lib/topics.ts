@@ -16,7 +16,7 @@ export const TOPICS = [
     description: 'How Supabase compares to other databases and platforms.',
     pinned: false,
   },
-  { name: 'Troubleshooting', description: 'Common errors and how to resolve them.', pinned: false },
+  { name: 'Troubleshooting', description: 'Common errors and how to resolve them.', pinned: true },
   {
     name: 'Tutorial',
     description: 'Step-by-step walkthroughs for building with Supabase.',
@@ -30,6 +30,11 @@ export const TOPICS = [
   },
   { name: 'Database', description: 'Postgres schemas, queries, and performance.', pinned: true },
   {
+    name: 'Data API',
+    description: 'Auto-generated REST endpoints for querying your database powered by PostgREST.',
+    pinned: false,
+  },
+  {
     name: 'Edge Functions',
     description: 'Deploying and running serverless functions.',
     pinned: false,
@@ -39,6 +44,26 @@ export const TOPICS = [
   {
     name: 'Supabase Platform',
     description: 'Project settings, billing, and infrastructure.',
+    pinned: false,
+  },
+  {
+    name: 'Supavisor',
+    description: 'Connection pooling and Supavisor configuration.',
+    pinned: false,
+  },
+  {
+    name: 'CLI',
+    description: 'Using and troubleshooting the Supabase CLI.',
+    pinned: false,
+  },
+  {
+    name: 'Dashboard',
+    description: 'Using and troubleshooting the Supabase Dashboard.',
+    pinned: false,
+  },
+  {
+    name: 'Self-Hosting',
+    description: 'Running and managing self-hosted Supabase deployments.',
     pinned: false,
   },
 ] as const

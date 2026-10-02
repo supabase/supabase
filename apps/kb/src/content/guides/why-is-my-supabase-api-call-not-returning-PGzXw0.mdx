@@ -1,0 +1,12 @@
+---
+title: 'Why is my supabase API call not returning?'
+description: 'Documents a supabase-js deadlock triggered by async calls inside onAuthStateChange, which hangs later client calls, and links a workaround.'
+topics: ['Troubleshooting', 'Auth', 'Supabase Platform']
+github_url: 'https://github.com/orgs/supabase/discussions/19058'
+---
+
+There is currently a bug in supabase-js which results in a deadlock if any async API call is made in `onAuthStateChange` code. If a call is made in the handler then the next Supabase call anywhere using that client will hang and not return.
+
+For now a workaround is needed until this is fixed.
+
+[auth-js issue #762](https://github.com/supabase/auth-js/issues/762#issuecomment-1780006492)

@@ -1,0 +1,29 @@
+---
+title: 'Edge Function deploy failed due to an internal error'
+description: 'Explains how to debug an Edge Function deploy that fails with an internal error, including using --debug and alternative bundling flags.'
+topics: ['Troubleshooting', 'Edge Functions']
+---
+
+When encountering the `Function deploy failed due to an internal error`, try deploy the function via the [Supabase CLI](/docs/guides/local-development) with the `--debug` flag to gather extra information to identify the possible cause.
+
+You can also try [alternative bundle methods](/docs/reference/cli/supabase-functions-deploy):
+
+- `--use-api`: Use Management API to bundle functions.
+- `--use-docker`: Use Docker to bundle functions.
+
+If you're not able to run the CLI or cannot identify the cause, [open a support ticket](/dashboard/support/new).
+
+**Example error**
+
+```bash
+$ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID
+```
+
+**Example output with `--debug`**
+
+From the details we can see it is exceeding the 20MB [Edge Function size limit](/docs/guides/functions/limits):
+
+```bash
+$ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID --debug
+Deploying Function: FUNCTION_NAME (script size: 62.61MB)
+```

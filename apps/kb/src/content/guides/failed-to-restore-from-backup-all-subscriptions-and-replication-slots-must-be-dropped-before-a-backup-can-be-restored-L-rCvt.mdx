@@ -1,0 +1,26 @@
+---
+title: 'Failed to restore from backup: All subscriptions and replication slots must be dropped before a backup can be restored.'
+description: 'Shows how to find and drop existing subscriptions and replication slots so a database backup can be restored.'
+topics: ['Troubleshooting', 'Database']
+github_url: 'https://github.com/orgs/supabase/discussions/21830'
+---
+
+As the error suggests, you must first drop any current subscriptions or replication slots to restore backups.
+
+You can check those with:
+
+```sql
+select * from pg_replication_slots;
+
+select * from pg_subscription;
+```
+
+You can drop them with:
+
+```sql
+DROP SUBSCRIPTION <subscription>;
+
+SELECT pg_drop_replication_slot(slot_name);
+```
+
+NOTE: These are destructive actions. This is fine since you will overwrite your database with a backup.

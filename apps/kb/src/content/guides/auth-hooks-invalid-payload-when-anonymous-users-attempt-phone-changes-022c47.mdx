@@ -1,0 +1,19 @@
+---
+title: "Auth Hooks: 'Invalid payload' when anonymous users attempt phone changes"
+description: 'Explains why an Auth Hooks 500 invalid payload error occurs when anonymous users trigger a phone_change flow, and how to fix the client logic.'
+topics: ['Troubleshooting', 'Auth']
+---
+
+An 'Invalid payload sent to hook' error (500) occurs in Auth hooks when the payload includes `new_phone` for an anonymous user.
+
+## Why does this happen?
+
+This error arises because anonymous users do not have an existing phone number to modify. Client application logic attempting a `phone_change` for such users results in an invalid operation. The `new_phone` field should only be present during a `phone_change` flow initiated by an _authenticated_ user.
+
+## How to avoid this issue
+
+Refine your client application logic to prevent this incorrect payload structure:
+
+- Differentiate phone update and login flows for anonymous users from authenticated users.
+- Ensure `new_phone` is only transmitted when an authenticated user initiates a `phone_change` flow.
+- Implement distinct handling for anonymous user updates to avoid sending `new_phone` in the payload.

@@ -1,0 +1,20 @@
+---
+title: 'How do I check Supabase Auth/API version of a Supabase project?'
+description: 'Shows how to query the Auth health check endpoint with curl to retrieve the GoTrue/API version of a Supabase project.'
+topics: ['Troubleshooting', 'Auth', 'Supabase Platform']
+github_url: 'https://github.com/orgs/supabase/discussions/14217'
+---
+
+You can check the Supabase Auth/API version of your project by heading to your project under [`project settings > general > Service versions > Auth version`](/dashboard/project/_/settings/general)
+
+You can also make a `GET` request to the health check endpoint to retrieve this information. Below is an example using `curl`:
+
+```bash
+curl -X GET 'https://project-ref.supabase.co/auth/v1/health' -H 'apikey: PUBLISHABLE_KEY'
+
+{
+    "version": "v2.60.7",
+    "name": "GoTrue",
+    "description": "GoTrue is a user registration and authentication API"
+}
+```

@@ -1,0 +1,13 @@
+---
+title: 'Why am I being redirected to the wrong url when using auth redirectTo option?'
+description: "Explains that auth redirects fall back to the wrong URL unless the exact redirectTo value is added to the project's Redirect URLs setting."
+topics: ['Troubleshooting', 'Auth']
+github_url: 'https://github.com/orgs/supabase/discussions/12946'
+---
+
+Why are redirects going to localhost instead of the production site URL?
+In order for the provided `redirectTo` option to work you must set the exact URL in the shown Redirect URL's setting.
+
+![Site URL and Redirect URLs in the Auth URL Configuration page](/kb/img/troubleshooting/224379580-fa77bd31-bb58-47e6-90ce-64e140f32579.png)
+
+For more information on formats for redirect URL settings see the documentation [here](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls)
