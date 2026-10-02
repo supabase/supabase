@@ -128,8 +128,8 @@ jobs:
 
           migration_files="$(find core/services/storage/migrations/tenant -maxdepth 1 -type f -name '*.sql' ! -name '.*' | wc -l | tr -d ' ')"
           migration_rows="$(docker exec storage-postgres psql -U postgres -d postgres -At -v ON_ERROR_STOP=1 -c 'select count(*) from storage.migrations;' | tr -d '[:space:]')"
-          echo "Storage tenant migration files: $migration_files; ledger rows: $migration_rows"
-          test "$migration_rows" -eq "$migration_files"
+          echo "Storage tenant migration files: $migration_files; ledger rows: $migration_rows; expected ledger rows: $((migration_files + 1)) (postgres-migrations bootstrap)"
+          test "$migration_rows" -eq "$((migration_files + 1))"
 
           unauthenticated="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:5000/object/ci-storage/unauthorized.txt)"
           test "$unauthenticated" = "401"
