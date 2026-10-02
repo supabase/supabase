@@ -1,7 +1,7 @@
 ---
 title: 'Scale without limits: Multigres, OrioleDB, and dbarena'
 description: 'The app your agent built in minutes stays on the same Postgres from prototype to petabyte.'
-author: joe_sciarrino, aditya_maruvada, riccardo_busetti
+author: joe_sciarrino, aditya_maruvada
 date: '2026-10-02T10:35:00'
 categories:
   - product
@@ -18,7 +18,7 @@ Today at Supabase Select, we announced Multigres for high availability and scala
 
 Every Supabase project starts with a single Postgres database. As your project grows, vertically upgrading the database’s available RAM & CPU resources can help, but it isn’t a solution to every challenge.
 
-Scaling Postgres isn’t a singular problem — users encounter new challenges at different stages of scale and under different workloads. Our users often report needing help scaling concurrent client connections, reducing the overhead of bloat and frequent VACUUM operations, increasing read and write throughput, offloading heavy analytics queries from Postgres, avoiding transaction ID wraparound, and guaranteeing uptime with high availability.
+Scaling Postgres isn’t a singular problem — users encounter new challenges at different stages of scale and under different workloads. Our users often report needing help scaling concurrent client connections, reducing the overhead of bloat and frequent VACUUM operations, increasing read and write throughput, avoiding transaction ID wraparound, and guaranteeing uptime with high availability.
 
 Our focus is to remove every scaling limitation from our user’s journey. That means tackling bottlenecks at every layer of Postgres, building in public, and making the improvements fully open source and available to the broader builder community.
 
