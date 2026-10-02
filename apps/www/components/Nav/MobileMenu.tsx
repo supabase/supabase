@@ -63,6 +63,11 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
               description={component.description_short}
               icon={component.icon}
               onClick={() => setOpen(false)}
+              badge={
+                component.name === 'Compute'
+                  ? { label: 'Private Alpha', variant: 'default' }
+                  : undefined
+              }
             />
           ))}
           <div>

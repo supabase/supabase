@@ -1,0 +1,56 @@
+{
+  "rules": {
+    "shadcn/no-arbitrary-values": 42,
+    "shadcn/no-unknown-classes": 8,
+    "shadcn/no-raw-colors": 22
+  },
+  "ruleFiles": {
+    "shadcn/no-arbitrary-values": {
+      "components/code-block-wrapper.tsx": 1,
+      "components/code-fragment.tsx": 7,
+      "components/color-palette.tsx": 2,
+      "components/command-menu.tsx": 1,
+      "components/component-preview.tsx": 12,
+      "components/mdx-components.tsx": 2,
+      "registry/default/example/admonition-button-split.tsx": 2,
+      "registry/default/example/assistant-chat-commands.tsx": 2,
+      "registry/default/example/button-split-dropdown.tsx": 2,
+      "registry/default/example/chart-tooltip-demo.tsx": 2,
+      "registry/default/example/command-dialog.tsx": 1,
+      "registry/default/example/connect-interstitial-shared.tsx": 2,
+      "registry/default/example/drawer-demo.tsx": 1,
+      "registry/default/example/page-layout-edge-function.tsx": 1,
+      "registry/default/example/toc-demo.tsx": 1,
+      "registry/default/example/toc-single-demo.tsx": 1,
+      "registry/default/example/typography-inline-code.tsx": 2
+    },
+    "shadcn/no-unknown-classes": {
+      "components/code-block-wrapper.tsx": 1,
+      "components/code-fragment.tsx": 1,
+      "components/component-preview.tsx": 1,
+      "components/mdx-components.tsx": 2,
+      "registry/default/example/data-grid-demo.tsx": 1,
+      "registry/default/example/data-grid-empty-state.tsx": 1,
+      "registry/default/example/form-patterns-sidepanel.tsx": 1
+    },
+    "shadcn/no-raw-colors": {
+      "components/code-block-wrapper.tsx": 2,
+      "components/copy-button.tsx": 3,
+      "registry/default/example/calendar-form.tsx": 1,
+      "registry/default/example/calendar-react-hook-form.tsx": 1,
+      "registry/default/example/checkbox-form-multiple.tsx": 1,
+      "registry/default/example/checkbox-form-single.tsx": 1,
+      "registry/default/example/combobox-form.tsx": 1,
+      "registry/default/example/connect-interstitial-shared.tsx": 3,
+      "registry/default/example/date-picker-form.tsx": 1,
+      "registry/default/example/input-form.tsx": 1,
+      "registry/default/example/input-otp-form.tsx": 1,
+      "registry/default/example/radio-group-card-form.tsx": 1,
+      "registry/default/example/radio-group-form.tsx": 1,
+      "registry/default/example/radio-group-stacked-form.tsx": 1,
+      "registry/default/example/select-form.tsx": 1,
+      "registry/default/example/switch-form.tsx": 1,
+      "registry/default/example/textarea-form.tsx": 1
+    }
+  }
+}

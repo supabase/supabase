@@ -18,6 +18,7 @@
     "test:headless-tools": "tsx scripts/test-headless-tools.mts",
     "start": "next start",
     "lint": "eslint .",
+    "lint:ratchet": "tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts --rules-file node_modules/eslint-config-supabase/ratchet-rules.json",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite",
     "typecheck": "run-p build:content build:markdown && next typegen && tsc --noEmit -p tsconfig.json"
   },
