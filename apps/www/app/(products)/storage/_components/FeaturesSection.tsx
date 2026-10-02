@@ -38,7 +38,7 @@ function InteroperableSkeleton() {
           {[0, 1].map((i) => (
             <div
               key={`left-conn-${i}`}
-              className="relative h-[1.5px] w-full overflow-hidden bg-brand/18 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)] [webkit-mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]"
+              className="relative h-[1.5px] w-full overflow-hidden bg-brand-default/18 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)] [webkit-mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]"
             >
               <div
                 className="absolute inset-y-0 left-0 w-24 [animation:interopLineSweep_1.05s_linear_infinite]"
@@ -55,7 +55,7 @@ function InteroperableSkeleton() {
           {[0, 1].map((i) => (
             <div
               key={`right-conn-${i}`}
-              className="relative h-[1.5px] w-full overflow-hidden bg-brand/18 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)] [webkit-mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]"
+              className="relative h-[1.5px] w-full overflow-hidden bg-brand-default/18 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)] [webkit-mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]"
             >
               <div
                 className="absolute inset-y-0 left-0 w-24 [animation:interopLineSweep_1.05s_linear_infinite]"
@@ -97,7 +97,7 @@ function InteroperableSkeleton() {
             height="34"
             viewBox="0 0 24 24"
             fill="none"
-            className="relative z-10 text-brand"
+            className="relative z-10 text-primary"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -153,7 +153,7 @@ function CDNSkeleton() {
           {[-20, -10, 0, 10, 20].map((offset, i) => (
             <div
               key={`flash-${offset}`}
-              className="relative h-px w-full overflow-hidden bg-brand/15 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)] [webkit-mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]"
+              className="relative h-px w-full overflow-hidden bg-brand-default/15 [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)] [webkit-mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]"
               style={{ transform: `translateY(${offset}px)` }}
             >
               <div
@@ -177,13 +177,13 @@ function CDNSkeleton() {
 
         <div className="relative flex h-[116px] w-[116px] items-center justify-center rounded-[24px] border border-foreground/15 bg-surface-200/95 shadow-[0_8px_28px_hsl(var(--background-default)/0.24)]">
           <div className="absolute inset-0 rounded-[24px] shadow-[inset_0_1px_0_hsl(var(--foreground-default)/0.06)]" />
-          <div className="absolute size-10 rounded-full bg-brand/15 blur-xl" />
+          <div className="absolute size-10 rounded-full bg-brand-default/15 blur-xl" />
           <svg
             width="48"
             height="48"
             viewBox="0 0 24 24"
             fill="none"
-            className="relative z-10 text-brand"
+            className="relative z-10 text-primary"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -217,7 +217,7 @@ function BucketsSkeleton() {
       name: 'Files',
       label: 'images, videos, docs',
       icon: 'folder' as const,
-      colorClass: 'text-brand',
+      colorClass: 'text-primary',
     },
     {
       name: 'Analytics',

@@ -477,6 +477,15 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         group by
           cf.country
         `,
+        safeSqlOtel: (filters) => safeLogSql`
+        select
+          log_attributes['request.cf.country'] as country,
+          toFloat64(count()) as count
+        from logs
+        ${otelWhere(filters, safeLogSql`notEmpty(log_attributes['request.cf.country'])`)}
+        group by country
+        order by count desc
+        limit 250`,
       },
     },
   },

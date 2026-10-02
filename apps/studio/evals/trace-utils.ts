@@ -223,5 +223,6 @@ export function getThreadPartsFromThread(thread: unknown[]): Transcript {
  * in a way the offline path isn't).
  */
 export async function getThreadParts(trace: Trace): Promise<Transcript> {
-  return getThreadPartsFromThread(await trace.getThread())
+  // Pinned to not rely on project's default preprocessor, which may be custom for Topics
+  return getThreadPartsFromThread(await trace.getThread({ preprocessor: 'thread' }))
 }

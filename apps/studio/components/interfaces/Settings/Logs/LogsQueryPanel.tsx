@@ -263,7 +263,7 @@ export const LogsQueryPanel = ({
                         href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand"
+                        className="text-primary"
                       >
                         unnesting joins
                         <ExternalLink
@@ -380,7 +380,7 @@ const Field = ({
         {isCopied ? (
           <Tooltip>
             <TooltipTrigger>
-              <Check size={14} strokeWidth={3} className="text-brand" />
+              <Check size={14} strokeWidth={3} className="text-primary" />
             </TooltipTrigger>
             <TooltipContent side="bottom">Copied</TooltipContent>
           </Tooltip>

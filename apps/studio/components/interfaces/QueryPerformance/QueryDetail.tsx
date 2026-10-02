@@ -1,7 +1,7 @@
 import { ChevronsUpDown, Lightbulb } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
-import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, cn, FloatingPlate } from 'ui'
 
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
@@ -92,6 +92,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
           />
         </div>
         <div
+          id="query-detail-sql-panel"
           className={cn(
             'overflow-hidden pb-0 z-0 relative transition-all duration-300',
             isExpanded ? 'h-[348px]' : 'h-[120px]'
@@ -104,7 +105,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
           {isLinterWarning && (
             <Alert
               variant="default"
-              className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
+              className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary"
             >
               <Lightbulb />
               <AlertTitle>Suggested optimization: Add an index</AlertTitle>
@@ -126,13 +127,18 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
           )}
         />
         <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
-          <Button
-            className="rounded-full"
-            icon={<ChevronsUpDown />}
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? 'Collapse' : 'Expand'}
-          </Button>
+          <FloatingPlate rounded="full">
+            <Button
+              type="button"
+              className="rounded-full"
+              icon={<ChevronsUpDown />}
+              aria-expanded={isExpanded}
+              aria-controls="query-detail-sql-panel"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? 'Collapse' : 'Expand'}
+            </Button>
+          </FloatingPlate>
         </div>
       </QueryPanelSection>
       <QueryPanelSection className="pb-3 pt-6">

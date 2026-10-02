@@ -51,7 +51,7 @@ describe('generateOtelWhereSafe', () => {
   })
 })
 
-describe('Storage report OTEL queries', () => {
+describe('Report OTEL queries', () => {
   it.each([
     ['totalRequests', 50000],
     ['topRoutes', 10],
@@ -60,6 +60,7 @@ describe('Storage report OTEL queries', () => {
     ['responseSpeed', 50000],
     ['topSlowRoutes', 10],
     ['networkTraffic', 50000],
+    ['requestsByCountry', 250],
   ])('uses edge_logs and a fixed limit for API query %s', (queryName, limit) => {
     const sql = getOtelSql(Presets.API, queryName)
 
@@ -87,6 +88,7 @@ describe('Storage report OTEL queries', () => {
     const routesSql = getOtelSql(Presets.API, 'topRoutes')
     const speedSql = getOtelSql(Presets.API, 'responseSpeed')
     const trafficSql = getOtelSql(Presets.API, 'networkTraffic')
+    const countrySql = getOtelSql(Presets.API, 'requestsByCountry')
 
     expect(routesSql).toContain("log_attributes['request.path'] as path")
     expect(routesSql).toContain("log_attributes['request.method'] as method")
@@ -104,6 +106,8 @@ describe('Storage report OTEL queries', () => {
     expect(trafficSql).toContain(
       "sum(toFloat64OrZero(log_attributes['response.headers.content_length'])) / 1000000 as egress_mb"
     )
+    expect(countrySql).toContain("log_attributes['request.cf.country'] as country")
+    expect(countrySql).toContain("notEmpty(log_attributes['request.cf.country'])")
   })
 
   it('builds numeric Storage cache results from exact OTEL attributes', () => {

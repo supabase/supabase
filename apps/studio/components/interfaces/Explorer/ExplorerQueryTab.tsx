@@ -133,6 +133,7 @@ export const ExplorerQueryTab = () => {
     <QueryEditor
       ref={queryEditorRef}
       id={id}
+      location={{ surface: 'query_tab', queryId: id }}
       variant="viewport"
       title={draft.name}
       query={query}
@@ -183,7 +184,7 @@ export const ExplorerQueryTab = () => {
                   <Keyboard size={14} />
                   <span>Intellisense enabled</span>
                 </div>
-                {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+                {isIntellisenseEnabled && <Check className="text-primary" size={16} />}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

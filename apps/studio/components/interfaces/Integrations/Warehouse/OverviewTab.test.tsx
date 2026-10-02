@@ -255,6 +255,7 @@ describe('WarehouseOverviewTab', () => {
                   name: 'customers',
                   copy_name: 'public.customers',
                   state: 'syncing',
+                  lag_ms: 0,
                 },
               ]
             : [],
@@ -270,6 +271,7 @@ describe('WarehouseOverviewTab', () => {
         ).toBeInTheDocument()
         expect(screen.getByText('orders')).toBeInTheDocument()
         expect(screen.getByText('customers')).toBeInTheDocument()
+        expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
       }
     }
   )
@@ -341,9 +343,13 @@ describe('WarehouseOverviewTab', () => {
       expect(await screen.findByRole('heading', { name })).toBeInTheDocument()
     }
     expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
-    expect(screen.getByText('Synced')).toBeInTheDocument()
+    expect(screen.getByText('Live')).toBeInTheDocument()
     expect(screen.getByText('Backfilling')).toBeInTheDocument()
     expect(screen.getByText('Error')).toBeInTheDocument()
+    expect(screen.getByText('Caught up')).toBeInTheDocument()
+    expect(screen.queryByText(/behind$/)).not.toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Lag' })).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: 'Size' })).not.toBeInTheDocument()
 
     const headings = screen
       .getAllByRole('heading')

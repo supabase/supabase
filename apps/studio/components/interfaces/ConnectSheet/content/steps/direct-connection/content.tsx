@@ -178,7 +178,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
         </div>
         {deploymentMode.isPlatform && temporaryDatabasePassword && (
           <div className="flex items-center gap-2 border-t px-4 py-3 text-sm text-foreground-light">
-            <Check size={16} className="text-brand shrink-0" />
+            <Check size={16} className="text-primary shrink-0" />
             <span>New password shown until refresh.</span>
           </div>
         )}
