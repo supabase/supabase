@@ -60,6 +60,12 @@ export const PLAN_DETAILS: Record<PlanId, PlanDetails> = {
   platform: { includedDiskGB: { gp3: 8, io2: 0 } },
 }
 
+export const SUPPORTED_DISK_CONFIG_UNDER_COST_GUARDRAIL = {
+  storageType: DiskType.GP3,
+  provisionedIOPS: DISK_LIMITS[DiskType.GP3].minIops,
+  throughput: DISK_LIMITS[DiskType.GP3].minThroughput,
+} as const
+
 export const RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 = ['ci_nano', 'ci_micro', 'ci_small', 'ci_medium']
 
 export const RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 = [
