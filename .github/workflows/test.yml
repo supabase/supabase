@@ -1,0 +1,134 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    tags: ["*"]
+
+permissions:
+  contents: read
+
+jobs:
+  test_postgres:
+    name: Test / Postgres
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+      - name: Check gofmt
+        run: make check-format
+      - name: Init Database
+        run: psql -f hack/init_postgres.sql postgresql://postgres:root@localhost:5432/postgres
+      - name: Run migrations
+        run: make migrate_dev
+      - name: Run linters and tests
+        run: |
+          set -x
+
+          MAKE_JOBS="$(nproc 2>/dev/null || echo 4)"
+          make -j"$MAKE_JOBS" release-test
+
+      - name: Cleanup coverage
+        run: |
+          set -x
+
+          # since Go 1.20 these source files need to be deleted from the
+          # coverage profile as they contain legacy or untestable code (like
+          # `main` package)
+
+          sed -i '/^github.com\/supabase\/auth\/client/d' coverage.out
+          sed -i '/^github.com\/supabase\/auth\/cmd/d' coverage.out
+          sed -i '/^github.com\/supabase\/auth\/docs/d' coverage.out
+          sed -i '/^github.com\/supabase\/auth\/main/d' coverage.out
+
+      - uses: shogo82148/actions-goveralls@25f5320d970fb565100cf1993ada29be1bb196a1 # v1.10.0
+        with:
+          path-to-profile: coverage.out
+
+  test_oriole:
+    name: Test / OrioleDB
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    services:
+      postgres:
+        image: orioledb/orioledb:beta16-pre-2-pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: postgres
+          POSTGRES_INITDB_ARGS: "--locale=C"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+      - name: Init Database
+        run: psql -f hack/init_postgres.sql postgresql://postgres:root@localhost:5432/postgres
+      - name: Run migrations
+        run: make migrate_dev
+      - name: Run tests
+        run: go test ./... -p 1 -race -v -count=1
+
+  test_multigres:
+    name: Test / Multigres
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: ghcr.io/multigres/multigres-cluster:latest
+        env:
+          MULTIGRES_GATEWAY_PG_PORT: "5432"
+          MULTIGRES_NUM_CELLS: "2"
+          MULTIGRES_PG_MAX_CONNECTIONS: "100"
+        ports:
+          - 5432:5432
+        options: >-
+          --init
+          --shm-size=1gb
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+      - name: Init Database
+        # Multigres' superuser is postgres/postgres (POSTGRES_PASSWORD is
+        # ignored); init_postgres.sql then creates supabase_auth_admin (pw root)
+        # which migrations and tests connect as, exactly like the other jobs.
+        run: psql -f hack/init_postgres.sql postgresql://postgres:postgres@localhost:5432/postgres
+      - name: Run migrations
+        run: make migrate_dev
+      - name: Run tests
+        # Multigres' postgres superuser password is "postgres" (not "root")
+        env:
+          POSTGRES_PASSWORD: postgres
+        run: go test ./... -p 1 -race -v -count=1

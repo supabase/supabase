@@ -1,0 +1,34 @@
+{
+  "name": "Gotrue",
+  "description": "",
+  "website": "https://www.gotrueapi.org",
+  "repository": "https://github.com/supabase/gotrue",
+  "env": {
+    "DATABASE_URL": {},
+    "GOTRUE_DB_DRIVER": {
+      "value": "postgres"
+    },
+    "GOTRUE_DB_AUTOMIGRATE": {
+      "value": true
+    },
+    "GOTRUE_DB_NAMESPACE": {
+      "value": "auth"
+    },
+    "GOTRUE_JWT_SECRET": {
+      "required": true
+    },
+    "GOTRUE_SMTP_ADMIN_EMAIL": {},
+    "GOTRUE_SMTP_HOST": {},
+    "GOTRUE_SMTP_PASS": {},
+    "GOTRUE_SMTP_PORT": {},
+    "GOTRUE_MAILER_SITE_URL": {},
+    "GOTRUE_MAILER_SUBJECTS_CONFIRMATION": {},
+    "GOTRUE_MAILER_SUBJECTS_RECOVERY": {},
+    "GOTRUE_MAILER_SUBJECTS_MAGIC_LINK": {},
+    "GOTRUE_MAILER_TEMPLATES_CONFIRMATION": {},
+    "GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGE": {},
+    "GOTRUE_MAILER_TEMPLATES_RECOVERY": {},
+    "GOTRUE_MAILER_TEMPLATES_MAGIC_LINK": {},
+    "GOTRUE_MAILER_USER": {}
+  }
+}

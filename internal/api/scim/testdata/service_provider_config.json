@@ -1,0 +1,39 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+  ],
+  "patch": {
+    "supported": false
+  },
+  "bulk": {
+    "supported": false,
+    "maxOperations": 0,
+    "maxPayloadSize": 0
+  },
+  "filter": {
+    "supported": false,
+    "maxResults": 0
+  },
+  "changePassword": {
+    "supported": false
+  },
+  "sort": {
+    "supported": false
+  },
+  "etag": {
+    "supported": false
+  },
+  "authenticationSchemes": [
+    {
+      "type": "oauthbearertoken",
+      "name": "OAuth Bearer Token",
+      "description": "Authentication scheme using the OAuth Bearer Token Standard",
+      "specUri": "http://www.rfc-editor.org/info/rfc6750",
+      "primary": true
+    }
+  ],
+  "meta": {
+    "resourceType": "ServiceProviderConfig",
+    "location": "http://localhost:9999/scim/v2/ServiceProviderConfig"
+  }
+}

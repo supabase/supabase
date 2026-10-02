@@ -1,0 +1,41 @@
+# Set the default behavior
+* text=auto
+
+# Go files
+*.mod text eol=lf
+*.sum text eol=lf
+*.go text eol=lf
+
+# Serialization
+*.yml eol=lf
+*.yaml eol=lf
+*.toml eol=lf
+*.json eol=lf
+
+# Scripts
+*.sh eol=lf
+
+# DB files
+*.sql eol=lf
+
+# Html
+*.html eol=lf
+
+# Text and markdown files
+*.txt text eol=lf
+*.md text eol=lf
+
+# Environment files/examples
+*.env text eol=lf
+
+# Docker files
+.dockerignore text eol=lf
+Dockerfile* text eol=lf
+
+# Makefile
+Makefile text eol=lf
+
+# Git files
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.gitkeep text eol=lf

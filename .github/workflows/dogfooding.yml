@@ -1,0 +1,58 @@
+name: Dogfooding Check
+
+on:
+  pull_request_review:
+    types: [submitted, edited]
+
+  pull_request:
+
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  check_dogfooding:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: github.event.pull_request.base.ref == 'master' && github.event.pull_request.head.ref == 'release-please--branches--master'
+        with:
+          ref: master # used to identify the latest RC version via git describe --tags --match rc*
+          fetch-depth: 0
+
+      - if: github.event.pull_request.base.ref == 'master' && github.event.pull_request.head.ref == 'release-please--branches--master'
+        run: |
+          set -ex
+
+          # finds the latest RC version on master
+          RELEASE_VERSION=$(node -e "const a = '$(git describe --tags --match rc*)'.replace(/^rc/, 'v').split('-'); console.log(a[0] + '-' + a[1]);")
+
+          PROD_VERSION=$(curl 'https://auth.supabase.io/auth/v1/health' | jq -r .version)
+          STAGING_VERSION=$(curl 'https://alt.supabase.green/auth/v1/health' | jq -r .version)
+
+          echo "Expecting RC version $RELEASE_VERSION to be up on prod and staging."
+
+          if [ "$PROD_VERSION" != "$STAGING_VERSION" ]
+          then
+            echo "Versions on prod and staging don't match!"
+
+            exit 1
+          fi
+
+          if [ "$PROD_VERSION" != "$RELEASE_VERSION" ]
+          then
+            echo "Version on prod $PROD_VERSION is not the latest release candidate. Please release this RC first to proof the release before merging this PR."
+            exit 1
+          fi
+
+          echo "Release away!"
+          exit 0
+
+      - if: github.event.pull_request.base.ref != 'master' || github.event.pull_request.head.ref != 'release-please--branches--master'
+        run: |
+          set -ex
+
+          echo "This PR is not subject to dogfooding checks."
+          exit 0
+

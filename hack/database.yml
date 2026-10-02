@@ -1,0 +1,15 @@
+postgres: 
+  dialect: "postgres"
+  database: "postgres"
+  host: {{ envOr "POSTGRES_HOST" "127.0.0.1"  }}
+  port: {{ envOr "POSTGRES_PORT" "5432"  }}
+  user: {{ envOr "POSTGRES_USER"  "postgres"  }}
+  password: {{ envOr "POSTGRES_PASSWORD"  "root"  }}
+
+test:
+  dialect: "postgres"
+  database: "postgres"
+  host: {{ envOr "POSTGRES_HOST" "127.0.0.1"  }}
+  port: {{ envOr "POSTGRES_PORT" "5432"  }}
+  user: {{ envOr "POSTGRES_USER"  "postgres"  }}
+  password: {{ envOr "POSTGRES_PASSWORD"  "root"  }}

@@ -1,0 +1,4307 @@
+openapi: 3.0.3
+info:
+  version: latest
+  title: Supabase Auth REST API
+  description: |-
+    This is the REST API for [Supabase Auth](https://supabase.com/auth). Visit https://supabase.com/docs/guides/auth for complete documentation.
+
+    **Notes:**
+    - HTTP 5XX errors are not listed for each endpoint.
+      These should be handled globally. Not all HTTP 5XX errors are generated from Auth, and they may serve non-JSON content. Make sure you inspect the `Content-Type` header before parsing as JSON.
+    - Error responses are somewhat inconsistent.
+      Avoid using the `msg` and HTTP status code to identify errors. HTTP 400 and 422 are used interchangeably in many APIs.
+    - If the server has CAPTCHA protection enabled, the verification token should be included in the request body.
+    - Rate limit errors are consistently raised with the HTTP 429 code.
+    - Enums are used only in request bodies / parameters and not in responses to ensure wide compatibility with code generators that fail to include an unknown enum case.
+
+    **OAuth Support:**
+    - This service supports two OAuth modes:
+      - **OAuth Client**: Endpoints tagged `oauth-client` are used when this service connects to external OAuth providers (like Google, GitHub)
+      - **OAuth Server**: Endpoints tagged `oauth-server` are used when this service acts as an OAuth provider for other applications
+
+    **Backward compatibility:**
+    - Endpoints marked as _Experimental_ may change without notice.
+    - Endpoints marked as _Deprecated_ will be supported for at least 3 months since being marked as deprecated.
+    - HTTP status codes like 400, 404, 422 may change for the same underlying error condition.
+
+  termsOfService: https://supabase.com/terms
+  contact:
+    name: Ask a question about this API
+    url: https://github.com/supabase/supabase/discussions
+  license:
+    name: MIT License
+    url: https://github.com/supabase/auth/blob/master/LICENSE
+externalDocs:
+  description: Learn more about Supabase Auth
+  url: https://supabase.com/docs/guides/auth/overview
+servers:
+  - url: "https://{project}.supabase.co/auth/v1"
+    variables:
+      project:
+        description: >
+          Your Supabase project ID.
+        default: abcdefghijklmnopqrst
+tags:
+  - name: auth
+    description: APIs for authentication and authorization.
+  - name: user
+    description: APIs used by a user to manage their account.
+  - name: oauth-client
+    description: APIs for OAuth flows where this service acts as an OAuth client (connecting to external providers).
+  - name: oauth-server
+    description: APIs for OAuth 2.1 flows where this service acts as an OAuth provider/server for other applications. Requires `GOTRUE_OAUTH_SERVER_ENABLED=true` for self-hosted or enable in Supabase Dashboard. (Experimental.)
+  - name: sso
+    description: APIs for authenticating using SSO providers (SAML). (Experimental.)
+  - name: saml
+    description: SAML 2.0 Endpoints. (Experimental.)
+  - name: admin
+    description: Administration APIs requiring elevated access.
+  - name: general
+    description: General APIs.
+paths:
+  /token:
+    post:
+      summary: Issues access and refresh tokens based on grant type.
+      tags:
+        - auth
+      parameters:
+        - name: grant_type
+          in: query
+          required: true
+          description: >
+            - What grant type should be used to issue an access and refresh token. Note: `id_token` is only offered in experimental mode. 
+
+            - CAPTCHA protection does not apply on the `refresh_token` grant flow.
+
+            - Using `password` is akin to a user signing in. 
+
+            - `pkce` is used for exchanging the authorization code for a pair of access and refresh tokens.
+          schema:
+            type: string
+            enum:
+              - password
+              - refresh_token
+              - id_token
+              - pkce
+              - web3
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            examples:
+              grant_type=password:
+                value:
+                  email: user@example.com
+                  password: password1
+              grant_type=refresh_token:
+                value:
+                  refresh_token: 4nYUCw0wZR_DNOTSDbSGMQ
+              grant_type=pkce:
+                value:
+                  auth_code: 009e5066-fc11-4eca-8c8c-6fd82aa263f2
+                  code_verifier: ktPNXpR65N6JtgzQA8_5HHtH6PBSAahMNoLKRzQEa0Tzgl.vdV~b6lPk004XOd.4lR0inCde.NoQx5K63xPfzL8o7tJAjXncnhw5Niv9ycQ.QRV9JG.y3VapqbgLfIrJ
+              web3_solana:
+                value:
+                  message: "example.com wants you to sign in with your Solana account:\n0x1234...5678\n\nSign in with Solana\n\nURI: https://example.com\nVersion: 1\nNonce: abc123def456\nIssued At: 2023-09-19T12:00:00Z"
+                  signature: "base64_encoded_signature_string"
+                  chain: "solana"
+              web3_ethereum:
+                value:
+                  message: "example.com wants you to sign in with your Ethereum account:\n0x1234567890123456789012345678901234567890\n\nSign in with Ethereum\n\nURI: https://example.com\nVersion: 1\nIssued At: 2023-09-19T12:00:00Z"
+                  signature: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1b"
+                  chain: "ethereum"
+            schema:
+              type: object
+              description: |-
+                For the refresh token flow, supply only `refresh_token`.
+                For the email/phone with password flow, supply `email`, `phone` and `password` with an optional `gotrue_meta_security`.
+                For the OIDC ID token flow, supply `id_token`, `nonce`, `provider`, `client_id`, `issuer` with an optional `gotrue_meta_security`.
+                For the Web3 flow, supply `message`, `signature`, and `chain`.
+              properties:
+                refresh_token:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                  format: phone
+                id_token:
+                  type: string
+                access_token:
+                  type: string
+                  description: Provide only when `grant_type` is `id_token` and the provided ID token requires the presence of an access token to be accepted (usually by having an `at_hash` claim).
+                nonce:
+                  type: string
+                provider:
+                  type: string
+                  enum:
+                    - google
+                    - apple
+                    - azure
+                    - facebook
+                    - keycloak
+                client_id:
+                  type: string
+                issuer:
+                  type: string
+                  description: If `provider` is `azure` then you can specify any Azure OIDC issuer string here, which will be used for verification.
+                gotrue_meta_security:
+                  $ref: "#/components/schemas/GoTrueSecurity"
+                auth_code:
+                  type: string
+                  format: uuid
+                code_verifier:
+                  type: string
+                message:
+                  type: string
+                  description: |
+                    Signed message for Web3 authentication following the Sign in with Solana (SIWS) or Sign in with Ethereum (SIWE) standard. Must include: `Issued At`, `URI`, `Version`.
+                signature:
+                  type: string
+                  description: |
+                    The signature of the message for Web3 authentication. 
+                    For Solana: Base64 or Base64-URL encoded. 
+                    For Ethereum: hexadecimal string with 0x prefix.
+                chain:
+                  type: string
+                  description: What blockchain is the Web3 message and signature for.
+                  enum:
+                    - solana
+                    - ethereum
+                  example: solana
+      responses:
+        200:
+          description: >
+            An access and refresh token have been successfully issued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenResponseSchema"
+
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/ForbiddenResponse"
+        403:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        500:
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /logout:
+    post:
+      summary: Logs out a user.
+      tags:
+        - auth
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      parameters:
+        - name: scope
+          in: query
+          description: >
+            (Optional.) Determines how the user should be logged out. When `global` is used, the user is logged out from all active sessions. When `local` is used, the user is logged out from the current session. When `others` is used, the user is logged out from all other sessions except the current one. Clients should remove stored access and refresh tokens except when `others` is used.
+          schema:
+            type: string
+            enum:
+              - global
+              - local
+              - others
+      responses:
+        204:
+          description: No content returned on successful logout.
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+
+  /verify:
+    get:
+      summary: Authenticate by verifying the possession of a one-time token. Usually for use as clickable links.
+      tags:
+        - auth
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - signup
+              - invite
+              - recovery
+              - magiclink
+              - email_change
+        - name: redirect_to
+          in: query
+          description: >
+            (Optional) URL to redirect back into the app on after verification completes successfully. If not specified will use the "Site URL" configuration option. If not allowed per the allow list it will use the "Site URL" configuration option.
+          schema:
+            type: string
+            format: uri
+      security:
+        - APIKeyAuth: []
+      responses:
+        302:
+          $ref: "#/components/responses/AccessRefreshTokenRedirectResponse"
+    post:
+      summary: Authenticate by verifying the possession of a one-time token.
+      tags:
+        - auth
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - signup
+                    - recovery
+                    - invite
+                    - magiclink
+                    - email_change
+                    - sms
+                    - phone_change
+                token:
+                  type: string
+                token_hash:
+                  type: string
+                  description: >
+                    The hashed value of token. Applicable only if used with `type` and nothing else.
+                email:
+                  type: string
+                  format: email
+                  description: >
+                    Applicable only if `type` is with regards to an email address.
+                phone:
+                  type: string
+                  format: phone
+                  description: >
+                    Applicable only if `type` is with regards to an phone number.
+                redirect_to:
+                  type: string
+                  format: uri
+                  description: >
+                    (Optional) URL to redirect back into the app on after verification completes successfully. If not specified will use the "Site URL" configuration option. If not allowed per the allow list it will use the "Site URL" configuration option.
+
+      responses:
+        200:
+          description: An access and refresh token.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenResponseSchema"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /authorize:
+    get:
+      summary: Redirects to an external OAuth provider. Usually for use as clickable links.
+      tags:
+        - oauth-client
+      security:
+        - APIKeyAuth: []
+      parameters:
+        - name: provider
+          in: query
+          description: Name of the OAuth provider.
+          example: google
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-zA-Z0-9]+$"
+        - name: scopes
+          in: query
+          required: true
+          description: Space separated list of OAuth scopes to pass on to `provider`.
+          schema:
+            type: string
+            pattern: "[^ ]+( +[^ ]+)*"
+        - name: invite_token
+          in: query
+          description: (Optional) A token representing a previous invitation of the user. A successful sign-in with OAuth will mark the invitation as completed.
+          schema:
+            type: string
+        - name: redirect_to
+          in: query
+          description: >
+            (Optional) URL to redirect back into the app on after OAuth sign-in completes successfully or not. If not specified will use the "Site URL" configuration option. If not allowed per the allow list it will use the "Site URL" configuration option.
+          schema:
+            type: string
+            format: uri
+        - name: code_challenge_method
+          in: query
+          description: (Optional) Method used to encrypt the verifier. Can be `plain` (no transformation) or `s256` (where SHA-256 is used). It is always recommended that `s256` is used.
+          schema:
+            type: string
+            enum:
+              - plain
+              - s256
+      responses:
+        302:
+          $ref: "#/components/responses/OAuthAuthorizeRedirectResponse"
+
+  /signup:
+    post:
+      summary: Signs a user up.
+      description: >
+        Creates a new user.
+      tags:
+        - auth
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            examples:
+              "email+password":
+                value:
+                  email: user@example.com
+                  password: password1
+              "phone+password":
+                value:
+                  phone: "+1234567890"
+                  password: password1
+              "phone+password+whatsapp":
+                value:
+                  phone: "+1234567890"
+                  password: password1
+                  channel: whatsapp
+              "email+password+pkce":
+                value:
+                  email: user@example.com
+                  password: password1
+                  code_challenge_method: s256
+                  code_challenge: elU6u5zyqQT2f92GRQUq6PautAeNDf4DQPayyR0ek_c&
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                  format: phone
+                channel:
+                  type: string
+                  enum:
+                    - sms
+                    - whatsapp
+                password:
+                  type: string
+                data:
+                  type: object
+                code_challenge:
+                  type: string
+                code_challenge_method:
+                  type: string
+                  enum:
+                    - plain
+                    - s256
+                gotrue_meta_security:
+                  $ref: "#/components/schemas/GoTrueSecurity"
+      responses:
+        200:
+          description: >
+            A user already exists and is not confirmed (in which case a user object is returned). A user did not exist and is signed up. If email or phone confirmation is enabled, returns a user object. If confirmation is disabled, returns an access token and refresh token response.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/AccessTokenResponseSchema"
+                  - $ref: "#/components/schemas/UserSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /recover:
+    post:
+      summary: Request password recovery.
+      description: >
+        Users that have forgotten their password can have it reset with this API.
+      tags:
+        - auth
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                code_challenge:
+                  type: string
+                code_challenge_method:
+                  type: string
+                  enum:
+                    - plain
+                    - s256
+                gotrue_meta_security:
+                  $ref: "#/components/schemas/GoTrueSecurity"
+      responses:
+        200:
+          description: A recovery email has been sent to the address. An empty JSON object is returned. To obfuscate whether such an email address already exists in the system this response is sent regardless whether the address exists or not.
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        422:
+          description: Returned when unable to validate the email address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /resend:
+    post:
+      summary: Resends a one-time password (OTP) through email or SMS.
+      description: >
+        Allows a user to resend an existing signup, sms, email_change or phone_change OTP.
+      tags:
+        - auth
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: >
+                    Applicable only if `type` is with regards to an email address.
+                phone:
+                  type: string
+                  format: phone
+                  description: >
+                    Applicable only if `type` is with regards to an phone number.
+                type:
+                  type: string
+                  enum:
+                    - signup
+                    - email_change
+                    - sms
+                    - phone_change
+                gotrue_meta_security:
+                  $ref: "#/components/schemas/GoTrueSecurity"
+      responses:
+        200:
+          description: A One-Time Password was sent to the email or phone. To obfuscate whether such an address or number already exists in the system this response is sent in both cases.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: string
+                    description: Unique ID of the message as reported by the SMS sending provider. Useful for tracking deliverability problems.
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        422:
+          description: Returned when unable to validate the email address or phone number.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /magiclink:
+    post:
+      summary: Authenticate a user by sending them a magic link.
+      description: >
+        A magic link is a special type of URL that includes a One-Time Password. When a user visits this link in a browser they are immediately authenticated.
+      tags:
+        - auth
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                data:
+                  type: object
+                gotrue_meta_security:
+                  $ref: "#/components/schemas/GoTrueSecurity"
+      responses:
+        200:
+          description: A recovery email has been sent to the address. An empty JSON object is returned. To obfuscate whether such an email address already exists in the system this response is sent regardless whether the address exists or not.
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        422:
+          description: Returned when unable to validate the email address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /otp:
+    post:
+      summary: Authenticate a user by sending them a One-Time Password over email or SMS.
+      tags:
+        - auth
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                  format: phone
+                channel:
+                  type: string
+                  enum:
+                    - sms
+                    - whatsapp
+                create_user:
+                  type: boolean
+                data:
+                  type: object
+                code_challenge_method:
+                  type: string
+                  enum:
+                    - s256
+                    - plain
+                code_challenge:
+                  type: string
+                gotrue_meta_security:
+                  $ref: "#/components/schemas/GoTrueSecurity"
+      responses:
+        200:
+          description: A One-Time Password was sent to the email or phone. To obfuscate whether such an address or number already exists in the system this response is sent in both cases.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: string
+                    description: Unique ID of the message as reported by the SMS sending provider. Useful for tracking deliverability problems.
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        422:
+          description: Returned when unable to validate the email or phone number.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /user:
+    get:
+      summary: Fetch the latest user account information.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      responses:
+        200:
+          description: User's account information.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSchema"
+    put:
+      summary: Update certain properties of the current user account.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                  format: phone
+                password:
+                  type: string
+                nonce:
+                  type: string
+                data:
+                  type: object
+                app_metadata:
+                  type: object
+                channel:
+                  type: string
+                  enum:
+                    - sms
+                    - whatsapp
+      responses:
+        200:
+          description: User's updated account information.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /user/identities/authorize:
+    get:
+      summary: Links an OAuth identity to an existing user. Redirects to an external OAuth provider.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      parameters:
+        - name: provider
+          in: query
+          description: Name of the OAuth provider.
+          example: google
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-zA-Z0-9]+$"
+        - name: scopes
+          in: query
+          required: true
+          description: Space separated list of OAuth scopes to pass on to `provider`.
+          schema:
+            type: string
+            pattern: "[^ ]+( +[^ ]+)*"
+        - name: redirect_to
+          in: query
+          description: >
+            (Optional) URL to redirect back into the app on after OAuth sign-in completes successfully or not. If not specified will use the "Site URL" configuration option. If not allowed per the allow list it will use the "Site URL" configuration option.
+          schema:
+            type: string
+            format: uri
+        - name: code_challenge_method
+          in: query
+          description: (Optional) Method used to encrypt the verifier. Can be `plain` (no transformation) or `s256` (where SHA-256 is used). It is always recommended that `s256` is used.
+          schema:
+            type: string
+            enum:
+              - plain
+              - s256
+      responses:
+        302:
+          $ref: "#/components/responses/OAuthAuthorizeRedirectResponse"
+
+  /user/identities/{identityId}:
+    parameters:
+      - name: identityId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      summary: Unlinks an identity from the current user.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      responses:
+        200:
+          description: User's account data.
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: no_authorization
+                  value:
+                    error_code: no_authorization
+        403:
+          description: Forbidden error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: bad_jwt
+                  value:
+                    error_code: bad_jwt
+                example1:
+                  summary: unexpected_audience
+                  value:
+                    error_code: unexpected_audience
+        404:
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: manual_linking_disabled
+                  value:
+                    error_code: manual_linking_disabled
+                example1:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+        422:
+          description: Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: single_identity_not_deletable
+                  value:
+                    error_code: single_identity_not_deletable
+                example1:
+                  summary: identity_already_exists
+                  value:
+                    error_code: identity_already_exists
+                example2:
+                  summary: identity_not_found
+                  value:
+                    error_code: identity_not_found
+                example3:
+                  summary: email_conflict_identity_not_deletable
+                  value:
+                    error_code: email_conflict_identity_not_deletable
+
+  /user/oauth/grants:
+    get:
+      summary: List OAuth grants
+      description: >
+        Retrieves a list of all OAuth grants that the authenticated user has authorized. Only available when OAuth server is enabled.
+      tags:
+        - user
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      responses:
+        200:
+          description: List of user's OAuth grants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    client:
+                      type: object
+                      description: OAuth client details
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          description: Unique client identifier
+                        name:
+                          type: string
+                          description: Human-readable name of the client application
+                        uri:
+                          type: string
+                          format: uri
+                          description: URL of the client application's homepage
+                        logo_uri:
+                          type: string
+                          format: uri
+                          description: URL of the client application's logo
+                    scopes:
+                      type: array
+                      items:
+                        type: string
+                      description: List of scopes granted to this client
+                    granted_at:
+                      type: string
+                      format: date-time
+                      description: Timestamp when grant was authorized
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+    delete:
+      summary: Revoke OAuth grant
+      description: >
+        Revokes the user's OAuth grant for a specific client. This will:
+        - Mark the consent as revoked
+        - Delete all active sessions associated with this OAuth client
+        - Invalidate all refresh tokens for those sessions
+
+        Only available when OAuth server is enabled.
+      tags:
+        - user
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      parameters:
+        - name: client_id
+          in: query
+          required: true
+          description: The OAuth client identifier
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Grant successfully revoked
+        400:
+          description: Missing or invalid client_id parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                validation_failed:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+                    msg: client_id query parameter is required
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: No active grant found for this client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                oauth_consent_not_found:
+                  summary: oauth_consent_not_found
+                  value:
+                    error_code: oauth_consent_not_found
+                    msg: No active grant found for this client
+
+  /reauthenticate:
+    post:
+      summary: Reauthenticates the possession of an email or phone number for the purpose of password change.
+      description: >
+        For a password to be changed on a user account, the user's email or phone number needs to be confirmed before they are allowed to set a new password. This requirement is configurable. This API sends a confirmation email or SMS message. A nonce in this message can be provided in `PUT /user` to change the password on the account.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      responses:
+        200:
+          description: A One-Time Password was sent to the user's email or phone.
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /factors:
+    post:
+      summary: Begin enrolling a new factor for MFA.
+      description: >
+        Starts enrollment of a `totp`, `phone` or `webauthn` factor. Recovery codes are not enrolled through this endpoint; use `POST /factors/recovery-codes` instead.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - factor_type
+              properties:
+                factor_type:
+                  type: string
+                  enum:
+                    - totp
+                    - phone
+                    - webauthn
+                friendly_name:
+                  type: string
+                issuer:
+                  type: string
+                  format: uri
+                phone:
+                  type: string
+                  format: phone
+      responses:
+        200:
+          description: >
+            A new factor was created in the unverified state. Call `POST /factors/{factorId}/verify' to verify it.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  type:
+                    type: string
+                    enum:
+                      - totp
+                      - phone
+                      - webauthn
+                  totp:
+                    type: object
+                    properties:
+                      qr_code:
+                        type: string
+                      secret:
+                        type: string
+                      uri:
+                        type: string
+                  phone:
+                    type: string
+                    format: phone
+
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+
+  /factors/{factorId}/challenge:
+    post:
+      summary: Create a new challenge for a MFA factor.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      parameters:
+        - name: factorId
+          in: path
+          required: true
+          example: 2b306a77-21dc-4110-ba71-537cb56b9e98
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channel:
+                  type: string
+                  enum:
+                    - sms
+                    - whatsapp
+
+      responses:
+        200:
+          description: >
+            A new challenge was generated for the factor. Use `POST /factors/{factorId}/verify` to verify the challenge.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TOTPPhoneChallengeResponse"
+                  - $ref: "#/components/schemas/WebAuthnChallengeResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /factors/{factorId}/verify:
+    post:
+      summary: Verify a challenge on a factor.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      parameters:
+        - name: factorId
+          in: path
+          required: true
+          example: 2b306a77-21dc-4110-ba71-537cb56b9e98
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - challenge_id
+              properties:
+                challenge_id:
+                  type: string
+                  format: uuid
+                code:
+                  type: string
+                webauthn:
+                  type: object
+                  required:
+                    - type
+                    - credential_response
+                  properties:
+                    type:
+                      type: string
+                      enum: [create, request]
+                      description: Type of WebAuthn operation
+                    credential_response:
+                      type: object
+                      description: WebAuthn credential response from the client
+      responses:
+        200:
+          description: >
+            This challenge has been verified. Client libraries should replace their stored access and refresh tokens with the ones provided in this response. These new credentials have an increased Authenticator Assurance Level (AAL).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenResponseSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /factors/{factorId}:
+    delete:
+      summary: Remove a MFA factor from a user.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      parameters:
+        - name: factorId
+          in: path
+          required: true
+          example: 2b306a77-21dc-4110-ba71-537cb56b9e98
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: >
+            This MFA factor is removed (unenrolled) and cannot be used for increasing the AAL level of user's sessions. Client libraries should use the `POST /token?grant_type=refresh_token` endpoint to get a new access and refresh token with a decreased AAL.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: 2b306a77-21dc-4110-ba71-537cb56b9e98
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        422:
+          description: >
+            Unprocessable entity. Returned when the factor is a recovery-code factor (use `DELETE /factors/recovery-codes` instead), when unenrolling the user's last verified second factor would leave recovery codes as the only second factor, or when the session does not have the required AAL.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+                example1:
+                  summary: mfa_recovery_codes_sole_factor
+                  value:
+                    error_code: mfa_recovery_codes_sole_factor
+                example2:
+                  summary: insufficient_aal
+                  value:
+                    error_code: insufficient_aal
+
+  /factors/recovery-codes:
+    get:
+      summary: Get the status of the user's MFA recovery codes.
+      description: >
+        Returns the recovery-code factor ID together with the total number of codes and how many are still unused. Code values are never returned after generation. Works regardless of whether recovery-code enrollment or verification is enabled on the server.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      responses:
+        200:
+          description: The user's recovery-code status.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MFARecoveryCodesStatusSchema"
+        403:
+          description: Forbidden error. Anonymous users cannot use recovery codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: no_authorization
+                  value:
+                    error_code: no_authorization
+        404:
+          description: The user has not enrolled recovery codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: mfa_factor_not_found
+                  value:
+                    error_code: mfa_factor_not_found
+    post:
+      summary: Generate the user's one-time set of MFA recovery codes.
+      description: >
+        Creates a verified `recovery_code` factor together with a set of single-use codes. The plaintext codes are returned exactly once, in canonical form. Requires an AAL2 session and at least one other verified factor, because recovery codes can never be the user's only second factor. Use `POST /factors/recovery-codes/regenerate` to rotate an existing set.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                friendly_name:
+                  type: string
+                  description: >
+                    Name shown in the user's factor list. Subject to the same per-user uniqueness rule as any other factor. Defaults to `Recovery codes` when omitted or blank.
+      responses:
+        200:
+          description: >
+            Recovery codes were generated. Show the `codes` to the user now; they cannot be retrieved again.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MFARecoveryCodesSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        403:
+          description: Forbidden error. Requires an AAL2 session; anonymous users cannot use recovery codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: insufficient_aal
+                  value:
+                    error_code: insufficient_aal
+                example1:
+                  summary: no_authorization
+                  value:
+                    error_code: no_authorization
+        422:
+          description: >
+            Unprocessable entity. Recovery-code enrollment is disabled on the server, the user has no other verified factor, recovery codes are already enrolled (use `POST /factors/recovery-codes/regenerate`), the friendly name is already used by another factor, or the user has reached the maximum number of enrolled or verified factors.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: mfa_recovery_codes_enroll_not_enabled
+                  value:
+                    error_code: mfa_recovery_codes_enroll_not_enabled
+                example1:
+                  summary: mfa_recovery_codes_sole_factor
+                  value:
+                    error_code: mfa_recovery_codes_sole_factor
+                example2:
+                  summary: mfa_verified_factor_exists
+                  value:
+                    error_code: mfa_verified_factor_exists
+                example3:
+                  summary: mfa_factor_name_conflict
+                  value:
+                    error_code: mfa_factor_name_conflict
+                example4:
+                  summary: too_many_enrolled_mfa_factors
+                  value:
+                    error_code: too_many_enrolled_mfa_factors
+    delete:
+      summary: Revoke the user's MFA recovery codes.
+      description: >
+        Removes the recovery-code factor and all of its codes. Sessions that reached AAL2 with a recovery code are downgraded to AAL1. Requires an AAL2 session. Works regardless of whether recovery-code enrollment or verification is enabled on the server.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      responses:
+        200:
+          description: The recovery-code factor was removed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: 2b306a77-21dc-4110-ba71-537cb56b9e98
+        403:
+          description: Forbidden error. Requires an AAL2 session; anonymous users cannot use recovery codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: insufficient_aal
+                  value:
+                    error_code: insufficient_aal
+                example1:
+                  summary: no_authorization
+                  value:
+                    error_code: no_authorization
+        404:
+          description: The user has not enrolled recovery codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: mfa_factor_not_found
+                  value:
+                    error_code: mfa_factor_not_found
+
+  /factors/recovery-codes/verify:
+    post:
+      summary: Verify a recovery code and upgrade the session to AAL2.
+      description: >
+        Redeems one single-use recovery code from an AAL1 session. The submitted code is normalized before comparison: whitespace and `-` separators are removed and letters are lowercased, so `K4M9-X7QP-2AB8-HT3Z` and `k4m9x7qp2ab8ht3z` are equivalent. A matched code is consumed and cannot be used again.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: The recovery code to redeem. Separators, whitespace and letter case are ignored.
+                  example: K4M9-X7QP-2AB8-HT3Z
+      responses:
+        200:
+          description: >
+            The recovery code was accepted and consumed. These new credentials have an increased Authenticator Assurance Level (AAL) and an `amr` claim that includes `mfa/recovery_code`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenResponseSchema"
+        400:
+          description: Bad request. The body could not be parsed or `code` is missing or empty.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+        403:
+          description: Forbidden error. The MFA verification attempt hook rejected the attempt or the user is anonymous.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: mfa_verification_rejected
+                  value:
+                    error_code: mfa_verification_rejected
+                example1:
+                  summary: no_authorization
+                  value:
+                    error_code: no_authorization
+        422:
+          description: >
+            Unprocessable entity. `mfa_verification_failed` is returned for a wrong code, an already-used code and when no recovery codes are enrolled. `mfa_recovery_codes_verify_not_enabled` is returned when recovery-code verification is disabled on the server.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: mfa_verification_failed
+                  value:
+                    error_code: mfa_verification_failed
+                example1:
+                  summary: mfa_recovery_codes_verify_not_enabled
+                  value:
+                    error_code: mfa_recovery_codes_verify_not_enabled
+        429:
+          description: >
+            Too many requests. Either the IP-based rate limit was breached (`over_request_rate_limit`), or the per-user lockout is active after too many consecutive failed attempts (`mfa_recovery_codes_locked`). Regenerating the codes from an AAL2 session clears the lock.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: over_request_rate_limit
+                  value:
+                    error_code: over_request_rate_limit
+                example1:
+                  summary: mfa_recovery_codes_locked
+                  value:
+                    error_code: mfa_recovery_codes_locked
+
+  /factors/recovery-codes/regenerate:
+    post:
+      summary: Replace the user's MFA recovery codes with a new set.
+      description: >
+        Atomically invalidates all existing codes, issues a fresh set and clears any active verification lockout. The new plaintext codes are returned exactly once. Requires an AAL2 session.
+      tags:
+        - user
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      responses:
+        200:
+          description: >
+            Recovery codes were regenerated. Show the `codes` to the user now; they cannot be retrieved again and the previous codes no longer work.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MFARecoveryCodesSchema"
+        403:
+          description: Forbidden error. Requires an AAL2 session; anonymous users cannot use recovery codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: insufficient_aal
+                  value:
+                    error_code: insufficient_aal
+                example1:
+                  summary: no_authorization
+                  value:
+                    error_code: no_authorization
+        404:
+          description: The user has not enrolled recovery codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: mfa_factor_not_found
+                  value:
+                    error_code: mfa_factor_not_found
+        422:
+          description: Unprocessable entity. Recovery-code enrollment is disabled on the server.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                example:
+                  summary: mfa_recovery_codes_enroll_not_enabled
+                  value:
+                    error_code: mfa_recovery_codes_enroll_not_enabled
+
+  /callback:
+    get:
+      summary: Redirects OAuth flow errors to the frontend app.
+      description: >
+        When an OAuth sign-in flow fails for any reason, the error message needs to be delivered to the frontend app requesting the flow. This callback delivers the errors as `error` and `error_description` query params. Usually this request is not called directly.
+      tags:
+        - oauth-client
+      security:
+        - APIKeyAuth: []
+      responses:
+        302:
+          $ref: "#/components/responses/OAuthCallbackRedirectResponse"
+    post:
+      summary: Redirects OAuth flow errors to the frontend app.
+      description: >
+        When an OAuth sign-in flow fails for any reason, the error message needs to be delivered to the frontend app requesting the flow. This callback delivers the errors as `error` and `error_description` query params. Usually this request is not called directly.
+      tags:
+        - oauth-client
+      responses:
+        302:
+          $ref: "#/components/responses/OAuthCallbackRedirectResponse"
+
+  /sso:
+    post:
+      summary: Initiate a Single-Sign On flow.
+      tags:
+        - sso
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                  format: hostname
+                  description: Email address domain used to identify the SSO provider.
+                provider_id:
+                  type: string
+                  format: uuid
+                  example: 40451fc2-4997-429c-bf7f-cc6f33c788e6
+                redirect_to:
+                  type: string
+                  format: uri
+                skip_http_redirect:
+                  type: boolean
+                  description: Set to `true` if the response to this request should not be a HTTP 303 redirect -- useful for browser-based applications.
+                code_challenge:
+                  type: string
+                code_challenge_method:
+                  type: string
+                  enum:
+                    - plain
+                    - s256
+                gotrue_meta_security:
+                  $ref: "#/components/schemas/GoTrueSecurity"
+      responses:
+        200:
+          description: >
+            Returned only when `skip_http_redirect` is `true` and the SSO provider could be identified from the `provider_id` or `domain`. Client libraries should use the returned URL to redirect or open a browser.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+        303:
+          description: >
+            Returned only when `skip_http_redirect` is `false` or not present and the SSO provider could be identified from the `provider_id` or `domain`. Client libraries should follow the redirect. 303 is used instead of 302 because the request should be executed with a `GET` verb.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        404:
+          description: >
+            Returned when the SSO provider could not be identified.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+
+  /saml/metadata:
+    get:
+      summary: Returns the SAML 2.0 Metadata XML.
+      description: >
+        The metadata XML can be downloaded or used for the SAML 2.0 Metadata URL discovery mechanism. This URL is the SAML 2.0 EntityID of the Service Provider implemented by this server.
+      tags:
+        - saml
+      security:
+        - APIKeyAuth: []
+      parameters:
+        - name: download
+          in: query
+          description: >
+            If set to `true` will add a `Content-Disposition` header to the response which will trigger a download dialog on the browser.
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: >
+            A valid SAML 2.0 Metadata XML document. Should be cached according to the `Cache-Control` header and/or caching data specified in the document itself.
+          headers:
+            Content-Disposition:
+              description: >
+                Present if `download=true`, which triggers the browser to show a donwload dialog.
+              schema:
+                type: string
+                example: attachment; filename="metadata.xml"
+            Cache-Control:
+              description: >
+                Should be parsed and obeyed to avoid putting strain on the server.
+              schema:
+                type: string
+                example: public, max-age=600
+
+  /saml/acs:
+    post:
+      summary: SAML 2.0 Assertion Consumer Service (ACS) endpoint.
+      description: >
+        Implements the SAML 2.0 Assertion Consumer Service (ACS) endpoint supporting the POST and Artifact bindings.
+      tags:
+        - saml
+      security: []
+      parameters:
+        - name: RelayState
+          in: query
+          schema:
+            oneOf:
+              - type: string
+                format: uri
+                description: URL to take the user to after the ACS has been verified. Often sent by Identity Provider initiated login requests.
+              - type: string
+                format: uuid
+                description: UUID of the SAML Relay State stored in the database, used to identify the Service Provider initiated login request.
+        - name: SAMLArt
+          in: query
+          description: >
+            See the SAML 2.0 ACS specification. Cannot be used without a UUID `RelayState` parameter.
+          schema:
+            type: string
+        - name: SAMLResponse
+          in: query
+          description: >
+            See the SAML 2.0 ACS specification. Must be present unless `SAMLArt` is specified. If `RelayState` is not a UUID, the SAML Response is unpacked and the identity provider is identified from the response.
+          schema:
+            type: string
+      responses:
+        302:
+          $ref: "#/components/responses/AccessRefreshTokenRedirectResponse"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /invite:
+    post:
+      summary: Invite a user by email.
+      description: >
+        Sends an invitation email which contains a link that allows the user to sign-in.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                data:
+                  type: object
+      responses:
+        200:
+          description: An invitation has been sent to the user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        422:
+          description: User already exists and has confirmed their address.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+
+  /admin/generate_link:
+    post:
+      summary: Generate a link to send in an email message.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - email
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - magiclink
+                    - signup
+                    - recovery
+                    - email_change_current
+                    - email_change_new
+                email:
+                  type: string
+                  format: email
+                new_email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                data:
+                  type: object
+                redirect_to:
+                  type: string
+                  format: uri
+      responses:
+        200:
+          description: User profile and generated link information.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                properties:
+                  action_link:
+                    type: string
+                    format: uri
+                  email_otp:
+                    type: string
+                  hashed_token:
+                    type: string
+                  verification_type:
+                    type: string
+                  redirect_to:
+                    type: string
+                    format: uri
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: There is no such user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        422:
+          description: >
+            Has multiple meanings:
+              - User already exists
+              - Provided password does not meet minimum criteria
+              - Secure email change not enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+
+  /admin/audit:
+    get:
+      summary: Fetch audit log events.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        200:
+          description: List of audit logs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    payload:
+                      type: object
+                      properties:
+                        actor_id:
+                          type: string
+                        actor_via_sso:
+                          type: boolean
+                          description: Whether the actor used a SSO protocol (like SAML 2.0 or OIDC) to authenticate.
+                        actor_username:
+                          type: string
+                        actor_name:
+                          type: string
+                        traits:
+                          type: object
+                        action:
+                          type: string
+                          description: |-
+                            Usually one of these values:
+                            - login
+                            - logout
+                            - invite_accepted
+                            - user_signedup
+                            - user_invited
+                            - user_deleted
+                            - user_modified
+                            - user_recovery_requested
+                            - user_reauthenticate_requested
+                            - user_confirmation_requested
+                            - user_repeated_signup
+                            - user_updated_password
+                            - token_revoked
+                            - token_refreshed
+                            - factor_in_progress
+                            - factor_unenrolled
+                            - challenge_created
+                            - verification_attempted
+                            - factor_deleted
+                            - factor_updated
+                            - identity_linked
+                            - identity_unlinked
+                            - passkey_created
+                            - passkey_updated
+                            - passkey_deleted
+                            - recovery_codes_generated
+                            - recovery_codes_verified
+                            - recovery_codes_regenerated
+                            - recovery_codes_deleted
+                        log_type:
+                          type: string
+                          description: |-
+                            Usually one of these values:
+                            - account
+                            - team
+                            - token
+                            - user
+                            - factor
+                    created_at:
+                      type: string
+                      format: date-time
+                    ip_address:
+                      type: string
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+
+  /admin/users:
+    get:
+      summary: Fetch a listing of users.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        200:
+          description: A page of users.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aud:
+                    type: string
+                    deprecated: true
+                  users:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+
+  /admin/users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Fetch user account data for a user.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: User's account data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: There is no such user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+    put:
+      summary: Update user's account data.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSchema"
+      responses:
+        200:
+          description: User's account data was updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: There is no such user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+    delete:
+      summary: Delete a user.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: User's account data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: There is no such user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+
+  /admin/users/{userId}/factors:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: List all of the MFA factors for a user.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: User's MFA factors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MFAFactorSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: There is no such user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+
+  /admin/users/{userId}/factors/{factorId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: factorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Update a user's MFA factor.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: User's MFA factor.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MFAFactorSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: There is no such user and/or factor.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+    delete:
+      summary: Remove a user's MFA factor.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: User's MFA factor.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MFAFactorSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: There is no such user and/or factor.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+
+  /admin/sso/providers:
+    get:
+      summary: Fetch a list of all registered SSO providers.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: A list of all providers.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SSOProviderSchema"
+    post:
+      summary: Register a new SSO provider.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - saml
+                metadata_url:
+                  type: string
+                  format: uri
+                metadata_xml:
+                  type: string
+                domains:
+                  type: array
+                  items:
+                    type: string
+                    format: hostname
+                attribute_mapping:
+                  $ref: "#/components/schemas/SAMLAttributeMappingSchema"
+      responses:
+        200:
+          description: SSO provider was created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SSOProviderSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+
+  /admin/sso/providers/{ssoProviderId}:
+    parameters:
+      - name: ssoProviderId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Fetch SSO provider details.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: SSO provider exists with these details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SSOProviderSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: A provider with this UUID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+    put:
+      summary: Update details about a SSO provider.
+      description: >
+        You can only update only one of `metadata_url` or `metadata_xml` at once. The SAML Metadata represented by these updates must advertize the same Identity Provider EntityID. Do not include the `domains` or `attribute_mapping` property to keep the existing database values.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                metadata_url:
+                  type: string
+                  format: uri
+                metadata_xml:
+                  type: string
+                domains:
+                  type: array
+                  items:
+                    type: string
+                    pattern: "[a-z0-9-]+([.][a-z0-9-]+)*"
+                attribute_mapping:
+                  $ref: "#/components/schemas/SAMLAttributeMappingSchema"
+      responses:
+        200:
+          description: SSO provider details were updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SSOProviderSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: A provider with this UUID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+    delete:
+      summary: Remove an SSO provider.
+      tags:
+        - admin
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: SSO provider was removed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SSOProviderSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: A provider with this UUID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+
+  /admin/oauth/clients:
+    get:
+      summary: List OAuth clients (admin)
+      description: >
+        Retrieves a list of all registered OAuth clients. Only available when OAuth server is enabled.
+      tags:
+        - admin
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+      responses:
+        200:
+          description: List of OAuth clients
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clients:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OAuthClientSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+    post:
+      summary: Register OAuth client (admin)
+      description: >
+        Manually register a new OAuth client (admin endpoint). Only available when OAuth server is enabled.
+      tags:
+        - admin
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - client_name
+                - redirect_uris
+              properties:
+                client_name:
+                  type: string
+                  description: Human-readable name of the client application
+                client_uri:
+                  type: string
+                  format: uri
+                  description: URL of the client application's homepage
+                logo_uri:
+                  type: string
+                  format: uri
+                  description: URL of the client application's logo
+                redirect_uris:
+                  type: array
+                  items:
+                    type: string
+                    format: uri
+                  description: Array of redirect URIs used by the client (maximum 10)
+                client_type:
+                  type: string
+                  enum:
+                    - public
+                    - confidential
+                  description: >
+                    Type of the client. Optional. If not provided, will be inferred from token_endpoint_auth_method or defaults to 'confidential'.
+                    Public clients are used for applications that cannot securely store credentials (e.g., SPAs, mobile apps).
+                    Confidential clients can securely store credentials (e.g., server-side applications).
+                token_endpoint_auth_method:
+                  type: string
+                  enum:
+                    - none
+                    - client_secret_basic
+                    - client_secret_post
+                  description: >
+                    Authentication method for the token endpoint. Optional.
+                    'none' is for public clients, 'client_secret_basic' and 'client_secret_post' are for confidential clients.
+                    If provided, must be consistent with client_type. If not provided, will be inferred from client_type.
+                grant_types:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - authorization_code
+                      - refresh_token
+                  description: OAuth grant types the client will use (defaults to both if not specified)
+                response_types:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - code
+                  description: OAuth response types the client can use
+                scope:
+                  type: string
+                  description: Space-separated list of scope values
+      responses:
+        201:
+          description: OAuth client created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthClientSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+
+  /admin/oauth/clients/{client_id}:
+    parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get OAuth client details (admin)
+      description: >
+        Retrieves details of a specific OAuth client. Only available when OAuth server is enabled.
+      tags:
+        - admin
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: OAuth client details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthClientSchema"
+        404:
+          description: OAuth client not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+    put:
+      summary: Update OAuth client (admin)
+      description: >
+        Updates an existing OAuth client registration. Only the provided fields will be updated.
+        Only available when OAuth server is enabled.
+      tags:
+        - admin
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_name:
+                  type: string
+                  description: Human-readable name of the client application
+                client_uri:
+                  type: string
+                  format: uri
+                  description: URL of the client application's homepage
+                logo_uri:
+                  type: string
+                  format: uri
+                  description: URL of the client application's logo
+                redirect_uris:
+                  type: array
+                  items:
+                    type: string
+                    format: uri
+                  description: Array of redirect URIs used by the client
+                grant_types:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - authorization_code
+                      - refresh_token
+                  description: OAuth grant types the client is authorized to use
+                token_endpoint_auth_method:
+                  type: string
+                  enum:
+                    - none
+                    - client_secret_basic
+                    - client_secret_post
+                  description: >
+                    Authentication method for the token endpoint. Must be compatible with the client's current client_type.
+                    Confidential clients can use 'client_secret_basic' or 'client_secret_post'.
+                    Public clients can only use 'none'.
+      responses:
+        200:
+          description: OAuth client updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthClientSchema"
+        400:
+          description: Bad request - validation failed or no fields provided for update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        404:
+          description: OAuth client not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+    delete:
+      summary: Delete OAuth client (admin)
+      description: >
+        Removes an OAuth client registration. Only available when OAuth server is enabled.
+      tags:
+        - admin
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        204:
+          description: OAuth client deleted
+        404:
+          description: OAuth client not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+
+  /admin/oauth/clients/{client_id}/regenerate_secret:
+    parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Regenerate OAuth client secret (admin)
+      description: >
+        Regenerates the client secret for a confidential OAuth client. Only available when OAuth server is enabled.
+        This endpoint can only be used for confidential clients, not public clients.
+      tags:
+        - admin
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: OAuth client secret regenerated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthClientSchema"
+        400:
+          description: Bad request - cannot regenerate secret for public client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        404:
+          description: OAuth client not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+
+  /admin/custom-providers:
+    get:
+      summary: List all custom OIDC/OAuth providers
+      description: >
+        Retrieves a list of all custom OAuth 2.0 and OIDC provider configurations.
+        Optionally filter by provider type. Only available when custom OIDC/OAuth providers are enabled
+        (set `GOTRUE_CUSTOM_OAUTH_ENABLED=true` for self-hosted or enable in Supabase Dashboard).
+      tags:
+        - admin
+        - oauth-client
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      parameters:
+        - name: type
+          in: query
+          required: false
+          description: Filter by provider type
+          schema:
+            type: string
+            enum:
+              - oauth2
+              - oidc
+      responses:
+        200:
+          description: List of custom OIDC/OAuth providers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  providers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CustomOAuthProviderSchema"
+        400:
+          description: Invalid type parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                invalid_type:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+                    msg: "type must be either 'oauth2' or 'oidc'"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+    post:
+      summary: Create a new custom OIDC/OAuth provider
+      description: >
+        Creates a new custom OAuth 2.0 or OIDC provider configuration.
+        Required fields differ based on provider_type. Only available when custom OIDC/OAuth providers are enabled.
+        For OIDC providers, the server fetches and validates the OpenID Connect discovery document
+        from the issuer's well-known endpoint (or the provided discovery_url) at creation time.
+        This ensures the issuer is reachable and correctly configured before the provider is stored.
+      tags:
+        - admin
+        - oauth-client
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - provider_type
+                - identifier
+                - name
+                - client_id
+                - client_secret
+              properties:
+                provider_type:
+                  type: string
+                  enum:
+                    - oauth2
+                    - oidc
+                  description: Type of OAuth provider
+                identifier:
+                  type: string
+                  pattern: "^[a-zA-Z0-9_-]+$"
+                  description: Unique identifier (will be prefixed with 'custom:' automatically). Cannot use reserved provider names.
+                  example: "mycompany"
+                name:
+                  type: string
+                  description: Human-readable display name
+                  example: "My Company SSO"
+                client_id:
+                  type: string
+                  description: OAuth client ID from the provider
+                client_secret:
+                  type: string
+                  description: OAuth client secret (will be encrypted at rest)
+                acceptable_client_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Additional acceptable client IDs for token validation
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                  description: OAuth scopes to request (OIDC providers will automatically include 'openid')
+                  example: ["email", "profile"]
+                pkce_enabled:
+                  type: boolean
+                  description: Enable PKCE (Proof Key for Code Exchange)
+                  default: true
+                attribute_mapping:
+                  type: object
+                  description: Map provider claims to user attributes (cannot map to protected system fields)
+                  additionalProperties: true
+                  example:
+                    email: "user_email"
+                    name: "full_name"
+                custom_claims_allowlist:
+                  type: array
+                  items:
+                    type: string
+                  description: Raw IdP claim keys to copy verbatim into the user's custom_claims (e.g. groups, org_id). For OIDC providers these are read from the ID token claims (falling back to the userinfo response when no ID token is returned); for OAuth2 providers they are read from the userinfo response. Empty preserves no non-standard claims.
+                  example: ["groups", "org_id"]
+                authorization_params:
+                  type: object
+                  description: Additional authorization request parameters as string key-value pairs (cannot override reserved OAuth parameters)
+                  additionalProperties:
+                    type: string
+                  example:
+                    prompt: "consent"
+                enabled:
+                  type: boolean
+                  description: Whether the provider is enabled
+                  default: true
+                email_optional:
+                  type: boolean
+                  description: Whether email is optional for users from this provider
+                  default: false
+                issuer:
+                  type: string
+                  format: uri
+                  description: "OIDC issuer URL (required for provider_type: oidc)"
+                  example: "https://accounts.google.com"
+                discovery_url:
+                  type: string
+                  format: uri
+                  description: OIDC discovery URL (optional for OIDC, defaults to {issuer}/.well-known/openid-configuration)
+                skip_nonce_check:
+                  type: boolean
+                  description: Skip nonce validation for OIDC (not recommended for production)
+                  default: false
+                authorization_url:
+                  type: string
+                  format: uri
+                  description: "OAuth 2.0 authorization endpoint (required for provider_type: oauth2)"
+                  example: "https://provider.com/oauth/authorize"
+                token_url:
+                  type: string
+                  format: uri
+                  description: "OAuth 2.0 token endpoint (required for provider_type: oauth2)"
+                  example: "https://provider.com/oauth/token"
+                userinfo_url:
+                  type: string
+                  format: uri
+                  description: "OAuth 2.0 userinfo endpoint (required for provider_type: oauth2)"
+                  example: "https://provider.com/oauth/userinfo"
+                jwks_uri:
+                  type: string
+                  format: uri
+                  description: JWKS URI for token validation (optional for OAuth2)
+            examples:
+              oidc_provider:
+                summary: Create OIDC provider
+                value:
+                  provider_type: "oidc"
+                  identifier: "mycompany"
+                  name: "My Company SSO"
+                  client_id: "your-client-id"
+                  client_secret: "your-client-secret"
+                  issuer: "https://accounts.mycompany.com"
+                  scopes: ["email", "profile"]
+              oauth2_provider:
+                summary: Create OAuth2 provider
+                value:
+                  provider_type: "oauth2"
+                  identifier: "customauth"
+                  name: "Custom Auth Provider"
+                  client_id: "your-client-id"
+                  client_secret: "your-client-secret"
+                  authorization_url: "https://provider.com/oauth/authorize"
+                  token_url: "https://provider.com/oauth/token"
+                  userinfo_url: "https://provider.com/oauth/userinfo"
+                  scopes: ["email", "profile"]
+      responses:
+        201:
+          description: Custom OIDC/OAuth provider created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomOAuthProviderSchema"
+        400:
+          description: Bad request - validation failed, provider exists, or quota exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                validation_failed:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+                    msg: "issuer is required for OIDC providers"
+                provider_exists:
+                  summary: conflict
+                  value:
+                    error_code: conflict
+                    msg: "A custom OAuth provider with this identifier already exists"
+                quota_exceeded:
+                  summary: over_custom_provider_quota
+                  value:
+                    error_code: over_custom_provider_quota
+                    msg: "Maximum number of custom OIDC/OAuth providers reached"
+                reserved_name:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+                    msg: "Cannot use reserved provider name: google. This provider is already built into Supabase Auth."
+                discovery_fetch_failed:
+                  summary: OIDC discovery fetch failed
+                  value:
+                    error_code: validation_failed
+                    msg: 'Failed to fetch OIDC discovery document from "https://example.com/.well-known/openid-configuration"'
+                discovery_invalid:
+                  summary: OIDC discovery missing required fields
+                  value:
+                    error_code: validation_failed
+                    msg: "OIDC discovery document is missing required fields: jwks_uri"
+                discovery_issuer_mismatch:
+                  summary: OIDC discovery issuer mismatch
+                  value:
+                    error_code: validation_failed
+                    msg: 'OIDC discovery issuer mismatch: discovery document reports "https://other.example.com" but expected "https://example.com"'
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+
+  /admin/custom-providers/{identifier}:
+    parameters:
+      - name: identifier
+        in: path
+        required: true
+        description: Provider identifier (must start with 'custom:' prefix)
+        schema:
+          type: string
+          pattern: "^custom:[a-zA-Z0-9_-]+$"
+        example: "custom:mycompany"
+    get:
+      summary: Get custom OIDC/OAuth provider details
+      description: >
+        Retrieves details of a specific custom OIDC/OAuth provider.
+        Only available when custom OIDC/OAuth providers are enabled.
+      tags:
+        - admin
+        - oauth-client
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        200:
+          description: Custom OIDC/OAuth provider details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomOAuthProviderSchema"
+        400:
+          description: Invalid identifier format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                validation_failed:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+                    msg: "identifier must start with 'custom:' prefix"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: Provider not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                not_found:
+                  summary: custom_provider_not_found
+                  value:
+                    error_code: custom_provider_not_found
+                    msg: "Custom OAuth provider not found"
+    put:
+      summary: Update custom OIDC/OAuth provider
+      description: >
+        Updates an existing custom OIDC/OAuth provider. All fields are optional.
+        Only provided fields will be updated. Only available when custom OIDC/OAuth providers are enabled.
+        When `issuer` or `discovery_url` is changed on an OIDC provider, the server re-fetches and
+        validates the discovery document before persisting.
+      tags:
+        - admin
+        - oauth-client
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human-readable display name
+                client_id:
+                  type: string
+                  description: OAuth client ID
+                client_secret:
+                  type: string
+                  description: OAuth client secret (only provide if changing, will be encrypted)
+                acceptable_client_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Additional acceptable client IDs
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                  description: OAuth scopes to request
+                pkce_enabled:
+                  type: boolean
+                  description: Enable PKCE
+                attribute_mapping:
+                  type: object
+                  description: Map provider claims to user attributes
+                  additionalProperties: true
+                custom_claims_allowlist:
+                  type: array
+                  items:
+                    type: string
+                  description: Raw IdP claim keys to copy verbatim into the user's custom_claims (e.g. groups, org_id). For OIDC providers these are read from the ID token claims (falling back to the userinfo response when no ID token is returned); for OAuth2 providers they are read from the userinfo response. Empty preserves no non-standard claims.
+                authorization_params:
+                  type: object
+                  description: Additional authorization request parameters as string key-value pairs
+                  additionalProperties:
+                    type: string
+                enabled:
+                  type: boolean
+                  description: Whether the provider is enabled
+                email_optional:
+                  type: boolean
+                  description: Whether email is optional
+                issuer:
+                  type: string
+                  format: uri
+                  description: OIDC issuer URL (for OIDC providers)
+                discovery_url:
+                  type: string
+                  format: uri
+                  description: OIDC discovery URL (for OIDC providers)
+                skip_nonce_check:
+                  type: boolean
+                  description: Skip nonce validation for OIDC
+                authorization_url:
+                  type: string
+                  format: uri
+                  description: OAuth 2.0 authorization endpoint (for OAuth2 providers)
+                token_url:
+                  type: string
+                  format: uri
+                  description: OAuth 2.0 token endpoint (for OAuth2 providers)
+                userinfo_url:
+                  type: string
+                  format: uri
+                  description: OAuth 2.0 userinfo endpoint (for OAuth2 providers)
+                jwks_uri:
+                  type: string
+                  format: uri
+                  description: JWKS URI for token validation (for OAuth2 providers)
+            examples:
+              update_name:
+                summary: Update provider name
+                value:
+                  name: "Updated Company Name"
+              update_scopes:
+                summary: Update scopes
+                value:
+                  scopes: ["openid", "email", "profile", "groups"]
+      responses:
+        200:
+          description: Custom OIDC/OAuth provider updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomOAuthProviderSchema"
+        400:
+          description: Invalid identifier, validation failed, or OIDC discovery validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                validation_failed:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+                    msg: "identifier must start with 'custom:' prefix"
+                discovery_fetch_failed:
+                  summary: OIDC discovery fetch failed
+                  value:
+                    error_code: validation_failed
+                    msg: 'Failed to fetch OIDC discovery document from "https://example.com/.well-known/openid-configuration"'
+                discovery_issuer_mismatch:
+                  summary: OIDC discovery issuer mismatch
+                  value:
+                    error_code: validation_failed
+                    msg: 'OIDC discovery issuer mismatch: discovery document reports "https://other.example.com" but expected "https://example.com"'
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: Provider not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+    delete:
+      summary: Delete custom OIDC/OAuth provider
+      description: >
+        Permanently removes a custom OIDC/OAuth provider configuration.
+        Only available when custom OIDC/OAuth providers are enabled.
+      tags:
+        - admin
+        - oauth-client
+      security:
+        - APIKeyAuth: []
+          AdminAuth: []
+      responses:
+        204:
+          description: Custom OIDC/OAuth provider deleted successfully (no content)
+        400:
+          description: Invalid identifier format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                validation_failed:
+                  summary: validation_failed
+                  value:
+                    error_code: validation_failed
+                    msg: "identifier must start with 'custom:' prefix"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+        403:
+          $ref: "#/components/responses/ForbiddenResponse"
+        404:
+          description: Provider not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+              examples:
+                not_found:
+                  summary: custom_provider_not_found
+                  value:
+                    error_code: custom_provider_not_found
+                    msg: "Custom OAuth provider not found"
+
+  /oauth/clients/register:
+    post:
+      summary: Register a new OAuth client dynamically (public endpoint).
+      description: >
+        Allows applications to register as OAuth clients with this server dynamically. This follows the OAuth 2.0 Dynamic Client Registration Protocol. Only available when OAuth server is enabled and dynamic registration is allowed (set `GOTRUE_OAUTH_SERVER_ENABLED=true` and `GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION=true` for self-hosted or enable both settings in Supabase Dashboard).
+      tags:
+        - oauth-server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - client_name
+                - redirect_uris
+              properties:
+                client_name:
+                  type: string
+                  description: Human-readable name of the client application
+                client_uri:
+                  type: string
+                  format: uri
+                  description: URL of the client application's homepage
+                logo_uri:
+                  type: string
+                  format: uri
+                  description: URL of the client application's logo
+                redirect_uris:
+                  type: array
+                  items:
+                    type: string
+                    format: uri
+                  description: Array of redirect URIs used by the client (maximum 10)
+                client_type:
+                  type: string
+                  enum:
+                    - public
+                    - confidential
+                  description: >
+                    Type of the client. Optional. If not provided, will be inferred from token_endpoint_auth_method or defaults to 'confidential'.
+                    Public clients are used for applications that cannot securely store credentials (e.g., SPAs, mobile apps).
+                    Confidential clients can securely store credentials (e.g., server-side applications).
+                token_endpoint_auth_method:
+                  type: string
+                  enum:
+                    - none
+                    - client_secret_basic
+                    - client_secret_post
+                  description: >
+                    Authentication method for the token endpoint. Optional.
+                    'none' is for public clients, 'client_secret_basic' and 'client_secret_post' are for confidential clients.
+                    If provided, must be consistent with client_type. If not provided, will be inferred from client_type.
+                grant_types:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - authorization_code
+                      - refresh_token
+                  description: OAuth grant types the client will use (defaults to both if not specified)
+                response_types:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - code
+                  description: OAuth response types the client will use
+                scope:
+                  type: string
+                  description: Space-separated list of scope values
+      responses:
+        201:
+          description: OAuth client registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuthClientSchema"
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        429:
+          $ref: "#/components/responses/RateLimitResponse"
+
+  /oauth/token:
+    post:
+      summary: OAuth 2.1 Token endpoint
+      description: >
+        Issues access tokens in exchange for authorization codes or refresh tokens. Supports authorization_code and refresh_token grant types. Only available when OAuth server is enabled (set `GOTRUE_OAUTH_SERVER_ENABLED=true` for self-hosted or enable in Supabase Dashboard).
+      tags:
+        - oauth-server
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - grant_type
+              properties:
+                grant_type:
+                  type: string
+                  enum:
+                    - authorization_code
+                    - refresh_token
+                  description: The grant type being used
+                code:
+                  type: string
+                  description: Authorization code (required for authorization_code grant)
+                redirect_uri:
+                  type: string
+                  format: uri
+                  description: Redirect URI (required for authorization_code grant)
+                code_verifier:
+                  type: string
+                  description: PKCE code verifier (required for authorization_code grant)
+                refresh_token:
+                  type: string
+                  description: Refresh token (required for refresh_token grant)
+                client_id:
+                  type: string
+                  description: OAuth client identifier
+                client_secret:
+                  type: string
+                  description: OAuth client secret (for confidential clients)
+      responses:
+        200:
+          description: Access token issued successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: The access token
+                  token_type:
+                    type: string
+                    example: Bearer
+                    description: Type of token issued
+                  expires_in:
+                    type: integer
+                    description: Lifetime in seconds of the access token
+                  refresh_token:
+                    type: string
+                    description: Refresh token (if applicable)
+                  scope:
+                    type: string
+                    description: Authorized scopes
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+
+  /oauth/authorize:
+    get:
+      summary: OAuth 2.1 Authorization endpoint
+      description: >
+        Initiates the OAuth authorization code flow. Redirects users to login and authorize the requesting application. Only available when OAuth server is enabled (set `GOTRUE_OAUTH_SERVER_ENABLED=true` for self-hosted or enable in Supabase Dashboard).
+      tags:
+        - oauth-server
+      parameters:
+        - name: response_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - code
+        - name: client_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The client identifier
+        - name: redirect_uri
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uri
+          description: Client's redirect URI
+        - name: scope
+          in: query
+          schema:
+            type: string
+          description: Requested access scope
+        - name: state
+          in: query
+          schema:
+            type: string
+          description: State parameter for CSRF protection
+        - name: code_challenge
+          in: query
+          required: true
+          schema:
+            type: string
+          description: PKCE code challenge
+        - name: code_challenge_method
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - S256
+          description: PKCE code challenge method
+      responses:
+        302:
+          description: Redirect to login or authorization page
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+
+  /oauth/authorizations/{authorization_id}:
+    parameters:
+      - name: authorization_id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get OAuth authorization details
+      description: >
+        Retrieves details about a pending OAuth authorization request. Only available when OAuth server is enabled (set `GOTRUE_OAUTH_SERVER_ENABLED=true` for self-hosted or enable in Supabase Dashboard).
+      tags:
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      responses:
+        200:
+          description: Authorization details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorization_id:
+                    type: string
+                  redirect_uri:
+                    type: string
+                    format: uri
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      uri:
+                        type: string
+                        format: uri
+                      logo_uri:
+                        type: string
+                        format: uri
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      email:
+                        type: string
+                        format: email
+                  scope:
+                    type: string
+        404:
+          description: Authorization not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorSchema"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+
+  /oauth/authorizations/{authorization_id}/consent:
+    parameters:
+      - name: authorization_id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Approve or deny OAuth authorization
+      description: >
+        User approves or denies authorization to the OAuth client. Only available when OAuth server is enabled (set `GOTRUE_OAUTH_SERVER_ENABLED=true` for self-hosted or enable in Supabase Dashboard).
+      tags:
+        - oauth-server
+      security:
+        - APIKeyAuth: []
+          UserAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+              properties:
+                action:
+                  type: string
+                  enum:
+                    - approve
+                    - deny
+                  description: Whether to approve or deny the authorization
+      responses:
+        200:
+          description: Authorization consent processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  redirect_url:
+                    type: string
+                    format: uri
+        400:
+          $ref: "#/components/responses/BadRequestResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+
+  /health:
+    get:
+      summary: Service healthcheck.
+      description: Ping this endpoint to receive information about the health of the service.
+      tags:
+        - general
+      security:
+        - APIKeyAuth: []
+      responses:
+        200:
+          description: >
+            Service is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    example: v2.40.1
+                  name:
+                    type: string
+                    example: GoTrue
+                  description:
+                    type: string
+                    example: GoTrue is a user registration and authentication API
+
+        500:
+          description: >
+            Service is not healthy. Retriable with exponential backoff.
+        502:
+          description: >
+            Service is not healthy: infrastructure issue. Usually not retriable.
+        503:
+          description: >
+            Service is not healthy: infrastrucutre issue. Retriable with exponential backoff.
+        504:
+          description: >
+            Service is not healthy: request timed out. Retriable with exponential backoff.
+
+  /settings:
+    get:
+      summary: Retrieve some of the public settings of the server.
+      description: >
+        Use this endpoint to configure parts of any authentication UIs depending on the configured settings.
+      tags:
+        - general
+      security:
+        - APIKeyAuth: []
+      responses:
+        200:
+          description: >
+            Currently applicable settings of the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  disable_signup:
+                    type: boolean
+                    example: false
+                    description: Whether new accounts can be created. (Valid for all providers.)
+                  mailer_autoconfirm:
+                    type: boolean
+                    example: false
+                    description: Whether new email addresses need to be confirmed before sign-in is possible.
+                  phone_autoconfirm:
+                    type: boolean
+                    example: false
+                    description: Whether new phone numbers need to be confirmed before sign-in is possible.
+                  sms_provider:
+                    type: string
+                    optional: true
+                    example: twilio
+                    description: Which SMS provider is being used to send messages to phone numbers.
+                  saml_enabled:
+                    type: boolean
+                    example: true
+                    description: Whether SAML is enabled on this API server. Defaults to false.
+                  external:
+                    type: object
+                    description: Which external identity providers are enabled.
+                    example:
+                      github: true
+                      apple: true
+                      email: true
+                      phone: true
+                    patternProperties:
+                      "[a-zA-Z0-9]+":
+                        type: boolean
+
+components:
+  securitySchemes:
+    UserAuth:
+      type: http
+      scheme: bearer
+      description: >
+        An access token in the form of a JWT issued by this server.
+
+    AdminAuth:
+      type: http
+      scheme: bearer
+      description: >
+        A special admin JWT.
+
+    APIKeyAuth:
+      type: apiKey
+      in: header
+      name: apikey
+      description: >
+        When deployed on Supabase, this server requires an `apikey` header containing a valid Supabase-issued API key to call any endpoint.
+
+  schemas:
+    GoTrueSecurity:
+      type: object
+      description: >
+        Use this property to pass a CAPTCHA token only if you have enabled CAPTCHA protection.
+      properties:
+        captcha_token:
+          type: string
+
+    ErrorSchema:
+      type: object
+      properties:
+        error:
+          type: string
+          description: |-
+            Certain responses will contain this property with the provided values.
+
+            Usually one of these:
+              - invalid_request
+              - unauthorized_client
+              - access_denied
+              - server_error
+              - temporarily_unavailable
+              - unsupported_otp_type
+        error_description:
+          type: string
+          description: >
+            Certain responses that have an `error` property may have this property which describes the error.
+        code:
+          type: integer
+          description: >
+            The HTTP status code. Usually missing if `error` is present.
+          example: 400
+        msg:
+          type: string
+          description: >
+            A basic message describing the problem with the request. Usually missing if `error` is present.
+        error_code:
+          type: string
+          description: >
+            A short code used to describe the class of error encountered.
+        weak_password:
+          type: object
+          description: >
+            Only returned on the `/signup` endpoint if the password used is too weak. Inspect the `reasons` and `msg` property to identify the causes.
+          properties:
+            reasons:
+              type: array
+              items:
+                type: string
+                enum:
+                  - length
+                  - characters
+                  - pwned
+
+    UserSchema:
+      type: object
+      description: Object describing the user related to the issued access and refresh tokens.
+      properties:
+        id:
+          type: string
+          format: uuid
+        aud:
+          type: string
+          deprecated: true
+        role:
+          type: string
+        email:
+          type: string
+          description: User's primary contact email. In most cases you can uniquely identify a user by their email address, but not in all cases.
+        email_confirmed_at:
+          type: string
+          format: date-time
+        phone:
+          type: string
+          format: phone
+          description: User's primary contact phone number. In most cases you can uniquely identify a user by their phone number, but not in all cases.
+        phone_confirmed_at:
+          type: string
+          format: date-time
+        confirmation_sent_at:
+          type: string
+          format: date-time
+        confirmed_at:
+          type: string
+          format: date-time
+        recovery_sent_at:
+          type: string
+          format: date-time
+        new_email:
+          type: string
+          format: email
+        email_change_sent_at:
+          type: string
+          format: date-time
+        new_phone:
+          type: string
+          format: phone
+        phone_change_sent_at:
+          type: string
+          format: date-time
+        reauthentication_sent_at:
+          type: string
+          format: date-time
+        last_sign_in_at:
+          type: string
+          format: date-time
+        app_metadata:
+          type: object
+        user_metadata:
+          type: object
+        factors:
+          type: array
+          items:
+            $ref: "#/components/schemas/MFAFactorSchema"
+        identities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdentitySchema"
+        banned_until:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+        is_anonymous:
+          type: boolean
+
+    SAMLAttributeMappingSchema:
+      type: object
+      properties:
+        keys:
+          type: object
+          patternProperties:
+            ".+":
+              type: object
+              properties:
+                name:
+                  type: string
+                names:
+                  type: array
+                  items:
+                    type: string
+                default:
+                  oneOf:
+                    - type: string
+                    - type: number
+                    - type: boolean
+                    - type: object
+
+    SSOProviderSchema:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sso_domains:
+          type: array
+          items:
+            type: object
+            properties:
+              domain:
+                type: string
+                format: hostname
+        saml:
+          type: object
+          properties:
+            entity_id:
+              type: string
+            metadata_xml:
+              type: string
+            metadata_url:
+              type: string
+            attribute_mapping:
+              $ref: "#/components/schemas/SAMLAttributeMappingSchema"
+
+    AccessTokenResponseSchema:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: A valid JWT that will expire in `expires_in` seconds.
+        refresh_token:
+          type: string
+          description: An opaque string that can be used once to obtain a new access and refresh token.
+        token_type:
+          type: string
+          description: What type of token this is. Only `bearer` returned, may change in the future.
+        expires_in:
+          type: integer
+          description: Number of seconds after which the `access_token` should be renewed by using the refresh token with the `refresh_token` grant type.
+        expires_at:
+          type: integer
+          description: UNIX timestamp after which the `access_token` should be renewed by using the refresh token with the `refresh_token` grant type.
+        weak_password:
+          type: object
+          description: Only returned on the `/token?grant_type=password` endpoint. When present, it indicates that the password used is weak. Inspect the `reasons` and/or `message` properties to identify why.
+          properties:
+            reasons:
+              type: array
+              items:
+                type: string
+                enum:
+                  - length
+                  - characters
+                  - pwned
+            message:
+              type: string
+        user:
+          $ref: "#/components/schemas/UserSchema"
+
+    MFAFactorSchema:
+      type: object
+      description: Represents a MFA factor.
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          description: |-
+            Usually one of:
+            - verified
+            - unverified
+        friendly_name:
+          type: string
+        factor_type:
+          type: string
+          description: |-
+            Usually one of:
+            - totp
+            - phone
+            - webauthn
+            - recovery_code
+        webauthn_credential:
+          type: string
+        phone:
+          type: string
+          format: phone
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        last_challenged_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    MFARecoveryCodesStatusSchema:
+      type: object
+      description: Enrollment status of the user's MFA recovery codes. Never contains code values.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID of the user's `recovery_code` factor.
+        type:
+          type: string
+          description: Always `recovery_code`.
+        total:
+          type: integer
+          description: Number of codes in the current set.
+          example: 10
+        remaining:
+          type: integer
+          description: Number of codes in the current set that have not been used yet.
+          example: 9
+
+    MFARecoveryCodesSchema:
+      type: object
+      description: >
+        A freshly generated set of MFA recovery codes. Returned only by `POST /factors/recovery-codes` and `POST /factors/recovery-codes/regenerate`; the codes cannot be retrieved afterwards.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID of the user's `recovery_code` factor.
+        type:
+          type: string
+          description: Always `recovery_code`.
+        friendly_name:
+          type: string
+          example: Recovery codes
+        total:
+          type: integer
+          description: Number of codes in the set.
+          example: 10
+        codes:
+          type: array
+          description: >
+            The plaintext single-use codes in canonical form (16 characters by default). Show them to the user once.
+          items:
+            type: string
+            example: k4m9x7qp2ab8ht3z
+
+    IdentitySchema:
+      type: object
+      properties:
+        identity_id:
+          type: string
+          format: uuid
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        identity_data:
+          type: object
+        provider:
+          type: string
+        last_sign_in_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        email:
+          type: string
+          format: email
+    TOTPPhoneChallengeResponse:
+      type: object
+      required:
+        - id
+        - type
+        - expires_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 14c1560e-2749-4522-bb62-d1458451830a
+          description: ID of the challenge.
+        type:
+          type: string
+          enum: [totp, phone]
+          description: Type of the challenge.
+        expires_at:
+          type: integer
+          example: 1674840917
+          description: UNIX seconds of the timestamp past which the challenge should not be verified.
+
+    WebAuthnChallengeResponse:
+      type: object
+      required:
+        - id
+        - type
+        - webauthn
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 14c1560e-2749-4522-bb62-d1458451830a
+          description: ID of the challenge.
+        type:
+          type: string
+          enum: [webauthn]
+          description: Type of the challenge.
+        expires_at:
+          type: integer
+          example: 1674840917
+          description: UNIX seconds of the timestamp past which the challenge should not be verified.
+        webauthn:
+          oneOf:
+            - type: object
+              required:
+                - type
+                - credential_options
+              properties:
+                type:
+                  type: string
+                  enum: [create]
+                  description: Credential creation operation
+                credential_options:
+                  type: object
+                  required:
+                    - publicKey
+                  properties:
+                    publicKey:
+                      $ref: "#/components/schemas/CredentialCreationOptions"
+            - type: object
+              required:
+                - type
+                - credential_options
+              properties:
+                type:
+                  type: string
+                  enum: [request]
+                  description: Credential request operation
+                credential_options:
+                  type: object
+                  required:
+                    - publicKey
+                  properties:
+                    publicKey:
+                      $ref: "#/components/schemas/CredentialRequestOptions"
+          discriminator:
+            propertyName: type
+
+    CredentialRequestOptions:
+      type: object
+      description: PublicKeyCredentialRequestOptions for WebAuthn authentication
+      required:
+        - challenge
+      properties:
+        challenge:
+          type: string
+          format: base64url
+          description: A challenge to be signed by the authenticator
+        timeout:
+          type: integer
+          description: Time (in milliseconds) that the caller is willing to wait for the call to complete
+        rpId:
+          type: string
+          description: Relying Party ID
+        allowCredentials:
+          type: array
+          description: List of acceptable credentials for authentication
+          items:
+            $ref: "#/components/schemas/PublicKeyCredentialDescriptor"
+        userVerification:
+          type: string
+          enum: [required, preferred, discouraged]
+          description: User verification requirement
+        hints:
+          type: array
+          description: Hints for the browser about what types of authenticators to show
+          items:
+            type: string
+            enum: [security-key, client-device, hybrid]
+        extensions:
+          type: object
+          description: WebAuthn extensions to enable
+
+    CredentialCreationOptions:
+      type: object
+      description: PublicKeyCredentialCreationOptions for WebAuthn registration
+      required:
+        - rp
+        - user
+        - challenge
+        - pubKeyCredParams
+      properties:
+        rp:
+          type: object
+          required:
+            - name
+            - id
+          properties:
+            id:
+              type: string
+              description: Relying Party ID (usually the domain)
+            name:
+              type: string
+              description: Human-readable Relying Party name
+        user:
+          type: object
+          required:
+            - id
+            - name
+            - displayName
+          properties:
+            id:
+              description: User handle (opaque byte sequence, base64url encoded string or raw bytes)
+              oneOf:
+                - type: string
+                  format: base64url
+                - type: string
+            name:
+              type: string
+              description: User account identifier (e.g., username or email)
+            displayName:
+              type: string
+              description: Human-readable user display name
+        challenge:
+          type: string
+          format: base64url
+          description: A challenge to be signed by the authenticator
+        pubKeyCredParams:
+          type: array
+          description: List of supported public key algorithms
+          items:
+            type: object
+            required:
+              - type
+              - alg
+            properties:
+              type:
+                type: string
+                enum: [public-key]
+              alg:
+                type: integer
+                description: COSE algorithm identifier (e.g., -7 for ES256, -257 for RS256)
+        timeout:
+          type: integer
+          description: Time (in milliseconds) that the caller is willing to wait for the call to complete
+        excludeCredentials:
+          type: array
+          description: List of credentials to exclude (prevent re-registration)
+          items:
+            $ref: "#/components/schemas/PublicKeyCredentialDescriptor"
+        authenticatorSelection:
+          type: object
+          properties:
+            authenticatorAttachment:
+              type: string
+              enum: [platform, cross-platform]
+              description: Preferred authenticator type
+            requireResidentKey:
+              type: boolean
+              description: Whether to require a resident key (deprecated, use residentKey)
+            residentKey:
+              type: string
+              enum: [required, preferred, discouraged]
+              description: Resident key requirement
+            userVerification:
+              type: string
+              enum: [required, preferred, discouraged]
+              description: User verification requirement
+        attestation:
+          type: string
+          enum: [none, indirect, direct, enterprise]
+          description: Attestation conveyance preference
+        attestationFormats:
+          type: array
+          description: Preferred attestation statement formats
+          items:
+            type: string
+        hints:
+          type: array
+          description: Hints for the browser about what types of authenticators to show
+          items:
+            type: string
+            enum: [security-key, client-device, hybrid]
+        extensions:
+          type: object
+          description: WebAuthn extensions to enable
+
+    PublicKeyCredentialDescriptor:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          type: string
+          enum: [public-key]
+          description: Credential type
+        id:
+          type: string
+          format: base64url
+          description: Credential ID
+        transports:
+          type: array
+          description: Supported transports for this credential
+          items:
+            type: string
+            enum: [usb, nfc, ble, internal, hybrid]
+
+    OAuthClientSchema:
+      type: object
+      description: Represents an OAuth 2.1 client
+      properties:
+        client_id:
+          type: string
+          description: Unique client identifier
+        client_name:
+          type: string
+          description: Human-readable name of the client application
+        client_secret:
+          type: string
+          description: Client secret for confidential clients (only returned on registration/regeneration)
+        client_type:
+          type: string
+          enum:
+            - public
+            - confidential
+          description: Type of the client
+        token_endpoint_auth_method:
+          type: string
+          enum:
+            - none
+            - client_secret_basic
+            - client_secret_post
+          description: Authentication method for the token endpoint
+        registration_type:
+          type: string
+          enum:
+            - dynamic
+            - manual
+          description: Registration type of the client
+        client_uri:
+          type: string
+          format: uri
+          description: URL of the client application's homepage
+        logo_uri:
+          type: string
+          format: uri
+          description: URL of the client application's logo
+        redirect_uris:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: Array of redirect URIs used by the client
+        grant_types:
+          type: array
+          items:
+            type: string
+            enum:
+              - authorization_code
+              - refresh_token
+          description: OAuth grant types the client is authorized to use
+        response_types:
+          type: array
+          items:
+            type: string
+            enum:
+              - code
+          description: OAuth response types the client can use
+        scope:
+          type: string
+          description: Space-separated list of scope values
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CustomOAuthProviderSchema:
+      type: object
+      description: Represents a custom OAuth 2.0 or OIDC provider configuration
+      required:
+        - id
+        - provider_type
+        - identifier
+        - name
+        - client_id
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique provider identifier
+        provider_type:
+          type: string
+          enum:
+            - oauth2
+            - oidc
+          description: Type of OAuth provider
+        identifier:
+          type: string
+          pattern: "^custom:[a-zA-Z0-9_-]+$"
+          description: Unique identifier for the provider (must start with 'custom:' prefix)
+          example: "custom:mycompany"
+        name:
+          type: string
+          description: Human-readable name of the provider
+          example: "My Company SSO"
+        client_id:
+          type: string
+          description: OAuth client ID
+        acceptable_client_ids:
+          type: array
+          items:
+            type: string
+          description: Additional acceptable client IDs for token validation
+        scopes:
+          type: array
+          items:
+            type: string
+          description: OAuth scopes to request (OIDC providers will automatically include 'openid')
+          example: ["openid", "email", "profile"]
+        pkce_enabled:
+          type: boolean
+          description: Whether PKCE (Proof Key for Code Exchange) is enabled
+          default: true
+        attribute_mapping:
+          type: object
+          description: Maps provider claims to user attributes
+          additionalProperties: true
+          example:
+            email: "user_email"
+            name: "full_name"
+        custom_claims_allowlist:
+          type: array
+          items:
+            type: string
+          description: Raw IdP claim keys copied verbatim into the user's custom_claims (e.g. groups, org_id). For OIDC providers these are read from the ID token claims (falling back to the userinfo response when no ID token is returned); for OAuth2 providers they are read from the userinfo response. Empty preserves no non-standard claims.
+          example: ["groups", "org_id"]
+        authorization_params:
+          type: object
+          description: Additional parameters to include in authorization requests as string key-value pairs (cannot override reserved OAuth parameters)
+          additionalProperties:
+            type: string
+          example:
+            prompt: "consent"
+        enabled:
+          type: boolean
+          description: Whether the provider is enabled
+          default: true
+        email_optional:
+          type: boolean
+          description: Whether email is optional for users from this provider
+          default: false
+        issuer:
+          type: string
+          format: uri
+          description: OIDC issuer URL (required for OIDC providers)
+          example: "https://accounts.google.com"
+        discovery_url:
+          type: string
+          format: uri
+          description: OIDC discovery URL (optional, defaults to {issuer}/.well-known/openid-configuration)
+        skip_nonce_check:
+          type: boolean
+          description: Skip nonce validation for OIDC (not recommended for production)
+          default: false
+        authorization_url:
+          type: string
+          format: uri
+          description: OAuth 2.0 authorization endpoint (required for OAuth2 providers)
+        token_url:
+          type: string
+          format: uri
+          description: OAuth 2.0 token endpoint (required for OAuth2 providers)
+        userinfo_url:
+          type: string
+          format: uri
+          description: OAuth 2.0 userinfo endpoint (required for OAuth2 providers)
+        jwks_uri:
+          type: string
+          format: uri
+          description: JWKS URI for token validation (optional for OAuth2 providers)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+  responses:
+    OAuthCallbackRedirectResponse:
+      description: >
+        HTTP Redirect to a URL containing the `error` and `error_description` query parameters which should be shown to the user requesting the OAuth sign-in flow.
+      headers:
+        Location:
+          description: >
+            URL containing the `error` and `error_description` query parameters.
+          schema:
+            type: string
+            format: uri
+            example: https://example.com/?error=server_error&error_description=User%20does%20not%20exist.
+
+    OAuthAuthorizeRedirectResponse:
+      description: >
+        HTTP Redirect to the OAuth identity provider's authorization URL.
+      headers:
+        Location:
+          description: >
+            URL to which the user agent should redirect (or open in a browser for mobile apps).
+          schema:
+            type: string
+            format: uri
+
+    RateLimitResponse:
+      description: >
+        HTTP Too Many Requests response, when a rate limiter has been breached.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 429
+              msg:
+                type: string
+                description: A basic message describing the rate limit breach. Do not use as an error code identifier.
+                example: Too many requests. Please try again in a few seconds.
+
+    BadRequestResponse:
+      description: >
+        HTTP Bad Request response. Can occur if the passed in JSON cannot be unmarshalled properly or when CAPTCHA verification was not successful. In certain cases can also occur when features are disabled on the server (e.g. sign ups). It may also mean that the operation failed due to some constraint not being met (such a user already exists for example).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorSchema"
+
+    UnauthorizedResponse:
+      description: >
+        HTTP Unauthorized response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorSchema"
+
+    ForbiddenResponse:
+      description: >
+        HTTP Forbidden response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorSchema"
+
+    InternalServerErrorResponse:
+      description: >
+        HTTP Internal Server Error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorSchema"
+
+    AccessRefreshTokenRedirectResponse:
+      description: >
+        HTTP See Other redirect response where `Location` is a specially formatted URL that includes an `access_token`, `refresh_token`, `expires_in` as URL query encoded values in the URL fragment (anything after `#`). These values are encoded in the fragment as this value is only visible to the browser handling the redirect and is not sent to the server.
+      headers:
+        Location:
+          schema:
+            type: string
+            format: uri
+            example: https://example.com/#access_token=...&refresh_token=...&expires_in=...
