@@ -1,0 +1,132 @@
+name: Manual Build Production
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to run the workflow"
+        required: true
+      docker_tag:
+        description: "Tag to be used by the docker image on push"
+        required: true
+jobs:
+  docker_x86_release:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    env:
+      arch: amd64
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: |
+            supabase/realtime
+          tags: |
+            type=raw,value=v${{ github.event.inputs.docker_tag }}_${{ env.arch }}
+
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@ef12d5b165b596e3aa44ea8198d8fde563eab402 # v1.4.0
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - id: build
+        uses: useblacksmith/build-push-action@30c71162f16ea2c27c3e21523255d209b8b538c1 # v2
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/${{ env.arch }}
+
+  docker_arm_release:
+    runs-on: blacksmith-4vcpu-ubuntu-2404-arm
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    env:
+      arch: arm64
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: |
+            supabase/realtime
+          tags: |
+            type=raw,value=v${{ github.event.inputs.docker_tag }}_${{ env.arch }}
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@ef12d5b165b596e3aa44ea8198d8fde563eab402 # v1.4.0
+
+      - id: build
+        uses: useblacksmith/build-push-action@30c71162f16ea2c27c3e21523255d209b8b538c1 # v2
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/${{ env.arch }}
+
+  merge_manifest:
+    needs: [docker_x86_release, docker_arm_release]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@ef12d5b165b596e3aa44ea8198d8fde563eab402 # v1.4.0
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Merge multi-arch manifests for custom output
+        env:
+          DOCKER_TAG: ${{ github.event.inputs.docker_tag }}
+          IMAGE_DIGEST: ${{ needs.docker_arm_release.outputs.image_digest }}
+        run: |
+          docker buildx imagetools create -t "supabase/realtime:v${DOCKER_TAG}" \
+          "supabase/realtime@${IMAGE_DIGEST}" \
+          "supabase/realtime@${IMAGE_DIGEST}"
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: public.ecr.aws
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mirror to ECR
+        uses: akhilerm/tag-push-action@eadeefebd39db8a47e146115649adae1fce576a6 # v2.3.0
+        with:
+          src: docker.io/supabase/realtime:v${{ github.event.inputs.docker_tag }}
+          dst: |
+            public.ecr.aws/supabase/realtime:v${{ github.event.inputs.docker_tag }}
+            ghcr.io/supabase/realtime:v${{ github.event.inputs.docker_tag }}

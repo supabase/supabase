@@ -1,0 +1,133 @@
+select 1 from pg_create_logical_replication_slot('realtime', 'wal2json', false);
+ ?column? 
+----------
+        1
+(1 row)
+
+create table public.notes(
+    id serial primary key,
+    page_id int
+);
+insert into realtime.subscription(subscription_id, entity, claims, filters)
+select
+    seed_uuid(1),
+    'public.notes',
+    jsonb_build_object(
+        'role', 'authenticated',
+        'email', 'example@example.com',
+        'sub', seed_uuid(1)::text
+    ),
+    array[('page_id', 'eq', '5', false)::realtime.user_defined_filter];
+select clear_wal();
+ clear_wal 
+-----------
+ 
+(1 row)
+
+-- Expect 0 subscriptions: filters do not match: 5 <> 1
+insert into public.notes(page_id) values (1);
+select
+    rec,
+    is_rls_enabled,
+    subscription_ids,
+    errors
+from
+   walrus;
+                        rec                         | is_rls_enabled | subscription_ids | errors 
+----------------------------------------------------+----------------+------------------+--------
+ {                                                 +| f              | {}               | {}
+     "type": "INSERT",                             +|                |                  | 
+     "table": "notes",                             +|                |                  | 
+     "record": {                                   +|                |                  | 
+         "id": 1,                                  +|                |                  | 
+         "page_id": 1                              +|                |                  | 
+     },                                            +|                |                  | 
+     "schema": "public",                           +|                |                  | 
+     "columns": [                                  +|                |                  | 
+         {                                         +|                |                  | 
+             "name": "id",                         +|                |                  | 
+             "type": "int4"                        +|                |                  | 
+         },                                        +|                |                  | 
+         {                                         +|                |                  | 
+             "name": "page_id",                    +|                |                  | 
+             "type": "int4"                        +|                |                  | 
+         }                                         +|                |                  | 
+     ],                                            +|                |                  | 
+     "commit_timestamp": "2000-01-01T08:01:01.000Z"+|                |                  | 
+ }                                                  |                |                  | 
+(1 row)
+
+-- Expect 1 subscription: filters do match 5 = 5
+insert into public.notes(page_id) values (5);
+select
+    rec,
+    is_rls_enabled,
+    subscription_ids,
+    errors
+from
+   walrus;
+                        rec                         | is_rls_enabled |            subscription_ids            | errors 
+----------------------------------------------------+----------------+----------------------------------------+--------
+ {                                                 +| f              | {f4539ebe-c779-5788-bbc1-2421ffaa8954} | {}
+     "type": "INSERT",                             +|                |                                        | 
+     "table": "notes",                             +|                |                                        | 
+     "record": {                                   +|                |                                        | 
+         "id": 2,                                  +|                |                                        | 
+         "page_id": 5                              +|                |                                        | 
+     },                                            +|                |                                        | 
+     "schema": "public",                           +|                |                                        | 
+     "columns": [                                  +|                |                                        | 
+         {                                         +|                |                                        | 
+             "name": "id",                         +|                |                                        | 
+             "type": "int4"                        +|                |                                        | 
+         },                                        +|                |                                        | 
+         {                                         +|                |                                        | 
+             "name": "page_id",                    +|                |                                        | 
+             "type": "int4"                        +|                |                                        | 
+         }                                         +|                |                                        | 
+     ],                                            +|                |                                        | 
+     "commit_timestamp": "2000-01-01T08:01:01.000Z"+|                |                                        | 
+ }                                                  |                |                                        | 
+(1 row)
+
+-- Expect 0 subscriptions: filters do match 5 <> null
+insert into public.notes(page_id) values (null);
+select
+    rec,
+    is_rls_enabled,
+    subscription_ids,
+    errors
+from
+   walrus;
+                        rec                         | is_rls_enabled | subscription_ids | errors 
+----------------------------------------------------+----------------+------------------+--------
+ {                                                 +| f              | {}               | {}
+     "type": "INSERT",                             +|                |                  | 
+     "table": "notes",                             +|                |                  | 
+     "record": {                                   +|                |                  | 
+         "id": 3,                                  +|                |                  | 
+         "page_id": null                           +|                |                  | 
+     },                                            +|                |                  | 
+     "schema": "public",                           +|                |                  | 
+     "columns": [                                  +|                |                  | 
+         {                                         +|                |                  | 
+             "name": "id",                         +|                |                  | 
+             "type": "int4"                        +|                |                  | 
+         },                                        +|                |                  | 
+         {                                         +|                |                  | 
+             "name": "page_id",                    +|                |                  | 
+             "type": "int4"                        +|                |                  | 
+         }                                         +|                |                  | 
+     ],                                            +|                |                  | 
+     "commit_timestamp": "2000-01-01T08:01:01.000Z"+|                |                  | 
+ }                                                  |                |                  | 
+(1 row)
+
+drop table public.notes;
+select pg_drop_replication_slot('realtime');
+ pg_drop_replication_slot 
+--------------------------
+ 
+(1 row)
+
+truncate table realtime.subscription;

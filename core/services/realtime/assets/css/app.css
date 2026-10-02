@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Marks the characters a fuzzy query actually matched, so a hit is explainable at a glance.
+     Resets the user-agent yellow on <mark>, which would otherwise fight the brand palette. */
+  mark.search-hit {
+    @apply bg-transparent font-semibold text-brand-700 dark:text-brand-300 underline decoration-brand-400 decoration-1 underline-offset-2;
+  }
+}

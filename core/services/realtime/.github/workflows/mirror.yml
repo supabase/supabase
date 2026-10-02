@@ -1,0 +1,37 @@
+name: Mirror Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Image tag"
+        required: true
+        type: string
+
+jobs:
+  mirror:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: public.ecr.aws
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: akhilerm/tag-push-action@eadeefebd39db8a47e146115649adae1fce576a6 # v2.3.0
+        with:
+          src: docker.io/supabase/realtime:${{ inputs.version }}
+          dst: |
+            public.ecr.aws/supabase/realtime:${{ inputs.version }}
+            ghcr.io/supabase/realtime:${{ inputs.version }}

@@ -1,0 +1,183 @@
+<.h1>Realtime Cluster Health</.h1>
+<p class="text-gray-600 dark:text-neutral-400">
+  Ops view of inter-node latency across the Realtime cluster.
+</p>
+
+<div class="my-6">
+  <.h2>Region latency (avg)</.h2>
+  <p class="text-gray-600 dark:text-neutral-400 text-sm mb-4">
+    Average latency between regions, aggregated across every node pair.
+  </p>
+  <div class="overflow-x-auto">
+    <table class="table-fixed text-sm text-left text-gray-700 dark:text-neutral-300">
+      <thead class="text-xs text-gray-700 dark:text-neutral-300 uppercase bg-gray-50 dark:bg-neutral-800">
+        <tr>
+          <th scope="col" class="py-2 px-3">from \ to</th>
+          <th :for={to <- regions(@node_ids, @node_regions)} scope="col" class="py-2 px-3">
+            <%= to %>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr :for={from <- regions(@node_ids, @node_regions)}>
+          <th scope="row" class="py-2 px-3 bg-gray-50 dark:bg-neutral-800"><%= from %></th>
+          <td :for={to <- regions(@node_ids, @node_regions)} class="py-2 px-3">
+            <% stats = region_pair_stats(@pair_status, @node_regions, from, to) %>
+            <span :if={from == to} class="text-xs text-gray-400">&mdash;</span>
+            <.badge :if={from != to} variant={status_variant(stats.status)}>
+              <%= if is_number(stats.avg_latency),
+                do: "#{Float.round(stats.avg_latency, 1)} ms",
+                else: status_label(stats.status) %>
+            </.badge>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="my-6">
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+    <.h2>Nodes</.h2>
+    <div class="flex items-center gap-2">
+      <input
+        type="text"
+        value={@region_filter}
+        placeholder="Filter by region..."
+        phx-keyup="filter_region"
+        phx-debounce="200"
+        class="text-sm rounded-md border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+      />
+      <select
+        phx-change="sort_nodes"
+        name="value"
+        class="text-sm rounded-md border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+      >
+        <option value="node" selected={@node_sort == "node"}>Sort: Node</option>
+        <option value="region" selected={@node_sort == "region"}>Sort: Region</option>
+        <option value="status" selected={@node_sort == "status"}>Sort: Status</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 gap-4 py-2 sm:grid-cols-2 md:grid-cols-3">
+    <button
+      :for={node <- visible_nodes(@node_ids, @node_regions, @pair_status, @region_filter, @node_sort)}
+      type="button"
+      phx-click="select_node"
+      phx-value-node={node}
+      id={"node_" <> node}
+      class={[
+        "text-left min-w-0 break-words border-2 p-4 rounded",
+        if(@selected_node == node,
+          do: "border-brand-500",
+          else: "border-gray-200 dark:border-neutral-700"
+        )
+      ]}
+    >
+      <div class="flex flex-row items-center justify-between gap-2">
+        <span class="font-mono text-sm"><%= node %></span>
+        <.badge variant={status_variant(node_status(node, @node_ids, @pair_status))}>
+          <%= status_label(node_status(node, @node_ids, @pair_status)) %>
+        </.badge>
+      </div>
+      <div class="text-xs text-gray-500 dark:text-neutral-400 mt-1">
+        region: <%= Map.get(@node_regions, node, "unknown") %>
+      </div>
+    </button>
+  </div>
+</div>
+
+<div :if={@selected_node} class="my-6">
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+    <.h2>Pairs for <span class="font-mono"><%= @selected_node %></span></.h2>
+    <select
+      phx-change="sort_drill"
+      name="value"
+      class="text-sm rounded-md border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+    >
+      <option value="node" selected={@drill_sort == "node"}>Sort: Node</option>
+      <option value="latency" selected={@drill_sort == "latency"}>Sort: Latency</option>
+      <option value="status" selected={@drill_sort == "status"}>Sort: Status</option>
+    </select>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table-fixed text-sm text-left text-gray-700 dark:text-neutral-300">
+      <thead class="text-xs text-gray-700 dark:text-neutral-300 uppercase bg-gray-50 dark:bg-neutral-800">
+        <tr>
+          <th scope="col" class="py-2 px-3">Node</th>
+          <th scope="col" class="py-2 px-3">Outgoing</th>
+          <th scope="col" class="py-2 px-3">Incoming</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr :for={pair <- node_pairs(@selected_node, @node_ids, @pair_status, @drill_sort)}>
+          <th scope="row" class="py-2 px-3 font-mono bg-gray-50 dark:bg-neutral-800"><%= pair.node %></th>
+          <td class="py-2 px-3">
+            <.badge variant={status_variant(pair.outgoing[:status] || :unknown)}>
+              <%= if is_number(pair.outgoing[:latency]),
+                do: "#{Float.round(pair.outgoing.latency * 1.0, 1)} ms",
+                else: status_label(pair.outgoing[:status] || :unknown) %>
+            </.badge>
+          </td>
+          <td class="py-2 px-3">
+            <.badge variant={status_variant(pair.incoming[:status] || :unknown)}>
+              <%= if is_number(pair.incoming[:latency]),
+                do: "#{Float.round(pair.incoming.latency * 1.0, 1)} ms",
+                else: status_label(pair.incoming[:status] || :unknown) %>
+            </.badge>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="my-6">
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+    <.h2>Problem pairs</.h2>
+    <select
+      phx-change="sort_pairs"
+      name="value"
+      class="text-sm rounded-md border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+    >
+      <option value="severity" selected={@pair_sort == "severity"}>Sort: Severity</option>
+      <option value="latency" selected={@pair_sort == "latency"}>Sort: Latency</option>
+      <option value="region" selected={@pair_sort == "region"}>Sort: Region</option>
+    </select>
+  </div>
+  <p class="text-gray-600 dark:text-neutral-400 text-xs mb-2">
+    A pair counts as a problem when it's slow (&gt;1s), unreachable, or stale (no update for two
+    ping cycles &mdash; including pairs that never reported even once).
+  </p>
+  <% {problems, overflow} = problem_pairs(@pair_status, @node_regions, @pair_sort) %>
+  <p :if={problems == []} class="text-sm text-gray-500 dark:text-neutral-400">
+    No issues detected. All non-self pairs are healthy (or still waiting on the first ping round).
+  </p>
+  <div :if={problems != []} class="overflow-x-auto">
+    <table class="table-fixed text-sm text-left text-gray-700 dark:text-neutral-300">
+      <thead class="text-xs text-gray-700 dark:text-neutral-300 uppercase bg-gray-50 dark:bg-neutral-800">
+        <tr>
+          <th scope="col" class="py-2 px-3">From</th>
+          <th scope="col" class="py-2 px-3">To</th>
+          <th scope="col" class="py-2 px-3">Status</th>
+          <th scope="col" class="py-2 px-3">Latency</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr :for={pair <- problems}>
+          <td class="py-2 px-3 font-mono"><%= pair.from %></td>
+          <td class="py-2 px-3 font-mono"><%= pair.to %></td>
+          <td class="py-2 px-3">
+            <.badge variant={status_variant(pair.status)}><%= status_label(pair.status) %></.badge>
+          </td>
+          <td class="py-2 px-3 font-mono">
+            <%= if is_number(pair.latency), do: "#{Float.round(pair.latency * 1.0, 1)} ms", else: "—" %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p :if={overflow > 0} class="text-xs text-gray-500 dark:text-neutral-400 mt-2">
+    +<%= overflow %> more not shown.
+  </p>
+</div>

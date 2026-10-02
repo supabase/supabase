@@ -1,0 +1,450 @@
+<div>
+  <.form
+    :let={f}
+    id="conn_form"
+    for={@changeset}
+    phx-change="validate"
+    phx-submit="connect"
+    phx-target={@myself}
+  >
+    <div class="flex flex-wrap items-stretch gap-2">
+      <div class="flex flex-[3] min-w-[22rem] items-stretch rounded-md border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 focus-within:border-brand-500 focus-within:ring focus-within:ring-brand-200 dark:focus-within:ring-brand-900/40 focus-within:ring-opacity-50 overflow-hidden">
+        <.plain_input
+          field={f[:host]}
+          placeholder="https://project_ref.supabase.co"
+          aria_label="Host"
+          class="flex-[2] min-w-0"
+        />
+        <span class="self-center text-gray-300 dark:text-neutral-600 select-none">/</span>
+        <.plain_input field={f[:channel]} placeholder="room_a" aria_label="Channel" class="flex-1 min-w-0" />
+        <span class="self-center w-px h-5 bg-gray-200 dark:bg-neutral-700"></span>
+        <.plain_input
+          field={f[:token]}
+          placeholder="anon key"
+          aria_label="Token"
+          class="flex-1 min-w-0 font-mono"
+        />
+      </div>
+
+      <.button type="submit" phx-disable-with="Connecting..." class="shrink-0"><%= @subscribed_state %></.button>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-2 gap-y-2 mt-3">
+      <.toggle field={f[:enable_presence]} label="presence" />
+      <.toggle field={f[:enable_db_changes]} label="postgres changes" />
+      <.toggle field={f[:private_channel]} label="private" />
+
+      <span class="text-xs text-gray-400 dark:text-neutral-500">
+        broadcast is always on
+      </span>
+
+      <span class="flex-1"></span>
+
+      <button
+        type="button"
+        phx-click="clear_local_storage"
+        phx-target={@myself}
+        class="text-xs text-gray-500 dark:text-neutral-400 hover:text-gray-800 dark:hover:text-neutral-200 underline underline-offset-2"
+      >
+        Clear saved
+      </button>
+    </div>
+
+    <div
+      :if={Ecto.Changeset.get_field(@changeset, :enable_db_changes)}
+      class="flex flex-wrap items-center gap-2 mt-3 text-sm"
+    >
+      <span class="text-xs uppercase font-semibold text-gray-500 dark:text-neutral-400">Watching</span>
+      <.slim_input field={f[:schema]} placeholder="public" aria_label="Schema" class="w-28" />
+      <span class="text-gray-400 dark:text-neutral-500">.</span>
+      <.slim_input field={f[:table]} placeholder="*" aria_label="Table" class="w-40" />
+
+      <span class="text-gray-400 dark:text-neutral-500">on</span>
+      <div class="flex items-center gap-1">
+        <label
+          :for={event <- ~w(* INSERT UPDATE DELETE)}
+          class={[
+            "px-2 py-1 rounded-md border text-xs font-medium cursor-pointer select-none",
+            if(Ecto.Changeset.get_field(@changeset, :event) == event,
+              do:
+                "bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 border-brand-300 dark:border-brand-700",
+              else:
+                "bg-transparent text-gray-500 dark:text-neutral-400 border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600"
+            )
+          ]}
+        >
+          <input
+            type="radio"
+            name={f[:event].name}
+            value={event}
+            checked={Ecto.Changeset.get_field(@changeset, :event) == event}
+            class="sr-only"
+          />
+          <%= if event == "*", do: "all", else: String.downcase(event) %>
+        </label>
+      </div>
+    </div>
+
+    <% conditions = describe_filter(@changeset) %>
+    <% columns = selected_columns(@changeset) %>
+
+    <div :if={Ecto.Changeset.get_field(@changeset, :enable_db_changes)} class="mt-2 space-y-1.5">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs uppercase font-semibold text-gray-500 dark:text-neutral-400">Where</span>
+
+        <span :if={conditions == []} class="text-xs text-gray-400 dark:text-neutral-500">every row</span>
+
+        <span :for={{condition, index} <- Enum.with_index(conditions)} class="flex items-center gap-2">
+          <span :if={index > 0} class="text-[10px] uppercase tracking-wide text-gray-400 dark:text-neutral-500">
+            and
+          </span>
+          <code class="text-xs font-mono px-2 py-1 rounded-md bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-200">
+            <%= condition %>
+          </code>
+        </span>
+
+        <button
+          type="button"
+          phx-click="open_filter_editor"
+          phx-target={@myself}
+          class="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-neutral-200 hover:border-brand-400 dark:hover:border-brand-600"
+        >
+          Edit
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs uppercase font-semibold text-gray-500 dark:text-neutral-400">Returning</span>
+
+        <span :if={columns == []} class="text-xs text-gray-400 dark:text-neutral-500">every column</span>
+
+        <code
+          :for={column <- columns}
+          class="text-xs font-mono px-2 py-1 rounded-md bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-200"
+        >
+          <%= column %>
+        </code>
+
+        <span :if={columns != []} class="text-xs text-gray-400 dark:text-neutral-500">and the primary key</span>
+      </div>
+    </div>
+
+    <%!-- The form rebuilds the changeset from its own params, so these carry the applied filter. --%>
+    <input type="hidden" name={f[:filter].name} value={Ecto.Changeset.get_field(@changeset, :filter)} />
+    <input type="hidden" name={f[:select].name} value={Ecto.Changeset.get_field(@changeset, :select)} />
+
+    <% identity = bearer_identity(Ecto.Changeset.get_field(@changeset, :bearer)) %>
+
+    <div class="flex flex-wrap items-center gap-2 mt-3 text-sm">
+      <span class="text-xs uppercase font-semibold text-gray-500 dark:text-neutral-400">As user</span>
+
+      <div :if={identity} class="flex flex-wrap items-center gap-2">
+        <span class={[
+          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium",
+          if(identity.expired?,
+            do: "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-800",
+            else:
+              "bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 border-brand-300 dark:border-brand-700"
+          )
+        ]}>
+          <%= identity.subject %>
+          <span :if={identity.role} class="opacity-70">· <%= identity.role %></span>
+          <span :if={identity.expired?} class="font-semibold">· expired</span>
+        </span>
+        <button
+          type="button"
+          phx-click="clear_bearer"
+          phx-target={@myself}
+          class="text-xs text-gray-500 dark:text-neutral-400 hover:text-gray-800 dark:hover:text-neutral-200 underline underline-offset-2"
+        >
+          Sign out
+        </button>
+        <input type="hidden" name={f[:bearer].name} value={Ecto.Changeset.get_field(@changeset, :bearer)} />
+      </div>
+
+      <%!-- Credentials are not form fields, so phx-update=ignore keeps LiveView's re-render on
+            every keystroke from wiping what has been typed. The bearer field stays outside it,
+            since that one is managed by the changeset. --%>
+      <div
+        :if={is_nil(identity)}
+        id="sign-in"
+        phx-hook="signIn"
+        phx-update="ignore"
+        class="flex flex-wrap items-center gap-2"
+      >
+        <input
+          type="email"
+          data-role="email"
+          aria-label="Email to sign in with"
+          placeholder="email"
+          autocomplete="username"
+          class="text-xs rounded-md py-1 px-2 w-44 border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 focus:border-brand-500 focus:ring focus:ring-brand-200 dark:focus:ring-brand-900/40 focus:ring-opacity-50"
+        />
+        <input
+          type="password"
+          data-role="password"
+          aria-label="Password to sign in with"
+          placeholder="password"
+          autocomplete="current-password"
+          class="text-xs rounded-md py-1 px-2 w-36 border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 focus:border-brand-500 focus:ring focus:ring-brand-200 dark:focus:ring-brand-900/40 focus:ring-opacity-50"
+        />
+        <button
+          type="button"
+          data-role="sign-in"
+          class="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-neutral-200 hover:border-brand-400 dark:hover:border-brand-600"
+        >
+          Sign in
+        </button>
+        <span data-role="sign-in-status" class="text-xs text-gray-500 dark:text-neutral-400"></span>
+      </div>
+
+      <span :if={is_nil(identity)} class="text-xs text-gray-400 dark:text-neutral-500">or</span>
+      <.slim_input
+        :if={is_nil(identity)}
+        field={f[:bearer]}
+        placeholder="paste a user JWT"
+        aria_label="User token"
+        class="flex-1 min-w-[12rem] font-mono"
+      />
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 mt-3">
+      <span class="text-xs uppercase font-semibold text-gray-500 dark:text-neutral-400">Server logs</span>
+      <select
+        id="conn_form_log_level"
+        name="connection[log_level]"
+        aria-label="Server log level"
+        class="text-xs rounded-md border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 py-1"
+      >
+        <option :for={level <- ~w(debug info warning error)} value={level} selected={
+          Ecto.Changeset.get_field(@changeset, :log_level) == level
+        }>
+          <%= level %>
+        </option>
+      </select>
+
+      <p
+        :if={stale_connection?(@changeset, @connected_snapshot)}
+        class="text-xs text-warning-700 dark:text-warning-300"
+      >
+        Changed since connecting. <%= @subscribed_state %> to apply.
+      </p>
+    </div>
+
+    <p :for={{field, {message, _}} <- @changeset.errors} class="text-xs text-red-600 dark:text-red-400 mt-2">
+      <%= field %> <%= message %>
+    </p>
+  </.form>
+
+  <div :if={@filter_editor} class="relative z-50">
+    <div class="fixed inset-0 bg-gray-900/40 dark:bg-black/70" aria-hidden="true" />
+
+    <div class="fixed inset-0 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <.focus_wrap
+          id="filter-editor"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="filter-editor-title"
+          phx-window-keydown="close_filter_editor"
+          phx-key="escape"
+          phx-target={@myself}
+          class="w-full max-w-2xl rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-xl"
+        >
+          <div class="px-5 py-4 border-b border-gray-200 dark:border-neutral-800">
+            <h2 id="filter-editor-title" class="text-sm font-semibold text-gray-900 dark:text-neutral-100">
+              Filters and columns
+            </h2>
+            <p class="text-xs text-gray-500 dark:text-neutral-400 mt-0.5 font-mono">
+              <%= Ecto.Changeset.get_field(@changeset, :schema) %>.<%= Ecto.Changeset.get_field(@changeset, :table) %>
+            </p>
+          </div>
+
+          <div class="px-5 py-4 space-y-6">
+            <p :if={@filter_editor.unreadable} class="text-xs text-warning-700 dark:text-warning-300">
+              The filter in use could not be read and will be replaced:
+              <code class="font-mono"><%= @filter_editor.unreadable %></code>
+            </p>
+
+            <section>
+              <h3 class="text-xs uppercase font-semibold text-gray-500 dark:text-neutral-400 mb-2">Conditions</h3>
+
+              <form
+                id="filter-editor-form"
+                phx-change="filter_editor_change"
+                phx-submit="apply_filter_editor"
+                phx-target={@myself}
+              >
+                <div
+                  :for={{condition, index} <- Enum.with_index(@filter_editor.conditions)}
+                  class="flex flex-wrap items-center gap-2 mb-2"
+                >
+                  <span class="w-7 text-[10px] uppercase tracking-wide text-gray-400 dark:text-neutral-500">
+                    <%= if index > 0, do: "and" %>
+                  </span>
+
+                  <input
+                    type="text"
+                    name={"conditions[#{index}][column]"}
+                    value={condition.column}
+                    placeholder="column"
+                    aria-label={"Column for condition #{index + 1}"}
+                    autocomplete="off"
+                    spellcheck="false"
+                    class="text-xs rounded-md py-1 px-2 w-36 border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 focus:border-brand-500 focus:ring focus:ring-brand-200 dark:focus:ring-brand-900/40 focus:ring-opacity-50"
+                  />
+
+                  <label class={[
+                    "inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs cursor-pointer select-none",
+                    if(condition.negated,
+                      do:
+                        "bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 border-brand-300 dark:border-brand-700",
+                      else: "text-gray-500 dark:text-neutral-400 border-gray-200 dark:border-neutral-700"
+                    )
+                  ]}>
+                    <input type="hidden" name={"conditions[#{index}][negated]"} value="false" />
+                    <input
+                      type="checkbox"
+                      name={"conditions[#{index}][negated]"}
+                      value="true"
+                      checked={condition.negated}
+                      aria-label={"Negate condition #{index + 1}"}
+                      class="sr-only"
+                    />
+                    not
+                  </label>
+
+                  <select
+                    name={"conditions[#{index}][operator]"}
+                    aria-label={"Operator for condition #{index + 1}"}
+                    class="text-xs rounded-md py-1 px-2 border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                  >
+                    <option
+                      :for={operator <- Realtime.Filter.operators()}
+                      value={operator}
+                      selected={condition.operator == operator}
+                    >
+                      <%= Realtime.Filter.operator_label(operator) %>
+                    </option>
+                  </select>
+
+                  <input
+                    type="text"
+                    name={"conditions[#{index}][value]"}
+                    value={condition.value}
+                    placeholder={Realtime.Filter.value_placeholder(condition.operator)}
+                    aria-label={"Value for condition #{index + 1}"}
+                    autocomplete="off"
+                    spellcheck="false"
+                    class="text-xs rounded-md py-1 px-2 w-44 border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 focus:border-brand-500 focus:ring focus:ring-brand-200 dark:focus:ring-brand-900/40 focus:ring-opacity-50"
+                  />
+
+                  <button
+                    type="button"
+                    phx-click="remove_condition"
+                    phx-value-index={index}
+                    phx-target={@myself}
+                    aria-label={"Remove condition #{index + 1}"}
+                    class="text-gray-400 dark:text-neutral-500 hover:text-red-600 dark:hover:text-red-400 px-1"
+                  >
+                    &times;
+                  </button>
+                </div>
+              </form>
+
+              <button
+                type="button"
+                phx-click="add_condition"
+                phx-target={@myself}
+                class="text-xs px-2 py-1 rounded-md border border-dashed border-gray-300 dark:border-neutral-600 text-gray-600 dark:text-neutral-300 hover:border-brand-400 dark:hover:border-brand-600"
+              >
+                + Add condition
+              </button>
+
+              <p class="text-xs text-gray-400 dark:text-neutral-500 mt-2">
+                Every condition has to match. The wire format has no <code class="font-mono">or</code>.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-xs uppercase font-semibold text-gray-500 dark:text-neutral-400 mb-2">Columns</h3>
+
+              <div class="flex flex-wrap items-center gap-1.5 mb-2">
+                <span :if={@filter_editor.select == []} class="text-xs text-gray-400 dark:text-neutral-500">
+                  every column
+                </span>
+
+                <span
+                  :for={column <- @filter_editor.select}
+                  class="inline-flex items-center gap-1 pl-2 pr-1 py-1 rounded-full border text-xs font-mono bg-gray-100 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-neutral-200"
+                >
+                  <%= column %>
+                  <button
+                    type="button"
+                    phx-click="remove_select_column"
+                    phx-value-column={column}
+                    phx-target={@myself}
+                    aria-label={"Stop returning #{column}"}
+                    class="opacity-50 hover:opacity-100 px-0.5"
+                  >
+                    &times;
+                  </button>
+                </span>
+              </div>
+
+              <%!-- The chip count in the id remounts the input empty once a chip is committed. --%>
+              <form phx-submit="add_select_column" phx-target={@myself}>
+                <input
+                  type="text"
+                  id={"select-column-#{length(@filter_editor.select)}"}
+                  name="column"
+                  value=""
+                  placeholder="column name, then Enter"
+                  aria-label="Add a column to return"
+                  autocomplete="off"
+                  spellcheck="false"
+                  class="text-xs rounded-md py-1 px-2 w-56 border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 focus:border-brand-500 focus:ring focus:ring-brand-200 dark:focus:ring-brand-900/40 focus:ring-opacity-50"
+                />
+              </form>
+
+              <p class="text-xs text-gray-400 dark:text-neutral-500 mt-2">
+                Empty returns every column. The primary key always comes back. The server rejects column
+                selection on a wildcard table, and says so in the event log.
+              </p>
+            </section>
+
+            <section>
+              <h3 class="text-xs uppercase font-semibold text-gray-500 dark:text-neutral-400 mb-2">On the wire</h3>
+
+              <% wire_filter = Realtime.Filter.compose_all(@filter_editor.conditions) %>
+              <pre class="text-xs font-mono rounded-md bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-200 p-3 overflow-x-auto"><%= "filter  " %><%= if wire_filter == "", do: "(none)", else: inspect(wire_filter) %>
+<%= "select  " %><%= if @filter_editor.select == [], do: "(every column)", else: inspect(@filter_editor.select) %></pre>
+            </section>
+
+            <p :if={@filter_editor.error} class="text-xs text-red-600 dark:text-red-400">
+              <%= @filter_editor.error %>
+            </p>
+          </div>
+
+          <div class="px-5 py-3 border-t border-gray-200 dark:border-neutral-800 flex items-center justify-end gap-4">
+            <button
+              type="button"
+              phx-click="close_filter_editor"
+              phx-target={@myself}
+              class="text-xs text-gray-600 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-neutral-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="filter-editor-form"
+              class="text-xs font-semibold px-3 py-1.5 rounded-md bg-brand-600 hover:bg-brand-500 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+            >
+              Apply
+            </button>
+          </div>
+        </.focus_wrap>
+      </div>
+    </div>
+  </div>
+</div>

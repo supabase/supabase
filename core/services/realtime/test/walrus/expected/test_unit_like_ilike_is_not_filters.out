@@ -1,0 +1,230 @@
+-- like (negate=false)
+select realtime.check_equality_op('like', 'text', 'hello world', '%world%', false);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('like', 'text', 'hello world', '%xyz%',   false);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- like negated (NOT LIKE)
+select realtime.check_equality_op('like', 'text', 'hello world', '%xyz%',   true);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('like', 'text', 'hello world', '%world%', true);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- ilike (negate=false)
+select realtime.check_equality_op('ilike', 'text', 'Hello World', '%world%', false);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('ilike', 'text', 'Hello World', '%xyz%',   false);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- ilike negated (NOT ILIKE)
+select realtime.check_equality_op('ilike', 'text', 'Hello World', '%xyz%',   true);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('ilike', 'text', 'Hello World', '%world%', true);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- in (negate=false)
+select realtime.check_equality_op('in', 'bigint', '2', '{1,2,3}', false);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('in', 'bigint', '4', '{1,2,3}', false);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- in negated (NOT IN)
+select realtime.check_equality_op('in', 'bigint', '4', '{1,2,3}', true);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('in', 'bigint', '2', '{1,2,3}', true);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- is null
+select realtime.check_equality_op('is', 'text', null,    'null', false);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('is', 'text', 'value', 'null', false);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- is not null (negate=true)
+select realtime.check_equality_op('is', 'text', 'value', 'null', true);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('is', 'text', null,    'null', true);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- is true / false on boolean
+select realtime.check_equality_op('is', 'boolean', 'true',  'true',  false);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('is', 'boolean', 'false', 'true',  false);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+select realtime.check_equality_op('is', 'boolean', 'false', 'true',  true);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+-- match (regex)
+select realtime.check_equality_op('match',  'text', 'hello world', 'hel+o',  false);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('match',  'text', 'hello world', '^world', false);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+select realtime.check_equality_op('match',  'text', 'hello world', 'hel+o',  true);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- imatch (case-insensitive regex)
+select realtime.check_equality_op('imatch', 'text', 'Hello World', 'hel+o',  false);
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('imatch', 'text', 'Hello World', '^world', false);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+select realtime.check_equality_op('imatch', 'text', 'Hello World', 'hel+o',  true);
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- isdistinct (IS DISTINCT FROM — differs from neq in NULL handling)
+select realtime.check_equality_op('isdistinct', 'text', 'aaa', 'bbb',  false);  -- true
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('isdistinct', 'text', 'aaa', 'aaa',  false);  -- false
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+select realtime.check_equality_op('isdistinct', 'text', null,  'aaa',  false);  -- true (NULL IS DISTINCT FROM 'aaa')
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('isdistinct', 'text', null,  'aaa',  true);   -- false (IS NOT DISTINCT FROM)
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+select realtime.check_equality_op('isdistinct', 'text', null,  null,   false);  -- false (NULL IS NOT DISTINCT FROM NULL)
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- negate works on all existing operators
+select realtime.check_equality_op('eq',  'text',   'aaa', 'aaa',      true);  -- NOT eq  → false
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+select realtime.check_equality_op('neq', 'text',   'aaa', 'bbb',      true);  -- NOT neq → false
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+select realtime.check_equality_op('lt',  'bigint', '1',   '2',        true);  -- NOT lt  → false
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+select realtime.check_equality_op('gte', 'bigint', '5',   '3',        true);  -- NOT gte → false
+ check_equality_op 
+-------------------
+ f
+(1 row)
+
+-- negate defaults to false (existing callers unaffected)
+select realtime.check_equality_op('eq', 'text', 'aaa', 'aaa');
+ check_equality_op 
+-------------------
+ t
+(1 row)
+
+select realtime.check_equality_op('in', 'bigint', '2', '{1,2,3}');
+ check_equality_op 
+-------------------
+ t
+(1 row)
+

@@ -1,0 +1,59 @@
+# fly.toml app configuration file generated for realtime-staging on 2023-06-27T07:39:20-07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "realtime-staging"
+primary_region = "lhr"
+kill_signal = "SIGTERM"
+kill_timeout = "5s"
+
+[experimental]
+  auto_rollback = true
+
+[deploy]
+  release_command = "/app/bin/migrate"
+  strategy = "rolling"
+
+[env]
+  DNS_NODES = "realtime-staging.internal"
+  ERL_CRASH_DUMP = "/data/erl_crash.dump"
+  ERL_CRASH_DUMP_SECONDS = "30"
+
+[[mounts]]
+  source = "data_vol_machines"
+  destination = "/data"
+  processes = ["app"]
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 4000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 16384
+    soft_limit = 16384
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "30s"
+    restart_limit = 6
+
+  [[services.http_checks]]
+    interval = "10s"
+    timeout = "2s"
+    grace_period = "5s"
+    restart_limit = 0
+    method = "get"
+    path = "/"
+    protocol = "http"

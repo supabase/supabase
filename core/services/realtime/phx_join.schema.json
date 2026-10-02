@@ -1,0 +1,139 @@
+{
+    "type": "object",
+    "description": "",
+    "title": "phx_join",
+    "required": [
+        "access_token",
+        "config"
+    ],
+    "properties": {
+        "config": {
+            "title": "config",
+            "$ref": "#/$defs/phx_join_config"
+        },
+        "access_token": {
+            "type": "string",
+            "description": "String, e.g. 'hello'",
+            "title": "access_token"
+        }
+    },
+    "additionalProperties": false,
+    "$defs": {
+        "phx_join_config": {
+            "type": "object",
+            "description": "",
+            "title": "phx_join_config",
+            "properties": {
+                "private": {
+                    "type": "boolean",
+                    "description": "Boolean, e.g. true",
+                    "title": "private",
+                    "default": false
+                },
+                "broadcast": {
+                    "title": "broadcast",
+                    "$ref": "#/$defs/phx_join_broadcast",
+                    "default": {
+                        "self": false,
+                        "ack": false
+                    }
+                },
+                "presence": {
+                    "title": "presence",
+                    "$ref": "#/$defs/phx_join_presence",
+                    "default": {
+                        "enabled": false,
+                        "key": ""
+                    }
+                },
+                "postgres_changes": {
+                    "type": "array",
+                    "title": "phx_join_postgres_changes",
+                    "items": {
+                        "$ref": "#/$defs/phx_join_postgres_changes",
+                        "default": {
+                            "table": "",
+                            "filter": "",
+                            "schema": "",
+                            "event": ""
+                        }
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "phx_join_broadcast": {
+            "type": "object",
+            "description": "",
+            "title": "phx_join_broadcast",
+            "properties": {
+                "self": {
+                    "type": "boolean",
+                    "description": "Boolean, e.g. true",
+                    "title": "self",
+                    "default": false
+                },
+                "ack": {
+                    "type": "boolean",
+                    "description": "Boolean, e.g. true",
+                    "title": "ack",
+                    "default": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "phx_join_postgres_changes": {
+            "type": "object",
+            "description": "",
+            "title": "phx_join_postgres_changes",
+            "required": [
+                "event",
+                "filter",
+                "schema",
+                "table"
+            ],
+            "properties": {
+                "table": {
+                    "type": "string",
+                    "description": "String, e.g. 'hello'",
+                    "title": "table"
+                },
+                "filter": {
+                    "type": "string",
+                    "description": "String, e.g. 'hello'",
+                    "title": "filter"
+                },
+                "schema": {
+                    "type": "string",
+                    "description": "String, e.g. 'hello'",
+                    "title": "schema"
+                },
+                "event": {
+                    "type": "string",
+                    "description": "String, e.g. 'hello'",
+                    "title": "event"
+                }
+            },
+            "additionalProperties": false
+        },
+        "phx_join_presence": {
+            "type": "object",
+            "description": "",
+            "title": "phx_join_presence",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Boolean, e.g. true",
+                    "title": "enabled",
+                    "default": false
+                },
+                "key": {
+                    "type": "string",
+                    "description": "String, e.g. 'hello'",
+                    "title": "key"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

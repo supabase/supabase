@@ -1,0 +1,281 @@
+name: Tests
+on:
+  pull_request:
+    paths:
+      - "lib/**"
+      - "test/**"
+      # its own workflow: walrus_tests.yml
+      - "!test/walrus/**"
+      - "config/**"
+      - "priv/**"
+      - "!priv/repo/tenant_schema/**"
+      - "assets/**"
+      - "rel/**"
+      - "native/**"
+      - "dev/**"
+      - "mix.exs"
+      - "compose.dbs.yml"
+      - "compose.realtime-db.yml"
+      - "compose.tenant-db.yml"
+      - "mix.lock"
+      - "Dockerfile"
+      - "run.sh"
+      - ".github/workflows/tests.yml"
+
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read # needed to resolve this job's own numeric ID for the flaky digest's job link
+
+env:
+  MIX_ENV: test
+
+jobs:
+  tests:
+    name: Tests (${{ matrix.postgres }} - Partition ${{ matrix.partition }})
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    env:
+      POSTGRES_IMAGE: ${{ matrix.postgres_image }}
+      TENANT_DB_IMAGE: ${{ matrix.tenant_db_image }}
+      # A cluster serves one database, so a port each, and max_cases is one fewer: some tests
+      # hold a second database while holding the first, and checkout blocks until one frees up.
+      USE_EXTERNAL_TENANT_DB: ${{ matrix.postgres == 'multigres' }}
+      EXTERNAL_TENANT_DB_PORTS: "5433,5434,5435,5436,5437"
+      TENANT_DB_PORT: "5433"
+    strategy:
+      fail-fast: false
+      matrix:
+        partition: [1, 2, 3, 4]
+        postgres: [pg14, pg15, pg15_latest, pg17, orioledb17, multigres]
+        include:
+          - postgres: pg14
+            postgres_image: supabase/postgres:14.1.0.82
+          # test before supautils.policy_grants added all necessary grants
+          - postgres: pg15
+            postgres_image: supabase/postgres:15.1.0.1
+          - postgres: pg15_latest
+            postgres_image: supabase/postgres:15.14.1.167
+          - postgres: pg17
+            postgres_image: supabase/postgres:17.6.1.166
+            coverage: true
+          - postgres: orioledb17
+            postgres_image: supabase/postgres:17.9.0.019-orioledb
+          # The realtime DB is independent of the tenant databases, so it stays on a plain
+          # Postgres image and only the tenant DBs run a cluster.
+          - postgres: multigres
+            postgres_image: supabase/postgres:17.6.1.166
+            tenant_db_image: ghcr.io/multigres/multigres-cluster-supabase:sha-d96b2f9
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup elixir
+        id: beam
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: 28.5.0.4 # Define the OTP version [required]
+          elixir-version: 1.19.5 # Define the elixir version [required]
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            deps
+            _build
+            priv/native
+          key: ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-
+
+      - name: Cache Docker images
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        id: docker-cache
+        with:
+          path: /tmp/docker-images
+          key: docker-images-zstd-${{ env.POSTGRES_IMAGE }}-${{ env.TENANT_DB_IMAGE }}
+      - name: Load Docker images from cache
+        if: steps.docker-cache.outputs.cache-hit == 'true'
+        run: zstd -d --stdout /tmp/docker-images/images.tar.zst | docker image load
+      - name: Pull and save Docker images
+        if: steps.docker-cache.outputs.cache-hit != 'true'
+        run: |
+          for image in ${{ env.POSTGRES_IMAGE }} ${{ env.TENANT_DB_IMAGE }}; do docker pull "$image"; done
+          mkdir -p /tmp/docker-images
+          docker image save ${{ env.POSTGRES_IMAGE }} ${{ env.TENANT_DB_IMAGE }} |
+            zstd -T0 -o /tmp/docker-images/images.tar.zst
+
+      - name: Install pgdelta
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          install_args: "node@24 npm:@supabase/pg-delta"
+          env: false
+
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Set up Postgres
+        run: docker compose -f compose.dbs.yml up -d --wait --wait-timeout 300
+      - name: Bootstrap the tenant database
+        run: docker compose -f compose.dbs.yml run --rm tenant_db_bootstrap
+      - name: Set up the additional Multigres tenant databases
+        if: matrix.postgres == 'multigres'
+        run: |
+          # Every port but the one the step above already brought up.
+          ports=()
+          for port in ${EXTERNAL_TENANT_DB_PORTS//,/ }; do
+            [ "$port" = "$TENANT_DB_PORT" ] || ports+=("$port")
+          done
+
+          # Waited on one pid at a time: `wait` with several only reports the last one's status,
+          # which would let a cluster that never came up fail silently here and confusingly later.
+          pids=()
+          for port in "${ports[@]}"; do
+            COMPOSE_PROJECT_NAME="tenant-db-$port" TENANT_DB_PORT="$port" \
+              docker compose -f compose.tenant-db.yml up -d --wait --wait-timeout 300 &
+            pids+=($!)
+          done
+          for pid in "${pids[@]}"; do wait "$pid"; done
+
+          for port in "${ports[@]}"; do
+            COMPOSE_PROJECT_NAME="tenant-db-$port" TENANT_DB_PORT="$port" \
+              docker compose -f compose.tenant-db.yml run --rm tenant_db_bootstrap
+          done
+      - name: Start epmd
+        run: epmd -daemon
+      # flaky test reporter wants to provide full job URLs, no easier way to allow this found
+      - name: Resolve job URL
+        id: job_url
+        continue-on-error: true # best-effort metadata for the flaky digest; never fail the test job over this
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          # github.job is the YAML job key ("tests"), not the per-matrix numeric job ID
+          # the /job/<id> URL needs - resolve it by matching this runner against the run's job
+          # list (each job in a run gets a distinct runner; RUNNER_NAME is set by the runner).
+          JOB_ID="$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs?per_page=100" \
+            --paginate --jq ".jobs[] | select(.runner_name == \"$RUNNER_NAME\") | .id" | head -n1)"
+          if [ -n "$JOB_ID" ]; then
+            echo "url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${JOB_ID}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run tests
+        env:
+          MIX_TEST_PARTITION: ${{ matrix.partition }}
+          MATRIX_POSTGRES: ${{ matrix.postgres }}
+          JOB_URL: ${{ steps.job_url.outputs.url }}
+          EXPORT_COVERAGE: ${{ matrix.coverage == true }}
+          WAIT_MARGIN_REPORT: "true"
+        run: .github/scripts/run_tests_with_retry.sh partition-${{ matrix.partition }}
+      - name: Merge wait margin diagnostics into flaky events
+        if: always()
+        continue-on-error: true # a bug in this script must never mark the test job as failed
+        env:
+          MIX_TEST_PARTITION: ${{ matrix.partition }}
+          MATRIX_POSTGRES: ${{ matrix.postgres }}
+          JOB_URL: ${{ steps.job_url.outputs.url }}
+        run: .github/scripts/append_wait_margin_events.sh
+      - name: Upload coverage artifact
+        if: matrix.coverage
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: coverage-partition-${{ matrix.partition }}
+          path: |
+            cover/lcov.info
+            cover/partition-${{ matrix.partition }}.coverdata
+      - name: Upload flaky test report
+        if: hashFiles('flaky-report.md', 'flaky-events.jsonl') != ''
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: flaky-${{ matrix.postgres }}-p${{ matrix.partition }}
+          path: |
+            flaky-report.md
+            flaky-events.jsonl
+
+  assets_tests:
+    name: Asset Tests
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: assets/package-lock.json
+      - name: Install dependencies
+        run: npm --prefix assets ci
+      - name: Run asset tests
+        run: npm --prefix assets test
+
+  coverage:
+    name: Merge Coverage
+    needs: tests
+    if: ${{ needs.tests.result == 'success' }}
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Download all coverage artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: coverage-partition-*
+          path: coverage
+      - name: Upload merged coverage to Coveralls
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          files: coverage/coverage-partition-1/lcov.info coverage/coverage-partition-2/lcov.info coverage/coverage-partition-3/lcov.info coverage/coverage-partition-4/lcov.info
+
+  crap:
+    name: CRAP Report
+    needs: tests
+    if: ${{ github.event_name == 'pull_request' && needs.tests.result == 'success' }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup elixir
+        id: beam
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: 28.5.0.4
+          elixir-version: 1.19.5
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            deps
+            _build
+            priv/native
+          key: ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: coverage-partition-*
+          path: coverage
+      - name: Build CRAP report
+        run: |
+          mix compile
+
+          {
+            echo '## CRAP Score Report'
+            echo '```'
+            mix crap.ci 2>&1 |
+              sed -r 's/\x1b\[[0-9;]*m//g' |
+              sed -n '/^Summary:/,$p' ||
+              true
+            echo '```'
+          } > crap-report.md
+      - name: Post CRAP report comment
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
+        with:
+          header: crap-report
+          path: crap-report.md

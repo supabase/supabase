@@ -1,0 +1,125 @@
+services:
+  # Supabase Realtime service
+  test_db:
+    image: ${POSTGRES_IMAGE:-supabase/postgres:17.6.1.166}
+    ports:
+      - "${TEST_DB_PORT:-5532}:5432"
+    volumes:
+      - ./dev/postgres/za-permit-supabase-admin.sh:/docker-entrypoint-initdb.d/za-permit-supabase-admin.sh
+      - ./dev/postgres/zb-supabase-schema.sql:/docker-entrypoint-initdb.d/zb-supabase-schema.sql
+      - ./dev/postgres/zc-template1-orioledb.sql:/docker-entrypoint-initdb.d/zc-template1-orioledb.sql
+    # Serves both images: a cluster ignores `command` and /docker-entrypoint-initdb.d,
+    # and supabase/postgres ignores MULTIGRES_*.
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    # A cluster forks its services and returns, so PID 1 must reap.
+    init: true
+    shm_size: "1gb"
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: postgres
+      MULTIGRES_GATEWAY_PG_PORT: "5432"
+      # Minimum for the shard to elect a leader.
+      MULTIGRES_NUM_CELLS: "2"
+    healthcheck:
+      # Over TCP: a cluster's Postgres sits behind the pooler on its own socket.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      # A cluster takes about a minute to bootstrap.
+      start_period: 90s
+
+  # Does what /docker-entrypoint-initdb.d would for an image that skips it. Profiled so
+  # only `compose run` triggers it, which waits for test_db to be healthy first.
+  test_db_bootstrap:
+    profiles: ["bootstrap"]
+    image: ${POSTGRES_IMAGE:-supabase/postgres:17.6.1.166}
+    depends_on:
+      test_db:
+        condition: service_healthy
+    volumes:
+      - ./dev/postgres/zb-supabase-schema.sql:/zb-supabase-schema.sql:ro
+    environment:
+      # The script reconnects over TCP, where there is no peer auth.
+      PGPASSWORD: postgres
+    entrypoint:
+      - psql
+      - --host=test_db
+      - --port=5432
+      - --username=supabase_admin
+      - --dbname=postgres
+      - --no-psqlrc
+      - --quiet
+      - --set=ON_ERROR_STOP=1
+      # Only POSTGRES_USER gets POSTGRES_PASSWORD; Realtime also uses `postgres`.
+      - --command=alter role postgres with password 'postgres'
+      - --file=/zb-supabase-schema.sql
+
+  test_realtime:
+    depends_on:
+      test_db:
+        condition: service_healthy
+    build: .
+    ports:
+      - "${TEST_REALTIME_PORT:-4100}:4100"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      PORT: 4100
+      DB_HOST: host.docker.internal
+      DB_PORT: ${TEST_DB_PORT:-5532}
+      DB_USER: ${DB_USER:-supabase_admin}
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
+      DB_ENC_KEY: 1234567890123456
+      DB_ENC_KEY_GCM: "12345678901234567890123456789012"
+      DB_ENC_WRITE_GCM: "true"
+      DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
+      API_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      METRICS_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      ERL_AFLAGS: -proto_dist inet_tcp
+      DNS_NODES: "''"
+      APP_NAME: realtime
+      RUN_JANITOR: true
+      JANITOR_INTERVAL: 60000
+      LOG_LEVEL: "info"
+      SEED_SELF_HOST: true
+      DASHBOARD_USER: admin
+      DASHBOARD_PASSWORD: admin
+    networks:
+      test-network:
+        aliases:
+          - realtime-dev.local
+          - realtime-dev.localhost
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4100/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # Deno test runner
+  test-runner:
+    image: denoland/deno:alpine-2.5.6
+    depends_on:
+      test_realtime:
+        condition: service_healthy
+      test_db:
+        condition: service_healthy
+    volumes:
+      - ./test/integration/tests.ts:/app/tests.ts:ro
+    working_dir: /app
+    command: >
+      sh -c "
+      echo 'Running tests...' &&
+      deno test tests.ts --allow-import --no-check --allow-read --allow-net --trace-leaks --allow-env=WS_NO_BUFFER_UTIL
+      "
+    networks:
+      - test-network
+    extra_hosts:
+      - "realtime-dev.localhost:host-gateway"
+
+networks:
+  test-network:
+    driver: bridge

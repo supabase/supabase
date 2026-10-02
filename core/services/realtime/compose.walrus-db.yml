@@ -1,0 +1,26 @@
+# Postgres used by the WALRUS pg_regress suite (test/walrus, driven by test/walrus/run.sh).
+#
+# Deliberately a separate service from `tenant_db`: the suite creates and drops a
+# logical replication slot named `realtime`, and slots are cluster-wide, so sharing a
+# cluster with `mix test` would make both flaky.
+services:
+  walrus_db:
+    image: ${POSTGRES_IMAGE:-supabase/postgres:17.6.1.166}
+    ports:
+      - "${WALRUS_DB_PORT:-5534}:5432"
+    volumes:
+      - ./dev/postgres/za-permit-supabase-admin.sh:/docker-entrypoint-initdb.d/za-permit-supabase-admin.sh
+      - ./test/walrus:/walrus/test:ro
+      - ./priv/repo:/walrus/priv/repo:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      # Over TCP, not the socket: the entrypoint runs the init scripts against a
+      # temporary socket-only server, so a socket probe reports healthy while the
+      # real server is still coming up.
+      test: ["CMD-SHELL", "pg_isready -U postgres -h 127.0.0.1 -p 5432"]
+      interval: 2s
+      timeout: 5s
+      retries: 60

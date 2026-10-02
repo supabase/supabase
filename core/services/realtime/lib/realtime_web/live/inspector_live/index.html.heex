@@ -1,0 +1,67 @@
+<div class="flex flex-col gap-4 lg:h-[calc(100vh-11rem)]">
+  <header class="flex flex-row items-start justify-between gap-x-4">
+    <div id="conn_info" class="flex flex-wrap items-center gap-x-3 gap-y-2 min-w-0">
+      <.badge variant={status_variant(@health.channel.status)} pulse={status_pulse?(@health.channel.status)}>
+        <%= channel_label(@health.channel) %>
+      </.badge>
+      <span :if={@health.transport.rtt_ms} class="text-xs text-gray-500 dark:text-neutral-400 font-mono">
+        <%= Float.round(@health.transport.rtt_ms * 1.0, 1) %> ms
+      </span>
+      <span :if={channel_detail(@health.channel)} class="text-xs text-gray-500 dark:text-neutral-400">
+        <%= channel_detail(@health.channel) %>
+      </span>
+      <span :if={@health.presence.status == :synced} class="text-xs text-gray-500 dark:text-neutral-400">
+        <%= presence_label(@health.presence) %>
+      </span>
+      <span :if={@health.postgres.status == :subscribed} class="text-xs text-gray-500 dark:text-neutral-400">
+        <%= postgres_label(@health.postgres) %>
+      </span>
+    </div>
+
+    <.button id="share-button" type="button" phx-hook="copyToClipboard" variant={:secondary} class="shrink-0">
+      <.icon name="hero-share-mini" /> <span id="share-button-label">Share</span>
+    </.button>
+  </header>
+
+  <.live_component module={RealtimeWeb.InspectorLive.ConnComponent} id={:conn} title={@page_title} />
+
+  <div id="payload" phx-update="ignore" phx-hook="payload" class="hidden"></div>
+
+  <div class="flex flex-col min-h-0 flex-1 border-t border-gray-200 dark:border-neutral-800 pt-4">
+    <.live_component module={RealtimeWeb.InspectorLive.EventLogComponent} id="event_log" />
+  </div>
+
+  <.form
+    :let={m}
+    id="message_form"
+    for={@changeset}
+    phx-submit="send_message"
+    class="flex flex-wrap items-center gap-2 shrink-0"
+  >
+    <span class="text-brand font-mono text-sm select-none" aria-hidden="true">&gt;</span>
+    <input
+      type="text"
+      id={m[:event].id}
+      name={m[:event].name}
+      value={Phoenix.HTML.Form.normalize_value("text", m[:event].value)}
+      aria-label="Broadcast event name"
+      placeholder="event"
+      autocomplete="off"
+      class="w-40 text-sm font-mono rounded-md border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+    />
+    <input
+      type="text"
+      id={m[:payload].id}
+      name={m[:payload].name}
+      value={Phoenix.HTML.Form.normalize_value("text", m[:payload].value)}
+      aria-label="Broadcast payload"
+      placeholder={~s({"some":"data"})}
+      autocomplete="off"
+      class="flex-1 min-w-[12rem] text-sm font-mono rounded-md border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+    />
+    <.button type="submit" phx-disable-with="Sending...">Send</.button>
+    <p :for={{_field, {message, _}} <- @changeset.errors} class="text-xs text-red-600 dark:text-red-400 w-full">
+      <%= message %>
+    </p>
+  </.form>
+</div>

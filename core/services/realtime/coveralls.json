@@ -1,0 +1,28 @@
+{
+    "skip_files": [
+        "lib/realtime_web/api_spec.ex",
+        "lib/realtime_web/channels/presence.ex",
+        "lib/realtime_web/controllers/page_controller.ex",
+        "lib/realtime_web/dashboard/",
+        "lib/realtime_web/endpoint.ex",
+        "lib/realtime_web/gettext.ex",
+        "lib/realtime_web/live/",
+        "lib/realtime_web/open_api_schemas.ex",
+        "lib/realtime_web/telemetry.ex",
+        "lib/realtime_web/views/",
+        "lib/realtime.ex",
+        "lib/realtime/adapters/changes.ex",
+        "lib/realtime/adapters/postgres/decoder.ex",
+        "lib/realtime/adapters/postgres/oid_database.ex",
+        "lib/realtime/adapters/postgres/protocol/",
+        "lib/realtime/application.ex",
+        "lib/realtime/monitoring/prom_ex/plugins/phoenix.ex",
+        "lib/realtime/operations.ex",
+        "lib/realtime/release.ex",
+        "lib/realtime/tenants/authorization/policies/broadcast_policies.ex",
+        "lib/realtime/tenants/authorization/policies/presence_policies.ex",
+        "lib/realtime/tenants/repo/migrations/",
+        "/lib/realtime/tenants/cache_supervisor.ex",
+        "test/"
+    ]
+}

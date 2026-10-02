@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "test": "node --test js/*.test.mjs",
+    "lint": "oxlint js tailwind.config.js",
+    "format": "oxfmt js tailwind.config.js",
+    "format:check": "oxfmt --check js tailwind.config.js"
+  },
+  "dependencies": {
+    "@supabase/realtime-js": "2.114.0"
+  },
+  "devDependencies": {
+    "oxfmt": "0.63.0",
+    "oxlint": "1.78.0"
+  }
+}

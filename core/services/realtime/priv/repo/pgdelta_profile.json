@@ -1,0 +1,92 @@
+{
+  "id": "realtime-tenant",
+  "handlers": [],
+  "policy": {
+    "id": "realtime-tenant",
+    "filter": [
+      {
+        "match": { "partitionOf": { "schema": "realtime", "name": "messages" } },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.messages-partition-churn", "classification": "acknowledged" }
+      },
+      {
+        "match": { "all": [{ "kind": "policy" }, { "verb": "remove" }] },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.keep-unknown-rls-policies", "classification": "acknowledged" }
+      },
+      {
+        "match": { "all": [{ "kind": "comment" }, { "target": { "kind": "policy" } }, { "verb": "remove" }] },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.keep-unknown-rls-policy-comments", "classification": "acknowledged" }
+      },
+      {
+        "match": { "all": [{ "kind": "table" }, { "schema": "realtime" }, { "name": "schema_migrations" }] },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.schema-migrations-table", "classification": "acknowledged" }
+      },
+      {
+        "match": { "all": [{ "kind": "role" }, { "verb": "remove" }] },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.never-drop-roles", "classification": "acknowledged" }
+      },
+      {
+        "match": { "all": [{ "kind": "role" }, { "name": ["supabase_realtime_admin", "supabase_admin"] }] },
+        "action": "include"
+      },
+      {
+        "match": { "kind": "defaultPrivilege" },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.platform-default-privileges", "classification": "acknowledged" }
+      },
+      {
+        "match": {
+          "all": [{ "kind": "acl" }, { "idField": { "field": "grantee", "glob": ["dashboard_user", "postgres"] } }]
+        },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.platform-managed-grantees", "classification": "acknowledged" }
+      },
+      {
+        "match": {
+          "all": [
+            { "kind": "acl" },
+            { "verb": "remove" },
+            {
+              "not": {
+                "idField": {
+                  "field": "grantee",
+                  "glob": [
+                    "anon",
+                    "authenticated",
+                    "service_role",
+                    "postgres",
+                    "dashboard_user",
+                    "supabase_admin",
+                    "supabase_realtime_admin"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.keep-unknown-grants", "classification": "acknowledged" }
+      },
+      {
+        "match": {
+          "any": [
+            { "schema": "realtime" },
+            { "target": { "schema": "realtime" } },
+            { "target": { "kind": "schema", "name": "realtime" } },
+            { "all": [{ "kind": "schema" }, { "name": "realtime" }] }
+          ]
+        },
+        "action": "include"
+      },
+      {
+        "match": { "all": [] },
+        "action": "exclude",
+        "audit": { "reasonCode": "realtime.out-of-scope", "classification": "acknowledged" }
+      }
+    ]
+  }
+}

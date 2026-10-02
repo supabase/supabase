@@ -1,0 +1,60 @@
+name: Security Advisories
+
+# Runs mix hex.audit outside of PR gating so a newly published CVE never
+# blocks unrelated PRs. Deliberately never triggered by pull_request: that keeps
+# SLACK_ALERTS_WEBHOOK out of reach of forked-repo runs.
+# Scheduled so advisories are caught even when mix.lock hasn't
+# changed, not just on push.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "mix.lock"
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+# don't run 2 of the same runs at the same time, makes no sense
+concurrency:
+  group: security-audit
+
+permissions:
+  contents: read
+
+jobs:
+  hex-audit:
+    name: Hex Audit
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup elixir
+        id: beam
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: 28.5.0.4
+          elixir-version: 1.19.5
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Run hex audit
+        run: mix hex.audit
+
+  notify-slack:
+    name: Notify Slack
+    needs: hex-audit
+    if: always() && needs.hex-audit.result == 'failure'
+    uses: ./.github/workflows/slack-notify.yml
+    with:
+      title: 'Hex Audit'
+      status: 'failure'
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_WEBHOOK }}
