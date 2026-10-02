@@ -589,17 +589,17 @@ test.describe('Storage', () => {
       'another-file.txt'
     )
     await page.getByPlaceholder('Search in root directory...').fill('test')
-    expect(page.getByTitle('another-file.txt')).toHaveCount(0)
-    expect(page.getByTitle('test-file.txt')).toHaveCount(1)
-    expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
+    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
+    await expect(page.getByTitle('test-file.txt')).toHaveCount(1)
+    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
 
     // Delete the file
     await deleteItem(page, fileName)
 
     // Check the filter is still applied
-    expect(page.getByTitle('test-file.txt')).toHaveCount(0)
-    expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
-    expect(page.getByTitle('another-file.txt')).toHaveCount(0)
+    await expect(page.getByTitle('test-file.txt')).toHaveCount(0)
+    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
+    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
   })
 
   test('can delete a folder', async ({ page, ref }) => {
