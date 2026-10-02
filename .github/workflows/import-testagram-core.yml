@@ -11,13 +11,20 @@ permissions:
 
 jobs:
   import-core:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout foundation branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           persist-credentials: true
+
+      - name: Normalize working tree before subtree operations
+        run: |
+          # git subtree refuses to run when checkout leaves any tracked/untracked modifications.
+          git reset --hard HEAD
+          git clean -ffd
+          test -z "$(git status --porcelain)"
 
       - name: Configure Git
         run: |
