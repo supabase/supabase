@@ -142,12 +142,22 @@ async function enroll(a) {
   if (!response.ok) throw new Error(body.error ?? `HTTP ${response.status}`);
 
   const file = configPath(a.config);
+  const rootIds = {};
+  for (const serverRoot of body.node.roots ?? []) {
+    if (roots[serverRoot.root_identifier]) {
+      rootIds[serverRoot.id] = {
+        path: roots[serverRoot.root_identifier],
+        root_identifier: serverRoot.root_identifier,
+      };
+    }
+  }
   const config = {
     url: a.url,
     node_id: body.node.id,
     node_secret: body.node_secret,
     session_token: body.session_token,
     roots,
+    root_ids: rootIds,
     version: VERSION,
   };
   await saveConfig(file, config);
@@ -265,14 +275,10 @@ async function run(a) {
   const file = configPath(a.config);
   const config = await loadConfig(file);
   config.file = file;
-  config.root_ids = {};
-  const rootsResponse = await request(config, "/heartbeat", {
-    method: "POST",
-    body: JSON.stringify({ storage_capacity_bytes: 0, storage_used_bytes: 0, agent_version: VERSION }),
-  });
-  void rootsResponse;
-  const nodes = await request(config, "/nodes");
-  void nodes;
+  if (!config.root_ids || Object.keys(config.root_ids).length === 0) {
+    console.warn("[storage-node] No server-approved roots are configured yet. Approve a root before issuing commands.");
+  }
+  await heartbeat(config);
   console.log(`Testagram Storage Node ${VERSION} connected: ${config.node_id}`);
   while (true) {
     await poll(config);
