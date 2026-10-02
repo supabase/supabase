@@ -85,8 +85,8 @@ jobs:
             test -x /app/run.sh
             test -x /usr/local/bin/pgdelta
             test -s /usr/local/share/pgdelta/pgdelta.xz
-            test -d /app/priv/repo/migrations
-            test -f /app/releases/2.140.7/releases.exs
+            test -d /app/lib/realtime-2.140.7/priv/repo/migrations
+            test -f /app/releases/2.140.7/vm.args
             ! find /app -maxdepth 2 -type d -name _build | grep -q .
             ! find /app -maxdepth 2 -type d -name .git | grep -q .
             ! find /app -maxdepth 2 -type d -name node_modules | grep -q .
