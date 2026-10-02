@@ -70,7 +70,7 @@ export function SearchV2Trigger({ className, placeholder = 'Search...' }: Search
           'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
           'pl-2 pr-1',
           'flex items-center justify-between',
-          'border border-default bg-surface-75 text-foreground-lighter shadow-codeblock',
+          'border border-default bg-surface-75 text-foreground-lighter shadow-(--shadow-codeblock)',
           'hover:border-strong hover:text-foreground-light',
           'focus-ring',
           'transition-colors',

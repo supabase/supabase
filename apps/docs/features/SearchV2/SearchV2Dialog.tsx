@@ -2,12 +2,14 @@
 
 import { LoadingBeam } from '~/features/ui/LoadingBeam'
 import { useDocsSearchV2, type DocsSearchV2Result } from 'common'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { VisuallyHidden } from 'radix-ui'
+<<<<<<< HEAD
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
+=======
+import { useRef, useState, type KeyboardEvent } from 'react'
+>>>>>>> e9a773621a (fix(docs): keep search v2 result order and initial selection)
 import {
-  cn,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -21,8 +23,13 @@ import {
   KeyboardShortcut,
 } from 'ui'
 
+<<<<<<< HEAD
 import { formatHeadingPath, highlightMatches } from './SearchV2.utils'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
+=======
+import { getIsSearching } from './SearchV2.utils'
+import { SearchV2Result } from './SearchV2Result'
+>>>>>>> e9a773621a (fix(docs): keep search v2 result order and initial selection)
 
 interface SearchV2DialogProps {
   open: boolean
@@ -33,42 +40,6 @@ interface SearchV2PanelProps {
   onResultSelect: (path: string) => void
   onResultOpen: () => void
 }
-
-interface SearchV2ResultProps {
-  result: DocsSearchV2Result
-  highlightQuery: string
-  onResultSelect: (path: string) => void
-  onResultOpen: () => void
-}
-
-type PointerOpen = 'none' | 'same-tab' | 'new-tab'
-
-type DocsSearchV2State = ReturnType<typeof useDocsSearchV2>['searchState']
-
-interface GetIsSearchingParams {
-  searchState: DocsSearchV2State
-  query: string
-}
-
-const OVERLAY_CLASS = cn(
-  'data-closed:animate-out! data-closed:fade-out-0 data-closed:fill-mode-forwards',
-  'data-closed:duration-150 data-closed:ease-enter',
-  'max-lg:bg-transparent max-lg:backdrop-blur-none',
-  'max-lg:top-(--header-height) max-lg:p-0!',
-  'max-lg:data-closed:duration-200!'
-)
-
-const CONTENT_CLASS = cn(
-  'overflow-hidden rounded-lg border-0 p-0',
-  'shadow-[inset_0_0_0_1px_var(--border-default),var(--shadow-codeblock,0_0_#0000)]!',
-  'max-lg:flex max-lg:flex-1 max-lg:flex-col max-lg:max-w-none! max-lg:rounded-none!',
-  'max-lg:shadow-none!',
-  'max-lg:data-[state=open]:zoom-in-100! max-lg:data-[state=closed]:zoom-out-100!',
-  'max-lg:motion-safe:data-[state=open]:slide-in-from-top-[100%]!',
-  'max-lg:motion-safe:data-[state=closed]:slide-out-to-top-[100%]!',
-  'max-lg:motion-reduce:data-[state=open]:fade-in-0',
-  'max-lg:duration-300 max-lg:data-[state=closed]:duration-200! max-lg:ease-enter'
-)
 
 export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
   const router = useRouter()
@@ -87,9 +58,12 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
       <DialogContent
         hideClose
         centered={false}
-        dialogOverlayProps={{ className: OVERLAY_CLASS }}
+        dialogOverlayProps={{
+          className:
+            'data-closed:animate-out! data-closed:fade-out-0 data-closed:fill-mode-forwards data-closed:duration-150 data-closed:ease-enter max-lg:bg-transparent max-lg:backdrop-blur-none max-lg:top-(--header-height) max-lg:p-0! max-lg:data-closed:duration-200!',
+        }}
         size="large"
-        className={CONTENT_CLASS}
+        className="overflow-hidden rounded-lg border-0 p-0 inset-ring inset-ring-border shadow-(--shadow-codeblock)! max-lg:flex max-lg:flex-1 max-lg:flex-col max-lg:max-w-none! max-lg:rounded-none! max-lg:shadow-none! max-lg:inset-ring-0 max-lg:data-[state=open]:zoom-in-100! max-lg:data-[state=closed]:zoom-out-100! max-lg:motion-safe:data-[state=open]:slide-in-from-top! max-lg:motion-safe:data-[state=closed]:slide-out-to-top! max-lg:motion-reduce:data-[state=open]:fade-in-0 max-lg:duration-300 max-lg:data-[state=closed]:duration-200! max-lg:ease-enter"
       >
         <SearchV2Panel onResultSelect={handleSelect} onResultOpen={handleResultOpen} />
       </DialogContent>
@@ -102,13 +76,15 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
   const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2()
   const [query, setQuery] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
-  const [lastSettledQuery, setLastSettledQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Only update the highlighted query once a new result set actually lands, so highlights
-  // don't shift on every keystroke while the debounced search is still in flight.
-  const highlightQuery = getSettledQuery(searchState) ?? lastSettledQuery
-  if (highlightQuery !== lastSettledQuery) setLastSettledQuery(highlightQuery)
+  // highlight with the query the visible results belong to, not the one being typed
+  const highlightQuery =
+    'query' in searchState
+      ? searchState.query
+      : 'staleQuery' in searchState
+        ? searchState.staleQuery
+        : ''
 
   useEffect(() => {
     if (searchState.status === 'results' || searchState.status === 'noResults') {
@@ -126,7 +102,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
         ? searchState.staleResults
         : []
 
-  const hasListContent =
+  const isListVisible =
     results.length > 0 || searchState.status === 'noResults' || searchState.status === 'error'
   const isSearching = getIsSearching({ searchState, query })
 
@@ -136,8 +112,10 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
     inputRef.current?.focus()
   }
 
+  // cmdk's root turns enter into "open highlighted result", so keep it on the button.
+  // other keys must bubble, or tab never reaches the dialog's focus trap
   function handleClearKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
-    event.stopPropagation()
+    if (event.key === 'Enter') event.stopPropagation()
   }
 
   function handleValueChange(value: string) {
@@ -172,7 +150,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
   }
 
   return (
-    <Command className="bg-transparent max-lg:min-h-0 max-lg:flex-1">
+    <Command shouldFilter={false} className="bg-transparent max-lg:min-h-0 max-lg:flex-1">
       <VisuallyHidden.VisuallyHidden>
         <DialogTitle>Search docs</DialogTitle>
         <DialogDescription>Search the Supabase documentation</DialogDescription>
@@ -184,10 +162,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
           placeholder="Search docs..."
           aria-label="Search the Supabase documentation"
           onValueChange={handleValueChange}
-          wrapperClassName={cn(
-            'flex-1 border-0 pl-3 pr-0 text-foreground-lighter max-lg:pl-5',
-            '[&_svg]:size-4.5 [&_svg]:stroke-[2.25] [&_svg]:opacity-100'
-          )}
+          wrapperClassName="flex-1 border-0 pl-3 pr-0 text-foreground-lighter max-lg:pl-5 [&_svg]:size-4.5 [&_svg]:stroke-2 [&_svg]:opacity-100"
           className="h-12 pl-2.5 text-base text-foreground placeholder:text-foreground-lighter"
         />
         {query ? (
@@ -196,7 +171,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
             tabIndex={0}
             onClick={handleClear}
             onKeyDown={handleClearKeyDown}
-            className="shrink-0 rounded-sm text-sm text-foreground-lighter transition-colors hover:text-foreground-light focus-ring"
+            className="relative -mx-2 shrink-0 cursor-pointer rounded-md px-2 py-1 text-xs text-foreground-lighter transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-2 after:content-[''] hover:bg-overlay-hover hover:text-foreground focus-ring"
           >
             Clear
           </button>
@@ -204,7 +179,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
         <LoadingBeam
           isActive={isSearching}
           direction={isDeleting ? 'backward' : 'forward'}
-          className={hasListContent ? '-bottom-px' : 'max-lg:-bottom-px'}
+          className={isListVisible ? '-bottom-px' : 'max-lg:-bottom-px'}
         />
       </div>
       {/*
@@ -217,21 +192,14 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
       </div>
       <CommandList
         label="Search results"
-        className={cn(
-          'h-(--cmdk-list-height) max-h-[min(477px,70dvh)]',
-          'max-lg:h-auto max-lg:max-h-none max-lg:flex-1',
-          'shadow-[inset_0_1px_0_var(--border-default)] lg:mx-px',
-          'transition-[height] duration-150 ease-enter',
-          'motion-reduce:transition-none',
-          'scroll-fade-bottom'
-        )}
+        className="h-(--cmdk-list-height) max-h-[min(477px,70dvh)] max-lg:h-auto max-lg:max-h-none max-lg:flex-1 inset-shadow-2xs inset-shadow-border lg:mx-px transition-all duration-150 ease-enter motion-reduce:transition-none scroll-fade-bottom"
       >
         {searchState.status === 'noResults' && <CommandEmpty>No results found.</CommandEmpty>}
         {searchState.status === 'error' && (
           <CommandEmpty>Something went wrong. Please try again.</CommandEmpty>
         )}
         {results.length > 0 && (
-          <CommandGroup forceMount className="pt-1.25">
+          <CommandGroup className="pt-1.25">
             {results.map((result) => (
               <SearchV2Result
                 key={result.path}
@@ -267,82 +235,4 @@ function SearchV2Footer() {
       </span>
     </footer>
   )
-}
-
-function SearchV2Result({
-  result,
-  highlightQuery,
-  onResultSelect,
-  onResultOpen,
-}: SearchV2ResultProps) {
-  const parentHeadings = result.headingPath.slice(0, -1)
-  const heading = result.headingPath.at(-1) ?? result.title
-
-  const pointerOpenRef = useRef<PointerOpen>('none')
-
-  function handleLinkClick(event: MouseEvent<HTMLAnchorElement>) {
-    const isNewTab = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
-    pointerOpenRef.current = isNewTab ? 'new-tab' : 'same-tab'
-  }
-
-  function handleSelect() {
-    const pointerOpen = pointerOpenRef.current
-    pointerOpenRef.current = 'none'
-    if (pointerOpen === 'none') return onResultSelect(result.path)
-    if (pointerOpen === 'same-tab') onResultOpen()
-  }
-
-  return (
-    <CommandItem
-      asChild
-      value={result.path}
-      forceMount
-      onSelect={handleSelect}
-      className="cursor-pointer rounded-md px-2 py-2 max-lg:px-4"
-    >
-      <Link href={result.path} prefetch={false} onClick={handleLinkClick}>
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p
-            title={formatHeadingPath(result.headingPath)}
-            className="flex min-w-0 items-baseline gap-1.5 text-sm leading-5"
-          >
-            {parentHeadings.length > 0 ? (
-              <span className="min-w-0 truncate text-foreground-lighter">
-                {highlightMatches(`${formatHeadingPath(parentHeadings)} >`, highlightQuery)}
-              </span>
-            ) : null}
-            <span className="max-w-full shrink-0 truncate font-medium text-foreground [&_strong]:font-semibold">
-              {highlightMatches(heading, highlightQuery)}
-            </span>
-          </p>
-          {result.excerpt ? (
-            <p
-              className={cn(
-                'line-clamp-2 text-pretty text-sm leading-5 text-foreground-lighter',
-                '[&_strong]:font-medium [&_strong]:text-foreground-light'
-              )}
-            >
-              {highlightMatches(result.excerpt, highlightQuery)}
-            </p>
-          ) : null}
-        </div>
-      </Link>
-    </CommandItem>
-  )
-}
-
-function getSettledQuery(searchState: DocsSearchV2State): string | null {
-  if (searchState.status === 'results' || searchState.status === 'noResults') {
-    return searchState.query
-  }
-  if (searchState.status === 'initial') return ''
-  return null
-}
-
-function getIsSearching({ searchState, query }: GetIsSearchingParams): boolean {
-  if (searchState.status === 'loading') return true
-  if (searchState.status === 'error') return false
-  const trimmedQuery = query.trim()
-  const settledQuery = 'query' in searchState ? searchState.query : null
-  return trimmedQuery !== '' && trimmedQuery !== settledQuery
 }
