@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "Canonical source manifest for the Testagram core backend monorepo.",
+  "services": [
+    {"name":"studio","upstream":"https://github.com/supabase/supabase.git","path":"core/services/studio","role":"Studio and platform integration"},
+    {"name":"postgres","upstream":"https://github.com/supabase/postgres.git","path":"core/services/postgres","role":"PostgreSQL distribution and Supabase extensions"},
+    {"name":"auth","upstream":"https://github.com/supabase/auth.git","path":"core/services/auth","role":"Authentication and JWT/session management"},
+    {"name":"postgrest","upstream":"https://github.com/PostgREST/postgrest.git","path":"core/services/postgrest","role":"PostgreSQL REST API"},
+    {"name":"realtime","upstream":"https://github.com/supabase/realtime.git","path":"core/services/realtime","role":"WebSocket realtime service"},
+    {"name":"storage","upstream":"https://github.com/supabase/storage.git","path":"core/services/storage","role":"Object/file storage API"},
+    {"name":"edge-runtime","upstream":"https://github.com/supabase/edge-runtime.git","path":"core/services/edge-runtime","role":"Edge Functions runtime"},
+    {"name":"supavisor","upstream":"https://github.com/supabase/supavisor.git","path":"core/services/supavisor","role":"PostgreSQL connection pooling"},
+    {"name":"postgres-meta","upstream":"https://github.com/supabase/postgres-meta.git","path":"core/services/postgres-meta","role":"PostgreSQL metadata/control API"}
+  ]
+}
