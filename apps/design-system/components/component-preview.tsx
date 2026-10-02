@@ -97,8 +97,7 @@ export function ComponentPreview({
       <div className={cn('@container mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
-            'relative overflow-hidden rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio',
-            '[&_[data-sidebar=sidebar]]:bg-transparent'
+            'relative overflow-hidden rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
           )}
         >
           {showGrid && (
