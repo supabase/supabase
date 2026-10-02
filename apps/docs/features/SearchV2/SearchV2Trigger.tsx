@@ -44,30 +44,22 @@ export function SearchV2Trigger({ className, placeholder = 'Search...' }: Search
         aria-expanded={open}
         onClick={() => setOpen(true)}
         className={cn(
-          'group cursor-pointer',
+          'cursor-pointer',
           'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
-          'pl-1.5 md:pl-2 pr-1',
+          'pl-2 pr-1',
           'flex items-center justify-between',
-          'bg-transparent text-foreground-lighter border border-strong',
-          'hover:bg-popover hover:border-control-hover',
+          'border border-default bg-surface-75 text-foreground-lighter shadow-codeblock',
+          'hover:border-strong hover:text-foreground-light',
           'focus-ring',
           'transition-colors',
           className
         )}
       >
-        <div className="flex items-center space-x-1.5 text-foreground-lighter">
-          <Search
-            size={16}
-            strokeWidth={1.5}
-            className="group-hover:text-foreground-light transition-colors"
-          />
-          <p className="flex text-xs pr-2 text-foreground-muted">{placeholder}</p>
+        <div className="flex items-center gap-2">
+          <Search aria-hidden className="size-4 shrink-0" strokeWidth={2.25} />
+          <p className="flex pr-2 text-sm">{placeholder}</p>
         </div>
-        <KeyboardShortcut
-          keys={['Meta', 'k']}
-          aria-hidden
-          className="hidden md:inline-flex border border-default bg-surface-300 text-foreground-lighter shadow-xs shadow-background-surface-100"
-        />
+        <KeyboardShortcut keys={['Meta', 'k']} aria-hidden className="hidden md:inline-flex" />
       </button>
       <SearchV2Dialog open={open} onOpenChange={setOpen} />
     </>
