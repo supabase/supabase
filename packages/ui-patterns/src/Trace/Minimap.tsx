@@ -17,6 +17,8 @@ export interface MinimapProps extends ComponentProps<'div'> {
 }
 
 const VIEWBOX_WIDTH = 1000
+const MIN_LANE_HEIGHT = 2
+const MAX_LANE_HEIGHT = 10
 
 interface DensityBucket {
   x: number
@@ -74,7 +76,7 @@ const STATUS_FILL: Record<SpanStatus, string> = {
 export function Minimap({
   height = 48,
   maxDetailSpans = 2000,
-  laneHeight = 3,
+  laneHeight: laneHeightProp,
   className,
   ...props
 }: MinimapProps) {
@@ -90,6 +92,9 @@ export function Minimap({
   })
 
   const isDetail = index.byId.size <= maxDetailSpans
+  const depthCount = Math.max(1, ...Array.from(index.depthOf.values())) + 1
+  const laneHeight =
+    laneHeightProp ?? Math.min(MAX_LANE_HEIGHT, Math.max(MIN_LANE_HEIGHT, height / depthCount))
   const maxLanes = Math.max(1, Math.floor(height / laneHeight))
 
   const shapes = useMemo(() => {
@@ -139,7 +144,7 @@ export function Minimap({
                 x={x}
                 y={lane * laneHeight}
                 width={w}
-                height={Math.max(1, laneHeight - 1)}
+                height={Math.max(1, laneHeight - Math.min(2, laneHeight * 0.25))}
                 className={cn('opacity-70', STATUS_FILL[item.status])}
               />
             )
@@ -195,8 +200,8 @@ export function Minimap({
           data-dragging={brush.isDragging ? '' : undefined}
           data-full={brush.isFull ? '' : undefined}
           className={cn(
-            'absolute inset-y-0 cursor-grab border-x border-foreground-muted bg-foreground/5 focus-inset',
-            'data-[dragging]:cursor-grabbing data-[dragging]:bg-foreground/10'
+            'absolute inset-y-0 cursor-grab rounded-sm bg-brand/5 ring-2 ring-inset ring-brand focus-inset',
+            'data-[dragging]:cursor-grabbing data-[dragging]:bg-brand/10'
           )}
           style={{ left: brush.rect.left, width: brush.rect.width }}
           {...brush.getBrushProps()}
@@ -208,7 +213,7 @@ export function Minimap({
             className="absolute inset-y-0 -left-1 w-2 cursor-ew-resize focus-ring"
             {...brush.getHandleProps('start')}
           >
-            <span className="absolute inset-y-[25%] left-[3px] w-0.5 rounded bg-foreground-muted" />
+            <span className="absolute inset-y-[25%] left-[3px] w-0.5 rounded bg-foreground" />
           </div>
           <div
             aria-label="Window end"
@@ -217,7 +222,7 @@ export function Minimap({
             className="absolute inset-y-0 -right-1 w-2 cursor-ew-resize focus-ring"
             {...brush.getHandleProps('end')}
           >
-            <span className="absolute inset-y-[25%] right-[3px] w-0.5 rounded bg-foreground-muted" />
+            <span className="absolute inset-y-[25%] right-[3px] w-0.5 rounded bg-foreground" />
           </div>
         </div>
       </div>
