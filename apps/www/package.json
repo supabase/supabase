@@ -7,6 +7,7 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "pnpm run content:build:core && next --port 3000",
     "prebuild": "pnpm --filter=docs run build:federated-content && pnpm --filter=docs run build:guides-markdown && pnpm run content:build",
+    "generate:docs-redirects-md-variants": "node scripts/generate-docs-redirects-md-variants.mjs",
     "build": "turbo run build:next --filter=www",
     "build:next": "next build && node ./internals/generate-sitemap.mjs",
     "export": "next export",
