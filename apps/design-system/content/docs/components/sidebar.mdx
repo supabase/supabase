@@ -35,35 +35,26 @@ npx shadcn@latest add sidebar
 
 <Step>Add the following colors to your CSS file</Step>
 
-The command above should install the colors for you. If not, copy and paste the following in your CSS file.
+The command above may install classic shadcn **HSL channel** variables. In this monorepo, sidebar tokens are **full colours** aliased to the semantic system (same pattern Studio uses). Prefer these definitions:
 
 We'll go over the colors later in the [theming section](/docs/components/sidebar#theming).
 
 ```css title="app/globals.css"
 @layer base {
   :root {
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: var(--background-dash-sidebar);
+    --sidebar-foreground: var(--foreground-default);
+    --sidebar-primary: var(--foreground-default);
+    --sidebar-primary-foreground: var(--warning);
+    --sidebar-accent: var(--background-selection);
+    --sidebar-accent-foreground: var(--foreground-default);
+    --sidebar-border: var(--border-default);
+    --sidebar-ring: var(--ring);
   }
 }
 ```
+
+Apps that already import the shared theme (`config/tailwind.config.css`) get these aliases from `packages/ui` compat CSS, so you can skip this step there.
 
 </Steps>
 
@@ -81,50 +72,44 @@ We'll go over the colors later in the [theming section](/docs/components/sidebar
 
 <Step>Add the following colors to your CSS file</Step>
 
+In this monorepo, sidebar tokens are full colours (not HSL channel lists). Classic shadcn docs still show channels plus `hsl(var(--…))`; do not mix those patterns.
+
 We'll go over the colors later in the [theming section](/docs/components/sidebar#theming).
 
 ```css title="app/globals.css"
 @layer base {
   :root {
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: var(--background-dash-sidebar);
+    --sidebar-foreground: var(--foreground-default);
+    --sidebar-primary: var(--foreground-default);
+    --sidebar-primary-foreground: var(--warning);
+    --sidebar-accent: var(--background-selection);
+    --sidebar-accent-foreground: var(--foreground-default);
+    --sidebar-border: var(--border-default);
+    --sidebar-ring: var(--ring);
   }
 }
 ```
 
-<Step>Add the Sidebar tailwind config into `tailwind.config.js`</Step>
+Apps that already import the shared theme (`config/tailwind.config.css`) get these aliases from `packages/ui` compat CSS, so you can skip this step there.
 
-Add the following object in the `theme.extend.colors` section of your `tailwind.config.js` file
-this config enable sidebar related style utilities like bg-sidebar
+<Step>Wire sidebar colours into Tailwind</Step>
+
+If you use this monorepo's shared theme, `--color-sidebar*` is already defined in `packages/config/css/theme.css` with bare `var(--sidebar-*)`. Utilities like `bg-sidebar` work without a local `tailwind.config.js` entry.
+
+For a standalone Tailwind setup, map full colour variables without an `hsl()` wrap:
 
 ```javascript title="tailwind.config.js"
 // ...
 sidebar: {
-  DEFAULT: 'hsl(var(--sidebar-background))',
-  foreground: 'hsl(var(--sidebar-foreground))',
-  primary: 'hsl(var(--sidebar-primary))',
-  'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-  accent: 'hsl(var(--sidebar-accent))',
-  'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-  border: 'hsl(var(--sidebar-border))',
-  ring: 'hsl(var(--sidebar-ring))',
+  DEFAULT: 'var(--sidebar-background)',
+  foreground: 'var(--sidebar-foreground)',
+  primary: 'var(--sidebar-primary)',
+  'primary-foreground': 'var(--sidebar-primary-foreground)',
+  accent: 'var(--sidebar-accent)',
+  'accent-foreground': 'var(--sidebar-accent-foreground)',
+  border: 'var(--sidebar-border)',
+  ring: 'var(--sidebar-ring)',
 },
 // ...
 ```
@@ -1104,35 +1089,26 @@ export function AppSidebar() {
 
 ## Theming
 
-We use the following CSS variables to theme the sidebar.
+We use the following CSS variables to theme the sidebar. Values are full colours (aliases into the semantic token system), not HSL channel lists.
 
 ```css
 @layer base {
   :root {
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 240 5.9% 10%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: var(--background-dash-sidebar);
+    --sidebar-foreground: var(--foreground-default);
+    --sidebar-primary: var(--foreground-default);
+    --sidebar-primary-foreground: var(--warning);
+    --sidebar-accent: var(--background-selection);
+    --sidebar-accent-foreground: var(--foreground-default);
+    --sidebar-border: var(--border-default);
+    --sidebar-ring: var(--ring);
   }
 }
 ```
 
 **We intentionally use different variables for the sidebar and the rest of the application** to make it easy to have a sidebar that is styled differently from the rest of the application. Think a sidebar with a darker shade from the main application.
+
+In this monorepo the defaults above match Studio. Override any `--sidebar-*` token when you need a distinct sidebar surface. Classic shadcn still documents channel lists plus `hsl(var(--sidebar-*))`; that pattern is invalid here because these variables already resolve to complete colours.
 
 ## Styling
 
