@@ -33,7 +33,6 @@ jobs:
 
       - name: Import upstream core services
         run: |
-          chmod +x scripts/import-supabase-core.sh
           bash scripts/import-supabase-core.sh
 
       - name: Verify imported services
