@@ -1,0 +1,214 @@
+name: Verify Testagram Storage
+
+on:
+  push:
+    branches:
+      - testagram/core-platform-foundation
+    paths:
+      - "core/services/storage/**"
+      - "storage-node/**"
+      - "supabase/functions/storage-node-gateway/**"
+      - "supabase/migrations/20261002133000_testagram_storage_nodes.sql"
+      - ".github/workflows/verify-testagram-storage.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-storage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout foundation branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Verify Storage source/build contract
+        shell: bash
+        working-directory: core/services/storage
+        run: |
+          set -euo pipefail
+          test -s Dockerfile
+          test -s package.json
+          test -s package-lock.json
+          test -d src
+          test -d migrations/tenant
+          grep -Fq 'npm ci --ignore-scripts' Dockerfile
+          grep -Fq 'COPY migrations' Dockerfile
+          grep -Fq 'USER node' Dockerfile
+          grep -Fq 'CMD ["node", "dist/start/server.js"]' Dockerfile
+          ! grep -RniE 'secret1234|f023d3db-39dc-4ac9-87b2-b2be72e9162b|850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907' -- docker-compose*.yml .docker || true
+          echo "Storage source/build contract: GREEN"
+
+      - name: Verify local storage node package
+        working-directory: storage-node
+        run: |
+          set -euo pipefail
+          npm test
+          node --check src/index.mjs
+          echo "Local storage node protocol contract: GREEN"
+
+      - name: Verify Storage gateway contract
+        run: |
+          set -euo pipefail
+          test -s supabase/functions/storage-node-gateway/index.ts
+          test -s supabase/functions/storage-node-gateway/deno.json
+          grep -Fq 'storage_node_pairings' supabase/functions/storage-node-gateway/index.ts
+          grep -Fq 'storage_node_sessions' supabase/functions/storage-node-gateway/index.ts
+          grep -Fq 'storage_node_commands' supabase/functions/storage-node-gateway/index.ts
+          grep -Fq 'storage_objects' supabase/functions/storage-node-gateway/index.ts
+          grep -Fq 'x-testagram-node-session' supabase/functions/storage-node-gateway/index.ts
+          grep -Fq 'x-testagram-node-secret' supabase/functions/storage-node-gateway/index.ts
+          grep -Fq 'safeRelativePath' supabase/functions/storage-node-gateway/index.ts
+          grep -Fq 'write_base64' supabase/functions/storage-node-gateway/index.ts
+          echo "Storage node gateway contract: GREEN"
+
+      - name: Build Storage image
+        working-directory: core/services/storage
+        run: |
+          set -euxo pipefail
+          docker build --pull -t testagram-storage:${GITHUB_SHA} .
+
+      - name: Inspect Storage image contract
+        run: |
+          set -euo pipefail
+          image="testagram-storage:${GITHUB_SHA}"
+          user="$(docker image inspect "$image" --format '{{.Config.User}}')"
+          cmd="$(docker image inspect "$image" --format '{{json .Config.Cmd}}')"
+          test "$user" = "node"
+          test "$cmd" = '["node","dist/start/server.js"]'
+          docker run --rm --entrypoint /bin/sh "$image" -ec '
+            set -eu
+            test -x /app/dist/start/server.js
+            test -d /app/migrations
+            ! find /app -maxdepth 2 -type d -name .git | grep -q .
+            ! find /app -maxdepth 2 -type d -name node_modules | grep -q . && false || true
+          '
+          echo "Storage image metadata: GREEN"
+
+      - name: Verify image history contains no runtime credentials
+        run: |
+          set -euo pipefail
+          image="testagram-storage:${GITHUB_SHA}"
+          history="$(docker history --no-trunc "$image")"
+          if printf '%s' "$history" | grep -Eiq '(AUTH_JWT_SECRET|AWS_SECRET_ACCESS_KEY|S3_PROTOCOL_ACCESS_KEY_SECRET|SERVICE_KEY|ANON_KEY|secret1234|f023d3db)'; then
+            echo "::error::Runtime credential material found in Storage image history"
+            printf '%s\n' "$history"
+            exit 1
+          fi
+          echo "Image history credential scan: GREEN"
+
+      - name: Start isolated PostgreSQL and RustFS
+        run: |
+          set -euo pipefail
+          docker network create storage-ci
+          docker run -d --name storage-postgres --network storage-ci             -e POSTGRES_PASSWORD=postgres             -e POSTGRES_USER=postgres             -e POSTGRES_DB=postgres             postgres:17.6-alpine
+          docker run -d --name storage-rustfs --network storage-ci             -e RUSTFS_ACCESS_KEY=ci-storage             -e RUSTFS_SECRET_KEY=ci-storage-secret             -e RUSTFS_ADDRESS=:9000             -e RUSTFS_CONSOLE_ADDRESS=:9001             -e RUSTFS_CONSOLE_ENABLE=false             rustfs/rustfs:1.0.0
+          for i in {1..60}; do
+            docker exec storage-postgres pg_isready -U postgres -d postgres >/dev/null 2>&1 && break
+            sleep 2
+          done
+          for i in {1..60}; do
+            curl -fsS http://127.0.0.1:9000/health/ready >/dev/null 2>&1 && break
+            sleep 2
+          done
+          docker exec storage-postgres pg_isready -U postgres -d postgres >/dev/null
+          curl -fsS http://127.0.0.1:9000/health/ready >/dev/null
+
+      - name: Start Storage and run migration/startup smoke test
+        run: |
+          set -euo pipefail
+          image="testagram-storage:${GITHUB_SHA}"
+          JWT_SECRET="01234567890123456789012345678901"
+          docker run -d --name storage-smoke --network storage-ci             -e SERVER_PORT=5000             -e DATABASE_URL=postgres://postgres:postgres@storage-postgres:5432/postgres             -e DB_INSTALL_ROLES=true             -e AUTH_JWT_SECRET="$JWT_SECRET"             -e AUTH_JWT_ALGORITHM=HS256             -e STORAGE_BACKEND=s3             -e GLOBAL_S3_BUCKET=ci-storage             -e GLOBAL_S3_ENDPOINT=http://storage-rustfs:9000             -e GLOBAL_S3_FORCE_PATH_STYLE=true             -e AWS_ACCESS_KEY_ID=ci-storage             -e AWS_SECRET_ACCESS_KEY=ci-storage-secret             -e REGION=us-east-1             -e S3_PROTOCOL_ENABLED=true             -e S3_PROTOCOL_ACCESS_KEY_ID=ci-s3             -e S3_PROTOCOL_ACCESS_KEY_SECRET=ci-s3-secret             -e UPLOAD_FILE_SIZE_LIMIT=1048576             -e UPLOAD_FILE_SIZE_LIMIT_STANDARD=1048576             -e IMAGE_TRANSFORMATION_ENABLED=false             -e LOG_LEVEL=info             -p 5000:5000             "$image"
+          for i in {1..120}; do
+            if curl -fsS http://127.0.0.1:5000/status >/dev/null 2>&1; then
+              exit 0
+            fi
+            if ! docker inspect -f '{{.State.Running}}' storage-smoke 2>/dev/null | grep -q true; then
+              echo "::error::Storage exited before readiness"
+              docker logs storage-smoke || true
+              exit 1
+            fi
+            sleep 2
+          done
+          echo "::error::Storage did not become ready"
+          docker logs storage-smoke || true
+          exit 1
+
+      - name: Verify runtime identity, migrations, auth and object lifecycle
+        run: |
+          set -euo pipefail
+          test "$(docker exec storage-smoke id -un)" = "node"
+
+          migration_files="$(find core/services/storage/migrations/tenant -maxdepth 1 -type f -name '*.sql' ! -name '.*' | wc -l | tr -d ' ')"
+          migration_rows="$(docker exec storage-postgres psql -U postgres -d postgres -At -v ON_ERROR_STOP=1 -c 'select count(*) from storage.migrations;' | tr -d '[:space:]')"
+          echo "Storage tenant migration files: $migration_files; ledger rows: $migration_rows"
+          test "$migration_rows" -eq "$migration_files"
+
+          unauthenticated="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:5000/object/ci-storage/unauthorized.txt)"
+          test "$unauthenticated" = "401"
+
+          service_jwt="$(node --input-type=module <<'NODE'
+          import { createHmac, randomUUID } from 'node:crypto';
+          const secret = process.env.JWT_SECRET;
+          const b64 = (v) => Buffer.from(JSON.stringify(v)).toString('base64url');
+          const now = Math.floor(Date.now()/1000);
+          const header = b64({alg:'HS256',typ:'JWT'});
+          const payload = b64({role:'service_role',sub:randomUUID(),aud:'authenticated',iat:now,exp:now+3600});
+          const unsigned = header + '.' + payload;
+          process.stdout.write(unsigned + '.' + createHmac('sha256', secret).update(unsigned).digest('base64url'));
+          NODE
+          )"
+          export JWT_SECRET="01234567890123456789012345678901"
+          service_jwt="$(JWT_SECRET="$JWT_SECRET" node --input-type=module <<'NODE'
+          import { createHmac, randomUUID } from 'node:crypto';
+          const secret = process.env.JWT_SECRET;
+          const b64 = (v) => Buffer.from(JSON.stringify(v)).toString('base64url');
+          const now = Math.floor(Date.now()/1000);
+          const header = b64({alg:'HS256',typ:'JWT'});
+          const payload = b64({role:'service_role',sub:randomUUID(),aud:'authenticated',iat:now,exp:now+3600});
+          const unsigned = header + '.' + payload;
+          process.stdout.write(unsigned + '.' + createHmac('sha256', secret).update(unsigned).digest('base64url'));
+          NODE
+          )"
+
+          curl -fsS -X POST http://127.0.0.1:5000/bucket             -H "Authorization: Bearer $service_jwt"             -H 'Content-Type: application/json'             --data '{"id":"ci-bucket","name":"ci-bucket","public":false}' >/tmp/storage-bucket.json
+
+          printf 'testagram-storage-forensic\n' >/tmp/storage-payload.txt
+          curl -fsS -X POST http://127.0.0.1:5000/object/ci-bucket/hello.txt             -H "Authorization: Bearer $service_jwt"             -H 'Content-Type: text/plain'             --data-binary @/tmp/storage-payload.txt >/tmp/storage-upload.json
+
+          curl -fsS http://127.0.0.1:5000/object/ci-bucket/hello.txt             -H "Authorization: Bearer $service_jwt" >/tmp/storage-download.txt
+          cmp /tmp/storage-payload.txt /tmp/storage-download.txt
+
+          curl -fsS -X POST http://127.0.0.1:5000/object/sign/ci-bucket/hello.txt             -H "Authorization: Bearer $service_jwt"             -H 'Content-Type: application/json'             --data '{"expiresIn":60}' >/tmp/storage-sign.json
+          signed_path="$(node --input-type=module -e "const x=require('fs').readFileSync('/tmp/storage-sign.json','utf8'); console.log(JSON.parse(x).signedURL)")"
+          curl -fsS "http://127.0.0.1:5000${signed_path}" >/tmp/storage-signed.txt
+          cmp /tmp/storage-payload.txt /tmp/storage-signed.txt
+
+          delete_status="$(curl -sS -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5000/object/ci-bucket/hello.txt -H "Authorization: Bearer $service_jwt")"
+          test "$delete_status" = "200"
+
+          missing_status="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:5000/object/ci-bucket/hello.txt -H "Authorization: Bearer $service_jwt")"
+          test "$missing_status" = "404"
+
+          echo "Runtime identity, migration ledger, auth boundary, S3 upload/download/sign/delete lifecycle: GREEN"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker logs storage-smoke 2>/dev/null || true
+          docker logs storage-rustfs 2>/dev/null || true
+          docker logs storage-postgres 2>/dev/null || true
+          docker rm -f storage-smoke storage-rustfs storage-postgres 2>/dev/null || true
+          docker network rm storage-ci 2>/dev/null || true
