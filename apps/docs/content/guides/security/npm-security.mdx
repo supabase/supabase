@@ -149,7 +149,7 @@ For Deno-based Edge Functions, see the [Edge Functions specifics](#edge-function
 
 `@supabase/supabase-js`, `@supabase/auth-js`, `@supabase/postgrest-js`, `@supabase/realtime-js`, `@supabase/storage-js`, and `@supabase/functions-js` publish with [sigstore provenance attestations](https://docs.npmjs.com/generating-provenance-statements) via npm OIDC trusted publishing. The attestations cryptographically tie each published tarball to the workflow run, commit, and repository it was built from.
 
-A valid Supabase attestation will always resolve to a repository under the [`supabase` GitHub organisation](https://github.com/supabase). If `npm audit signatures` reports a verified attestation pointing anywhere else for an `@supabase/*` package, treat that as a red flag.
+A valid Supabase attestation will always resolve to a repository under the [`supabase` GitHub organization](https://github.com/supabase). If `npm audit signatures` reports a verified attestation pointing anywhere else for an `@supabase/*` package, treat that as a red flag.
 
 To verify after install:
 
@@ -235,7 +235,7 @@ Every dependency you don't need is attack surface you don't need. Two cheap habi
 - Periodically run `npx depcheck` (or the equivalent for your stack) and remove dependencies that aren't imported anywhere.
 - Look at your direct dependencies when a CVE lands. Is the dep doing something you could do in 20 lines yourself? Some of the most-exploited packages are tiny utilities that became transitive footguns.
 
-This is the unglamorous half of supply-chain defence: fewer packages, fewer attackers' chances.
+This is the unglamorous half of supply-chain defense: fewer packages, fewer attackers' chances.
 
 ## CI / lockfile hygiene
 
