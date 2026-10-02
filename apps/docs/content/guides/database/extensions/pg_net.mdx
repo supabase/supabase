@@ -437,21 +437,27 @@ More examples can be seen on the [Extension's GitHub page](https://github.com/su
 
 <Admonition type="note" title="The default privileges are secure">
 
-You don't need to change the privileges on the `net` schema, its functions, or its tables. Clients that use the `anon` or `authenticated` roles can't reach `pg_net` with the default configuration:
+With the default privileges, clients can't send requests or read responses through `pg_net`. You don't need to change these privileges, and you don't need to contact Support.
 
-- The `net` schema isn't exposed through the [Data API](/docs/guides/api).
-- `anon` and `authenticated` are `NOLOGIN` roles. They can't connect directly to the database.
+Clients that use the `anon` or `authenticated` roles can't reach the `net` schema:
 
-Don't try to revoke these privileges, and don't ask Support to revoke them. You only need to take action if your own functions, views, or triggers use `pg_net`. See [Client access](#client-access).
+- The Data API doesn't expose the `net` schema.
+- `anon` and `authenticated` are `NOLOGIN` roles, so they can't connect directly to the database.
+
+Clients can reach `pg_net` only through your own functions, views, and triggers. To control this access, see [Client access](#client-access).
 
 </Admonition>
 
-By default, `anon` and `authenticated` have these privileges on `pg_net`. From `pg_net` 0.12.0, they get them through `PUBLIC`. Before 0.12.0, they get `EXECUTE` directly.
+### Default privileges
 
-- In all versions, `anon` and `authenticated` can call `net.http_get` and `net.http_post`.
-- From `pg_net` 0.12.0, `anon` and `authenticated` can also read and change the rows in `net.http_request_queue` and `net._http_response`.
+The `anon` and `authenticated` roles have privileges on `pg_net`, but clients can't use them directly. The privileges depend on your `pg_net` version:
 
-To see your version and the settings of your functions, run:
+- In all versions, `anon` and `authenticated` have `EXECUTE` on `net.http_get` and `net.http_post`.
+- From `pg_net` 0.12.0, `anon` and `authenticated` also have all privileges on `net.http_request_queue` and `net._http_response`.
+
+From `pg_net` 0.12.0, `pg_net` grants these privileges to `PUBLIC`, which includes every role. If you create a role with the `LOGIN` attribute, that role can use these privileges directly. Give roles with `LOGIN` only to people and services that you trust.
+
+To see your `pg_net` version and the privileges on its functions, run:
 
 ```sql
 select extversion from pg_extension where extname = 'pg_net';
