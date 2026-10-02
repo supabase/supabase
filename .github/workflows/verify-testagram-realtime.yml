@@ -173,6 +173,50 @@ jobs:
           docker logs realtime-smoke || true
           exit 1
 
+      - name: Verify Realtime JWT authentication contract
+        run: |
+          set -euo pipefail
+
+          secret="01234567890123456789012345678901"
+
+          token="$(JWT_SECRET="$secret" python3 - <<'PY'
+import base64, hashlib, hmac, json, os, time
+
+def enc(value):
+    raw = json.dumps(value, separators=(",", ":")).encode()
+    return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+
+header = {"alg": "HS256", "typ": "JWT"}
+now = int(time.time())
+payload = {
+    "sub": "00000000-0000-0000-0000-000000000000",
+    "role": "service_role",
+    "iss": "testagram",
+    "iat": now,
+    "exp": now + 300,
+}
+
+unsigned = enc(header) + "." + enc(payload)
+signature = hmac.new(
+    os.environ["JWT_SECRET"].encode(),
+    unsigned.encode(),
+    hashlib.sha256,
+).digest()
+
+print(unsigned + "." + base64.urlsafe_b64encode(signature).rstrip(b"=").decode())
+PY
+)"
+
+          unauthorized="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:4000/api/tenants)"
+          test "$unauthorized" = "403"
+
+          authorized="$(curl -sS -o /tmp/realtime-tenants.json -w '%{http_code}'             -H "Authorization: Bearer $token"             http://127.0.0.1:4000/api/tenants)"
+          test "$authorized" = "200"
+
+          grep -Eq '"data"[[:space:]]*:' /tmp/realtime-tenants.json
+
+          echo "Realtime JWT authentication contract: GREEN"
+
       - name: Verify runtime identity and migration state
         run: |
           set -euo pipefail
