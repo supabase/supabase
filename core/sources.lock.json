@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-02",
+  "policy": "Exact source revisions must be reviewed before import. The importer may resolve upstream default branches, but production source provenance is recorded here.",
+  "services": {
+    "postgres": {"repository":"https://github.com/supabase/postgres.git","ref":"develop","commit":"d795a74e8fd5ed5031c49ffbc7cc99e4c7ac25c5","path":"core/services/postgres"},
+    "auth": {"repository":"https://github.com/supabase/auth.git","ref":"master","commit":"ce9a8eee0cc042be8c7a42981a7ddae631e41d91","path":"core/services/auth"},
+    "postgrest": {"repository":"https://github.com/PostgREST/postgrest.git","ref":"master","commit":"45593a3dbef8a3e0ad6656a88a91b226e1e483a2","path":"core/services/postgrest"},
+    "realtime": {"repository":"https://github.com/supabase/realtime.git","ref":"main","commit":"e0d1f657161f7f01e9b4be156627d974fdc6918","path":"core/services/realtime"},
+    "storage": {"repository":"https://github.com/supabase/storage.git","ref":"master","commit":"76b70ba80e7c171d6b534db3c65430467a82f4bd","path":"core/services/storage"},
+    "edge-runtime": {"repository":"https://github.com/supabase/edge-runtime.git","ref":"main","commit":"d4a4f606a90e8c66864219c9b1d31ef0e3e3f626","path":"core/services/edge-runtime"},
+    "supavisor": {"repository":"https://github.com/supabase/supavisor.git","ref":"main","commit":"e616317d74fbdd63324c3314aca6bb08cf764326","path":"core/services/supavisor"},
+    "postgres-meta": {"repository":"https://github.com/supabase/postgres-meta.git","ref":"master","commit":"f380cc5be21edef4e77d9838c732d1f20af0b3c0","path":"core/services/postgres-meta"}
+  }
+}
