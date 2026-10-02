@@ -1,9 +1,10 @@
-# docker-compose.yml
-
+# Testagram Storage multi-tenant stack.
 version: "3"
 services:
   storage:
-    image: supabase/storage-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
       - "5001:5001"
@@ -17,57 +18,49 @@ services:
       rustfs_setup:
         condition: service_completed_successfully
     environment:
-      # Server
       SERVER_PORT: 5000
-      SERVER_REGION: local
-      # Auth
-      AUTH_JWT_SECRET: f023d3db-39dc-4ac9-87b2-b2be72e9162b
-      AUTH_JWT_ALGORITHM: HS256
-      AUTH_ENCRYPTION_KEY: encryptionkey
-      # Multi tenant Mode
-      MULTI_TENANT: true
-      DATABASE_MULTITENANT_URL: postgresql://postgres:postgres@multitenant_db:5432/postgres
-      SERVER_ADMIN_API_KEYS: apikey
+      SERVER_REGION: ${SERVER_REGION:-local}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:?set AUTH_JWT_SECRET}
+      AUTH_JWT_ALGORITHM: ${AUTH_JWT_ALGORITHM:-HS256}
+      AUTH_ENCRYPTION_KEY: ${AUTH_ENCRYPTION_KEY:?set AUTH_ENCRYPTION_KEY}
+      MULTI_TENANT: "true"
+      DATABASE_MULTITENANT_URL: ${DATABASE_MULTITENANT_URL:-postgresql://postgres:postgres@multitenant_db:5432/postgres}
+      SERVER_ADMIN_API_KEYS: ${SERVER_ADMIN_API_KEYS:?set SERVER_ADMIN_API_KEYS}
       SERVER_ADMIN_PORT: 5001
       REQUEST_X_FORWARDED_HOST_REGEXP: "^([a-z]{20}).local.(?:com|dev)$"
-      # Migrations
-      DB_INSTALL_ROLES: true # set to false if you want to manage roles yourself
-      # Storage
-      STORAGE_BACKEND: s3
-      STORAGE_S3_BUCKET: supa-storage-bucket # name of s3 bucket where you want to store objects
-      STORAGE_S3_ENDPOINT: http://rustfs:9000
-      STORAGE_S3_FORCE_PATH_STYLE: "true"
-      STORAGE_S3_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: supa-storage
-      AWS_SECRET_ACCESS_KEY: secret1234
-      # Upload
-      UPLOAD_FILE_SIZE_LIMIT: 524288000
-      UPLOAD_FILE_SIZE_LIMIT_STANDARD: 52428800
-      UPLOAD_SIGNED_URL_EXPIRATION_TIME: 120
+      DB_INSTALL_ROLES: ${DB_INSTALL_ROLES:-true}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-s3}
+      GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET:-supa-storage-bucket}
+      GLOBAL_S3_ENDPOINT: ${GLOBAL_S3_ENDPOINT:-http://rustfs:9000}
+      GLOBAL_S3_FORCE_PATH_STYLE: ${GLOBAL_S3_FORCE_PATH_STYLE:-true}
+      AWS_ACCESS_KEY_ID: ${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY}
+      REGION: ${REGION:-us-east-1}
+      S3_PROTOCOL_ENABLED: ${S3_PROTOCOL_ENABLED:-true}
+      S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID:?set S3_PROTOCOL_ACCESS_KEY_ID}
+      S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET:?set S3_PROTOCOL_ACCESS_KEY_SECRET}
+      UPLOAD_FILE_SIZE_LIMIT: ${UPLOAD_FILE_SIZE_LIMIT:-524288000}
+      UPLOAD_FILE_SIZE_LIMIT_STANDARD: ${UPLOAD_FILE_SIZE_LIMIT_STANDARD:-52428800}
+      UPLOAD_SIGNED_URL_EXPIRATION_TIME: ${UPLOAD_SIGNED_URL_EXPIRATION_TIME:-120}
       TUS_URL_PATH: /upload/resumable
-      TUS_URL_EXPIRY_MS: 3600000
-      # Image Tranformation
-      IMAGE_TRANSFORMATION_ENABLED: "true"
-      IMGPROXY_URL: http://imgproxy:8080
-      IMGPROXY_REQUEST_TIMEOUT: 15
-
+      TUS_URL_EXPIRY_MS: ${TUS_URL_EXPIRY_MS:-3600000}
+      IMAGE_TRANSFORMATION_ENABLED: ${IMAGE_TRANSFORMATION_ENABLED:-true}
+      IMGPROXY_URL: ${IMGPROXY_URL:-http://imgproxy:8080}
+      IMGPROXY_REQUEST_TIMEOUT: ${IMGPROXY_REQUEST_TIMEOUT:-15}
       PG_QUEUE_ENABLE: "true"
 
   tenant_db:
     extends:
       service: tenant_db
       file: ./.docker/docker-compose-infra.yml
-
   multitenant_db:
     extends:
       service: multitenant_db
       file: ./.docker/docker-compose-infra.yml
-
   supavisor:
     extends:
       service: supavisor
       file: ./.docker/docker-compose-infra.yml
-
   supavisor_setup:
     depends_on:
       supavisor:
@@ -75,12 +68,10 @@ services:
     extends:
       service: supavisor_setup
       file: ./.docker/docker-compose-infra.yml
-
   rustfs:
     extends:
       service: rustfs
       file: ./.docker/docker-compose-infra.yml
-
   rustfs_setup:
     extends:
       service: rustfs_setup
@@ -88,33 +79,10 @@ services:
     depends_on:
       rustfs:
         condition: service_healthy
-
   imgproxy:
     extends:
       service: imgproxy
       file: ./.docker/docker-compose-infra.yml
-
-#  Optional for rate-limiting
-#  redis:
-#    extends:
-#      service: redis
-#      file: ./.docker/docker-compose-infra.yml
-
-# Optional for monitoring:
-#  grafana:
-#    extends:
-#      service: grafana
-#      file: ./.docker/docker-compose-monitoring.yml
-#
-#  prometheus:
-#    extends:
-#      service: prometheus
-#      file: ./.docker/docker-compose-monitoring.yml
-#
-#  postgres_exporter:
-#    extends:
-#      service: postgres_exporter
-#      file: ./.docker/docker-compose-monitoring.yml
 
 configs:
   init.sql:
